@@ -102,6 +102,7 @@ import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 
 /**
@@ -124,7 +125,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String QUERY_FLAVOR = "-query";
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     private static final String COMMENT = "_comment";
-    public static final String QUERY_SUFFIX = "form-queries.xml";
     public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
     public static final String VIEW_MODE = "view";
     public static final String EDIT_MODE = "edit";
@@ -257,6 +257,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
             XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
             VersioningMapDao versioningMapDao = (VersioningMapDao) SpringServletAccess.getApplicationContext(context).getBean("versioningMapDao");
+            OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
+
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
             // Cache the subject context for use during xform submission
@@ -276,6 +278,24 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setFormLoadMode(EDIT_MODE);
             String contextHash = cache.putSubjectContext(subjectContext);
             StudyBean parentStudyBean = getParentStudy(currentStudy.getOid(), ds);
+            List<Bind> binds=null;
+
+            String xformOutput = "";
+            int studyFilePath = parentStudyBean.getFilePath();
+
+            do {
+                xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid(),flavor);
+                studyFilePath--;
+            } while (xformOutput.equals("") && studyFilePath > 0);
+
+            // Unmarshal original form layout form
+            Html html = xformParser.unMarshall(xformOutput);
+            Body body = html.getBody();
+            Head head = html.getHead();
+            Model model = head.getModel();
+
+            binds = model.getBind();
+            List<Instance> instances = model.getInstance();
 
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 // This section is for version migration ,where item does not exist in the current formLayout
@@ -292,22 +312,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
                     formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());
                 // Get Original formLayout file from data directory
 
-                String xformOutput = "";
-                int studyFilePath = parentStudyBean.getFilePath();
-
-                do {
-                    xformOutput = getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid());
-                    studyFilePath--;
-                } while (xformOutput.equals("") && studyFilePath > 0);
-
-                // Unmarshal original form layout form
-                Html html = xformParser.unMarshall(xformOutput);
-                Body body = html.getBody();
-                Head head = html.getHead();
-                Model model = head.getModel();
-
-                List<Bind> binds = model.getBind();
-                List<Instance> instances = model.getInstance();
                 binds = getBindElements(binds, item);
                 Itext itext = model.getItext();
 
@@ -353,14 +357,19 @@ public class ResolveDiscrepancyServlet extends SecureController {
             StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
             Role role = currentRole.getRole();
 
+            boolean formContainsContactData=false;
+            if(openRosaServices.isFormContainsContactData(binds))
+                formContainsContactData=true;
+
+
             FormUrlObject formUrlObject = null;
-            if (ecb.getId() > 0) {
+            if (ecb.getId() > 0 ||  (ecb.getId() == 0 && formContainsContactData)) {
                 if (isLocked) {
                     formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role,
-                            EDIT_MODE, loadWarning, true);
+                            EDIT_MODE, loadWarning, true,formContainsContactData,binds,ub);
                 } else
                     formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb,
-                            role, EDIT_MODE, loadWarning, false);
+                            role, EDIT_MODE, loadWarning, false,formContainsContactData,binds,ub);
             } else {
                 String hash = formLayout.getXform();
                 formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
@@ -895,21 +904,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         }
     }
 
-    private String getXformOutput(String studyOID, int studyFilePath, String crfOID, String formLayoutOID) throws IOException {
-        String xformOutput = "";
-        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, studyFilePath, crfOID, formLayoutOID);
-        File dir = new File(directoryPath);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if (child.getName().endsWith(QUERY_SUFFIX)) {
-                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                    break;
-                }
-            }
-        }
-        return xformOutput;
-    }
+
 
     private String viewNotesUrl(String module) {
         String referer = request.getHeader("referer");

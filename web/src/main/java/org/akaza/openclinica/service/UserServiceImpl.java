@@ -2,10 +2,13 @@ package org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.ParticipateInviteEnum;
+import org.akaza.openclinica.ParticipateInviteStatusEnum;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
@@ -17,11 +20,15 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
+import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,23 +39,24 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+
+import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.messageServiceUri;
+import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.sbsUrl;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -120,13 +128,11 @@ public class UserServiceImpl implements UserService {
     public static final String ACCESS_LINK = "accessLink";
     public static final String ACCESS_LINK_PART_URL = "?accessCode=";
     public static final String ENABLED = "enabled";
-    public static final String SEPERATOR = "|";
+    public static final String SEPERATOR = ",";
     public static final String PARTICIPANT_ACCESS_CODE = "_Participant Access Code";
-
+    SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
 
     private String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
-
-    private static String sbsUrl = CoreResources.getField("SBSUrl");
 
     StudyDAO sdao;
 
@@ -139,10 +145,11 @@ public class UserServiceImpl implements UserService {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean userAccountBean, String customerUuid) {
+
+    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,
+                                        UserAccountBean userAccountBean, String customerUuid, ResourceBundle restext) {
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
-
         String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
 
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
@@ -182,19 +189,102 @@ public class UserServiceImpl implements UserService {
         } else {
             logger.info("Participant does not exists or not added yet in OC ");
         }
-        if (participantDTO.isInviteParticipant()) {
+        ParticipateInviteEnum inviteEnum = ParticipateInviteEnum.NO_INVITE;
+        ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
+        if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
             ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
+            boolean updateUserStatus = false;
 
-            sendEmailToParticipant(studySubject, tenantStudy, accessDTO);
-            studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null, tenantStudy, userAccount);
+            if (participantDTO.isInviteViaSms())
+                inviteEnum = ParticipateInviteEnum.SMS_INVITE;
+            if (participantDTO.isInviteParticipant())
+                inviteEnum = ParticipateInviteEnum.EMAIL_INVITE;
+            if (participantDTO.isInviteViaSms() && participantDTO.isInviteParticipant())
+                inviteEnum = ParticipateInviteEnum.BOTH_INVITE;
 
+            boolean smsToParticipant = false;
+            if (participantDTO.isInviteViaSms()) {
+                smsToParticipant = sendSMSToParticipant(accessToken, participantDTO, tenantStudy, accessDTO);
+            }
+            boolean emailToParticipant = false;
+            if (participantDTO.isInviteParticipant()) {
+                emailToParticipant = sendEmailToParticipant(studySubject, tenantStudy, accessDTO);
+            }
+            if (inviteEnum == ParticipateInviteEnum.BOTH_INVITE) {
+                if (emailToParticipant)
+                    inviteStatusEnum = ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS;
+                else
+                    inviteStatusEnum = ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
+
+                if (smsToParticipant) {
+                    if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
+                        inviteStatusEnum = ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS;
+                    else if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL)
+                        inviteStatusEnum = ParticipateInviteStatusEnum.EMAIL_FAIL_SMS_SUCCESS;
+                } else {
+                    if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL)
+                        inviteStatusEnum = ParticipateInviteStatusEnum.BOTH_INVITE_FAIL;
+                    else
+                        inviteStatusEnum = ParticipateInviteStatusEnum.EMAIL_SUCCESS_SMS_FAIL;
+                }
+            } else if (inviteEnum == ParticipateInviteEnum.SMS_INVITE) {
+                inviteStatusEnum = smsToParticipant ? ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS : ParticipateInviteStatusEnum.SMS_INVITE_FAIL;
+            } else if (inviteEnum == ParticipateInviteEnum.EMAIL_INVITE) {
+                inviteStatusEnum = emailToParticipant ? ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS : ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
+            }
+            if ((inviteEnum != ParticipateInviteEnum.NO_INVITE) &&
+                    ((inviteStatusEnum == ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS)
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS)
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_SUCCESS_SMS_FAIL)
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_FAIL_SMS_SUCCESS))) {
+                // change status only if it was CREATED
+                UserStatus newStatus = (studySubject.getUserStatus() == UserStatus.CREATED) ? UserStatus.INVITED : studySubject.getUserStatus();
+                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, newStatus, null, tenantStudy, userAccount);
+            }
         }
+
         ocUserDTO = buildOcUserDTO(studySubject);
+        ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum, restext));
 
         return ocUserDTO;
     }
 
+    private String getErrorMessage(ParticipateInviteEnum inviteEnum, ParticipateInviteStatusEnum inviteStatusEnum, ResourceBundle restext) {
+        String message = null;
+        if (inviteEnum == ParticipateInviteEnum.NO_INVITE)
+            return message;
+        switch(inviteStatusEnum) {
+            case EMAIL_INVITE_SUCCESS:
+                message = restext.getString("email_invite_success");
+                break;
+            case SMS_INVITE_SUCCESS:
+                message = restext.getString("sms_invite_success");
+                break;
+            case EMAIL_INVITE_FAIL:
+                message = restext.getString("email_invite_fail");
+                break;
+            case SMS_INVITE_FAIL:
+                message = restext.getString("sms_invite_fail");
+                break;
+            case EMAIL_SUCCESS_SMS_FAIL:
+                message = restext.getString("email_success_sms_fail");
+                break;
+            case EMAIL_FAIL_SMS_SUCCESS:
+                message = restext.getString("email_fail_sms_success");
+                break;
+            case BOTH_INVITE_FAIL:
+                message = restext.getString("both_invite_fail");
+                break;
+            case BOTH_INVITE_SUCCESS:
+                message = restext.getString("both_invite_success");
+                break;
+            default:
+                break;
+        }
+        return message;
+    }
     private StudySubject saveOrUpdateStudySubject(StudySubject studySubject, OCParticipantDTO participantDTO,
                                                   UserStatus userStatus, Integer userId, Study tenantStudy, UserAccount userAccount) {
 
@@ -209,19 +299,25 @@ public class UserServiceImpl implements UserService {
         }
 
         if (studySubject.getStudySubjectDetail() == null) {
+            studySubjectDao.saveOrUpdate(studySubject);
             StudySubjectDetail studySubjectDetail = new StudySubjectDetail();
             studySubject.setStudySubjectDetail(studySubjectDetail);
         }
-        studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName());
+        if (participantDTO.getFirstName() != null)
+        studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() != null ? participantDTO.getFirstName() : "");
 
         if (validateService.isParticipateActive(tenantStudy)) {
-            studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail());
-            studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber());
+            if (participantDTO.getEmail() != null)
+                studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() != null ? participantDTO.getEmail() : "");
+            if (participantDTO.getPhoneNumber() != null)
+            studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() != null ? participantDTO.getPhoneNumber() : "");
         }
 
         if (validateService.isAdvanceSearchEnabled(tenantStudy)) {
-            studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName());
-            studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier());
+            if (participantDTO.getLastName() != null)
+                studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() != null ? participantDTO.getLastName() : "");
+            if (participantDTO.getIdentifier() != null)
+                studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier() != null ? participantDTO.getIdentifier() : "");
         }
         return studySubjectDao.saveOrUpdate(studySubject);
 
@@ -241,7 +337,8 @@ public class UserServiceImpl implements UserService {
         // Get all list of StudySubjects by studyId
         List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId());
         List<OCUserDTO> userDTOS = new ArrayList<>();
-        String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
+        sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
 
         try {
             for (StudySubject studySubject : studySubjects) {
@@ -372,7 +469,43 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void sendEmailToParticipant(StudySubject studySubject, Study tenantStudy, ParticipantAccessDTO accessDTO) {
+    private boolean sendSMSToParticipant (String accessToken, OCParticipantDTO participantDTO, Study tenantStudy, ParticipantAccessDTO accessDTO) {
+        String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
+
+        StringBuffer buffer = new StringBuffer("Hi ").append(participantDTO.getFirstName())
+                .append(", Thanks for participating in ").append(studyName).append("! ")
+        .append("Please follow the link below to get started. ").append(System.lineSeparator())
+        .append("For future reference, your access code is ").append(accessDTO.getAccessCode())
+        .append(System.lineSeparator()).append(accessDTO.getAccessLink());
+
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        OCMessageDTO messageDTO = new OCMessageDTO();
+        messageDTO.setReceiverPhone(StringUtils.remove(participantDTO.getPhoneNumber(), " "));
+        messageDTO.setMessage(buffer.toString());
+        HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
+
+        ResponseEntity<String> result = null;
+        try {
+            result = restTemplate.postForEntity(messageServiceUri, request, String.class);
+        } catch (RestClientException e) {
+            logger.error("sendMessage failed with :" + e);
+            return false;
+        }
+        if (result.getStatusCode() != HttpStatus.OK) {
+            logger.error("sendMessage failed with :" + result.getStatusCode());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean sendEmailToParticipant(StudySubject studySubject, Study tenantStudy, ParticipantAccessDTO accessDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
         pDTO.setEmailAccount(studySubject.getStudySubjectDetail().getEmail());
         pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
@@ -422,11 +555,11 @@ public class UserServiceImpl implements UserService {
 
         pDTO.setMessage(sb.toString());
 
-        sendEmailToParticipant(pDTO);
+        return sendEmailToParticipant(pDTO);
 
     }
 
-    private void sendEmailToParticipant(ParticipantDTO pDTO) throws OpenClinicaSystemException {
+    private boolean sendEmailToParticipant(ParticipantDTO pDTO) throws OpenClinicaSystemException {
 
         logger.info("Sending email...");
         try {
@@ -439,13 +572,13 @@ public class UserServiceImpl implements UserService {
 
             mailSender.send(mimeMessage);
             logger.debug("Email sent successfully on {}", new Date());
+            return true;
         } catch (MailException me) {
-            logger.error("Email could not be sent");
-            throw new OpenClinicaSystemException(me.getMessage());
+            logger.error("Email could not be sent:" + me.getMessage());
         } catch (MessagingException me) {
-            logger.error("Email could not be sent");
-            throw new OpenClinicaSystemException(me.getMessage());
+            logger.error("Email could not be sent:" + me.getMessage());
         }
+        return false;
     }
 
 
@@ -651,7 +784,9 @@ public class UserServiceImpl implements UserService {
         jobDetail.setType(jobType);
         jobDetail.setUuid(UUID.randomUUID().toString());
         jobDetail.setSourceFileName(sourceFileName);
-        return jobService.saveOrUpdateJob(jobDetail);
+        jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has started",jobDetail.getJobDetailId());
+        return jobDetail;
     }
 
 
@@ -660,6 +795,7 @@ public class UserServiceImpl implements UserService {
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.COMPLETED);
         jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has completed",jobDetail.getJobDetailId());
     }
 
     public void persistJobFailed(JobDetail jobDetail,String fileName) {
@@ -667,6 +803,7 @@ public class UserServiceImpl implements UserService {
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.FAILED);
         jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has failed",jobDetail.getJobDetailId());
     }
 
 

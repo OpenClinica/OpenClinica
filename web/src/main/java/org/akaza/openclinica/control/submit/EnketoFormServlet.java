@@ -10,12 +10,16 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.xform.XformParser;
+import org.akaza.openclinica.domain.xform.dto.*;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.crfdata.FormUrlObject;
+import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -51,6 +55,9 @@ public class EnketoFormServlet extends SecureController {
 
         EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
         EnketoCredentials enketoCredentials = (EnketoCredentials) SpringServletAccess.getApplicationContext(context).getBean("enketoCredentials");
+        XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
+        OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
+
         String mode = request.getParameter(MODE);
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
@@ -86,6 +93,12 @@ public class EnketoFormServlet extends SecureController {
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role role = currentRole.getRole();
         EventCrf eventCrf = null;
+        boolean preview=false;
+        if(eventCrfId==0 && studyEvent==null){
+            preview=true;
+        }
+
+
         if (eventCrfId == 0 && studyEvent != null && formLayout != null) {
             eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
             if (eventCrf != null) {
@@ -114,10 +127,17 @@ public class EnketoFormServlet extends SecureController {
             flavor = QUERY_FLAVOR;
         }
 
-        if (Integer.valueOf(eventCrfId) > 0) {
+
+   List<Bind> binds = openRosaServices.getBinds(formLayout, flavor, parentStudy.getOc_oid());
+        boolean formContainsContactData=false;
+        if(openRosaServices.isFormContainsContactData(binds))
+            formContainsContactData=true;
+
+
+        if (Integer.valueOf(eventCrfId) > 0 || (Integer.valueOf(eventCrfId) == 0 && formContainsContactData && !preview)) {
             logger.info("eventCrfId:" + eventCrfId + " user:" + ub.getName());
             formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout,
-                    flavor, null, role, mode, loadWarning, isFormLocked);
+                    flavor, null, role, mode, loadWarning, isFormLocked,formContainsContactData,binds,ub);
         } else if (Integer.valueOf(eventCrfId) == 0) {
             logger.info("eventCrfId is zero user:" + ub.getName());
             String hash = formLayout.getXform();

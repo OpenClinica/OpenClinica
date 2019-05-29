@@ -26,9 +26,12 @@
                     <b><fmt:message key="viewStudySubject.casebookGenerationForm.options" bundle="${resword}"/></b><br>
                     <input type="checkbox" checked="" value="includeDNs=y" id="casebookParamDn" name="casebookParam">
                     <fmt:message key="viewStudySubject.casebookGenerationForm.option.dn" bundle="${resword}"/>
-                    <input type="checkbox" checked="" value="includeAudits=y" id="casebookParamAudit"
-                           name="casebookParam">
+                    <input type="checkbox" checked="" value="includeAudits=y" id="casebookParamAudit" name="casebookParam">
                     <fmt:message key="viewStudySubject.casebookGenerationForm.option.auditTrail" bundle="${resword}"/>
+                    <input type="checkbox" checked="" value="includeMetadata=y" anti-value="includeMetadata=n" id="casebookParamMetadata" name="casebookParam">
+                    <fmt:message key="viewStudySubject.casebookGenerationForm.option.includeMetadata" bundle="${resword}"/>
+                    <input type="checkbox" checked="" value="showArchived=y" anti-value="showArchived=n" id="casebookParamArchived" name="casebookParam">
+                    <fmt:message key="viewStudySubject.casebookGenerationForm.option.includeArchived" bundle="${resword}"/>
                 </div>
 
                 <div style="margin-bottom:10px;" class="connect-widget">

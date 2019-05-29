@@ -32,6 +32,8 @@ import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
@@ -127,8 +129,9 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
+        ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
 
-        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid);
+        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid, textsBundle);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
@@ -193,7 +196,7 @@ public class UserController {
     }
 
     @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
-    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.GET )
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST )
     public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
@@ -218,12 +221,13 @@ public class UserController {
             if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
             }
-            if (!validateService.isUserHasCrcOrInvestigaterRole(userRoles)) {
+
+            if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToSite(userRoles,siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+            }else if (!validateService.isUserHas_CRC_INV_RoleInSite(userRoles,siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
             }
-            if (!validateService.isUserRoleHasAccessToSite(userRoles, siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-            }
+
             if (!validateService.isParticipateActive(tenantStudy)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
             }
@@ -289,7 +293,11 @@ public class UserController {
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
         JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE,null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
-            userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean,schema,jobDetail);
+            try {
+                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail);
+            }catch(Exception e) {
+                logger.error("Exeception is thrown while extracting job : " + e);
+            }
             return null;
         });
         return jobDetail.getUuid();

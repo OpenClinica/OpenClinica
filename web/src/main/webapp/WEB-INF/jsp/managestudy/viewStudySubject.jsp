@@ -242,6 +242,10 @@
   .error {
     color: red;
   }
+  .yes-no-question {
+    display: inline-block;
+    width: 165px;
+  }
   .invite-input {
     width: 250px;
   }
@@ -273,6 +277,9 @@
   }
   .grayed-out {
     color: #999;
+  }
+  #inviteResultAlert > table {
+    width: 600px;
   }
 </style>
 <!-- then instructions-->
@@ -343,7 +350,7 @@
           <td>
             <c:if test="${
               studySub.status.name!='removed' &&
-              (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
+              (sessionScope.customUserRole=='Clinical Research Coordinator' || sessionScope.customUserRole=='Investigator')
             }">
               <c:if test="${participateStatus=='enabled'}">
                 <a href="javascript:;" id="contactInformation">
@@ -358,7 +365,7 @@
               </c:if>
               <c:if test="${participateStatus!='enabled' && advsearchStatus=='enabled'}">
                 <a href="javascript:;" id="partid-edit">
-                  <fmt:message key="partid_edit" bundle="${resword}"/>
+                  <fmt:message key="edit" bundle="${resword}"/>
                 </a>
               </c:if>
             </c:if>
@@ -380,17 +387,17 @@
                               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tbody>
                                   <tr>
-                                    <td class="table_header_column_top">
+                                    <td class="table_header_column_top" width="25%">
                                       <fmt:message key="study_subject_ID" bundle="${resword}"/>
                                     </td>
-                                    <td class="table_cell_top">
+                                    <td class="table_cell_top" width="25%">
                                       <c:out value="${studySub.label}"/>
                                     </td>
 
-                                    <td class="table_header_column">
+                                    <td class="table_header_column" width="25%">
                                       <fmt:message key="status" bundle="${resword}"/>
                                     </td>
-                                    <td class="table_cell">
+                                    <td class="table_cell" width="25%">
                                       <c:out value="${studySub.status.name}"/>
                                     </td>
                                   </tr>
@@ -449,26 +456,26 @@
                             <div class="tablebox_center">
                               <c:if test="${
                                 studySub.status.name!='removed' &&
-                                (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
+                                (sessionScope.customUserRole=='Clinical Research Coordinator' || sessionScope.customUserRole=='Investigator')
                               }">
                                 <c:if test="${participateStatus=='enabled'}">
                                   <!-- Table Contents -->
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                       <tr>
-                                        <td class="table_header_column_top">
+                                        <td class="table_header_column_top" width="25%">
                                           <fmt:message key="first_name" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-fname">
+                                        <td class="table_cell_top" id="info-fname" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
 
                                         <c:choose>
                                           <c:when test="${advsearchStatus=='enabled'}">
-                                            <td class="table_header_column_top">
+                                            <td class="table_header_column_top" width="25%">
                                               <fmt:message key="last_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-lname">
+                                            <td class="table_cell_top" id="info-lname" width="25%">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -482,10 +489,10 @@
                                           </c:when>
                                         </c:choose>
 
-                                        <td class="table_header_column">
+                                        <td class="table_header_column" width="25%">
                                           Mobile Number
                                         </td>
-                                        <td class="table_cell" id="info-phone-number">
+                                        <td class="table_cell" id="info-phone-number" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>
@@ -1225,7 +1232,7 @@
                   </td>
                   <td valign="top">
                     <input id="email-input" onfocus="this.select()" type="text" value="" size="45" maxlength="255" class="formfield form-control invite-input">
-                    <div id="email-input-info" class="grayed-out">
+                    <div id="email-input-info" class="invisible">
                       <fmt:message key="invite_required" bundle="${resword}"/>
                       <br>
                       <fmt:message key="invite_required_line2" bundle="${resword}"/>
@@ -1237,15 +1244,15 @@
                 </tr>
                 <tr valign="top">
                   <td></td>
-                  <td valign="top" id="invite-option">
-                    <span style="margin-right:15px;">
+                  <td valign="top" id="invite_via_email">
+                    <span class="yes-no-question">
                       <fmt:message key="invite_via_email" bundle="${resword}"/>
                     </span>
-                    <label><input type="radio" name="invite-option" value="true">
+                    <label><input type="radio" name="invite_via_email" value="true">
                       <fmt:message key="invite_yes" bundle="${resword}"/>
                     </label>
                     &emsp;
-                    <label><input type="radio" name="invite-option" value="false" checked="checked">
+                    <label><input type="radio" name="invite_via_email" value="false" checked="checked">
                       <fmt:message key="invite_no" bundle="${resword}"/>
                     </label>
                   </td>
@@ -1305,7 +1312,7 @@
                       }
                     </style>
                     <div id="phone-widget">
-                      <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()" maxlength="15"> 
+                      <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()"> 
                       <div id="country-select">
                         <div id="country-flag" class="down-arrow">&nbsp;</div> 
                         <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
@@ -1526,6 +1533,21 @@
                     </div>
                   </td>
                 </tr>
+                <tr valign="top">
+                  <td></td>
+                  <td valign="top" id="invite_via_sms">
+                    <span class="yes-no-question">
+                      <fmt:message key="invite_via_sms" bundle="${resword}"/>
+                    </span>
+                    <label><input type="radio" name="invite_via_sms" value="true">
+                      <fmt:message key="invite_yes" bundle="${resword}"/>
+                    </label>
+                    &emsp;
+                    <label><input type="radio" name="invite_via_sms" value="false" checked="checked">
+                      <fmt:message key="invite_no" bundle="${resword}"/>
+                    </label>
+                  </td>
+                </tr>
               </c:when>
             </c:choose>
           </table>
@@ -1537,7 +1559,10 @@
     </tr>
     <tr>
       <td colspan="2" style="text-align: right;">
-        <input type="button" class="cancel" value="Cancel"/>
+        <span id="inviting" class="left hide">
+          <img src='images/loading.gif'> Inviting...
+        </span>
+        <input type="button" id="cancel-button" class="cancel" value="Cancel"/>
         <input type="button" id="connect-button" value="Update"/>
       </td>
     </tr>
@@ -1604,6 +1629,36 @@
   </form>
 </div>
 
+<div id="inviteResultAlert" class="hide">
+  <table border="0" cellpadding="0" align="center" style="cursor:default;">
+    <tr style="height:10px;">
+      <td class="formlabel" align="left">
+        <h3>
+          <fmt:message key="update_and_invite" bundle="${resword}"/>
+        </h3>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td>
+        <div id="inviteResultMessage">
+        </div>
+        <br>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <input type="button" class="cancel right" value='<fmt:message key="close" bundle="${resword}"/>'/>
+      </td>
+    </tr>
+  </table>
+</div>
+
 <script type="text/javascript">
 
     var jsAtt = '${showOverlay}';
@@ -1640,13 +1695,21 @@
         var hasEmail = !!$('#email-input').val().trim();
         var validEmail = $('#email-input-error').is(':hidden');
         if (hasEmail && validEmail) {
-            $('#invite-option input').removeAttr("disabled");
+            $('#invite_via_email input').removeAttr("disabled");
         }
         else {
-            $('#invite-option input').attr("disabled", "disabled");
+            $('#invite_via_email input').attr("disabled", "disabled");
         }
 
+        var hasPhone = !!$('#phone-input').val().trim();
         var validPhone = $('#phone-input-error').is(':hidden');
+        if (hasPhone && validPhone) {
+            $('#invite_via_sms input').removeAttr("disabled");
+        }
+        else {
+            $('#invite_via_sms input').attr("disabled", "disabled");
+        }
+
         if (validEmail && validPhone)
             $('#connect-button').removeAttr('disabled');
         else
@@ -1687,18 +1750,38 @@
                 lastName: $('#lname-input').val(),
                 email: $('#email-input').val(),
                 phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
-                inviteParticipant: $('#invite-option input:checked').val(),
+                inviteParticipant: $('#invite_via_email input:checked').val(),
+                inviteViaSms: $('#invite_via_sms input:checked').val(),
                 identifier: $('#secid-input').val()
             };
+            if (data.inviteParticipant === 'true' || data.inviteViaSms === 'true') {
+                $('#inviting').show();
+                $('#connect-button, #cancel-button').attr('disabled', 'disabled');
+            }
+            else {
+                jQuery.unblockUI();
+            }
+            function doneInviting(result) {
+                if ($('#inviting').is(':hidden'))
+                    return;
+                $('#inviting').hide();
+                $('#connect-button, #cancel-button').removeAttr('disabled');
+                $('#inviteResultMessage').html(result);
+                jQuery.blockUI({message: jQuery('#inviteResultAlert'), css:{left: "300px", top:"100px" }});
+            }
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: updateParticipateInfo,
-                error: logDump
+                success: function(data) {
+                    updateParticipateInfo(data);
+                    doneInviting(data.errorMessage || '<fmt:message key="invite_result_unknown" bundle="${resword}"/>');
+                },
+                error: function() {
+                    doneInviting('<fmt:message key="invite_result_error" bundle="${resword}"/>: ' + arguments[2]);
+                }
             });
-            jQuery.unblockUI();
             return false;
         });
 
@@ -1721,18 +1804,29 @@
             }
             enableDisableControls();
         });
-        jQuery('#phone-input').on('input blur', function() {
+
+        function checkPhoneMaxLength() {
+            var maxLength = 15;
+            var ccLength = $('#country-code').text().replace(/ |-|\+/g, '').length;
+            var phoneLength = $('#phone-input').val().replace(/ |-|\+/g, '').length;
+            var totalLength = ccLength + phoneLength;
+            if (totalLength > maxLength) {
+                var extraLength = totalLength - maxLength;
+                $('#phone-input').val($('#phone-input').val().substring(0, phoneLength - extraLength));
+            }
+        }
+
+        jQuery('#phone-input').on('input blur paste', function() {
+            checkPhoneMaxLength();
             var phonePattern = /^[0-9 -]*$/;
-            var input = $(this).val();
-            var length = input.replace(/ |-/g, '').length;
-            var isValid = phonePattern.test(input) && length <= 12;
+            var isValid = phonePattern.test($(this).val());
             if (isValid) {
                 $('#phone-input-error').hide();
             }
             else {
                 $('#phone-input-error').show();
             }
-            enableDisableControls();
+            enableDisableControls();            
         });
 
         jQuery('#contactInformation, #partid-edit').click(function() {
@@ -1747,9 +1841,19 @@
             $('#country-code').text(countryCode || '+1');
             $('#phone-input').val(phoneNumber);
 
+            var shownFlag = $('#country-flag').css('background-position');
+            var shownCountryCode = $('#country-options tr.country-option').filter(function() {
+              return $('div.the-flag', this).css('background-position') === shownFlag;
+            }).find('span.the-country-code').text();
+            if (shownCountryCode !== countryCode) {
+              $('#country-options span.the-country-code').filter(function() {
+                return $(this).text() === countryCode;
+              }).click();
+            }
+
             $('#email-input-error').hide();
             $('#phone-input-error').hide();
-            $('#invite-option input[value=' + participateInfo.inviteParticipant + ']').click();
+            $('#invite_via_email input[value=' + participateInfo.inviteParticipant + ']').click();
 
             enableDisableControls();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });

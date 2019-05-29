@@ -1,11 +1,13 @@
 package org.akaza.openclinica.controller;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -14,12 +16,19 @@ import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.xform.XformParser;
+import org.akaza.openclinica.domain.xform.dto.*;
 import org.akaza.openclinica.service.ParticipateService;
+import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.crfdata.FormUrlObject;
+import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -50,6 +59,19 @@ public class EditFormController {
     @Autowired
     EnketoUrlService urlService;
 
+    @Autowired
+    XformParser xformParser;
+
+    @Autowired
+    EnketoCredentials enketoCredentials;
+
+    @Autowired
+    OpenRosaServices openRosaServices;
+
+    @Autowired
+    private UtilService utilService;
+
+
     private RestfulServiceHelper restfulServiceHelper;
 
     public static final String FORM_CONTEXT = "ecid";
@@ -61,6 +83,9 @@ public class EditFormController {
     public static final String QUERY_FLAVOR = "-query";
     public static final String PARTICIPATE_FLAVOR = "-participate";
     public static final String NO_FLAVOR = "";
+    public static final String CONTACTDATA = "contactdata";
+
+
 
     /**
      * @api {get} /pages/api/v1/editform/:studyOid/url Get Form Edit URL
@@ -104,11 +129,20 @@ public class EditFormController {
 
         subjectContext.setStudySubjectOid(subjectContextMap.get("studySubjectOID"));
         subjectContext.setOrdinal(subjectContextMap.get("studyEventOrdinal"));
+        subjectContext.setUserAccountId(subjectContextMap.get("userAccountID"));
+        UserAccountDAO udao = new UserAccountDAO(dataSource);
+        UserAccountBean ub = (UserAccountBean) udao.findByPK(Integer.parseInt(subjectContextMap.get("userAccountID")));
 
         FormLayout formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         Role role = Role.RESEARCHASSISTANT;
         String mode = PFormCache.PARTICIPATE_MODE;
-        editURL = urlService.getActionUrl(formContext, subjectContext, studyOID, formLayout, PARTICIPATE_FLAVOR, null, role, mode, null, false);
+
+        List <Bind> binds = openRosaServices.getBinds(formLayout,PARTICIPATE_FLAVOR,studyOID);
+        boolean formContainsContactData=false;
+        if(openRosaServices.isFormContainsContactData(binds))
+            formContainsContactData=true;
+
+        editURL = urlService.getActionUrl(formContext, subjectContext, studyOID, formLayout, PARTICIPATE_FLAVOR, null, role, mode, null, false,formContainsContactData,binds,ub);
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL.getFormUrl(), org.springframework.http.HttpStatus.ACCEPTED);

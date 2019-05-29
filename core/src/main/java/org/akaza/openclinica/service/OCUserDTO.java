@@ -47,7 +47,10 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     private String accessCode;
 
+    private String errorMessage;
 
+    public OCUserDTO() {
+    }
 
     public String getUuid() {
         return uuid;
@@ -192,6 +195,7 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
                 ", externalUserId='" + getExternalUserId() + "'" +
                 ", organization='" + getOrganization() + "'" +
                 ", status='" + getStatus() + "'" +
+                ", errorMessage='" + getErrorMessage() + "'" +
                 ", lastSuccessfulLogin='" + getLastSuccessfulLogin() + "'" +
                 "}";
     }
@@ -210,5 +214,13 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     public void setAccessCode(String accessCode) {
         this.accessCode = accessCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

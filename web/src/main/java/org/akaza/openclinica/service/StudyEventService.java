@@ -8,9 +8,9 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 
 public interface StudyEventService {
 
-	RestReponseDTO scheduleStudyEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate);
+	RestReponseDTO scheduleStudyEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId, String startDate,String endDate);
 
 	RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, String siteOID, String studyEventOID,
-			String participantId, String sampleOrdinalStr, String startDate, String endDate);
+			String participantId,  String startDate, String endDate);
 	
 }

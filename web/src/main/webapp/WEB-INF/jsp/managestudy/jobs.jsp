@@ -49,14 +49,12 @@
     border: 1px solid #ccc;
     border-bottom-color: #ccc !important;
   }
-  .datatable thead td {
-    border-color: white !important;
-  }
   .datatable thead th {
     background-color: #ccc;
     font-weight: normal !important;
     padding: 3px;
     border-bottom: none !important;
+    border: 1px solid white;
   }
   .datatable tbody td:last-child {
     text-align: center;
@@ -68,8 +66,16 @@
   #tbl-jobs_filter {
     margin-bottom: 3px;
   }
+  #tbl-jobs_wrapper {
+    margin-top: 30px;
+  }
   .icon {
     cursor: pointer;
+  }
+  input[type=search] {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 6px;
   }
 </style>
 
@@ -86,8 +92,10 @@
 <table id="tbl-jobs" class="datatable">
   <thead>
     <tr>
-      <th><fmt:message key="log_file" bundle="${resword}"/></th>
+      <th><fmt:message key="jobs_source_filename" bundle="${resword}"/></th>
       <th><fmt:message key="job_type" bundle="${resword}"/></th>
+      <th><fmt:message key="site_name" bundle="${resword}"/></th>
+      <th><fmt:message key="job_status" bundle="${resword}"/></th>
       <th><fmt:message key="created_on" bundle="${resword}"/></th>
       <th><fmt:message key="created_by" bundle="${resword}"/></th>
       <th><fmt:message key="completed_on" bundle="${resword}"/></th>
@@ -100,7 +108,7 @@
 
 <script>
 $('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html#/job-controller');
-var dateFormat = 'DD-MMM-YYYY HH:mm:ss Z';
+var dateFormat = 'hh:mma MMM DD YYYY';
 function formatDate(date) {
   return moment(date).format(dateFormat);
 }
@@ -140,14 +148,21 @@ jQuery.ajax({
   url: url,
   success: function(data) {
     datatable.rows.add(data.map(function (logEntry) {
+      var actionView = '<a target="_blank" href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile?open=true"><span class="icon icon-search"></span></a> ';
+      var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
+      var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
+      if (logEntry.status === 'IN_PROGRESS') {
+        actionView = actionDownload = actionDelete = '';
+      }
       return [
         logEntry.sourceFileName,
         logEntry.type,
+        logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid,
+        logEntry.status,
         formatDate(logEntry.dateCreated),
         logEntry.createdByUsername,
         formatDate(logEntry.dateCompleted),
-        '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ' + 
-        '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>'
+        actionView + actionDownload + actionDelete
       ];
     }));
     datatable.draw();

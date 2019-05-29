@@ -31,6 +31,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -58,15 +59,15 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     private final String COMMON = "common";
     private StudyDAO sdao;
     private String[] permissionTagsStringArray;
-    private boolean crossForm;
+    private ODMFilterDTO odmFilter;
 
-    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean , boolean crossForm,String[] permissionTagsStringArray) {
+    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean , ODMFilterDTO odmFilter, String[] permissionTagsStringArray) {
         super();
         this.clinicalData = clinicaldata;
         this.dataSource = dataSource;
         this.userBean = userBean;
         this.permissionTagsStringArray=permissionTagsStringArray;
-        this.crossForm=crossForm;
+        this.odmFilter = odmFilter;
 
     }
 
@@ -103,7 +104,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         StudyBean userRoleStudy = CoreResources.getPublicStudy(userRole.getStudyId(), dataSource);
         setRoleDescription(role, userRoleStudy);
 
-        if (crossForm) {
+        if (odmFilter.isCrossForm()) {
             xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");
         }
 
@@ -160,7 +161,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
             // Subject
             // ***************** OpenClinica: Subject Links Start**************
-            if (role != null && !role.getName().equals("invalid")) {
+            if (odmFilter.includeLinks() && (role != null && !role.getName().equals("invalid"))) {
                 xml.append(indent + indent + indent + "<OpenClinica:Links>");
                 xml.append(nls);
 
@@ -193,7 +194,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             //
             for (ExportStudyEventDataBean se : ses) {
 
-                if (!crossForm || (crossForm && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
+                if (!odmFilter.isCrossForm() || (odmFilter.isCrossForm() && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
                     // For developers, please do not change order of properties sorted, it will break OpenRosaService
                     // Manifest Call for odm file
                     xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
@@ -230,7 +231,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     StudyEvent studyEvent = se.getStudyEvent();
 
                     // ***************** OpenClinica: Event Links Start **************
-                    if (role != null && !role.getName().equals("invalid") && se.getExportFormData().size() != 0) {
+                    if (odmFilter.includeLinks() && (role != null && !role.getName().equals("invalid") && se.getExportFormData().size() != 0)) {
                         xml.append(indent + indent + indent + indent + "<OpenClinica:Links>");
                         xml.append(nls);
 
@@ -310,7 +311,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     //
                     ArrayList<ExportFormDataBean> forms = se.getExportFormData();
                     for (ExportFormDataBean form : forms) {
-                        if (!crossForm || (crossForm && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
+                        if (!odmFilter.isCrossForm() || (odmFilter.isCrossForm() && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
 
                             xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
                             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
@@ -360,7 +361,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             EventDefinitionCrf eventDefinitionCrf = form.getEventDefinitionCrf();
 
                             // ***************** OpenClinica: Form Links Start **************
-                            if (role != null && !role.getName().equals("invalid")) {
+                            if (odmFilter.includeLinks() && (role != null && !role.getName().equals("invalid"))) {
 
                                 xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Links>");
                                 xml.append(nls);
@@ -1021,6 +1022,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         auditLogEventTypes.add(47);
         auditLogEventTypes.add(49);
         auditLogEventTypes.add(50);
+        auditLogEventTypes.add(53);
+        auditLogEventTypes.add(56);
         return auditLogEventTypes;
     }
 

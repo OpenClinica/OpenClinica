@@ -48,6 +48,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.service.extract.OdmFileCreation;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
@@ -194,6 +195,8 @@ public class XsltTransformJob extends QuartzJobBean {
             String permissionTagsString = (String) context.getScheduler().getContext().get("permissionTagsString");
             String[] permissionTagsStringArray = (String[]) context.getScheduler().getContext().get("permissionTagsStringArray");
             List <String> permissionTagsList = (List <String>) context.getScheduler().getContext().get("permissionTagsList");
+
+            ODMFilterDTO odmFilter = (ODMFilterDTO) context.getScheduler().getContext().get("odmFilter");
             Set<Integer> edcSet = new HashSet<>();
 
             ArchivedDatasetFileBean fbFinal=null;
@@ -203,7 +206,7 @@ public class XsltTransformJob extends QuartzJobBean {
                     odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
                             currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
                             (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType(),
-                            userBean,permissionTagsString,permissionTagsStringArray ,edcSet);
+                            userBean, odmFilter, permissionTagsString, permissionTagsStringArray, edcSet);
 
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for

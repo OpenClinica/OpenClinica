@@ -53,6 +53,11 @@ public class Term extends EntityBean {
         // return this.description;
     }
 
+    public String getPlainDescription() {
+            return this.description;
+    }
+
+
     /**
      * @param description
      *            The description to set.

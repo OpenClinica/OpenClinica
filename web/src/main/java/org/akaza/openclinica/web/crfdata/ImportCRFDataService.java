@@ -187,7 +187,8 @@ public class ImportCRFDataService {
     					
 						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
 						if(sqlStr != null) {
-							matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr); 
+							ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
+							matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
     		                matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
 						}
 		                    
@@ -1769,7 +1770,8 @@ public class ImportCRFDataService {
                 
                 // test skip
                 String sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
-                ArrayList matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr); 
+                ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
+                ArrayList matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
                 boolean matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
                 
                 
@@ -2240,6 +2242,30 @@ public class ImportCRFDataService {
     	
     }
     
+    public ArrayList<String> getSkipMatchCriteriaItemOIDs(HttpServletRequest request){
+    
+    	ArrayList<String> skipMatchCriteriaOids = new ArrayList();
+    	String[] skipMatchCriteriaArray = null;
+    	
+    	String skipMatchCriteria = request.getHeader("SkipMatchCriteria");
+    	if(skipMatchCriteria != null && skipMatchCriteria.trim().length() > 0 && !(skipMatchCriteria.equals("${SkipMatchCriteria}"))) {
+    		skipMatchCriteriaArray = this.toArray(skipMatchCriteria, ",");
+    	
+        	String itemOID;        	
+        	
+        	for(int  i= 0; i< skipMatchCriteriaArray.length; i++) {
+        		int k = skipMatchCriteriaArray[i].indexOf(".");        	
+        		itemOID =  skipMatchCriteriaArray[i].substring(k+1, skipMatchCriteriaArray[i].length()).trim();
+       		        	
+        		skipMatchCriteriaOids.add(itemOID);        		        		
+        	}
+     }
+		
+    
+		return skipMatchCriteriaOids;
+    	
+    }
+    
     private String[] toArray(String columnNmsStr,String delemiterStr) {
 		StringTokenizer st = new StringTokenizer(columnNmsStr, delemiterStr);
 		int size =st.countTokens();
@@ -2289,35 +2315,77 @@ public class ImportCRFDataService {
 		    	itemValue = (String) rowhm.get(itemOID);
 		    	
 		    	
-		    	for (FormDataBean formDataBean : formDataBeans) {
-		    		
-		    		 ArrayList<ImportItemGroupDataBean> importItemGroupDataBeans= formDataBean.getItemGroupData();
-		    		 for(ImportItemGroupDataBean importItemGroupDataBean:importItemGroupDataBeans) {
-		    			 
-		    			 ArrayList<ImportItemDataBean> importItemDataBeans=importItemGroupDataBean.getItemData();
-		    			 for(ImportItemDataBean importItemDataBean:importItemDataBeans) {
-		    				 itemOIDinODMxml = importItemDataBean.getItemOID();
-		    				 itemValueinODMxml = importItemDataBean.getValue();
-		    				 
-		    				 // find the itemOID first, then compare the value
-		    				 if(itemOID.equals(itemOIDinODMxml) ) {
-		    					 if(itemValue.equals(itemValueinODMxml)){
-		    						 matchCheck[i] = true;
-		    						 break;
-		    					 }else {
-		    						 matchCheck[i] = false;
-		    					 }
-		    				 }
-		    				 
+		    	if(itemValue != null && itemValue.trim().length() > 0) {
+		    		for (FormDataBean formDataBean : formDataBeans) {
+			    		
+			    		 ArrayList<ImportItemGroupDataBean> importItemGroupDataBeans= formDataBean.getItemGroupData();
+			    		 for(ImportItemGroupDataBean importItemGroupDataBean:importItemGroupDataBeans) {
+			    			 
+			    			 ArrayList<ImportItemDataBean> importItemDataBeans=importItemGroupDataBean.getItemData();
+			    			 for(ImportItemDataBean importItemDataBean:importItemDataBeans) {
+			    				 itemOIDinODMxml = importItemDataBean.getItemOID();
+			    				 itemValueinODMxml = importItemDataBean.getValue();
+			    				 
+			    				 // find the itemOID first, then compare the value
+			    				 if(itemOID.equals(itemOIDinODMxml) ) {
+			    					 if(itemValue.trim().equals(itemValueinODMxml.trim())){
+			    						 matchCheck[i] = true;
+			    						 break;
+			    					 }else {
+			    						 matchCheck[i] = false;
+			    					 }
+			    				 }			    				 
+			    			 }	
+			    			 
+			    			 //check status
+			    			 if(matchCheck[i]) {
+			    				 break;
+			    			 }
+			    		 }	
+			    		 
+			    		 //check status
+			    		 if(matchCheck[i]) {
+		    				 break;
 		    			 }
-		    			 
-		    			
-		    		 }
-		    		 
-		    		
-		    	 }
+			    	 }
 		    	
-		    	i++;
+		    	}else {
+		    		
+		    		for (FormDataBean formDataBean : formDataBeans) {
+			    		
+			    		 ArrayList<ImportItemGroupDataBean> importItemGroupDataBeans= formDataBean.getItemGroupData();
+			    		 for(ImportItemGroupDataBean importItemGroupDataBean:importItemGroupDataBeans) {
+			    			 
+			    			 ArrayList<ImportItemDataBean> importItemDataBeans=importItemGroupDataBean.getItemData();
+			    			 for(ImportItemDataBean importItemDataBean:importItemDataBeans) {
+			    				 itemOIDinODMxml = importItemDataBean.getItemOID();
+			    				 itemValueinODMxml = importItemDataBean.getValue();
+			    				 
+			    				 // for null/blank item value, there is no itemOIDinODMxml
+			    				 if(itemOID.equals(itemOIDinODMxml) ) {			    					
+			    						 matchCheck[i] = false;		
+			    						 break;
+			    				 }else {
+			    					 matchCheck[i] = true;
+			    				 }
+			    				 
+			    			 }
+			    			 
+			    			//check status
+				    		 if(matchCheck[i]) {
+			    				 break;
+			    			 }
+			    		 }
+			    		 
+			    		//check status
+			    		 if(matchCheck[i]) {
+		    				 break;
+		    			 }
+			    	 }
+		    	}
+		    	
+		    	 i++;
+		    	 
 		    	
 		    }// inner-while loop
 		    
