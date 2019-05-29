@@ -188,11 +188,10 @@ public class ImportCRFDataService {
 						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
 						if(sqlStr != null) {
 							ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
-							HashMap matchCriteriasMap  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
-							Boolean notFound = (Boolean) matchCriteriasMap.get("NotFound");
-							matchCriterias = (ArrayList) matchCriteriasMap.get("matchCriterias");
+							matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
 							
-							if(notFound) {
+							
+							if(matchCriterias == null || matchCriterias.size() == 0) {
 								;
 							}else {
 								 matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
@@ -1777,15 +1776,13 @@ public class ImportCRFDataService {
                 logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());
                 
                 // test skip
-                ArrayList matchCriterias;
+                ArrayList matchCriterias = null;
                 boolean matchedAndSkip=false;
                 String sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
                 ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
-                HashMap matchCriteriasMap  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
-				Boolean notFound = (Boolean) matchCriteriasMap.get("NotFound");
-				matchCriterias = (ArrayList) matchCriteriasMap.get("matchCriterias");
-				
-				if(notFound) {
+                matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+							
+				if(matchCriterias == null || matchCriterias.size() == 0) {
 					;
 				}else {
 					 matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
