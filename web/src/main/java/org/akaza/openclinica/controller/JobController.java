@@ -196,7 +196,7 @@ public class JobController {
             inputStream = new FileInputStream(fileToDownload);
             if (!"true".equals(open)) {
                 response.setContentType("application/force-download");
-                String fileName= URLEncoder.encode(jobDetail.getLogPath(), "UTF-8");
+                String fileName = URLEncoder.encode(jobDetail.getLogPath(), "UTF-8").replace("+", "%20");
                 String userAgent = request.getHeader("user-agent");
 
                 if (userAgent.contains("Firefox") || userAgent.contains("Safari")) {
