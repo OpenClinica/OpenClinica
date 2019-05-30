@@ -339,28 +339,33 @@ $(function() {
         if (!metadata)
             return;
 
+        var numVisitBased = 0;
         foreach(metadata.StudyEventDef, function(studyEvent) {
             studyEvents[studyEvent['@OID']] = studyEvent;
-            if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent['@OpenClinica:Status'] !== 'DELETED') {
-                studyEvent.showMe = true;
-            }
-            else if (studyEvent['@OpenClinica:EventType'] === 'Common') {
-                studyEventOid = studyEvent['@OID'];
-                $.ajax({
-                    type: "GET",
-                    url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
-                    async: false,
-                    success: function(statData) {
-                        var stats = statData;
-                        if (stats.body.matchingForms > 0) {
-                            studyEvent.showMe = true;
+            
+            var eventType = studyEvent['@OpenClinica:EventType'];
+            if (eventType === 'Common') {
+                if (studyEvent['@OpenClinica:Status'] !== 'DELETED')
+                    studyEvent.showMe = true;
+                else {
+                    studyEventOid = studyEvent['@OID'];
+                    $.ajax({
+                        type: "GET",
+                        url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
+                        async: false,
+                        success: function(statData) {
+                            var stats = statData;
+                            if (stats.body.matchingForms > 0) {
+                                studyEvent.showMe = true;
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
+            else if (eventType === 'Unscheduled')
+                numVisitBased++;
 
             studyEvent.forms = {};
-
             foreach(studyEvent.FormRef, function(ref) {
                 var studyEventOid = studyEvent['@OID'];
                 var formOid = ref['@FormOID'];
@@ -395,6 +400,9 @@ $(function() {
                 }, form);
             }, errors);
         }, errors);
+
+        if (numVisitBased)
+            showSection(1, '#subjectEvents');
 
         var hideClass = 'oc-status-removed';
         $.fn.DataTable.ext.search.push(
