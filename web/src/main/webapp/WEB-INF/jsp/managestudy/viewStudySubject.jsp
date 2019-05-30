@@ -152,6 +152,13 @@
     section.toggleClass('collapsed expanded');
   }
 
+  function showSection(position, selector) {
+    var $el = $(selector);
+    if (store.data.collapseSections[position])
+      $el.toggleClass('expanded collapsed').children('.section-body').hide();
+    $el.removeClass('hide');
+  }
+
   function clickAllSections(selector) {
     $(selector).children('.section-header').each(showHide);
   };
@@ -565,11 +572,8 @@
   </div>
 </div>
 <script>
-  if (store.data.collapseSections[0])
-    $('#studySubjectRecord').toggleClass('expanded collapsed').children('.section-body').hide();
-  $('#studySubjectRecord').removeClass('hide');
+  showSection(0, '#studySubjectRecord');
 </script>
-<div id="loading"><br> &nbsp; Loading...</div>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
@@ -597,6 +601,12 @@
     </c:import>
   </div>
 </div>
+<script>
+  if ($('#subjectEvents td.table_cell_left').length) {
+    showSection(1, '#subjectEvents');
+  }
+</script>
+<div id="loading"><br> &nbsp; Loading...</div>
 <jsp:include page="viewStudySubjectCommon.jsp"/>
 <div style="width: 250px">
 <c:choose>
@@ -1171,9 +1181,9 @@
             <c:when test="${participateStatus=='enabled'}">
               <fmt:message key="update_and_invite" bundle="${resword}"/>
             </c:when>
-            <c:otherwise>
+            <c:when test="${!userRole.monitor}">
               <fmt:message key="partid_edit" bundle="${resword}"/>
-            </c:otherwise>
+            </c:when>
           </c:choose>
         </h3>
       </td>

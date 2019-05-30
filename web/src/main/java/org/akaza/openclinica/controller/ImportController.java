@@ -221,10 +221,9 @@ public class ImportController {
     }
 
     @ApiOperation( value = "To schedule an event for participant at site level", notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date" )
-    @RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/{subjectKey}/events001", method = RequestMethod.POST )
+    @RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events", method = RequestMethod.POST )
     public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
                                                               @RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
-                                                              @PathVariable( "subjectKey" ) String subjectKey,
                                                               @PathVariable( "studyOID" ) String studyOid,
                                                               @PathVariable( "siteOID" ) String siteOid) throws Exception {
 
@@ -255,13 +254,11 @@ public class ImportController {
 
             if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && !validateService.isUserHasAccessToSite(userRoles, siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-            } else if (!validateService.isUserHas_CRC_INV_RoleInSite(userRoles, siteOid)) {
+            } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
             }
 
-            if (!validateService.isParticipateActive(tenantStudy)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
-            }
+
         } catch (OpenClinicaSystemException e) {
             String errorMsg = e.getErrorCode();
             HashMap<String, String> map = new HashMap<>();
@@ -284,8 +281,7 @@ public class ImportController {
 
         ArrayList<SubjectDataBean> subjectDataBeans = new ArrayList<>();
         SubjectDataBean subjectDataBean = new SubjectDataBean();
-      //  subjectDataBean.setSubjectOID(subjectKey);           //  ????????????????????
-        subjectDataBean.setStudySubjectID(subjectKey);       //  ????????????????????
+        subjectDataBean.setStudySubjectID(studyEventScheduleRequestDTO.getSubjectKey());
         subjectDataBean.setStudyEventData(studyEventDataBeans);
         subjectDataBeans.add(subjectDataBean);
 

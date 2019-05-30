@@ -183,13 +183,20 @@ public class ImportCRFDataService {
                          */
                         String sqlStr;
                         ArrayList matchCriterias;
-                        boolean matchedAndSkip=false;;
+                        boolean matchedAndSkip=false;
     					
 						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
 						if(sqlStr != null) {
 							ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
-							matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
-    		                matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
+							matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+							
+							
+							if(matchCriterias == null || matchCriterias.size() == 0) {
+								;
+							}else {
+								 matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
+							}
+    		               
 						}
 		                    
 		                if(matchedAndSkip) {
@@ -1769,11 +1776,17 @@ public class ImportCRFDataService {
                 logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());
                 
                 // test skip
+                ArrayList matchCriterias = null;
+                boolean matchedAndSkip=false;
                 String sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
                 ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
-                ArrayList matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
-                boolean matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
-                
+                matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+							
+				if(matchCriterias == null || matchCriterias.size() == 0) {
+					;
+				}else {
+					 matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
+				}
                 
                 if(matchedAndSkip) {
                 	//System.out.println("===============================matchedAndSkip========================");
@@ -2372,13 +2385,13 @@ public class ImportCRFDataService {
 			    			 }
 			    			 
 			    			//check status
-				    		 if(matchCheck[i]) {
+				    		 if(!matchCheck[i]) {
 			    				 break;
 			    			 }
 			    		 }
 			    		 
 			    		//check status
-			    		 if(matchCheck[i]) {
+			    		 if(!matchCheck[i]) {
 		    				 break;
 		    			 }
 			    	 }
