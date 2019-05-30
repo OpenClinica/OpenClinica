@@ -284,7 +284,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             int studyFilePath = parentStudyBean.getFilePath();
 
             do {
-                xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid(),flavor);
+                xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid(),QUERY_FLAVOR);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
 
