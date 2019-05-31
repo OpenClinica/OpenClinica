@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-   File fileSizeMax set to Interger.MAX_VALUE : derivitive work (under orig license) by Nor Consult, LLC in 2015
 
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2010 Akaza Research
@@ -25,7 +24,7 @@ public class FileProperties {
 	private String extensions;
     private ExtensionSettings extensionSettings;
     private final Integer MB = 1024 * 1024;
-    private final Long fileSizeMax = (long) Integer.MAX_VALUE;
+    private final Long fileSizeMax;
 
     enum ExtensionSettings {
         VALID, INVALID
@@ -34,19 +33,19 @@ public class FileProperties {
     public FileProperties() {
         setExtensions("");
         setExtensionSettings(ExtensionSettings.VALID);
-     
+        fileSizeMax = Long.valueOf(MB * 10);
     }
 
     public FileProperties(String extensions) {
         setExtensions(extensions);
         setExtensionSettings(ExtensionSettings.VALID);
-
+        fileSizeMax = Long.valueOf(MB * 10);
     }
 	
 	public FileProperties(String extensions, String extensionSettings) {
         setExtensions(extensions);
 		this.extensionSettings = getExtensionSettings(extensionSettings);
-    
+        fileSizeMax = Long.valueOf(MB * 10);
 	}
 
 	public void isValidExtension(String uploadedFileExtension){
