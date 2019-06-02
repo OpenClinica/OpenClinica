@@ -63,6 +63,12 @@
     padding-top: 0.75em;
     padding-left: 1.5em;
   }
+  #tbl-jobs, #tbl-job {
+    width: 100%;
+  }
+  #tbl-jobs td:last-child {
+    white-space: nowrap;
+  }
   #tbl-jobs_filter {
     margin-bottom: 3px;
   }
@@ -76,6 +82,14 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 6px;
+  }
+  .highlight-green {
+    background-color: green;
+    color: white;
+  }
+  .highlight-red {
+    background-color: red;
+    color: white;
   }
 </style>
 
@@ -172,6 +186,14 @@
         }));
         datatable.settings()[0].oLanguage.sEmptyTable = '<fmt:message key="jobs_noresult" bundle="${resword}"/>';
         datatable.draw();
+        $('#tbl-jobs td:nth-child(4)').each(function() {
+          var cell = $(this);
+          var text = cell.text();
+          if (text === 'COMPLETED')
+            cell.addClass('highlight-green');
+          else if (text !== 'IN_PROGRESS')
+            cell.addClass('highlight-red');
+        });
       }).fail(function(e) {
         console.log(arguments);
         datatable.settings()[0].oLanguage.sEmptyTable = formatError(e);
