@@ -19,7 +19,6 @@ import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.util.ErrorConstants;
 import org.akaza.openclinica.web.util.HeaderUtil;
-import org.apache.batik.bridge.UserAgent;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -196,15 +194,8 @@ public class JobController {
             inputStream = new FileInputStream(fileToDownload);
             if (!"true".equals(open)) {
                 response.setContentType("application/force-download");
-                String fileName = URLEncoder.encode(jobDetail.getLogPath(), "UTF-8").replace("+", "%20");
-                String userAgent = request.getHeader("user-agent");
-
-                if (userAgent.contains("Firefox") || userAgent.contains("Safari")) {
-                    response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + fileName);
-                } else {
-                    response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-                }
-                }
+                response.setHeader("Content-Disposition", "attachment; filename=" + jobDetail.getLogPath());                
+            }
             IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
         } catch (Exception e) {

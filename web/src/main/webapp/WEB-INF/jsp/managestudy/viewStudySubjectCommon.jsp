@@ -142,7 +142,11 @@
 <script id="section-tmpl" type="text/x-handlebars-template">
     <div class="section {{collapseOrExpand}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
         <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
-            {{studyEvent.[@Name]}}
+            {{#if studyEvent}}
+                {{studyEvent.[@Name]}}
+            {{else}}
+                (Event)
+            {{/if}}
         </div>
         <div class="section-body">
             Loading...<br><br>
@@ -150,28 +154,25 @@
     </div>
 </script>
 <script id="section-body-tmpl" type="text/x-handlebars-template">
-    {{#if sectionErrors}}
-        <div>ERROR</div>
-        <ul>
-            {{#each sectionErrors as |err|}}
-                <li>{{err}}</li>
-            {{/each}}
-        </ul>
-    {{/if}}
     {{#each studyEvent.forms as |form|}}
     {{#if form.showMe}}
         <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
             <div class="subsection-header">
                 <h3 class="form-name">
-                    {{form.[@Name]}}
+                    {{#if form}}
+                        {{form.[@Name]}}
+                    {{else}}
+                        (Form)
+                    {{/if}}
                 </h3>
                 <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
-                    {{#if form.addNew}}
-                        data-url="{{form.addNew}}"
-                    {{else}}
-                        disabled="disabled"
-                    {{/if}}
-                >
+                    {{#if form}}        
+                        {{#if form.addNew}}
+                            data-url="{{form.addNew}}"
+                        {{else}}
+                            disabled="disabled"
+                        {{/if}}>
+                    {{/if}}>
             </div>
             <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
             <thead>
@@ -221,32 +222,6 @@ $(function() {
         return [];
     }
 
-    function foreach(items, action, errors) {
-        collection(items).forEach(function(item) {
-            try {
-                action(item);
-            }
-            catch (e) {
-                console.log('Unable to process', item, e);
-                errors.push('Unable to process ' + item + '. See console log.');
-            }
-        });
-    }
-
-    function findone(items, condition, errors) {
-        for (var i=0, items=collection(items); i<items.length; i++) {
-            var item = items[i];
-            try {
-                if (condition(item))
-                    return item;                
-            }
-            catch (e) {
-                console.log('Unable to process', item, e);
-                errors.push('Unable to process ' + item + '. See console log.');
-            }
-        }
-    }
-
     var linksOrder = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
     function collectLinks(studyEventData, formData) {
         var links = [];
@@ -272,101 +247,81 @@ $(function() {
     var items = {};
     var codes = {};
     var columns = {};
-    var errors = [];
 
     $.when(
         $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n&links=y', function(data) {
             odm = data;
-            var study = findone(odm.Study, function(study) {
-                return study['@OID'] === '${study.oid}';
-            }, errors);
-
-            if (study && study.MetaDataVersion) {
-                metadata = study.MetaDataVersion;
+            for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
+                if (studies[i]['@OID'] === '${study.oid}') {
+                    metadata = studies[i].MetaDataVersion;
+                    break;
+                }
             }
-            else {
-                return errors.push('Unable to fetch metadata for study: ${study.oid}');
-            }
-
-            foreach(metadata.CodeList, function(codelist) {
+            collection(metadata.CodeList).forEach(function(codelist) {
                 var code = {};
-                foreach(codelist.CodeListItem, function(item) {
+                collection(codelist.CodeListItem).forEach(function(item) {
                     code[item['@CodedValue']] = item.Decode.TranslatedText;
-                }, errors);
+                });
                 codes[codelist['@OID']] = code;
-            }, errors);
-            foreach(metadata['OpenClinica:MultiSelectList'], function(multiselect) {
+            });
+            collection(metadata['OpenClinica:MultiSelectList']).forEach(function(multiselect) {
                 var code = {};
-                foreach(multiselect['OpenClinica:MultiSelectListItem'], function(item) {
+                collection(multiselect['OpenClinica:MultiSelectListItem']).forEach(function(item) {
                     code[item['@CodedOptionValue']] = item.Decode.TranslatedText;
-                }, errors);
+                });
                 codes[multiselect['@ID']] = code;
-            }, errors);
-            foreach(metadata.ItemDef, function(item) {
+            });
+            collection(metadata.ItemDef).forEach(function(item) {
                 items[item['@OID']] = item;
                 if (item.CodeListRef)
                     item.codes = codes[item.CodeListRef['@CodeListOID']]
                 if (item['OpenClinica:MultiSelectListRef'])
                     item.codes = codes[item['OpenClinica:MultiSelectListRef']['@MultiSelectListID']]
-            }, errors);
-            foreach(metadata.ItemGroupDef, function(itemGroup) {
+            });
+            collection(metadata.ItemGroupDef).forEach(function(itemGroup) {
                 itemGroup.items = collection(itemGroup.ItemRef).map(function(ref) {
                     return items[ref['@ItemOID']];
                 });
                 itemGroups[itemGroup['@OID']] = itemGroup;
-            }, errors);
-            foreach(metadata.FormDef, function(form) {
+            });
+            collection(metadata.FormDef).forEach(function(form) {
                 form.itemGroups = collection(form.ItemGroupRef).map(function(ref) {
                     return itemGroups[ref['@ItemGroupOID']];
                 });
                 forms[form['@OID']] = form;
-            }, errors);
-        })
-        .error(function() {
-            errors.push('Unable to load any Common Events');
+            });
         }),
 
-        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson) {
-            foreach(pageJson.components, function(component) {
+        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson){
+            collection(pageJson.components).forEach(function(component) {
                 columns[component.name] = component.columns;
-            }, errors);
-        })
-        .error(function() {
-            errors.push('Unable to load Components data');
+            });
         })
 
     ).then(function() {
-        if (!metadata)
-            return;
-
-        var numVisitBased = 0;
-        foreach(metadata.StudyEventDef, function(studyEvent) {
+        collection(metadata.StudyEventDef).forEach(function(studyEvent) {
             studyEvents[studyEvent['@OID']] = studyEvent;
-            
-            var eventType = studyEvent['@OpenClinica:EventType'];
-            if (eventType === 'Common') {
-                if (studyEvent['@OpenClinica:Status'] !== 'DELETED')
-                    studyEvent.showMe = true;
-                else {
-                    studyEventOid = studyEvent['@OID'];
-                    $.ajax({
-                        type: "GET",
-                        url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
-                        async: false,
-                        success: function(statData) {
-                            var stats = statData;
-                            if (stats.body.matchingForms > 0) {
-                                studyEvent.showMe = true;
-                            }
-                        }
-                    });
-                }
+            if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent['@OpenClinica:Status'] !== 'DELETED') {
+                studyEvent.showMe = true;
             }
-            else if (eventType === 'Unscheduled')
-                numVisitBased++;
+            else if (studyEvent['@OpenClinica:EventType'] === 'Common') {
+                studyEventOid = studyEvent['@OID'];
+                $.ajax({
+                    type: "GET",
+                    url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
+                    async: false,
+                    success: function(statData) {
+                        var stats = statData;
+                        if (stats.body.matchingForms > 0) {
+                            studyEvent.showMe = true;
+                        }
+                    }
+                });
+            }
 
             studyEvent.forms = {};
-            foreach(studyEvent.FormRef, function(ref) {
+
+            collection(studyEvent.FormRef).forEach(function(ref) {
                 var studyEventOid = studyEvent['@OID'];
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
@@ -376,7 +331,7 @@ $(function() {
                 var submissionFields = {};
                 var componentOid = studyEventOid + '.' + formOid;
                 var components = columns[componentOid];
-                foreach(components, function(col) {
+                collection(components).forEach(function(col) {
                     var item = items[col];
                     if (item) {
                         if (item.Question)
@@ -384,12 +339,10 @@ $(function() {
                         else
                             columnTitles.push(item['@Name']);
                     }
-                    else {
-                        columnTitles.push('!?' + col);
-                        errors.push('Unable to reference Common Event Form Item: ' + col);
-                    }
+                    else
+                        columnTitles.push('?');
                     submissionFields[col] = [];
-                }, errors);
+                });
 
                 studyEvent.forms[formOid] = $.extend({
                     columnTitles: columnTitles,
@@ -398,11 +351,8 @@ $(function() {
                     addNew: false,
                     showMe: false
                 }, form);
-            }, errors);
-        }, errors);
-
-        if (numVisitBased)
-            showSection(1, '#subjectEvents');
+            });
+        });
 
         var hideClass = 'oc-status-removed';
         $.fn.DataTable.ext.search.push(
@@ -423,6 +373,7 @@ $(function() {
             });
         }).change();
 
+        var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         var sectionBodyTmpl = Handlebars.compile($('#section-body-tmpl').html());
@@ -442,6 +393,14 @@ $(function() {
                     sectionIndex++;
                 }
             }
+            else { // event type != common event
+                numVisitBaseds++;
+            }
+        }
+        if (numVisitBaseds) {
+            if (store.data.collapseSections[1])
+                $('#subjectEvents').toggleClass('expanded collapsed').children('.section-body').hide();
+            $('#subjectEvents').removeClass('hide');
         }
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
@@ -523,37 +482,36 @@ $(function() {
         }).on('uncollapse', '.section', function() {
             var sectionDiv = $(this);
             var studyEventOid = sectionDiv.data('section-oid');
-            var studyEvent = studyEvents[studyEventOid];
-            var sectionErrors = [];
-            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n&links=y', function(data) {
+            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n&links=y', function(data){
                 var odm = data;
+                var studyEvent = studyEvents[studyEventOid];
                 for (var formOid in studyEvent.forms) {
                     var form = studyEvent.forms[formOid];
                     form.submissions = [];
                 }
 
-                foreach(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link'], function(link) {
+                collection(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link']).forEach(function(link) {
                     if (link['@rel'] !== 'common-add-new')
                         return;
 
-                    var refs = link['@tag'].split('.');
-                    var studyEventRef = refs[0];
-                    var formRef = refs[1];
-
-                    if (studyEventRef !== studyEventOid)
-                        return;
-
-                    var form = studyEvent.forms[formRef];
-                    if (form) {
+                    var oids = link['@tag'].split('.');
+                    var studyEventOid = oids[0];
+                    var formOid = oids[1];
+                    var studyEvent = studyEvents[studyEventOid];
+                    var form = studyEvent.forms[formOid];
+                    if (form && studyEvent) {
                         form.addNew = link['@href'];
                         form.showMe = studyEvent.showMe = true;                        
                     }
                     else {
-                        sectionErrors.push('Unable to reference Common Event Form: ' + formRef);
+                        if (!form)
+                            console.log('Missing Form: ' + formOid);
+                        if (!studyEvent)
+                            console.log('Missing Study Event: ' + studyEventOid);
                     }
-                }, sectionErrors);
+                });
 
-                foreach(odm.ClinicalData.SubjectData.StudyEventData, function(studyEventData) {
+                collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
                     var studyEventOid = studyEventData['@StudyEventOID'];
                     var studyEvent = studyEvents[studyEventOid];
                     if (!studyEvent)
@@ -579,8 +537,8 @@ $(function() {
                         fields: copyObject(form.submissionFields),
                         links: collectLinks(studyEventData, formData)
                     };
-                    foreach(formData.ItemGroupData, function(igd) {
-                        foreach(igd.ItemData, function(itemData) {
+                    collection(formData.ItemGroupData).forEach(function(igd) {
+                        collection(igd.ItemData).forEach(function(itemData) {
                             var itemOid = itemData['@ItemOID'];
                             var data = submission.fields[itemOid];
                             if (data) {
@@ -593,17 +551,16 @@ $(function() {
                                 }
                                 data.push(value);
                             }
-                        }, sectionErrors);
-                    }, sectionErrors);
+                        });
+                    });
 
                     form.submissions.push(submission);
                     form.showMe = true;
                     studyEvent.showMe = true;
-                }, sectionErrors);
+                });
 
                 var sectionBody = $(sectionBodyTmpl({
-                    studyEvent: studyEvent,
-                    sectionErrors: sectionErrors
+                    studyEvent: studyEvents[studyEventOid]
                 }));
                 sectionDiv.children('.section-body').empty().append(sectionBody);
                 setTimeout(function() {
@@ -613,17 +570,9 @@ $(function() {
         }).children('.expanded').trigger('uncollapse');
 
         $('div.section.collapsed').children('.section-body').hide();
-    })
-    .always(function() {
-        if (errors.length) {
-            $('#loading').html('<h1>ERROR</h1><ul>' + errors.map(function(err) {
-                return '<li>' + err + '</li>';
-            }).join('') + '</ul>').show();
-        }
-        else {
-            $('#loading').hide();
-        }
-
+        $('#loading').remove();
+    }, function() {
+        $('#loading').text("Can't Load View Participant Page");
     });
 });
 </script>

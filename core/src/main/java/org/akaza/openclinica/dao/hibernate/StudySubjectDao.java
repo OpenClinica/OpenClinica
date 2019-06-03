@@ -23,8 +23,8 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
     @Transactional
     public List<StudySubject> findAllByStudy(Integer studyId) {
         String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyid", studyId);
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyid", studyId);
         return (List<StudySubject>) q.list();
       
     }
@@ -40,9 +40,9 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
     public StudySubject findByLabelAndStudy(String embeddedStudySubjectId, Study study) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.study.studyId = :studyid and do.label = :label";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyid", study.getStudyId());
-        q.setString("label", embeddedStudySubjectId);
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyid", study.getStudyId());
+        q.setParameter("label", embeddedStudySubjectId);
         return (StudySubject) q.uniqueResult();
     }
 
@@ -62,20 +62,20 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         if (identifierForSearchUse != null)
             query = query + " and do.studySubjectDetail.identifierForSearchUse = :identifierForSearchUse";
 
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyid", study.getStudyId());
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyid", study.getStudyId());
 
         if (participantId != null)
-            q.setString("participantId","%" + participantId.toLowerCase()+ "%");
+            q.setParameter("participantId","%" + participantId.toLowerCase()+ "%");
 
         if (firstNameForSearchUse != null)
-            q.setString("firstNameForSearchUse", firstNameForSearchUse);
+            q.setParameter("firstNameForSearchUse", firstNameForSearchUse);
 
         if (lastNameForSearchUse != null)
-            q.setString("lastNameForSearchUse", lastNameForSearchUse);
+            q.setParameter("lastNameForSearchUse", lastNameForSearchUse);
 
         if (identifierForSearchUse != null)
-            q.setString("identifierForSearchUse", identifierForSearchUse);
+            q.setParameter("identifierForSearchUse", identifierForSearchUse);
 
         return (ArrayList<StudySubject>) q.list();
     }
@@ -85,9 +85,9 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " " +
                 "do  where do.study.oc_oid = :studyOid and do.studySubjectDetail.identifier = :identifier";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setString("studyOid", studyOid);
-        q.setString("identifier" , identifier);
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyOid", studyOid);
+        q.setParameter("identifier" , identifier);
         return (ArrayList<StudySubject>) q.list();
     }
 
@@ -105,26 +105,26 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
     public StudySubject findByLabelAndStudyOrParentStudy(String embeddedStudySubjectId, Study study) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where (do.study.studyId = :studyid or do.study.study.studyId = :studyid) and do.label = :label";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyid", study.getStudyId());
-        q.setString("label", embeddedStudySubjectId);
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyid", study.getStudyId());
+        q.setParameter("label", embeddedStudySubjectId);
         return (StudySubject) q.uniqueResult();
     }
 
     public ArrayList<StudySubject> findByLabelAndParentStudy(String embeddedStudySubjectId, Study parentStudy) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.study.study.studyId = :studyid and do.label = :label";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyid", parentStudy.getStudyId());
-        q.setString("label", embeddedStudySubjectId);
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyid", parentStudy.getStudyId());
+        q.setParameter("label", embeddedStudySubjectId);
         return (ArrayList<StudySubject>) q.list();
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public ArrayList<StudyEvent> fetchListSEs(String id) {
         String query = " from StudyEvent se where se.studySubject.ocOid = :id order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setString("id", id.toString());
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("id", id.toString());
 
         return (ArrayList<StudyEvent>) q.list();
 

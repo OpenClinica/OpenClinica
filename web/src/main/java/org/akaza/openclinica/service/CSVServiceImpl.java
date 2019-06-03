@@ -138,10 +138,10 @@ public class CSVServiceImpl implements CSVService {
      * @return
      * @throws Exception
      */
-    public void validateCSVFile(MultipartFile file) throws Exception {
+    public void validateBulkParticipantCSVFile(MultipartFile file) throws Exception {
 
         ArrayList<String> subjectKeyList = new ArrayList<>();
-
+        CSVParser csvParser = null;
         try {
             BufferedReader reader;
 
@@ -150,7 +150,6 @@ public class CSVServiceImpl implements CSVService {
 
             //Create the CSVFormat object with the header mapping
             CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader().withTrim();
-            CSVParser csvParser;
             try {
                 csvParser = new CSVParser(reader, csvFileFormat);
             } catch (IllegalArgumentException e) {
@@ -171,10 +170,13 @@ public class CSVServiceImpl implements CSVService {
             if (StringUtils.isNotEmpty(e.getMessage()))
                 message = e.getMessage();
             throw new Exception(message);
+        } finally {
+            if (csvParser != null)
+                csvParser.close();
         }
     }
 
-    public static List<SubjectTransferBean> populateCSVColumns(CSVParser parser) throws Exception {
+    private List<SubjectTransferBean> populateCSVColumns(CSVParser parser) throws Exception {
         List<SubjectTransferBean> transferBeans = new ArrayList<>();
         Map<String, Integer> headerMap = parser.getHeaderMap();
         BidiMap<String, Integer> bidiMap = new DualHashBidiMap();
@@ -219,9 +221,10 @@ public class CSVServiceImpl implements CSVService {
         return transferBeans;
     }
 
-    public  List<SubjectTransferBean> readCSVFile(MultipartFile file) throws Exception {
+    public  List<SubjectTransferBean> readBulkParticipantCSVFile(MultipartFile file) throws Exception {
 
         List<SubjectTransferBean> subjectKeyList = null;
+        CSVParser csvParser = null;
 
         try {
             BufferedReader reader;
@@ -232,7 +235,6 @@ public class CSVServiceImpl implements CSVService {
 
             //Create the CSVFormat object with the header mapping
             CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader().withTrim();
-            CSVParser csvParser = null;
             csvParser = new CSVParser(reader, csvFileFormat);
             subjectKeyList = populateCSVColumns(csvParser);
         } catch (Exception e) {
@@ -240,51 +242,9 @@ public class CSVServiceImpl implements CSVService {
             if (StringUtils.isNotEmpty(e.getMessage()))
                 message = e.getMessage();
             throw new Exception(message);
-        }
-
-        return subjectKeyList;
-    }
-
-    /**
-     * @param file
-     * @return
-     * @throws IOException
-     */
-    private static ArrayList<String> readFile(MultipartFile file) throws IOException {
-
-        ArrayList<String> subjectKeyList = new ArrayList<>();
-
-        try(Scanner sc = new Scanner(file.getInputStream())){
-
-            String line;
-
-            int lineNm = 1;
-            int position = 0;
-
-            while (sc.hasNextLine()) {
-                line = sc.nextLine();
-                String[] lineVal= line.split(",", 0);
-
-                // check ParticipantID column number
-                if(lineNm ==1) {
-
-                    for(int i=0; i < lineVal.length;i++) {
-                        lineVal.equals(ParticipantID_header);
-                        position = i;
-
-                        break;
-                    }
-                }else {
-                    subjectKeyList.add(lineVal[position]);
-                }
-
-
-
-                lineNm++;
-            }
-
-        } catch (Exception e) {
-            log.error("Exception with cause = {} {}", e.getCause(), e.getMessage());
+        }  finally {
+            if (csvParser != null)
+                csvParser.close();
         }
 
         return subjectKeyList;

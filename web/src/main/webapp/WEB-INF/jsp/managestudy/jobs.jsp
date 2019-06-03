@@ -79,151 +79,113 @@
   }
 </style>
 
-<c:choose>
-  <c:when test="${param['uuid'] == null}">
-    <h1 id="header">
-      <span class="title_manage">
-        <fmt:message key="jobs" bundle="${resword}"/>
-      </span>
-    </h1>
-    <br>
-    <div>
-      <fmt:message key="jobs_description" bundle="${resword}"/>
-    </div>
-    <br>
-    <table id="tbl-jobs" class="datatable">
-      <thead>
-        <tr>
-          <th><fmt:message key="jobs_source_filename" bundle="${resword}"/></th>
-          <th><fmt:message key="job_type" bundle="${resword}"/></th>
-          <th><fmt:message key="site_name" bundle="${resword}"/></th>
-          <th><fmt:message key="job_status" bundle="${resword}"/></th>
-          <th><fmt:message key="created_on" bundle="${resword}"/></th>
-          <th><fmt:message key="created_by" bundle="${resword}"/></th>
-          <th><fmt:message key="completed_on" bundle="${resword}"/></th>
-          <th><fmt:message key="actions" bundle="${resword}"/></th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
+<h1 id="header">
+  <span class="title_manage">
+    <fmt:message key="jobs" bundle="${resword}"/>
+  </span>
+</h1>
+<br>
+<div>
+  <fmt:message key="jobs_description" bundle="${resword}"/>
+</div>
+<br>
+<table id="tbl-jobs" class="datatable">
+  <thead>
+    <tr>
+      <th><fmt:message key="jobs_source_filename" bundle="${resword}"/></th>
+      <th><fmt:message key="job_type" bundle="${resword}"/></th>
+      <th><fmt:message key="site_name" bundle="${resword}"/></th>
+      <th><fmt:message key="job_status" bundle="${resword}"/></th>
+      <th><fmt:message key="created_on" bundle="${resword}"/></th>
+      <th><fmt:message key="created_by" bundle="${resword}"/></th>
+      <th><fmt:message key="completed_on" bundle="${resword}"/></th>
+      <th><fmt:message key="actions" bundle="${resword}"/></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
 
-    <script>
-    $('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html#/job-controller');
-    var dateFormat = 'hh:mma MMM DD YYYY';
-    function formatDate(date) {
-      return moment(date).format(dateFormat);
-    }
-    $.fn.dataTable.moment(dateFormat);
-    var datatable = $('#tbl-jobs').DataTable({
-      dom: 'frtilp',
-      searching: true,
-      paging: true,
-      pageLength: 50,
-      columnDefs: [{
-        targets: -1,
-        orderable: false
-      }],
-      language: {
-        emptyTable: '<fmt:message key="jobs_noresult" bundle="${resword}"/>',
-        paginate: {
-            first: '<<',
-            previous: '<',
-            next: '>',
-            last: '>>'
-        },
-        info: '<fmt:message key="results_m_n_of_total" bundle="${resword}"/>',
-        infoEmpty: '<fmt:message key="results_zero_of_zero" bundle="${resword}"/>',
-        infoFiltered: '<span class="info-filtered"><fmt:message key="results_filtered" bundle="${resword}"/></span>',
-        lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
+<script>
+$('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html#/job-controller');
+var dateFormat = 'hh:mma MMM DD YYYY';
+function formatDate(date) {
+  return moment(date).format(dateFormat);
+}
+$.fn.dataTable.moment(dateFormat);
+var datatable = $('#tbl-jobs').DataTable({
+  dom: 'frtilp',
+  searching: true,
+  paging: true,
+  pageLength: 50,
+  columnDefs: [{
+    targets: -1,
+    orderable: false
+  }],
+  language: {
+    emptyTable: '<fmt:message key="jobs_noresult" bundle="${resword}"/>',
+    paginate: {
+        first: '<<',
+        previous: '<',
+        next: '>',
+        last: '>>'
+    },
+    info: '<fmt:message key="results_m_n_of_total" bundle="${resword}"/>',
+    infoEmpty: '<fmt:message key="results_zero_of_zero" bundle="${resword}"/>',
+    infoFiltered: '<span class="info-filtered"><fmt:message key="results_filtered" bundle="${resword}"/></span>',
+    lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
+  }
+});
+$('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_log" bundle="${resword}"/></b>');
+
+var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}';
+var siteOid = '${atSiteLevel ? theSite.oid : null}';
+if (siteOid)
+  url += '/sites/' + siteOid;
+url += '/jobs';
+jQuery.ajax({
+  type: 'get',
+  url: url,
+  success: function(data) {
+    datatable.rows.add(data.map(function (logEntry) {
+      var actionView = '<a target="_blank" href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile?open=true"><span class="icon icon-search"></span></a> ';
+      var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
+      var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
+      if (logEntry.status === 'IN_PROGRESS') {
+        actionView = actionDownload = actionDelete = '';
       }
-    });
-    $('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_log" bundle="${resword}"/></b>');
+      return [
+        logEntry.sourceFileName,
+        logEntry.type,
+        logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid,
+        logEntry.status,
+        formatDate(logEntry.dateCreated),
+        logEntry.createdByUsername,
+        formatDate(logEntry.dateCompleted),
+        actionView + actionDownload + actionDelete
+      ];
+    }));
+    datatable.draw();
+  },
+  error: function() {
+    console.log(arguments);
+  }
+});
 
-    var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}';
-    var siteOid = '${atSiteLevel ? theSite.oid : null}';
-    if (siteOid)
-      url += '/sites/' + siteOid;
-    url += '/jobs';
+$('#tbl-jobs').on('click', '.icon-trash', function() {
+  if(confirm('<fmt:message key="jobs_del_confirm" bundle="${resword}"/>')) {
+    var uuid = $(this).data('uuid');
+    var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/' + uuid;
     jQuery.ajax({
-      type: 'get',
+      type: 'delete',
       url: url,
-      success: function(data) {
-        datatable.rows.add(data.map(function (logEntry) {
-          var actionView = '<a href="Jobs?uuid=' + logEntry.uuid + '"><span class="icon icon-search"></span></a> ';
-          var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
-          var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
-          if (logEntry.status === 'IN_PROGRESS') {
-            actionView = actionDownload = actionDelete = '';
-          }
-          return [
-            logEntry.sourceFileName,
-            logEntry.type,
-            logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid,
-            logEntry.status,
-            formatDate(logEntry.dateCreated),
-            logEntry.createdByUsername,
-            formatDate(logEntry.dateCompleted),
-            actionView + actionDownload + actionDelete
-          ];
-        }));
-        datatable.draw();
+      success: function() {
+        window.location.reload();
       },
       error: function() {
-        console.log(arguments);
+        alert('<fmt:message key="jobs_del_failed" bundle="${resword}"/>');
       }
     });
-
-    $('#tbl-jobs')
-      .on('click', '.icon-trash', function() {
-        if(confirm('<fmt:message key="jobs_del_confirm" bundle="${resword}"/>')) {
-          var uuid = $(this).data('uuid');
-          var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/' + uuid;
-          jQuery.ajax({
-            type: 'delete',
-            url: url,
-            success: function() {
-              window.location.reload();
-            },
-            error: function() {
-              alert('<fmt:message key="jobs_del_failed" bundle="${resword}"/>');
-            }
-          });
-        }
-      });
-
-    </script>
-  </c:when>
-  <c:otherwise>
-    <div id="loading">Loading...</div>
-    <table id="tbl-job"></table>
-    <script>
-      $.get('${pageContext.request.contextPath}/pages/auth/api/jobs/${param["uuid"]}/downloadFile?open=true', function(data) {
-        var rows = data.trim().split('\n');
-        var header = rows[0];
-        function splitby(separator) {
-          var titles = header.split(separator);
-          return {
-            separator: separator,
-            titles: titles,
-            length: titles.length
-          }
-        }
-        var bycoma = splitby(',');
-        var bypipe = splitby('|');
-        var cols = bycoma.length > bypipe.length ? bycoma : bypipe;
-        $('#tbl-job').DataTable({
-          data: rows.slice(1).map(function(row) {
-            return row.split(cols.separator);
-          }),
-          columns: cols.titles.map(function(title) {
-            return {title: title};
-          })
-        });
-        $('#loading').remove();
-      }).fail(function(e) {
-        $('#loading').text(e.responseText);
-      });
-    </script>
-  </c:otherwise>
-</c:choose>
+  }
+});
+</script>

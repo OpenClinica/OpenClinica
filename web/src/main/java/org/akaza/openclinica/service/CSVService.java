@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface CSVService {
-    List<SubjectTransferBean> readCSVFile(MultipartFile file) throws Exception;
-    void validateCSVFile(MultipartFile file) throws Exception;
+    List<SubjectTransferBean> readBulkParticipantCSVFile(MultipartFile file) throws Exception;
+    void validateBulkParticipantCSVFile(MultipartFile file) throws Exception;
     ArrayList<StudyEventScheduleDTO> readStudyEventScheduleBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception;
 }

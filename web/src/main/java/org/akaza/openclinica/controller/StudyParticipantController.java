@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
@@ -164,6 +165,7 @@ public class StudyParticipantController {
 						+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
 						+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
 						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
+		@Async
 		@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<String> createNewStudyParticipantAtSiteLevel(HttpServletRequest request,
 				@RequestParam("file") MultipartFile file,
@@ -239,7 +241,7 @@ public class StudyParticipantController {
 						 throw new OpenClinicaSystemException("errorCode.notSupportedFileFormat","The file format is not supported at this time, please send CSV file, like *.csv ");
 					 }
 					 
-					 csvService.validateCSVFile(file);
+					 csvService.validateBulkParticipantCSVFile(file);
 				     
 				     return this.createNewStudySubjectsInBulk(request, map, studyOID, siteOID, file);
 
@@ -371,13 +373,10 @@ public class StudyParticipantController {
 
 			UserAccount userAccount = uDao.findById(userAccountBean.getId());
 			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.BULK_ADD_PARTICIPANTS,file.getOriginalFilename());
+			String uri = request.getRequestURI();
 			CompletableFuture.supplyAsync(() -> {
-				try {
-					participantService.processBulkParticipants(studyBean, studyOid, siteBean, siteOid, userAccountBean, accessToken, customerUuid, file,
-							jobDetail, request.getLocale(), request.getRequestURI(), map);
-				} catch (Exception e) {
-					logger.error("Error processing participant impoprt: " + e);
-				}
+				participantService.processBulkParticipants(studyBean, studyOid, siteBean, siteOid, userAccountBean, accessToken, customerUuid, file,
+							jobDetail, request.getLocale(), uri, map);
 				return null;
 			});
 			return jobDetail.getUuid();
@@ -542,27 +541,7 @@ public class StudyParticipantController {
 			errorOBject.setField(field);
 			return errorOBject;
 		}
-		
-		/**
-		 * 
-		 * @param roleName
-		 * @param resterm
-		 * @return
-		 */
-		public Role getStudyRole(String roleName, ResourceBundle resterm) {
-			if (roleName.equalsIgnoreCase(resterm.getString("Study_Director").trim())) {
-				return Role.STUDYDIRECTOR;
-			} else if (roleName.equalsIgnoreCase(resterm.getString("Study_Coordinator").trim())) {
-				return Role.COORDINATOR;
-			} else if (roleName.equalsIgnoreCase(resterm.getString("Investigator").trim())) {
-				return Role.INVESTIGATOR;
-			} else if (roleName.equalsIgnoreCase(resterm.getString("Data_Entry_Person").trim())) {
-				return Role.RESEARCHASSISTANT;
-			} else if (roleName.equalsIgnoreCase(resterm.getString("Monitor").trim())) {
-				return Role.MONITOR;
-			} else
-				return null;
-		}
+
 
 		/**
 		 * 
@@ -617,33 +596,7 @@ public class StudyParticipantController {
 		        return studyParticipanttDTO;
 			 
 		 }
-		 
-		 
-		 /**
-	     * Helper Method to resolve a date provided as a string to a Date object.
-	     * 
-	     * @param dateAsString
-	     * @return Date
-	     * @throws ParseException
-	     */
-	    private Date getDate(String dateAsString) throws ParseException, Exception {
-	        SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
-	        sdf.setLenient(false);
-	        Date dd = sdf.parse(dateAsString);
-	        Calendar c = Calendar.getInstance();
-	        c.setTime(dd);
-	        if (c.get(Calendar.YEAR) < 1900 || c.get(Calendar.YEAR) > 9999) {
-	        	throw new Exception("Unparsable date: "+dateAsString);
-	        }
-	        return dd;
-	    }
 
-	    private int getYear(Date dt) throws ParseException, Exception {       
-	        Calendar c = Calendar.getInstance();
-	        c.setTime(dt);
-	        
-	        return c.get(Calendar.YEAR);
-	    }
 	    /**
 	     * 
 	     * @return

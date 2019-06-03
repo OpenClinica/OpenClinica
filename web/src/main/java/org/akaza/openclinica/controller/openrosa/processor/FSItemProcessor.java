@@ -10,13 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
@@ -33,8 +30,6 @@ import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.RepeatCountDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
@@ -53,8 +48,6 @@ import org.xml.sax.InputSource;
 @Order(value = 7)
 public class FSItemProcessor extends AbstractItemProcessor implements Processor {
 
-    @Autowired
-    private DataSource dataSource;
     @Autowired
     private QueryService queryService;
     @Autowired
@@ -395,16 +388,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         setStudySubjectDetail(studySubject);
         studySubject.setUpdateId(container.getUser().getUserId());
         studySubject.setDateUpdated(new Date());
-
-        StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
-        UserAccountDAO udao = new UserAccountDAO(dataSource);
-        UserAccountBean userAccountBean=(UserAccountBean) udao.findByPK(container.getUser().getUserId());
-
-        StudySubjectBean studySubjectBean=(StudySubjectBean) ssdao.findByPK(studySubject.getStudySubjectId());
-        studySubjectBean.setUpdatedDate(new Date());
-        studySubjectBean.setUpdater(userAccountBean);
-        ssdao.update(studySubjectBean);
-
         if (attrValue.equals(FIRSTNAME)) {
             studySubject.getStudySubjectDetail().setFirstName(itemValue);
             studySubjectDao.saveOrUpdate(studySubject);

@@ -172,7 +172,7 @@ public class EnketoUrlService {
     }
 
     public FormUrlObject getActionUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
-                                      ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked , boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub) throws Exception {
+                                      ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked , List <Bind> binds, UserAccountBean ub) throws Exception {
         Study study = enketoCredentials.getParentStudy(studyOid);
         Study site = enketoCredentials.getSiteStudy(studyOid);
         studyOid = study.getOc_oid();
@@ -202,7 +202,7 @@ public class EnketoUrlService {
         EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
                 formLayout.getFormLayoutId());
 
-        if(eventCrf==null){
+        if(eventCrf==null && binds!=null){
             UserAccount userAccount = userAccountDao.findByUserId(ub.getId());
             eventCrf= createEventCrf(formLayout,studyEvent,subject,userAccount);
         }
@@ -218,7 +218,7 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
         if(flavor.equals(PARTICIPATE_FLAVOR) || flavor.equals(QUERY_FLAVOR)){
-            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds);
+            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,binds);
             crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
@@ -320,7 +320,7 @@ public class EnketoUrlService {
         return dt;
     }
 
-    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,boolean formContainsContactData, List<Bind> binds)
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,List<Bind> binds)
             throws Exception {
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -430,7 +430,7 @@ public class EnketoUrlService {
             data.put(repeatCount.getGroupName(), repeatCount.getGroupCount());
         }
 
-        if (formContainsContactData ){
+        if (binds != null){
             addContactData(binds,data,eventCrf.getStudySubject());
         }
 

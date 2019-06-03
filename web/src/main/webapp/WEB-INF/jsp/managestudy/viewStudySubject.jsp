@@ -152,13 +152,6 @@
     section.toggleClass('collapsed expanded');
   }
 
-  function showSection(position, selector) {
-    var $el = $(selector);
-    if (store.data.collapseSections[position])
-      $el.toggleClass('expanded collapsed').children('.section-body').hide();
-    $el.removeClass('hide');
-  }
-
   function clickAllSections(selector) {
     $(selector).children('.section-header').each(showHide);
   };
@@ -357,7 +350,7 @@
           <td>
             <c:if test="${
               studySub.status.name!='removed' &&
-              (sessionScope.customUserRole=='Clinical Research Coordinator' || sessionScope.customUserRole=='Investigator')
+              (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
             }">
               <c:if test="${participateStatus=='enabled'}">
                 <a href="javascript:;" id="contactInformation">
@@ -463,7 +456,7 @@
                             <div class="tablebox_center">
                               <c:if test="${
                                 studySub.status.name!='removed' &&
-                                (sessionScope.customUserRole=='Clinical Research Coordinator' || sessionScope.customUserRole=='Investigator')
+                                (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
                               }">
                                 <c:if test="${participateStatus=='enabled'}">
                                   <!-- Table Contents -->
@@ -572,8 +565,11 @@
   </div>
 </div>
 <script>
-  showSection(0, '#studySubjectRecord');
+  if (store.data.collapseSections[0])
+    $('#studySubjectRecord').toggleClass('expanded collapsed').children('.section-body').hide();
+  $('#studySubjectRecord').removeClass('hide');
 </script>
+<div id="loading"><br> &nbsp; Loading...</div>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
@@ -601,12 +597,6 @@
     </c:import>
   </div>
 </div>
-<script>
-  if ($('#subjectEvents td.table_cell_left').length) {
-    showSection(1, '#subjectEvents');
-  }
-</script>
-<div id="loading"><br> &nbsp; Loading...</div>
 <jsp:include page="viewStudySubjectCommon.jsp"/>
 <div style="width: 250px">
 <c:choose>
@@ -1181,9 +1171,9 @@
             <c:when test="${participateStatus=='enabled'}">
               <fmt:message key="update_and_invite" bundle="${resword}"/>
             </c:when>
-            <c:when test="${!userRole.monitor}">
+            <c:otherwise>
               <fmt:message key="partid_edit" bundle="${resword}"/>
-            </c:when>
+            </c:otherwise>
           </c:choose>
         </h3>
       </td>

@@ -19,7 +19,6 @@ import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -56,7 +55,6 @@ public class EnketoFormServlet extends SecureController {
         EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
         EnketoCredentials enketoCredentials = (EnketoCredentials) SpringServletAccess.getApplicationContext(context).getBean("enketoCredentials");
         XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
-        OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
 
         String mode = request.getParameter(MODE);
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
@@ -128,16 +126,35 @@ public class EnketoFormServlet extends SecureController {
         }
 
 
-   List<Bind> binds = openRosaServices.getBinds(formLayout, flavor, parentStudy.getOc_oid());
-        boolean formContainsContactData=false;
-        if(openRosaServices.isFormContainsContactData(binds))
-            formContainsContactData=true;
+        String xformOutput = "";
+        int studyFilePath = parentStudy.getFilePath();
+        CrfBean crf = formLayout.getCrf();
+
+        do {
+            xformOutput = getXformOutput(parentStudy.getOc_oid(), studyFilePath, crf.getOcOid(), formLayout.getOcOid());
+            studyFilePath--;
+        } while (xformOutput.equals("") && studyFilePath > 0);
+        Html html = xformParser.unMarshall(xformOutput);
+        Body body = html.getBody();
+        Head head = html.getHead();
+        Model model = head.getModel();
+
+        List<Bind> binds = model.getBind();
+        boolean formContainsContactData = false;
+        for (Bind bind : binds) {
+            if (bind.getOcExternal() != null && bind.getOcExternal().startsWith(CONTACTDATA)) {
+                formContainsContactData = true;
+                break;
+            }
+        }
+        if (!formContainsContactData)
+            binds = null;
 
 
         if (Integer.valueOf(eventCrfId) > 0 || (Integer.valueOf(eventCrfId) == 0 && formContainsContactData && !preview)) {
             logger.info("eventCrfId:" + eventCrfId + " user:" + ub.getName());
             formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout,
-                    flavor, null, role, mode, loadWarning, isFormLocked,formContainsContactData,binds,ub);
+                    flavor, null, role, mode, loadWarning, isFormLocked,binds,ub);
         } else if (Integer.valueOf(eventCrfId) == 0) {
             logger.info("eventCrfId is zero user:" + ub.getName());
             String hash = formLayout.getXform();

@@ -211,8 +211,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
-        DiscrepancyNoteBean dNBean;
-
         for (DiscrepancyNoteBean discrepancyNoteBean : items) {
 
             HashMap<Object, Object> h = new HashMap<Object, Object>();
@@ -233,23 +231,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
             h.put("entityName", discrepancyNoteBean.getEntityName());
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
-            // if DisType is QUERY(3) and ResolutionStatus is UPDATE or CLOSED
-            // then find latest detailedNotes
-            if (discrepancyNoteBean.getDisType().equals(DiscrepancyNoteType.QUERY) &&
-                    (discrepancyNoteBean.getResStatus().equals(ResolutionStatus.UPDATED)) ||
-                    discrepancyNoteBean.getResStatus().equals(ResolutionStatus.CLOSED) ) {
-                if (discrepancyNoteBean.getParentDnId() > 0) {
-                    dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findLatestChildByParent(
-                            discrepancyNoteBean.getParentDnId());
-                } else {
-                    // this entity is parent
-                    dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findLatestChildByParent(
-                            discrepancyNoteBean.getId());
-                }
-                h.put("discrepancyNoteBean.detailedNotes", dNBean.getDetailedNotes());
-            } else {
-                h.put("discrepancyNoteBean.detailedNotes", discrepancyNoteBean.getDetailedNotes());
-            }
+            h.put("discrepancyNoteBean.detailedNotes", discrepancyNoteBean.getDetailedNotes());
             h.put("numberOfNotes", discrepancyNoteBean.getNumChildren());
             h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
             h.put("discrepancyNoteBean.entityType", discrepancyNoteBean.getEntityType());

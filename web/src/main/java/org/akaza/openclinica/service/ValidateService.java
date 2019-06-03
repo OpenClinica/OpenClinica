@@ -17,7 +17,6 @@ import java.util.List;
  */
 public interface ValidateService {
 
-    boolean isStudyAvailable(String studyOid);
 
     boolean isStudyOidValid(String studyOid);
 

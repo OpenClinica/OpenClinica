@@ -25,10 +25,9 @@ import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.validator.ParticipantValidator;
-import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,13 +128,14 @@ public class ParticipantServiceImpl implements ParticipantService {
 
             studySubjectBean.setLabel(subjectTransfer.getStudySubjectId());
             studySubjectBean.setStatus(Status.AVAILABLE);
+            studySubjectBean.setUserStatus(UserStatus.CREATED);
             studySubjectBean.setOwner(subjectTransfer.getOwner());
             Date now = new Date();
             studySubjectBean.setCreatedDate(now);
             studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
 
         }
-        studySubject=saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,accessToken,currentStudy.getOid(),userAccountBean);
+        studySubject = saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,userAccountBean);
 
         if (!studySubjectBean.isActive() || studySubject==null) {
             throw new OpenClinicaException("Could not create study subject", "4");
@@ -160,7 +160,8 @@ public class ParticipantServiceImpl implements ParticipantService {
             oCParticipantDTO.setPhoneNumber(subjectTransfer.getPhoneNumber());
             oCParticipantDTO.setIdentifier(subjectTransfer.getIdentifier());
             ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(locale);
-            userService.connectParticipant(currentStudy.getOid(), subjectTransfer.getPersonId(), oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
+            userService.connectParticipant(currentStudy.getOid(), subjectTransfer.getPersonId(),
+                    oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
         }
 
 
@@ -348,21 +349,23 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     /**
      * Create the Subject object if it is not already in the system.
      */
+    @Transactional
     public void processBulkParticipants(StudyBean study, String studyOid, StudyBean siteStudy, String siteOid,
                                          UserAccountBean user, String accessToken, String customerUuid, MultipartFile file,
-                                        JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) throws Exception {
+                                        JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) {
 
         List<OCParticipateImportDTO> ocParticipateImportDTOs = new ArrayList<>();
-        List<SubjectTransferBean> subjects = csvService.readCSVFile(file);
-        String fileName = study.getIdentifier()
-                + UserServiceImpl.DASH
-                + study.getEnvType()
-                + PARTICIPANT_IMPORT + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
-        ResourceBundleProvider.updateLocale(locale);
-        final boolean siteImport = uri.indexOf("/sites/") > 0 ? true: false;
-
+        String fileName = null;
+        int index = 1;
         try {
-            int index = 1;
+            List<SubjectTransferBean> subjects = csvService.readBulkParticipantCSVFile(file);
+            fileName = study.getIdentifier()
+                    + UserServiceImpl.DASH
+                    + study.getEnvType()
+                    + PARTICIPANT_IMPORT + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
+            ResourceBundleProvider.updateLocale(locale);
+            final boolean siteImport = uri.indexOf("/sites/") > 0 ? true: false;
+
             for (SubjectTransferBean subject: subjects) {
                 ArrayList<String> errorMsgs = new ArrayList<String>();
                 subject.setPersonId((String) subject.getStudySubjectId());
@@ -417,11 +420,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                     ocParticipateImportDTOs.add(p);
                 } else {
                     String label = null;
-                    try {
-                        label = createParticipant(subject, study, accessToken, customerUuid, user, locale);
-                    } catch (Exception e) {
-                        logger.error("Error in createParticipant:" + e);
-                    }
+                    label = createParticipant(subject, study, accessToken, customerUuid, user, locale);
                     StudySubjectBean subjectBean = this.getStudySubjectDAO().findByLabel(label);
                     studyParticipantDTO.setSubjectOid(subjectBean.getOid());
 
@@ -429,7 +428,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                     p.setRow(index);
                     p.setParticipantId(subjectBean.getLabel());
                     p.setParticipantOid(subjectBean.getOid());
-                    p.setParticipateStatus(subjectBean.getStatus().getName());
+                    p.setParticipateStatus(subjectBean.getStatus() != null ? subjectBean.getStatus().getName() : "");
                     p.setStatus("Success");
                     p.setMessage("");
                     ocParticipateImportDTOs.add(p);
@@ -437,10 +436,16 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                 }
                 ++index;
             }
-            writeToFile(ocParticipateImportDTOs, studyOid, fileName);
         } catch (Exception e) {
             userService.persistJobFailed(jobDetail, fileName);
-            logger.error("Bulk Participant Import Job Failed ");
+            logger.error("Bulk Participant Import Job Failed.");
+        } finally {
+            // write out any DTOs that have been processed
+            if (CollectionUtils.isNotEmpty(ocParticipateImportDTOs)) {
+                writeToFile(ocParticipateImportDTOs, studyOid, fileName);
+            } else {
+                logger.error("No records were processed.");
+            }
         }
         userService.persistJobCompleted(jobDetail, fileName);
     }
@@ -461,7 +466,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         } finally {
-            writer.print(writeToTextFile(participateImportDTOS));
+            writer.print(writeToStringBuffer(participateImportDTOS));
             closeFile(writer);
         }
     }
@@ -488,7 +493,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     }
 
 
-    private String writeToTextFile(List<OCParticipateImportDTO> participateImportDTOs) {
+    private String writeToStringBuffer(List<OCParticipateImportDTO> participateImportDTOs) {
 
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Row");
@@ -528,8 +533,9 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         return sb.toString();
     }
 
-    private StudySubject saveOrUpdateStudySubjectDetails(StudySubjectBean studySubjectBean, SubjectTransferBean subjectTransfer, String accessToken, String studyOid , UserAccountBean userAccountBean) {
-        StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getId());
+    private StudySubject saveOrUpdateStudySubjectDetails(StudySubjectBean studySubjectBean, SubjectTransferBean subjectTransfer,
+                                                          UserAccountBean userAccountBean) throws Exception {
+        StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getSubjectId());
 
         studySubjectBean.setUpdater(userAccountBean);
         studySubjectBean.setUpdatedDate(new Date());
