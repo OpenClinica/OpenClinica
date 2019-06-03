@@ -103,7 +103,7 @@ public class ImportCRFDataService {
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
      * findByEventSubjectVersion method in EventCRFDAO. May return more than one, hmm.
      */
-    public HashMap fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) throws OpenClinicaException {
+    public synchronized HashMap fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) throws OpenClinicaException {
     	HashMap fetchEventCRFBeansResult = new HashMap();
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         //StudyEventBean List to hold new common event
@@ -182,13 +182,21 @@ public class ImportCRFDataService {
                          *  will test skip logic first
                          */
                         String sqlStr;
-                        ArrayList matchCriterias;
+                        ArrayList matchCriterias = null;
                         boolean matchedAndSkip=false;
     					
 						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
 						if(sqlStr != null) {
 							ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
-							matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+							try {
+								matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+								
+							}catch(Exception e) {
+								e.printStackTrace();
+								logger.error("skipMatchCriteriaOids="+ skipMatchCriteriaOids);
+								logger.error("buildSkipMatchCriteriaSql="+ sqlStr);
+							}
+							
 							
 							
 							if(matchCriterias == null || matchCriterias.size() == 0) {
@@ -2257,7 +2265,7 @@ public class ImportCRFDataService {
     		finalSqlStr = baseSqlStr + " " + itemGroupOIDSmt.toString() + " "+ itemOIDSmt.toString() + " order by se.study_event_id";
     	}
 		
-    	logger.info("buildSkipMatchCriteriaSql============"+ finalSqlStr);
+    	//logger.info("buildSkipMatchCriteriaSql============"+ finalSqlStr);
 		return finalSqlStr;
     	
     }
