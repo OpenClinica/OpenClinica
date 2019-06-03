@@ -223,7 +223,7 @@ public class DataController {
      * @return
      * @throws Exception
      */
-    protected ArrayList<ErrorMessage> importDataInTransaction(String importXml, HttpServletRequest request) throws Exception {
+    protected synchronized ArrayList<ErrorMessage> importDataInTransaction(String importXml, HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
         
