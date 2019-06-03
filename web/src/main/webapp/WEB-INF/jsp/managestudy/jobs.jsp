@@ -124,6 +124,7 @@
         targets: -1,
         orderable: false
       }],
+      order: [[6, 'desc']],
       language: {
         emptyTable: '<fmt:message key="jobs_noresult" bundle="${resword}"/>',
         paginate: {
