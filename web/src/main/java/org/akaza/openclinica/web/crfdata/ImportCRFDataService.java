@@ -716,7 +716,7 @@ public class ImportCRFDataService {
     /*
      * purpose: returns false if any of the forms/EventCRFs fail the UpsertOnBean rules.
      */
-    public boolean eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub) {
+    public synchronized boolean eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub) {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
@@ -747,6 +747,13 @@ public class ImportCRFDataService {
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
                         studyBean.getId(), studyBean.getParentStudyId());
+                // more detail log
+                if(studyEventDefinitionBean == null) {
+                	logger.error("studyEventDefinitionBean == null for OID:" + studyEventDataBean.getStudyEventOID() + "-StudyId:"+ studyBean.getId() + "-ParentStudyId:" + studyBean.getParentStudyId());
+                }
+                if(studySubjectBean == null) {
+                	logger.error("studySubjectBean == null for OID:" + subjectDataBean.getSubjectOID() + "-StudyId:"+ studyBean.getId());
+                }
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
                 StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
