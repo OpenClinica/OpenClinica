@@ -228,7 +228,7 @@ public class DataImportService {
             errors.add(respage.getString("an_error_was_thrown_while_validation_errors"));
             logger.debug("=== threw the null pointer, import === " + npe1.getMessage());
         } catch (OpenClinicaException oce1) {
-            errors.add(oce1.getOpenClinicaMessage());
+            errors.add(oce1.errorID+":"+oce1.getOpenClinicaMessage());
             logger.debug("=== threw the openclinica message, import === " + oce1.getOpenClinicaMessage());
         }
 
