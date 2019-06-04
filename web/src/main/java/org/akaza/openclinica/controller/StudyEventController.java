@@ -49,11 +49,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
-import org.akaza.openclinica.service.CustomRuntimeException;
-import org.akaza.openclinica.service.ParticipateService;
-import org.akaza.openclinica.service.StudyEventService;
-import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.service.UtilService;
+import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
@@ -120,6 +116,9 @@ public class StudyEventController {
 
     @Autowired
 	private StudyEventService studyEventService;
+
+    @Autowired
+	private CSVService csvService;
 
 	@Autowired
 	private UserService userService;
@@ -360,7 +359,7 @@ public class StudyEventController {
 
 
 	@Transactional
-	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, Study study, String siteOID,UserAccountBean ub,JobDetail jobDetail,String schema) {
+	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, Study study, String siteOID,UserAccountBean ub,JobDetail jobDetail,String schema) {
 			
 		ResponseEntity response = null;
 		String logFileName = null;
@@ -376,7 +375,7 @@ public class StudyEventController {
 		try {
 			 
 				// read csv file
-				 ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = RestfulServiceHelper.readStudyEventScheduleBulkCSVFile(file, study.getOc_oid(), siteOID);
+				 ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = csvService.readStudyEventScheduleBulkCSVFile(file, study.getOc_oid(), siteOID);
 				 
 				 //schedule events
 				 for(StudyEventScheduleDTO studyEventScheduleDTO:studyEventScheduleDTOList) {
