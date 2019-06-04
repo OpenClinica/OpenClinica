@@ -58,6 +58,9 @@
 
         sessionStorage.setItem("pageContextPath", "<c:out value='${pageContext.request.contextPath}' />");
         sessionStorage.setItem("studyOid", "<c:out value='${study.oid}' />");
+        sessionStorage.setItem("studyName", "<c:out value='${study.name}' />");
+        sessionStorage.setItem("studyParentId", "<c:out value='${study.parentStudyId}' />");
+        sessionStorage.setItem("siteSubStringMark", "<c:out value='${siteSubStringMark}' />");
     });
 
     window.onload = function() {
