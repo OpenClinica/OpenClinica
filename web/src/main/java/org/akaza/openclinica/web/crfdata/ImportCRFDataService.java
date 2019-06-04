@@ -69,6 +69,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.service.ViewStudySubjectService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -724,7 +725,7 @@ public class ImportCRFDataService {
     /*
      * purpose: returns false if any of the forms/EventCRFs fail the UpsertOnBean rules.
      */
-    public synchronized boolean eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub) {
+    public synchronized boolean eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub) throws OpenClinicaException {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
@@ -760,7 +761,10 @@ public class ImportCRFDataService {
                 	logger.error("studyEventDefinitionBean == null for OID:" + studyEventDataBean.getStudyEventOID() + "-StudyId:"+ studyBean.getId() + "-ParentStudyId:" + studyBean.getParentStudyId());
                 }
                 if(studySubjectBean == null) {
-                	logger.error("studySubjectBean == null for OID:" + subjectDataBean.getSubjectOID() + "-StudyId:"+ studyBean.getId());
+                	
+                	String errMsg = "The study subject " + subjectDataBean.getSubjectOID() +" can not be found in Study "+ studyBean.getOid();
+    	        	logger.info(errMsg);
+    	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NO_SUBJECT_FOUND);
                 }
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
