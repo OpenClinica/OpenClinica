@@ -1,11 +1,15 @@
 package org.akaza.openclinica.controller.dto;
 
-public class StudyEventScheduleRequestDTO {
+import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
+
+public class StudyEventUpdateRequestDTO {
 
 	private String subjectKey;
 	private String studyEventOID;
+	private String eventRepeatKey;
 	private String startDate;
 	private String endDate;
+	private String eventStatus;
 
 		
 	public String getStudyEventOID() {
@@ -36,5 +40,22 @@ public class StudyEventScheduleRequestDTO {
 	public void setSubjectKey(String subjectKey) {
 		this.subjectKey = subjectKey;
 	}
+
+
+    public String getEventStatus() {
+        return eventStatus;
+    }
+
+    public void setEventStatus(String eventStatus) {
+        this.eventStatus = eventStatus;
+    }
+
+    public String getEventRepeatKey() {
+        return eventRepeatKey;
+    }
+
+    public void setEventRepeatKey(String eventRepeatKey) {
+        this.eventRepeatKey = eventRepeatKey;
+    }
 
 }

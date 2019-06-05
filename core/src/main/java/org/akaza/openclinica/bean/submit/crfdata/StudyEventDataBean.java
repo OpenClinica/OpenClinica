@@ -6,7 +6,9 @@ import java.util.Date;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
+import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 
 public class StudyEventDataBean {
     private ArrayList<FormDataBean> formData;
@@ -17,6 +19,7 @@ public class StudyEventDataBean {
     private StudyEventDefinition studyEventDefinition;
     private String startDate;
     private String endDate;
+    private String eventStatus;
 
     public StudyEventDataBean() {
         formData = new ArrayList<FormDataBean>();
@@ -86,5 +89,13 @@ public class StudyEventDataBean {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public String getEventStatus() {
+        return eventStatus;
+    }
+
+    public void setEventStatus(String eventStatus) {
+        this.eventStatus = eventStatus;
     }
 }
