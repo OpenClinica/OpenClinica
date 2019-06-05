@@ -102,7 +102,7 @@ public class DownloadRuleSetXmlServlet extends SecureController {
             RuleSetRuleBean rsr = getRuleSetService().getRuleSetRuleDao().findById(Integer.valueOf(string));
             ruleSetRules.add(rsr);
         }
-        rpic.populate(ruleSetRules);
+        rpic.populate(ruleSetRules, false);
         
         } 
         return rpic;

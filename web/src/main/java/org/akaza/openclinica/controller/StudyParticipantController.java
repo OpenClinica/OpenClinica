@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import com.sun.corba.se.spi.resolver.LocalResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -228,7 +229,7 @@ public class StudyParticipantController {
 		private ResponseEntity<String> createNewStudyParticipantsInBulk(HttpServletRequest request, MultipartFile file,
 				String studyOID, String siteOID, Map<String, Object> map) throws Exception {
 			ResponseEntity response = null;
-			
+
 			UserAccountBean  user = this.participantService.getUserAccount(request);
 			String message = null;
 
@@ -373,10 +374,9 @@ public class StudyParticipantController {
 
 			UserAccount userAccount = uDao.findById(userAccountBean.getId());
 			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.BULK_ADD_PARTICIPANTS,file.getOriginalFilename());
-			String uri = request.getRequestURI();
 			CompletableFuture.supplyAsync(() -> {
 				participantService.processBulkParticipants(studyBean, studyOid, siteBean, siteOid, userAccountBean, accessToken, customerUuid, file,
-							jobDetail, request.getLocale(), uri, map);
+							jobDetail, request.getLocale(), request.getRequestURI(), map);
 				return null;
 			});
 			return jobDetail.getUuid();

@@ -12,6 +12,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -124,6 +125,8 @@ public class ListStudySubjectsServlet extends SecureController {
             fp.addPresetValue(AddNewSubjectServlet.INPUT_EVENT_START_DATE, todayFormatted);
             setPresetValues(fp.getPresetValues());
         }
+
+        request.setAttribute("siteSubStringMark", CoreResources.getField("insight.report.replica.substring"));
 
         request.setAttribute("closeInfoShowIcons", true);
         if (fp.getString("navBar").equals("yes") && fp.getString("findSubjects_f_studySubject.label").trim().length() > 0) {

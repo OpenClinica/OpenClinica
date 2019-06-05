@@ -310,7 +310,7 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        }
 
 	        validateParticipantData(subjectTransferBean, e);
-    	   	        
+
 	    }
 
 	/**
