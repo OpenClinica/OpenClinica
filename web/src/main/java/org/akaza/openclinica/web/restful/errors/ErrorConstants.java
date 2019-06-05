@@ -74,11 +74,11 @@ public class ErrorConstants {
     public static final String ERR_INVALID_XML_FILE = "errorCode.invalidXMLFile";
     public static final String ERR_FILE_FORMAT_NOT_SUPPORTED = "errorCode.fileFormatNotSupported";
 
-    public static final String ERR_MISSING_START_DATE = "errorCode.eventNotScheduled.missingStartDate";
-    public static final String ERR_INVALID_START_DATE = "errorCode.eventNotScheduled.invalidStartDate";
-    public static final String ERR_INVALID_END_DATE = "errorCode.eventNotScheduled.invalidEndDate";
-    public static final String ERR_EVENT_REPEAT_KEY_TOO_LARGE = "errorCode.eventNotScheduled.repeatKeyTooLarge";
-    public static final String ERR_INVALID_EVENT_REPEAT_KEY = "errorCode.eventNotScheduled.invalidRepeatKey";
+    public static final String ERR_MISSING_START_DATE = "errorCode.missingStartDate";
+    public static final String ERR_INVALID_START_DATE = "errorCode.invalidStartDate";
+    public static final String ERR_INVALID_END_DATE = "errorCode.invalidEndDate";
+    public static final String ERR_EVENT_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
+    public static final String ERR_INVALID_EVENT_REPEAT_KEY = "errorCode.invalidRepeatKey";
 
     public static final String ERR_ITEM_TYPE_NOT_SUPPORTED = "errorCode.itemTypeNotSupportedInImport";
     public static final String ERR_VALUE_CHOICE_NOT_FOUND = "errorCode.valueChoiceCodeNotFound";
@@ -112,5 +112,29 @@ public class ErrorConstants {
     public static final String ERR_ITEMGROUP_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
 
     public static final String ERR_SUBJECT_DATA_MISSING = "errorCode.subjectDataMissing";
+    public static final String ERR_COMMON_EVENTS_CANNOT_BE_SCHEDULED = "errorCode.commonEventsCannotBeScheduled";
+
+    public static final String ERR_SUBJECT_DOES_NOT_CONTAIN_EVENTDATA = "errorCode.subjectDoesNotContainStudyEventData";
+    public static final String ERR_EVENT_DOES_NOT_CONTAIN_FORMDATA = "errorCode.eventDoesNotContainFormData";
+    public static final String ERR_FORM_DOES_NOT_CONTAIN_ITEMGROUPDATA = "errorCode.formDoesNotContainItemGroupData";
+    public static final String ERR_ITEMGROUP_DOES_NOT_CONTAIN_ITEMDATA = "errorCode.itemGroupDoesNotContainItemData";
+
+    public static final String ERR_EVENT_STATUS_NOT_NULL = "errorCode.eventStatusNotNull";
+    public static final String ERR_EVENT_REPEAT_KEY_NOT_NULL = "errorCode.eventRepeatKeyNotNull";
+
+    public static final String ERR_EVENT_ALREADY_EXISTS_CANT_SCHEDULE = "errorCode.eventAlreadyExistsCan'tSchedule";
+    public static final String ERR_EVENT_DOES_NOT_EXISTS_TO_UPDATE = "errorCode.eventDoesNotExistsToUpdate";
+
+    public static final String ERR_INVALID_EVENT_STATUS = "errorCode.invalidEventStatus";
+    public static final String ERR_INVALID_EVENT_TRANSITION_STATUS = "errorCode.invalidEventTransitionStatus";
+
+    public static final String ERR_END_DATE_IS_BEFORE_START_DATE = "errorCode.endDateIsBeforeStartDate";
+
+    public static final String ERR_REPEAT_KEY_REQUIRED = "errorCode.repeatKeyRequired";
+    public static final String ERR_EVENT_DOES_NOT_EXIST = "errorCode.eventDoesNotExist";
+    public static final String ERR_EVENT_ALREADY_EXISTS = "errorCode.eventAlreadyExists";
+
+    public static final String ERR_INVALID_REPEAT_KEY = "errorCode.invalidRepeatKey";
+    public static final String ERR_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
 
 }
