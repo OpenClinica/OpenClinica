@@ -26,5 +26,5 @@ public interface ParticipantService {
 	 UserAccountBean getUserAccount(HttpServletRequest request);
 	void processBulkParticipants(StudyBean study, String studyOid, StudyBean siteStudy, String siteOid,
 								 UserAccountBean user, String accessToken, String customerUuid, MultipartFile file,
-								 JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map);
+								 JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) throws Exception;
 }

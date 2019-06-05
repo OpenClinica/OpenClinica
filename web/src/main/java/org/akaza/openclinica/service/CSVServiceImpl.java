@@ -184,12 +184,16 @@ public class CSVServiceImpl implements CSVService {
         try {
             parser.getRecords().forEach(record -> {
                 SubjectTransferBean transferBean = new SubjectTransferBean();
-                int headerIndex = 0;
+                int headerIndex = -1;
                 Iterator<String> iterator = record.iterator();
                 while (iterator.hasNext()) {
                     String column = iterator.next();
                     if (StringUtils.isNotEmpty(column)) {
-                        switch (EnumUtils.getEnum(PIIEnum.class, bidiMap.getKey(headerIndex))) {
+                        ++headerIndex;
+                        PIIEnum piiEnum = EnumUtils.getEnum(PIIEnum.class, bidiMap.getKey(headerIndex));
+                        if (piiEnum == null)
+                            continue;
+                        switch (piiEnum) {
                             case EmailAddress:
                                 transferBean.setEmailAddress(column);
                                 break;
@@ -208,9 +212,11 @@ public class CSVServiceImpl implements CSVService {
                             case MobileNumber:
                                 transferBean.setPhoneNumber(column);
                                 break;
+                            default:
+                                // ignore all others
+                                break;
                         }
                     }
-                    ++headerIndex;
                 }
                 transferBeans.add(transferBean);
             });
