@@ -682,6 +682,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
             studySubjectBean = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
             return studySubjectBean;
         } else {
+        	logger.info(sql+"WARNING: cannot find StudySubjectBean by oid " + oid + " and study id " + studyId);
             return null;
         }
     }
