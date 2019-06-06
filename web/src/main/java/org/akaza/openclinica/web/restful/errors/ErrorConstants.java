@@ -39,6 +39,8 @@ public class ErrorConstants {
     public static final String ERR_XML_NOT_WELL_FORMED = "errorCode.xmlNotWellFormed";
 
     public static final String ERR_STUDY_NOT_EXIST = "errorCode.studyNotExist";
+    public static final String ERR_STUDY_OID_NOT_AVAILABLE = "errorCode.studyOIDNotAvailable";
+
     public static final String ERR_SITE_NOT_EXIST = "errorCode.siteNotExist";
     public static final String ERR_NO_ROLE_SETUP = "errorCode.noRoleSetUp";
     public static final String ERR_NO_SUFFICIENT_PRIVILEGES = "errorCode.noSufficientPrivileges";
@@ -46,6 +48,9 @@ public class ErrorConstants {
 
     public static final String ERR_NO_SUBJECT_FOUND = "errorCode.noSubjectFound";
     public static final String ERR_EVENT_NOT_EXIST = "errorCode.eventNotExist";
+    public static final String ERR_EVENT_NOT_AVAILABLE = "errorCode.eventNotAvailable";
+    public static final String ERR_FORM_NOT_AVAILABLE = "errorCode.formNotAvailable";
+
     public static final String ERR_NOT_INTEGER = "errorCode.notInteger";
     public static final String ERR_ORDINAL_TOO_BIG = "errorCode.ordinalTooBig";
 
