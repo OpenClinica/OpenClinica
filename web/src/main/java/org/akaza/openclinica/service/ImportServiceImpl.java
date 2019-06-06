@@ -554,7 +554,7 @@ public class ImportServiceImpl implements ImportService {
         return errorObj;
     }
 
-    private ErrorObj validateItemDataType(Item item, String value) {
+    private ErrorObj validateItemDataType(Item item, String value,ItemCountInForm itemCountInForm) {
         ItemDataType itemDataType = item.getItemDataType();
         switch (itemDataType.getCode()) {
             case "BL":
@@ -567,11 +567,8 @@ public class ImportServiceImpl implements ImportService {
                 return validateForReal(value);
             case "DATE":
                 return validateForDate(value);
-            case "PDATE":
-                return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
-            case "FILE":
-                return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
             default:
+                itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
         }
     }
@@ -618,7 +615,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private ErrorObj validateResponseSets(ResponseSet responseSet, String value) {
+    private ErrorObj validateResponseSets(ResponseSet responseSet, String value,ItemCountInForm itemCountInForm) {
         ResponseType responseType = responseSet.getResponseType();
         switch (responseType.getName()) {
             case ("checkbox"):
@@ -633,10 +630,10 @@ public class ImportServiceImpl implements ImportService {
                 return null;
             case ("textarea"):
                 return null;
-            case ("file"):
-                return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
             case ("calculation"):
+                return null;
             default:
+                itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
         }
     }
@@ -1150,12 +1147,13 @@ public class ImportServiceImpl implements ImportService {
         }
 
         if (StringUtils.isNotEmpty(itemDataBean.getValue())) {
-            errorObj = validateItemDataType(item, itemDataBean.getValue());
+            errorObj = validateItemDataType(item, itemDataBean.getValue(), itemCountInForm);
             if (errorObj != null) return errorObj;
+
 
             Set<ItemFormMetadata> ifms = item.getItemFormMetadatas();
             ResponseSet responseSet = ifms.iterator().next().getResponseSet();
-            errorObj = validateResponseSets(responseSet, itemDataBean.getValue());
+            errorObj = validateResponseSets(responseSet, itemDataBean.getValue(),itemCountInForm);
             if (errorObj != null) return errorObj;
 
         }
@@ -1164,6 +1162,7 @@ public class ImportServiceImpl implements ImportService {
 
         if (itemData != null) {
             if (itemData.getValue().equals(itemDataBean.getValue())) {
+                itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 return new ErrorObj(NO_CHANGE, null);
 
             } else {
