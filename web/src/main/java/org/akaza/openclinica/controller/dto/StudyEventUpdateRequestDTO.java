@@ -6,7 +6,7 @@ public class StudyEventUpdateRequestDTO {
 
 	private String subjectKey;
 	private String studyEventOID;
-	private String eventRepeatKey;
+	private String studyEventRepeatKey;
 	private String startDate;
 	private String endDate;
 	private String eventStatus;
@@ -50,12 +50,11 @@ public class StudyEventUpdateRequestDTO {
         this.eventStatus = eventStatus;
     }
 
-    public String getEventRepeatKey() {
-        return eventRepeatKey;
-    }
+	public String getStudyEventRepeatKey() {
+		return studyEventRepeatKey;
+	}
 
-    public void setEventRepeatKey(String eventRepeatKey) {
-        this.eventRepeatKey = eventRepeatKey;
-    }
-
+	public void setStudyEventRepeatKey(String studyEventRepeatKey) {
+		this.studyEventRepeatKey = studyEventRepeatKey;
+	}
 }
