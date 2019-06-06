@@ -178,34 +178,11 @@ public class StudyParticipantController {
 			Study tenantStudy = studyDao.findByOcOID(studyOid);
 			ResponseEntity<String> response = null;
 			UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-			ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 			try {
-				if (!validateService.isStudyOidValid(studyOid)) {
-					throw new OpenClinicaSystemException(org.akaza.openclinica.web.restful.errors.ErrorConstants.ERR_STUDY_NOT_EXIST);
-				}
-				if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
-					throw new OpenClinicaSystemException(org.akaza.openclinica.web.restful.errors.ErrorConstants.ERR_STUDY_NOT_Valid_OID);
-				}
-				if (!validateService.isSiteOidValid(siteOid)) {
-					throw new OpenClinicaSystemException(org.akaza.openclinica.web.restful.errors.ErrorConstants.ERR_SITE_NOT_EXIST);
-				}
-				if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
-					throw new OpenClinicaSystemException(org.akaza.openclinica.web.restful.errors.ErrorConstants.ERR_SITE_NOT_Valid_OID);
-				}
-				if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
-					throw new OpenClinicaSystemException(org.akaza.openclinica.web.restful.errors.ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
-				}
-
-				if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToStudy(userRoles,siteOid)) {
-					throw new OpenClinicaSystemException(org.akaza.openclinica.web.restful.errors.ErrorConstants.ERR_NO_ROLE_SETUP);
-				} else if (!validateService.isUserHas_CRC_INV_RoleInSite(userRoles,siteOid)) {
-					throw new OpenClinicaSystemException(org.akaza.openclinica.web.restful.errors.ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-				}
-
 				if(!validateService.isParticipateActive(tenantStudy)) {
 					throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
 				}
-
+				participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
 			} catch (OpenClinicaSystemException e) {
 				String errorMsg = e.getErrorCode();
 				response = new ResponseEntity(errorMsg, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
@@ -375,8 +352,12 @@ public class StudyParticipantController {
 			UserAccount userAccount = uDao.findById(userAccountBean.getId());
 			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.BULK_ADD_PARTICIPANTS,file.getOriginalFilename());
 			CompletableFuture.supplyAsync(() -> {
-				participantService.processBulkParticipants(studyBean, studyOid, siteBean, siteOid, userAccountBean, accessToken, customerUuid, file,
-							jobDetail, request.getLocale(), request.getRequestURI(), map);
+				try {
+					participantService.processBulkParticipants(studyBean, studyOid, siteBean, siteOid, userAccountBean, accessToken, customerUuid, file,
+								jobDetail, request.getLocale(), request.getRequestURI(), map);
+				} catch (Exception e) {
+					logger.error("Error in Bulk participant job:" + e);
+				}
 				return null;
 			});
 			return jobDetail.getUuid();

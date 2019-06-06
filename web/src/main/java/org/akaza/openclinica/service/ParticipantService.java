@@ -1,21 +1,16 @@
 package org.akaza.openclinica.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.domain.datamap.JobDetail;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public interface ParticipantService {
 
@@ -26,5 +21,5 @@ public interface ParticipantService {
 	 UserAccountBean getUserAccount(HttpServletRequest request);
 	void processBulkParticipants(StudyBean study, String studyOid, StudyBean siteStudy, String siteOid,
 								 UserAccountBean user, String accessToken, String customerUuid, MultipartFile file,
-								 JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map);
+								 JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) throws Exception;
 }
