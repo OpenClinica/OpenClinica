@@ -5,20 +5,29 @@ import io.swagger.annotations.ApiOperation;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
+import org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
+import org.akaza.openclinica.controller.dto.StudyEventUpdateRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
+import org.akaza.openclinica.domain.enumsupport.EndpointType;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -29,9 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
@@ -39,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -122,7 +130,7 @@ public class ImportController {
             odmContainer = (ODMContainer) um1.unmarshal(reader);
 
         } catch (Exception e) {
-            logger.error("found exception with xml transform {}", e );
+            logger.error("found exception with xml transform {}", e);
             return new ResponseEntity(ErrorConstants.ERR_INVALID_XML_FILE + "\n" + e.getMessage(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 
         } finally {
@@ -154,7 +162,12 @@ public class ImportController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
+
         if (!validateService.isStudyOidValid(studyOid)) {
+            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
+        }
+
+        if (!validateService.isStudyAvailable(studyOid)) {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
         }
 
@@ -175,7 +188,7 @@ public class ImportController {
 
         String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm);
 
-        logger.info("REST request to Import Job uuid {} ",uuid);
+        logger.info("REST request to Import Job uuid {} ", uuid);
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
     }
 
@@ -194,8 +207,8 @@ public class ImportController {
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             try {
                 importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
-            } catch (Exception e){
-                logger.error("Exeception is thrown while processing dataImport: " + e);
+            } catch (Exception e) {
+                logger.error("Exception is thrown while processing dataImport: " + e);
             }
             return null;
 
@@ -209,6 +222,9 @@ public class ImportController {
 
         return new File(SpringServletAccess.getPropertiesDir(context) + fileNm);
     }
+
+
+
 
 
 }

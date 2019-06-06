@@ -25,13 +25,20 @@ import io.swagger.annotations.ApiParam;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.RestReponseDTO;
 import org.akaza.openclinica.bean.login.ResponseSuccessStudyParticipantDTO;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
+import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import org.akaza.openclinica.controller.dto.StudyEventResponseDTO;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
+import org.akaza.openclinica.controller.dto.StudyEventUpdateRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
@@ -42,6 +49,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.enumsupport.EndpointType;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -126,6 +134,9 @@ public class StudyEventController {
 	@Autowired
     private UtilService utilService;
 
+	@Autowired
+	private ValidateService validateService;
+
     PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
             new PassiveExpiringMap<>(24, TimeUnit.HOURS);
     
@@ -135,7 +146,8 @@ public class StudyEventController {
 	public static final String FILE_HEADER_MAPPING = "ParticipantID, StudyEventOID, Ordinal, StartDate, EndDate";
 	public static final String SEPERATOR = ",";
 	SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
-
+	public static final String CREATE = "create";
+	public static final String UPDATE = "update";
 
     /**
      * @api {put} /pages/auth/api/v1/studyevent/studysubject/{studySubjectOid}/studyevent/{studyEventDefOid}/ordinal/{ordinal}/complete Complete a Participant Event
@@ -562,6 +574,144 @@ public class StudyEventController {
     	return userBean;
        
 	}
+
+	@ApiOperation( value = "To schedule an event for participant at site level", notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date" )
+	@RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events", method = RequestMethod.POST )
+	public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
+														   @RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
+														   @PathVariable( "studyOID" ) String studyOid,
+														   @PathVariable( "siteOID" ) String siteOid) throws Exception {
+
+
+		return validateEndpoint(studyOid, siteOid, request, studyEventScheduleRequestDTO, null, EndpointType.EVENT_POST);
+
+	}
+
+
+	@ApiOperation( value = "To Update an event for participant at site level", notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date , Event Repeat Key , Event Status" )
+	@RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events", method = RequestMethod.PUT )
+	public ResponseEntity<Object> updateEventAtSiteLevel(HttpServletRequest request,
+														 @RequestBody StudyEventUpdateRequestDTO studyEventUpdateRequestDTO,
+														 @PathVariable( "studyOID" ) String studyOid,
+														 @PathVariable( "siteOID" ) String siteOid) throws Exception {
+
+
+		return validateEndpoint(studyOid, siteOid, request, null, studyEventUpdateRequestDTO, EndpointType.EVENT_PUT);
+
+	}
+
+	private ResponseEntity<Object> validateEndpoint(String studyOid, String siteOid, HttpServletRequest request, StudyEventScheduleRequestDTO studyEventScheduleRequestDTO, StudyEventUpdateRequestDTO studyEventUpdateRequestDTO, EndpointType endpointType) {
+
+		utilService.setSchemaFromStudyOid(studyOid);
+		Study tenantStudy = getTenantStudy(studyOid);
+		Study tenantSite = getTenantStudy(siteOid);
+		ResponseEntity<Object> response = null;
+		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+		ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+
+		try {
+			if (!validateService.isStudyOidValid(studyOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+			}
+			if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+			}
+			if (!validateService.isSiteOidValid(siteOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
+			}
+			if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+			}
+			if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+			}
+
+			if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && !validateService.isUserHasAccessToSite(userRoles, siteOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+			} else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+			}
+
+
+			Object result = null;
+
+			ODMContainer odmContainer = new ODMContainer();
+			if (endpointType.equals(EndpointType.EVENT_POST)) {
+				populateOdmContainerForEventSchedule(odmContainer, studyEventScheduleRequestDTO, siteOid);
+				result = studyEventService.studyEventProcess(odmContainer, studyOid, siteOid, userAccountBean, CREATE);
+
+			} else if (endpointType.equals(EndpointType.EVENT_PUT)) {
+				populateOdmContainerForEventUpdate(odmContainer, studyEventUpdateRequestDTO, siteOid);
+				result = studyEventService.studyEventProcess(odmContainer, studyOid, siteOid, userAccountBean, UPDATE);
+			}
+
+			if (result instanceof ErrorObj)
+				throw new OpenClinicaSystemException(((ErrorObj) result).getMessage());
+			else if (result instanceof StudyEventResponseDTO)
+				return new ResponseEntity<Object>(result, HttpStatus.OK);
+
+		} catch (OpenClinicaSystemException e) {
+			String errorMsg = e.getErrorCode();
+			HashMap<String, String> map = new HashMap<>();
+			map.put("studyOid", studyOid);
+			map.put("siteOid", siteOid);
+			org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
+			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+			return response;
+		}
+
+		return null;
+	}
+
+	private void populateOdmContainerForEventUpdate(ODMContainer odmContainer, StudyEventUpdateRequestDTO studyEventUpdateRequestDTO, String siteOid) {
+		ArrayList<StudyEventDataBean> studyEventDataBeans = new ArrayList<>();
+		StudyEventDataBean studyEventDataBean = new StudyEventDataBean();
+		studyEventDataBean.setStudyEventOID(studyEventUpdateRequestDTO.getStudyEventOID());
+		studyEventDataBean.setStartDate(studyEventUpdateRequestDTO.getStartDate());
+		studyEventDataBean.setEndDate(studyEventUpdateRequestDTO.getEndDate());
+		studyEventDataBean.setStudyEventRepeatKey(studyEventUpdateRequestDTO.getEventRepeatKey());
+		studyEventDataBean.setEventStatus(studyEventUpdateRequestDTO.getEventStatus());
+		studyEventDataBeans.add(studyEventDataBean);
+
+		ArrayList<SubjectDataBean> subjectDataBeans = new ArrayList<>();
+		SubjectDataBean subjectDataBean = new SubjectDataBean();
+		subjectDataBean.setStudySubjectID(studyEventUpdateRequestDTO.getSubjectKey());
+		subjectDataBean.setStudyEventData(studyEventDataBeans);
+		subjectDataBeans.add(subjectDataBean);
+
+		CRFDataPostImportContainer importContainer = new CRFDataPostImportContainer();
+		importContainer.setStudyOID(siteOid);
+		importContainer.setSubjectData(subjectDataBeans);
+
+		odmContainer.setCrfDataPostImportContainer(importContainer);
+	}
+
+
+	private void populateOdmContainerForEventSchedule(ODMContainer odmContainer, StudyEventScheduleRequestDTO studyEventScheduleRequestDTO, String siteOid) {
+		ArrayList<StudyEventDataBean> studyEventDataBeans = new ArrayList<>();
+		StudyEventDataBean studyEventDataBean = new StudyEventDataBean();
+		studyEventDataBean.setStudyEventOID(studyEventScheduleRequestDTO.getStudyEventOID());
+		studyEventDataBean.setStartDate(studyEventScheduleRequestDTO.getStartDate());
+		studyEventDataBean.setEndDate(studyEventScheduleRequestDTO.getEndDate());
+		studyEventDataBeans.add(studyEventDataBean);
+
+		ArrayList<SubjectDataBean> subjectDataBeans = new ArrayList<>();
+		SubjectDataBean subjectDataBean = new SubjectDataBean();
+		subjectDataBean.setStudySubjectID(studyEventScheduleRequestDTO.getSubjectKey());
+		subjectDataBean.setStudyEventData(studyEventDataBeans);
+		subjectDataBeans.add(subjectDataBean);
+
+		CRFDataPostImportContainer importContainer = new CRFDataPostImportContainer();
+		importContainer.setStudyOID(siteOid);
+		importContainer.setSubjectData(subjectDataBeans);
+
+		odmContainer.setCrfDataPostImportContainer(importContainer);
+	}
+
+	private Study getTenantStudy(String studyOid) {
+		return studyDao.findByOcOID(studyOid);
+	}
+
 }
 
 

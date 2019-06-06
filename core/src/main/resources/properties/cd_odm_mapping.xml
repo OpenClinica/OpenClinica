@@ -92,6 +92,12 @@
             <bind-xml name="OpenClinica:EndDate" node="attribute"/>
         </field>
 
+        <field name="eventStatus"
+               type="java.lang.String">
+            <bind-xml name="OpenClinica:Status" node="attribute"/>
+        </field>
+
+
        <field name="FormData"
        		type="org.akaza.openclinica.bean.submit.crfdata.FormDataBean"
        		collection="arraylist">
