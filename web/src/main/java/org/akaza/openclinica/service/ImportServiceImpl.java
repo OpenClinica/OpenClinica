@@ -824,6 +824,8 @@ public class ImportServiceImpl implements ImportService {
 
 
     public ErrorObj validateStartAndEndDateAndOrder(StudyEventDataBean studyEventDataBean) {
+        if(studyEventDataBean.getStartDate()==null)
+            return new ErrorObj(FAILED,ErrorConstants.ERR_MISSING_START_DATE);
         ErrorObj errorObj = null;
         if (studyEventDataBean.getStartDate() != null) {
             //validate start date
