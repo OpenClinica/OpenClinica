@@ -617,7 +617,7 @@ public class StudyEventController {
 			if (!validateService.isStudyAvailable(studyOid)) {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
 			}
-			if (!validateService.isStudyAvailable(siteOid)) {
+			if (siteOid!=null && !validateService.isStudyAvailable(siteOid)) {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
 			}
 			if (!validateService.isStudyOidValid(studyOid)) {

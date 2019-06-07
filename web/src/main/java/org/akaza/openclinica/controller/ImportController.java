@@ -171,7 +171,7 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_AVAILABLE, HttpStatus.OK);
         }
 
-        if (!validateService.isStudyAvailable(siteOid)) {
+        if (siteOid!=null && !validateService.isStudyAvailable(siteOid)) {
             return new ResponseEntity(ErrorConstants.ERR_SITE_NOT_AVAILABLE, HttpStatus.OK);
         }
 
