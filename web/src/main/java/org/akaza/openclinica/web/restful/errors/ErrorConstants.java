@@ -137,7 +137,7 @@ public class ErrorConstants {
     public static final String ERR_END_DATE_IS_BEFORE_START_DATE = "errorCode.endDateIsBeforeStartDate";
 
     public static final String ERR_REPEAT_KEY_REQUIRED = "errorCode.repeatKeyRequired";
-    public static final String ERR_EVENT_DOES_NOT_EXIST = "errorCode.eventDoesNotExist";
+    public static final String ERR_STUDY_EVENT_REPEAT_NOT_FOUND = "errorCode.studyEventRepeatNotFound";
     public static final String ERR_EVENT_ALREADY_EXISTS = "errorCode.eventAlreadyExists";
 
     public static final String ERR_INVALID_REPEAT_KEY = "errorCode.invalidRepeatKey";
