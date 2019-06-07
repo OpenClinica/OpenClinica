@@ -289,9 +289,21 @@ public class ImportServiceImpl implements ImportService {
 
                                 itemObject = validateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm);
                                 if (itemObject instanceof ErrorObj) {
-                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), ((ErrorObj) itemObject).getCode(), ((ErrorObj) itemObject).getTimeStamp(), ((ErrorObj) itemObject).getMessage());
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), ((ErrorObj) itemObject).getCode(), null, ((ErrorObj) itemObject).getMessage());
                                     dataImportReports.add(dataImportReport);
                                     logger.error("ItemOID {} related issue", itemDataBean.getItemOID());
+                                    continue;
+                                }else if(itemObject instanceof DataImportReport){
+                                    dataImportReport= (DataImportReport) itemObject;
+                                    dataImportReport.setSubjectKey(subjectDataBean.getStudySubjectID());
+                                    dataImportReport.setStudySubjectID(subjectDataBean.getStudySubjectID());
+                                    dataImportReport.setStudyEventOID(studyEventDataBean.getStudyEventOID());
+                                    dataImportReport.setStudyEventRepeatKey(studyEventDataBean.getStudyEventRepeatKey());
+                                    dataImportReport.setFormOID(formDataBean.getFormOID());
+                                    dataImportReport.setItemGroupOID(itemGroupDataBean.getItemGroupOID());
+                                    dataImportReport.setItemGroupRepeatKey(itemGroupDataBean.getItemGroupRepeatKey());
+                                    dataImportReport.setItemOID(itemDataBean.getItemOID());
+                                    dataImportReports.add(dataImportReport);
                                     continue;
                                 } else if (itemObject instanceof Item) {
                                     item = (Item) itemObject;
@@ -1171,15 +1183,13 @@ public class ImportServiceImpl implements ImportService {
                 itemData = updateItemData(itemData, userAccount, itemDataBean.getValue());
                 itemCountInForm.setInsertedUpdatedItemCountInForm(itemCountInForm.getInsertedUpdatedItemCountInForm() + 1);
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
-                return new ErrorObj(UPDATED, null, sdf_logFile.format(new Date()));
-
+                return new DataImportReport(null,null,null,null,null,null,null,null,UPDATED,sdf_logFile.format(new Date()),null);
             }
         } else {
             itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
             itemCountInForm.setInsertedUpdatedItemCountInForm(itemCountInForm.getInsertedUpdatedItemCountInForm() + 1);
             itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
-            return new ErrorObj(INSERTED, null, sdf_logFile.format(new Date()));
-
+            return new DataImportReport(null,null,null,null,null,null,null,null,INSERTED,sdf_logFile.format(new Date()),null);
         }
     }
 
