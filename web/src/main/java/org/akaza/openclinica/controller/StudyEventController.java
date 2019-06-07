@@ -669,7 +669,7 @@ public class StudyEventController {
 		studyEventDataBean.setStudyEventOID(studyEventUpdateRequestDTO.getStudyEventOID());
 		studyEventDataBean.setStartDate(studyEventUpdateRequestDTO.getStartDate());
 		studyEventDataBean.setEndDate(studyEventUpdateRequestDTO.getEndDate());
-		studyEventDataBean.setStudyEventRepeatKey(studyEventUpdateRequestDTO.getEventRepeatKey());
+		studyEventDataBean.setStudyEventRepeatKey(studyEventUpdateRequestDTO.getStudyEventRepeatKey());
 		studyEventDataBean.setEventStatus(studyEventUpdateRequestDTO.getEventStatus());
 		studyEventDataBeans.add(studyEventDataBean);
 

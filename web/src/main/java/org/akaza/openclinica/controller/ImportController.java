@@ -162,14 +162,14 @@ public class ImportController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
+        if (!validateService.isStudyAvailable(studyOid)) {
+            return new ResponseEntity(ErrorConstants.ERR_STUDY_OID_NOT_AVAILABLE, HttpStatus.OK);
+        }
 
         if (!validateService.isStudyOidValid(studyOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
+            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.OK);
         }
 
-        if (!validateService.isStudyAvailable(studyOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
-        }
 
         if (siteOid != null) {
             if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
