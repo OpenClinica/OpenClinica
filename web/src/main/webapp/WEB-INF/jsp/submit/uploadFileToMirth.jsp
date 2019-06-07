@@ -4,6 +4,8 @@
 <%@ page import="org.akaza.openclinica.logic.importdata.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -108,6 +110,7 @@
 <div class="homebox_bullets"><a href="ImportRule?action=downloadUploadMappingTemplate"><b><fmt:message key="download_upload_mapping_template" bundle="${resword}"/></b></a></div>
 
 <% 
+    final Logger logger = LoggerFactory.getLogger(getClass().getName());
     ImportDataHelper importDataHelper = new ImportDataHelper();
 	File [] fileObjects = null;
 	String [] fileNames = null;
@@ -126,6 +129,11 @@
 	}	
 	
     
+	// debug
+	if(fileObjects.length == 0){
+		logger.info("No any log files can be found in file directory : " + fileDir);
+	}
+	
 	BufferedReader readReport;
 	int i = 0;
     int num=0;
