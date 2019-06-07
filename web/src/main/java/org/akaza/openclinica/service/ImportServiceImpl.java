@@ -295,7 +295,7 @@ public class ImportServiceImpl implements ImportService {
                                     continue;
                                 }else if(itemObject instanceof DataImportReport){
                                     dataImportReport= (DataImportReport) itemObject;
-                                    dataImportReport.setSubjectKey(subjectDataBean.getStudySubjectID());
+                                    dataImportReport.setSubjectKey(subjectDataBean.getSubjectOID());
                                     dataImportReport.setStudySubjectID(subjectDataBean.getStudySubjectID());
                                     dataImportReport.setStudyEventOID(studyEventDataBean.getStudyEventOID());
                                     dataImportReport.setStudyEventRepeatKey(studyEventDataBean.getStudyEventRepeatKey());
@@ -1064,6 +1064,9 @@ public class ImportServiceImpl implements ImportService {
             if (studySubject != null && studySubject02 != null && studySubject.getStudySubjectId() != studySubject02.getStudySubjectId()) {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_IDENTIFIERS_MISMATCH);
             }
+        }
+        if(studySubject!=null && !studySubject.getStatus().equals(Status.AVAILABLE)){
+            return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
