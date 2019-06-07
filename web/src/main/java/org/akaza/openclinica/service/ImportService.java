@@ -29,7 +29,7 @@ public interface ImportService {
 
     StudyEvent updateStudyEventDates(StudyEvent studyEvent, UserAccount userAccount, String startDate, String endDate);
 
-    ErrorObj validateRepeatKeyIntNumber(String repeatKey);
+    ErrorObj validateEventRepeatKeyIntNumber(String repeatKey);
 
     StudyEvent scheduleEvent(StudyEventDataBean studyEventDataBean, StudySubject studySubject, StudyEventDefinition studyEventDefinition, UserAccount userAccount);
 
