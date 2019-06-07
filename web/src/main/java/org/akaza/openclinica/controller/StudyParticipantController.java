@@ -423,14 +423,17 @@ public class StudyParticipantController {
 		@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 		@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
-			
+			studyOid=studyOid.toUpperCase();
+
 			return listStudySubjects(studyOid, null, request);
 		}
 
 		@ApiOperation(value = "To get all participants at site level",  notes = "only work for authorized users with the right acecss permission ")
 		@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudySite(@PathVariable("studyOID") String studyOid,@PathVariable("sitesOID") String siteOid,HttpServletRequest request) throws Exception {
-			
+			studyOid=studyOid.toUpperCase();
+			siteOid=siteOid.toUpperCase();
+
 			return listStudySubjects(studyOid, siteOid, request);
 		}
 
