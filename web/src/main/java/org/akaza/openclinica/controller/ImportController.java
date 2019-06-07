@@ -156,8 +156,10 @@ public class ImportController {
             studyOid = publicStudy.getStudy().getOc_oid();
 
         }
-        studyOid=studyOid.toUpperCase();
-        siteOid=siteOid.toUpperCase();
+        if (studyOid != null)
+            studyOid = studyOid.toUpperCase();
+        if (siteOid != null)
+            siteOid = siteOid.toUpperCase();
 
         utilService.setSchemaFromStudyOid(studyOid);
 

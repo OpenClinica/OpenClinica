@@ -608,8 +608,10 @@ public class StudyEventController {
 		ResponseEntity<Object> response = null;
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 		ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-        studyOid=studyOid.toUpperCase();
-        siteOid=siteOid.toUpperCase();
+		if (studyOid != null)
+			studyOid = studyOid.toUpperCase();
+		if (siteOid != null)
+			siteOid = siteOid.toUpperCase();
 
 		try {
 			if (!validateService.isStudyAvailable(studyOid)) {
