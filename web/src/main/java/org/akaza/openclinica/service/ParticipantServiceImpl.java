@@ -352,7 +352,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     @Transactional
     public void processBulkParticipants(StudyBean study, String studyOid, StudyBean siteStudy, String siteOid,
                                          UserAccountBean user, String accessToken, String customerUuid, MultipartFile file,
-                                        JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) {
+                                        JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) throws Exception {
 
         List<OCParticipateImportDTO> ocParticipateImportDTOs = new ArrayList<>();
         String fileName = null;
@@ -438,15 +438,18 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
             }
         } catch (Exception e) {
             userService.persistJobFailed(jobDetail, fileName);
-            logger.error("Bulk Participant Import Job Failed.");
+            logger.error("Bulk Participant Import Job Failed." + e);
+            throw e;
         } finally {
             // write out any DTOs that have been processed
             if (CollectionUtils.isNotEmpty(ocParticipateImportDTOs)) {
                 writeToFile(ocParticipateImportDTOs, studyOid, fileName);
+                logger.info(ocParticipateImportDTOs.size() + " records were processed");
             } else {
                 logger.error("No records were processed.");
             }
         }
+        logger.info("Bulk participant job completed");
         userService.persistJobCompleted(jobDetail, fileName);
     }
 
