@@ -118,6 +118,9 @@ public class StudyParticipantController {
 				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
 
+			studyOID=studyOID.toUpperCase();
+			siteOID=siteOID.toUpperCase();
+
 			utilService.setSchemaFromStudyOid(studyOID);
 			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
 			HashMap<String, Object> map = new HashMap<>();
@@ -174,6 +177,9 @@ public class StudyParticipantController {
 				@PathVariable("studyOid") String studyOid,
 				@PathVariable("siteOid") String siteOid,
 				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
+
+			studyOid=studyOid.toUpperCase();
+			siteOid=siteOid.toUpperCase();
 			utilService.setSchemaFromStudyOid(studyOid);
 			Study tenantStudy = studyDao.findByOcOID(studyOid);
 			ResponseEntity<String> response = null;

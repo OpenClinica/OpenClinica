@@ -156,6 +156,9 @@ public class ImportController {
             studyOid = publicStudy.getStudy().getOc_oid();
 
         }
+        studyOid=studyOid.toUpperCase();
+        siteOid=siteOid.toUpperCase();
+
         utilService.setSchemaFromStudyOid(studyOid);
 
         ResponseEntity<Object> response = null;
@@ -163,7 +166,11 @@ public class ImportController {
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
         if (!validateService.isStudyAvailable(studyOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_STUDY_OID_NOT_AVAILABLE, HttpStatus.OK);
+            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_AVAILABLE, HttpStatus.OK);
+        }
+
+        if (!validateService.isStudyAvailable(siteOid)) {
+            return new ResponseEntity(ErrorConstants.ERR_SITE_NOT_AVAILABLE, HttpStatus.OK);
         }
 
         if (!validateService.isStudyOidValid(studyOid)) {
