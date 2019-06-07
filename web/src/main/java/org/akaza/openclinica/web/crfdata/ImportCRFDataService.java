@@ -193,7 +193,7 @@ public class ImportCRFDataService {
 								matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
 								
 							}catch(Exception e) {
-								e.printStackTrace();
+								logger.error("Exception occurred", e);
 								logger.error("skipMatchCriteriaOids="+ skipMatchCriteriaOids);
 								logger.error("buildSkipMatchCriteriaSql="+ sqlStr);
 							}
