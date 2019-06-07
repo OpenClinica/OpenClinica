@@ -742,24 +742,24 @@ public class StudyEventServiceImpl implements StudyEventService {
 
         if ( studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.getRepeating()) {   // Repeating Visit Event
             if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
-                eventObject = importService.validateRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
+                eventObject = importService.validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                 if (eventObject instanceof ErrorObj) return eventObject;
                 eventObject = processEventUpdateForUnscheduled(studyEventDataBean, userAccount, studySubject);
                 if (eventObject instanceof ErrorObj) return eventObject;
             } else {
-                return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_REPEAT_KEY);
+                return new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_STUDY_EVENT_REPEAT_KEY);
             }
 
         } else if (studyEventDefinition.getType().equals(COMMON)) {   // Repeating Visit Event
                 if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
-                    eventObject = importService.validateRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
+                    eventObject = importService.validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                     if (eventObject instanceof ErrorObj) return eventObject;
                     studyEventDataBean.setStartDate(null);
                     studyEventDataBean.setEndDate(null);
                     eventObject = processEventUpdateForCommon(studyEventDataBean, userAccount, studySubject);
                     if (eventObject instanceof ErrorObj) return eventObject;
                 } else {
-                    return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_REPEAT_KEY);
+                    return new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_STUDY_EVENT_REPEAT_KEY);
                 }
 
             }

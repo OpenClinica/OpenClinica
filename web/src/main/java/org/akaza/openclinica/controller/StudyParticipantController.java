@@ -118,6 +118,9 @@ public class StudyParticipantController {
 				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
 
+			studyOID=studyOID.toUpperCase();
+			siteOID=siteOID.toUpperCase();
+
 			utilService.setSchemaFromStudyOid(studyOID);
 			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
 			HashMap<String, Object> map = new HashMap<>();
@@ -174,6 +177,9 @@ public class StudyParticipantController {
 				@PathVariable("studyOid") String studyOid,
 				@PathVariable("siteOid") String siteOid,
 				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
+
+			studyOid=studyOid.toUpperCase();
+			siteOid=siteOid.toUpperCase();
 			utilService.setSchemaFromStudyOid(studyOid);
 			Study tenantStudy = studyDao.findByOcOID(studyOid);
 			ResponseEntity<String> response = null;
@@ -398,14 +404,17 @@ public class StudyParticipantController {
 		@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 		@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
-			
+			studyOid=studyOid.toUpperCase();
+
 			return listStudySubjects(studyOid, null, request);
 		}
 
 		@ApiOperation(value = "To get all participants at site level",  notes = "only work for authorized users with the right acecss permission ")
 		@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudySite(@PathVariable("studyOID") String studyOid,@PathVariable("sitesOID") String siteOid,HttpServletRequest request) throws Exception {
-			
+			studyOid=studyOid.toUpperCase();
+			siteOid=siteOid.toUpperCase();
+
 			return listStudySubjects(studyOid, siteOid, request);
 		}
 

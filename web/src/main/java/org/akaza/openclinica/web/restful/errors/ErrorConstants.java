@@ -39,7 +39,8 @@ public class ErrorConstants {
     public static final String ERR_XML_NOT_WELL_FORMED = "errorCode.xmlNotWellFormed";
 
     public static final String ERR_STUDY_NOT_EXIST = "errorCode.studyNotExist";
-    public static final String ERR_STUDY_OID_NOT_AVAILABLE = "errorCode.studyOIDNotAvailable";
+    public static final String ERR_STUDY_NOT_AVAILABLE = "errorCode.studyNotAvailable";
+    public static final String ERR_SITE_NOT_AVAILABLE = "errorCode.siteNotAvailable";
 
     public static final String ERR_SITE_NOT_EXIST = "errorCode.siteNotExist";
     public static final String ERR_NO_ROLE_SETUP = "errorCode.noRoleSetUp";
@@ -83,7 +84,7 @@ public class ErrorConstants {
     public static final String ERR_INVALID_START_DATE = "errorCode.invalidStartDate";
     public static final String ERR_INVALID_END_DATE = "errorCode.invalidEndDate";
     public static final String ERR_EVENT_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
-    public static final String ERR_INVALID_EVENT_REPEAT_KEY = "errorCode.invalidRepeatKey";
+    public static final String ERR_INVALID_EVENT_REPEAT_KEY = "errorCode.invalidStudyEventRepeatKey";
 
     public static final String ERR_ITEM_TYPE_NOT_SUPPORTED = "errorCode.itemTypeNotSupportedInImport";
     public static final String ERR_VALUE_CHOICE_NOT_FOUND = "errorCode.valueChoiceCodeNotFound";
@@ -113,7 +114,7 @@ public class ErrorConstants {
     public static final String ERR_MULTIPLE_PARTICIPANTS_FOUND = "errorCode.multipleParticipantsFound";
     public static final String ERR_REPEAT_KEY_AND_FORM_MISMATCH = "errorCode.repeatKeyAndFormMismatch";
 
-    public static final String ERR_INVALID_GROUP_REPEAT_KEY = "errorCode.invalidRepeatKey";
+    public static final String ERR_INVALID_GROUP_REPEAT_KEY = "errorCode.invalidItemGroupRepeatKey";
     public static final String ERR_ITEMGROUP_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
 
     public static final String ERR_SUBJECT_DATA_MISSING = "errorCode.subjectDataMissing";
@@ -142,4 +143,5 @@ public class ErrorConstants {
     public static final String ERR_INVALID_REPEAT_KEY = "errorCode.invalidRepeatKey";
     public static final String ERR_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
 
+    public static final String ERR_MISSING_STUDY_EVENT_REPEAT_KEY = "errorCode.missingStudyEventRepeatKey";
 }

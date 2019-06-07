@@ -608,8 +608,16 @@ public class StudyEventController {
 		ResponseEntity<Object> response = null;
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 		ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+        studyOid=studyOid.toUpperCase();
+        siteOid=siteOid.toUpperCase();
 
 		try {
+			if (!validateService.isStudyAvailable(studyOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
+			}
+			if (!validateService.isStudyAvailable(siteOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
+			}
 			if (!validateService.isStudyOidValid(studyOid)) {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
 			}

@@ -295,7 +295,7 @@ public class ImportServiceImpl implements ImportService {
                                     continue;
                                 }else if(itemObject instanceof DataImportReport){
                                     dataImportReport= (DataImportReport) itemObject;
-                                    dataImportReport.setSubjectKey(subjectDataBean.getStudySubjectID());
+                                    dataImportReport.setSubjectKey(subjectDataBean.getSubjectOID());
                                     dataImportReport.setStudySubjectID(subjectDataBean.getStudySubjectID());
                                     dataImportReport.setStudyEventOID(studyEventDataBean.getStudyEventOID());
                                     dataImportReport.setStudyEventRepeatKey(studyEventDataBean.getStudyEventRepeatKey());
@@ -719,7 +719,7 @@ public class ImportServiceImpl implements ImportService {
 
             if (studyEventDefinition.getRepeating()) {   // Repeating Common Event
                 if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
-                    eventObject = validateRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
+                    eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                     if (eventObject instanceof ErrorObj) return eventObject;
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
                     if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
@@ -775,7 +775,7 @@ public class ImportServiceImpl implements ImportService {
             if (studyEventDefinition.getRepeating()) {   // Repeating Visit Event
                 if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
                     //validate repeat key for integer
-                    eventObject = validateRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
+                    eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                     if (eventObject instanceof ErrorObj) return eventObject;
                     // Lookup for event if exists
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
@@ -897,7 +897,7 @@ public class ImportServiceImpl implements ImportService {
 
         if (itemGroup.getItemGroupMetadatas().get(0).isRepeatingGroup()) {   // Repeating Item Group
             if (itemGroupDataBean.getItemGroupRepeatKey() != null && !itemGroupDataBean.getItemGroupRepeatKey().equals("")) {   // Repeat Key present
-                errorObj = validateRepeatKeyIntNumber(itemGroupDataBean.getItemGroupRepeatKey());
+                errorObj = validateGroupRepeatKeyIntNumber(itemGroupDataBean.getItemGroupRepeatKey());
                 if (errorObj != null) return errorObj;
 
             } else {  // Repeat Key missing
@@ -987,13 +987,22 @@ public class ImportServiceImpl implements ImportService {
         return null;
     }
 
-
-    public ErrorObj validateRepeatKeyIntNumber(String repeatKey) {
+    public ErrorObj validateGroupRepeatKeyIntNumber(String repeatKey) {
         try {
             Integer.parseInt(repeatKey);
         } catch (NumberFormatException nfe) {
             nfe.getStackTrace();
-            return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_REPEAT_KEY);
+            return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_GROUP_REPEAT_KEY);
+        }
+        return null;
+    }
+
+    public ErrorObj validateEventRepeatKeyIntNumber(String repeatKey) {
+        try {
+            Integer.parseInt(repeatKey);
+        } catch (NumberFormatException nfe) {
+            nfe.getStackTrace();
+            return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_EVENT_REPEAT_KEY);
         }
         return null;
     }
@@ -1064,6 +1073,9 @@ public class ImportServiceImpl implements ImportService {
             if (studySubject != null && studySubject02 != null && studySubject.getStudySubjectId() != studySubject02.getStudySubjectId()) {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_IDENTIFIERS_MISMATCH);
             }
+        }
+        if(studySubject!=null && !studySubject.getStatus().equals(Status.AVAILABLE)){
+            return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
