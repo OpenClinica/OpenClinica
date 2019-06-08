@@ -318,6 +318,7 @@ public class ImportServiceImpl implements ImportService {
                         if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) && itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {                         // update eventcrf status into Complete
                             // Update Event Crf Status into Complete
                             eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE);
+                            openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
 
                             logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
 
@@ -326,7 +327,6 @@ public class ImportServiceImpl implements ImportService {
                             eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE);
                         }
                         // check if all Forms within this Event is Complete
-                        openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
                     } // formDataBean for loop
                 } // StudyEventDataBean for loop
             } // StudySubjectDataBean for loop
