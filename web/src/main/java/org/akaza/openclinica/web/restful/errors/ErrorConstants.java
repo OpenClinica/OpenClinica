@@ -96,6 +96,7 @@ public class ErrorConstants {
 
     public static final String ERR_MISSING_PARTICIPANT_ID = "errorCode.missingParticipantID";
     public static final String ERR_PARTICIPANT_NOT_FOUND = "errorCode.participantNotFound";
+    public static final String ERR_PARTICIPANT_ID_NOT_AVAILABLE = "errorCode.participantIDNotAvailable";
     public static final String ERR_PARTICIPANT_IDENTIFIERS_MISMATCH = "errorCode.participantIdentiersMismatch";
     public static final String ERR_MISSING_STUDYEVENTOID = "errorCode.missingStudyEventOID";
     public static final String ERR_INVALID_STUDYEVENTOID = "errorCode.invalidStudyEventOID";
