@@ -325,10 +325,14 @@ public class ChangeStudyServlet extends SecureController {
 
             currentRole = (StudyUserRoleBean) session.getAttribute("studyWithRole");
             session.setAttribute("userRole", currentRole);
-            if (currentPublicStudy.getParentStudyId() == 0)
+            // update baseUserRole value when switch study/site(OC-10770)
+            if (currentPublicStudy.getParentStudyId() == 0) {
                 session.setAttribute("customUserRole", customRole.studyRoleMap.get(currentPublicStudy.getId()));
-            else
+                session.setAttribute("baseUserRole", customRole.studyRoleMap.get(currentRole.getStudyId()));
+            } else {
                 session.setAttribute("customUserRole", customRole.siteRoleMap.get(currentPublicStudy.getId()));
+                session.setAttribute("baseUserRole", customRole.siteRoleMap.get(currentRole.getStudyId()));
+            }
             session.removeAttribute("studyWithRole");
             addPageMessage(restext.getString("current_study_changed_succesfully"));
         }

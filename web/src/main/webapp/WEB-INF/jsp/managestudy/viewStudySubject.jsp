@@ -357,7 +357,7 @@
           <td>
             <c:if test="${
               studySub.status.name!='removed' &&
-              (sessionScope.customUserRole=='Clinical Research Coordinator' || sessionScope.customUserRole=='Investigator')
+              (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
             }">
               <c:if test="${participateStatus=='enabled'}">
                 <a href="javascript:;" id="contactInformation">
@@ -463,7 +463,7 @@
                             <div class="tablebox_center">
                               <c:if test="${
                                 studySub.status.name!='removed' &&
-                                (sessionScope.customUserRole=='Clinical Research Coordinator' || sessionScope.customUserRole=='Investigator')
+                                (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
                               }">
                                 <c:if test="${participateStatus=='enabled'}">
                                   <!-- Table Contents -->
