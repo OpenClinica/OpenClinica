@@ -583,15 +583,15 @@ public class EnketoUrlService {
                 int begIndex = bind.getNodeSet().lastIndexOf("/");
                 String itemName = bind.getNodeSet().substring(begIndex + 1);
                 if (bind.getOcExternal().equals(CONTACTDATA_FIRSTNAME)) {
-                    data.put(itemName, studySubjectDetail.getFirstName()!=null?studySubjectDetail.getFirstName():"");
+                    data.put(itemName, studySubjectDetail.getFirstName()!=null? escapedValue(studySubjectDetail.getFirstName()):"");
                 } else if (bind.getOcExternal().equals(CONTACTDATA_LASTNAME)) {
-                    data.put(itemName, studySubjectDetail.getLastName()!=null?studySubjectDetail.getLastName():"");
+                    data.put(itemName, studySubjectDetail.getLastName()!=null?escapedValue(studySubjectDetail.getLastName()):"");
                 } else if (bind.getOcExternal().equals(CONTACTDATA_SECONDARYID)) {
-                    data.put(itemName, studySubjectDetail.getIdentifier()!=null?studySubjectDetail.getIdentifier():"");
+                    data.put(itemName, studySubjectDetail.getIdentifier()!=null?escapedValue(studySubjectDetail.getIdentifier()):"");
                 } else if (bind.getOcExternal().equals(CONTACTDATA_EMAIL)) {
-                    data.put(itemName, studySubjectDetail.getEmail()!=null?studySubjectDetail.getEmail():"");
+                    data.put(itemName, studySubjectDetail.getEmail()!=null?escapedValue(studySubjectDetail.getEmail()):"");
                 } else if (bind.getOcExternal().equals(CONTACTDATA_MOBILENUMBER))
-                    data.put(itemName, studySubjectDetail.getPhone()!=null?studySubjectDetail.getPhone():"");
+                    data.put(itemName, studySubjectDetail.getPhone()!=null?escapedValue(studySubjectDetail.getPhone()):"");
             }
         }
     }
