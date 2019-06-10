@@ -270,7 +270,7 @@ public String readFileToString(File file) throws IOException{
 				}else {
 					// start process item data
 					// ignore blank line					
-					if(dataRows[i].toString().replaceAll("/n|||/r", "").trim().length() > 0) {
+					if(dataRows[i].toString().replaceAll("[\\n\\t\\r]", "").trim().length() > 0) {
 						subjectKey = dataRow[indexofParticipantID].toString().trim();
 						//logger.info(i+ "************dataRow************************"+ dataRow);
 						
@@ -330,7 +330,7 @@ public String readFileToString(File file) throws IOException{
 													
 											if(mappingItemGroupOID.equals(currenItemGroupOID) && mappingItemName.equals(itemName)){
 												//logger.info("----mappingItemName:"+ mappingItemName + "----itemName:"+ itemName);
-												 itemDataValue = dataRow[k].toString();
+												 itemDataValue = dataRow[k].toString().replaceAll("[\\n\\t\\r]", " ").trim();
 						
 												 //ignore item which has no item value or blank value
 												 if(itemDataValue != null && itemDataValue.trim().length() > 0) {
