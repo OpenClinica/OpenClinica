@@ -118,8 +118,11 @@ public class StudyParticipantController {
 				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
 
-			studyOID=studyOID.toUpperCase();
-			siteOID=siteOID.toUpperCase();
+			if (studyOID != null)
+				studyOID = studyOID.toUpperCase();
+			if (siteOID != null)
+				siteOID = siteOID.toUpperCase();
+
 
 			utilService.setSchemaFromStudyOid(studyOID);
 			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
@@ -178,8 +181,11 @@ public class StudyParticipantController {
 				@PathVariable("siteOid") String siteOid,
 				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
-			studyOid=studyOid.toUpperCase();
-			siteOid=siteOid.toUpperCase();
+			if (studyOid != null)
+				studyOid = studyOid.toUpperCase();
+			if (siteOid != null)
+				siteOid = siteOid.toUpperCase();
+
 			utilService.setSchemaFromStudyOid(studyOid);
 			Study tenantStudy = studyDao.findByOcOID(studyOid);
 			ResponseEntity<String> response = null;
@@ -404,7 +410,8 @@ public class StudyParticipantController {
 		@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 		@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
-			studyOid=studyOid.toUpperCase();
+			if (studyOid != null)
+				studyOid = studyOid.toUpperCase();
 
 			return listStudySubjects(studyOid, null, request);
 		}
@@ -412,8 +419,10 @@ public class StudyParticipantController {
 		@ApiOperation(value = "To get all participants at site level",  notes = "only work for authorized users with the right acecss permission ")
 		@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudySite(@PathVariable("studyOID") String studyOid,@PathVariable("sitesOID") String siteOid,HttpServletRequest request) throws Exception {
-			studyOid=studyOid.toUpperCase();
-			siteOid=siteOid.toUpperCase();
+			if (studyOid != null)
+				studyOid = studyOid.toUpperCase();
+			if (siteOid != null)
+				siteOid = siteOid.toUpperCase();
 
 			return listStudySubjects(studyOid, siteOid, request);
 		}

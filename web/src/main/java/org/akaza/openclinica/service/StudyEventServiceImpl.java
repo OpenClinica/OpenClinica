@@ -779,7 +779,7 @@ public class StudyEventServiceImpl implements StudyEventService {
         StudyEvent studyEvent = null;
         studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
         if (studyEvent == null) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_DOES_NOT_EXIST);
+            return new ErrorObj(FAILED, ErrorConstants.ERR_STUDY_EVENT_REPEAT_NOT_FOUND);
         } else {
 
             if(studyEventDataBean.getStartDate()==null && studyEvent.getDateStart()!=null)
@@ -808,7 +808,7 @@ public class StudyEventServiceImpl implements StudyEventService {
         StudyEvent studyEvent = null;
         studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
         if (studyEvent == null) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_DOES_NOT_EXIST);
+            return new ErrorObj(FAILED, ErrorConstants.ERR_STUDY_EVENT_REPEAT_NOT_FOUND);
         } else {
             if (studyEventDataBean.getEventStatus() == null) {
                 eventObject = importService.updateStudyEventDates(studyEvent, userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
