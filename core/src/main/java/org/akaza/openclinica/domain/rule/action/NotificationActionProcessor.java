@@ -196,7 +196,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		if (eventOrdinal != 1)
 			eventName = eventName + "(" + eventOrdinal + ")";
 
-		StudyBean studyBean = getStudyBean(studyId);
+		StudyBean studyBean = getStudyBean(studySubject.getStudy().getStudyId());
 		StudyBean siteBean=null;
 		if(studyBean.getParentStudyId()!=0) {    // it is a site level study
 			siteBean = studyBean;
@@ -268,7 +268,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 			eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", pDTOaccessCode);
 			eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", pDTOfName);
-			eSubject = eSubject.replaceAll("\\$\\{participant.url}",pDTOurl);
 			eSubject = eSubject.replaceAll("\\$\\{participant.url}",pDTOurl);
 			eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", pDTOloginUrl);
 			eSubject = eSubject.replaceAll("\\$\\{participant.id}", pDTOId);
@@ -359,16 +358,16 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	public ParticipantDTO getParticipantInfo(StudySubject studySubject) {
 		ParticipantDTO pDTO = null;
-		if (studySubject != null && studySubject.getUserId()!=null ) {
+		if (studySubject != null) {
 			pDTO = new ParticipantDTO();
 			pDTO.setParticipantId(studySubject.getLabel());
-			pDTO.setfName(studySubject.getStudySubjectDetail().getFirstName());
-            pDTO.setParticipantEmailAccount(studySubject.getStudySubjectDetail().getEmail());
-            pDTO.setPhone(studySubject.getStudySubjectDetail().getPhone());
-			pDTO.setIdentifier(studySubject.getStudySubjectDetail().getIdentifier());
 
 			if(studySubject.getUserId()!=null) {
-                ParticipantAccessDTO participantAccessDTO =notificationService.getAccessInfo(accessToken,studyBean,studySubject,userUuid) ;
+				pDTO.setfName(studySubject.getStudySubjectDetail().getFirstName());
+				pDTO.setParticipantEmailAccount(studySubject.getStudySubjectDetail().getEmail());
+				pDTO.setPhone(studySubject.getStudySubjectDetail().getPhone());
+				pDTO.setIdentifier(studySubject.getStudySubjectDetail().getIdentifier());
+				ParticipantAccessDTO participantAccessDTO =notificationService.getAccessInfo(accessToken,studyBean,studySubject,userUuid) ;
 
                 if (participantAccessDTO != null) {
                     pDTO.setAccessCode(participantAccessDTO.getAccessCode());
