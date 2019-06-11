@@ -1,11 +1,14 @@
 package org.akaza.openclinica.bean.submit.crfdata;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
+import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 
 public class StudyEventDataBean {
     private ArrayList<FormDataBean> formData;
@@ -14,6 +17,9 @@ public class StudyEventDataBean {
     private AuditLogsBean auditLogs;
     private DiscrepancyNotesBean discrepancyNotes;
     private StudyEventDefinition studyEventDefinition;
+    private String startDate;
+    private String endDate;
+    private String eventStatus;
 
     public StudyEventDataBean() {
         formData = new ArrayList<FormDataBean>();
@@ -61,13 +67,35 @@ public class StudyEventDataBean {
         this.discrepancyNotes = discrepancyNotes;
     }
 
-	public StudyEventDefinition getStudyEventDefinition() {
-	return studyEventDefinition;
-}
+    public StudyEventDefinition getStudyEventDefinition() {
+        return studyEventDefinition;
+    }
 
     public void setStudyEventDefinition(StudyEventDefinition studyEventDefinition) {
-	this.studyEventDefinition = studyEventDefinition;
-}
+        this.studyEventDefinition = studyEventDefinition;
+    }
 
+    public String getStartDate() {
+        return startDate;
+    }
 
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getEventStatus() {
+        return eventStatus;
+    }
+
+    public void setEventStatus(String eventStatus) {
+        this.eventStatus = eventStatus;
+    }
 }

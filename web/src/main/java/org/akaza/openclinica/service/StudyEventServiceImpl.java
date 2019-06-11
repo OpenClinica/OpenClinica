@@ -250,7 +250,8 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 	
 	        studySubject = unsignSignedParticipant(studySubject);
-	        sdao.update(studySubject);		       
+	        studySubject.setUpdater(ub);
+	        sdao.update(studySubject);
 	       	studyEvent.setSampleOrdinal(sampleOrdinal);	       
 	
 	        studyEvent = (StudyEventBean) sed.create(studyEvent);

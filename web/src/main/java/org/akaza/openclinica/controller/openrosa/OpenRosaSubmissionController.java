@@ -134,7 +134,7 @@ public class OpenRosaSubmissionController {
 
     @RequestMapping(value = "/{studyOID}/submission", method = RequestMethod.POST)
     public ResponseEntity<String> doSubmission(HttpServletRequest request, HttpServletResponse response, @PathVariable("studyOID") String studyOID,
-            @RequestParam(FORM_CONTEXT) String ecid) {
+                                               @RequestParam(FORM_CONTEXT) String ecid) {
 
         logger.info("Processing xform submission.");
         HashMap<String, String> subjectContext = null;
@@ -214,7 +214,7 @@ public class OpenRosaSubmissionController {
 
     // @RequestMapping(value = "/{studyOID}/fieldsubmission/complete", method = RequestMethod.POST)
     public ResponseEntity<String> markComplete(HttpServletRequest request, HttpServletResponse response, @PathVariable("studyOID") String studyOID,
-            @RequestParam(FORM_CONTEXT) String ecid) throws Exception {
+                                               @RequestParam(FORM_CONTEXT) String ecid) throws Exception {
 
         HashMap<String, String> subjectContext = null;
         PFormCache cache = PFormCache.getInstance(context);
@@ -256,61 +256,7 @@ public class OpenRosaSubmissionController {
             eventCrfDao.saveOrUpdate(eventCrf);
         }
 
-        List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
-        List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
-                study.getStudyId());
-        boolean statusChanged=false;
-
-        if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SIGNED.getCode()) {
-            int count = 0;
-            for (EventCrf evCrf : eventCrfs) {
-                if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
-                        || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.DELETED.getCode()
-                        || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
-                    for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
-                        if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
-                            count++;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
-                if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.COMPLETED.getCode()){
-                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
-                    statusChanged=true;
-                }
-                studyEvent.setUserAccount(userAccount);
-                persistStudyEvent(studyEvent,statusChanged);
-            } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
-                if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.DATA_ENTRY_STARTED.getCode()){
-                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
-                    statusChanged=true;
-                }
-                studyEvent.setUserAccount(userAccount);
-                persistStudyEvent(studyEvent,statusChanged);
-            }
-        } else {
-            boolean allFormsComplete = true;
-            for (EventCrf evCrf : eventCrfs){
-                if (studyEvent.getId() != evCrf.getId() && !evCrf.getStatusId().equals(SubjectEventStatus.COMPLETED.getCode())){
-                    allFormsComplete = false;
-                }
-            }
-            if (allFormsComplete){
-                if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.COMPLETED.getCode()){
-                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
-                    statusChanged=true;
-                }
-            } else {
-                if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.DATA_ENTRY_STARTED.getCode()){
-                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
-                    statusChanged=true;
-                }
-            }
-            persistStudyEvent(studyEvent,statusChanged);
-        }
+        updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount);
 
         studySubject = unsignSignedParticipant(studySubject);
         studySubjectDao.saveOrUpdate(studySubject);
@@ -340,7 +286,7 @@ public class OpenRosaSubmissionController {
 
     @RequestMapping(value = "/{studyOID}/fieldsubmission", method = RequestMethod.POST)
     public ResponseEntity<String> doFieldSubmission(HttpServletRequest request, HttpServletResponse response, @PathVariable("studyOID") String studyOID,
-            @RequestParam(FORM_CONTEXT) String ecid) {
+                                                    @RequestParam(FORM_CONTEXT) String ecid) {
 
         long millis = System.currentTimeMillis();
 
@@ -436,7 +382,7 @@ public class OpenRosaSubmissionController {
 
     @RequestMapping(value = "/{studyOID}/fieldsubmission", method = RequestMethod.DELETE)
     public ResponseEntity<String> doFieldDeletion(HttpServletRequest request, HttpServletResponse response, @PathVariable("studyOID") String studyOID,
-            @RequestParam(FORM_CONTEXT) String ecid) {
+                                                  @RequestParam(FORM_CONTEXT) String ecid) {
 
         logger.info("Processing xform field deletion.");
         HashMap<String, String> subjectContext = null;
@@ -642,13 +588,72 @@ public class OpenRosaSubmissionController {
         studyEventDao.saveOrUpdateTransactional(container);
     }
 
-private UserAccount getUserAccount(HashMap<String, String> subjectContext) {
-    String userAccountId = subjectContext.get("userAccountID");
-    if (StringUtils.isNotEmpty(userAccountId)) {
-        UserAccount user = userAccountDao.findByUserId(Integer.valueOf(userAccountId));
-        return user;
-    }
-    return null;
+    private UserAccount getUserAccount(HashMap<String, String> subjectContext) {
+        String userAccountId = subjectContext.get("userAccountID");
+        if (StringUtils.isNotEmpty(userAccountId)) {
+            UserAccount user = userAccountDao.findByUserId(Integer.valueOf(userAccountId));
+            return user;
+        }
+        return null;
 
-}
+    }
+
+    public void updateStudyEventStatus(Study study, StudySubject studySubject, StudyEventDefinition sed, StudyEvent studyEvent, UserAccount userAccount) {
+        List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
+        List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
+                study.getStudyId());
+        boolean statusChanged = false;
+        studyEvent.setUpdateId(userAccount.getUserId());
+        studyEvent.setDateUpdated(new Date());
+        if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SIGNED.getCode()) {
+            int count = 0;
+            for (EventCrf evCrf : eventCrfs) {
+                if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
+                        || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.DELETED.getCode()
+                        || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
+                    for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
+                        if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
+                            count++;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
+                if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.COMPLETED.getCode()) {
+                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                    statusChanged = true;
+                }
+                studyEvent.setUserAccount(userAccount);
+                persistStudyEvent(studyEvent, statusChanged);
+            } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
+                if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.DATA_ENTRY_STARTED.getCode()) {
+                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                    statusChanged = true;
+                }
+                studyEvent.setUserAccount(userAccount);
+                persistStudyEvent(studyEvent, statusChanged);
+            }
+        } else {
+            boolean allFormsComplete = true;
+            for (EventCrf evCrf : eventCrfs) {
+                if (studyEvent.getId() != evCrf.getId() && !evCrf.getStatusId().equals(SubjectEventStatus.COMPLETED.getCode())) {
+                    allFormsComplete = false;
+                }
+            }
+            if (allFormsComplete) {
+                if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.COMPLETED.getCode()) {
+                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                    statusChanged = true;
+                }
+            } else {
+                if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.DATA_ENTRY_STARTED.getCode()) {
+                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                    statusChanged = true;
+                }
+            }
+            persistStudyEvent(studyEvent, statusChanged);
+        }
+    }
 }
