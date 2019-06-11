@@ -72,8 +72,7 @@ public class InsightReportServiceImpl implements InsightReportService {
         }
     }
 
-    @Override
-    public String doPost(String api, HashMap<String, String> mapHeaders, String body, HashMap<String, String> queries) {
+    private String doPost(String api, HashMap<String, String> mapHeaders, String body, HashMap<String, String> queries) {
         try {
             HttpHeaders headers = new HttpHeaders();
             for (String i : mapHeaders.keySet()) {

@@ -122,17 +122,16 @@ public class InsightReportController {
     public void doJobInFuture(String username, String password, String insightURL, String[] participantLabels,
                               String fullPath, String reportId, JobDetail jobDetail, String fileName) {
 
-        String response = insightReportService.runReport(username, password, insightURL, participantLabels, fullPath,reportId);
-        if (response != null) {
-            CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
-                try {
-                    insightReportService.saveToFile(response.toString(), fullPath);
-                    userService.persistJobCompleted(jobDetail, fileName);
-                }catch(Exception e) {
-                    logger.error("Exeception is thrown while creating file : " + e);
-                }
-                return null;
-            });
-        }
+        CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                String response = insightReportService.runReport(username, password, insightURL, participantLabels, fullPath, reportId);
+                insightReportService.saveToFile(response.toString(), fullPath);
+                userService.persistJobCompleted(jobDetail, fileName);
+            }catch(Exception e) {
+                logger.error("Exception is thrown while creating file : " + e);
+                userService.persistJobFailed(jobDetail, fileName);
+            }
+            return null;
+        });
     }
 }
