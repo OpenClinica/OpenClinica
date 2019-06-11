@@ -218,12 +218,13 @@ public class UserController {
             if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
             }
-            if (!validateService.isUserHasCrcOrInvestigaterRole(userRoles)) {
+
+            if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToSite(userRoles,siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+            }else if (!validateService.isUserHas_CRC_INV_RoleInSite(userRoles,siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
             }
-            if (!validateService.isUserRoleHasAccessToSite(userRoles, siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-            }
+
             if (!validateService.isParticipateActive(tenantStudy)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
             }
