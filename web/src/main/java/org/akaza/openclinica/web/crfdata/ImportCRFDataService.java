@@ -69,6 +69,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.service.ViewStudySubjectService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +104,7 @@ public class ImportCRFDataService {
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
      * findByEventSubjectVersion method in EventCRFDAO. May return more than one, hmm.
      */
-    public HashMap fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) throws OpenClinicaException {
+    public synchronized HashMap fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) throws OpenClinicaException {
     	HashMap fetchEventCRFBeansResult = new HashMap();
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         //StudyEventBean List to hold new common event
@@ -182,13 +183,21 @@ public class ImportCRFDataService {
                          *  will test skip logic first
                          */
                         String sqlStr;
-                        ArrayList matchCriterias;
+                        ArrayList matchCriterias = null;
                         boolean matchedAndSkip=false;
     					
 						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
 						if(sqlStr != null) {
 							ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
-							matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+							try {
+								matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+								
+							}catch(Exception e) {
+								logger.error("Exception occurred", e);
+								logger.error("skipMatchCriteriaOids="+ skipMatchCriteriaOids);
+								logger.error("buildSkipMatchCriteriaSql="+ sqlStr);
+							}
+							
 							
 							
 							if(matchCriterias == null || matchCriterias.size() == 0) {
@@ -716,7 +725,7 @@ public class ImportCRFDataService {
     /*
      * purpose: returns false if any of the forms/EventCRFs fail the UpsertOnBean rules.
      */
-    public boolean eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub) {
+    public synchronized boolean eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub) throws OpenClinicaException {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
@@ -747,6 +756,16 @@ public class ImportCRFDataService {
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
                         studyBean.getId(), studyBean.getParentStudyId());
+                // more detail log
+                if(studyEventDefinitionBean == null) {
+                	logger.error("studyEventDefinitionBean == null for OID:" + studyEventDataBean.getStudyEventOID() + "-StudyId:"+ studyBean.getId() + "-ParentStudyId:" + studyBean.getParentStudyId());
+                }
+                if(studySubjectBean == null) {
+                	
+                	String errMsg = "The study subject " + subjectDataBean.getSubjectOID() +" can not be found in Study "+ studyBean.getOid();
+    	        	logger.info(errMsg);
+    	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NO_SUBJECT_FOUND);
+                }
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
                 StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
@@ -2250,7 +2269,7 @@ public class ImportCRFDataService {
     		finalSqlStr = baseSqlStr + " " + itemGroupOIDSmt.toString() + " "+ itemOIDSmt.toString() + " order by se.study_event_id";
     	}
 		
-    	logger.info("buildSkipMatchCriteriaSql============"+ finalSqlStr);
+    	//logger.info("buildSkipMatchCriteriaSql============"+ finalSqlStr);
 		return finalSqlStr;
     	
     }
@@ -2414,7 +2433,7 @@ public class ImportCRFDataService {
 	    	}
     			    
 	    }//outer- while loop
-	    logger.info(matched+"matchCriterias============"+ matchCriterias);
+	   // logger.info(matched+"matchCriterias============"+ matchCriterias);
 	    
 	    return matched;
 	    }

@@ -13,44 +13,41 @@ import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.ParticipantRestfulRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.domain.enumsupport.JobType;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.OCParticipantDTO;
-import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.service.UtilService;
-import org.akaza.openclinica.service.ValidateService;
-import org.akaza.openclinica.service.participant.ParticipantService;
-import org.akaza.openclinica.service.rest.errors.ErrorConstants;
+import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.validator.ParticipantValidator;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.validator.routines.EmailValidator;
 
-import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Pattern;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
@@ -62,11 +59,8 @@ public class StudyParticipantController {
 		private DataSource dataSource;
 		
 		@Autowired
-		private UserAccountDAO udao;
+		private UserAccountDao uDao;
 
-		@Autowired
-		private StudySubjectDao studySubjectDao;
-		
 		@Autowired
 		private ParticipantService participantService;
 
@@ -79,10 +73,13 @@ public class StudyParticipantController {
         @Autowired
         private UserService userService;
 
-	    @Autowired
-	    private StudyDao studyHibDao;
+        @Autowired
+		private CSVService csvService;
 
-        private StudyDAO studyDao;
+	    @Autowired
+	    private StudyDao studyDao;
+
+        private StudyDAO studyDAO;
 		private StudySubjectDAO ssDao;
 		private UserAccountDAO userAccountDao;
 		
@@ -121,6 +118,12 @@ public class StudyParticipantController {
 				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
 
+			if (studyOID != null)
+				studyOID = studyOID.toUpperCase();
+			if (siteOID != null)
+				siteOID = siteOID.toUpperCase();
+
+
 			utilService.setSchemaFromStudyOid(studyOID);
 			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
 			HashMap<String, Object> map = new HashMap<>();
@@ -147,7 +150,7 @@ public class StudyParticipantController {
 		
 
 		
-		@ApiOperation(value = "To create participants at site level in bulk",  notes = "Will read the subjectKeys in CSV file")
+		@ApiOperation(value = "To create participants at site level in bulk",  notes = "Will read subjectKeys and PII from the CSV file")
 		@ApiResponses(value = {
 		        @ApiResponse(code = 200, message = "Successful operation"),
 		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
@@ -169,15 +172,38 @@ public class StudyParticipantController {
 						+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
 						+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
 						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
-		@RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
-		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request,
+		@Async
+		@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+		public ResponseEntity<String> createNewStudyParticipantAtSiteLevel(HttpServletRequest request,
 				@RequestParam("file") MultipartFile file,
-				//@RequestParam("size") Integer size,				
-				@PathVariable("studyOID") String studyOID,
-				@PathVariable("siteOID") String siteOID) throws Exception {
-			
-			
-            return createNewStudyParticipantsInBulk(request, file, studyOID, siteOID);
+				//@RequestParam("size") Integer size,
+				@PathVariable("studyOid") String studyOid,
+				@PathVariable("siteOid") String siteOid,
+				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
+
+			if (studyOid != null)
+				studyOid = studyOid.toUpperCase();
+			if (siteOid != null)
+				siteOid = siteOid.toUpperCase();
+
+			utilService.setSchemaFromStudyOid(studyOid);
+			Study tenantStudy = studyDao.findByOcOID(studyOid);
+			ResponseEntity<String> response = null;
+			UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+			try {
+				if(!validateService.isParticipateActive(tenantStudy)) {
+					throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+				}
+				participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
+			} catch (OpenClinicaSystemException e) {
+				String errorMsg = e.getErrorCode();
+				response = new ResponseEntity(errorMsg, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+				return response;
+			}
+			Map<String, Object> map = new HashMap<>();
+			map.put("register", StringUtils.containsAny(register, "y", "Y") ? true : false);
+
+            return createNewStudyParticipantsInBulk(request, file, studyOid, siteOid, map);
 		}
 
 
@@ -189,19 +215,13 @@ public class StudyParticipantController {
 		 * @return
 		 * @throws Exception
 		 */
-		private ResponseEntity<Object> createNewStudyParticipantsInBulk(HttpServletRequest request, MultipartFile file,
-				String studyOID, String siteOID) throws Exception {
+		private ResponseEntity<String> createNewStudyParticipantsInBulk(HttpServletRequest request, MultipartFile file,
+				String studyOID, String siteOID, Map<String, Object> map) throws Exception {
 			ResponseEntity response = null;
-			
-			ResponseStudyParticipantsBulkDTO responseStudyParticipantsBulkDTO = new ResponseStudyParticipantsBulkDTO();
+
 			UserAccountBean  user = this.participantService.getUserAccount(request);
-			String createdBy = user.getLastName() + " " + user.getFirstName(); 			
-			responseStudyParticipantsBulkDTO.setCreatedBy(createdBy);  
-			
-			SimpleDateFormat  format = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-			String  DateToStr = format.format(new Date());
-			responseStudyParticipantsBulkDTO.setCreatedAt(DateToStr);
-			
+			String message = null;
+
 			if (!file.isEmpty()) {
 				
 				try {
@@ -211,24 +231,24 @@ public class StudyParticipantController {
 						 throw new OpenClinicaSystemException("errorCode.notSupportedFileFormat","The file format is not supported at this time, please send CSV file, like *.csv ");
 					 }
 					 
-					 ArrayList<String> subjectKeyList = RestfulServiceHelper.readCSVFile(file);
+					 csvService.validateBulkParticipantCSVFile(file);
 				     
-				     return this.createNewStudySubjectsInBulk(request, null, studyOID, siteOID, subjectKeyList);
+				     return this.createNewStudySubjectsInBulk(request, map, studyOID, siteOID, file);
 
 				  }catch(OpenClinicaSystemException e) {
 					  String validation_failed_message = e.getErrorCode();
-					  responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);				   
+					  message = validation_failed_message;
 				  }catch (Exception e) {	
 				    
 					String validation_failed_message = e.getMessage();
-				    responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);					
+				    message = validation_failed_message;
 				  }
 				
-			}else {								
-				responseStudyParticipantsBulkDTO.setMessage("Can not read file " + file.getOriginalFilename());			 	
+			} else {
+				message = "Can not read file " + file.getOriginalFilename();
 			}
 			
-			response = new ResponseEntity(responseStudyParticipantsBulkDTO, HttpStatus.BAD_REQUEST);
+			response = new ResponseEntity(message, HttpStatus.BAD_REQUEST);
 			return response;
 		}
 
@@ -245,14 +265,9 @@ public class StudyParticipantController {
 				 String studyOID,
 				String siteOID,UserAccountBean userAccountBean) throws Exception {
 
-			ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-
 			ArrayList<String> errorMessages = new ArrayList<String>();
-			ErrorObject errorOBject = null;
 			ResponseEntity<Object> response = null;
-			String validation_failed_message = "VALIDATION FAILED";
-			String validation_passed_message = "SUCCESS";
-	   		    						
+
 			SubjectTransferBean subjectTransferBean = this.transferToSubject(map);
 			subjectTransferBean.setStudyOid(studyOID);
 			String uri = request.getRequestURI();
@@ -270,7 +285,7 @@ public class StudyParticipantController {
 			subjectTransferBean.setStudy(tenantstudyBean);
 			
 			if(siteOID != null) {
-				StudyBean siteStudy = getStudyDao().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
+				StudyBean siteStudy = getStudyDAO().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
 				subjectTransferBean.setSiteStudy(siteStudy);
 			}
 			
@@ -280,60 +295,11 @@ public class StudyParticipantController {
 	        DataBinder dataBinder = new DataBinder(subjectTransferBean);
 	        errors = dataBinder.getBindingResult();
 
-			if (!validateService.isStudyOidValid(studyOID)) {
-				errors.reject(ErrorConstants.ERR_STUDY_NOT_EXIST, "The study identifier you provided is not valid.");
-			}
-			if (!validateService.isStudyOidValidStudyLevelOid(studyOID)) {
-				errors.reject(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
-			}
-			if (!validateService.isSiteOidValid(siteOID)) {
-				errors.reject(ErrorConstants.ERR_SITE_NOT_EXIST);
-			}
-			if (!validateService.isSiteOidValidSiteLevelOid(siteOID)) {
-				errors.reject(ErrorConstants.ERR_SITE_NOT_Valid_OID);
-			}
-			if (!validateService.isStudyToSiteRelationValid(studyOID, siteOID)) {
-				errors.reject(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
-			}
-			if (!validateService.isUserHasAccessToStudy(userRoles,studyOID) && !validateService.isUserHasAccessToSite(userRoles,siteOID)) {
-				errors.reject(ErrorConstants.ERR_NO_ROLE_SETUP);
-			}else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles,studyOID)&&!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles,siteOID)  ){
-				errors.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES );
-			}
 
 			if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){
 				errors.reject( "errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
 			}
-
-			if (subjectTransferBean.getFirstName()!=null && subjectTransferBean.getFirstName().length()>35){
-				errors.reject("errorCode.firsNameTooLong","First name length should not exceed 35 characters");
-			}
-			if (subjectTransferBean.getLastName()!=null && subjectTransferBean.getLastName().length()>35){
-				errors.reject("errorCode.lastNameTooLong","Last name length should not exceed 35 characters");
-			}
-			if (subjectTransferBean.getIdentifier()!=null && subjectTransferBean.getIdentifier().length()>35){
-				errors.reject("errorCode.identifierTooLong","Identifier length should not exceed 35 characters");
-			}
-			if (subjectTransferBean.getEmailAddress()!=null &&  subjectTransferBean.getEmailAddress().length()>255){
-				errors.reject("errorCode.emailAddressTooLong","Email Address length should not exceed 255 characters");
-			}
-
-			if (subjectTransferBean.getEmailAddress()!=null &&  ! EmailValidator.getInstance().isValid(subjectTransferBean.getEmailAddress())&& subjectTransferBean.getEmailAddress().length()!=0){
-				errors.reject("errorCode.invalidEmailAddress","Email Address contains invalid characters or format");
-			}
-
-			if (subjectTransferBean.getPhoneNumber()!=null && subjectTransferBean.getPhoneNumber().length()>15){
-				errors.reject("errorCode.phoneNumberTooLong","Phone number length should not exceed 15 characters");
-			}
-
-			if (subjectTransferBean.getPhoneNumber()!=null && !onlyContainsNumbers(subjectTransferBean.getPhoneNumber()) && subjectTransferBean.getPhoneNumber().length()!=0) {
-				errors.reject("errorCode.invalidPhoneNumber","Phone number should not containe alphabetic characters");
-			}
-
-			Study tenantstudy = studyHibDao.findById(tenantstudyBean.getId());
-			if(subjectTransferBean.isRegister() && !validateService.isParticipateActive(tenantstudy)) {
-				errors.reject("errorCode.participateModuleNotActive", "Participate Module is not Active");
-			}
+			participantValidator.validateParticipantData(subjectTransferBean, errors);
 
 			participantValidator.validate(subjectTransferBean, errors);
 
@@ -363,8 +329,10 @@ public class StudyParticipantController {
 	        	}
 	    		
 	    		response = new ResponseEntity(responseFailure, org.springframework.http.HttpStatus.BAD_REQUEST);
-	        } else {        				
-			  	String label = create(subjectTransferBean,tenantstudyBean,request);
+	        } else {
+				String accessToken = utilService.getAccessTokenFromRequest(request);
+				String customerUuid = utilService.getCustomerUuidFromRequest(request);
+			  	String label = participantService.createParticipant(subjectTransferBean,tenantstudyBean, accessToken, customerUuid, userAccountBean, request.getLocale());
 			  	studyParticipantDTO.setSubjectKey(label);
 
 				StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
@@ -384,143 +352,78 @@ public class StudyParticipantController {
 			return response;
 			
 		}
-		
+
+		public String startParticipantImportJob(String studyOid, String siteOid, HttpServletRequest request, String accessToken,
+												String customerUuid, UserAccountBean userAccountBean, MultipartFile file, Map<String, Object> map) {
+			utilService.setSchemaFromStudyOid(studyOid);
+			Study site = studyDao.findByOcOID(siteOid);
+			Study study = studyDao.findByOcOID(studyOid);
+			StudyBean siteBean = getStudyDAO().findSiteByOid(studyOid, siteOid);
+			StudyBean studyBean = getStudyDAO().findByOid(studyOid);
+
+			UserAccount userAccount = uDao.findById(userAccountBean.getId());
+			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.BULK_ADD_PARTICIPANTS,file.getOriginalFilename());
+			CompletableFuture.supplyAsync(() -> {
+				try {
+					participantService.processBulkParticipants(studyBean, studyOid, siteBean, siteOid, userAccountBean, accessToken, customerUuid, file,
+								jobDetail, request.getLocale(), request.getRequestURI(), map);
+				} catch (Exception e) {
+					logger.error("Error in Bulk participant job:" + e);
+				}
+				return null;
+			});
+			return jobDetail.getUuid();
+		}
+
 		/** 
 		 * @param request
 		 * @param map
 		 * @return
 		 * @throws Exception
 		 */		
-		public ResponseEntity<Object> createNewStudySubjectsInBulk(HttpServletRequest request, 
-				@RequestBody HashMap<String, Object> map,
+		public ResponseEntity<String> createNewStudySubjectsInBulk(HttpServletRequest request,
+				@RequestBody Map<String, Object> map,
 				String studyOID,
-				String siteOID,
-				ArrayList subjectKeys) throws Exception {
-			
-			ArrayList<String> errorMsgsAll = new ArrayList<String>();
-			ResponseEntity<Object> response = null;
-			ResponseStudyParticipantsBulkDTO responseStudyParticipantsBulkDTO = new ResponseStudyParticipantsBulkDTO();
-			
-			String validation_failed_message = "Found validation failure,please see detail error message for each subjectKey";
-			String validation_passed_message = "SUCCESS";
-					
-			StudyBean study = this.getRestfulServiceHelper().setSchema(studyOID, request);
+				String siteOID, MultipartFile file) throws Exception {
+
 			StudyBean studyBean = null;
-			studyBean = this.participantService.validateRequestAndReturnStudy(studyOID, siteOID,request);			
+			studyBean = participantService.validateRequestAndReturnStudy(studyOID, siteOID,request);
         	if(utilService.isParticipantIDSystemGenerated(studyBean)) {
 
 				 throw new OpenClinicaSystemException("errorCode.bulkUploadNotSupportSystemGeneratedSetting","This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
-			 }
-        	
+        	}
+
+
 			UserAccountBean  user = this.participantService.getUserAccount(request);
-			
-			StudyBean siteStudy = null;
-			if(siteOID != null) {
-				siteStudy = getStudyDao().findSiteByOid(studyOID, siteOID);				
-			}
-			
-			int failureCount = 0;
-			int uploadCount = subjectKeys.size();
-			   		
-			for(int i= 0; i < subjectKeys.size(); i++) {
-				ArrayList<String> errorMsgs = new ArrayList<String>();
-				SubjectTransferBean subjectTransferBean = new SubjectTransferBean();
-				subjectTransferBean.setPersonId((String) subjectKeys.get(i));
-				subjectTransferBean.setStudySubjectId((String) subjectKeys.get(i));
-				subjectTransferBean.setStudyOid(studyOID);
-				subjectTransferBean.setStudy(study);
-				subjectTransferBean.setOwner(user);
-				subjectTransferBean.setSiteStudy(siteStudy);
-				
-				String uri = request.getRequestURI();
-				if(uri.indexOf("/sites/") >  0) {
-					subjectTransferBean.setSiteIdentifier(siteOID);
-				}
-							
-			    StudyParticipantDTO studyParticipantDTO = new StudyParticipantDTO();			   
-			    studyParticipantDTO.setSubjectKey((String) subjectKeys.get(i));
-			    
-				subjectTransferBean.setOwner(this.participantService.getUserAccount(request));
-				ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
-				participantValidator.setBulkMode(true);
-		        Errors errors = null;
-		        
-		        DataBinder dataBinder = new DataBinder(subjectTransferBean);
-		        errors = dataBinder.getBindingResult();
-		        participantValidator.validateBulk(subjectTransferBean, errors);
-		        
-		        if(errors.hasErrors()) {
-		        	ArrayList validerrors = new ArrayList(errors.getAllErrors());
-		        	Iterator errorIt = validerrors.iterator();
-		        	while(errorIt.hasNext()) {
-		        		ObjectError oe = (ObjectError) errorIt.next();		        				        		
-						
-						if(oe.getCode()!=null) {
-							errorMsgs.add(oe.getCode());
-		        		}else {
-		        			errorMsgs.add(oe.getDefaultMessage());
-		        		}
-		        	}
-		        }
-		        
-		        if (errorMsgs != null && errorMsgs.size() != 0) {		        	
-		        	ResponseFailureStudyParticipantSingleDTO e = new ResponseFailureStudyParticipantSingleDTO();
-		        	e.setSubjectKey(studyParticipantDTO.getSubjectKey());
-		        	e.setMessage(errorMsgs);
-		        	
-		        	failureCount++;
-		        	responseStudyParticipantsBulkDTO.getFailedParticipants().add(e);
-		        } else {        				
-				  	String label = create(subjectTransferBean,study,request);
-					StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
-					studyParticipantDTO.setSubjectOid(subject.getOid());
 
-				  	ResponseSuccessStudyParticipantDTO e = new ResponseSuccessStudyParticipantDTO();
-				  	e.setSubjectKey(studyParticipantDTO.getSubjectKey());
-				  	e.setSubjectOid(studyParticipantDTO.getSubjectOid());
-				  	e.setStatus("Available");
-				  	responseStudyParticipantsBulkDTO.getParticipants().add(e);
-		           
-		        }		        
-		      
-		        errorMsgsAll.addAll(errorMsgs);
-			}
-			
-			String createdBy = user.getLastName() + " " + user.getFirstName(); 			
-			responseStudyParticipantsBulkDTO.setCreatedBy(createdBy);  
-			
-			SimpleDateFormat  format = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-			String  DateToStr = format.format(new Date());
-			responseStudyParticipantsBulkDTO.setCreatedAt(DateToStr);
-			
-			responseStudyParticipantsBulkDTO.setFailureCount(failureCount);
-			responseStudyParticipantsBulkDTO.setUploadCount(uploadCount - failureCount);
-			
-		  if (errorMsgsAll != null && errorMsgsAll.size() != 0 && failureCount == uploadCount ) {	
-			  responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);
-			  response = new ResponseEntity(responseStudyParticipantsBulkDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-	      } else {
-	    	  responseStudyParticipantsBulkDTO.setMessage(validation_passed_message); 
-	            ResponseSuccessStudyParticipantDTO responseSuccess = new ResponseSuccessStudyParticipantDTO();	           
-				response = new ResponseEntity(responseStudyParticipantsBulkDTO, org.springframework.http.HttpStatus.OK);
-	      }
+			String accessToken = utilService.getAccessTokenFromRequest(request);
+			String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-		  return response;
+			String uuid = startParticipantImportJob( studyOID,  siteOID,  request, accessToken,  customerUuid,  user, file, map);
+
+			logger.info("REST request to Extract Participants info ");
+			return new ResponseEntity<String>("job uuid: "+ uuid,HttpStatus.OK);
 			
 		}
-		
-		
+
+
 		@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 		@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
-			
+			if (studyOid != null)
+				studyOid = studyOid.toUpperCase();
+
 			return listStudySubjects(studyOid, null, request);
 		}
 
 		@ApiOperation(value = "To get all participants at site level",  notes = "only work for authorized users with the right acecss permission ")
 		@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudySite(@PathVariable("studyOID") String studyOid,@PathVariable("sitesOID") String siteOid,HttpServletRequest request) throws Exception {
-			
+			if (studyOid != null)
+				studyOid = studyOid.toUpperCase();
+			if (siteOid != null)
+				siteOid = siteOid.toUpperCase();
+
 			return listStudySubjects(studyOid, siteOid, request);
 		}
 
@@ -540,7 +443,7 @@ public class StudyParticipantController {
 		            StudyBean study = null;
 		            try {
 		            	study = this.getRestfulServiceHelper().setSchema(studyOid, request);
-		            	study = this.participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
+		            	study = participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
 		            } catch (OpenClinicaSystemException e) {	                	               	                
 		                
 		                String errorMsg = e.getErrorCode();
@@ -572,8 +475,8 @@ public class StudyParticipantController {
 		}
 		
 		/**
-		 * @param studyIdentifier
-		 * @param siteIdentifier
+		 * @param studyOid
+		 * @param siteOid
 		 * @param study
 		 * @return
 		 * @throws Exception
@@ -585,7 +488,7 @@ public class StudyParticipantController {
 		         *  pass in site OID, so will return data in site level
 		         */
 		       if(siteOid != null) {
-		    	   studyToCheck = this.getStudyDao().findByOid(siteOid);
+		    	   studyToCheck = this.getStudyDAO().findByOid(siteOid);
 		       }else {
 		    	   studyToCheck = study;
 		       }
@@ -620,42 +523,10 @@ public class StudyParticipantController {
 		        
 		        return studyParticipantDTOs;
 		    }
-		 
-		
-	    
-		/**
-	     * Create the Subject object if it is not already in the system.
-	     * 
-	     * @param subjectTransferBean
-	     * @return String
-		 * @throws OpenClinicaException 
-	     */
-	    private String create(SubjectTransferBean subjectTransferBean,StudyBean currentStudy, HttpServletRequest request) throws Exception {
-	          logger.debug("creating subject transfer");
-	          String accessToken = utilService.getAccessTokenFromRequest(request);
-			String customerUuid= utilService.getCustomerUuidFromRequest(request);
-			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
-			OCParticipantDTO oCParticipantDTO = new OCParticipantDTO();
-			oCParticipantDTO.setFirstName(subjectTransferBean.getFirstName());
-			oCParticipantDTO.setLastName(subjectTransferBean.getLastName());
-			oCParticipantDTO.setEmail(subjectTransferBean.getEmailAddress());
-			oCParticipantDTO.setPhoneNumber(subjectTransferBean.getPhoneNumber());
-			oCParticipantDTO.setIdentifier(subjectTransferBean.getIdentifier());
-			String label =this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken,userAccountBean);
 
-			if(subjectTransferBean.isRegister()) {
-				ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
-				userService.connectParticipant(currentStudy.getOid(), subjectTransferBean.getPersonId(), oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
-			}
 
-			return label;
-	    }
-	    
-	   
-	    
-		
-		
-	    /**
+
+	/**
 	     * 
 	     * @param resource
 	     * @param code
@@ -669,27 +540,7 @@ public class StudyParticipantController {
 			errorOBject.setField(field);
 			return errorOBject;
 		}
-		
-		/**
-		 * 
-		 * @param roleName
-		 * @param resterm
-		 * @return
-		 */
-		public Role getStudyRole(String roleName, ResourceBundle resterm) {
-			if (roleName.equalsIgnoreCase(resterm.getString("Study_Director").trim())) {
-				return Role.STUDYDIRECTOR;
-			} else if (roleName.equalsIgnoreCase(resterm.getString("Study_Coordinator").trim())) {
-				return Role.COORDINATOR;
-			} else if (roleName.equalsIgnoreCase(resterm.getString("Investigator").trim())) {
-				return Role.INVESTIGATOR;
-			} else if (roleName.equalsIgnoreCase(resterm.getString("Data_Entry_Person").trim())) {
-				return Role.RESEARCHASSISTANT;
-			} else if (roleName.equalsIgnoreCase(resterm.getString("Monitor").trim())) {
-				return Role.MONITOR;
-			} else
-				return null;
-		}
+
 
 		/**
 		 * 
@@ -744,33 +595,7 @@ public class StudyParticipantController {
 		        return studyParticipanttDTO;
 			 
 		 }
-		 
-		 
-		 /**
-	     * Helper Method to resolve a date provided as a string to a Date object.
-	     * 
-	     * @param dateAsString
-	     * @return Date
-	     * @throws ParseException
-	     */
-	    private Date getDate(String dateAsString) throws ParseException, Exception {
-	        SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
-	        sdf.setLenient(false);
-	        Date dd = sdf.parse(dateAsString);
-	        Calendar c = Calendar.getInstance();
-	        c.setTime(dd);
-	        if (c.get(Calendar.YEAR) < 1900 || c.get(Calendar.YEAR) > 9999) {
-	        	throw new Exception("Unparsable date: "+dateAsString);
-	        }
-	        return dd;
-	    }
 
-	    private int getYear(Date dt) throws ParseException, Exception {       
-	        Calendar c = Calendar.getInstance();
-	        c.setTime(dt);
-	        
-	        return c.get(Calendar.YEAR);
-	    }
 	    /**
 	     * 
 	     * @return
@@ -794,10 +619,10 @@ public class StudyParticipantController {
 		 * 
 		 * @return
 		 */
-		 public StudyDAO getStudyDao() {
-	        studyDao = studyDao
-					!= null ? studyDao : new StudyDAO(dataSource);
-	        return studyDao;
+		 public StudyDAO getStudyDAO() {
+	        studyDAO = studyDAO
+					!= null ? studyDAO : new StudyDAO(dataSource);
+	        return studyDAO;
 	    }
 		 
 		 public UserAccountDAO getUserAccountDao() {
@@ -814,15 +639,5 @@ public class StudyParticipantController {
 				serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource);
 		        return serviceHelper;
 		}
-
-	private boolean onlyContainsNumbers(String text) {
-		try {
-			Long.parseLong(text);
-			return true;
-		} catch (NumberFormatException ex) {
-			return false;
-		}
-	}
-
 
 }

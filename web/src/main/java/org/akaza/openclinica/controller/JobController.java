@@ -19,6 +19,7 @@ import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.util.ErrorConstants;
 import org.akaza.openclinica.web.util.HeaderUtil;
+import org.apache.batik.bridge.UserAgent;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -145,10 +146,6 @@ public class JobController {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         }
 
-        if (!validateService.isParticipateActive(tenantStudy)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_PARTICIAPTE_INACTIVE, "Participate is Inactive. Participate module for the study is inactive")).body(null);
-        }
-
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
@@ -195,9 +192,15 @@ public class JobController {
             inputStream = new FileInputStream(fileToDownload);
             if (!"true".equals(open)) {
                 response.setContentType("application/force-download");
-                String fileName=URLEncoder.encode(jobDetail.getLogPath(), "UTF-8");
-                response.setHeader("Content-Disposition", "attachment; filename="+fileName);
-            }
+                String fileName = URLEncoder.encode(jobDetail.getLogPath(), "UTF-8").replace("+", "%20");
+                String userAgent = request.getHeader("user-agent");
+
+                if (userAgent.contains("Firefox") || userAgent.contains("Safari")) {
+                    response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + fileName);
+                } else {
+                    response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+                }
+                }
             IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
         } catch (Exception e) {

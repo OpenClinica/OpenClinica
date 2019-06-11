@@ -131,3 +131,49 @@
 <%-- view all subjects ends here --%>
 
 <link rel="stylesheet" href="../includes/css/icomoon-style.css">
+
+<script>
+  function store(callback) {
+    if (callback)
+      store.data = callback(store.data) || store.data;
+    if (!store.dirty) {
+      store.dirty = true;
+      setTimeout(function() {
+        sessionStorage.setItem(store.key, JSON.stringify(store.data));
+        if (
+          store.data.ocStatusHide !== 'oc-status-removed' ||
+          store.data.datatables.some(function(state) {return canReset(state)}) ||
+          $('#studySubjectRecord.collapsed, #subjectEvents.collapsed, #commonEvents>.expanded').length
+        )
+          $('#reset-all-filters').removeClass('invisible');
+        else
+          $('#reset-all-filters').addClass('invisible');
+        store.dirty = false;
+      }, 1);
+    }
+  }
+  store.key = '${study.oid}.SDVs';
+  store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
+    sdvChecks: {}
+  };
+  store.dirty = false;
+
+  $('#sdv')
+      .on('change', 'input[type=checkbox]', function() {
+        var checkbox = $(this);
+        var name = checkbox.attr('name');
+        var checked = checkbox.is(':checked');
+        store(function(data) {
+            data.sdvChecks[name] = checked;
+        });
+      })
+      .find('input[type=checkbox]').each(function() {
+        var checkbox = $(this);
+        var name = checkbox.attr('name');
+        var checked = store.data.sdvChecks[name];
+        if (checked)
+            checkbox.attr('checked', 'checked');
+        else
+            checkbox.removeAttr('checked');
+      });
+</script>

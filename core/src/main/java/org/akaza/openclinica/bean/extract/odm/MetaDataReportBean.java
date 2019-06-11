@@ -136,6 +136,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             marshaller.marshal(rpic);
             String result = writer.toString();
             String newResult = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
+            // The result of this is being double escaped. Somewhere the Castor library is escaping the XML specific
+            // characters when they have already been escaped.
+            newResult = StringEscapeUtils.unescapeXml(newResult);
             return newResult;
 
         } catch (FileNotFoundException ex) {
@@ -156,7 +159,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     public void addNodeRulesData(MetaDataVersionBean a) {
 
         RulesPostImportContainer rpic = new RulesPostImportContainer();
-        rpic.populate(a.getRuleSetRules());
+        rpic.populate(a.getRuleSetRules(), true);
 
         if (rpic.getRuleSets() != null && rpic.getRuleSets().size() > 0) {
             StringBuffer xml = this.getXmlOutput();

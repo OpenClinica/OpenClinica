@@ -566,7 +566,7 @@ public class ImportDataHelper {
 	 			bw.close();						
 	 	       
 	 	    } catch (Exception e) {
-	 	        e.printStackTrace();
+	 	    	logger.error("Exception occurred", e);
 	 	    }finally {
 	 			try {
 	 				if (bw != null)
@@ -574,7 +574,7 @@ public class ImportDataHelper {
 	 				if (fw != null)
 	 					fw.close();
 	 			} catch (IOException ex) {
-	 				ex.printStackTrace();
+	 				logger.error("Exception occurred", ex);
 	 			}
 	 		}
 	    }
