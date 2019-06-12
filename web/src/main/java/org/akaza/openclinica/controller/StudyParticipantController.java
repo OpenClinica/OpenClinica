@@ -135,7 +135,7 @@ public class StudyParticipantController {
 			map.put("identifier", participantRestfulRequestDTO.getIdentifier());
 			map.put("register", register);
 			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
-			
+			responseFailureStudyParticipantSingleDTO.setSubjectKey((String) map.get("subjectKey"));
 			try {
 				return this.createNewStudySubject(request, map, studyOID, siteOID,userAccountBean);
 			} catch (Exception e) {
@@ -332,6 +332,7 @@ public class StudyParticipantController {
 	        } else {
 				String accessToken = utilService.getAccessTokenFromRequest(request);
 				String customerUuid = utilService.getCustomerUuidFromRequest(request);
+
 			  	String label = participantService.createParticipant(subjectTransferBean,tenantstudyBean, accessToken, customerUuid, userAccountBean, request.getLocale());
 			  	studyParticipantDTO.setSubjectKey(label);
 

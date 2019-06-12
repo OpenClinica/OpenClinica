@@ -27,6 +27,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.validator.ParticipantValidator;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,6 +136,9 @@ public class ParticipantServiceImpl implements ParticipantService {
             studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
 
         }
+        if(studySubjectBean!=null && !studySubjectBean.getStatus().equals(Status.AVAILABLE))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
+
         studySubject = saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,userAccountBean);
 
         if (!studySubjectBean.isActive() || studySubject==null) {
