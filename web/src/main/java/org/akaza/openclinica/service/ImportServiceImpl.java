@@ -671,6 +671,7 @@ public class ImportServiceImpl implements ImportService {
 
     private FormLayout getFormLayout(StudyEventDataBean studyEventDataBean) {
         String formOid = studyEventDataBean.getFormData().get(0).getFormOID();
+        if (formOid!=null) formOid=formOid.toUpperCase();
         String formLayoutName = studyEventDataBean.getFormData().get(0).getFormLayoutName();
         CrfBean crf = crfDao.findByOcOID(formOid);
         FormLayout formLayout = formLayoutDao.findByNameCrfId(formLayoutName, crf.getCrfId());
