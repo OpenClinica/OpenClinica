@@ -12,6 +12,7 @@ import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.web.pform.formlist.Form;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -669,18 +670,24 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private FormLayout getFormLayout(StudyEventDataBean studyEventDataBean) {
+    private Object getFormLayout(StudyEventDataBean studyEventDataBean) {
         String formOid = studyEventDataBean.getFormData().get(0).getFormOID();
         if (formOid!=null) formOid=formOid.toUpperCase();
         String formLayoutName = studyEventDataBean.getFormData().get(0).getFormLayoutName();
         CrfBean crf = crfDao.findByOcOID(formOid);
+        if (crf == null || (crf != null && !crf.getStatus().equals(Status.AVAILABLE))) {
+            return new ErrorObj(FAILED, ErrorConstants.ERR_FORMOID_NOT_FOUND);
+        }
+
         FormLayout formLayout = formLayoutDao.findByNameCrfId(formLayoutName, crf.getCrfId());
         return formLayout;
     }
 
 
-    private EventCrf commonNonRepeatingEventCrfLookUp(StudyEventDataBean studyEventDataBean, StudyEventDefinition studyEventDefinition, StudySubject studySubject) {
-        FormLayout formLayout = getFormLayout(studyEventDataBean);
+    private Object commonNonRepeatingEventCrfLookUp(StudyEventDataBean studyEventDataBean, StudyEventDefinition studyEventDefinition, StudySubject studySubject) {
+          Object formLayoutObject = getFormLayout(studyEventDataBean);
+          if(formLayoutObject instanceof ErrorObj)return formLayoutObject;
+          FormLayout formLayout = (FormLayout) formLayoutObject;
 
         List<StudyEvent> studyEvents = studyEventDao.fetchListByStudyEventDefOID(studyEventDefinition.getOc_oid(), studySubject.getStudySubjectId());
         EventCrf eventCrf = null;
@@ -700,6 +707,8 @@ public class ImportServiceImpl implements ImportService {
 
         StudyEvent studyEvent = null;
         Object eventObject = null;
+        Object formLayoutObject=null;
+        Object eventCrfObject=null;
 
         // OID is missing
         if (studyEventDataBean.getStudyEventOID() == null) {
@@ -729,7 +738,9 @@ public class ImportServiceImpl implements ImportService {
                         if (eventObject instanceof ErrorObj) return eventObject;
                         studyEvent = scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
                     } else {
-                        FormLayout formLayout = getFormLayout(studyEventDataBean);
+                        formLayoutObject = getFormLayout(studyEventDataBean);
+                        if(formLayoutObject instanceof ErrorObj) return formLayoutObject;
+                        FormLayout formLayout= (FormLayout) formLayoutObject;
                         EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());
                         // Event Crf has status complete or unavailable
                         if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()))
@@ -749,7 +760,9 @@ public class ImportServiceImpl implements ImportService {
             } else {   // non Repeating Common Event
 
                 // Discard Repeat Key
-                EventCrf eventCrf = commonNonRepeatingEventCrfLookUp(studyEventDataBean, studyEventDefinition, studySubject);
+                eventCrfObject  = commonNonRepeatingEventCrfLookUp(studyEventDataBean, studyEventDefinition, studySubject);
+                if(eventCrfObject instanceof ErrorObj) return eventCrfObject;
+                EventCrf eventCrf=(EventCrf)eventCrfObject;
                 // Event Crf has status complete or invalid
                 if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()))
                     return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
@@ -862,18 +875,6 @@ public class ImportServiceImpl implements ImportService {
         return null;
     }
 
-
-    // private ErrorObj validateRepeatKey(String repeatKey, int eventOrdinal) {
-    //    ErrorObj errorObj = null;
-    // Validate Repeat Key is an Integer Value
-    //    errorObj = validateRepeatKeyIntNumber(repeatKey);
-    //   if (errorObj != null) return errorObj;
-    // verify repeat key too Large
-    //   errorObj = validateRepeatKeyTooLarge(repeatKey, eventOrdinal);
-    //   if (errorObj != null) return errorObj;
-
-    //   return null;
-    // }
 
 
     public StudyEvent scheduleEvent(StudyEventDataBean studyEventDataBean, StudySubject studySubject, StudyEventDefinition studyEventDefinition, UserAccount userAccount) {
@@ -1102,9 +1103,22 @@ public class ImportServiceImpl implements ImportService {
         if (eventCrf == null && studyEventDefinition.getType().equals(COMMON) && studyEventDefinition.getRepeating()) {
             List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
             if (eventCrfs.size() > 0) {
-                return new ErrorObj(FAILED, ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH);
+                if (eventCrfs.get(0).getFormLayout().getCrf().getCrfId() == formLayout.getCrf().getCrfId()) {
+                    eventCrf = eventCrfs.get(0);
+                } else
+                    return new ErrorObj(FAILED, ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH);
             }
         }
+
+        if (eventCrf == null && studyEventDefinition.getType().equals(COMMON) && !studyEventDefinition.getRepeating()) {
+            List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
+            if (eventCrfs.size() > 0) {
+                if(eventCrfs.get(0).getFormLayout().getCrf().getCrfId()==formLayout.getCrf().getCrfId()) {
+                    eventCrf = eventCrfs.get(0);
+                }
+            }
+        }
+
 
         if (eventCrf == null) {
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
