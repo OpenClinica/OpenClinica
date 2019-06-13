@@ -64,7 +64,7 @@
     padding-left: 1.5em;
   }
   #tbl-jobs, #tbl-job {
-    width: 100%;
+    width: 100% !important;
   }
   #tbl-jobs td:last-child {
     white-space: nowrap;
@@ -88,8 +88,8 @@
     color: white;
   }
   .highlight-red {
-    background-color: red;
-    color: white;
+    color: red;
+    font-weight: bold;
   }
 </style>
 
@@ -189,9 +189,7 @@
         $('#tbl-jobs td:nth-child(4)').each(function() {
           var cell = $(this);
           var text = cell.text();
-          if (text === 'COMPLETED')
-            cell.addClass('highlight-green');
-          else if (text !== 'IN_PROGRESS')
+          if (text !== 'IN_PROGRESS' && text !== 'COMPLETED')
             cell.addClass('highlight-red');
         });
       }).fail(function(e) {
@@ -244,15 +242,15 @@
                             </tr>
                             <tr>
                               <td class="table_header_column_top">
-                                <fmt:message key="start_time" bundle="${resword}"/>
-                              </td>
-                              <td class="table_cell_top" id="job-start-time"></td>
-                            </tr>
-                            <tr>
-                              <td class="table_header_column_top">
                                 <fmt:message key="submitted_by" bundle="${resword}"/>
                               </td>
                               <td class="table_cell_top" id="job-submitted-by"></td>
+                            </tr>
+                            <tr>
+                              <td class="table_header_column_top">
+                                <fmt:message key="start_time" bundle="${resword}"/>
+                              </td>
+                              <td class="table_cell_top" id="job-start-time"></td>
                             </tr>
                             <tr>
                               <td class="table_header_column_top">
