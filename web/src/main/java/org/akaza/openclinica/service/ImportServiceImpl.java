@@ -692,13 +692,14 @@ public class ImportServiceImpl implements ImportService {
           FormLayout formLayout = (FormLayout) formLayoutObject;
 
         List<StudyEvent> studyEvents = studyEventDao.fetchListByStudyEventDefOID(studyEventDefinition.getOc_oid(), studySubject.getStudySubjectId());
-        EventCrf eventCrf = null;
+        EventCrf eventCrf=null;
+        List <EventCrf> eventCrfs = null;
         for (StudyEvent stEvent : studyEvents) {
-            eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(stEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());
-            if (eventCrf != null) {
-                break;
-            }
+            eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(stEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
+            if(eventCrfs.size()>0) eventCrf=eventCrfs.get(0);
+            break;
         }
+
         return eventCrf;
     }
 
@@ -743,7 +744,9 @@ public class ImportServiceImpl implements ImportService {
                         formLayoutObject = getFormLayout(studyEventDataBean);
                         if(formLayoutObject instanceof ErrorObj) return formLayoutObject;
                         FormLayout formLayout= (FormLayout) formLayoutObject;
-                        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());
+                       EventCrf eventCrf=null;
+                        List < EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
+                       if(eventCrfs.size()>0) eventCrf=eventCrfs.get(0);
                         // Event Crf has status complete or unavailable
                         if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()))
                             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
@@ -1094,30 +1097,11 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
 
-        if (eventCrf == null && studyEventDefinition.getType().equals(UNSCHEDULED)) {
+        if (eventCrf == null) {
             List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), crf.getCrfId());
             if (eventCrfs.size() > 0) {
                 eventCrf = eventCrfs.get(0);
                 formDataBean.setFormLayoutName(eventCrf.getFormLayout().getXformName());
-            }
-        }
-
-        if (eventCrf == null && studyEventDefinition.getType().equals(COMMON) && studyEventDefinition.getRepeating()) {
-            List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
-            if (eventCrfs.size() > 0) {
-                if (eventCrfs.get(0).getFormLayout().getCrf().getCrfId() == formLayout.getCrf().getCrfId()) {
-                    eventCrf = eventCrfs.get(0);
-                } else
-                    return new ErrorObj(FAILED, ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH);
-            }
-        }
-
-        if (eventCrf == null && studyEventDefinition.getType().equals(COMMON) && !studyEventDefinition.getRepeating()) {
-            List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
-            if (eventCrfs.size() > 0) {
-                if(eventCrfs.get(0).getFormLayout().getCrf().getCrfId()==formLayout.getCrf().getCrfId()) {
-                    eventCrf = eventCrfs.get(0);
-                }
             }
         }
 
