@@ -1,21 +1,10 @@
 package org.akaza.openclinica.validator;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
-import javax.sql.DataSource;
-
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
@@ -24,12 +13,18 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class ParticipantValidator extends SubjectTransferValidator {
 
@@ -295,18 +290,7 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        	 e.reject("errorCode.participantsEnrollmentCapReached","Participants enrollment cap has reached and hence NO MORE participant can be added to the study");   
 	        	 return;
 	        }
-	        
-	        /**
-			 * Applicable ONLY when manual entry: Participant ID provided in the request is a duplicate. A participant already exists with that ID
-			 * in study level
-			 */
-	        StudyBean checkStudy = currentStudy;
-      	        
-	        if(getStudySubjectDao().findByLabelAndStudy(subjectTransferBean.getPersonId(), checkStudy).getId() != 0) {
-	        	 e.reject("errorCode.participantIDNotUnique", "Participant ID " + subjectTransferBean.getPersonId() + " already exists with that ID, please use different ID");
-		         return;				
-			}
-     	    
+
 	        int handleStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();		     
 	        StudyParameterValueBean studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectPersonIdRequired");
 	        String personId = subjectTransferBean.getPersonId();
@@ -324,7 +308,9 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	                + " cannot be longer than 30 characters.");
 	            return;
 	        }
-    	   	        
+
+	        validateParticipantData(subjectTransferBean, e);
+
 	    }
 
 	/**
@@ -372,4 +358,40 @@ public class ParticipantValidator extends SubjectTransferValidator {
 		this.isBulkMode = isBulkMode;
 	}
 
+	public void validateParticipantData(SubjectTransferBean subjectTransferBean, Errors errors) {
+		if (subjectTransferBean.getFirstName()!=null && subjectTransferBean.getFirstName().length()>35){
+			errors.reject("errorCode.firsNameTooLong","First name length should not exceed 35 characters");
+		}
+		if (subjectTransferBean.getLastName()!=null && subjectTransferBean.getLastName().length()>35){
+			errors.reject("errorCode.lastNameTooLong","Last name length should not exceed 35 characters");
+		}
+		if (subjectTransferBean.getIdentifier()!=null && subjectTransferBean.getIdentifier().length()>35){
+			errors.reject("errorCode.identifierTooLong","Identifier length should not exceed 35 characters");
+		}
+		if (subjectTransferBean.getEmailAddress()!=null &&  subjectTransferBean.getEmailAddress().length()>255){
+			errors.reject("errorCode.emailAddressTooLong","Email Address length should not exceed 255 characters");
+		}
+
+		if (subjectTransferBean.getEmailAddress()!=null &&  ! EmailValidator.getInstance().isValid(subjectTransferBean.getEmailAddress())&& subjectTransferBean.getEmailAddress().length()!=0){
+			errors.reject("errorCode.invalidEmailAddress","Email Address contains invalid characters or format");
+		}
+
+		if (subjectTransferBean.getPhoneNumber()!=null && subjectTransferBean.getPhoneNumber().length()>15){
+			errors.reject("errorCode.phoneNumberTooLong","Phone number length should not exceed 15 characters");
+		}
+
+		if (subjectTransferBean.getPhoneNumber()!=null && !onlyContainsNumbers(subjectTransferBean.getPhoneNumber()) && subjectTransferBean.getPhoneNumber().length()!=0) {
+			errors.reject("errorCode.invalidPhoneNumber","Phone number should not containe alphabetic characters");
+		}
+
+	}
+
+	private boolean onlyContainsNumbers(String text) {
+		try {
+			Long.parseLong(text);
+			return true;
+		} catch (NumberFormatException ex) {
+			return false;
+		}
+	}
 }

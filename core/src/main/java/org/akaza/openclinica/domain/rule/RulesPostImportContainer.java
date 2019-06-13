@@ -8,6 +8,7 @@
 package org.akaza.openclinica.domain.rule;
 
 import org.akaza.openclinica.domain.rule.action.RuleActionComparator;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +42,7 @@ public class RulesPostImportContainer {
      * 
      * @param ruleSetRules
      */
-    public void populate(List<RuleSetRuleBean> ruleSetRules) {
+    public void populate(List<RuleSetRuleBean> ruleSetRules, boolean escapeXML) {
         HashMap<Integer, RuleSetBean> ruleSets = new HashMap<Integer, RuleSetBean>();
         HashSet<RuleBean> rules = new HashSet<RuleBean>();
 
@@ -64,7 +65,12 @@ public class RulesPostImportContainer {
                 rs.addRuleSetRuleForDisplay(rsr);
                 ruleSets.put(key, rs);
             }
-            rules.add(rsr.getRuleBean());
+            if (escapeXML){
+                rules.add(getRuleBeanEscaped(rsr));
+            }
+            else {
+                rules.add(rsr.getRuleBean());
+            }
         }
 
         for (Map.Entry<Integer, RuleSetBean> entry : ruleSets.entrySet()) {
@@ -73,6 +79,13 @@ public class RulesPostImportContainer {
         for (RuleBean theRule : rules) {
             this.addRuleDef(theRule);
         }
+    }
+
+    public RuleBean getRuleBeanEscaped(RuleSetRuleBean rsr) {
+        RuleBean ruleBeanEscaped = rsr.getRuleBean();
+        ruleBeanEscaped.setDescription(StringEscapeUtils.escapeXml(ruleBeanEscaped.getDescription()));
+        ruleBeanEscaped.setName(StringEscapeUtils.escapeXml(ruleBeanEscaped.getName()));
+        return ruleBeanEscaped;
     }
 
     // GETTERS & SETTERS

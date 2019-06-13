@@ -9,7 +9,6 @@ public class ErrorObj {
     }
 
     public ErrorObj(String code, String message) {
-        super();
         this.code = code;
         this.message = message;
     }

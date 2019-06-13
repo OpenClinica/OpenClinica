@@ -38,7 +38,7 @@ jQuery(document).ready(function() {
                                             </td> \
                                         </tr> \
                                         <tr> \
-                                            <td valign='top'> \
+                                            <td valign='top' style='width: 132px;'> \
                                                 <div class='formfieldXL_BG' style='padding-top: 5px;'> \
                                                     Enter Participant ID  \
                                                 </div> \
@@ -53,7 +53,7 @@ jQuery(document).ready(function() {
                                             <td valign='top'> \
                                             </td> \
                                             <td valign='top'> \
-                                                <div class='formfieldXL_BG'> \
+                                                <div class='formfieldXL_BG' id='checkboxReportId' style='display: none'> \
                                                     <table style='width: 310px; margin-left: -5px;'> \
                                                         <tr> \
                                                             <td style='padding: 7px 0 5px;' > \
@@ -128,6 +128,22 @@ jQuery(document).ready(function() {
                         clearPIDVerificationForm();
                     }
                 });
+
+                // is site?
+                if (sessionStorage.getItem("studyParentId") > 0) {
+                    var studyName = sessionStorage.getItem("studyName").trim();
+                    var siteSubStringMark = sessionStorage.getItem("siteSubStringMark").trim();
+                    var indexStartMark = studyName.indexOf(siteSubStringMark);
+                    if (indexStartMark > -1) {
+                        // is substring on end string?
+                        if (indexStartMark + (siteSubStringMark).length == studyName.length) {
+                            jQuery("#step-0").css({'height': '325px'});
+                            jQuery("#step-0").find('#checkboxReportId').css({'display': 'block'});
+                        }
+                    }
+                }
+
+
             }
         });
 

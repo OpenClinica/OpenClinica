@@ -39,6 +39,9 @@ public class ErrorConstants {
     public static final String ERR_XML_NOT_WELL_FORMED = "errorCode.xmlNotWellFormed";
 
     public static final String ERR_STUDY_NOT_EXIST = "errorCode.studyNotExist";
+    public static final String ERR_STUDY_NOT_AVAILABLE = "errorCode.studyNotAvailable";
+    public static final String ERR_SITE_NOT_AVAILABLE = "errorCode.siteNotAvailable";
+
     public static final String ERR_SITE_NOT_EXIST = "errorCode.siteNotExist";
     public static final String ERR_NO_ROLE_SETUP = "errorCode.noRoleSetUp";
     public static final String ERR_NO_SUFFICIENT_PRIVILEGES = "errorCode.noSufficientPrivileges";
@@ -46,6 +49,9 @@ public class ErrorConstants {
 
     public static final String ERR_NO_SUBJECT_FOUND = "errorCode.noSubjectFound";
     public static final String ERR_EVENT_NOT_EXIST = "errorCode.eventNotExist";
+    public static final String ERR_EVENT_NOT_AVAILABLE = "errorCode.eventNotAvailable";
+    public static final String ERR_FORM_NOT_AVAILABLE = "errorCode.formNotAvailable";
+
     public static final String ERR_NOT_INTEGER = "errorCode.notInteger";
     public static final String ERR_ORDINAL_TOO_BIG = "errorCode.ordinalTooBig";
 
@@ -74,11 +80,11 @@ public class ErrorConstants {
     public static final String ERR_INVALID_XML_FILE = "errorCode.invalidXMLFile";
     public static final String ERR_FILE_FORMAT_NOT_SUPPORTED = "errorCode.fileFormatNotSupported";
 
-    public static final String ERR_MISSING_START_DATE = "errorCode.eventNotScheduled.missingStartDate";
-    public static final String ERR_INVALID_START_DATE = "errorCode.eventNotScheduled.invalidStartDate";
-    public static final String ERR_INVALID_END_DATE = "errorCode.eventNotScheduled.invalidEndDate";
-    public static final String ERR_EVENT_REPEAT_KEY_TOO_LARGE = "errorCode.eventNotScheduled.repeatKeyTooLarge";
-    public static final String ERR_INVALID_EVENT_REPEAT_KEY = "errorCode.eventNotScheduled.invalidRepeatKey";
+    public static final String ERR_MISSING_START_DATE = "errorCode.missingStartDate";
+    public static final String ERR_INVALID_START_DATE = "errorCode.invalidStartDate";
+    public static final String ERR_INVALID_END_DATE = "errorCode.invalidEndDate";
+    public static final String ERR_EVENT_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
+    public static final String ERR_INVALID_EVENT_REPEAT_KEY = "errorCode.invalidStudyEventRepeatKey";
 
     public static final String ERR_ITEM_TYPE_NOT_SUPPORTED = "errorCode.itemTypeNotSupportedInImport";
     public static final String ERR_VALUE_CHOICE_NOT_FOUND = "errorCode.valueChoiceCodeNotFound";
@@ -90,6 +96,7 @@ public class ErrorConstants {
 
     public static final String ERR_MISSING_PARTICIPANT_ID = "errorCode.missingParticipantID";
     public static final String ERR_PARTICIPANT_NOT_FOUND = "errorCode.participantNotFound";
+    public static final String ERR_PARTICIPANT_ID_NOT_AVAILABLE = "errorCode.participantIDNotAvailable";
     public static final String ERR_PARTICIPANT_IDENTIFIERS_MISMATCH = "errorCode.participantIdentiersMismatch";
     public static final String ERR_MISSING_STUDYEVENTOID = "errorCode.missingStudyEventOID";
     public static final String ERR_INVALID_STUDYEVENTOID = "errorCode.invalidStudyEventOID";
@@ -108,9 +115,34 @@ public class ErrorConstants {
     public static final String ERR_MULTIPLE_PARTICIPANTS_FOUND = "errorCode.multipleParticipantsFound";
     public static final String ERR_REPEAT_KEY_AND_FORM_MISMATCH = "errorCode.repeatKeyAndFormMismatch";
 
-    public static final String ERR_INVALID_GROUP_REPEAT_KEY = "errorCode.invalidRepeatKey";
+    public static final String ERR_INVALID_GROUP_REPEAT_KEY = "errorCode.invalidItemGroupRepeatKey";
     public static final String ERR_ITEMGROUP_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
 
     public static final String ERR_SUBJECT_DATA_MISSING = "errorCode.subjectDataMissing";
+    public static final String ERR_COMMON_EVENTS_CANNOT_BE_SCHEDULED = "errorCode.commonEventsCannotBeScheduled";
 
+    public static final String ERR_SUBJECT_DOES_NOT_CONTAIN_EVENTDATA = "errorCode.subjectDoesNotContainStudyEventData";
+    public static final String ERR_EVENT_DOES_NOT_CONTAIN_FORMDATA = "errorCode.eventDoesNotContainFormData";
+    public static final String ERR_FORM_DOES_NOT_CONTAIN_ITEMGROUPDATA = "errorCode.formDoesNotContainItemGroupData";
+    public static final String ERR_ITEMGROUP_DOES_NOT_CONTAIN_ITEMDATA = "errorCode.itemGroupDoesNotContainItemData";
+
+    public static final String ERR_EVENT_STATUS_NOT_NULL = "errorCode.eventStatusNotNull";
+    public static final String ERR_EVENT_REPEAT_KEY_NOT_NULL = "errorCode.eventRepeatKeyNotNull";
+
+    public static final String ERR_EVENT_ALREADY_EXISTS_CANT_SCHEDULE = "errorCode.eventAlreadyExistsCan'tSchedule";
+    public static final String ERR_EVENT_DOES_NOT_EXISTS_TO_UPDATE = "errorCode.eventDoesNotExistsToUpdate";
+
+    public static final String ERR_INVALID_EVENT_STATUS = "errorCode.invalidEventStatus";
+    public static final String ERR_INVALID_EVENT_TRANSITION_STATUS = "errorCode.invalidEventTransitionStatus";
+
+    public static final String ERR_END_DATE_IS_BEFORE_START_DATE = "errorCode.endDateIsBeforeStartDate";
+
+    public static final String ERR_REPEAT_KEY_REQUIRED = "errorCode.repeatKeyRequired";
+    public static final String ERR_STUDY_EVENT_REPEAT_NOT_FOUND = "errorCode.studyEventRepeatNotFound";
+    public static final String ERR_EVENT_ALREADY_EXISTS = "errorCode.eventAlreadyExists";
+
+    public static final String ERR_INVALID_REPEAT_KEY = "errorCode.invalidRepeatKey";
+    public static final String ERR_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
+
+    public static final String ERR_MISSING_STUDY_EVENT_REPEAT_KEY = "errorCode.missingStudyEventRepeatKey";
 }
