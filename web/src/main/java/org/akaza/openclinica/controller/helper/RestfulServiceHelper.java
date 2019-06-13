@@ -602,7 +602,7 @@ public class RestfulServiceHelper {
 	  * @return
 	  * @throws Exception
 	  */
-	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request) throws Exception {
+	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request,HashMap hm) throws Exception {
 		    String remoteAddress = this.getBasePath(request);
 	  		
 	  		String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/";
@@ -672,7 +672,7 @@ public class RestfulServiceHelper {
 	 	 	 		  	 *  Here will only send ODM XML to OC API
 	 	 	 		  	 *  
 	 	 	 		  	 */
-	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile);
+	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile,hm);
 	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName,studyOID);
 	 	 	 		    tempODMFileList.add(odmXmlFile);
 	 	 	 		 
@@ -741,7 +741,7 @@ public class RestfulServiceHelper {
 	 		return importCRFInfoSummary;
 	  }
 	 
-	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,MockHttpServletRequest request,boolean ismock) throws Exception {
+	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,MockHttpServletRequest request,boolean ismock,HashMap hm) throws Exception {
 		   
 	  		String importDataWSUrl = (String) request.getAttribute("importDataWSUrl");
 	  		String accessToken = (String) request.getAttribute("accessToken");
@@ -816,7 +816,7 @@ public class RestfulServiceHelper {
 		 	 	 		  	 *  Here will only send ODM XML to OC API
 		 	 	 		  	 *  
 		 	 	 		  	 */
-		 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile);
+		 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile,hm);
 		 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName,studyOID);
 		 	 	 		    tempODMFileList.add(odmXmlFile);
 		 	 	 		 
