@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -103,6 +104,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
         session.setAttribute(MODULE, module);
 
         String action = request.getParameter("action");
+        HashMap hm = new HashMap();
         
         String submitted =  (String) request.getParameter("submitted");
         if(submitted!=null && submitted.equals("true")) {
@@ -179,7 +181,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
          	  }
          	  else {
          		 try {
-         			 this.getRestfulServiceHelper().getImportDataHelper().validateMappingFile(mappingFile); 
+         			hm = this.getRestfulServiceHelper().getImportDataHelper().validateMappingFile(mappingFile); 
          		 }catch(Exception e) {
          			 String message = e.getMessage(); 
              		 this.addPageMessage(message);
@@ -190,6 +192,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
          		
          	  }
                
+         	  
                // here process all files in one request 
                //sendRequestByHttpClient(files);
                
@@ -226,10 +229,13 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	         
 	          //////////////// Start of heavy thread run/////////////////////
 	          //sendOneDataRowPerRequestByHttpClient(files,requestMock);
+	          final HashMap hmIn =hm;
 	          new Thread(new Runnable() {
 	              public void run(){
 	               try {
-					sendOneDataRowPerRequestByHttpClient(files, requestMock);
+	            	  
+					
+					sendOneDataRowPerRequestByHttpClient(files, requestMock,hmIn );
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -967,7 +973,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  * @param files
  * @throws Exception
  */
-	public void sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request) throws Exception {
+	public void sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request,HashMap hm) throws Exception {
 		/*HttpServletRequest requestMock = new MockHttpServletRequest();
 		
 		String remoteAddress = this.getBasePath(request);	  		
@@ -982,15 +988,15 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 		
 		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, requestMock);*/
 		
-		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, request);
+		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, request,hm);
 		
 	}
 	
 	
-	public void sendOneDataRowPerRequestByHttpClient(List<File> files,MockHttpServletRequest mockRequest) throws Exception {
+	public void sendOneDataRowPerRequestByHttpClient(List<File> files,MockHttpServletRequest mockRequest,HashMap hm) throws Exception {
 		
 		
-		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, mockRequest, true);
+		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, mockRequest, true,hm);
 		/*SendOneDataRowPerRequestRunnable sendOneDataRowPerRequestRunnable = new SendOneDataRowPerRequestRunnable(this.getRestfulServiceHelper(), files, request);
 		Thread sendOneDataRowPerRequest = new Thread(sendOneDataRowPerRequestRunnable, "sendOneDataRowPerRequest");
 		sendOneDataRowPerRequest.start();*/

@@ -658,7 +658,8 @@ public class DataController {
 
         ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
         ResponseEntity<Object> response = null;
-
+        HashMap hm = new HashMap();
+        
         String validation_failed_message = "VALIDATION FAILED";
         String validation_passed_message = "SUCCESS";
 
@@ -690,7 +691,7 @@ public class DataController {
                       		foundMappingFile = true;
                       		logger.info("Found mapping property file and uploaded");
                       		
-                      		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().validateMappingFile(file);
+                      		hm = this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().validateMappingFile(file);
                       		break;
                       	}
                       }
@@ -703,7 +704,7 @@ public class DataController {
             		  throw new OpenClinicaSystemException("errorCode.noMappingfile", "When send files, please include one correct mapping file, named like *mapping.txt ");
             	  }
             	 
-            	  importCRFInfoSummary = this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(Arrays.asList(files), request);
+            	  importCRFInfoSummary = this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(Arrays.asList(files), request,hm);
               }else {
             	  
             	  throw new OpenClinicaSystemException("errorCode.notCorrectFileNumber", "Please send at least one data text files and  one mapping text file in correct format ");
