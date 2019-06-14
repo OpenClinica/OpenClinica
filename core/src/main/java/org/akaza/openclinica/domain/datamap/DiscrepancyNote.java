@@ -52,6 +52,8 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 	private List<DnSubjectMap> dnSubjectMaps ;
 	private DiscrepancyNote parentDiscrepancyNote;
 	private List<DiscrepancyNote> childDiscrepancyNotes;
+	private String threadUuid;
+	private String threadName;
 
 	public DiscrepancyNote() {
 	}
@@ -262,7 +264,21 @@ public class DiscrepancyNote  extends DataMapDomainObject {
 		this.dnSubjectMaps = dnSubjectMaps;
 	}
 
+	@Column(name = "thread_uuid")
+	public String getThreadUuid() {
+		return threadUuid;
+	}
 
-	
+	public void setThreadUuid(String threadUuid) {
+		this.threadUuid = threadUuid;
+	}
 
+	@Column(name = "thread_name")
+	public String getThreadName() {
+		return threadName;
+	}
+
+	public void setThreadName(String threadName) {
+		this.threadName = threadName;
+	}
 }

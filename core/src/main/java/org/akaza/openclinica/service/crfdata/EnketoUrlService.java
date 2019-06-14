@@ -25,7 +25,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.rule.action.EventActionProcessor;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.domain.xform.dto.Bind;
@@ -62,6 +61,7 @@ public class EnketoUrlService {
     public static final String NO_FLAVOR = "";
     public static final String QUERY = "comment";
     public static final String REASON = "reason";
+    public static final String ANNOTATION = "annotation";
     public static final String AUDIT = "audit";
     public static final String ITEMDATA = "item_data";
     public static final String STUDYEVENT = "study_event";
@@ -268,7 +268,6 @@ public class EnketoUrlService {
             i++;
             QueryBean query = new QueryBean();
             query.setId(String.valueOf(i));
-            query.setAssigned_to(dn.getUserAccountByOwnerId().getUserName());
             query.setComment(escapedValue(dn.getDetailedNotes()));
             if (dn.getResolutionStatus().getResolutionStatusId() != 5) {
                 query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
@@ -279,9 +278,14 @@ public class EnketoUrlService {
             query.setUser(dn.getUserAccountByOwnerId().getUserName());
             if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.QUERY.getValue()) {
                 query.setType(QUERY);
+                query.setAssigned_to(dn.getUserAccountByOwnerId().getUserName());
             } else if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.REASON.getValue()) {
                 query.setType(REASON);
+            } else if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.ANNOTATION.getValue()) {
+                query.setType(ANNOTATION);
             }
+            query.setThread_id(dn.getThreadUuid());
+            query.setVisible_thread_id("Thread "+ dn.getParentDiscrepancyNote().getDiscrepancyNoteId());
             queryBeans.add(query);
         }
 
@@ -299,7 +303,6 @@ public class EnketoUrlService {
             logBean.setDate_time(convertDateFormat(dateTime));
             UserAccount uAccount = userAccountDao.findById(audit.getUserAccount().getUserId());
             logBean.setUser(uAccount.getUserName());
-            logBean.setAssigned_to(uAccount.getUserName());
             logBean.setType(AUDIT);
             logBeans.add(logBean);
         }

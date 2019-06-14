@@ -76,6 +76,7 @@ public class QueryServiceImpl implements QueryService {
 
     @Autowired
     private ApplicationContext appContext;
+    public static final String DASH = "-";
 
     @Override
     public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode, int itemOrdinal) throws Exception {
@@ -113,11 +114,16 @@ public class QueryServiceImpl implements QueryService {
             }
             Collections.reverse(idList);
             queryBean = qBeans.get(0);
-            int noteTypeId = 3;
-            if (queryBean.getType().equals(QueryType.REASON.getName())) {
-                noteTypeId = 4;
+
+
+            List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(helperBean.getItemData().getItemDataId());
+            for (DiscrepancyNote pDiscrepancyNote : parentDiscrepancyNoteList) {
+                if (pDiscrepancyNote.getThreadUuid()!=null && pDiscrepancyNote.getThreadUuid().equals(queryBean.getThread_id())) {
+                    parentDN = pDiscrepancyNote;
+                    break;
+                }
             }
-            parentDN = findQueryParent(helperBean, noteTypeId);
+
 
             if (parentDN == null) {
                 parentDN = createQuery(helperBean, queryBean);
@@ -126,7 +132,7 @@ public class QueryServiceImpl implements QueryService {
                 saveQueryItemDatamap(helperBean);
             }
 
-            childDns = findChildQueries(helperBean);
+            childDns = findChildQueries(helperBean.getItemData());
             if (childDns.size() < qBeans.size()) {
 
                 // Enketo passes JSON "id" attribute for unsubmitted queries only
@@ -164,6 +170,10 @@ public class QueryServiceImpl implements QueryService {
             (queryBean.getType().equals(QueryType.REASON.getName())){
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(4));
             dn.setResolutionStatus(resolutionStatusDao.findById(5));
+        }else if
+        (queryBean.getType().equals(QueryType.ANNOTATION.getName())){
+            dn.setDiscrepancyNoteType(new DiscrepancyNoteType(2));
+            dn.setResolutionStatus(resolutionStatusDao.findById(5));
         }
         String user = queryBean.getUser();
         if (user == null) {
@@ -174,10 +184,12 @@ public class QueryServiceImpl implements QueryService {
         }
 
         String assignedTo = "";
-        if (queryBean.getComment().startsWith("Automatic query for:")) {
-            assignedTo = helperBean.getContainer().getUser().getUserName();
-        } else {
-            assignedTo = queryBean.getAssigned_to();
+        if (queryBean.getType().equals(QueryType.QUERY.getName())) {
+            if (queryBean.getComment().startsWith("Automatic query for:")) {
+                assignedTo = helperBean.getContainer().getUser().getUserName();
+            } else {
+                assignedTo = queryBean.getAssigned_to();
+            }
         }
         if (!StringUtils.isEmpty(assignedTo)) {
             UserAccount userAccount = userAccountDao.findByUserName(assignedTo);
@@ -192,6 +204,7 @@ public class QueryServiceImpl implements QueryService {
             helperBean.setItemData(createBlankItemData(helperBean));
         }
         dn.setDateCreated(new Date());
+        dn.setThreadUuid(queryBean.getThread_id());
         return dn;
     }
 
@@ -261,13 +274,13 @@ public class QueryServiceImpl implements QueryService {
         return itemData;
     }
 
-    private DiscrepancyNote findQueryParent(QueryServiceHelperBean helperBean, int noteTypeId) {
-        DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(helperBean.getItemData().getItemDataId(), noteTypeId);
+    private DiscrepancyNote findQueryParent(ItemData itemData, int noteTypeId) {
+        DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(itemData.getItemDataId(), noteTypeId);
         return parentDiscrepancyNote;
     }
 
-    private List<DiscrepancyNote> findChildQueries(QueryServiceHelperBean helperBean) {
-        List<DiscrepancyNote> childDiscrepancyNotes = discrepancyNoteDao.findChildQueriesByItemData(helperBean.getItemData().getItemDataId());
+    private List<DiscrepancyNote> findChildQueries(ItemData itemData) {
+        List<DiscrepancyNote> childDiscrepancyNotes = discrepancyNoteDao.findChildQueriesByItemData(itemData.getItemDataId());
         return childDiscrepancyNotes;
     }
 
