@@ -322,8 +322,8 @@ $(function() {
                 forms[form['@OID']] = form;
             }, errors);
         })
-        .error(function() {
-            errors.push('Unable to load any Common Events');
+        .error(function(e) {
+            errors.push('Unable to load any Common Events: ' + e.status + ' ' + e.statusText);
         }),
 
         $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson) {
@@ -331,8 +331,8 @@ $(function() {
                 columns[component.name] = component.columns;
             }, errors);
         })
-        .error(function() {
-            errors.push('Unable to load Components data');
+        .error(function(e) {
+            errors.push('Unable to load Components data: ' + e.status + ' ' + e.statusText);
         })
 
     ).then(function() {
