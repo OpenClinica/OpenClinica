@@ -103,6 +103,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author Tao Li
@@ -155,9 +156,10 @@ public class DataController {
         String validation_passed_message = "SUCCESS";
 
         String importXml = null;
+        String importMappingTxt = null;
         responseSuccessDTO = new ImportDataResponseSuccessDTO();
 
-        try {       	         	  
+        try {        	  
               //only support XML file
               if (file !=null) {
             	  String fileNm = file.getOriginalFilename();
@@ -216,6 +218,9 @@ public class DataController {
 
         return response;
     }
+
+    
+
 
     /**
      * @param importXml
@@ -691,7 +696,14 @@ public class DataController {
                       		foundMappingFile = true;
                       		logger.info("Found mapping property file and uploaded");
                       		
+                      		 String importMappingTxt = null;                          
+                         	 if (mappingFile !=null) {
+                         		  importMappingTxt = RestfulServiceHelper.readFileToStringWithNewlineFormat(file);
+                         		  request.setAttribute("importMappingTxt", importMappingTxt);
+                         	  }
+                         	  
                       		hm = this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().validateMappingFile(file);
+                      		
                       		break;
                       	}
                       }
@@ -745,6 +757,91 @@ public class DataController {
 
 	
 
+    /**
+     *  this is only used by pipe delimited data import
+     * @param request
+     * @param file
+     * @param mappingFile
+     * @return
+     * @throws Exception
+     */
+    @ApiIgnore
+    @RequestMapping(value = "/pxml", method = RequestMethod.POST)
+    public ResponseEntity<Object> importDataXMLFileFromPipe(HttpServletRequest request, MultipartFile file,MultipartFile mappingFile) throws Exception {
+
+        ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
+        ResponseEntity<Object> response = null;
+
+        String validation_failed_message = "VALIDATION FAILED";
+        String validation_passed_message = "SUCCESS";
+
+        String importXml = null;
+        String importMappingTxt = null;
+        responseSuccessDTO = new ImportDataResponseSuccessDTO();
+
+        try { 
+        	  if (mappingFile !=null) {
+        		  importMappingTxt = RestfulServiceHelper.readFileToStringWithNewlineFormat(mappingFile);
+        		  request.setAttribute("importMappingTxt", importMappingTxt);
+        	  }
+              //only support XML file
+              if (file !=null) {
+            	  String fileNm = file.getOriginalFilename();
+            	  
+            	  if (fileNm!=null && fileNm.endsWith(".xml")) {
+            		   importXml = RestfulServiceHelper.readFileToString(file);	
+            	  }else {
+            		  throw new OpenClinicaSystemException("errorCode.notXMLfile", "The file format is not supported, please send correct XML file, like *.xml ");
+
+            	  }
+            	 
+              }else {
+            	  
+            	 /**
+              	 *  if call is from the mirth server, then may have no attached file in the request
+              	 *  
+              	 */
+              
+          		  // Read from request content
+          	    StringBuilder buffer = new StringBuilder();
+          	    BufferedReader reader = request.getReader();
+          	    String line;
+          	    while ((line = reader.readLine()) != null) {
+          	        buffer.append(line);
+          	    }
+          	    importXml = buffer.toString();
+          	    
+                
+            	 
+              }        	
+          
+            errorMsgs = importDataInTransaction(importXml, request);
+        } catch (OpenClinicaSystemException e) {
+        	e.printStackTrace();
+            String err_msg = e.getMessage();
+            ErrorMessage error = createErrorMessage(e.getErrorCode(), err_msg);
+            errorMsgs.add(error);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            String err_msg = "Error processing data import request.";
+            ErrorMessage error = createErrorMessage("errorCode.Exception", err_msg);
+            errorMsgs.add(error);
+
+        }
+
+        if (errorMsgs != null && errorMsgs.size() != 0) {
+            ImportDataResponseFailureDTO responseDTO = new ImportDataResponseFailureDTO();
+            responseDTO.setMessage(validation_failed_message);
+            responseDTO.setErrors(errorMsgs);
+            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        } else {
+            responseSuccessDTO.setMessage(validation_passed_message);
+            response = new ResponseEntity(responseSuccessDTO, org.springframework.http.HttpStatus.OK);
+        }
+
+        return response;
+    }
 	
         
           

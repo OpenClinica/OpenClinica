@@ -524,6 +524,9 @@ public class ImportDataHelper {
 		FileWriter fw = null;
 		boolean isNewFile = false;
 
+		String LogFileNm = request.getHeader("LogFileName"); 
+		String importMappingTxt =(String) request.getAttribute("importMappingTxt");
+		
 	    String logFileName;
 	    // OC-10156
 	    if(orginalFileName == null) {
@@ -536,8 +539,12 @@ public class ImportDataHelper {
 	 	    	String importFileDir = this.getPersonalImportFileDir(request);
 	     	    
 	 	    	//orginalFileName like: pipe_delimited_local_skip
+	 	    	if(LogFileNm !=null && LogFileNm.trim().length() > 0) {
+	 	    		logFileName = importFileDir + LogFileNm + "_log.txt";
+	 	    	}else {
+	 	    		logFileName = importFileDir + orginalFileName + "_log.txt";
+	 	    	}
 	 	    	
-	 	    	logFileName = importFileDir + orginalFileName + "_log.txt";
 	 			logFile = new File(logFileName);
 	 			
 	 			/**
@@ -545,15 +552,21 @@ public class ImportDataHelper {
 	 			 *  RowNo | ParticipantID | Status | Message
 	 			 */
 	 			if(!logFile.exists()) {
-	 				logFile.createNewFile();
-	 				isNewFile = true;				
+	 				logFile.createNewFile();	 				
+	 				isNewFile = true;			 						 			
 	 			}
 	 			
 	 			// true = append file
 	 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
 	 			bw = new BufferedWriter(fw);
 	             
-	 			if(isNewFile) {				
+	 			if(isNewFile) {
+	 			   // write importMappingTxt on the top of the log file	 				
+		 			bw = new BufferedWriter(fw,importMappingTxt.length());
+	             		 						
+	 				bw.write(importMappingTxt);	
+	 				bw.write("\n");
+ 					 			
 	 				bw.write("RowNo|ParticipantID|Status|Message");	
 	 				bw.write("\n");
 	 			}

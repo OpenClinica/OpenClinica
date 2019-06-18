@@ -9,7 +9,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -167,7 +169,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
          	  if(files.size() < 2) {
          		 String message = "errorCode.notCorrectFileNumber - When upload files, please select at least one data text files and one mapping file named like *.properties"; 
          		 this.addPageMessage(message);
-                 
+         		 removeFiles(files);
          		 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
                  return;  
          	  }
@@ -175,7 +177,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
          	  if (!foundMappingFile) {            		         		
          		 String message = "errorCode.noMappingfileFound - When upload files, please include one correct mapping file and named it like *.properties "; 
          		 this.addPageMessage(message);
-                 
+         		 removeFiles(files);
          		 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
                  return;
          	  }
@@ -185,7 +187,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
          		 }catch(Exception e) {
          			 String message = e.getMessage(); 
              		 this.addPageMessage(message);
-                     
+                     removeFiles(files);
              		 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
                      return;
          		 }
@@ -230,6 +232,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	          //////////////// Start of heavy thread run/////////////////////
 	          //sendOneDataRowPerRequestByHttpClient(files,requestMock);
 	          final HashMap hmIn =hm;
+	        
 	          new Thread(new Runnable() {
 	              public void run(){
 	               try {
@@ -295,13 +298,25 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
     }
 
 	/**
+	 * @param files
+	 */
+	private void removeFiles(List<File> files) {
+		// remove temporary uploaded files
+		 for (File file : files) {    
+			 if(file.exists()) {
+				 file.delete();
+			 }
+		 }
+	}
+
+	/**
 	 * @return
 	 */
 	private MockHttpServletRequest getMockRequest(HttpServletRequest request) {
 		MockHttpServletRequest requestMock = new MockHttpServletRequest();
 		
 		String remoteAddress = this.getBasePath(request);	  		
-		String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/";	  	
+		String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/pxml";	  	
 		requestMock.setAttribute("importDataWSUrl", importDataWSUrl);
 		
 		String accessToken = (String) request.getSession().getAttribute("accessToken");
@@ -910,8 +925,19 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
  	 	 	 		post.setHeader("Connection", "keep-alive");
  	 	 	 		
- 	 	 	 		String originalFileName = rowFile.getName();
+ 	 	 	 		String originalFileName = rowFile.getName(); 	 	 	 	   
  	 	 	 	    post.setHeader("originalFileName", originalFileName);
+ 	 	 	 	    
+	 	 	 	 	if(originalFileName !=null) {	            	
+	            		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+	            	}
+ 	 	 	 	
+	 	 	 	 	Date now = new Date();	
+	 	 	 	    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
+	 	 	 	    String timeStamp = simpleDateFormat.format(now);
+	 	 	 	    originalFileName =originalFileName+"_"+ timeStamp; 
+	 	 	 	    post.setHeader("LogFileName", originalFileName);
+	 	 	 	 
  	 	 			
  	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
  	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
