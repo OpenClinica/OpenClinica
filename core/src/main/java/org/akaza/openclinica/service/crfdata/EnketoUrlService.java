@@ -72,6 +72,8 @@ public class EnketoUrlService {
     public static final String CONTACTDATA_EMAIL = "contactdata-email";
     public static final String CONTACTDATA_MOBILENUMBER = "contactdata-mobilenumber";
     public static final String DASH = "-";
+    public static final int THREAD_NAME_LENGTH = 5;
+    public static final String THREAD_NAME_PREFIX="Q";
 
     @Autowired
     @Qualifier("dataSource")
@@ -285,7 +287,8 @@ public class EnketoUrlService {
                 query.setType(ANNOTATION);
             }
             query.setThread_id(dn.getThreadUuid());
-            query.setVisible_thread_id("Thread "+ dn.getParentDiscrepancyNote().getDiscrepancyNoteId());
+            Integer threadNumber=dn.getParentDiscrepancyNote().getThreadNumber();
+            query.setVisible_thread_id(addLeadingZeros(String.valueOf(threadNumber)));
             queryBeans.add(query);
         }
 
@@ -597,6 +600,11 @@ public class EnketoUrlService {
                     data.put(itemName, studySubjectDetail.getPhone()!=null?escapedValue(studySubjectDetail.getPhone()):"");
             }
         }
+    }
+
+    public String addLeadingZeros(String s) {
+        if (s.length() >= THREAD_NAME_LENGTH) return THREAD_NAME_PREFIX+s;
+        else return THREAD_NAME_PREFIX+String.format("%0" + (THREAD_NAME_LENGTH - s.length()) + "d%s", 0, s);
     }
 
     }

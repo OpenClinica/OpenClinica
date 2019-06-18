@@ -15,7 +15,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
@@ -126,7 +125,7 @@ public class QueryServiceImpl implements QueryService {
 
 
             if (parentDN == null) {
-                parentDN = createQuery(helperBean, queryBean);
+                parentDN = createQuery(helperBean, queryBean,true);
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
                 helperBean.setDn(parentDN);
                 saveQueryItemDatamap(helperBean);
@@ -138,7 +137,7 @@ public class QueryServiceImpl implements QueryService {
                 // Enketo passes JSON "id" attribute for unsubmitted queries only
                 // if (StringUtils.isEmpty(queryBean.getId())){
 
-                childDN = createQuery(helperBean, queryBean);
+                childDN = createQuery(helperBean, queryBean,false);
                 childDN.setParentDiscrepancyNote(parentDN);
                 childDN = discrepancyNoteDao.saveOrUpdate(childDN);
 
@@ -157,7 +156,7 @@ public class QueryServiceImpl implements QueryService {
         }
     }
 
-    private DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean) throws Exception {
+    private DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) throws Exception {
         DiscrepancyNote dn = new DiscrepancyNote();
         dn.setStudy(helperBean.getContainer().getStudy());
         dn.setEntityType("itemData");
@@ -205,6 +204,10 @@ public class QueryServiceImpl implements QueryService {
         }
         dn.setDateCreated(new Date());
         dn.setThreadUuid(queryBean.getThread_id());
+        if(parentDn && queryBean.getType().equals(QueryType.QUERY.getName())){
+            int maxThreadNumber= discrepancyNoteDao.getMaxThreadNumber();
+            dn.setThreadNumber(maxThreadNumber+1);
+        }
         return dn;
     }
 
