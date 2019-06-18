@@ -31,6 +31,7 @@ import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.service.crfdata.xform.*;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -603,8 +604,9 @@ public class EnketoUrlService {
     }
 
     public String addLeadingZeros(String s) {
-        if (s.length() >= THREAD_NAME_LENGTH) return THREAD_NAME_PREFIX+s;
-        else return THREAD_NAME_PREFIX+String.format("%0" + (THREAD_NAME_LENGTH - s.length()) + "d%s", 0, s);
+
+        if (s.length() >= THREAD_NAME_LENGTH) return THREAD_NAME_PREFIX + s;
+        else return THREAD_NAME_PREFIX + StringUtils.leftPad(s, THREAD_NAME_LENGTH, "0");
     }
 
     }

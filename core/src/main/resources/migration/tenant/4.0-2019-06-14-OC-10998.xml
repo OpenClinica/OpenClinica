@@ -10,6 +10,8 @@
 		</addColumn>
 	</changeSet>
 
+
+
 	<changeSet author="jkeremian" id="2019-06-17-10998-02" >
 		<comment>insert thread_uuid and thread_number in discrepancy_note table</comment>
 		<sql splitStatements="false">
@@ -23,7 +25,7 @@
 			BEGIN
 			FOR rec IN select * from discrepancy_note  where thread_uuid isNull and discrepancy_note_type_id=3 and parent_dn_id isNull order by discrepancy_note_id
 			LOOP
-			SELECT md5(random()::text || clock_timestamp()::text)::uuid INTO uuid;
+			SELECT uuid_generate_v4() INTO uuid;
 
 			counter :=counter+1;
 			update discrepancy_note  set thread_number = counter, thread_uuid=uuid where discrepancy_note_id= rec.discrepancy_note_id ;
