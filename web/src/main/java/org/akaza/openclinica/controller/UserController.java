@@ -129,7 +129,7 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
-        ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
+        ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(request.getLocale());
 
         OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid, textsBundle);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
