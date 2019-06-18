@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({ "type", "id", "date_time", "comment", "status", "assigned_to", "notify" })
+@JsonPropertyOrder({ "type", "id", "date_time", "comment", "status", "assigned_to", "notify","thread_id" ,"visible_thread_id"})
 public class QueryBean {
 
     @JsonProperty("id")
@@ -36,6 +36,11 @@ public class QueryBean {
     private Boolean notify;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    @JsonProperty("thread_id")
+    private String thread_id;
+    @JsonProperty("visible_thread_id")
+    private String visible_thread_id;
+
 
     /**
      * 
@@ -195,4 +200,22 @@ public class QueryBean {
         this.type = type;
     }
 
+    @JsonProperty("thread_id")
+    public String getThread_id() {
+        return thread_id;
+    }
+
+    @JsonProperty("thread_id")
+    public void setThread_id(String thread_id) {
+        this.thread_id = thread_id;
+    }
+
+    @JsonProperty("visible_thread_id")
+    public String getVisible_thread_id() {
+        return visible_thread_id;
+    }
+    @JsonProperty("visible_thread_id")
+    public void setVisible_thread_id(String visible_thread_id) {
+        this.visible_thread_id = visible_thread_id;
+    }
 }

@@ -1,7 +1,7 @@
 package org.akaza.openclinica.core.form.xform;
 
 public enum QueryType {
-    QUERY("comment", 3), REASON("reason", 4);
+    ANNOTATION("annotation", 2),QUERY("comment", 3), REASON("reason", 4);
 
     private String name;
     private int value;
