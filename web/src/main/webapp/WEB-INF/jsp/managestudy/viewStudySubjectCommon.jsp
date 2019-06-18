@@ -227,8 +227,7 @@ $(function() {
                 action(item);
             }
             catch (e) {
-                console.log('Unable to process', item, e);
-                errors.push('Unable to process ' + item + '. See console log.');
+                logError('Unable to process' + item, e);
             }
         });
     }
@@ -241,8 +240,7 @@ $(function() {
                     return item;                
             }
             catch (e) {
-                console.log('Unable to process', item, e);
-                errors.push('Unable to process ' + item + '. See console log.');
+                logError('Unable to process' + item, e);
             }
         }
     }
@@ -274,6 +272,11 @@ $(function() {
     var columns = {};
     var errors = [];
 
+    function logError(message, objs) {
+        console.log(arguments);
+        return errors.push(message);
+    }
+
     $.when(
         $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n&links=y', function(data) {
             odm = data;
@@ -285,7 +288,7 @@ $(function() {
                 metadata = study.MetaDataVersion;
             }
             else {
-                return errors.push('Unable to fetch metadata for study: ${study.oid}');
+                return logError('Unable to fetch metadata for study: ${study.oid}', study);
             }
 
             foreach(metadata.CodeList, function(codelist) {
@@ -323,7 +326,7 @@ $(function() {
             }, errors);
         })
         .error(function(e) {
-            errors.push('Unable to load any Common Events: ' + e.status + ' ' + e.statusText);
+            logError('Unable to load any Common Events.', e);
         }),
 
         $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson) {
@@ -332,7 +335,7 @@ $(function() {
             }, errors);
         })
         .error(function(e) {
-            errors.push('Unable to load Components data: ' + e.status + ' ' + e.statusText);
+            logError('Unable to load Components data.', e);
         })
 
     ).then(function() {
@@ -386,7 +389,7 @@ $(function() {
                     }
                     else {
                         columnTitles.push('!?' + col);
-                        errors.push('Unable to reference Common Event Form Item: ' + col);
+                        logError('Unable to reference Common Event Form Item: ' + col, items);
                     }
                     submissionFields[col] = [];
                 }, errors);
@@ -549,7 +552,7 @@ $(function() {
                         form.showMe = studyEvent.showMe = true;                        
                     }
                     else {
-                        sectionErrors.push('Unable to reference Common Event Form: ' + formRef);
+                        logError('Unable to reference Common Event Form: ' + formRef, formRef, studyEvent);
                     }
                 }, sectionErrors);
 
