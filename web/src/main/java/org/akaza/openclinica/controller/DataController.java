@@ -223,7 +223,7 @@ public class DataController {
      * @return
      * @throws Exception
      */
-    protected ArrayList<ErrorMessage> importDataInTransaction(String importXml, HttpServletRequest request) throws Exception {
+    protected synchronized ArrayList<ErrorMessage> importDataInTransaction(String importXml, HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
         
@@ -414,8 +414,14 @@ public class DataController {
                 errorMessagesFromValidation = (List<String>) validateDataResult.get("errors");
                 
                 if (errorMessagesFromValidation.size() > 0) {
+                	String erroCode ="";
                     String err_msg = convertToErrorString(errorMessagesFromValidation);
-                    ErrorMessage errorOBject = createErrorMessage("errorCode.ValidationFailed", err_msg);
+                    if(err_msg!=null && err_msg.startsWith("errorCode.")) {
+                    	erroCode = err_msg.substring(0,err_msg.indexOf(":"));
+                    }else {
+                    	erroCode = "errorCode.ValidationFailed";
+                    }
+                    ErrorMessage errorOBject = createErrorMessage(erroCode, err_msg);
                     errorMsgs.add(errorOBject);
 
 
@@ -435,7 +441,12 @@ public class DataController {
                 	if(err_msg.indexOf("SUCCESS|Skip") > -1) {
                 		msg = err_msg;
                 	}else {
-                		msg = "errorCode.ValidationFailed:" + err_msg;
+                		if(err_msg != null && err_msg.startsWith("errorCode.")) {
+                			msg = err_msg;
+                		}else {
+                			msg = "errorCode.ValidationFailed:" + err_msg;
+                		}
+                		
                     	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
                 	}
                 	
@@ -647,7 +658,8 @@ public class DataController {
 
         ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
         ResponseEntity<Object> response = null;
-
+        HashMap hm = new HashMap();
+        
         String validation_failed_message = "VALIDATION FAILED";
         String validation_passed_message = "SUCCESS";
 
@@ -679,7 +691,7 @@ public class DataController {
                       		foundMappingFile = true;
                       		logger.info("Found mapping property file and uploaded");
                       		
-                      		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().validateMappingFile(file);
+                      		hm = this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().validateMappingFile(file);
                       		break;
                       	}
                       }
@@ -692,7 +704,7 @@ public class DataController {
             		  throw new OpenClinicaSystemException("errorCode.noMappingfile", "When send files, please include one correct mapping file, named like *mapping.txt ");
             	  }
             	 
-            	  importCRFInfoSummary = this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(Arrays.asList(files), request);
+            	  importCRFInfoSummary = this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(Arrays.asList(files), request,hm);
               }else {
             	  
             	  throw new OpenClinicaSystemException("errorCode.notCorrectFileNumber", "Please send at least one data text files and  one mapping text file in correct format ");

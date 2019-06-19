@@ -14,10 +14,6 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -33,7 +29,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,23 +45,14 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
-import static org.akaza.openclinica.service.rest.errors.ErrorConstants.PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA;
-import static org.akaza.openclinica.service.rest.errors.ErrorConstants.PARTICIPANT_ID_MULTIPLE_PARTICIPANT_ID_HEADERS;
 @Service("serviceHelper")
 public class RestfulServiceHelper {
 	
 	private final static Logger log = LoggerFactory.getLogger("RestfulServiceHelper");
 	
-	//CSV file header	
-	private static final String [] FILE_HEADER_MAPPING = {"ParticipantID"};
+	//CSV file header
 	private static final String ParticipantID_header = "ParticipantID";
-	
-	//Study event bulk schedule CSV file header	
-	private static final String [] STUDY_EVENT_BULK_SCHEDULE_FILE_HEADER_MAPPING = {"ParticipantID", "StudyEventOID", "Ordinal", "StartDate", "EndDate"};
-	private static final String StudyEventOID_header = "StudyEventOID";
-	private static final String Ordinal_header = "Ordinal";
-	private static final String StartDate_header = "StartDate";
-	private static final String EndDate_header = "EndDate";
+
 
 	private DataSource dataSource;	
 	private StudyDAO studyDao; 
@@ -77,214 +63,6 @@ public class RestfulServiceHelper {
 	
 	public RestfulServiceHelper(DataSource dataSource2) {
 		dataSource = dataSource2;
-	}
-
-
-	/**
-	 * @param file
-	 * @return
-	 * @throws Exception 
-	 */
-	public static ArrayList<String> readCSVFile(MultipartFile file) throws Exception {
-		
-		ArrayList<String> subjectKeyList = new ArrayList<>();
-		 
-		try {
-			 BufferedReader reader;
-				
-			 String line;
-			 InputStream is = file.getInputStream();
-			 reader = new BufferedReader(new InputStreamReader(is));
-			 
-			//Create the CSVFormat object with the header mapping		 
-			CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader().withTrim();
-			CSVParser csvParser = null;
-			try {
-				csvParser = new CSVParser(reader, csvFileFormat);
-			} catch (IllegalArgumentException e) {
-				throw new Exception(PARTICIPANT_ID_MULTIPLE_PARTICIPANT_ID_HEADERS);
-			}
-			Map<String, Integer> headerMap = csvParser.getHeaderMap();
-			if (CollectionUtils.isEmpty(headerMap))
-				throw new Exception(PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA);
-			final long participantIDCount = headerMap.entrySet().stream().filter(x -> x.getKey().equals(ParticipantID_header)).count();
-
-			if (participantIDCount == 0) {
-				throw new Exception(PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA);
-			} else if (participantIDCount > 1) {
-				throw new Exception(PARTICIPANT_ID_MULTIPLE_PARTICIPANT_ID_HEADERS);
-			}
-
-	         try {
-	        	//Get a list of CSV file records              	         
-		         for (CSVRecord csvRecord : csvParser) {		      	
-		        	     	          	 
-		        	  String participantID = csvRecord.get(ParticipantID_header);
-		        	  
-		        	  if (StringUtils.isNotEmpty(participantID)) {
-		     			 subjectKeyList.add(participantID);     							     				         
-		     		 }
-		         }
-	         }catch(java.lang.IllegalArgumentException e) {
-	        	 subjectKeyList = readFile(file);
-	        	
-		         
-		     
-	         }
-	         
-		}catch (Exception e) {
-			String message = " This CSV format is not supported ";
-			if (StringUtils.isNotEmpty(e.getMessage()))
-				message = e.getMessage();
-			throw new Exception(message);
-	    }
-		
-        
-		 
-		return subjectKeyList;
-	}
-	
-	
-	/**
-	 * @param file
-	 * @return
-	 * @throws Exception 
-	 */
-	public static ArrayList<StudyEventScheduleDTO> readStudyEventScheduleBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception {
-		
-		ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = new ArrayList<>();
-
-		//Study event bulk schedule CSV file header position
-		int ParticipantID_index = -999;	
-		int StudyEventOID_index = -999;
-		int Ordinal_index = -999;
-		int StartDate_index = -999;
-		int EndDate_index = -999;
-		
-		try(Scanner sc = new Scanner(file.getInputStream())){
-			
-			 String line;
-			
-			 int lineNm = 1;
-			 int position = 0;
-			 
-			 while (sc.hasNextLine()) {
-				 line = sc.nextLine();
-				 
-				 //in case the last column is empty
-				 if(line.endsWith(",")) {
-					 line = line + " ,";
-				 }
-				 
-				 String[] lineVal= line.split(",", 0);
-				 
-				 // check ParticipantID column number
-				 if(lineNm ==1) {
-					 
-					 for(int i=0; i < lineVal.length;i++) {
-						 String currentHeader = lineVal[i].trim();
-						if(currentHeader.equalsIgnoreCase(ParticipantID_header)) {
-							ParticipantID_index = i;	
-						}else if(currentHeader.equalsIgnoreCase(StudyEventOID_header)) {
-							StudyEventOID_index = i;
-						}else if(currentHeader.equalsIgnoreCase(Ordinal_header)) {
-							Ordinal_index = i;
-						}else if(currentHeader.equalsIgnoreCase(StartDate_header)) {
-							StartDate_index = i;							
-						}else if(currentHeader.equalsIgnoreCase(EndDate_header)) {							
-							EndDate_index = i;
-						}else {
-							;
-						}
-					 }
-				 }else {
-					 StudyEventScheduleDTO studyEventScheduleDTO = new StudyEventScheduleDTO();
-					 
-					 studyEventScheduleDTO.setStudyOID(studyOID.trim());
-					 if(siteOID != null) {
-						 studyEventScheduleDTO.setSiteOID(siteOID.trim());	 
-					 }
-					 
-					 if(lineVal[ParticipantID_index] != null) {
-						 studyEventScheduleDTO.setSubjectKey(lineVal[ParticipantID_index].trim());	 
-					 }
-					 
-					 if(lineVal[StudyEventOID_index] != null) {
-						 studyEventScheduleDTO.setStudyEventOID(lineVal[StudyEventOID_index].trim());
-					 }
-					 
-					 if(lineVal[Ordinal_index] != null && lineVal[Ordinal_index].trim().length() > 0) {
-						 studyEventScheduleDTO.setOrdinal(lineVal[Ordinal_index].trim());	 
-					 }
-					 if(lineVal[StartDate_index] != null) {
-						 studyEventScheduleDTO.setStartDate(lineVal[StartDate_index].trim());
-					 }
-					 if(lineVal[EndDate_index] != null && lineVal[EndDate_index].trim().length()>0) {
-						 studyEventScheduleDTO.setEndDate(lineVal[EndDate_index].trim());
-					 }
-					 
-					 studyEventScheduleDTO.setRowNum(lineNm - 1);
-					 
-					 studyEventScheduleDTOList.add(studyEventScheduleDTO);
-				 }
-				 
-				 
-				
-				 lineNm++;
-			 }
-			
-		} catch (Exception e) {
-			log.error("Exception with cause = {} {}", e.getCause(), e.getMessage());
-	    }
-		
-	
-		 
-		return studyEventScheduleDTOList;
-	}
-	
-	/**
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 */
-	private static ArrayList<String> readFile(MultipartFile file) throws IOException {
-		
-		ArrayList<String> subjectKeyList = new ArrayList<>();
-		
-		try(Scanner sc = new Scanner(file.getInputStream())){
-			
-			 String line;
-			
-			 int lineNm = 1;
-			 int position = 0;
-			 
-			 while (sc.hasNextLine()) {
-				 line = sc.nextLine();
-				 String[] lineVal= line.split(",", 0);
-				 
-				 // check ParticipantID column number
-				 if(lineNm ==1) {
-					 
-					 for(int i=0; i < lineVal.length;i++) {
-						 lineVal.equals(ParticipantID_header);
-						 position = i;
-						 
-						 break;
-					 }
-				 }else {
-					 subjectKeyList.add(lineVal[position]);
-				 }
-				 
-				 
-				
-				 lineNm++;
-			 }
-			
-		} catch (Exception e) {
-			log.error("Exception with cause = {} {}", e.getCause(), e.getMessage());
-	    }
-		
-		return subjectKeyList;
 	}
 	
 	 /**
@@ -471,127 +249,6 @@ public class RestfulServiceHelper {
     	userAccountDAO = userAccountDAO != null ? userAccountDAO : new UserAccountDAO(dataSource);
         return userAccountDAO;
     }
-
-
-	
-	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClientToMirth(List<File> files,HttpServletRequest request) throws Exception {
-
-	  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
-	  		ImportCRFInfoSummary importCRFInfoSummary  = new ImportCRFInfoSummary();
-	  		String studyOID = null;
-	  		
-	  		/**
-	  		 *  prepare mapping file
-	  		 */
-	  		FileBody mappingFileBody = null;
-	  		String  mappingpartNm = null;
-	  		for (File file : files) {
-	  			
-	  			if(file.getName().toLowerCase().endsWith(".properties")) {
-	  				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
-	  				mappingpartNm = "uploadedData"; 
-	  				studyOID =this.getImportDataHelper().getStudyOidFromMappingFile(file);
-	  	 	  		
-	  	 	  		break;
-	  			}
-	 			
-	 		}
-	  		
-		  	int i = 1;	  		
-	 		for (File file : files) {
-	 			// skip mapping file
-	 			if(file.getName().toLowerCase().endsWith(".properties")) {
-	 				;
-	 			}else {
-	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
-	 				
-	 				Iterator dataFilesIt = dataFileList.iterator();
-	 				
-	 				while(dataFilesIt.hasNext()) {
-	 					File rowFile = (File) dataFilesIt.next();
-	 					
-	 					HttpPost post = new HttpPost(uploadMirthUrl);
-	 	 	 	  		/**
-	 	 	 	  		 *  add header Authorization
-	 	 	 	  		 */
-	 	 	 	 		String accessToken = (String) request.getSession().getAttribute("accessToken");
-	 	 	 	  		post.setHeader("Authorization", "Bearer " + accessToken);
-	 	 	 	  		
-	 	 	 	  		String basePath = getBasePath(request);
-	 	 	 	  		post.setHeader("OCBasePath", basePath);
-  	 	 	 	  	    //PIPETEXT
-	 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
-
-
-	 	 	 	 		post.setHeader("Accept", 
-	 	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-	 	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
-	 	 	 	 		post.setHeader("Connection", "keep-alive");
-	 	 	 	 		
-	 	 	 	 		String originalFileName = rowFile.getName();
-	 	 	 	 	    post.setHeader("originalFileName", originalFileName);
-	 	 	 			
-	 	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-	 	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-	 	 	 		  	String partNm = null;
-	 	 	 			FileBody fileBody = new FileBody(rowFile, ContentType.TEXT_PLAIN);
-	 	 	 			partNm = "uploadedData" + i;
-	 	 	 	  		builder.addPart(partNm, fileBody);
-	 	 	 	  		
-	 	 	 	  		// add mapping file
-	 	 	 	  		builder.addPart(mappingpartNm, mappingFileBody);
-	 	 	 	  		
-	 	 	 	  		HttpEntity entity = builder.build();   		
-	 	 	 	  		post.setEntity(entity);
-	 	 	 	  		
-	 	 	 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
-	 	 	 	  		HttpResponse response = httpClient.execute(post);
-	 	 	 	  		
-	 	 	 	  	    //print result	
-	 	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
-
-	 	 	 	 		//System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
-	 	 	 	 		//System.out.println("Response Code : " + responseCode);
-
-	 	 	 	 		BufferedReader rd = new BufferedReader(
-	 	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
-
-	 	 	 	 		StringBuffer result = new StringBuffer();
-	 	 	 	 		String line = "";
-	 	 	 	 		while ((line = rd.readLine()) != null) {
-	 	 	 	 			result.append(line);
-	 	 	 	 		}
-	 	 	 	        
-	 	 	 	 		String responseStr = result.toString();
-	 	 	 	 		if(responseStr!=null && responseStr.toLowerCase().indexOf("error")>-1) {
-	 	 	 	 			importCRFInfoSummary.setFailCnt(importCRFInfoSummary.getFailCnt()+1);
-	 	 	 	 		}else {
-	 	 	 	 			importCRFInfoSummary.setPassCnt(importCRFInfoSummary.getPassCnt() +1);
-	 	 	 	 		}
-	 	 	 	 
-	 	 	 	 	    importCRFInfoSummary.getDetailMessages().add(responseStr);
-	 	 	 	 		//System.out.println(responseStr);
-	 	 	 	 		
-	 	 	 	 	    //TimeUnit.MILLISECONDS.sleep(5);
-	 				}
-	 				
-	 			   // after sent, then delete from disk
-	 				dataFilesIt = dataFileList.iterator();
-	 				while(dataFilesIt.hasNext()) {
-	 					File rowFile = (File) dataFilesIt.next();					 					
-		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile,studyOID);
-		 	 	  		
-	 				}
-		 	 	  		
-	 			}
-	 			
-	 	  		i++;
-	 		}
-	 		 // not save original data
-	 		//this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
-			
-	 		return importCRFInfoSummary;
-	  }
 	 
 	 /**
 	  *  this will call OC Restful API directly:
@@ -602,7 +259,7 @@ public class RestfulServiceHelper {
 	  * @return
 	  * @throws Exception
 	  */
-	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request) throws Exception {
+	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request,HashMap hm) throws Exception {
 		    String remoteAddress = this.getBasePath(request);
 	  		
 	  		String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/";
@@ -672,7 +329,7 @@ public class RestfulServiceHelper {
 	 	 	 		  	 *  Here will only send ODM XML to OC API
 	 	 	 		  	 *  
 	 	 	 		  	 */
-	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile);
+	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile,hm);
 	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName,studyOID);
 	 	 	 		    tempODMFileList.add(odmXmlFile);
 	 	 	 		 
@@ -741,7 +398,7 @@ public class RestfulServiceHelper {
 	 		return importCRFInfoSummary;
 	  }
 	 
-	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,MockHttpServletRequest request,boolean ismock) throws Exception {
+	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,MockHttpServletRequest request,boolean ismock,HashMap hm) throws Exception {
 		   
 	  		String importDataWSUrl = (String) request.getAttribute("importDataWSUrl");
 	  		String accessToken = (String) request.getAttribute("accessToken");
@@ -816,7 +473,7 @@ public class RestfulServiceHelper {
 		 	 	 		  	 *  Here will only send ODM XML to OC API
 		 	 	 		  	 *  
 		 	 	 		  	 */
-		 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile);
+		 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile,hm);
 		 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName,studyOID);
 		 	 	 		    tempODMFileList.add(odmXmlFile);
 		 	 	 		 

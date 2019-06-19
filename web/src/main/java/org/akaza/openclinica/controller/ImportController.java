@@ -11,12 +11,15 @@ import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
+import org.akaza.openclinica.controller.dto.StudyEventUpdateRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
+import org.akaza.openclinica.domain.enumsupport.EndpointType;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -127,7 +130,7 @@ public class ImportController {
             odmContainer = (ODMContainer) um1.unmarshal(reader);
 
         } catch (Exception e) {
-            logger.error("found exception with xml transform {}", e );
+            logger.error("found exception with xml transform {}", e);
             return new ResponseEntity(ErrorConstants.ERR_INVALID_XML_FILE + "\n" + e.getMessage(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 
         } finally {
@@ -153,20 +156,29 @@ public class ImportController {
             studyOid = publicStudy.getStudy().getOc_oid();
 
         }
+        if (studyOid != null)
+            studyOid = studyOid.toUpperCase();
+        if (siteOid != null)
+            siteOid = siteOid.toUpperCase();
+
         utilService.setSchemaFromStudyOid(studyOid);
 
         ResponseEntity<Object> response = null;
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
+        if (!validateService.isStudyAvailable(studyOid)) {
+            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_AVAILABLE, HttpStatus.OK);
+        }
+
+        if (siteOid!=null && !validateService.isStudyAvailable(siteOid)) {
+            return new ResponseEntity(ErrorConstants.ERR_SITE_NOT_AVAILABLE, HttpStatus.OK);
+        }
 
         if (!validateService.isStudyOidValid(studyOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
+            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.OK);
         }
 
-        if (!validateService.isStudyAvailable(studyOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
-        }
 
         if (siteOid != null) {
             if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
@@ -185,7 +197,7 @@ public class ImportController {
 
         String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm);
 
-        logger.info("REST request to Import Job uuid {} ",uuid);
+        logger.info("REST request to Import Job uuid {} ", uuid);
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
     }
 
@@ -204,7 +216,7 @@ public class ImportController {
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             try {
                 importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
-            } catch (Exception e){
+            } catch (Exception e) {
                 logger.error("Exception is thrown while processing dataImport: " + e);
             }
             return null;
@@ -220,82 +232,8 @@ public class ImportController {
         return new File(SpringServletAccess.getPropertiesDir(context) + fileNm);
     }
 
-    @ApiOperation( value = "To schedule an event for participant at site level", notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date" )
-    @RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events", method = RequestMethod.POST )
-    public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
-                                                              @RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
-                                                              @PathVariable( "studyOID" ) String studyOid,
-                                                              @PathVariable( "siteOID" ) String siteOid) throws Exception {
 
 
-        utilService.setSchemaFromStudyOid(studyOid);
-        Study tenantStudy = getTenantStudy(studyOid);
-        Study tenantSite = getTenantStudy(siteOid);
-        ResponseEntity<Object> response = null;
-        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-
-        try {
-            if (!validateService.isStudyOidValid(studyOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
-            }
-            if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
-            }
-            if (!validateService.isSiteOidValid(siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
-            }
-            if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
-            }
-            if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
-            }
-
-            if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && !validateService.isUserHasAccessToSite(userRoles, siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-            } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-            }
 
 
-        } catch (OpenClinicaSystemException e) {
-            String errorMsg = e.getErrorCode();
-            HashMap<String, String> map = new HashMap<>();
-            map.put("studyOid", studyOid);
-            map.put("siteOid", siteOid);
-            org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
-            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
-            return response;
-        }
-
-        String accessToken = utilService.getAccessTokenFromRequest(request);
-        String customerUuid = utilService.getCustomerUuidFromRequest(request);
-
-        ArrayList<StudyEventDataBean> studyEventDataBeans = new ArrayList<>();
-        StudyEventDataBean studyEventDataBean = new StudyEventDataBean();
-        studyEventDataBean.setStudyEventOID(studyEventScheduleRequestDTO.getStudyEventOID());
-        studyEventDataBean.setStartDate(studyEventScheduleRequestDTO.getStartDate());
-        studyEventDataBean.setEndDate(studyEventScheduleRequestDTO.getEndDate());
-        studyEventDataBeans.add(studyEventDataBean);
-
-        ArrayList<SubjectDataBean> subjectDataBeans = new ArrayList<>();
-        SubjectDataBean subjectDataBean = new SubjectDataBean();
-        subjectDataBean.setStudySubjectID(studyEventScheduleRequestDTO.getSubjectKey());
-        subjectDataBean.setStudyEventData(studyEventDataBeans);
-        subjectDataBeans.add(subjectDataBean);
-
-        CRFDataPostImportContainer importContainer = new CRFDataPostImportContainer();
-        importContainer.setStudyOID(siteOid);
-        importContainer.setSubjectData(subjectDataBeans);
-
-        ODMContainer odmContainer = new ODMContainer();
-        odmContainer.setCrfDataPostImportContainer(importContainer);
-
-        String schema = CoreResources.getRequestSchema();
-        String uuid = startImportJob(odmContainer,schema, studyOid, siteOid, userAccountBean,null );
-
-        logger.info("REST request to Extract Participants info ");
-        return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
-    }
 }

@@ -50,4 +50,15 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
         return ((List<DiscrepancyNote>) q.list());
     }
 
+    public int getMaxThreadNumber() {
+        String query = "select max(dn.thread_number) from discrepancy_note dn ";
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+        Number result = (Number) q.uniqueResult();
+        if (result == null)
+            return 0;
+        else
+            return result.intValue();
+
+    }
+
 }

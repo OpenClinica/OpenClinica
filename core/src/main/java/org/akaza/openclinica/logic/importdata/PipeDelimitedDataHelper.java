@@ -83,7 +83,7 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 	 * @return
 	 * @throws IOException 
 	 */
-public String transformTextToODMxml(File mappingFile,File rawItemDataFile) throws OpenClinicaSystemException, IOException{
+public String transformTextToODMxml(File mappingFile,File rawItemDataFile,HashMap hm ) throws OpenClinicaSystemException, IOException{
 	
 		String rawMappingStr;
 		String rawItemData;
@@ -93,7 +93,7 @@ public String transformTextToODMxml(File mappingFile,File rawItemDataFile) throw
 		rawMappingStr = this.readFileToString(mappingFile);
 		rawItemData = this.readFileToString(rawItemDataFile);
 		
-		odmXml = transformTextToODMxml(rawMappingStr,rawItemData); 
+		odmXml = transformTextToODMxml(rawMappingStr,rawItemData,hm); 
 	
 		return odmXml;
 	
@@ -120,7 +120,7 @@ public String readFileToString(File file) throws IOException{
 	
       return sb.toString();
 }
-	public String transformTextToODMxml(String rawMappingStr,String rawItemData) throws OpenClinicaSystemException {
+	public String transformTextToODMxml(String rawMappingStr,String rawItemData,HashMap hm) throws OpenClinicaSystemException {
 		
 		String studyOID;
 		String subjectKey;
@@ -175,6 +175,10 @@ public String readFileToString(File file) throws IOException{
 			studyEventOID =(String) mappedValues.get("StudyEventOID");
 			formOID =(String) mappedValues.get("FormOID");
 			formVersion =(String) mappedValues.get("FormVersion");
+			// get default version
+			if(formVersion == null || formVersion.trim().length() == 0) {
+				formVersion = (String) hm.get("FormVersion");
+			}
 			
 			mappedColumnNameList =(ArrayList) mappedValues.get("mappedColumnNameList");
 			ArrayList itemGroupOIDList = (ArrayList) mappedValues.get("itemGroupOIDList");
@@ -270,7 +274,7 @@ public String readFileToString(File file) throws IOException{
 				}else {
 					// start process item data
 					// ignore blank line					
-					if(dataRows[i].toString().replaceAll("/n|||/r", "").trim().length() > 0) {
+					if(dataRows[i].toString().replaceAll("[\\n\\t\\r]", "").trim().length() > 0) {
 						subjectKey = dataRow[indexofParticipantID].toString().trim();
 						//logger.info(i+ "************dataRow************************"+ dataRow);
 						
@@ -330,7 +334,7 @@ public String readFileToString(File file) throws IOException{
 													
 											if(mappingItemGroupOID.equals(currenItemGroupOID) && mappingItemName.equals(itemName)){
 												//logger.info("----mappingItemName:"+ mappingItemName + "----itemName:"+ itemName);
-												 itemDataValue = dataRow[k].toString();
+												 itemDataValue = dataRow[k].toString().replaceAll("[\\n\\t\\r]", " ").trim();
 						
 												 //ignore item which has no item value or blank value
 												 if(itemDataValue != null && itemDataValue.trim().length() > 0) {
@@ -713,8 +717,10 @@ public String readFileToString(File file) throws IOException{
      * @param file
      * @throws IOException
      */
-    public void validateMappingFile(File file) throws IOException,OpenClinicaSystemException{
+    public HashMap validateMappingFile(File file) throws IOException,OpenClinicaSystemException{
        
+    	HashMap hm = new HashMap();
+    	
     	boolean foundFormOID=false;
     	boolean foundFormVersion=false;
     	boolean foundStudyOID=false;
@@ -743,12 +749,17 @@ public String readFileToString(File file) throws IOException{
 	       		 if(mappingRow.length == 2) {
 	       			 String keyWord = mappingRow[0];
 	           		 String value = mappingRow[1];
+	           		 hm.put(keyWord, value);
+	           		 
 	           		 if(keyWord != null && keyWord.trim().startsWith("FormOID") && value != null && value.trim().length() >0) {
 	           			formOIDValue = value.trim();
 	           			foundFormOID=true;
 	           		 }else if(keyWord != null && keyWord.trim().startsWith("FormVersion") && value != null && value.trim().length() >0) {
 	           			formVersionValue = value.trim();
-	           			foundFormVersion=true;
+	           			if(formVersionValue != null || formVersionValue.trim().length() > 0) {
+	           				foundFormVersion=true;
+	           			}
+	           			
 	                 }else if(keyWord != null && keyWord.trim().startsWith("StudyOID") && value != null && value.trim().length() >0) {
 	                	 studyOIDValue = value.trim();
 	           			foundStudyOID=true;
@@ -786,11 +797,7 @@ public String readFileToString(File file) throws IOException{
         if(!foundFormOID) {
         	 throw new OpenClinicaSystemException("errorCode.noFormOID", "Please check mapping file, make sure that it has correct FormOID configuration.  ");
         }
-        
-        if(!foundFormVersion) {
-       	 	throw new OpenClinicaSystemException("errorCode.noFormVersion", "Please check mapping file, make sure that it has correct FormVersion configuration.  ");
-        }
-        
+           
         if(!foundStudyOID) {
        	 	throw new OpenClinicaSystemException("errorCode.noStudyOID", "Please check mapping file, make sure that it has correct StudyOID configuration.  ");
         }
@@ -805,11 +812,12 @@ public String readFileToString(File file) throws IOException{
         
         // check against current system/DB
         errorMsgs.clear();
-        ArrayList<ErrorObj> errors = this.validateStudyMetadata(formOIDValue, formVersionValue, studyOIDValue, studyEventOIDValue, importItemGroupDTOs, null);
+        ArrayList<ErrorObj> errors = this.validateStudyMetadata(formOIDValue, formVersionValue, studyOIDValue, studyEventOIDValue, importItemGroupDTOs, hm,null);
         if(errors.size() >0) {
         	throw new OpenClinicaSystemException(errors.get(0).getCode(), errors.get(0).getMessage());
         }
-        
+      
+        return hm;
 	 }
     /**
      * 
@@ -959,6 +967,7 @@ public ArrayList<ErrorObj> validateStudyMetadata(String formOIDValue,
 										  String studyOIDValue,
 										  String studyEventOIDValue,
 										  ArrayList<ImportItemGroupDTO> importItemGroupDTOs,
+										  HashMap hm,
 										  Locale newLocale) {
   
 	ArrayList<ErrorObj> errors = new ArrayList<ErrorObj>();
@@ -1014,27 +1023,51 @@ public ArrayList<ErrorObj> validateStudyMetadata(String formOIDValue,
                        
         // check Form              
         String formOid = formOIDValue;
-        String formLayoutName = formVersionValue;
+        String formLayoutName = null;
+        boolean needToCheckFormVersion = false;
+        
+        if(formVersionValue != null) {
+        	formLayoutName = formVersionValue; 
+        	needToCheckFormVersion = true;
+        }
+        
         CRFBean crfBean = crfDAO.findByOid(formOid);
         if (crfBean != null && studyEventDefintionBean != null) {
-            EventDefinitionCRFBean edcBean = edcDAO.findByStudyEventDefinitionIdAndCRFId(studyEventDefintionBean.getId(),
+            EventDefinitionCRFBean edcBean = edcDAO.findByStudyEventDefinitionIdAndCRFId(studyBean,studyEventDefintionBean.getId(),
                     crfBean.getId());
             if (edcBean == null || edcBean.getId() == 0) {
                 mf.applyPattern(respage.getString("your_form_oid_for_study_event_oid"));
                 Object[] arguments = { formOid, sedOid };
                 eo = new ErrorObj(ErrorConstants.ERR_EVENT_NOT_EXIST,mf.format(arguments));
                 errors.add(eo); 
+            }else {
+            	 if(formVersionValue == null) {
+            		FormLayoutBean formLayoutBean = null; 
+            		int formLayoutId = edcBean.getDefaultVersionId();
+            		if (formLayoutId == 0) {
+                        logger.error("FormLayout is null");
+                        return null;
+                    }else{
+                        formLayoutBean = (FormLayoutBean)formLayoutDAO.findByPK(formLayoutId);
+                    }
+                 	formLayoutName = formLayoutBean.getName(); 
+                 	formVersionValue = formLayoutBean.getName();
+                 	hm.put("FormVersion", formVersionValue);
+                 }
             }
         }
 
         if (crfBean != null) {
-            FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formLayoutName, crfBean.getName());
-            if (formLayoutBean == null || formLayoutBean.getId() == 0) {
-                mf.applyPattern(respage.getString("your_form_layout_oid_for_form_oid"));
-                Object[] arguments = { formLayoutName, formOid };
-                eo = new ErrorObj(ErrorConstants.ERR_FORM_LAYOUT,mf.format(arguments));
-                errors.add(eo); 
-            }
+        	if(needToCheckFormVersion) {
+        		 FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formLayoutName, crfBean.getName());
+                 if (formLayoutBean == null || formLayoutBean.getId() == 0) {
+                     mf.applyPattern(respage.getString("your_form_layout_oid_for_form_oid"));
+                     Object[] arguments = { formLayoutName, formOid };
+                     eo = new ErrorObj(ErrorConstants.ERR_FORM_LAYOUT,mf.format(arguments));
+                     errors.add(eo); 
+                 }
+        	}
+           
         } else {
             mf.applyPattern(respage.getString("your_form_oid_did_not_generate"));
             Object[] arguments = { formOid };

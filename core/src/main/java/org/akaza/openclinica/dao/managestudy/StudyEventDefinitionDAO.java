@@ -253,7 +253,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
             studyEventDefinitionBean = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
             return studyEventDefinitionBean;
         } else {
-            logger.info("WARNING: cannot find sed bean by oid " + oid + " and study id " + studyId);
+            logger.info(sql+"WARNING: cannot find sed bean by oid " + oid + " and study id " + studyId);
             // throw new
             // RuntimeException("cannot find sed bean by oid and study id");
             return null;

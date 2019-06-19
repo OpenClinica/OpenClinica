@@ -288,6 +288,9 @@
   #inviteResultAlert > table {
     width: 600px;
   }
+  input[type=radio]:focus {
+    outline-style: solid;
+  }
 </style>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -357,7 +360,7 @@
           <td>
             <c:if test="${
               studySub.status.name!='removed' &&
-              (sessionScope.customUserRole=='Clinical Research Coordinator' || sessionScope.customUserRole=='Investigator')
+              (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
             }">
               <c:if test="${participateStatus=='enabled'}">
                 <a href="javascript:;" id="contactInformation">
@@ -463,7 +466,7 @@
                             <div class="tablebox_center">
                               <c:if test="${
                                 studySub.status.name!='removed' &&
-                                (sessionScope.customUserRole=='Clinical Research Coordinator' || sessionScope.customUserRole=='Investigator')
+                                (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
                               }">
                                 <c:if test="${participateStatus=='enabled'}">
                                   <!-- Table Contents -->
@@ -2058,5 +2061,31 @@
             countryCode: 'GB'
         },
     ];
+
+    var form = $('#contactInformationForm');
+    var inputs = form.find('input');
+    form.on('keyup', 'input', function(e) {
+        if (e.keyCode === 9) { // keycode 9 is Tab
+            e.preventDefault;
+            return false;
+        }
+    });
+    form.on('keydown', 'input', function(e) {
+        if (e.keyCode !== 9)
+            return;
+
+        var index = $.inArray(this, inputs);
+        index += e.shiftKey ? -1 : 1;
+        if (index < 0) {
+            index = inputs.length - 1;          
+        }
+        else if (index >= inputs.length) {
+            index = 0;
+        }
+
+        e.preventDefault();
+        inputs[index].focus();
+        return false;
+    });
 
 </script>

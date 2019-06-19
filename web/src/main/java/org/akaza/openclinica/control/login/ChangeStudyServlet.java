@@ -33,6 +33,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.StudyBuildService;
+import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -325,10 +326,10 @@ public class ChangeStudyServlet extends SecureController {
 
             currentRole = (StudyUserRoleBean) session.getAttribute("studyWithRole");
             session.setAttribute("userRole", currentRole);
-            if (currentPublicStudy.getParentStudyId() == 0)
-                session.setAttribute("customUserRole", customRole.studyRoleMap.get(currentPublicStudy.getId()));
-            else
-                session.setAttribute("customUserRole", customRole.siteRoleMap.get(currentPublicStudy.getId()));
+            // update baseUserRole value when switch study/site(OC-10770)
+            StudyEnvironmentRoleDTO envRole = getBaseRoleName();
+            session.setAttribute("customUserRole", envRole.getDynamicRoleName());
+            session.setAttribute("baseUserRole", envRole.getBaseRoleName());
             session.removeAttribute("studyWithRole");
             addPageMessage(restext.getString("current_study_changed_succesfully"));
         }
@@ -364,6 +365,38 @@ public class ChangeStudyServlet extends SecureController {
 
         forwardPage(Page.MENU);
 
+    }
+
+    private StudyEnvironmentRoleDTO getBaseRoleName() {
+        List<StudyEnvironmentRoleDTO> roles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
+        StudyEnvironmentRoleDTO role;
+
+        if (currentStudy.getStudyEnvSiteUuid() != null && !currentStudy.getStudyEnvSiteUuid().equals("")) {
+            // Active study is a site level study
+            // Active study is a site level hence it's parent is the study
+
+            // Look for a site based role
+            role = roles.stream()
+                    .filter(s -> s.getSiteUuid() != null && s.getSiteUuid().equals(currentStudy.getStudyEnvSiteUuid()))
+                    .findAny()
+                    .orElse(null);
+
+            if (role == null) {
+                // The user inherit a study level role
+                StudyBean parent = (StudyBean)getStudyDAO().findByPK(currentStudy.getParentStudyId());
+                role = roles.stream()
+                        .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(parent.getStudyEnvUuid()))
+                        .findAny()
+                        .orElse(null);
+            }
+        } else {
+            // Active study is a study not a site
+            role = roles.stream()
+                    .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(currentStudy.getStudyEnvUuid()))
+                    .findAny()
+                    .orElse(null);
+        }
+        return role;
     }
 
     private void setupSubjectSDVTable() {
