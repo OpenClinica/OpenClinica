@@ -322,14 +322,15 @@ function handleUserSource() {
 							<option value="0">-<fmt:message key="select" bundle="${resword}"/>-</option>
 
                             <c:forEach var="study" items="${studies}">
+							<c:if test = "${study.status.getName().trim() ne 'removed'}">
 								<c:choose>
 									<c:when test="${activeStudy == study.id}">
 										<c:choose>
 										<c:when test="${study.parentStudyId>0}">
 											<option value='<c:out value="${study.id}" />' selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
 										</c:when>
-										<c:otherwise>
-											<option value='<c:out value="${study.id}" />' selected><c:out value="${study.name}" /></option>
+										<c:otherwise>											
+												<option value='<c:out value="${study.id}" />' selected><c:out value="${study.name}" /></option>											 
 										</c:otherwise>
 										</c:choose>
 									</c:when>
@@ -338,12 +339,13 @@ function handleUserSource() {
 										<c:when test="${study.parentStudyId>0}">
 											<option value='<c:out value="${study.id}" />'>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
 										</c:when>
-										<c:otherwise>
-											<option value='<c:out value="${study.id}" />'><c:out value="${study.name}" /></option>
+										<c:otherwise>											
+												<option value='<c:out value="${study.id}" />'><c:out value="${study.name}" /></option>											  
 										</c:otherwise>
 										</c:choose>
 									</c:otherwise>
 								</c:choose>
+								 </c:if> 
 							</c:forEach>
 						</select>
 					</div>

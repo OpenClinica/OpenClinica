@@ -70,6 +70,7 @@
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
      <table border="0" cellpadding="0" cellspacing="0" width="100%">
        <c:forEach var="studyRole" items="${studies}">
+	   <c:if test = "${studyRole.status.getName().trim() ne 'removed'}">
            <c:set var="statusId" value="${studyRole.status.id}"/>
         <c:choose>
          <c:when test="${study.id == studyRole.studyId}">
@@ -130,7 +131,7 @@
            </c:choose>
          </c:otherwise>
         </c:choose>
-
+		</c:if> 
      </c:forEach>
 
     <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyId"/></jsp:include>
