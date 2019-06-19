@@ -129,9 +129,9 @@
           <th><fmt:message key="job_type" bundle="${resword}"/></th>
           <th><fmt:message key="site_name" bundle="${resword}"/></th>
           <th><fmt:message key="job_status" bundle="${resword}"/></th>
-          <th><fmt:message key="created_on" bundle="${resword}"/></th>
-          <th><fmt:message key="created_by" bundle="${resword}"/></th>
-          <th><fmt:message key="completed_on" bundle="${resword}"/></th>
+          <th><fmt:message key="start_time" bundle="${resword}"/></th>
+          <th><fmt:message key="submitted_by" bundle="${resword}"/></th>
+          <th><fmt:message key="completion_time" bundle="${resword}"/></th>
           <th><fmt:message key="actions" bundle="${resword}"/></th>
         </tr>
       </thead>
@@ -151,6 +151,7 @@
           targets: -1,
           orderable: false
         }],
+        order: [[6, 'desc']],
         language: {
           emptyTable: 'Loading...',
           paginate: {
