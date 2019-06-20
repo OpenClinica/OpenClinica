@@ -115,8 +115,10 @@ public class QueryServiceImpl implements QueryService {
                 idList.add(Integer.valueOf(qBean.getId()));
             }
             Collections.reverse(idList);
-            queryBean = qBeans.get(0);
+            childDns = findChildQueries(helperBean.getItemData());
 
+            while (childDns.size() < qBeans.size()) {
+                queryBean = qBeans.get(0);
 
             List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(helperBean.getItemData().getItemDataId());
             for (DiscrepancyNote pDiscrepancyNote : parentDiscrepancyNoteList) {
@@ -134,8 +136,6 @@ public class QueryServiceImpl implements QueryService {
                 saveQueryItemDatamap(helperBean);
             }
 
-            childDns = findChildQueries(helperBean.getItemData());
-            if (childDns.size() < qBeans.size()) {
 
                 // Enketo passes JSON "id" attribute for unsubmitted queries only
                 // if (StringUtils.isEmpty(queryBean.getId())){
@@ -156,6 +156,7 @@ public class QueryServiceImpl implements QueryService {
                 helperBean.setParentDn(parentDN);
                 saveQueryItemDatamap(helperBean);
                 handleEmailNotification(helperBean, queryBean);
+                qBeans.remove(0);
             }
         }
     }
