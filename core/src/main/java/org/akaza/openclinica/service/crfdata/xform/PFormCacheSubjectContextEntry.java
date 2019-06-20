@@ -16,6 +16,8 @@ public class PFormCacheSubjectContextEntry {
     private String itemRepeatGroupName = null;
     private String studyOid = null;
     private String formLoadMode = null;
+    private String discrepancyNoteThreadUuid = null;
+
 
     public String getStudySubjectOid() {
         return studySubjectOid;
@@ -129,4 +131,11 @@ public class PFormCacheSubjectContextEntry {
         this.formLoadMode = formLoadMode;
     }
 
+    public String getDiscrepancyNoteThreadUuid() {
+        return discrepancyNoteThreadUuid;
+    }
+
+    public void setDiscrepancyNoteThreadUuid(String discrepancyNoteThreadUuid) {
+        this.discrepancyNoteThreadUuid = discrepancyNoteThreadUuid;
+    }
 }

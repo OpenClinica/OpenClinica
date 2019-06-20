@@ -43,6 +43,7 @@ import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.UserType;
+import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -1654,7 +1655,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
     }
 
-
+    protected EnketoUrlService getEnketoUrlService() {
+        return (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
+    }
 
     private boolean isContactsModuleEnabled(){
         String previousSchema = (String) request.getAttribute("requestSchema");

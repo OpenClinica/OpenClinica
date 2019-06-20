@@ -32,6 +32,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.pform.OpenRosaService;
 import org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
@@ -72,6 +73,8 @@ public class QueryServiceImpl implements QueryService {
     private OpenRosaService openRosaService;
     @Autowired
     private BeanFactory beanFactory;
+    @Autowired
+    private EnketoUrlService enketoUrlService;
 
     @Autowired
     private ApplicationContext appContext;
@@ -150,6 +153,7 @@ public class QueryServiceImpl implements QueryService {
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
                 helperBean.setDn(childDN);
+                helperBean.setParentDn(parentDN);
                 saveQueryItemDatamap(helperBean);
                 handleEmailNotification(helperBean, queryBean);
             }
@@ -333,7 +337,7 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
         message.append(
-                MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
+             MessageFormat.format(respage.getString("mailDNParameters1"), enketoUrlService.addLeadingZeros(String.valueOf(helperBean.getParentDn().getThreadNumber())),helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("entity_information"));
         message.append(respage.getString("email_body_separator"));

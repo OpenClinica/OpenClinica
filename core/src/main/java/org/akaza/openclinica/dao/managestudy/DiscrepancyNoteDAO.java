@@ -109,6 +109,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         this.setTypeExpected(9, TypeNames.STRING);
         this.setTypeExpected(10, TypeNames.INT);
         this.setTypeExpected(11, TypeNames.INT);
+        this.setTypeExpected(12, TypeNames.STRING);
+        this.setTypeExpected(13, TypeNames.INT);
+
     }
 
     public void setMapTypesExpected() {
@@ -157,6 +160,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
         eb.setAge(selectInt(hm, "age"));
         eb.setDays(selectInt(hm, "days"));
+
+        eb.setThreadUuid ((String) hm.get("thread_uuid"));
+        eb.setThreadNumber (((Integer) hm.get("thread_number")).intValue());
         return eb;
     }
 
