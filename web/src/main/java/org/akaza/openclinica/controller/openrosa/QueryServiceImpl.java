@@ -107,8 +107,7 @@ public class QueryServiceImpl implements QueryService {
         List<Integer> idList = new ArrayList();
         List<QueryBean> qBeans = queries.getQueries();
         QueryBean queryBean = null;
-        DiscrepancyNote childDN = null;
-        DiscrepancyNote parentDN = null;
+
         List<DiscrepancyNote> childDns = null;
         if (qBeans.size() > 0) {
             for (QueryBean qBean : qBeans) {
@@ -118,6 +117,8 @@ public class QueryServiceImpl implements QueryService {
             childDns = findChildQueries(helperBean.getItemData());
 
             while (childDns.size() < qBeans.size()) {
+                DiscrepancyNote parentDN = null;
+                DiscrepancyNote childDN = null;
                 queryBean = qBeans.get(0);
 
             List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(helperBean.getItemData().getItemDataId());
