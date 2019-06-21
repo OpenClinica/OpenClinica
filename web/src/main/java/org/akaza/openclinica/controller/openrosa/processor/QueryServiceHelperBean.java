@@ -11,6 +11,14 @@ import org.w3c.dom.Node;
 public class QueryServiceHelperBean {
     private Node itemNode;
     private SubmissionContainer container;
+    private ItemData itemData;
+    private int itemOrdinal;
+    private ResolutionStatus resStatus;
+    private DiscrepancyNote dn;
+    private String parentElementName;
+    private UserAccount userAccount;
+
+    private DiscrepancyNote parentDn;
 
     public Node getItemNode() {
         return itemNode;
@@ -60,10 +68,6 @@ public class QueryServiceHelperBean {
         this.dn = dn;
     }
 
-    private ItemData itemData;
-    private int itemOrdinal;
-    private ResolutionStatus resStatus;
-
     public String getParentElementName() {
         return parentElementName;
     }
@@ -71,9 +75,6 @@ public class QueryServiceHelperBean {
     public void setParentElementName(String parentElementName) {
         this.parentElementName = parentElementName;
     }
-
-    private DiscrepancyNote dn;
-    private String parentElementName;
 
     public UserAccount getUserAccount() {
         return userAccount;
@@ -83,6 +84,11 @@ public class QueryServiceHelperBean {
         this.userAccount = userAccount;
     }
 
-    private UserAccount userAccount;
+    public DiscrepancyNote getParentDn() {
+        return parentDn;
+    }
 
+    public void setParentDn(DiscrepancyNote parentDn) {
+        this.parentDn = parentDn;
+    }
 }

@@ -9,10 +9,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +26,6 @@ import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -52,9 +48,9 @@ import org.akaza.openclinica.control.submit.EnketoFormServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.core.LockInfo;
+import org.akaza.openclinica.core.form.xform.QueryType;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -70,9 +66,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
-import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.dto.Bind;
@@ -270,6 +264,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setFormLayoutOid(formLayout.getOid());
             subjectContext.setUserAccountId(String.valueOf(ub.getId()));
             subjectContext.setItemName(item.getName() + COMMENT);
+
+            if(note.getDiscrepancyNoteTypeId() == QueryType.QUERY.getValue()) {
+                subjectContext.setDiscrepancyNoteThreadUuid(note.getThreadUuid());
+            }
             subjectContext.setItemRepeatOrdinalAdjusted(repeatOrdinal);
             subjectContext.setItemRepeatOrdinalOriginal(idb.getOrdinal());
             subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());

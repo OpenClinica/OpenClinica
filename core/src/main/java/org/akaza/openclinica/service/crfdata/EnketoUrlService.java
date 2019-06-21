@@ -73,8 +73,8 @@ public class EnketoUrlService {
     public static final String CONTACTDATA_EMAIL = "contactdata-email";
     public static final String CONTACTDATA_MOBILENUMBER = "contactdata-mobilenumber";
     public static final String DASH = "-";
-    public static final int THREAD_NAME_LENGTH = 5;
-    public static final String THREAD_NAME_PREFIX="Q";
+    public static final int THREAD_NAME_LENGTH = 4;
+    public static final String THREAD_NAME_PREFIX="Q-";
 
     @Autowired
     @Qualifier("dataSource")
@@ -189,9 +189,10 @@ public class EnketoUrlService {
         if (subjectContext.getItemName() != null) {
             goTo = (subjectContext.isItemInRepeatingGroup()) ? "//" + subjectContext.getItemRepeatGroupName() + "["
                     + subjectContext.getItemRepeatOrdinalAdjusted() + "]//" + subjectContext.getItemName() : "//" + subjectContext.getItemName();
+            goTo=goTo+ (subjectContext.getDiscrepancyNoteThreadUuid()!=null? "#" +subjectContext.getDiscrepancyNoteThreadUuid():"");
         }
         if (flavor.equals(SINGLE_ITEM_FLAVOR))
-            goTo = "//" + subjectContext.getItemName();
+            goTo = "//" + subjectContext.getItemName()+ (subjectContext.getDiscrepancyNoteThreadUuid()!=null? "#" +subjectContext.getDiscrepancyNoteThreadUuid():"");
 
         // Lookup relevant data
 
@@ -603,10 +604,10 @@ public class EnketoUrlService {
         }
     }
 
-    public String addLeadingZeros(String s) {
+    public String addLeadingZeros(String threadNumber) {
 
-        if (s.length() >= THREAD_NAME_LENGTH) return THREAD_NAME_PREFIX + s;
-        else return THREAD_NAME_PREFIX + StringUtils.leftPad(s, THREAD_NAME_LENGTH, "0");
+        if (threadNumber.length() >= THREAD_NAME_LENGTH) return THREAD_NAME_PREFIX + threadNumber;
+        else return THREAD_NAME_PREFIX + StringUtils.leftPad(threadNumber, THREAD_NAME_LENGTH, "0");
     }
 
     }

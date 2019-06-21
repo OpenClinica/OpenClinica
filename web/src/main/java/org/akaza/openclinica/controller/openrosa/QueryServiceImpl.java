@@ -32,6 +32,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.pform.OpenRosaService;
 import org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
@@ -72,6 +73,8 @@ public class QueryServiceImpl implements QueryService {
     private OpenRosaService openRosaService;
     @Autowired
     private BeanFactory beanFactory;
+    @Autowired
+    private EnketoUrlService enketoUrlService;
 
     @Autowired
     private ApplicationContext appContext;
@@ -104,16 +107,19 @@ public class QueryServiceImpl implements QueryService {
         List<Integer> idList = new ArrayList();
         List<QueryBean> qBeans = queries.getQueries();
         QueryBean queryBean = null;
-        DiscrepancyNote childDN = null;
-        DiscrepancyNote parentDN = null;
+
         List<DiscrepancyNote> childDns = null;
         if (qBeans.size() > 0) {
             for (QueryBean qBean : qBeans) {
                 idList.add(Integer.valueOf(qBean.getId()));
             }
             Collections.reverse(idList);
-            queryBean = qBeans.get(0);
+            childDns = findChildQueries(helperBean.getItemData());
 
+            while (childDns.size() < qBeans.size()) {
+                DiscrepancyNote parentDN = null;
+                DiscrepancyNote childDN = null;
+                queryBean = qBeans.get(0);
 
             List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(helperBean.getItemData().getItemDataId());
             for (DiscrepancyNote pDiscrepancyNote : parentDiscrepancyNoteList) {
@@ -131,8 +137,6 @@ public class QueryServiceImpl implements QueryService {
                 saveQueryItemDatamap(helperBean);
             }
 
-            childDns = findChildQueries(helperBean.getItemData());
-            if (childDns.size() < qBeans.size()) {
 
                 // Enketo passes JSON "id" attribute for unsubmitted queries only
                 // if (StringUtils.isEmpty(queryBean.getId())){
@@ -150,8 +154,10 @@ public class QueryServiceImpl implements QueryService {
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
                 helperBean.setDn(childDN);
+                helperBean.setParentDn(parentDN);
                 saveQueryItemDatamap(helperBean);
                 handleEmailNotification(helperBean, queryBean);
+                qBeans.remove(0);
             }
         }
     }
@@ -333,7 +339,7 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
         message.append(
-                MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
+             MessageFormat.format(respage.getString("mailDNParameters1"), enketoUrlService.addLeadingZeros(String.valueOf(helperBean.getParentDn().getThreadNumber())),helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("entity_information"));
         message.append(respage.getString("email_body_separator"));
