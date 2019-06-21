@@ -9,6 +9,7 @@ import org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.service.UserType;
 import org.akaza.openclinica.web.rest.client.cs.dto.CustomerDTO;
 import org.akaza.openclinica.web.rest.client.cs.impl.CustomerServiceClientImpl;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.javers.common.collections.Lists;
 import org.keycloak.admin.client.Keycloak;
@@ -46,6 +47,7 @@ public class KeycloakClientImpl {
     private static final String USER_TYPE_ATTRIBUTE = "userType";
     String DB_CONNECTION_KEY = "dbConnection";
     public static final String IDENTITY_SERVER_CALL_FAILED = "errorCode.identityServerCallFailed";
+    public static final String USER_NOT_FOUND = "errorCode.userNotFound";
     private static final String PATH_SEPARATOR = "/";
     private static final MessageFormat USERS_PATH = new MessageFormat("/realms/{0}/oc-rest/users");
     private static final String ACCESS_CODE = "access_code";
@@ -56,9 +58,26 @@ public class KeycloakClientImpl {
     @Autowired
     private Keycloak keycloak;
 
+    public void resetParticipateUserAccessCode(String accessToken, String email, String username, String accessCode,String studyEnvironment,String customerUuid) {
+        String realm = getRealmName(accessToken, customerUuid);
+        UserResource userResource = null;
+        List<UserRepresentation> userRepresentations = keycloak
+                .realm(realm)
+                .users().search(username, null, null, null, 0, 1);
+        UserRepresentation userRepresentation = null;
+        if (CollectionUtils.isNotEmpty(userRepresentations)) {
+            userRepresentation = userRepresentations.get(0);
+            userResource = keycloak.realm(realm).users().get(userRepresentation.getId());
+        }
+        if (userResource == null) {
+            throw new CustomParameterizedException(IDENTITY_SERVER_CALL_FAILED, USER_NOT_FOUND);
+        }
+        userRepresentation.getAttributes().put(ACCESS_CODE_ATTRIBUTE, Lists.asList(accessCode));
+        userResource.update(userRepresentation);
+    }
+
     public String createParticipateUser(String accessToken, String email, String username, String accessCode,String studyEnvironment,String customerUuid) {
         logger.debug("Calling Keycloak to create participate user with username: {}", username);
-
 
         String realm = getRealmName(accessToken, customerUuid);
         UserRepresentation userRepresentation = new UserRepresentation();

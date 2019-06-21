@@ -1,7 +1,5 @@
 package org.akaza.openclinica.service;
 
-import net.sf.json.JSON;
-import net.sf.json.xml.XMLSerializer;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -9,10 +7,6 @@ import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
-import org.akaza.openclinica.controller.RuleController;
-import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
-import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
-import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
@@ -25,16 +19,12 @@ import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.dto.Bind;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
@@ -45,24 +35,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.TimeZone;
+import java.util.*;
 
 /**
  * This Service class is used with View Study Subject Page

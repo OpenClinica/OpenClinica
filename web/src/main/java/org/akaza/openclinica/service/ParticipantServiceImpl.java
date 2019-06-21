@@ -414,7 +414,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                     p.setRow(index);
                     p.setParticipantId(subject.getStudySubjectId());
 
-                    if (byLabelAndStudy != null) {
+                    if (byLabelAndStudy != null && byLabelAndStudy.getOid() != null) {
                         p.setParticipantOid(byLabelAndStudy.getOid());
                         p.setParticipateStatus(byLabelAndStudy.getStatus().getName());
                     }
@@ -424,7 +424,19 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                     ocParticipateImportDTOs.add(p);
                 } else {
                     String label = null;
-                    label = createParticipant(subject, study, accessToken, customerUuid, user, locale);
+                    try {
+                        label = createParticipant(subject, study, accessToken, customerUuid, user, locale);
+                    } catch (Exception e) {
+                        OCParticipateImportDTO p = new OCParticipateImportDTO();
+                        p.setRow(index);
+                        p.setParticipantId(subject.getStudySubjectId());
+                        p.setStatus("Failed");
+
+                        p.setMessage(e.getMessage());
+                        ocParticipateImportDTOs.add(p);
+                        ++index;
+                        continue;
+                    }
                     StudySubjectBean subjectBean = this.getStudySubjectDAO().findByLabel(label);
                     studyParticipantDTO.setSubjectOid(subjectBean.getOid());
 
@@ -441,9 +453,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                 ++index;
             }
         } catch (Exception e) {
-            userService.persistJobFailed(jobDetail, fileName);
-            logger.error("Bulk Participant Import Job Failed." + e);
-            throw e;
+            logger.error("Exception while processing batch file." + e);
         } finally {
             // write out any DTOs that have been processed
             if (CollectionUtils.isNotEmpty(ocParticipateImportDTOs)) {
