@@ -158,11 +158,6 @@ public class UserServiceImpl implements UserService {
 
 
         String accessCode = "";
-        if (validateService.isParticipateActive(tenantStudy)) {
-            do {
-                accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
-            } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, customerUuid));
-        }
 
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
 
@@ -173,6 +168,11 @@ public class UserServiceImpl implements UserService {
         if (studySubject != null) {
             if (studySubject.getUserId() == null && validateService.isParticipateActive(tenantStudy)) {
                 logger.info("Participate has not registered yet");
+                if (validateService.isParticipateActive(tenantStudy)) {
+                    do {
+                        accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+                    } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, customerUuid));
+                }
                 // create participant user Account In Keycloak
                 String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
                 // create participant user Account In Runtime

@@ -15,7 +15,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
@@ -33,6 +32,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.pform.OpenRosaService;
 import org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
@@ -73,9 +73,12 @@ public class QueryServiceImpl implements QueryService {
     private OpenRosaService openRosaService;
     @Autowired
     private BeanFactory beanFactory;
+    @Autowired
+    private EnketoUrlService enketoUrlService;
 
     @Autowired
     private ApplicationContext appContext;
+    public static final String DASH = "-";
 
     @Override
     public void process(QueryServiceHelperBean helperBean, SubmissionContainer container, Node itemNode, int itemOrdinal) throws Exception {
@@ -104,35 +107,41 @@ public class QueryServiceImpl implements QueryService {
         List<Integer> idList = new ArrayList();
         List<QueryBean> qBeans = queries.getQueries();
         QueryBean queryBean = null;
-        DiscrepancyNote childDN = null;
-        DiscrepancyNote parentDN = null;
+
         List<DiscrepancyNote> childDns = null;
         if (qBeans.size() > 0) {
             for (QueryBean qBean : qBeans) {
                 idList.add(Integer.valueOf(qBean.getId()));
             }
             Collections.reverse(idList);
-            queryBean = qBeans.get(0);
-            int noteTypeId = 3;
-            if (queryBean.getType().equals(QueryType.REASON.getName())) {
-                noteTypeId = 4;
+            childDns = findChildQueries(helperBean.getItemData());
+
+            while (childDns.size() < qBeans.size()) {
+                DiscrepancyNote parentDN = null;
+                DiscrepancyNote childDN = null;
+                queryBean = qBeans.get(0);
+
+            List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(helperBean.getItemData().getItemDataId());
+            for (DiscrepancyNote pDiscrepancyNote : parentDiscrepancyNoteList) {
+                if (pDiscrepancyNote.getThreadUuid()!=null && pDiscrepancyNote.getThreadUuid().equals(queryBean.getThread_id())) {
+                    parentDN = pDiscrepancyNote;
+                    break;
+                }
             }
-            parentDN = findQueryParent(helperBean, noteTypeId);
+
 
             if (parentDN == null) {
-                parentDN = createQuery(helperBean, queryBean);
+                parentDN = createQuery(helperBean, queryBean,true);
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
                 helperBean.setDn(parentDN);
                 saveQueryItemDatamap(helperBean);
             }
 
-            childDns = findChildQueries(helperBean);
-            if (childDns.size() < qBeans.size()) {
 
                 // Enketo passes JSON "id" attribute for unsubmitted queries only
                 // if (StringUtils.isEmpty(queryBean.getId())){
 
-                childDN = createQuery(helperBean, queryBean);
+                childDN = createQuery(helperBean, queryBean,false);
                 childDN.setParentDiscrepancyNote(parentDN);
                 childDN = discrepancyNoteDao.saveOrUpdate(childDN);
 
@@ -145,13 +154,15 @@ public class QueryServiceImpl implements QueryService {
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
                 helperBean.setDn(childDN);
+                helperBean.setParentDn(parentDN);
                 saveQueryItemDatamap(helperBean);
                 handleEmailNotification(helperBean, queryBean);
+                qBeans.remove(0);
             }
         }
     }
 
-    private DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean) throws Exception {
+    private DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) throws Exception {
         DiscrepancyNote dn = new DiscrepancyNote();
         dn.setStudy(helperBean.getContainer().getStudy());
         dn.setEntityType("itemData");
@@ -164,6 +175,10 @@ public class QueryServiceImpl implements QueryService {
             (queryBean.getType().equals(QueryType.REASON.getName())){
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(4));
             dn.setResolutionStatus(resolutionStatusDao.findById(5));
+        }else if
+        (queryBean.getType().equals(QueryType.ANNOTATION.getName())){
+            dn.setDiscrepancyNoteType(new DiscrepancyNoteType(2));
+            dn.setResolutionStatus(resolutionStatusDao.findById(5));
         }
         String user = queryBean.getUser();
         if (user == null) {
@@ -174,10 +189,12 @@ public class QueryServiceImpl implements QueryService {
         }
 
         String assignedTo = "";
-        if (queryBean.getComment().startsWith("Automatic query for:")) {
-            assignedTo = helperBean.getContainer().getUser().getUserName();
-        } else {
-            assignedTo = queryBean.getAssigned_to();
+        if (queryBean.getType().equals(QueryType.QUERY.getName())) {
+            if (queryBean.getComment().startsWith("Automatic query for:")) {
+                assignedTo = helperBean.getContainer().getUser().getUserName();
+            } else {
+                assignedTo = queryBean.getAssigned_to();
+            }
         }
         if (!StringUtils.isEmpty(assignedTo)) {
             UserAccount userAccount = userAccountDao.findByUserName(assignedTo);
@@ -192,6 +209,11 @@ public class QueryServiceImpl implements QueryService {
             helperBean.setItemData(createBlankItemData(helperBean));
         }
         dn.setDateCreated(new Date());
+        dn.setThreadUuid(queryBean.getThread_id());
+        if(parentDn && queryBean.getType().equals(QueryType.QUERY.getName())){
+            int maxThreadNumber= discrepancyNoteDao.getMaxThreadNumber();
+            dn.setThreadNumber(maxThreadNumber+1);
+        }
         return dn;
     }
 
@@ -261,13 +283,13 @@ public class QueryServiceImpl implements QueryService {
         return itemData;
     }
 
-    private DiscrepancyNote findQueryParent(QueryServiceHelperBean helperBean, int noteTypeId) {
-        DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(helperBean.getItemData().getItemDataId(), noteTypeId);
+    private DiscrepancyNote findQueryParent(ItemData itemData, int noteTypeId) {
+        DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(itemData.getItemDataId(), noteTypeId);
         return parentDiscrepancyNote;
     }
 
-    private List<DiscrepancyNote> findChildQueries(QueryServiceHelperBean helperBean) {
-        List<DiscrepancyNote> childDiscrepancyNotes = discrepancyNoteDao.findChildQueriesByItemData(helperBean.getItemData().getItemDataId());
+    private List<DiscrepancyNote> findChildQueries(ItemData itemData) {
+        List<DiscrepancyNote> childDiscrepancyNotes = discrepancyNoteDao.findChildQueriesByItemData(itemData.getItemDataId());
         return childDiscrepancyNotes;
     }
 
@@ -317,7 +339,7 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
         message.append(
-                MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
+             MessageFormat.format(respage.getString("mailDNParameters1"), enketoUrlService.addLeadingZeros(String.valueOf(helperBean.getParentDn().getThreadNumber())),helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("entity_information"));
         message.append(respage.getString("email_body_separator"));

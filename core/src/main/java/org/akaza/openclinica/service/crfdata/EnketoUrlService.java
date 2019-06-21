@@ -25,13 +25,13 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.rule.action.EventActionProcessor;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.service.crfdata.xform.*;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +62,7 @@ public class EnketoUrlService {
     public static final String NO_FLAVOR = "";
     public static final String QUERY = "comment";
     public static final String REASON = "reason";
+    public static final String ANNOTATION = "annotation";
     public static final String AUDIT = "audit";
     public static final String ITEMDATA = "item_data";
     public static final String STUDYEVENT = "study_event";
@@ -72,6 +73,8 @@ public class EnketoUrlService {
     public static final String CONTACTDATA_EMAIL = "contactdata-email";
     public static final String CONTACTDATA_MOBILENUMBER = "contactdata-mobilenumber";
     public static final String DASH = "-";
+    public static final int THREAD_NAME_LENGTH = 4;
+    public static final String THREAD_NAME_PREFIX="Q-";
 
     @Autowired
     @Qualifier("dataSource")
@@ -186,9 +189,10 @@ public class EnketoUrlService {
         if (subjectContext.getItemName() != null) {
             goTo = (subjectContext.isItemInRepeatingGroup()) ? "//" + subjectContext.getItemRepeatGroupName() + "["
                     + subjectContext.getItemRepeatOrdinalAdjusted() + "]//" + subjectContext.getItemName() : "//" + subjectContext.getItemName();
+            goTo=goTo+ (subjectContext.getDiscrepancyNoteThreadUuid()!=null? "#" +subjectContext.getDiscrepancyNoteThreadUuid():"");
         }
         if (flavor.equals(SINGLE_ITEM_FLAVOR))
-            goTo = "//" + subjectContext.getItemName();
+            goTo = "//" + subjectContext.getItemName()+ (subjectContext.getDiscrepancyNoteThreadUuid()!=null? "#" +subjectContext.getDiscrepancyNoteThreadUuid():"");
 
         // Lookup relevant data
 
@@ -268,7 +272,6 @@ public class EnketoUrlService {
             i++;
             QueryBean query = new QueryBean();
             query.setId(String.valueOf(i));
-            query.setAssigned_to(dn.getUserAccountByOwnerId().getUserName());
             query.setComment(escapedValue(dn.getDetailedNotes()));
             if (dn.getResolutionStatus().getResolutionStatusId() != 5) {
                 query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
@@ -279,9 +282,15 @@ public class EnketoUrlService {
             query.setUser(dn.getUserAccountByOwnerId().getUserName());
             if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.QUERY.getValue()) {
                 query.setType(QUERY);
+                query.setAssigned_to(dn.getUserAccountByOwnerId().getUserName());
             } else if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.REASON.getValue()) {
                 query.setType(REASON);
+            } else if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.ANNOTATION.getValue()) {
+                query.setType(ANNOTATION);
             }
+            query.setThread_id(dn.getThreadUuid());
+            Integer threadNumber=dn.getParentDiscrepancyNote().getThreadNumber();
+            query.setVisible_thread_id(addLeadingZeros(String.valueOf(threadNumber)));
             queryBeans.add(query);
         }
 
@@ -299,7 +308,6 @@ public class EnketoUrlService {
             logBean.setDate_time(convertDateFormat(dateTime));
             UserAccount uAccount = userAccountDao.findById(audit.getUserAccount().getUserId());
             logBean.setUser(uAccount.getUserName());
-            logBean.setAssigned_to(uAccount.getUserName());
             logBean.setType(AUDIT);
             logBeans.add(logBean);
         }
@@ -594,6 +602,12 @@ public class EnketoUrlService {
                     data.put(itemName, studySubjectDetail.getPhone()!=null?escapedValue(studySubjectDetail.getPhone()):"");
             }
         }
+    }
+
+    public String addLeadingZeros(String threadNumber) {
+
+        if (threadNumber.length() >= THREAD_NAME_LENGTH) return THREAD_NAME_PREFIX + threadNumber;
+        else return THREAD_NAME_PREFIX + StringUtils.leftPad(threadNumber, THREAD_NAME_LENGTH, "0");
     }
 
     }

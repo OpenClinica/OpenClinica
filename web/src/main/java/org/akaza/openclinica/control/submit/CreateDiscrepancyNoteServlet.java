@@ -800,7 +800,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         message.append(respage.getString("email_body_separator"));
                         message.append(respage.getString("disc_note_info"));
                         message.append(respage.getString("email_body_separator"));
-                        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), note.getDetailedNotes(), ub.getName()));
+                        DiscrepancyNoteBean parentDn= (DiscrepancyNoteBean) dndao.findByPK(note.getParentDnId());
+                        message.append(
+                                MessageFormat.format(respage.getString("mailDNParameters1"), getEnketoUrlService().addLeadingZeros(String.valueOf(parentDn.getThreadNumber())),note.getDetailedNotes(), ub.getName()));
                         message.append(respage.getString("email_body_separator"));
                         message.append(respage.getString("entity_information"));
                         message.append(respage.getString("email_body_separator"));

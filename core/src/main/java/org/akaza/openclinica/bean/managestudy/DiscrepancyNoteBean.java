@@ -88,6 +88,8 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private StudyEventDefinitionBean studyEventDefinitionBean = new StudyEventDefinitionBean();
     private Integer itemDataOrdinal;
     private String itemGroupName;
+    private String threadUuid;
+    private Integer threadNumber;
 
     private StudyBean study = new StudyBean();
 
@@ -631,4 +633,19 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
         this.activated = activated;
     }
 
+    public String getThreadUuid() {
+        return threadUuid;
+    }
+
+    public void setThreadUuid(String threadUuid) {
+        this.threadUuid = threadUuid;
+    }
+
+    public Integer getThreadNumber() {
+        return threadNumber;
+    }
+
+    public void setThreadNumber(Integer threadNumber) {
+        this.threadNumber = threadNumber;
+    }
 }
