@@ -1020,9 +1020,12 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        String sql;
+        String sql = "";
+        boolean filterIsEmpty = false;
+       
         if (filter.getFilters().isEmpty()){
             sql = digester.getQuery("getCountofStudySubjects");
+            filterIsEmpty = true;
         }
         else {
             sql = digester.getQuery("getCountWithFilter");
@@ -1032,7 +1035,12 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
             variables.put(new Integer(1), currentStudy.getId());
             variables.put(new Integer(2), currentStudy.getId());
         }else{
-            sql=sql + " AND ss.user_status_id=?";
+        	if(filterIsEmpty) {
+        		sql=sql + " WHERE subss.user_status_id=?";
+        	}else {
+        		sql=sql + " AND ss.user_status_id=?";
+        	}
+          
             variables.put(new Integer(1), currentStudy.getId());
             variables.put(new Integer(2), currentStudy.getId());
             variables.put(new Integer(3), participateStatusSetFilter.getCode());
