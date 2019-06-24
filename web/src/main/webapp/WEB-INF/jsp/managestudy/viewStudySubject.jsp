@@ -1573,7 +1573,7 @@
     <tr>
       <td>
         <label>
-          <input type="checkbox">
+          <input type="checkbox" name="reset_participant_access_code" value="true">
           <fmt:message key="reset_participant_access_code" bundle="${resword}"/>
         </label>
         <br><br>
