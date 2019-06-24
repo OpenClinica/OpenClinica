@@ -1571,6 +1571,18 @@
       <td><div class="lines"></div></td>
     </tr>
     <tr>
+      <td>
+        <label>
+          <input type="checkbox">
+          <fmt:message key="reset_participant_access_code" bundle="${resword}"/>
+        </label>
+        <br><br>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
       <td colspan="2" style="text-align: right;">
         <span id="inviting" class="left hide">
           <img src='images/loading.gif'> Inviting...
