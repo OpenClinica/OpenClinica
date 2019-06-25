@@ -52,7 +52,7 @@
         <sql>
             select count (*) from (select distinct ss.* from study_subject ss, study s where
                 ss.study_id = s.study_id AND
-                ( s.study_id = ? or s.parent_study_id = ? )) as ss
+                ( s.study_id = ? or s.parent_study_id = ? )) as subss
         </sql>
     </query>
 
