@@ -1137,6 +1137,16 @@ and column_name='interviewer_name'
         </sql>
     </query>
     <query>
+        <name>findFirstChildByParent</name>
+        <sql>
+            SELECT dn.*
+            FROM discrepancy_note dn
+            WHERE parent_dn_id=?
+            and dn.discrepancy_note_id =
+            (select min(discrepancy_note_id) from discrepancy_note where parent_dn_id = ?)
+        </sql>
+    </query>
+    <query>
     	<name>getResolutionStatusIdForSubjectDNFlag</name>
     	<sql>select min(a.resolution_status_id) as resolution_status_id from (
 				select dn.discrepancy_note_id, dn.resolution_status_id from discrepancy_note dn 
