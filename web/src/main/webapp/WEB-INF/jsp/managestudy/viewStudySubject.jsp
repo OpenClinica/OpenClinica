@@ -1570,7 +1570,7 @@
     <tr>
       <td><div class="lines"></div></td>
     </tr>
-    <tr>
+    <tr class="reset-participant-access-code hide">
       <td>
         <label>
           <input type="checkbox" name="reset_participant_access_code" value="true">
@@ -1579,7 +1579,7 @@
         <br><br>
       </td>
     </tr>
-    <tr>
+    <tr class="reset-participant-access-code hide">
       <td><div class="lines"></div></td>
     </tr>
     <tr>
@@ -1711,6 +1711,7 @@
         if (status) {
             $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
             $('#view-access-link').show();
+            $('tr.reset-participant-access-code').show();
         }
     }
     function enableDisableControls() {
