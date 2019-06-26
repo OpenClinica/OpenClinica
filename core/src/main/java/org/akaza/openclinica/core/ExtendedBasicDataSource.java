@@ -22,4 +22,11 @@ public class ExtendedBasicDataSource extends BasicDataSource implements Serializ
         CoreResources.setSchema(connection);
         return connection;
     }
+
+    /**
+     * Returns connection without setting any schema.
+     */
+    public Connection getAnyConnection() throws SQLException {
+        return super.getConnection();
+    }
 }
