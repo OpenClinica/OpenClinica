@@ -1,6 +1,5 @@
 package org.akaza.openclinica.service;
 
-import net.sf.saxon.Err;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.controller.dto.*;
@@ -14,7 +13,6 @@ import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
-import org.akaza.openclinica.web.pform.formlist.Form;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -737,7 +735,7 @@ public class ImportServiceImpl implements ImportService {
                         return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
 
                     if (studyEvent == null) {
-                        eventObject = validateRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
+                        eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
                         if (eventObject instanceof ErrorObj) return eventObject;
                         studyEvent = scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
                     } else {
@@ -802,7 +800,7 @@ public class ImportServiceImpl implements ImportService {
 
                     if (studyEvent == null) {
                         //validate repeat key too large
-                        eventObject = validateRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
+                        eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
                         if (eventObject instanceof ErrorObj) return eventObject;
                         //validate start, end date
                         eventObject = validateStartAndEndDateAndOrder(studyEventDataBean);
@@ -899,14 +897,16 @@ public class ImportServiceImpl implements ImportService {
             if (maxRepeatGroup > highestGroupOrdinal)
                 highestGroupOrdinal = maxRepeatGroup;
         }
+        int groupOrdinal= highestGroupOrdinal+1;
 
         if (itemGroup.getItemGroupMetadatas().get(0).isRepeatingGroup()) {   // Repeating Item Group
             if (itemGroupDataBean.getItemGroupRepeatKey() != null && !itemGroupDataBean.getItemGroupRepeatKey().equals("")) {   // Repeat Key present
                 errorObj = validateGroupRepeatKeyIntNumber(itemGroupDataBean.getItemGroupRepeatKey());
                 if (errorObj != null) return errorObj;
-
+                errorObj = validateGroupRepeatKeyTooLarge(itemGroupDataBean.getItemGroupRepeatKey(),groupOrdinal);
+                if (errorObj != null) return errorObj;
             } else {  // Repeat Key missing
-                itemGroupDataBean.setItemGroupRepeatKey(String.valueOf(highestGroupOrdinal + 1));
+                itemGroupDataBean.setItemGroupRepeatKey(String.valueOf(groupOrdinal));
             }
 
         } else {   // Non Repeat Item Group
@@ -1012,9 +1012,16 @@ public class ImportServiceImpl implements ImportService {
         return null;
     }
 
-    private ErrorObj validateRepeatKeyTooLarge(String repeatKey, int eventOrdinal) {
+    private ErrorObj validateEventRepeatKeyTooLarge(String repeatKey, int eventOrdinal) {
         if (Integer.parseInt(repeatKey) != (eventOrdinal)) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_REPEAT_KEY_TOO_LARGE);
+            return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_REPEAT_KEY_TOO_LARGE);
+        }
+        return null;
+    }
+
+    private ErrorObj validateGroupRepeatKeyTooLarge(String repeatKey, int groupOrdinal) {
+        if (Integer.parseInt(repeatKey) > (groupOrdinal)) {
+            return new ErrorObj(FAILED, ErrorConstants.ERR_GROUP_REPEAT_KEY_TOO_LARGE);
         }
         return null;
     }
