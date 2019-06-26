@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -81,39 +84,40 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     }
 
     public Session getCurrentSession() {
-//        Session session = null;
-//        String tenant = null;
-//        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-//        if (requestAttributes != null && requestAttributes.getRequest() != null) {
-//            HttpServletRequest request = requestAttributes.getRequest();
-//            tenant = (String) request.getAttribute("requestSchema");
-//        } else {
-//            tenant = CoreResources.tenantSchema.get();
-//        }
-//        session = getSessionFactory().getCurrentSession();
-//        SessionImpl sessionImpl = (SessionImpl) session;
-//
-//        if (StringUtils.isNotEmpty(tenant)) {
-//            try {
-//                String currentSchema = sessionImpl.connection().getSchema();
-//                if (!tenant.equals(currentSchema)) {
-//                    sessionImpl.connection().setSchema(tenant);
-//                }
-//            } catch (SQLException e) {
-//                logger.error(e.getMessage(), e);
-//            }
-//        } else {
-//            String schema = CoreResources.tenantSchema.get();
-//            if (StringUtils.isNotEmpty(schema)) {
-//                try {
-//                    sessionImpl.connection().setSchema(schema);
-//                } catch (SQLException e) {
-//                    logger.error(e.getMessage(), e);
-//                }
-//            }
-//
-//        }
-        return getSessionFactory().getCurrentSession();
+        Session session = null;
+        String tenant = null;
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            tenant = (String) request.getAttribute("requestSchema");
+        } else {
+            tenant = CoreResources.tenantSchema.get();
+        }
+        session = getSessionFactory().getCurrentSession();
+        SessionImpl sessionImpl = (SessionImpl) session;
+
+        if (StringUtils.isNotEmpty(tenant)) {
+            try {
+                String currentSchema = sessionImpl.connection().getSchema();
+                if (!tenant.equals(currentSchema)) {
+                    sessionImpl.connection().setSchema(tenant);
+                }
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);
+            }
+        } else {
+            String schema = CoreResources.tenantSchema.get();
+            if (StringUtils.isNotEmpty(schema)) {
+                try {
+                    sessionImpl.connection().setSchema(schema);
+                } catch (SQLException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+
+        }
+
+        return session;
     }
 
     public Session getCurrentSession(String schema) {
