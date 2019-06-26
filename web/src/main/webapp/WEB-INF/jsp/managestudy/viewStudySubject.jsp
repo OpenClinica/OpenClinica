@@ -1570,6 +1570,18 @@
     <tr>
       <td><div class="lines"></div></td>
     </tr>
+    <tr class="reset-participant-access-code hide">
+      <td>
+        <label>
+          <input type="checkbox" name="reset_participant_access_code" value="true">
+          <fmt:message key="reset_participant_access_code" bundle="${resword}"/>
+        </label>
+        <br><br>
+      </td>
+    </tr>
+    <tr class="reset-participant-access-code hide">
+      <td><div class="lines"></div></td>
+    </tr>
     <tr>
       <td colspan="2" style="text-align: right;">
         <span id="inviting" class="left hide">
@@ -1604,7 +1616,7 @@
                   <span><fmt:message key="access_code" bundle="${resword}"/></span>
                 </td>
                 <td valign="top" id="access-code-td">
-                  <input id="access-code-input" onfocus="this.select()" type="password" readonly="readonly" value="" size="45" class="formfield form-control">
+                  <input id="access-code-input" onfocus="this.select()" type="password" readonly="readonly" value="Loading..." size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
                 </td>
                 <td valign="top" class="grayed-out" style="padding-top:4px;">
@@ -1699,6 +1711,7 @@
         if (status) {
             $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
             $('#view-access-link').show();
+            $('tr.reset-participant-access-code').show();
         }
     }
     function enableDisableControls() {
@@ -1873,7 +1886,6 @@
         });
 
         jQuery('#participateAccess').click(function() {
-            getAccessCode();
             $('#eye').show();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
@@ -1897,6 +1909,7 @@
         });
 
         jQuery('#eye').click(function() {
+            getAccessCode();
             $(this).hide();
             $('#access-code-input').attr('type', 'text');
         });
