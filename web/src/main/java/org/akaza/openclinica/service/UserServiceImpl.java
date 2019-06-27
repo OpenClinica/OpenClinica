@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
         ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
         if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
-            ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
+            ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,false);
             boolean updateUserStatus = false;
 
             if (participantDTO.isInviteViaSms())
@@ -350,7 +350,7 @@ public class UserServiceImpl implements UserService {
                     //Get accessToken from Keycloak
 
 
-                    ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean);
+                    ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,false);
                     if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
                         userDTO.setAccessCode(participantAccessDTO.getAccessCode());
                     }
@@ -582,7 +582,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean) {
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
         Study tenantStudy = getStudy(studyOid);
         if (!validateService.isParticipateActive(tenantStudy)) {
             logger.error("Participant account is not Active");
@@ -620,9 +620,10 @@ public class UserServiceImpl implements UserService {
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
-                    AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId());
-                    auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
-
+                    if(auditAccessCodeViewing) {
+                        AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId());
+                        auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
+                    }
                     return participantAccessDTO;
                 }
             }

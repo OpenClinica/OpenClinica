@@ -171,7 +171,7 @@ public class UserController {
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 
-        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
+        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,true);
         if (participantAccessDTO == null) {
             logger.error("REST request to GET AccessLink Object for Participant not found ");
             return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.NOT_FOUND);
