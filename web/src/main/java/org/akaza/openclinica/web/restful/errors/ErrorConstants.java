@@ -145,4 +145,5 @@ public class ErrorConstants {
     public static final String ERR_GROUP_REPEAT_KEY_TOO_LARGE = "errorCode.groupRepeatKeyTooLarge";
 
     public static final String ERR_MISSING_STUDY_EVENT_REPEAT_KEY = "errorCode.missingStudyEventRepeatKey";
+    public static final String ERR_FORM_MISSING_STUDY_EVENT_CONSTRUCT = "errorCode.formMissingStudyEventConstruct";
 }
