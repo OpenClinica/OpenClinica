@@ -52,7 +52,6 @@ public class StudySubjectProcessor implements Processor {
 
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
         String embeddedStudySubjectId = getEmbeddedStudySubjectOid(container);
-        int nextLabel = studySubjectDao.findTheGreatestLabel() + 1;
         Date currentDate = new Date();
         UserAccount rootUser = userAccountDao.findByUserId(1);
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd.HHmmss");
@@ -92,6 +91,7 @@ public class StudySubjectProcessor implements Processor {
             // create Subject & Study Subject
             Study study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
             Subject subject = createSubject(currentDate);
+            int nextLabel = studySubjectDao.findTheGreatestLabel() + 1;
             StudySubject studySubject = createStudySubject(Integer.toString(nextLabel), subject, study, rootUser, currentDate, null);
             container.setSubject(studySubject);
         }
