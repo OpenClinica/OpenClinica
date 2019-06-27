@@ -765,6 +765,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 			dnNoteBean.setDateUpdated(dn.getDateCreated());
 			dnNoteBean.setEntityName(columnName);
+			dnNoteBean.setThreadUuid(dn.getThreadUuid());
+			dnNoteBean.setThreadNumber(dn.getThreadNumber());
 
 			for (DiscrepancyNote childDN : dn.getChildDiscrepancyNotes()) {
 				ChildNoteBean childNoteBean = new ChildNoteBean();
