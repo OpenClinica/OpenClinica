@@ -506,6 +506,10 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note.thread_uuid
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); // discrepancy_note.thread_number
     }
 
     public void setOCEventDataDNsTypesExpected() {
@@ -530,6 +534,10 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note.thread_uuid
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); // discrepancy_note.thread_number
     }
 
     public void setOCFormDataDNsTypesExpected() {
@@ -552,6 +560,10 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note.thread_uuid
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); // discrepancy_note.thread_number
     }
 
     public void setOCItemDataDNsTypesExpected() {
@@ -574,6 +586,10 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note.thread_uuid
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); // discrepancy_note.thread_number
     }
 
     public void setSectionLabelsTypesExpected() {
@@ -2763,6 +2779,8 @@ public class OdmExtractDAO extends DatasetDAO {
             Date dateCreated = (Date) row.get("date_created");
             String status = (String) row.get("status");
             String noteType = (String) row.get("name");
+            String threadUuid = (String) row.get("thread_uuid");
+            Integer threadNumber = (Integer) row.get("thread_number");
 
             if (pdnId != null && pdnId > 0) {
                 String key = studySubjectLabel + "-" + pdnId;
@@ -2789,6 +2807,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 dn.setNoteType(noteType);
                 dn.setStatus(status);
                 dn.setOid("DN_" + dnId);
+                dn.setThreadUuid(threadUuid);
+                dn.setThreadNumber(threadNumber);
                 ElementRefBean userRef = new ElementRefBean();
                 userRef.setElementDefOID("USR_" + ownerId);
                 if (subOidPoses.containsKey(studySubjectLabel)) {
@@ -2821,6 +2841,8 @@ public class OdmExtractDAO extends DatasetDAO {
             Date dateCreated = (Date) row.get("date_created");
             String status = (String) row.get("status");
             String noteType = (String) row.get("name");
+            String threadUuid = (String) row.get("thread_uuid");
+            Integer threadNumber = (Integer) row.get("thread_number");
 
             String oidKey = studySubjectLabel + defOid;
             if (pdnId != null && pdnId > 0) {
@@ -2848,6 +2870,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 dn.setNoteType(noteType);
                 dn.setStatus(status);
                 dn.setOid("DN_" + dnId);
+                dn.setThreadUuid(threadUuid);
+                dn.setThreadNumber(threadNumber);
                 ElementRefBean userRef = new ElementRefBean();
                 userRef.setElementDefOID("USR_" + ownerId);
                 if (evnOidPoses.containsKey(oidKey)) {
@@ -2881,6 +2905,8 @@ public class OdmExtractDAO extends DatasetDAO {
             Date dateCreated = (Date) row.get("date_created");
             String status = (String) row.get("status");
             String noteType = (String) row.get("name");
+            String threadUuid = (String) row.get("thread_uuid");
+            Integer threadNumber = (Integer) row.get("thread_number");
 
             if (pdnId != null && pdnId > 0) {
                 String key = ecId + "-" + pdnId;
@@ -2907,6 +2933,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 dn.setNoteType(noteType);
                 dn.setStatus(status);
                 dn.setOid("DN_" + dnId);
+                dn.setThreadUuid(threadUuid);
+                dn.setThreadNumber(threadNumber);
                 ElementRefBean userRef = new ElementRefBean();
                 userRef.setElementDefOID("USR_" + ownerId);
                 if (formOidPoses.containsKey(ecId)) {
@@ -2943,6 +2971,8 @@ public class OdmExtractDAO extends DatasetDAO {
             Date dateCreated = (Date) row.get("date_created");
             String status = (String) row.get("status");
             String noteType = (String) row.get("name");
+            String threadUuid = (String) row.get("thread_uuid");
+            Integer threadNumber = (Integer) row.get("thread_number");
 
             if (pdnId != null && pdnId > 0) {
                 String key = idataId + "-" + pdnId;
@@ -2969,6 +2999,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 dn.setNoteType(noteType);
                 dn.setStatus(status);
                 dn.setOid("DN_" + dnId);
+                dn.setThreadUuid(threadUuid);
+                dn.setThreadNumber(threadNumber);
+
                 ElementRefBean userRef = new ElementRefBean();
                 userRef.setElementDefOID("USR_" + ownerId);
                 if (idataOidPoses.containsKey(idataId)) {
@@ -3704,7 +3737,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCSubjectDataDNsSql(String studySubjectOids) {
         return "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
-                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name"
+                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name , dn.thread_uuid, dn.thread_number"
                 + " from discrepancy_note dn, dn_subject_map dnsm, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
                 + " where dn.entity_type = 'subject'" + " and dn.discrepancy_note_id = dnsm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids
                 + ") and ss.subject_id = dnsm.subject_id and dn.resolution_status_id = rs.resolution_status_id"
@@ -3719,7 +3752,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCEventDataDNsSql(String definitionOids, String studySubjectOids) {
         return "select ss.oc_oid as study_subject_oid, sed.oc_oid as definition_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
-                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name"
+                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name , dn.thread_uuid, dn.thread_number"
                 + " from discrepancy_note dn, dn_study_event_map dnsem, study_event se, study_event_definition sed, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
                 + " where dn.entity_type = 'studyEvent'"
                 + " and dn.discrepancy_note_id = dnsem.discrepancy_note_id and dnsem.study_event_id = se.study_event_id" + " and sed.oc_oid in ("
@@ -3730,7 +3763,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getOCFormDataDNsSql(String ecIds) {
-        return "select ec.event_crf_id, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, dn.owner_id, dn.date_created, rs.name as status, dnt.name"
+        return "select ec.event_crf_id, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, dn.owner_id, dn.date_created, rs.name as status, dnt.name , dn.thread_uuid, dn.thread_number"
                 + " from discrepancy_note dn, dn_event_crf_map dnecm, event_crf ec, discrepancy_note_type dnt, resolution_status rs"
                 + " where dn.entity_type = 'eventCrf'" + " and dnecm.event_crf_id in (" + ecIds + ") and dn.discrepancy_note_id = dnecm.discrepancy_note_id"
                 + " and ec.event_crf_id in (" + ecIds + ") and dnecm.event_crf_id = ec.event_crf_id" + " and dn.resolution_status_id = rs.resolution_status_id"
@@ -3738,7 +3771,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getOCItemDataDNsSql(String idataIds) {
-        return "select dnidm.item_data_id, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, dn.owner_id, dn.date_created, rs.name as status, dnt.name"
+        return "select dnidm.item_data_id, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, dn.owner_id, dn.date_created, rs.name as status, dnt.name, dn.thread_uuid, dn.thread_number"
                 + " from discrepancy_note dn, dn_item_data_map dnidm, discrepancy_note_type dnt, resolution_status rs"
                 + " where (dn.entity_type = 'itemData' or dn.entity_type = 'itemdata')" + " and dnidm.item_data_id in (" + idataIds
                 + ") and dn.discrepancy_note_id = dnidm.discrepancy_note_id" + " and dn.resolution_status_id = rs.resolution_status_id"
