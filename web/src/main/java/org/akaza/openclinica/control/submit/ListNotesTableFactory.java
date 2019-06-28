@@ -109,13 +109,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
         // https://jira.openclinica.com/browse/OC-9952
         tableFacade.setMaxRows(50);
-        tableFacade.setColumnProperties("studySubject.label", "siteId", "discrepancyNoteBean.disType","discrepancyNoteBean.resolutionStatus",
+        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.threadNumber", "siteId", "discrepancyNoteBean.disType","discrepancyNoteBean.resolutionStatus",
                 "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus",
                 "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.detailedNotes", "numberOfNotes", "discrepancyNoteBean.user",
                 "actions");
 
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
+        configureColumn(row.getColumn("discrepancyNoteBean.threadNumber"), resword.getString("query_id"), null, null, true, true);
         configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
                 true);
@@ -233,22 +234,31 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
             h.put("entityName", discrepancyNoteBean.getEntityName());
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
+            DiscrepancyNoteBean parentdNBean;
+            if (discrepancyNoteBean.getParentDnId() > 0) {
+                dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findLatestChildByParent(
+                        discrepancyNoteBean.getParentDnId());
+                parentdNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findByPK(discrepancyNoteBean.getParentDnId());
+            } else {
+                // this entity is parent
+                dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findLatestChildByParent(
+                        discrepancyNoteBean.getId());
+                parentdNBean = discrepancyNoteBean;
+            }
             // if DisType is QUERY(3) and ResolutionStatus is UPDATE or CLOSED
             // then find latest detailedNotes
             if (discrepancyNoteBean.getDisType().equals(DiscrepancyNoteType.QUERY) &&
                     (discrepancyNoteBean.getResStatus().equals(ResolutionStatus.UPDATED)) ||
                     discrepancyNoteBean.getResStatus().equals(ResolutionStatus.CLOSED) ) {
-                if (discrepancyNoteBean.getParentDnId() > 0) {
-                    dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findLatestChildByParent(
-                            discrepancyNoteBean.getParentDnId());
-                } else {
-                    // this entity is parent
-                    dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findLatestChildByParent(
-                            discrepancyNoteBean.getId());
-                }
+
                 h.put("discrepancyNoteBean.detailedNotes", dNBean.getDetailedNotes());
             } else {
                 h.put("discrepancyNoteBean.detailedNotes", discrepancyNoteBean.getDetailedNotes());
+            }
+            if (parentdNBean.getThreadNumber() == null || parentdNBean.getThreadNumber() == 0 ) {
+                h.put("discrepancyNoteBean.threadNumber", resword.getString("na") );
+            } else {
+                h.put("discrepancyNoteBean.threadNumber", parentdNBean.getThreadNumber());
             }
             h.put("numberOfNotes", discrepancyNoteBean.getNumChildren());
             h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());

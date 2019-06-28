@@ -28,6 +28,7 @@ public class ViewNotesSortCriteria {
         SORT_BY_TABLE_COLUMN.put("discrepancyNoteBean.createdDate", "date_created");
         SORT_BY_TABLE_COLUMN.put("days", "days");
         SORT_BY_TABLE_COLUMN.put("age", "age");
+        SORT_BY_TABLE_COLUMN.put("discrepancyNoteBean.threadNumber", "thread_number");
     }
 
     private final Map<String, String> sorters = new HashMap<String, String>();

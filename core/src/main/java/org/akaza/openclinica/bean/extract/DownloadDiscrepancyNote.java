@@ -197,6 +197,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         if(includeHeaderRow) {
             writer.append("Participant ID");
             writer.append(",");
+            writer.append("Query ID");
+            writer.append(",");
             writer.append("Participant Status");
             writer.append(",");
             writer.append("Study/Site OID");
@@ -257,6 +259,13 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         //Fields with embedded commas must be
         // delimited with double-quote characters.
         writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getLabel()));
+        writer.append(",");
+
+        String tn = "N/A";
+        if (discNoteBean.getThreadNumber() != null && discNoteBean.getThreadNumber() != 0 ) {
+            tn = discNoteBean.getThreadNumber()+"";
+        }
+        writer.append(escapeQuotesInCSV(tn));
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getStatus().getName()));
@@ -686,6 +695,14 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
             String daysSinceUpdated = escapeQuotesInCSV(dnBean.getDays()+"");
             cell = createCell("Days Since Updated", daysSinceUpdated.equals("0") ? "" : daysSinceUpdated +"");
+            table.addCell(cell);
+
+            String tn = "N/A";
+            if (dnBean.getThreadNumber() != null && dnBean.getThreadNumber() != 0 ) {
+                tn = dnBean.getThreadNumber()+"";
+            }
+            cell = createCell("Query ID", tn);
+            cell.setColspan(2);
             table.addCell(cell);
             
         }

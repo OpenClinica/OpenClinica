@@ -110,6 +110,9 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                 b.setItemId(rs.getInt("item_id"));
             }
 
+            b.setThreadUuid(rs.getString("thread_uuid"));
+            b.setThreadNumber(rs.getInt("thread_number"));
+
             return b;
         }
     };
@@ -218,7 +221,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                 }
             } else {
                 // set default sorting OC-9405
-                String[] defaultSort = {"days", "site_id", "label"};
+                String[] defaultSort = {"days", "site_id", "label", "thread_number"};
                 int count = 0;
                 for (String sortKey : defaultSort) {
                     count++;
