@@ -1485,14 +1485,6 @@
                                   <span>Italy</span>&nbsp;&nbsp;<span class="the-country-code">+39</span>
                               </td>
                           </tr>
-                          <tr class="country-option" data-country="JP">
-                              <td class="flag-holder">
-                                  <div class="the-flag" style="background-position: 0px -429px;"></div>
-                              </td>
-                              <td>
-                                  <span>Japan</span>&nbsp;&nbsp;<span class="the-country-code">+81</span>
-                              </td>
-                          </tr>
                           <tr class="country-option" data-country="NL">
                               <td class="flag-holder">
                                   <div class="the-flag" style="background-position: 0px -1441px;"></div>
@@ -2023,13 +2015,6 @@
             name: 'Italy',
             phoneCode: '+39',
             countryCode: 'IT'
-        },
-        {
-            backgroundPositionLeft: 0,
-            backgroundPositionTop: -429,
-            name: 'Japan',
-            phoneCode: '+81',
-            countryCode: 'JP'
         },
         {
             backgroundPositionLeft: 0,
