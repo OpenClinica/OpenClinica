@@ -282,7 +282,7 @@ public class EnketoUrlService {
             query.setUser(dn.getUserAccountByOwnerId().getUserName());
             if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.QUERY.getValue()) {
                 query.setType(QUERY);
-                query.setAssigned_to(dn.getUserAccount().getUserName());
+                query.setAssigned_to(dn.getUserAccount()!=null? dn.getUserAccount().getUserName():null);
             } else if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.REASON.getValue()) {
                 query.setType(REASON);
             } else if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.ANNOTATION.getValue()) {
