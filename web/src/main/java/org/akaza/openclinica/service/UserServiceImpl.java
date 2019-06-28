@@ -599,12 +599,17 @@ public class UserServiceImpl implements UserService {
             logger.error("Participant account not found");
             return null;
         }
-        String accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
-
-        if (accessCode == null) {
-            logger.error(" Access code from Keycloack returned null ");
-            return null;
+        
+        String accessCode = null;
+        if(auditAccessCodeViewing) {
+        	 accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
+        	 if (accessCode == null) {
+                 logger.error(" Access code from Keycloack returned null ");
+                 return null;
+             }
         }
+       
+       
         if (tenantStudy.getStudy() != null)
             tenantStudy = tenantStudy.getStudy();
 
@@ -616,7 +621,10 @@ public class UserServiceImpl implements UserService {
                 if (moduleConfigAttributeDTO != null) {
                     logger.info("Participant Access Link is :{}", moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
                     ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();
-                    participantAccessDTO.setAccessCode(accessCode);
+                    
+                    if(auditAccessCodeViewing) {
+                    	 participantAccessDTO.setAccessCode(accessCode);
+                    }                   
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
