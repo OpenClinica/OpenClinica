@@ -374,7 +374,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 }
             }
         }
-        // remove all the roles that are not there for this user
+        // If role sizes are different update the flag
         if (modifiedSURArray.size() != existingStudyUserRoles.size())
             studyUserRoleUpdated = true;
         if (currentActiveStudyValid == false) {
