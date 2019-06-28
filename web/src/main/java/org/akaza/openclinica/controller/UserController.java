@@ -198,7 +198,7 @@ public class UserController {
     @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST )
     public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid,
-    		@RequestParam( value = "includeRelatedInfo", defaultValue = "n", required = false ) String includeRelatedInfo) throws InterruptedException {
+    		@RequestParam( value = "includeParticipateRelatedInfo", defaultValue = "n", required = false ) String includeParticipateRelatedInfo) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
@@ -207,7 +207,7 @@ public class UserController {
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
         boolean incRelatedInfo = false;
-        if(includeRelatedInfo!=null && includeRelatedInfo.trim().toUpperCase().equals("Y")) {
+        if(includeParticipateRelatedInfo!=null && includeParticipateRelatedInfo.trim().toUpperCase().equals("Y")) {
         	incRelatedInfo = true;
         }
         

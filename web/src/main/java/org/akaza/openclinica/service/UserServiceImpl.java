@@ -342,24 +342,31 @@ public class UserServiceImpl implements UserService {
 
         try {
             for (StudySubject studySubject : studySubjects) {
-                /**
-                 * OC-10640
-                 * AC4: Participant contact information and their Participate related information should only be returned
-                 *  for participants that are in available or signed status.
-                 */
-                if (studySubject.getStatus().equals(Status.AVAILABLE)
-                        || studySubject.getStatus().equals(Status.SIGNED)) {
+            	if (!studySubject.getStatus().equals(Status.DELETED)
+                        && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
+            		 /**
+                     * OC-10640
+                     * AC4: Participant contact information and their Participate related information should only be returned
+                     *  for participants that are in available or signed status.
+                     */
+                    if (studySubject.getStatus().equals(Status.AVAILABLE)
+                            || studySubject.getStatus().equals(Status.SIGNED)) {
 
-                    OCUserDTO userDTO = buildOcUserDTO(studySubject,incRelatedInfo);
-                    //Get accessToken from Keycloak
+                        OCUserDTO userDTO = buildOcUserDTO(studySubject,incRelatedInfo);
+                        //Get accessToken from Keycloak
 
-
-                    ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean);
-                    if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
-                        userDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                        if(incRelatedInfo) {
+                        	ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean);
+                            if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
+                                userDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                            }	
+                        }
+                        
+                        userDTOS.add(userDTO);
                     }
-                    userDTOS.add(userDTO);
-                }
+                    
+            	}            		
+               
             }
             // add a new method to write this object into text file
             writeToFile(userDTOS, studyOid, fileName);
