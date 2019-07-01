@@ -1742,10 +1742,10 @@
             $('#connect-button').attr('disabled', 'disabled');
     }
 
-    function getAccessCode(returnAccessCode) {
+    function getAccessCode(accessCode) {
         jQuery.ajax({
             type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?returnAccessCode='+returnAccessCode,
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?accessCode='+accessCode,
             success: function(data) {
                 $('#access-code-input').val(data.accessCode);
                 $('#access-url').text(data.host);
