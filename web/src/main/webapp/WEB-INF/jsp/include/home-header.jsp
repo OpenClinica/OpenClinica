@@ -76,8 +76,8 @@
 <jsp:include page="../include/showPopUp.jsp"/>
 >
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/client.js"></script>
+<script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+<script type="text/javascript" src="js/lib/client.js"></script>
 <script type="text/javascript">
     var storage = new CrossStorageClient(crossStorageURL, {
         timeout: 7000});
