@@ -166,11 +166,11 @@ public class UserController {
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/accessLink", method = RequestMethod.GET )
     public ResponseEntity<ParticipantAccessDTO> getAccessLink(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid,
-    		@RequestParam( value = "accessCode", defaultValue = "n", required = false ) String accessCode) {
+    		@RequestParam( value = "includeAccessCode", defaultValue = "n", required = false ) String includeAccessCode) {
     	
-    	boolean auditAccessCodeViewing = false;
-        if(accessCode!=null && accessCode.trim().toUpperCase().equals("Y")) {
-        	auditAccessCodeViewing = true;
+    	boolean incldAccessCode = false;
+        if(includeAccessCode!=null && includeAccessCode.trim().toUpperCase().equals("Y")) {
+        	incldAccessCode = true;
         }
         
         utilService.setSchemaFromStudyOid(studyOid);
@@ -178,7 +178,7 @@ public class UserController {
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 
-        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,auditAccessCodeViewing);
+        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,true,incldAccessCode);
         if (participantAccessDTO == null) {
             logger.error("REST request to GET AccessLink Object for Participant not found ");
             return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.NOT_FOUND);

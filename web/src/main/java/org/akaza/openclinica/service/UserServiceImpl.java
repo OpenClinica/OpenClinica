@@ -583,6 +583,10 @@ public class UserServiceImpl implements UserService {
 
 
     public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
+    	return getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,auditAccessCodeViewing,true);
+    }
+    
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing,boolean includeAccessCode) {
         Study tenantStudy = getStudy(studyOid);
         if (!validateService.isParticipateActive(tenantStudy)) {
             logger.error("Participant account is not Active");
@@ -601,7 +605,7 @@ public class UserServiceImpl implements UserService {
         }
         
         String accessCode = null;
-        if(auditAccessCodeViewing) {
+        if(includeAccessCode) {
         	 accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
         	 if (accessCode == null) {
                  logger.error(" Access code from Keycloack returned null ");
