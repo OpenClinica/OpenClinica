@@ -2061,10 +2061,10 @@
     ];
 
     var form = $('#contactInformationForm');
-    var inputs = form.find('input');
     form.on('keyup', 'input', function(e) {
         if (e.keyCode === 9) { // keycode 9 is Tab
             e.preventDefault;
+            enableDisableControls();
             return false;
         }
     });
@@ -2072,6 +2072,8 @@
         if (e.keyCode !== 9)
             return;
 
+        enableDisableControls();
+        var inputs = form.find('input:not(:disabled)');
         var index = $.inArray(this, inputs);
         index += e.shiftKey ? -1 : 1;
         if (index < 0) {
