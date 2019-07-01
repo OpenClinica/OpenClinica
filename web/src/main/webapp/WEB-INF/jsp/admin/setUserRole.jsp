@@ -64,6 +64,7 @@
     <td><div class="formfieldXL_BG">
         <select name="studyId" class="formfieldXL" onchange="sendUrl();">
          <c:forEach var="userStudy" items="${studies}">
+		 <c:if test = "${userStudy.status.getName() ne 'removed'}">
            <c:choose>
            <c:when test="${userStudy.parentStudyId > 0}">
                 <c:choose>
@@ -80,12 +81,13 @@
                    <c:when test="${studyId==userStudy.id}">
                        <option value="<c:out value="${userStudy.id}"/>" selected><c:out value="${userStudy.name}"/>
                    </c:when>
-                   <c:otherwise>
-                       <option value="<c:out value="${userStudy.id}"/>"><c:out value="${userStudy.name}"/>
+                   <c:otherwise>					   
+						<option value="<c:out value="${userStudy.id}"/>"><c:out value="${userStudy.name}"/>					                        
                    </c:otherwise>
                 </c:choose>
            </c:otherwise>
            </c:choose>
+		   </c:if> 
          </c:forEach>
        </select>
        </div>
