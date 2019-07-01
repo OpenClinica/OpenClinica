@@ -141,9 +141,12 @@ public class StudyParticipantController {
 			} catch (Exception e) {
 			    System.err.println(e.getMessage()); 
 			    
-				String validation_failed_message = e.getMessage();
-			    responseFailureStudyParticipantSingleDTO.getMessage().add(validation_failed_message);
-			    ResponseEntity response = new ResponseEntity(responseFailureStudyParticipantSingleDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+				String errorMsg = e.getMessage();
+				HashMap<String, String> pmap = new HashMap<>();
+	            pmap.put("studyOid", studyOID);
+	            pmap.put("siteOid", siteOID);
+	    		ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, pmap);
+			    ResponseEntity response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 				return response;
 			  }
 		}
@@ -279,10 +282,14 @@ public class StudyParticipantController {
 					
 			subjectTransferBean.setOwner(this.participantService.getUserAccount(request));
 			
-			StudyBean tenantstudyBean = this.getRestfulServiceHelper().setSchema(studyOID, request);
-
-
-			subjectTransferBean.setStudy(tenantstudyBean);
+			StudyBean tenantstudyBean = null;
+			try {
+				tenantstudyBean = this.getRestfulServiceHelper().setSchema(studyOID, request);
+				subjectTransferBean.setStudy(tenantstudyBean);
+			}catch(OpenClinicaSystemException oe) {
+				throw new Exception(oe.getErrorCode());				
+			}
+			
 			
 			if(siteOID != null) {
 				StudyBean siteStudy = getStudyDAO().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
@@ -320,15 +327,13 @@ public class StudyParticipantController {
 	        	}
 	        }
 	        
-	        if (errorMessages != null && errorMessages.size() != 0) {
-	        	ResponseFailureStudyParticipantDTO responseFailure = new ResponseFailureStudyParticipantDTO();
-	        	responseFailure.setMessage(errorMessages);
-	        	responseFailure.getParams().add("studyOID " + studyOID);
-	        	if(subjectTransferBean.getSiteIdentifier() != null) {
-	        		responseFailure.getParams().add("siteOID " + subjectTransferBean.getSiteIdentifier());
-	        	}
-	    		
-	    		response = new ResponseEntity(responseFailure, org.springframework.http.HttpStatus.BAD_REQUEST);
+	        if (errorMessages != null && errorMessages.size() != 0) {	        		    		
+	        	 String errorMsg = errorMessages.get(0);
+	             HashMap<String, String> pmap = new HashMap<>();
+	             pmap.put("studyOid", studyOID);
+	             pmap.put("siteOid", subjectTransferBean.getSiteIdentifier());
+	    		 ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg,pmap);
+	    		 response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 	        } else {
 				String accessToken = utilService.getAccessTokenFromRequest(request);
 				String customerUuid = utilService.getCustomerUuidFromRequest(request);
