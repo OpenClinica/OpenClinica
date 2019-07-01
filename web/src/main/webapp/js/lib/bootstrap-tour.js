@@ -63,7 +63,7 @@ jQuery(document).ready(function() {
                                                             </td> \
                                                             <td style='padding: 5px 0;'> \
                                                                 <span> \
-                                                                    <span style='font-size: 16px; font-weight: 600;'>Run data reconciliation report</span>\
+                                                                    <span style='font-size: 16px; font-weight: 600;'>Run data re-abstraction report</span>\
                                                                 </span> \
                                                             </td> \
                                                         </tr> \

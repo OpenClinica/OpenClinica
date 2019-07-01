@@ -768,6 +768,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 xml.append("EntityName=\"" + s + "\" ");
             }
         }
+
+        if (dn.getThreadNumber() != null && dn.getThreadNumber()!=0) {
+            String s = String.valueOf(dn.getThreadNumber());
+            if (s.length() > 0) {
+                xml.append("QueryID=\"" + s + "\" ");
+            }
+        }
+
         int n = dn.getNumberOfChildNotes();
         if (n > 0) {
             xml.append("NumberOfChildNotes=\"" + dn.getNumberOfChildNotes() + "\"");

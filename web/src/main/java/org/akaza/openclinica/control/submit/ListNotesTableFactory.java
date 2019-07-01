@@ -361,7 +361,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
             for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
                 // filter only show query and reason_for_change type
-                if (type.getId() == 3 || type.getId() == 4) {
+                if (type.getId() == 2 || type.getId() == 3 || type.getId() == 4) {
                     this.addOption(Integer.toString(type.getId()), type.getName());
                 }
             }

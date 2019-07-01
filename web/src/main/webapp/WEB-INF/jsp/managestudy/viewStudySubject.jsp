@@ -1485,14 +1485,6 @@
                                   <span>Italy</span>&nbsp;&nbsp;<span class="the-country-code">+39</span>
                               </td>
                           </tr>
-                          <tr class="country-option" data-country="JP">
-                              <td class="flag-holder">
-                                  <div class="the-flag" style="background-position: 0px -429px;"></div>
-                              </td>
-                              <td>
-                                  <span>Japan</span>&nbsp;&nbsp;<span class="the-country-code">+81</span>
-                              </td>
-                          </tr>
                           <tr class="country-option" data-country="NL">
                               <td class="flag-holder">
                                   <div class="the-flag" style="background-position: 0px -1441px;"></div>
@@ -1570,6 +1562,18 @@
     <tr>
       <td><div class="lines"></div></td>
     </tr>
+    <tr class="reset-participant-access-code hide">
+      <td>
+        <label>
+          <input type="checkbox" name="reset_participant_access_code" value="true">
+          <fmt:message key="reset_participant_access_code" bundle="${resword}"/>
+        </label>
+        <br><br>
+      </td>
+    </tr>
+    <tr class="reset-participant-access-code hide">
+      <td><div class="lines"></div></td>
+    </tr>
     <tr>
       <td colspan="2" style="text-align: right;">
         <span id="inviting" class="left hide">
@@ -1604,7 +1608,7 @@
                   <span><fmt:message key="access_code" bundle="${resword}"/></span>
                 </td>
                 <td valign="top" id="access-code-td">
-                  <input id="access-code-input" onfocus="this.select()" type="password" readonly="readonly" value="" size="45" class="formfield form-control">
+                  <input id="access-code-input" onfocus="this.select()" type="password" readonly="readonly" value="Loading..." size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
                 </td>
                 <td valign="top" class="grayed-out" style="padding-top:4px;">
@@ -1699,6 +1703,7 @@
         if (status) {
             $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
             $('#view-access-link').show();
+            $('tr.reset-participant-access-code').show();
         }
     }
     function enableDisableControls() {
@@ -1873,7 +1878,6 @@
         });
 
         jQuery('#participateAccess').click(function() {
-            getAccessCode();
             $('#eye').show();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
@@ -1897,6 +1901,7 @@
         });
 
         jQuery('#eye').click(function() {
+            getAccessCode();
             $(this).hide();
             $('#access-code-input').attr('type', 'text');
         });
@@ -2013,13 +2018,6 @@
         },
         {
             backgroundPositionLeft: 0,
-            backgroundPositionTop: -429,
-            name: 'Japan',
-            phoneCode: '+81',
-            countryCode: 'JP'
-        },
-        {
-            backgroundPositionLeft: 0,
             backgroundPositionTop: -1441,
             name: 'Netherlands',
             phoneCode: '+31',
@@ -2063,10 +2061,10 @@
     ];
 
     var form = $('#contactInformationForm');
-    var inputs = form.find('input');
     form.on('keyup', 'input', function(e) {
         if (e.keyCode === 9) { // keycode 9 is Tab
             e.preventDefault;
+            enableDisableControls();
             return false;
         }
     });
@@ -2074,6 +2072,8 @@
         if (e.keyCode !== 9)
             return;
 
+        enableDisableControls();
+        var inputs = form.find('input:not(:disabled)');
         var index = $.inArray(this, inputs);
         index += e.shiftKey ? -1 : 1;
         if (index < 0) {
