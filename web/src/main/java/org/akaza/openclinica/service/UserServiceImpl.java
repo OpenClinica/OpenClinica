@@ -626,9 +626,8 @@ public class UserServiceImpl implements UserService {
                     logger.info("Participant Access Link is :{}", moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
                     ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();
                     
-                    if(auditAccessCodeViewing) {
-                    	 participantAccessDTO.setAccessCode(accessCode);
-                    }                   
+                    
+                    participantAccessDTO.setAccessCode(accessCode);                                       
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
