@@ -166,10 +166,10 @@ public class UserController {
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/accessLink", method = RequestMethod.GET )
     public ResponseEntity<ParticipantAccessDTO> getAccessLink(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid,
-    		@RequestParam( value = "returnAccessCode", defaultValue = "n", required = false ) String returnAccessCode) {
+    		@RequestParam( value = "accessCode", defaultValue = "n", required = false ) String accessCode) {
     	
     	boolean auditAccessCodeViewing = false;
-        if(returnAccessCode!=null && returnAccessCode.trim().toUpperCase().equals("Y")) {
+        if(accessCode!=null && accessCode.trim().toUpperCase().equals("Y")) {
         	auditAccessCodeViewing = true;
         }
         
