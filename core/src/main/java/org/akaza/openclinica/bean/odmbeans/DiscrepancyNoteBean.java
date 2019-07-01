@@ -25,6 +25,8 @@ public class DiscrepancyNoteBean extends ElementOIDBean {
     private int numberOfChildNotes;
     private List<ChildNoteBean> childNotes = new ArrayList<ChildNoteBean>();
     private String entityName;
+    private String threadUuid;
+    private Integer threadNumber;
     
     public String getStatus() {
         return status;
@@ -63,5 +65,21 @@ public class DiscrepancyNoteBean extends ElementOIDBean {
 
     public void setEntityName(String attribute) {
         this.entityName = attribute;
+    }
+
+    public Integer getThreadNumber() {
+        return threadNumber;
+    }
+
+    public void setThreadNumber(Integer threadNumber) {
+        this.threadNumber = threadNumber;
+    }
+
+    public String getThreadUuid() {
+        return threadUuid;
+    }
+
+    public void setThreadUuid(String threadUuid) {
+        this.threadUuid = threadUuid;
     }
 }

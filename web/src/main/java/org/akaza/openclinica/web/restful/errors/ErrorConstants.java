@@ -83,7 +83,7 @@ public class ErrorConstants {
     public static final String ERR_MISSING_START_DATE = "errorCode.missingStartDate";
     public static final String ERR_INVALID_START_DATE = "errorCode.invalidStartDate";
     public static final String ERR_INVALID_END_DATE = "errorCode.invalidEndDate";
-    public static final String ERR_EVENT_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
+    public static final String ERR_EVENT_REPEAT_KEY_TOO_LARGE = "errorCode.eventRepeatKeyTooLarge";
     public static final String ERR_INVALID_EVENT_REPEAT_KEY = "errorCode.invalidStudyEventRepeatKey";
 
     public static final String ERR_ITEM_TYPE_NOT_SUPPORTED = "errorCode.itemTypeNotSupportedInImport";
@@ -142,7 +142,8 @@ public class ErrorConstants {
     public static final String ERR_EVENT_ALREADY_EXISTS = "errorCode.eventAlreadyExists";
 
     public static final String ERR_INVALID_REPEAT_KEY = "errorCode.invalidRepeatKey";
-    public static final String ERR_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
+    public static final String ERR_GROUP_REPEAT_KEY_TOO_LARGE = "errorCode.groupRepeatKeyTooLarge";
 
     public static final String ERR_MISSING_STUDY_EVENT_REPEAT_KEY = "errorCode.missingStudyEventRepeatKey";
+    public static final String ERR_FORM_MISSING_STUDY_EVENT_CONSTRUCT = "errorCode.formMissingStudyEventConstruct";
 }

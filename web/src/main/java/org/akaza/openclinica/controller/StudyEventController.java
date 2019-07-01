@@ -613,13 +613,7 @@ public class StudyEventController {
 		if (siteOid != null)
 			siteOid = siteOid.toUpperCase();
 
-		try {
-			if (!validateService.isStudyAvailable(studyOid)) {
-				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
-			}
-			if (siteOid!=null && !validateService.isStudyAvailable(siteOid)) {
-				throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
-			}
+		try {			
 			if (!validateService.isStudyOidValid(studyOid)) {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
 			}
@@ -631,6 +625,12 @@ public class StudyEventController {
 			}
 			if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+			}
+			if (!validateService.isStudyAvailable(studyOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
+			}
+			if (siteOid!=null && !validateService.isStudyAvailable(siteOid)) {
+				throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
 			}
 			if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
