@@ -580,6 +580,10 @@ public class UserServiceImpl implements UserService {
 
 
     public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
+    	return getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,auditAccessCodeViewing,true);
+    }
+    
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing,boolean includeAccessCode) {
         Study tenantStudy = getStudy(studyOid);
         if (!validateService.isParticipateActive(tenantStudy)) {
             logger.error("Participant account is not Active");
@@ -596,12 +600,17 @@ public class UserServiceImpl implements UserService {
             logger.error("Participant account not found");
             return null;
         }
-        String accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
-
-        if (accessCode == null) {
-            logger.error(" Access code from Keycloack returned null ");
-            return null;
+        
+        String accessCode = null;
+        if(includeAccessCode) {
+        	 accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
+        	 if (accessCode == null) {
+                 logger.error(" Access code from Keycloack returned null ");
+                 return null;
+             }
         }
+       
+       
         if (tenantStudy.getStudy() != null)
             tenantStudy = tenantStudy.getStudy();
 
@@ -613,7 +622,9 @@ public class UserServiceImpl implements UserService {
                 if (moduleConfigAttributeDTO != null) {
                     logger.info("Participant Access Link is :{}", moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
                     ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();
-                    participantAccessDTO.setAccessCode(accessCode);
+                    
+                    
+                    participantAccessDTO.setAccessCode(accessCode);                                       
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
