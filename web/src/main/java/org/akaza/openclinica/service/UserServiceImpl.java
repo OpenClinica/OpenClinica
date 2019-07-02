@@ -245,7 +245,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        ocUserDTO = buildOcUserDTO(studySubject);
+        ocUserDTO = buildOcUserDTO(studySubject,true);
         ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum, restext));
 
         return ocUserDTO;
@@ -324,7 +324,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail) {
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo) {
 
         CoreResources.setRequestSchema(schema);
 
@@ -342,20 +342,33 @@ public class UserServiceImpl implements UserService {
 
         try {
             for (StudySubject studySubject : studySubjects) {
-                // subject is not removed or auto-removed
-                if (!studySubject.getStatus().equals(Status.DELETED)
+            	if (!studySubject.getStatus().equals(Status.DELETED)
                         && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
 
-                    OCUserDTO userDTO = buildOcUserDTO(studySubject);
-                    //Get accessToken from Keycloak
+            		 /**
+                     * OC-10640
+                     * AC4: Participant contact information and their Participate related information should only be returned
+                     *  for participants that are in available or signed status.
+                     */
+                    if (studySubject.getStatus().equals(Status.AVAILABLE)
+                            || studySubject.getStatus().equals(Status.SIGNED)) {
 
+                        
+                        //Get accessToken from Keycloak                      
+                    	OCUserDTO userDTO = buildOcUserDTO(studySubject,incRelatedInfo);
+                    	ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo);                            
+                        
+                        
+                        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
+                            userDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                        }	
+                        
+                        userDTOS.add(userDTO);
 
-                    ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,false);
-                    if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
-                        userDTO.setAccessCode(participantAccessDTO.getAccessCode());
                     }
-                    userDTOS.add(userDTO);
-                }
+                    
+            	}            		
+               
             }
             // add a new method to write this object into text file
             writeToFile(userDTOS, studyOid, fileName);
@@ -374,7 +387,7 @@ public class UserServiceImpl implements UserService {
         StudySubject studySubject = getStudySubject(ssid, study);
 
         if (studySubject != null) {
-            ocUserDTO = buildOcUserDTO(studySubject);
+            ocUserDTO = buildOcUserDTO(studySubject,true);
         }
         return ocUserDTO;
     }
@@ -625,7 +638,7 @@ public class UserServiceImpl implements UserService {
         return auditLogEventDTO;
     }
 
-    private OCUserDTO buildOcUserDTO(StudySubject studySubject) {
+    private OCUserDTO buildOcUserDTO(StudySubject studySubject,boolean incRelatedInfo) {
         OCUserDTO ocUserDTO = new OCUserDTO();
         ocUserDTO.setParticipantId(studySubject.getLabel());
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
@@ -635,7 +648,10 @@ public class UserServiceImpl implements UserService {
             ocUserDTO.setPhoneNumber(studySubjectDetail.getPhone() != null ? studySubjectDetail.getPhone() : "");
             ocUserDTO.setLastName(studySubjectDetail.getLastName() != null ? studySubjectDetail.getLastName() : "");
             ocUserDTO.setIdentifier(studySubjectDetail.getIdentifier() != null ? studySubjectDetail.getIdentifier() : "");
-            ocUserDTO.setStatus(studySubject.getUserStatus());
+            
+            if(incRelatedInfo) {
+            	ocUserDTO.setStatus(studySubject.getUserStatus());
+            }
         } else {
             ocUserDTO.setFirstName("");
             ocUserDTO.setEmail("");

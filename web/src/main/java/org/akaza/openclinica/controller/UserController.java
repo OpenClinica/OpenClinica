@@ -197,7 +197,8 @@ public class UserController {
 
     @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST )
-    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
+    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid,
+    		@RequestParam( value = "includeParticipateRelatedInfo", defaultValue = "n", required = false ) String includeParticipateRelatedInfo) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
@@ -205,6 +206,11 @@ public class UserController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
+        boolean incRelatedInfo = false;
+        if(includeParticipateRelatedInfo!=null && includeParticipateRelatedInfo.trim().toUpperCase().equals("Y")) {
+        	incRelatedInfo = true;
+        }
+        
         try {
             if (!validateService.isStudyOidValid(studyOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
@@ -244,7 +250,7 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-      String uuid= startExtractJob( studyOid,  siteOid,  accessToken,  customerUuid,  userAccountBean);
+      String uuid= startExtractJob( studyOid,  siteOid,  accessToken,  customerUuid,  userAccountBean,incRelatedInfo);
 
         logger.info("REST request to Extract Participants info ");
         return new ResponseEntity<Object>("job uuid: "+uuid,HttpStatus.OK);
@@ -284,7 +290,7 @@ public class UserController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startExtractJob(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean) {
+    public String startExtractJob(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean,boolean incRelatedInfo) {
         utilService.setSchemaFromStudyOid(studyOid);
         String schema = CoreResources.getRequestSchema();
 
@@ -294,7 +300,7 @@ public class UserController {
         JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE,null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             try {
-                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail);
+                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail,incRelatedInfo);
             }catch(Exception e) {
                 logger.error("Exeception is thrown while extracting job : " + e);
             }
