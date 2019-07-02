@@ -140,7 +140,7 @@
     </table>
 
     <script>
-      $('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html#/job-controller');
+      $('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html');
       $.fn.dataTable.moment(dateFormat);
       var datatable = $('#tbl-jobs').DataTable({
         dom: 'frtilp',
@@ -198,7 +198,6 @@
         datatable.settings()[0].oLanguage.sEmptyTable = formatError(e);
         datatable.draw();
       });
-      $('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_log" bundle="${resword}"/></b>');
       $('#tbl-jobs')
         .on('click', '.icon-trash', function() {
           if(confirm('<fmt:message key="jobs_del_confirm" bundle="${resword}"/>')) {
