@@ -225,7 +225,23 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("days", discrepancyNoteBean.getDays());
             h.put("siteId", discrepancyNoteBean.getSiteId());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
-            h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
+            if (discrepancyNoteBean.getDisType().equals(DiscrepancyNoteType.QUERY) &&
+                    (discrepancyNoteBean.getResStatus().equals(ResolutionStatus.UPDATED)) ||
+                    discrepancyNoteBean.getResStatus().equals(ResolutionStatus.CLOSED) ) {
+                // OC-10617 After update, Queries Table displays incorrect date created.
+                // use the first child createdDate
+                if (discrepancyNoteBean.getParentDnId() > 0) {
+                    dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findFirstChildByParent(
+                            discrepancyNoteBean.getParentDnId());
+                } else {
+                    // this entity is parent
+                    dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findFirstChildByParent(
+                            discrepancyNoteBean.getId());
+                }
+                h.put("discrepancyNoteBean.createdDate", dNBean.getCreatedDate());
+            } else {
+                h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
+            }
             h.put("discrepancyNoteBean.updatedDate", discrepancyNoteBean.getUpdatedDate());
             h.put("eventName", discrepancyNoteBean.getEventName());
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
