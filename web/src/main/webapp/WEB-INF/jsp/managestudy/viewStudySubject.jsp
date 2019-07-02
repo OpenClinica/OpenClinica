@@ -1734,13 +1734,14 @@
             $('#connect-button').attr('disabled', 'disabled');
     }
 
-    function getAccessCode() {
+    function getAccessLink(withAccessCode) {
         jQuery.ajax({
             type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?accesscode=' + (withAccessCode ? 'y' : 'n'),
             success: function(data) {
-                $('#access-code-input').val(data.accessCode);
                 $('#access-url').text(data.host);
+                if (withAccessCode)
+                    $('#access-code-input').val(data.accessCode);
             },
             error: logDump
         });
@@ -1756,6 +1757,7 @@
                 success: updateParticipateInfo,
                 error: logDump
             });
+            getAccessLink(false);
         }
 
         jQuery('#editParticipantID').click(function () {
@@ -1901,7 +1903,7 @@
         });
 
         jQuery('#eye').click(function() {
-            getAccessCode();
+            getAccessLink(true);
             $(this).hide();
             $('#access-code-input').attr('type', 'text');
         });
