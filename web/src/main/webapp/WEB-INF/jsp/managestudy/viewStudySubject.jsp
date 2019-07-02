@@ -1702,8 +1702,9 @@
         var status = participateInfo.status;
         if (status) {
             $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
-            $('#view-access-link').show();
             $('tr.reset-participant-access-code').show();
+            $('#view-access-link').show();
+            getAccessLink(false);
         }
     }
     function enableDisableControls() {
@@ -1757,7 +1758,6 @@
                 success: updateParticipateInfo,
                 error: logDump
             });
-            getAccessLink(false);
         }
 
         jQuery('#editParticipantID').click(function () {
