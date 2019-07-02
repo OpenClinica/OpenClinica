@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
         ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
         if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
-            ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
+            ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,false);
             boolean updateUserStatus = false;
 
             if (participantDTO.isInviteViaSms())
@@ -350,7 +350,7 @@ public class UserServiceImpl implements UserService {
                     //Get accessToken from Keycloak
 
 
-                    ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean);
+                    ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,false);
                     if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
                         userDTO.setAccessCode(participantAccessDTO.getAccessCode());
                     }
@@ -523,35 +523,19 @@ public class UserServiceImpl implements UserService {
             accessCode = (accessDTO.getAccessCode() == null ? "" : accessDTO.getAccessCode());
         }
         StringBuffer sb = new StringBuffer();
-        sb.append("Hi ");
-        sb.append(studySubject.getStudySubjectDetail().getFirstName());
-        sb.append(",");
-        sb.append("<br>");
-        sb.append("<br>");
-
-        sb.append("Thanks for participating in ");
-        sb.append(studyName);
-        sb.append("!");
-        sb.append("<br>");
-        sb.append("<br>");
-
-        sb.append("<a href=\"" + accessLink + "\">Click here to begin</a>");
-        sb.append("<br>");
-        sb.append("<br>");
-
-        sb.append("Or, you may go to: ");
-        sb.append(host);
-        sb.append("<br>");
-
-        sb.append("and enter access code: ");
-        sb.append(accessCode);
-        sb.append("<br>");
-        sb.append("<br>");
-
-        sb.append("Thank you");
-        sb.append("<br>");
-
-        sb.append(studyName + " Team");
+        sb.append("<h1 style=\"font-family:'Didact Gothic',sans-serif;color:#618ebb\">" +
+                "Welcome to " + studyName + " Study!</h1>");
+        sb.append("<p style='text-align:left'>Dear "+ studySubject.getStudySubjectDetail().getFirstName() + ",</p>");
+        sb.append("<p>Thanks for participating in " + studyName + " study! " +
+                "Please click the link below to get started.</p>");
+        sb.append("<p style='text-align:center;margin:25px'>" +
+                "<a href='" + accessLink + "' style=\"display: inline-block; " +
+                "text-decoration: none; background: #eb5424; color: white; padding: 15px 35px; font-weight: bold; " +
+                "font-size: medium; border-radius: 5px;\" " +
+                "target='_blank'> Let's Go -></a></p>");
+        sb.append("<p style= \"margin-bottom: 20px; line-height: 2em;\">You can also access the application by going to: " +
+                "" + host + "<br>and enter the access code: " + accessCode + "</p>");
+        sb.append("<p style= \"margin-bottom: 20px; line-height: 2em;\">Thanks!<br>The " + studyName + " Study Team</p>");
 
         pDTO.setMessage(sb.toString());
 
@@ -582,7 +566,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean) {
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
         Study tenantStudy = getStudy(studyOid);
         if (!validateService.isParticipateActive(tenantStudy)) {
             logger.error("Participant account is not Active");
@@ -620,9 +604,10 @@ public class UserServiceImpl implements UserService {
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
-                    AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId());
-                    auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
-
+                    if(auditAccessCodeViewing) {
+                        AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId());
+                        auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
+                    }
                     return participantAccessDTO;
                 }
             }
