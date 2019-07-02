@@ -146,4 +146,6 @@ public class ErrorConstants {
 
     public static final String ERR_MISSING_STUDY_EVENT_REPEAT_KEY = "errorCode.missingStudyEventRepeatKey";
     public static final String ERR_FORM_MISSING_STUDY_EVENT_CONSTRUCT = "errorCode.formMissingStudyEventConstruct";
+    public static final String ERR_FORMLAYOUTOID_NOT_AVAILABLE = "errorCode.formLayoutOIDNotAvailable";
+
 }

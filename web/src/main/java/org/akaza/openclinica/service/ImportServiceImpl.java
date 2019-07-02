@@ -246,7 +246,7 @@ public class ImportServiceImpl implements ImportService {
                         Object eventCrfObject = null;
                         EventCrf eventCrf = null;
 
-                        eventCrfObject = validateEventCrf(formDataBean, studySubject, studyEvent, studyEventDefinition, userAccount, crf, formLayout);
+                        eventCrfObject = validateEventCrf(formDataBean, studySubject, studyEvent, studyEventDefinition, userAccount, crf, formLayout,edc);
                         if (eventCrfObject instanceof ErrorObj) {
                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, ((ErrorObj) eventCrfObject).getCode(), null, ((ErrorObj) eventCrfObject).getMessage());
                             dataImportReports.add(dataImportReport);
@@ -696,8 +696,10 @@ public class ImportServiceImpl implements ImportService {
         List<EventCrf> eventCrfs = null;
         for (StudyEvent stEvent : studyEvents) {
             eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(stEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
-            if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
-            break;
+            if (eventCrfs.size() > 0) {
+                eventCrf = eventCrfs.get(0);
+                break;
+            }
         }
 
         return eventCrf;
@@ -1096,7 +1098,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private Object validateEventCrf(FormDataBean formDataBean, StudySubject studySubject, StudyEvent studyEvent, StudyEventDefinition studyEventDefinition, UserAccount userAccount, CrfBean crf, FormLayout formLayout) {
+    private Object validateEventCrf(FormDataBean formDataBean, StudySubject studySubject, StudyEvent studyEvent, StudyEventDefinition studyEventDefinition, UserAccount userAccount, CrfBean crf, FormLayout formLayout,EventDefinitionCrf edc) {
 
         EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());
 
@@ -1115,6 +1117,17 @@ public class ImportServiceImpl implements ImportService {
 
 
         if (eventCrf == null) {
+
+            String selectedVersionIds=edc.getSelectedVersionIds();
+            String[] ids = selectedVersionIds.split(",");
+            ArrayList<Integer> idList = new ArrayList<Integer>();
+            for (String id : ids) {
+                idList.add(Integer.valueOf(id));
+            }
+            if(!idList.contains(formLayout.getFormLayoutId()))
+                return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
+
+
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
             updateStudyEvntStatus(studyEvent, userAccount, DATA_ENTRY_STARTED);
@@ -1238,9 +1251,12 @@ public class ImportServiceImpl implements ImportService {
 
     private Object validateEventDefnCrf(Study tenantStudy, StudyEventDefinition studyEventDefinition, CrfBean crf) {
 
-        // Form Invalid OID
-        EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(),
-                tenantStudy.getStudy() == null ? tenantStudy.getStudyId() : tenantStudy.getStudy().getStudyId());
+        EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(),
+                crf.getCrfId(), tenantStudy.getStudyId());
+        if (edc == null) {
+            edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(),
+                    tenantStudy.getStudy().getStudyId());
+        }
         if (edc == null || (edc != null && !edc.getStatusId().equals(Status.AVAILABLE.getCode()))) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORMOID_NOT_FOUND);
         }
