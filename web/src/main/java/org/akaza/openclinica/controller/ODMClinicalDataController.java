@@ -1,12 +1,10 @@
 package org.akaza.openclinica.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiOperation;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.restful.ODMClinicaDataResource;
-import org.cdisc.ns.odm.v130.ODM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.mail.internet.ContentType;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
-import javax.ws.rs.HeaderParam;
 import java.util.Locale;
 
 @Controller
@@ -39,6 +35,7 @@ public class ODMClinicalDataController {
     @Qualifier("dataSource")
     private DataSource dataSource;
 
+    @ApiOperation(value = "To get Clinical Data in Json format")
     @RequestMapping(value = "/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET, produces={MediaType.APPLICATION_JSON_VALUE}, headers = "Accept=application/json")
     public @ResponseBody
     ResponseEntity<Object> getJsonClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,

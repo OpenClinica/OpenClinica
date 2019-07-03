@@ -1,6 +1,8 @@
 package org.akaza.openclinica.config;
 
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -20,8 +22,8 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("api")
                 .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(regex("/auth/api.*"))
+                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+//                .paths(regex("/auth/api.*"))
                 .build();
     }
 

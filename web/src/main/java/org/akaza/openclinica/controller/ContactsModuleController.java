@@ -56,7 +56,7 @@ public class ContactsModuleController {
     public static final String DISABLED = "disabled";
 
 
-    @ApiOperation( value = "To update contacts Module Status " )
+//    @ApiOperation( value = "To update contacts Module Status " )
     @ApiResponses( value = {
             @ApiResponse( code = 200, message = "Successful operation" ),
             @ApiResponse( code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
@@ -92,8 +92,7 @@ public class ContactsModuleController {
         return ResponseEntity.status(HttpStatus.OK).body(contactsModuleDTO);
     }
 
-    @ApiOperation( value = "To get contacts Module Status " )
-
+//    @ApiOperation( value = "To get contacts Module Status " )
     @RequestMapping( value = "/{studyOID}/modules/contacts", method = RequestMethod.GET )
     public ResponseEntity getContactModuleStatus(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid
     ) {
