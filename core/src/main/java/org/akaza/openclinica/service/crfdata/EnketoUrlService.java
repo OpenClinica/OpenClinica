@@ -290,7 +290,7 @@ public class EnketoUrlService {
             }
             query.setThread_id(dn.getThreadUuid());
             Integer threadNumber=dn.getParentDiscrepancyNote().getThreadNumber();
-            query.setVisible_thread_id(addLeadingZeros(String.valueOf(threadNumber)));
+            query.setVisible_thread_id(String.valueOf(threadNumber));
             queryBeans.add(query);
         }
 
@@ -602,12 +602,6 @@ public class EnketoUrlService {
                     data.put(itemName, studySubjectDetail.getPhone()!=null?escapedValue(studySubjectDetail.getPhone()):"");
             }
         }
-    }
-
-    public String addLeadingZeros(String threadNumber) {
-
-        if (threadNumber.length() >= THREAD_NAME_LENGTH) return THREAD_NAME_PREFIX + threadNumber;
-        else return THREAD_NAME_PREFIX + StringUtils.leftPad(threadNumber, THREAD_NAME_LENGTH, "0");
     }
 
     }
