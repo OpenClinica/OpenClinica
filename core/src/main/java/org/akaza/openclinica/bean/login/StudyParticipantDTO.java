@@ -1,6 +1,5 @@
 package org.akaza.openclinica.bean.login;
 
-
 public class StudyParticipantDTO {
 	
     private String subjectKey;
@@ -10,7 +9,7 @@ public class StudyParticipantDTO {
     private String createdAt;
     private String lastModified;
     private String lastModifiedBy;
-
+         
 	public String getSubjectKey() {
 		return subjectKey;
 	}
