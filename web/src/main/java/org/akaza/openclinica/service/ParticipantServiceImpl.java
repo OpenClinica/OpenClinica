@@ -590,25 +590,16 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         StudyParticipantDTO spDTO = new StudyParticipantDTO();
         
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
-        if (studySubjectDetail != null) {
-        	spDTO.setSubjectKey(studySubject.getLabel());
-        	spDTO.setSubjectOid(studySubject.getOcOid());
-            spDTO.setFirstName(studySubjectDetail.getFirstName() != null ? studySubjectDetail.getFirstName() : "");
-            spDTO.setLastName(studySubjectDetail.getLastName() != null ? studySubjectDetail.getLastName() : "");
-            spDTO.setEmail(studySubjectDetail.getEmail() != null ? studySubjectDetail.getEmail() : "");
-            spDTO.setMobileNumber(studySubjectDetail.getPhone() != null ? studySubjectDetail.getPhone() : "");           
-            spDTO.setSecondaryID(studySubject.getSecondaryLabel() != null ? studySubject.getSecondaryLabel() : "");
-            spDTO.setStatus(studySubject.getUserStatus().name());
-        } else {
-        	spDTO.setSubjectKey(studySubject.getLabel());
-        	spDTO.setSubjectOid(studySubject.getOcOid());
-            spDTO.setFirstName("");
-            spDTO.setLastName("");
-            spDTO.setEmail("");
-            spDTO.setMobileNumber("");            
-            spDTO.setSecondaryID(studySubject.getSecondaryLabel() != null ? studySubject.getSecondaryLabel() : "");
-            
-        }
+        spDTO.setSubjectKey(studySubject.getLabel());
+    	spDTO.setSubjectOid(studySubject.getOcOid());
+		
+        spDTO.setFirstName(studySubjectDetail.getFirstName());
+        spDTO.setLastName(studySubjectDetail.getLastName());
+        spDTO.setEmail(studySubjectDetail.getEmail());
+        spDTO.setMobileNumber(studySubjectDetail.getPhone());           
+        spDTO.setSecondaryID(studySubject.getSecondaryLabel());
+        spDTO.setStatus(studySubject.getUserStatus().name());
+    
         return spDTO;
     }
 
