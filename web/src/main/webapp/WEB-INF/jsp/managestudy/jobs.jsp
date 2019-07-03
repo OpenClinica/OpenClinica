@@ -72,9 +72,6 @@
   #tbl-jobs_filter {
     margin-bottom: 3px;
   }
-  #tbl-jobs_wrapper {
-    margin-top: 30px;
-  }
   .icon {
     cursor: pointer;
   }
@@ -121,7 +118,6 @@
     <div>
       <fmt:message key="jobs_description" bundle="${resword}"/>
     </div>
-    <br>
     <table id="tbl-jobs" class="datatable">
       <thead>
         <tr>
@@ -140,7 +136,7 @@
     </table>
 
     <script>
-      $('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html');
+      $('#jobs-doc').attr({href: '${pageContext.request.contextPath}/pages/swagger-ui.html', target: '_blank'});
       $.fn.dataTable.moment(dateFormat);
       var datatable = $('#tbl-jobs').DataTable({
         dom: 'frtilp',
