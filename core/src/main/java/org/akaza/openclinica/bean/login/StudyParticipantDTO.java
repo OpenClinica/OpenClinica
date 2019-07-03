@@ -1,7 +1,5 @@
 package org.akaza.openclinica.bean.login;
 
-import javax.validation.constraints.NotNull;
-
 public class StudyParticipantDTO {
 	
     private String subjectKey;
