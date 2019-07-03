@@ -1,6 +1,6 @@
 package org.akaza.openclinica.service;
 
-import org.akaza.openclinica.bean.login.StudyParticipantDTO;
+import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -25,5 +25,5 @@ public interface ParticipantService {
 								 UserAccountBean user, String accessToken, String customerUuid, MultipartFile file,
 								 JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) throws Exception;
 	
-	 StudyParticipantDTO buildStudyParticipantDTO(StudySubject studySubject);
+	StudyParticipantDetailDTO buildStudyParticipantDetailDTO(StudySubject studySubject);
 }

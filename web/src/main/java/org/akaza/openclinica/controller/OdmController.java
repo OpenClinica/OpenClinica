@@ -5,7 +5,7 @@ import net.sf.json.xml.XMLSerializer;
 import springfox.documentation.annotations.ApiIgnore;
 
 import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.StudyParticipantDTO;
+import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -286,9 +286,9 @@ public class OdmController {
         if(studySubject != null) {
         	logger.info("StudySubject Id: " +studySubject.getLabel());
             
-            StudyParticipantDTO spDTO= new StudyParticipantDTO();
+        	StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
         	
-            spDTO = participantService.buildStudyParticipantDTO(studySubject);
+            spDTO = participantService.buildStudyParticipantDetailDTO(studySubject);
             
            // convert to Json
             ObjectMapper Obj = new ObjectMapper();                                       
