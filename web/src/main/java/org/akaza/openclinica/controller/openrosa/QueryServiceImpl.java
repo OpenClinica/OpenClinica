@@ -148,8 +148,12 @@ public class QueryServiceImpl implements QueryService {
                 parentDN.setUserAccount(childDN.getUserAccount());
                 setResolutionStatus(queryBean, parentDN);
                 parentDN.setUserAccountByOwnerId(helperBean.getContainer().getUser());
-                parentDN.setDetailedNotes(childDN.getDetailedNotes());
                 parentDN.setDiscrepancyNoteType(childDN.getDiscrepancyNoteType());
+
+                // OC-10617 After update, Queries Table displays incorrect date created.
+                // (don't update parent detailedNotes and dateCreated)
+                // parentDN.setDetailedNotes(childDN.getDetailedNotes());
+                // parentDN.setDateCreated(new Date());
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
                 helperBean.setDn(childDN);

@@ -2127,6 +2127,24 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    public EntityBean findFirstChildByParent(int parentId) {
+        DiscrepancyNoteBean eb = new DiscrepancyNoteBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(parentId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(parentId));
+
+        String sql = digester.getQuery("findFirstChildByParent");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
+    }
+
     public int getResolutionStatusIdForSubjectDNFlag(int subjectId, String column) {
         int id = 0;
         unsetTypeExpected();
