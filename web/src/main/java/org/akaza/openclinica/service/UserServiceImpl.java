@@ -356,10 +356,10 @@ public class UserServiceImpl implements UserService {
                         
                         //Get accessToken from Keycloak                      
                     	OCUserDTO userDTO = buildOcUserDTO(studySubject,incRelatedInfo);
-                    	ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo);                            
+                    	ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,false,incRelatedInfo);                            
                         
                         
-                        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
+                        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
                             userDTO.setAccessCode(participantAccessDTO.getAccessCode());
                         }	
                         
