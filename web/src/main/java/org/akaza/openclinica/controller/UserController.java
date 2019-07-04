@@ -305,14 +305,21 @@ public class UserController {
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
         JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE,null);
-        CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+       // CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             try {
-                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail,incRelatedInfo);
+            	 new Thread(new Runnable() {
+   	              public void run(){
+   	               
+   	            	  userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail,incRelatedInfo);
+   				
+   	              }
+   	          }).start();
+              
             }catch(Exception e) {
                 logger.error("Exeception is thrown while extracting job : " + e);
             }
-            return null;
-        });
+         //   return null;
+       // });
         return jobDetail.getUuid();
     }
 
