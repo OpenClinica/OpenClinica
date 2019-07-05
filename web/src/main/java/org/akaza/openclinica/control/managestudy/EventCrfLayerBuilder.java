@@ -663,6 +663,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void linkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, CRFBean crf, String icon) {
+        studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "'); ";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
@@ -676,6 +677,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void lockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, CRFBean crf, String collapsedIcon, String icon) {
+        studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "'); ";
         String onmouseover = "layersShowOrHide('visible','Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "'); ";
@@ -693,6 +695,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void iconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, CRFBean crf, String expandedIcon, String icon) {
+        studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "'); ";
         String onmouseover = "moveObject('Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "', event); ";
