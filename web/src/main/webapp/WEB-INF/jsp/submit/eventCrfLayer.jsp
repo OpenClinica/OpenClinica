@@ -2,6 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<jsp:useBean class="org.apache.commons.lang.StringEscapeUtils" id="esc" />
+
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
@@ -31,41 +33,41 @@
 <c:if test="${studySubjectjectStatusId == 5 || studySubjectjectStatusId == 7}">
 	<c:set var="crfStatus" value="invalid"/>
 </c:if>
-<div id="Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>" style="position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;">
+<div id="Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}" style="position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;">
 		
  <c:choose>
   <c:when test="${crfStatus ==data_entry_completei18n ||crfStatus =='administrative editing'}">
 	<!-- administrative editing -->								
-   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Complete_collapse.gif');" 
+   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Complete_collapse.gif');" 
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
-		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Complete.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Complete.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
 
 		
   </c:when>
   
   <c:when test="${crfStatus ==initial_data_entry_completei18n}">
 	<!-- initial data entry completed -->							
-   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_InitialDEcomplete_collapse.gif');" 
+   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_InitialDEcomplete_collapse.gif');" 
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
-		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_InitialDEcomplete.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_InitialDEcomplete.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
 
 		
   </c:when>
   
   <c:when test="${crfStatus ==double_data_entryi18n}">
 	<!-- double data entry -->							
-   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_DDE_collapse.gif');" 
+   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_DDE_collapse.gif');" 
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
-		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_DDE.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_DDE.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
 
 		
   </c:when>
@@ -76,38 +78,38 @@
   
   <c:when test="${crfStatus ==no_startedi18n }">	
   <!-- we have not started -->
-   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Scheduled.gif');" 
+   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Scheduled.gif');" 
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
-		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Scheduled.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Scheduled.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
   
   </c:when>
   <c:when test="${crfStatus =='invalid' }">
   <!-- this is invalid -->	
-   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Invalid_collapse.gif');" 
+   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Invalid_collapse.gif');" 
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
-		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Invalid.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Invalid.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
   
   </c:when>
   <c:otherwise>
   <!-- all other cases, check to see here -->
-    <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Started.gif');" 
+    <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" onMouseOver="layersShowOrHide('visible','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Started.gif');" 
 	    onClick="layersShowOrHide('hidden','Lock_all'); 
-		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Started.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
+		layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+		javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Started.gif');"><img src="images/spacer.gif" width="144" height="30" border="0"></a>
   
   </c:otherwise>
   </c:choose>
 </div>
 		
-<div id="Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>" style="position: absolute; visibility: hidden; z-index: 3; width: 180px; top: 0px;">
+<div id="Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}" style="position: absolute; visibility: hidden; z-index: 3; width: 180px; top: 0px;">
 		
 			<!-- These DIVs define shaded box borders -->
 			<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -118,7 +120,7 @@
 					  <table border="0" cellpadding="0" cellspacing="0" width="100%">		
 						<tr valign="top">
 						<td class="table_header_row_left">
-						<fmt:message key="subject" bundle="${resword}"/>: <c:out value="${subjectName}"/>
+						<fmt:message key="subject" bundle="${resword}"/>: ${esc.escapeJavaScript(subjectName)}
 		
 						<br>
 		
@@ -139,31 +141,31 @@
 						 <c:choose>
                          <c:when test="${crfStatus ==data_entry_completei18n ||
                          crfStatus =='administrative editing'}">
-						    <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_1_6_1');" 
+						    <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_1_6_1');" 
 										onClick="layersShowOrHide('hidden','Lock_all'); 
-											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Complete.gif');">X</a></td>
+											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Complete.gif');">X</a></td>
 
 														
 							
 					     </c:when>
 					     <c:when test="${crfStatus ==initial_data_entry_completei18n}">
-						    <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_1_6_1');" 
+						    <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_1_6_1');" 
 										onClick="layersShowOrHide('hidden','Lock_all'); 
-											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_InitialDEcomplete.gif');">X</a></td>
+											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_InitialDEcomplete.gif');">X</a></td>
 
 														
 							
 					     </c:when>
 					     <c:when test="${crfStatus ==double_data_entryi18n}">
-						    <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_1_6_1');" 
+						    <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_1_6_1');" 
 										onClick="layersShowOrHide('hidden','Lock_all'); 
-											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_DDE.gif');">X</a></td>
+											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_DDE.gif');">X</a></td>
 
 														
 							
@@ -172,34 +174,34 @@
 							       
 		                 </c:when>
 		                 <c:when test="${crfStatus ==no_startedi18n }">	
-		                   <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_1_6_1');" 
+		                   <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_1_6_1');" 
 										onClick="layersShowOrHide('hidden','Lock_all'); 
-											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Scheduled.gif');">X</a></td>
+											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Scheduled.gif');">X</a></td>
 		                   
 		                 </c:when>
 		                 <c:when test="${crfStatus =='invalid' }">	
-		                   <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_1_6_1');" 
+		                   <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_1_6_1');" 
 										onClick="layersShowOrHide('hidden','Lock_all'); 
-											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Invalid.gif');">X</a></td>
+											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Invalid.gif');">X</a></td>
 		                   
 		                 </c:when>
 		                 <c:otherwise>
-		                  <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_1_6_1');" 
+		                  <td class="table_header_row_left" align="right"><a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_1_6_1');" 
 										onClick="layersShowOrHide('hidden','Lock_all'); 
-											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Started.gif');">X</a></td>
+											layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											layersShowOrHide('hidden','Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+											javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Started.gif');">X</a></td>
 		                  
 		   			
 		                 </c:otherwise>
 		  
 		             </c:choose>			
 						</tr>	
-						<tr id="Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>" style="display: all">
+						<tr id="Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}" style="display: all">
 										<td class="table_cell_left" colspan="2">
 										<c:choose>
 										 <c:when test="${crfStatus==no_startedi18n}">	
@@ -224,7 +226,7 @@
 										
 										</td>
 						</tr>
-						<tr id="Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>" style="display: none">
+						<tr id="Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}" style="display: none">
 							<td colspan="2">
 							<table border="0" cellpadding="0" cellspacing="0" width="100%">		
 							   <c:choose>
@@ -319,7 +321,7 @@
 									
 								 </c:choose>	
 								 </c:if>
-									<%--<tr valign="top"><td class="table_cell_left"><a href="MarkEventCRFComplete?eventCRFId=<c:out value="${eventCrfId}" />"><img src="images/icon_DEcomplete.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="MarkEventCRFComplete?eventCRFId=<c:out value="${eventCrfId}" />" onClick="javascript:return confirm('Click OK to mark the <c:out value="${crfName}"/> completed for Subject <c:out value="${subjectName}"/>.');">Mark Complete</a></td></tr>--%>
+									<%--<tr valign="top"><td class="table_cell_left"><a href="MarkEventCRFComplete?eventCRFId=<c:out value="${eventCrfId}" />"><img src="images/icon_DEcomplete.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="MarkEventCRFComplete?eventCRFId=<c:out value="${eventCrfId}" />" onClick="javascript:return confirm('Click OK to mark the <c:out value="${crfName}"/> completed for Subject ${esc.escapeJavaScript(subjectName)}.');">Mark Complete</a></td></tr>--%>
 									
 									<tr valign="top"><td class="table_cell_left"><a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
@@ -358,60 +360,60 @@
          
          <c:choose>
          <c:when test="${crfStatus ==data_entry_completei18n ||  crfStatus =='administrative editing'}">
-          <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" 
-							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Complete_expand.gif');"
-							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Complete.gif');"
-							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);">
+          <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" 
+							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Complete_expand.gif');"
+							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Complete.gif');"
+							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);">
 		  
 		  </c:when>
 		  <c:when test="${crfStatus ==initial_data_entry_completei18n}">
-          <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" 
-							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_InitialDEcomplete_expand.gif');"
-							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_InitialDEcomplete.gif');"
-							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);">
+          <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" 
+							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_InitialDEcomplete_expand.gif');"
+							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_InitialDEcomplete.gif');"
+							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);">
 		  
 		  </c:when>
 		  <c:when test="${crfStatus ==double_data_entryi18n}">
-          <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" 
-							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_DDE_expand.gif');"
-							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_DDE.gif');"
-							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);">
+          <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" 
+							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_DDE_expand.gif');"
+							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_DDE.gif');"
+							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);">
 		  
 		  </c:when>
 		  <c:when test="${crfStatus ==lockedi18n }">
 							       
 		 </c:when>
 		 <c:when test="${crfStatus ==no_startedi18n }">
-			<a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" 
-							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Scheduled.gif');"
-							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Scheduled.gif');"
-							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);">
+			<a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" 
+							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Scheduled.gif');"
+							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Scheduled.gif');"
+							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);">
 		  				    
 		 </c:when>
 		 <c:when test="${crfStatus =='invalid' }">
-			<a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" 
-							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Invalid_expand.gif');"
-							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Invalid.gif');"
-							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);">
+			<a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" 
+							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Invalid_expand.gif');"
+							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Invalid.gif');"
+							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);">
 		  				    
 		 </c:when>
 		 <c:otherwise>
-		   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');" 
-							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Started.gif');"
-							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>');
-							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>','images/CRF_status_icon_Started.gif');"
-							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_<c:out value="${subjectName}"/>', event);">
+		   <a href="javascript:leftnavExpand('Menu_on_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}'); javascript:leftnavExpand('Menu_off_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');" 
+							onmouseover="moveObject('Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Started.gif');"
+							onmouseout="layersShowOrHide('hidden','Event_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}');
+							javascript:setImage('CRFicon_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}','images/CRF_status_icon_Started.gif');"
+							onClick="layersShowOrHide('visible','Lock_all'); LockObject('Lock_<c:out value="${eblRowCount}"/>_<c:out value="${count}"/>_${esc.escapeJavaScript(subjectName)}', event);">
 		  			
 		 </c:otherwise>
 		  
