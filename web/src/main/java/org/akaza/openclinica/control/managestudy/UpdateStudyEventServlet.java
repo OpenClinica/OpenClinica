@@ -56,8 +56,11 @@ import org.akaza.openclinica.dao.rule.RuleSetDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.AuditLogEventType;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.AuditLogEventService;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
@@ -100,6 +103,8 @@ public class UpdateStudyEventServlet extends SecureController {
     public final static String END_DATE_NOTE = "endDateNote";
     private WebApplicationContext ctx = null;
     public static final String ORIGINATING_PAGE = "originatingPage";
+    public static final String STUDY_EVENT = "study_event";
+    public static final String PREV_STUDY_EVENT_STATUS_ID = "prev_study_event_id";
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -343,6 +348,7 @@ public class UpdateStudyEventServlet extends SecureController {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             SubjectEventStatus ses = SubjectEventStatus.get(fp.getInt(SUBJECT_EVENT_STATUS_ID));
+            session.setAttribute(PREV_STUDY_EVENT_STATUS_ID, studyEvent.getSubjectEventStatus().getId());
             studyEvent.setSubjectEventStatus(ses);
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
@@ -557,11 +563,27 @@ public class UpdateStudyEventServlet extends SecureController {
             }
             if (isAuthenticated && ub.getName().equalsIgnoreCase(username)) {
                 Date date = new Date();
+                String detail = "The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
+                        + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3");
                 seb.setUpdater(ub);
                 seb.setUpdatedDate(date);
-                seb.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
-                        + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
+                seb.setAttestation(detail);
                 sedao.update(seb);
+
+                // OC-10834 OC4 - Signature not recorded when signing an event if the event status is already Signed
+                // manually add audit-log-event when user re-signed without any changes
+                int studyEventStatusId = (int)session.getAttribute(PREV_STUDY_EVENT_STATUS_ID);
+                if (seb.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED) && studyEventStatusId == SubjectEventStatus.SIGNED.getId()) {
+                    AuditLogEvent auditLogEvent = new AuditLogEvent();
+                    auditLogEvent.setAuditTable(STUDY_EVENT);
+                    auditLogEvent.setEntityId(seb.getId());
+                    auditLogEvent.setEntityName("Status");
+                    auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
+                    auditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+                    auditLogEvent.setOldValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+                    auditLogEvent.setDetails(detail);
+                    getAuditLogEventService().saveAuditLogEvent(auditLogEvent, ub);
+                }
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -906,4 +928,7 @@ public class UpdateStudyEventServlet extends SecureController {
         return (RuleSetService) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
     }
 
+    private AuditLogEventService getAuditLogEventService() {
+        return  (AuditLogEventService) SpringServletAccess.getApplicationContext(context).getBean("auditLogEventService");
+    }
 }
