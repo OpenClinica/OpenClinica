@@ -147,7 +147,7 @@
           targets: -1,
           orderable: false
         }],
-        order: [[6, 'desc']],
+        order: [[4, 'desc'], [6, 'desc']],
         language: {
           emptyTable: 'Loading...',
           paginate: {
