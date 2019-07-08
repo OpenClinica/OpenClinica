@@ -59,6 +59,13 @@ public class AuditLogEventServiceImpl implements AuditLogEventService {
         return auditLogEvent;
     }
 
+    public AuditLogEvent saveAuditLogEvent(AuditLogEvent auditLogEvent, UserAccountBean ub) {
+        auditLogEvent.setUserAccount(userAccountDao.findByUserId(ub.getId()));
+        auditLogEvent.setAuditDate(new Timestamp(System.currentTimeMillis()));
+        logger.debug("Request to save AuditLogEvent : {}", auditLogEvent);
+        return (AuditLogEvent) auditLogEventDao.saveOrUpdate(auditLogEvent);
+    }
+
 
     private AuditLogEvent convertDTOtoEntity(AuditLogEventDTO auditLogEventDTO,UserAccountBean ub) {
         AuditLogEvent auditLogEvent = new AuditLogEvent();
