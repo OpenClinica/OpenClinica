@@ -536,7 +536,7 @@ public class UserServiceImpl implements UserService {
                 "Please click the link below to get started.</p>");
         sb.append("<p style='text-align:center;margin:25px'>" +
                 "<a href='" + accessLink + "' style=\"display: inline-block; " +
-                "text-decoration: none; background: #eb5424; color: white; padding: 15px 35px; font-weight: bold; " +
+                "text-decoration: none; background: #28a745; color: white; padding: 15px 35px; font-weight: bold; " +
                 "font-size: medium; border-radius: 5px;\" " +
                 "target='_blank'> Let's Go -></a></p>");
         sb.append("<p style= \"line-height: 2em;\">Thanks!<br><strong>" +
