@@ -292,7 +292,14 @@
             return {title: title};
           }),
           paging: false,
-          dom: 'ft'
+          dom: 'ft',
+          "drawCallback": function( settings ) {
+            const dtWidth = $("#tbl-job").width();
+            const sidebarWidth = $("#sidebar_Instructions_closed").width();
+            const navbarWidth = dtWidth + sidebarWidth;
+            $("#tbl-job_wrapper").css({"width": "calc(" + dtWidth + "px + 1em)", "padding-right": "1em" });
+            $(".oc_nav").css({"width": "calc(" + navbarWidth + "px + 2em)"});
+          }
         });
       }).fail(function(e) {
         $('#loading').text(formatError(e));
