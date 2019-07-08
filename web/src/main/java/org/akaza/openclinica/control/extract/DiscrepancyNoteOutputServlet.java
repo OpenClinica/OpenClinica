@@ -227,7 +227,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
     private Map<String, String> getFilters(HttpServletRequest request) {
         Map<String, String> filters = new HashMap<String, String>();
-        String ids[] = {"studySubject.label", "siteId", "studySubject.labelExact", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate",
+        String ids[] = {"studySubject.label", "discrepancyNoteBean.threadNumber", "siteId", "studySubject.labelExact", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate",
                 "discrepancyNoteBean.description", "discrepancyNoteBean.user", "discrepancyNoteBean.disType", "discrepancyNoteBean.entityType",
                 "discrepancyNoteBean.resolutionStatus", "age", "days",
 
@@ -242,7 +242,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     }
 
     private List<Pair<String, String>> getSortOrder(HttpServletRequest request) {
-        String ids[] = {"studySubject.label", "discrepancyNoteBean.createdDate", "days", "age"};
+        String ids[] = {"studySubject.label", "discrepancyNoteBean.createdDate", "days", "age", "discrepancyNoteBean.threadNumber"};
 
         List<Pair<String, String>> sortOrders = new ArrayList<Pair<String, String>>(4);
         for (String s : ids) {

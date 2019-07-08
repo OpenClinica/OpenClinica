@@ -32,7 +32,7 @@ public class ViewNotesFilterCriteria {
     private static final Map<String, String> FILTER_BY_TABLE_COLUMN = new HashMap<String, String>();
 
     private static final String[] NUMERIC_FILTERS = {
-        "discrepancy_note_type_id","resolution_status_id","days","age"
+        "discrepancy_note_type_id","resolution_status_id","days","age","thread_number"
     };
 
     private static final String[] DATE_FILTERS = {
@@ -57,6 +57,7 @@ public class ViewNotesFilterCriteria {
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.detailedNotes", "detailed_notes");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.user", "user");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.discrepancyNoteTypeId", "discrepancy_note_type_id");
+        FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.threadNumber", "thread_number");
     }
 
     private final Map<String, Object> filters = new HashMap<String, Object>();
