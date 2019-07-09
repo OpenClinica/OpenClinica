@@ -25,5 +25,11 @@ public interface AuditLogEventService {
 	 */
 	 AuditLogEvent saveAuditLogEvent(AuditLogEventDTO auditLogEventDTO,UserAccountBean ub);
 
+	/**
+	 * @param auditLogEvent
+	 * @return
+	 */
+	AuditLogEvent saveAuditLogEvent(AuditLogEvent auditLogEvent, UserAccountBean ub);
+
 
 	}

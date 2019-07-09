@@ -1739,7 +1739,7 @@
             type: 'get',
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?includeAccessCode='+includeAccessCode,
             success: function(data) {
-                $('#access-code-input').val(data.accessCode);
+            	$('#access-code-input').val(data.accessCode !=null ? data.accessCode:"loading...");
                 $('#access-url').text(data.host);
             },
             error: logDump
@@ -1804,16 +1804,18 @@
         });
 
         jQuery('#email-input').blur(function() {
-            var emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+            var maxLength = 255;
+            var emailPattern = /^[A-Za-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/;
             var input = $(this).val();
             var isEmpty = input.length === 0;
+            var tooLong = input.length > maxLength;
             var parts = input.split('@');
             var hasSingleAt = parts.length === 2;
             var afterAt = parts[1] || '';
             var afterAtHasDot = afterAt.includes('.');
             var dotRightAfterAt = afterAt[0] === '.';
             var endsWithDot = afterAt[afterAt.length - 1] === '.';
-            var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
+            var validEmail = emailPattern.test(input) && !tooLong && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
             if (validEmail || isEmpty) {
                 $('#email-input-error').hide();
             }
@@ -1824,8 +1826,8 @@
         });
 
         function checkPhoneMaxLength() {
-            var maxLength = 15;
-            var ccLength = $('#country-code').text().replace(/ |-|\+/g, '').length;
+            var maxLength = 17;
+            var ccLength = $('#country-code').text().length;
             var phoneLength = $('#phone-input').val().replace(/ |-|\+/g, '').length;
             var totalLength = ccLength + phoneLength;
             if (totalLength > maxLength) {
@@ -1836,8 +1838,9 @@
 
         jQuery('#phone-input').on('input blur paste', function() {
             checkPhoneMaxLength();
-            var phonePattern = /^[0-9 -]*$/;
-            var isValid = phonePattern.test($(this).val());
+            var phonePattern = /^\+[0-9]{1,3} [0-9]{1,14}$/;
+            var fullPhone = $('#country-code').text() + ' ' + $(this).val().replace(/ |-|\+/g, '');
+            var isValid = phonePattern.test(fullPhone);
             if (isValid) {
                 $('#phone-input-error').hide();
             }
