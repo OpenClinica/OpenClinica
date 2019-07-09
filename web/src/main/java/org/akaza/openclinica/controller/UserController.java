@@ -305,15 +305,25 @@ public class UserController {
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
         JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE,null);
-        CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
-            try {
-                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail,incRelatedInfo);
-            }catch(Exception e) {
-                logger.error("Exeception is thrown while extracting job : " + e);
-            }
-            return null;
-        });
+        // OC-11079 When extract participant info endpoint is called with accesscode parameter set to y then logfile does not generate
+        // error getting accessCode when using Async call
+        if (incRelatedInfo) {
+            extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail,incRelatedInfo);
+        } else {
+            CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+                extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail, incRelatedInfo);
+                return null;
+            });
+        }
         return jobDetail.getUuid();
+    }
+
+    private void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean incRelatedInfo) {
+        try {
+            userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail,incRelatedInfo);
+        }catch(Exception e) {
+            logger.error("Exeception is thrown while extracting job : " + e);
+        }
     }
 
 }
