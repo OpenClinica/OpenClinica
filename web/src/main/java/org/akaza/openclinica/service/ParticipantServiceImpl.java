@@ -3,6 +3,7 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyParticipantDTO;
+import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -584,6 +585,23 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
 
         return studySubject;
 
+    }
+    
+    public StudyParticipantDetailDTO buildStudyParticipantDetailDTO(StudySubject studySubject) {
+    	StudyParticipantDetailDTO spDTO = new StudyParticipantDetailDTO();
+        
+        StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
+        spDTO.setSubjectKey(studySubject.getLabel());
+    	spDTO.setSubjectOid(studySubject.getOcOid());
+		
+        spDTO.setFirstName(studySubjectDetail.getFirstName());
+        spDTO.setLastName(studySubjectDetail.getLastName());
+        spDTO.setEmail(studySubjectDetail.getEmail());
+        spDTO.setMobileNumber(studySubjectDetail.getPhone());           
+        spDTO.setSecondaryID(studySubject.getSecondaryLabel());
+        spDTO.setStatus(studySubject.getUserStatus().name());
+    
+        return spDTO;
     }
 
 }

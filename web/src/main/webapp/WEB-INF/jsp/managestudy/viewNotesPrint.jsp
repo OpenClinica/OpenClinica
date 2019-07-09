@@ -31,6 +31,7 @@
   <table border="0" cellpadding="0" cellspacing="0"> 		
 	<tr valign="top">						
 	<td class="table_header_row_left"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
+	<td class="table_header_row"><fmt:message key="query_id" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="site_id" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="resolution_status" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
@@ -51,6 +52,16 @@
    <c:forEach var="note" items="${allNotes}">
   <tr valign="top">
     <td class="table_cell_left"><c:out value="${note.studySub.label}" /></td>
+    <td class="table_cell">
+    	<c:choose>
+		  	<c:when test="${note.threadNumber == 0}">
+				<fmt:message key="na" bundle="${resword}"/>
+		  	</c:when>
+	  		<c:otherwise>
+    			<c:out value="${note.threadNumber}" />
+	  		</c:otherwise>
+		</c:choose>
+    </td>
     <td class="table_cell"><c:out value="${note.siteId}" /></td>
     <td class="table_cell"><c:out value="${note.resStatus.name}" /></td>
     <td class="table_cell"><fmt:formatDate value="${note.createdDate}" pattern="${dteFormat}"/></td>

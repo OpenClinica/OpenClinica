@@ -356,10 +356,10 @@ public class UserServiceImpl implements UserService {
                         
                         //Get accessToken from Keycloak                      
                     	OCUserDTO userDTO = buildOcUserDTO(studySubject,incRelatedInfo);
-                    	ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo);                            
+                    	ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,false,incRelatedInfo);                            
                         
                         
-                        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
+                        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
                             userDTO.setAccessCode(participantAccessDTO.getAccessCode());
                         }	
                         
@@ -536,6 +536,12 @@ public class UserServiceImpl implements UserService {
             accessCode = (accessDTO.getAccessCode() == null ? "" : accessDTO.getAccessCode());
         }
         StringBuffer sb = new StringBuffer();
+        sb.append("<div style=\"background-color:#f1f1f1\"><center>");
+        sb.append("<table style=\"background-color:#ffffff; width:600px; margin:0; padding:0; " +
+                "font-family:'Open Sans',sans-serif; border-collapse:collapse!important; height:100%!important\" " +
+                "border=\"0\" cellpadding=\"0\" cellspacing=\"0\" height=\"100%\" width=\"100%\">" +
+                "<tbody><tr><td valign=\"top\"" +
+                "style=\"margin:0; padding:20px; font-family:'Open Sans',sans-serif; height:100%!important\"><div>");
         sb.append("<h1 style=\"font-family:'Didact Gothic',sans-serif;color:#618ebb\">" +
                 "Welcome to " + studyName + " Study!</h1>");
         sb.append("<p style='text-align:left'>Dear "+ studySubject.getStudySubjectDetail().getFirstName() + ",</p>");
@@ -543,12 +549,18 @@ public class UserServiceImpl implements UserService {
                 "Please click the link below to get started.</p>");
         sb.append("<p style='text-align:center;margin:25px'>" +
                 "<a href='" + accessLink + "' style=\"display: inline-block; " +
-                "text-decoration: none; background: #eb5424; color: white; padding: 15px 35px; font-weight: bold; " +
+                "text-decoration: none; background: #28a745; color: white; padding: 15px 35px; font-weight: bold; " +
                 "font-size: medium; border-radius: 5px;\" " +
                 "target='_blank'> Let's Go -></a></p>");
-        sb.append("<p style= \"margin-bottom: 20px; line-height: 2em;\">You can also access the application by going to: " +
-                "" + host + "<br>and enter the access code: " + accessCode + "</p>");
-        sb.append("<p style= \"margin-bottom: 20px; line-height: 2em;\">Thanks!<br>The " + studyName + " Study Team</p>");
+        sb.append("<p style= \"line-height: 2em;\">Thanks!<br><strong>" +
+                "The " + studyName + " Study Team</strong></p>");
+        sb.append("<p style= \"margin-bottom: 20px; line-height: 2em; font-size:10px; color:#6b6b6b;\">You can also access the application by going to: " +
+                "" + host + " and enter the access code: " + accessCode + "</p>" +
+                "<hr style=\"border:2px solid #eaeef3;border-bottom:0;margin:20px 0\">");
+        sb.append("<p style=\"text-align:right; margin-bottom:30px;\">" +
+                "<img src=\"https://cdn.shortpixel.ai/client/q_lossless,ret_img/https://www.openclinica.com/wp-content/uploads/open-clinica.png\"" +
+                "width=\"125\" alt=\"OC logo\" style=\"border:0; height:auto; line-height:100%; outline:none; text-decoration:none\" data-image-whitelisted=\"\"></p>");
+        sb.append("</div></td></tr></tbody></table></center></div>");
 
         pDTO.setMessage(sb.toString());
 

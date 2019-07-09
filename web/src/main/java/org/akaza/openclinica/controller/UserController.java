@@ -159,7 +159,7 @@ public class UserController {
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 
-        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean, true, incldAccessCode);
+        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,incldAccessCode,incldAccessCode);
         if (participantAccessDTO == null) {
             logger.error("REST request to GET AccessLink Object for Participant not found ");
             return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.NOT_FOUND);
@@ -183,10 +183,10 @@ public class UserController {
         return new ResponseEntity<List<OCUserDTO>>(userDTOs, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "To extract participants info", notes = "Will extract the data in a text file")
-    @RequestMapping(value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST)
-    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable("studyOID") String studyOid, @PathVariable("siteOID") String siteOid,
-                                                         @RequestParam(value = "includeParticipateRelatedInfo", defaultValue = "n", required = false) String includeParticipateRelatedInfo) throws InterruptedException {
+    @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST )
+    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid,
+    		@RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
@@ -195,8 +195,8 @@ public class UserController {
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
         boolean incRelatedInfo = false;
-        if (includeParticipateRelatedInfo != null && includeParticipateRelatedInfo.trim().toUpperCase().equals("Y")) {
-            incRelatedInfo = true;
+        if(includeParticipateInfo!=null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
+        	incRelatedInfo = true;
         }
 
         try {

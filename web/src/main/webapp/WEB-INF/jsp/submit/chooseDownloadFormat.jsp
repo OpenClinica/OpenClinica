@@ -31,6 +31,7 @@
             <%
                     String[] filterParams = {
                          "studySubject.label",
+                         "discrepancyNoteBean.threadNumber",
                          "siteId",
                          "studySubject.labelExact",
                          "discrepancyNoteBean.createdDate",
@@ -62,7 +63,8 @@
                         "sort.studySubject.label",
                         "sort.discrepancyNoteBean.createdDate",
                         "sort.days",
-                        "sort.age"
+                        "sort.age",
+                        "sort.discrepancyNoteBean.threadNumber"
                     };
                     for (String s: sortParams) {
                         String value = request.getParameter(s);

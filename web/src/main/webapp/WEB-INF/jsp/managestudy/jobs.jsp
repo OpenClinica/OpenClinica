@@ -72,9 +72,6 @@
   #tbl-jobs_filter {
     margin-bottom: 3px;
   }
-  #tbl-jobs_wrapper {
-    margin-top: 30px;
-  }
   .icon {
     cursor: pointer;
   }
@@ -121,7 +118,6 @@
     <div>
       <fmt:message key="jobs_description" bundle="${resword}"/>
     </div>
-    <br>
     <table id="tbl-jobs" class="datatable">
       <thead>
         <tr>
@@ -140,7 +136,7 @@
     </table>
 
     <script>
-      $('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html');
+      $('#jobs-doc').attr({href: '${pageContext.request.contextPath}/pages/swagger-ui.html', target: '_blank'});
       $.fn.dataTable.moment(dateFormat);
       var datatable = $('#tbl-jobs').DataTable({
         dom: 'frtilp',
@@ -151,7 +147,7 @@
           targets: -1,
           orderable: false
         }],
-        order: [[6, 'desc']],
+        order: [[4, 'desc'], [6, 'desc']],
         language: {
           emptyTable: 'Loading...',
           paginate: {
@@ -296,7 +292,14 @@
             return {title: title};
           }),
           paging: false,
-          dom: 'ft'
+          dom: 'ft',
+          "drawCallback": function( settings ) {
+            const dtWidth = $("#tbl-job").width();
+            const sidebarWidth = $("#sidebar_Instructions_closed").width();
+            const navbarWidth = dtWidth + sidebarWidth;
+            $("#tbl-job_wrapper").css({"width": "calc(" + dtWidth + "px + 1em)", "padding-right": "1em" });
+            $(".oc_nav").css({"width": "calc(" + navbarWidth + "px + 2em)"});
+          }
         });
       }).fail(function(e) {
         $('#loading').text(formatError(e));

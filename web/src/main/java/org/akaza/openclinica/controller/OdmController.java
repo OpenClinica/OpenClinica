@@ -2,18 +2,25 @@ package org.akaza.openclinica.controller;
 
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
+import springfox.documentation.annotations.ApiIgnore;
+
 import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.ParticipantService;
 import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.service.UtilService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.cdisc.ns.odm.v130.ODM;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXB;
+
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Locale;
@@ -49,6 +57,11 @@ public class OdmController {
     @Autowired
     private UtilService utilService;
 
+    @Autowired
+    private ParticipantService participantService;
+    @Autowired
+    StudySubjectDao studySubjectDao;
+    
     @Autowired
     @Qualifier( "dataSource" )
     private BasicDataSource dataSource;
@@ -245,6 +258,48 @@ public class OdmController {
         return ResponseEntity.ok(json);
 
     }
+    
+    @ApiIgnore
+    @RequestMapping( value = "/auth/api/participant-info", method = RequestMethod.GET )
+    public @ResponseBody
+    ResponseEntity getParticipant(HttpServletRequest request) throws Exception {       
+        String studyOid=(String)request.getSession().getAttribute("studyOid");
+        UserAccountBean ub = utilService.getUserAccountFromRequest(request);
+        getRestfulServiceHelper().setSchema(studyOid, request);
+        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+
+        if(ub==null || !ub.hasUserType(UserType.PARTICIPATE)){
+            logger.info("Responding with HttpStatus.FORBIDDEN because the user is either null or not of type participate");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        logger.info("UserAccount username: " +ub.getName());
+        StudyBean currentStudy = participateService.getStudy(studyOid);
+        logger.info("Study OId: " +currentStudy.getOid());
+      
+        String userName=ub.getName();
+        int lastIndexOfDot= userName.lastIndexOf(".");
+        String subjectOid=userName.substring(lastIndexOfDot+1);
+
+        StudySubject studySubject= studySubjectDao.findByOcOID(subjectOid);
+        String jsonStr = null; 
+        if(studySubject != null) {
+        	logger.info("StudySubject Id: " +studySubject.getLabel());
+            
+        	StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
+        	
+            spDTO = participantService.buildStudyParticipantDetailDTO(studySubject);
+            
+           // convert to Json
+            ObjectMapper Obj = new ObjectMapper();                                       
+            jsonStr = Obj.writerWithDefaultPrettyPrinter().writeValueAsString(spDTO);                   
+        }             
+       
+
+        return ResponseEntity.ok(jsonStr);
+
+    }
+    
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
             restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
