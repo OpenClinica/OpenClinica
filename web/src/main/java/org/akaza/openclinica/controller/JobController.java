@@ -80,7 +80,7 @@ public class JobController {
     }
 
 
-//    @ApiOperation( value = "To get all jobs by site" )
+    @ApiOperation( value = "To get all jobs by site", hidden = true )
     @RequestMapping( value = "/studies/{studyOID}/sites/{siteOID}/jobs", method = RequestMethod.GET )
     public ResponseEntity<List<JobDetailDTO>> getAllJobsBySite(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
@@ -123,7 +123,7 @@ public class JobController {
     }
 
 
-//    @ApiOperation( value = "To get all jobs by study" )
+    @ApiOperation( value = "To get all jobs by study", hidden = true )
     @RequestMapping( value = "/studies/{studyOID}/jobs", method = RequestMethod.GET )
     public ResponseEntity<List<JobDetailDTO>> getAllJobsByStudy(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);

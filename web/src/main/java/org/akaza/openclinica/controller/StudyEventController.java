@@ -480,7 +480,7 @@ public class StudyEventController {
 	    
 	    }
 	
-//	@ApiOperation(value = "To check schedule job status with job ID",  notes = " the job ID is included in the response when you run bulk schedule task")
+	@ApiOperation(value = "To check schedule job status with job ID",  notes = " the job ID is included in the response when you run bulk schedule task", hidden = true)
 	@SuppressWarnings("unchecked")
     @RequestMapping(value = "/scheduleJobs/{uuid}", method = RequestMethod.GET)
     public ResponseEntity<Object>  checkScheduleStatus(@PathVariable("uuid") String scheduleUuid,
