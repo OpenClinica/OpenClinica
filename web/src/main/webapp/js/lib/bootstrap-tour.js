@@ -70,7 +70,7 @@ jQuery(document).ready(function() {
                                                         <tr> \
                                                             <td></td> \
                                                             <td> \
-                                                                <span style='font-style: italic; color: #555555;'>Finished report can be accessed in <a href='Jobs'>jobs page</a>.<br></span> \
+                                                                <span style='font-style: italic; color: #555555;'>Finished report can be accessed on <a href='Jobs'>the bulk actions log page</a>.<br></span> \
                                                                 <span style='font-style: italic; color: #555555;'>Please allow some time and refresh the page to see the report.</span> \
                                                             </td> \
                                                         </tr> \
