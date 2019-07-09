@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
  */
 // @author ywang
 public final class LocaleResolver {
-	private final static Locale DEFAULT_LOCALE = new Locale("en_US");
+	private final static Locale DEFAULT_LOCALE = new Locale("en");
 	private final static String LOCALE_SESSION_ATTRIBUTE_NAME
 	    = SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME;
 
