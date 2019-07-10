@@ -1771,7 +1771,7 @@
                 inviteParticipant: $('#invite_via_email input:checked').val(),
                 inviteViaSms: $('#invite_via_sms input:checked').val(),
                 identifier: $('#secid-input').val(),
-                resetParticipantAccessCode: $('#reset-participant-access-code').is(':checked')
+                resetAccessCode: $('#reset-participant-access-code').is(':checked')
             };
             if (data.inviteParticipant === 'true' || data.inviteViaSms === 'true') {
                 $('#inviting').show();
