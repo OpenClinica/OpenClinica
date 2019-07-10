@@ -83,7 +83,7 @@ jQuery(document).ready(function() {
                             </tr> \
                             <tr> \
                                 <td colspan='2' style='text-align: right;'> \
-                                    <div style='margin-top: 45px;'> \
+                                    <div style='margin-top: 25px;'> \
                                         <input type='button' value='Cancel' onclick='clearPIDVerificationForm()'/> \
                                         &nbsp; \
                                         <input type='button' value='Continue' onclick='validatePIDVerificationForm()'/> \
