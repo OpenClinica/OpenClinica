@@ -148,4 +148,16 @@ public class ErrorConstants {
     public static final String ERR_FORM_MISSING_STUDY_EVENT_CONSTRUCT = "errorCode.formMissingStudyEventConstruct";
     public static final String ERR_FORMLAYOUTOID_NOT_AVAILABLE = "errorCode.formLayoutOIDNotAvailable";
 
+    public static final String ERR_MISSING_PARTICIPANT_ID_DATA = "errorCode.missingParticipantIdData";
+    public static final String ERR_MISSING_STUDY_EVENT_OID_DATA = "errorCode.missingStudyEventOidData";
+    public static final String ERR_MISSING_START_DATE_DATA = "errorCode.missingStartDateData";
+
+
+    public static final String ERR_MULTIPLE_PARTICIPANT_ID_HEADERS = "errorCode.multipleParticipantIdHeaders";
+    public static final String ERR_MULTIPLE_STUDY_EVENT_OID_HEADERS = "errorCode.multipleStudyEventOidHeaders";
+    public static final String ERR_MULTIPLE_STUDY_EVENT_REPEAT_KEY_HEADERS = "errorCode.multipleStudyEventRepeatKeyHeaders";
+    public static final String ERR_MULTIPLE_START_DATE_HEADERS = "errorCode.multipleStartDateHeaders";
+    public static final String ERR_MULTIPLE_END_DATE_HEADERS = "errorCode.multipleEndDateHeaders";
+    public static final String ERR_MULTIPLE_STUDY_EVENT_STATUS_HEADERS = "errorCode.multipleStudyEventStatusHeaders";
+
 }

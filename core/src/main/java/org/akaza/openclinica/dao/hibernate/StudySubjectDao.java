@@ -111,6 +111,7 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         return (StudySubject) q.uniqueResult();
     }
 
+    @Transactional
     public ArrayList<StudySubject> findByLabelAndParentStudy(String embeddedStudySubjectId, Study parentStudy) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.study.study.studyId = :studyid and do.label = :label";

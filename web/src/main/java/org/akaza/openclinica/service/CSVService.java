@@ -11,4 +11,5 @@ public interface CSVService {
     List<SubjectTransferBean> readBulkParticipantCSVFile(MultipartFile file) throws Exception;
     void validateBulkParticipantCSVFile(MultipartFile file) throws Exception;
     ArrayList<StudyEventScheduleDTO> readStudyEventScheduleBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception;
-}
+     void validateCSVFileHeader(MultipartFile file, String studyOID, String siteOID) throws Exception;
+    }

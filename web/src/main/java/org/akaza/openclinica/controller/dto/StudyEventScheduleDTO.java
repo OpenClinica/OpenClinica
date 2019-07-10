@@ -9,6 +9,7 @@ public class StudyEventScheduleDTO {
 	private String startDate;			
 	private String studyOID;
 	private String siteOID;
+	private String studyEventStatus;
 	int rowNum;
 	
 	public String getOrdinal() {
@@ -58,5 +59,13 @@ public class StudyEventScheduleDTO {
 	}
 	public void setRowNum(int rowNum) {
 		this.rowNum = rowNum;
+	}
+
+	public String getStudyEventStatus() {
+		return studyEventStatus;
+	}
+
+	public void setStudyEventStatus(String studyEventStatus) {
+		this.studyEventStatus = studyEventStatus;
 	}
 }
