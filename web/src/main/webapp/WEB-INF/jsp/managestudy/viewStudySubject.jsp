@@ -1565,7 +1565,7 @@
     <tr class="reset-participant-access-code hide">
       <td>
         <label>
-          <input type="checkbox" name="reset_participant_access_code" value="true">
+          <input type="checkbox" id="reset-participant-access-code">
           <fmt:message key="reset_participant_access_code" bundle="${resword}"/>
         </label>
         <br><br>
@@ -1739,7 +1739,7 @@
             type: 'get',
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?includeAccessCode='+includeAccessCode,
             success: function(data) {
-            	$('#access-code-input').val(data.accessCode !=null ? data.accessCode:"loading...");
+                $('#access-code-input').val(data.accessCode !=null ? data.accessCode:"loading...");
                 $('#access-url').text(data.host);
             },
             error: logDump
@@ -1770,7 +1770,8 @@
                 phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
                 inviteParticipant: $('#invite_via_email input:checked').val(),
                 inviteViaSms: $('#invite_via_sms input:checked').val(),
-                identifier: $('#secid-input').val()
+                identifier: $('#secid-input').val(),
+                resetAccessCode: $('#reset-participant-access-code').is(':checked')
             };
             if (data.inviteParticipant === 'true' || data.inviteViaSms === 'true') {
                 $('#inviting').show();
@@ -1881,7 +1882,7 @@
         });
 
         jQuery('#participateAccess').click(function() {
-        	getAccessCode("N");
+            getAccessCode("N");
             $('#eye').show();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
