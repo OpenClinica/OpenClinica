@@ -166,21 +166,21 @@ public class UserServiceImpl implements UserService {
         UserAccount pUserAccount = null;
 
         if (studySubject != null) {
-            if (studySubject.getUserId() == null && validateService.isParticipateActive(tenantStudy)) {
-                logger.info("Participate has not registered yet");
-                if (validateService.isParticipateActive(tenantStudy)) {
-                    do {
-                        accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
-                    } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, customerUuid));
+            if (validateService.isParticipateActive(tenantStudy)) {
+                if (studySubject.getUserId() == null ) {
+                    logger.info("Participate has not registered yet");
+                    accessCode = generateAccessCode(accessToken, customerUuid);
+                    // create participant user Account In Keycloak
+                    String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
+                    // create participant user Account In Runtime
+                    pUserAccount = createUserAccount(participantDTO, studySubject, userAccountBean, username, publicStudy, keycloakUserId);
+                    // create study subject detail Account
+                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, pUserAccount.getUserId(), tenantStudy, userAccount);
+                    logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
+                } else if (participantDTO.isResetAccessCode()) {
+                    accessCode = generateAccessCode(accessToken, customerUuid);
+                    keycloakClient.resetParticipateUserAccessCode(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
                 }
-                // create participant user Account In Keycloak
-                String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
-                // create participant user Account In Runtime
-                pUserAccount = createUserAccount(participantDTO, studySubject, userAccountBean, username, publicStudy, keycloakUserId);
-                // create study subject detail Account
-                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, pUserAccount.getUserId(), tenantStudy, userAccount);
-                logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
-
             } else {
                 // update study subject detail Account
                 studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null, tenantStudy, userAccount);
@@ -249,6 +249,14 @@ public class UserServiceImpl implements UserService {
         ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum, restext));
 
         return ocUserDTO;
+    }
+
+    private String generateAccessCode(String accessToken, String customerUuid) {
+        String accessCode;
+        do {
+            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+        } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, customerUuid));
+        return accessCode;
     }
 
     private String getErrorMessage(ParticipateInviteEnum inviteEnum, ParticipateInviteStatusEnum inviteStatusEnum, ResourceBundle restext) {
