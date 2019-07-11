@@ -20,6 +20,8 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
 
     private String identifier;
 
+    private boolean resetAccessCode;
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -74,5 +76,13 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
 
     public void setInviteViaSms(boolean inviteViaSms) {
         this.inviteViaSms = inviteViaSms;
+    }
+
+    public boolean isResetAccessCode() {
+        return resetAccessCode;
+    }
+
+    public void setResetAccessCode(boolean resetAccessCode) {
+        this.resetAccessCode = resetAccessCode;
     }
 }
