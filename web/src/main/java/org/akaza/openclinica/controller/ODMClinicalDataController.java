@@ -24,7 +24,7 @@ import java.util.Locale;
 
 
 @RequestMapping(value = "/auth/api/clinicaldata")
-@Api(value = "Study", tags = {"Study"}, description = "REST API for Study")
+@Api(value = "ODMClinicalDataController", tags = {"Clinical Data"}, description = "REST API for Data Import")
 public class ODMClinicalDataController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

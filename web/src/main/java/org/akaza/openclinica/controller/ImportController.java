@@ -55,7 +55,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @RestController
 @RequestMapping( value = "/auth/api" )
-@Api( value = "ImportController", tags = {"Import"}, description = "REST API for Data Import" )
+@Api( value = "ImportController", tags = {"Clinical Data"}, description = "REST API for Data Import" )
 public class ImportController {
 
     @Autowired
