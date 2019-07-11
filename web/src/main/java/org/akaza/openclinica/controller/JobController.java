@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -49,6 +50,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping( value = "/auth/api" )
+@Api( value = "Job", tags = {"Job"}, description = "REST API for Job" )
 public class JobController {
 
     @Autowired
