@@ -231,7 +231,7 @@ public class UserController {
             map.put("studyOid", studyOid);
             map.put("siteOid", siteOid);
             org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
-            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+            response = new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
             return response;
         }
 
