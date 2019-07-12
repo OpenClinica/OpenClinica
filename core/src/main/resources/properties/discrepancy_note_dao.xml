@@ -765,8 +765,8 @@
             INSERT INTO discrepancy_note
             (description, discrepancy_note_type_id ,
             resolution_status_id ,  detailed_notes ,  date_created,
-            owner_id,  parent_dn_id, entity_type, study_id, assigned_user_id)
-            VALUES (?,?,?,?,now(),?,?, ?, ?, ?)
+            owner_id,  parent_dn_id, entity_type, study_id, assigned_user_id,thread_uuid,thread_number)
+            VALUES (?,?,?,?,now(),?,?, ?, ?, ?,?,?)
         </sql>
     </query>
     <query>
@@ -933,8 +933,8 @@
             SELECT dn.*
             FROM discrepancy_note dn, dn_item_data_map didm
             where didm.item_data_id=? AND dn.parent_dn_id isnull
-            AND dn.discrepancy_note_id=didm.discrepancy_note_id AND dn.discrepancy_note_type_id !=4
-                   </sql>
+            AND dn.discrepancy_note_id=didm.discrepancy_note_id AND dn.discrepancy_note_type_id =3 AND dn.resolution_status_id in (1,2)
+        </sql>
     </query>
 
         <query>

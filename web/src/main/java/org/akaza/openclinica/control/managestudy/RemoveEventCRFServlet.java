@@ -189,7 +189,7 @@ public class RemoveEventCRFServlet extends SecureController {
                         item.setUpdatedDate(new Date());
                         iddao.update(item);
                         DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
-                        List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(item.getId());
+                        List dnNotesOfRemovedItem = dnDao.findParentNotesOnlyByItemData(item.getId());
                         if (!dnNotesOfRemovedItem.isEmpty()) {
                             DiscrepancyNoteBean itemParentNote = null;
                             for (Object obj : dnNotesOfRemovedItem) {
@@ -201,6 +201,7 @@ public class RemoveEventCRFServlet extends SecureController {
                             if (itemParentNote != null) {
                                 dnb.setParentDnId(itemParentNote.getId());
                                 dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+                                dnb.setThreadUuid(itemParentNote.getThreadUuid());
                             }
                             dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
                             dnb.setStudyId(currentStudy.getId());

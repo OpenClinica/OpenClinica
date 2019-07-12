@@ -446,7 +446,7 @@ public class StudyEventController {
 		map.put("studyOid", studyOid);
 		map.put("siteOid", siteOid);
 		org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
-		return new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+		return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
 	}
 
 	public String startBulkEventJob(MultipartFile file, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean) {
