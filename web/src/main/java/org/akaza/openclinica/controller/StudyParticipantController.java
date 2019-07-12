@@ -196,7 +196,7 @@ public class StudyParticipantController {
 				participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
 			} catch (OpenClinicaSystemException e) {
 				String errorMsg = e.getErrorCode();
-				response = new ResponseEntity(errorMsg, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+				response = new ResponseEntity(errorMsg, HttpStatus.BAD_REQUEST);
 				return response;
 			}
 			Map<String, Object> map = new HashMap<>();
@@ -454,7 +454,7 @@ public class StudyParticipantController {
 		                map.put("siteOid", siteOid);
 		    			ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, map);
 		    			
-		        		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+		        		response = new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
 		        		
 		        		return response;
 		            }

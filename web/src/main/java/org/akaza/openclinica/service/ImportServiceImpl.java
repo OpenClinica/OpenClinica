@@ -15,6 +15,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.quartz.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -344,15 +345,15 @@ public class ImportServiceImpl implements ImportService {
         }
 
 
-        writeToFile(dataImportReports, studyOid, fileName);
+        writeToFile(dataImportReports, fileName,JobType.XML_IMPORT);
         userService.persistJobCompleted(jobDetail, fileName);
 
     }
 
-    private void writeToFile(List<DataImportReport> dataImportReports, String studyOid, String fileName) {
+    public void writeToFile(List<DataImportReport> dataImportReports, String fileName,JobType jobType) {
         logger.debug("writing report to File");
 
-        String filePath = getFilePath(JobType.XML_IMPORT) + File.separator + fileName;
+        String filePath = getFilePath(jobType) + File.separator + fileName;
 
         File file = new File(filePath);
 
@@ -362,7 +363,11 @@ public class ImportServiceImpl implements ImportService {
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         } finally {
-            writer.print(writeToTextFile(dataImportReports));
+            if(jobType.equals(JobType.XML_IMPORT))
+                writer.print(writeImportToTextFile(dataImportReports));
+            else if (jobType.equals(JobType.SCHEDULE_EVENT))
+                writer.print(writeBulkEventScheduleOrUpdateToTextFile(dataImportReports));
+
             closeFile(writer);
         }
         StringBuilder body = new StringBuilder();
@@ -394,7 +399,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private String writeToTextFile(List<DataImportReport> dataImportReports) {
+    private String writeImportToTextFile(List<DataImportReport> dataImportReports) {
 
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("SubjectKey");
@@ -439,6 +444,44 @@ public class ImportServiceImpl implements ImportService {
             stringBuffer.append(dataImportReport.getStatus() != null ? dataImportReport.getStatus() : "");
             stringBuffer.append(SEPERATOR);
             stringBuffer.append(dataImportReport.getTimeStamp() != null ? dataImportReport.getTimeStamp() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(dataImportReport.getMessage() != null ? dataImportReport.getMessage() : "");
+            stringBuffer.append('\n');
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(stringBuffer.toString() + "\n");
+
+        return sb.toString();
+    }
+
+
+
+    private String writeBulkEventScheduleOrUpdateToTextFile(List<DataImportReport> dataImportReports) {
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("Row #");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("ParticipantID");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("StudyEventOID");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("StudyEventRepeatKey");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Status");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Message");
+        stringBuffer.append('\n');
+        for (DataImportReport dataImportReport : dataImportReports) {
+            stringBuffer.append(dataImportReport.getRowNumber() != null ? dataImportReport.getRowNumber() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(dataImportReport.getStudySubjectID() != null ? dataImportReport.getStudySubjectID() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(dataImportReport.getStudyEventOID() != null ? dataImportReport.getStudyEventOID() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(dataImportReport.getStudyEventRepeatKey() != null ? dataImportReport.getStudyEventRepeatKey() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(dataImportReport.getStatus() != null ? dataImportReport.getStatus() : "");
             stringBuffer.append(SEPERATOR);
             stringBuffer.append(dataImportReport.getMessage() != null ? dataImportReport.getMessage() : "");
             stringBuffer.append('\n');
@@ -696,10 +739,8 @@ public class ImportServiceImpl implements ImportService {
         List<EventCrf> eventCrfs = null;
         for (StudyEvent stEvent : studyEvents) {
             eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(stEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
-            if (eventCrfs.size() > 0) {
-                eventCrf = eventCrfs.get(0);
-                break;
-            }
+            if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
+            break;
         }
 
         return eventCrf;
@@ -1128,6 +1169,7 @@ public class ImportServiceImpl implements ImportService {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
 
 
+
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
             updateStudyEvntStatus(studyEvent, userAccount, DATA_ENTRY_STARTED);
@@ -1250,6 +1292,8 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private Object validateEventDefnCrf(Study tenantStudy, StudyEventDefinition studyEventDefinition, CrfBean crf) {
+
+        // Form Invalid OID
 
         EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(),
                 crf.getCrfId(), tenantStudy.getStudyId());

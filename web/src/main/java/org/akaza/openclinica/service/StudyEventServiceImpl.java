@@ -1,9 +1,11 @@
 package org.akaza.openclinica.service;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -16,12 +18,13 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import org.akaza.openclinica.controller.dto.DataImportReport;
-import org.akaza.openclinica.controller.dto.StudyEventResponseDTO;
+import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
@@ -31,6 +34,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
@@ -40,7 +44,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service( "StudyEventService" )
 public class StudyEventServiceImpl implements StudyEventService {
@@ -66,16 +72,23 @@ public class StudyEventServiceImpl implements StudyEventService {
     @Autowired
     StudyEventDao studyEventDao;
 
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    private CSVService csvService;
 
     private RestfulServiceHelper restfulServiceHelper;
 
 
-
- public static final String DASH = "-";
+    public static final String DASH = "-";
     public static final String UNDERSCORE = "_";
     public static final String FAILED = "Failed";
     public static final String CREATE = "create";
     public static final String UPDATE = "update";
+    public static final String CREATED = "Created";
+    public static final String UPDATED = "Updated";
+
     /**
      * DAOs
      */
@@ -85,6 +98,8 @@ public class StudyEventServiceImpl implements StudyEventService {
     private StudyEventDAO seDao = null;
     private final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
+    SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
+    public static final String SCHEDULE_EVENT = "_Schedule Event";
 
 
     public RestReponseDTO scheduleStudyEvent(HttpServletRequest request, String studyOID, String siteOID, String studyEventOID, String participantId, String startDate, String endDate) {
@@ -657,7 +672,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                     if (eventObject instanceof ErrorObj) {
                         return eventObject;
                     } else if (eventObject instanceof StudyEvent) {
-                        SubjectEventStatus subjectEventStatus= SubjectEventStatus.get(((StudyEvent) eventObject).getSubjectEventStatusId());
+                        SubjectEventStatus subjectEventStatus = SubjectEventStatus.get(((StudyEvent) eventObject).getSubjectEventStatusId());
 
                         studyEventResponseDTO = new StudyEventResponseDTO();
                         studyEventResponseDTO.setSubjectKey(subjectDataBean.getStudySubjectID());
@@ -740,7 +755,7 @@ public class StudyEventServiceImpl implements StudyEventService {
         int maxSeOrdinal = studyEventDao.findMaxOrdinalByStudySubjectStudyEventDefinition(studySubject.getStudySubjectId(), studyEventDefinition.getStudyEventDefinitionId());
         int eventOrdinal = maxSeOrdinal + 1;
 
-        if ( studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.getRepeating()) {   // Repeating Visit Event
+        if (studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.getRepeating()) {   // Repeating Visit Event
             if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
                 eventObject = importService.validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                 if (eventObject instanceof ErrorObj) return eventObject;
@@ -751,21 +766,18 @@ public class StudyEventServiceImpl implements StudyEventService {
             }
 
         } else if (studyEventDefinition.getType().equals(COMMON)) {   // Repeating Visit Event
-                if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
-                    eventObject = importService.validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
-                    if (eventObject instanceof ErrorObj) return eventObject;
-                    studyEventDataBean.setStartDate(null);
-                    studyEventDataBean.setEndDate(null);
-                    eventObject = processEventUpdateForCommon(studyEventDataBean, userAccount, studySubject);
-                    if (eventObject instanceof ErrorObj) return eventObject;
-                } else {
-                    return new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_STUDY_EVENT_REPEAT_KEY);
-                }
-
+            if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
+                eventObject = importService.validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
+                if (eventObject instanceof ErrorObj) return eventObject;
+                studyEventDataBean.setStartDate(null);
+                studyEventDataBean.setEndDate(null);
+                eventObject = processEventUpdateForCommon(studyEventDataBean, userAccount, studySubject);
+                if (eventObject instanceof ErrorObj) return eventObject;
+            } else {
+                return new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_STUDY_EVENT_REPEAT_KEY);
             }
 
-
-         else if (studyEventDefinition.getType().equals(UNSCHEDULED) && !studyEventDefinition.getRepeating()) {   // Non Repeat Event
+        } else if (studyEventDefinition.getType().equals(UNSCHEDULED) && !studyEventDefinition.getRepeating()) {   // Non Repeat Event
             studyEventDataBean.setStudyEventRepeatKey(String.valueOf('1'));
             eventObject = processEventUpdateForUnscheduled(studyEventDataBean, userAccount, studySubject);
             if (eventObject instanceof ErrorObj) return eventObject;
@@ -782,10 +794,10 @@ public class StudyEventServiceImpl implements StudyEventService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_STUDY_EVENT_REPEAT_NOT_FOUND);
         } else {
 
-            if(studyEventDataBean.getStartDate()==null && studyEvent.getDateStart()!=null)
-                studyEventDataBean.setStartDate(studyEvent.getDateStart().toString().substring(0,10));
-            if(studyEventDataBean.getEndDate()==null && studyEvent.getDateEnd()!=null)
-                studyEventDataBean.setEndDate(studyEvent.getDateEnd().toString().substring(0,10));
+            if (studyEventDataBean.getStartDate() == null && studyEvent.getDateStart() != null)
+                studyEventDataBean.setStartDate(studyEvent.getDateStart().toString().substring(0, 10));
+            if (studyEventDataBean.getEndDate() == null && studyEvent.getDateEnd() != null)
+                studyEventDataBean.setEndDate(studyEvent.getDateEnd().toString().substring(0, 10));
 
             eventObject = importService.validateStartAndEndDateAndOrder(studyEventDataBean);
             if (eventObject instanceof ErrorObj) return eventObject;
@@ -822,6 +834,128 @@ public class StudyEventServiceImpl implements StudyEventService {
         }
         return eventObject;
     }
+
+    public void populateOdmContainerForEventUpdate(ODMContainer odmContainer, StudyEventUpdateRequestDTO studyEventUpdateRequestDTO, String siteOid) {
+        ArrayList<StudyEventDataBean> studyEventDataBeans = new ArrayList<>();
+        StudyEventDataBean studyEventDataBean = new StudyEventDataBean();
+        studyEventDataBean.setStudyEventOID(studyEventUpdateRequestDTO.getStudyEventOID());
+        studyEventDataBean.setStartDate(studyEventUpdateRequestDTO.getStartDate());
+        studyEventDataBean.setEndDate(studyEventUpdateRequestDTO.getEndDate());
+        studyEventDataBean.setStudyEventRepeatKey(studyEventUpdateRequestDTO.getStudyEventRepeatKey());
+        studyEventDataBean.setEventStatus(studyEventUpdateRequestDTO.getEventStatus());
+        studyEventDataBeans.add(studyEventDataBean);
+
+        ArrayList<SubjectDataBean> subjectDataBeans = new ArrayList<>();
+        SubjectDataBean subjectDataBean = new SubjectDataBean();
+        subjectDataBean.setStudySubjectID(studyEventUpdateRequestDTO.getSubjectKey());
+        subjectDataBean.setStudyEventData(studyEventDataBeans);
+        subjectDataBeans.add(subjectDataBean);
+
+        CRFDataPostImportContainer importContainer = new CRFDataPostImportContainer();
+        importContainer.setStudyOID(siteOid);
+        importContainer.setSubjectData(subjectDataBeans);
+
+        odmContainer.setCrfDataPostImportContainer(importContainer);
+    }
+
+
+    public void populateOdmContainerForEventSchedule(ODMContainer odmContainer, StudyEventScheduleRequestDTO studyEventScheduleRequestDTO, String siteOid) {
+        ArrayList<StudyEventDataBean> studyEventDataBeans = new ArrayList<>();
+        StudyEventDataBean studyEventDataBean = new StudyEventDataBean();
+        studyEventDataBean.setStudyEventOID(studyEventScheduleRequestDTO.getStudyEventOID());
+        studyEventDataBean.setStartDate(studyEventScheduleRequestDTO.getStartDate());
+        studyEventDataBean.setEndDate(studyEventScheduleRequestDTO.getEndDate());
+        studyEventDataBeans.add(studyEventDataBean);
+
+        ArrayList<SubjectDataBean> subjectDataBeans = new ArrayList<>();
+        SubjectDataBean subjectDataBean = new SubjectDataBean();
+        subjectDataBean.setStudySubjectID(studyEventScheduleRequestDTO.getSubjectKey());
+        subjectDataBean.setStudyEventData(studyEventDataBeans);
+        subjectDataBeans.add(subjectDataBean);
+
+        CRFDataPostImportContainer importContainer = new CRFDataPostImportContainer();
+        importContainer.setStudyOID(siteOid);
+        importContainer.setSubjectData(subjectDataBeans);
+
+        odmContainer.setCrfDataPostImportContainer(importContainer);
+    }
+
+
+    public void scheduleOrUpdateBulkEvent(MultipartFile file, Study study, String siteOid, UserAccountBean userAccountBean, JobDetail jobDetail, String schema) {
+
+        ResponseEntity response = null;
+        String logFileName = null;
+        CoreResources.setRequestSchema(schema);
+
+        sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + SCHEDULE_EVENT + "_" + sdf_fileName.format(new Date()) + ".csv";
+
+        String filePath = userService.getFilePath(JobType.SCHEDULE_EVENT) + File.separator + fileName;
+        jobDetail.setLogPath(filePath);
+        List<DataImportReport> dataImportReports = new ArrayList<>();
+        try {
+
+            // read csv file
+            ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = csvService.readStudyEventScheduleBulkCSVFile(file, study.getOc_oid(), siteOid);
+            for (StudyEventScheduleDTO studyEventScheduleDTO : studyEventScheduleDTOList) {
+                String studyEventOID = studyEventScheduleDTO.getStudyEventOID();
+                String participantId = studyEventScheduleDTO.getSubjectKey();
+                String eventRepeatKey = studyEventScheduleDTO.getOrdinal();
+                String startDate = studyEventScheduleDTO.getStartDate();
+                String endDate = studyEventScheduleDTO.getEndDate();
+                String studyEventStatus = studyEventScheduleDTO.getStudyEventStatus();
+                Integer rowNumber=studyEventScheduleDTO.getRowNum();
+
+                ODMContainer odmContainer = new ODMContainer();
+                Object result = null;
+                DataImportReport dataImportReport = null;
+                if (eventRepeatKey == null) {
+                    //schedule events
+                    StudyEventScheduleRequestDTO studyEventScheduleRequestDTO = new StudyEventScheduleRequestDTO();
+                    studyEventScheduleRequestDTO.setStudyEventOID(studyEventOID);
+                    studyEventScheduleRequestDTO.setSubjectKey(participantId);
+                    studyEventScheduleRequestDTO.setStartDate(startDate);
+                    studyEventScheduleRequestDTO.setEndDate(endDate);
+                    populateOdmContainerForEventSchedule(odmContainer, studyEventScheduleRequestDTO, siteOid);
+                    result = studyEventProcess(odmContainer, study.getOc_oid(), siteOid, userAccountBean, CREATE);
+                    if(result instanceof StudyEventResponseDTO) {
+                        dataImportReport = new DataImportReport(rowNumber,participantId, studyEventOID,((StudyEventResponseDTO) result).getStudyEventRepeatKey(), CREATED, null);
+                    }
+
+                } else {
+                    //Update events
+                    StudyEventUpdateRequestDTO studyEventUpdateRequestDTO = new StudyEventUpdateRequestDTO();
+                    studyEventUpdateRequestDTO.setStudyEventOID(studyEventOID);
+                    studyEventUpdateRequestDTO.setSubjectKey(participantId);
+                    studyEventUpdateRequestDTO.setStudyEventRepeatKey(eventRepeatKey);
+                    studyEventUpdateRequestDTO.setStartDate(startDate);
+                    studyEventUpdateRequestDTO.setEndDate(endDate);
+                    studyEventUpdateRequestDTO.setEventStatus(studyEventStatus);
+                    populateOdmContainerForEventUpdate(odmContainer, studyEventUpdateRequestDTO, siteOid);
+                    result = studyEventProcess(odmContainer, study.getOc_oid(), siteOid, userAccountBean, UPDATE);
+                    if(result instanceof StudyEventResponseDTO) {
+                        dataImportReport = new DataImportReport(rowNumber,participantId, studyEventOID,((StudyEventResponseDTO) result).getStudyEventRepeatKey(), UPDATED, null);
+                    }
+                }
+                if (result instanceof ErrorObj) {
+                    dataImportReport = new DataImportReport(rowNumber,participantId, studyEventOID, eventRepeatKey, ((ErrorObj) result).getCode(), ((ErrorObj) result).getMessage());
+                }
+                dataImportReports.add(dataImportReport);
+
+
+            }
+            importService.writeToFile(dataImportReports, fileName, JobType.SCHEDULE_EVENT);
+            userService.persistJobCompleted(jobDetail, fileName);
+
+        } catch (Exception e) {
+            userService.persistJobFailed(jobDetail, fileName);
+            logger.error("Error " + e.getMessage());
+        }
+
+        userService.persistJobCompleted(jobDetail, fileName);
+
+    }
+
 }
 
 

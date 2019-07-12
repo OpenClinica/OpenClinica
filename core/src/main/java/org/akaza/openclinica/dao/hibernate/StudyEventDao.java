@@ -68,6 +68,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         return se;
     }
 
+    @Transactional
     public Integer findMaxOrdinalByStudySubjectStudyEventDefinition(int studySubjectId, int studyEventDefinitionId) {
         String query = "select max(sample_ordinal) from study_event where study_subject_id = " + studySubjectId + " and study_event_definition_id = "
                 + studyEventDefinitionId;
