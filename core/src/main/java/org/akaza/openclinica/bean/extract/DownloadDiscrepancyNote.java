@@ -195,9 +195,9 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         //If includeHeaderRow = true, the first row of the output consists of header names, only
         //for CSV format
         if(includeHeaderRow) {
-            writer.append("Participant ID");
-            writer.append(",");
             writer.append("Query ID");
+            writer.append(",");
+            writer.append("Participant ID");
             writer.append(",");
             writer.append("Participant Status");
             writer.append(",");
@@ -258,14 +258,14 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         //Fields with embedded commas must be
         // delimited with double-quote characters.
-        writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getLabel()));
-        writer.append(",");
-
         String tn = "N/A";
         if (discNoteBean.getThreadNumber() != null && discNoteBean.getThreadNumber() != 0 ) {
             tn = discNoteBean.getThreadNumber()+"";
         }
         writer.append(escapeQuotesInCSV(tn));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getLabel()));
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getStatus().getName()));
