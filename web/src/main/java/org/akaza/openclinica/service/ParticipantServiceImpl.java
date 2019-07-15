@@ -86,6 +86,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     private UserService userService;
 
     @Autowired
+    private ValidateService validateService;
+
+    @Autowired
 	@Qualifier("dataSource")
 	private DataSource dataSource;
 
@@ -104,10 +107,19 @@ public class ParticipantServiceImpl implements ParticipantService {
     */
     public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy,String accessToken,
                                     String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
-   	   // create subject
+
+
+        // create subject
         StudyBean siteStudy = subjectTransfer.getSiteStudy();
         StudySubject studySubject=null;
         StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudy(subjectTransfer.getPersonId(), currentStudy);
+
+        if(!validateService.isStudyAvailable(currentStudy.getOid()))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
+
+
+        if(!validateService.isStudyAvailable(siteStudy.getOid()))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
 
         if(studySubjectBean==null || !studySubjectBean.isActive()) {
             // Create New Study Subject
