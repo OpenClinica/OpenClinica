@@ -88,6 +88,9 @@
     color: red;
     font-weight: bold;
   }
+  .right {
+    float: right;
+  }
 </style>
 
 <script>
@@ -216,6 +219,9 @@
   <c:otherwise>
     <div id="loading">Loading...</div>
     <div id="job-details" class="hide">
+      <a class="right" href="${pageContext.request.contextPath}/Jobs">
+        <fmt:message key="go_back" bundle="${resword}"/>
+      </a>
       <h1>
         Log For <span id="job-log-for"></span>
       </h1>
@@ -268,6 +274,10 @@
     </div>
 
     <table id="tbl-job"></table>
+    <a class="right" href="${pageContext.request.contextPath}/Jobs">
+      <fmt:message key="go_back" bundle="${resword}"/>
+    </a>
+
     <script>
       var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/${param["uuid"]}/downloadFile?open=true';
       var jobResult = $.get(url, function(data) {
