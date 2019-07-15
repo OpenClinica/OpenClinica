@@ -288,7 +288,7 @@
   #inviteResultAlert > table {
     width: 600px;
   }
-  input[type=radio]:focus {
+  input[type=radio]:focus,input[type=checkbox]:focus {
     outline-style: solid;
   }
 </style>
@@ -1829,8 +1829,8 @@
         function checkPhoneMaxLength() {
             var maxLength = 17;
             var ccLength = $('#country-code').text().length;
-            var phoneLength = $('#phone-input').val().replace(/ |-|\+/g, '').length;
-            var totalLength = ccLength + phoneLength;
+            var phoneLength = $('#phone-input').val().length;
+            var totalLength = ccLength + 1 + phoneLength;
             if (totalLength > maxLength) {
                 var extraLength = totalLength - maxLength;
                 $('#phone-input').val($('#phone-input').val().substring(0, phoneLength - extraLength));
@@ -1840,9 +1840,10 @@
         jQuery('#phone-input').on('input blur paste', function() {
             checkPhoneMaxLength();
             var phonePattern = /^\+[0-9]{1,3} [0-9]{1,14}$/;
-            var fullPhone = $('#country-code').text() + ' ' + $(this).val().replace(/ |-|\+/g, '');
+            var fullPhone = $('#country-code').text() + ' ' + $(this).val();
             var isValid = phonePattern.test(fullPhone);
-            if (isValid) {
+            var isEmpty = $(this).val().length === 0;
+            if (isValid || isEmpty) {
                 $('#phone-input-error').hide();
             }
             else {
@@ -2078,7 +2079,7 @@
             return;
 
         enableDisableControls();
-        var inputs = form.find('input:not(:disabled)');
+        var inputs = form.find('input:visible:not(:disabled)');
         var index = $.inArray(this, inputs);
         index += e.shiftKey ? -1 : 1;
         if (index < 0) {
