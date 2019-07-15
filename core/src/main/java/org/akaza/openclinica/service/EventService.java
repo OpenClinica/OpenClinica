@@ -236,7 +236,7 @@ public class EventService implements EventServiceInterface {
 								dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
 								dnb.setThreadUuid(itemParentNote.getThreadUuid());
 							}
-							dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+							dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
 							dnb.setStudyId(study.getId());
 							dnb.setAssignedUserId(ub.getId());
 							dnb.setOwner(ub);
@@ -248,7 +248,7 @@ public class EventService implements EventServiceInterface {
 							dnb.setDetailedNotes(detailedNotes);
 							getDiscrepancyNoteDao().create(dnb);
 							getDiscrepancyNoteDao().createMapping(dnb);
-							itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+							itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
 							itemParentNote.setDetailedNotes(detailedNotes);
 							getDiscrepancyNoteDao().update(itemParentNote);
 						}
