@@ -2,10 +2,7 @@ package org.akaza.openclinica.control;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,15 +56,28 @@ public abstract class AbstractTableFactory {
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         setStateAttr(tableFacade);
         setDataAndLimitVariables(tableFacade);
+        int[] maxRowIncrements = getMaxRowIncrements();
         configureTableFacade(response, tableFacade);
         if (!tableFacade.getLimit().isExported()) {
             configureColumns(tableFacade, locale);
-            tableFacade.setMaxRowsIncrements(getMaxRowIncrements());
+            tableFacade.setMaxRowsIncrements(maxRowIncrements);
             configureTableFacadePostColumnConfiguration(tableFacade);
             configureTableFacadeCustomView(tableFacade);
             configureUnexportedTable(tableFacade, locale);
         } else {
             configureExportColumns(tableFacade, locale);
+        }
+        if (request.getParameter("maxRows") != null) {
+            int maxRows = new Integer(request.getParameter("maxRows"));
+            if (maxRows > 0) {
+
+                boolean match = Arrays.stream(maxRowIncrements).anyMatch(x -> x == maxRows);
+                if (match) {
+                    RowSelect rowSelect = (RowSelectImpl) tableFacade.getLimit().getRowSelect();
+                    RowSelect newRowSelect = new RowSelectImpl(rowSelect.getPage(), maxRows, rowSelect.getTotalRows());
+                    tableFacade.getLimit().setRowSelect(newRowSelect);
+                }
+            }
         }
         return tableFacade;
     }
