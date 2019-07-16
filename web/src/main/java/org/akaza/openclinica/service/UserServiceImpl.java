@@ -166,21 +166,21 @@ public class UserServiceImpl implements UserService {
         UserAccount pUserAccount = null;
 
         if (studySubject != null) {
-            if (studySubject.getUserId() == null && validateService.isParticipateActive(tenantStudy)) {
-                logger.info("Participate has not registered yet");
-                if (validateService.isParticipateActive(tenantStudy)) {
-                    do {
-                        accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
-                    } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, customerUuid));
+            if (validateService.isParticipateActive(tenantStudy)) {
+                if (studySubject.getUserId() == null ) {
+                    logger.info("Participate has not registered yet");
+                    accessCode = generateAccessCode(accessToken, customerUuid);
+                    // create participant user Account In Keycloak
+                    String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
+                    // create participant user Account In Runtime
+                    pUserAccount = createUserAccount(participantDTO, studySubject, userAccountBean, username, publicStudy, keycloakUserId);
+                    // create study subject detail Account
+                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, pUserAccount.getUserId(), tenantStudy, userAccount);
+                    logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
+                } else if (participantDTO.isResetAccessCode()) {
+                    accessCode = generateAccessCode(accessToken, customerUuid);
+                    keycloakClient.resetParticipateUserAccessCode(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
                 }
-                // create participant user Account In Keycloak
-                String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
-                // create participant user Account In Runtime
-                pUserAccount = createUserAccount(participantDTO, studySubject, userAccountBean, username, publicStudy, keycloakUserId);
-                // create study subject detail Account
-                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, pUserAccount.getUserId(), tenantStudy, userAccount);
-                logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
-
             } else {
                 // update study subject detail Account
                 studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null, tenantStudy, userAccount);
@@ -245,10 +245,18 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        ocUserDTO = buildOcUserDTO(studySubject);
+        ocUserDTO = buildOcUserDTO(studySubject,true);
         ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum, restext));
 
         return ocUserDTO;
+    }
+
+    private String generateAccessCode(String accessToken, String customerUuid) {
+        String accessCode;
+        do {
+            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+        } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, customerUuid));
+        return accessCode;
     }
 
     private String getErrorMessage(ParticipateInviteEnum inviteEnum, ParticipateInviteStatusEnum inviteStatusEnum, ResourceBundle restext) {
@@ -324,7 +332,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail) {
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo) {
 
         CoreResources.setRequestSchema(schema);
 
@@ -342,20 +350,33 @@ public class UserServiceImpl implements UserService {
 
         try {
             for (StudySubject studySubject : studySubjects) {
-                // subject is not removed or auto-removed
-                if (!studySubject.getStatus().equals(Status.DELETED)
+            	if (!studySubject.getStatus().equals(Status.DELETED)
                         && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
 
-                    OCUserDTO userDTO = buildOcUserDTO(studySubject);
-                    //Get accessToken from Keycloak
+            		 /**
+                     * OC-10640
+                     * AC4: Participant contact information and their Participate related information should only be returned
+                     *  for participants that are in available or signed status.
+                     */
+                    if (studySubject.getStatus().equals(Status.AVAILABLE)
+                            || studySubject.getStatus().equals(Status.SIGNED)) {
 
+                        
+                        //Get accessToken from Keycloak                      
+                    	OCUserDTO userDTO = buildOcUserDTO(studySubject,incRelatedInfo);
+                        ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo,incRelatedInfo);
+                        
+                        
+                        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
+                            userDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                        }	
+                        
+                        userDTOS.add(userDTO);
 
-                    ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,false);
-                    if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
-                        userDTO.setAccessCode(participantAccessDTO.getAccessCode());
                     }
-                    userDTOS.add(userDTO);
-                }
+                    
+            	}            		
+               
             }
             // add a new method to write this object into text file
             writeToFile(userDTOS, studyOid, fileName);
@@ -374,7 +395,7 @@ public class UserServiceImpl implements UserService {
         StudySubject studySubject = getStudySubject(ssid, study);
 
         if (studySubject != null) {
-            ocUserDTO = buildOcUserDTO(studySubject);
+            ocUserDTO = buildOcUserDTO(studySubject,true);
         }
         return ocUserDTO;
     }
@@ -523,35 +544,31 @@ public class UserServiceImpl implements UserService {
             accessCode = (accessDTO.getAccessCode() == null ? "" : accessDTO.getAccessCode());
         }
         StringBuffer sb = new StringBuffer();
-        sb.append("Hi ");
-        sb.append(studySubject.getStudySubjectDetail().getFirstName());
-        sb.append(",");
-        sb.append("<br>");
-        sb.append("<br>");
-
-        sb.append("Thanks for participating in ");
-        sb.append(studyName);
-        sb.append("!");
-        sb.append("<br>");
-        sb.append("<br>");
-
-        sb.append("<a href=\"" + accessLink + "\">Click here to begin</a>");
-        sb.append("<br>");
-        sb.append("<br>");
-
-        sb.append("Or, you may go to: ");
-        sb.append(host);
-        sb.append("<br>");
-
-        sb.append("and enter access code: ");
-        sb.append(accessCode);
-        sb.append("<br>");
-        sb.append("<br>");
-
-        sb.append("Thank you");
-        sb.append("<br>");
-
-        sb.append(studyName + " Team");
+        sb.append("<div style=\"background-color:#f1f1f1\"><center>");
+        sb.append("<table style=\"background-color:#ffffff; width:600px; margin:0; padding:0; " +
+                "font-family:'Open Sans',sans-serif; border-collapse:collapse!important; height:100%!important\" " +
+                "border=\"0\" cellpadding=\"0\" cellspacing=\"0\" height=\"100%\" width=\"100%\">" +
+                "<tbody><tr><td valign=\"top\"" +
+                "style=\"margin:0; padding:20px; font-family:'Open Sans',sans-serif; height:100%!important\"><div>");
+        sb.append("<h1 style=\"font-family:'Didact Gothic',sans-serif;color:#618ebb\">" +
+                "Welcome to " + studyName + " Study!</h1>");
+        sb.append("<p style='text-align:left'>Dear "+ studySubject.getStudySubjectDetail().getFirstName() + ",</p>");
+        sb.append("<p>Thanks for participating in " + studyName + " study! " +
+                "Please click the link below to get started.</p>");
+        sb.append("<p style='text-align:center;margin:25px'>" +
+                "<a href='" + accessLink + "' style=\"display: inline-block; " +
+                "text-decoration: none; background: #28a745; color: white; padding: 15px 35px; font-weight: bold; " +
+                "font-size: medium; border-radius: 5px;\" " +
+                "target='_blank'> Let's Go -></a></p>");
+        sb.append("<p style= \"line-height: 2em;\">Thanks!<br><strong>" +
+                "The " + studyName + " Study Team</strong></p>");
+        sb.append("<p style= \"margin-bottom: 20px; line-height: 2em; font-size:10px; color:#6b6b6b;\">You can also access the application by going to: " +
+                "" + host + " and enter the access code: " + accessCode + "</p>" +
+                "<hr style=\"border:2px solid #eaeef3;border-bottom:0;margin:20px 0\">");
+        sb.append("<p style=\"text-align:right; margin-bottom:30px;\">" +
+                "<img src=\"https://cdn.shortpixel.ai/client/q_lossless,ret_img/https://www.openclinica.com/wp-content/uploads/open-clinica.png\"" +
+                "width=\"125\" alt=\"OC logo\" style=\"border:0; height:auto; line-height:100%; outline:none; text-decoration:none\" data-image-whitelisted=\"\"></p>");
+        sb.append("</div></td></tr></tbody></table></center></div>");
 
         pDTO.setMessage(sb.toString());
 
@@ -583,6 +600,10 @@ public class UserServiceImpl implements UserService {
 
 
     public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
+    	return getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,auditAccessCodeViewing,true);
+    }
+    
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing,boolean includeAccessCode) {
         Study tenantStudy = getStudy(studyOid);
         if (!validateService.isParticipateActive(tenantStudy)) {
             logger.error("Participant account is not Active");
@@ -599,12 +620,17 @@ public class UserServiceImpl implements UserService {
             logger.error("Participant account not found");
             return null;
         }
-        String accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
-
-        if (accessCode == null) {
-            logger.error(" Access code from Keycloack returned null ");
-            return null;
+        
+        String accessCode = null;
+        if(includeAccessCode) {
+        	 accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
+        	 if (accessCode == null) {
+                 logger.error(" Access code from Keycloack returned null ");
+                 return null;
+             }
         }
+       
+       
         if (tenantStudy.getStudy() != null)
             tenantStudy = tenantStudy.getStudy();
 
@@ -616,7 +642,9 @@ public class UserServiceImpl implements UserService {
                 if (moduleConfigAttributeDTO != null) {
                     logger.info("Participant Access Link is :{}", moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
                     ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();
-                    participantAccessDTO.setAccessCode(accessCode);
+                    
+                    
+                    participantAccessDTO.setAccessCode(accessCode);                                       
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
@@ -641,7 +669,7 @@ public class UserServiceImpl implements UserService {
         return auditLogEventDTO;
     }
 
-    private OCUserDTO buildOcUserDTO(StudySubject studySubject) {
+    private OCUserDTO buildOcUserDTO(StudySubject studySubject,boolean incRelatedInfo) {
         OCUserDTO ocUserDTO = new OCUserDTO();
         ocUserDTO.setParticipantId(studySubject.getLabel());
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
@@ -651,7 +679,10 @@ public class UserServiceImpl implements UserService {
             ocUserDTO.setPhoneNumber(studySubjectDetail.getPhone() != null ? studySubjectDetail.getPhone() : "");
             ocUserDTO.setLastName(studySubjectDetail.getLastName() != null ? studySubjectDetail.getLastName() : "");
             ocUserDTO.setIdentifier(studySubjectDetail.getIdentifier() != null ? studySubjectDetail.getIdentifier() : "");
-            ocUserDTO.setStatus(studySubject.getUserStatus());
+            
+            if(incRelatedInfo) {
+            	ocUserDTO.setStatus(studySubject.getUserStatus());
+            }
         } else {
             ocUserDTO.setFirstName("");
             ocUserDTO.setEmail("");

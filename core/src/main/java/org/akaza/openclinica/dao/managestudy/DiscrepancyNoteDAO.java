@@ -1514,7 +1514,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         } else {
             variables.put(Integer.valueOf(9), Integer.valueOf(sb.getAssignedUserId()));
         }
-        // variables.put(Integer.valueOf(9), Integer.valueOf(sb.getAssignedUserId()));
+
+
+        if (sb.getThreadUuid() == null) {
+            nullVars.put(Integer.valueOf(10), Integer.valueOf(Types.INTEGER));
+            variables.put(Integer.valueOf(10), null);
+        } else {
+            variables.put(Integer.valueOf(10), sb.getThreadUuid());
+        }
+
+        if (sb.getThreadNumber() == null) {
+            nullVars.put(Integer.valueOf(11), Integer.valueOf(Types.INTEGER));
+            variables.put(Integer.valueOf(11), null);
+        } else {
+            variables.put(Integer.valueOf(11), sb.getThreadNumber());
+        }
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -2118,6 +2132,24 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(2), Integer.valueOf(parentId));
 
         String sql = digester.getQuery("findLatestChildByParent");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
+    }
+
+    public EntityBean findFirstChildByParent(int parentId) {
+        DiscrepancyNoteBean eb = new DiscrepancyNoteBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(parentId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(parentId));
+
+        String sql = digester.getQuery("findFirstChildByParent");
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
 

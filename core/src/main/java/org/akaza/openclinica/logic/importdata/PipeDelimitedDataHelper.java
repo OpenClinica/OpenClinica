@@ -749,6 +749,22 @@ public String readFileToString(File file) throws IOException{
 	       		 if(mappingRow.length == 2) {
 	       			 String keyWord = mappingRow[0];
 	           		 String value = mappingRow[1];
+	           		
+	           		 if(keyWord !=null && keyWord.trim().length() >0) {
+	           			;
+	           		}else {
+	           			errorMsg = currentLine +" in wrong format,please use the format like 'key=value', key or value could not be blank.";	           			
+	             		errorMsgs.add(errorMsg);
+	             		
+	           		}
+	           		
+	           		if(value !=null && value.trim().length() >0) {
+	           			;
+	           		}else {
+	           			errorMsg = currentLine +" in wrong format,please use the format like 'key=value', key or value could not be blank.";
+	           			errorMsgs.add(errorMsg);
+	           		}
+	           		
 	           		 hm.put(keyWord, value);
 	           		 
 	           		 if(keyWord != null && keyWord.trim().startsWith("FormOID") && value != null && value.trim().length() >0) {
@@ -769,11 +785,16 @@ public String readFileToString(File file) throws IOException{
 	            	 } else if(keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") ||  keyWord.trim().indexOf("SkipMatchCriteria") ==1 ) ) {
 	            		//check SkipMatchCriteria format
 	            		 if(value != null && value.trim().length() >0) {
-	            			 errorMsg = this.validateSkipMatchCriteriaFormat(mappingRow);
-		            		 
-		            		 if(errorMsg != null) {
+	            			errorMsg = this.validateSkipMatchCriteriaFormat(mappingRow);
+	            			 	            			 
+		            		if(errorMsg != null) {
 			             			errorMsgs.add(errorMsg);
-			             		}
+		             		}else {
+		             			ArrayList<ImportItemGroupDTO> importItemGroupDTOsFromSkipMatchCriteria = this.convertSkipMatchCriteriaToImportItemGroupDTO(mappingRow);
+		            			 for(ImportItemGroupDTO itgd:importItemGroupDTOsFromSkipMatchCriteria) {
+		            				 addToItemGroupDTOList(importItemGroupDTOs, itgd); 
+		            			 }
+		             		}
 	            		 }
 	            		
 	             	 } else {
@@ -788,6 +809,11 @@ public String readFileToString(File file) throws IOException{
 	             		addToItemGroupDTOList(importItemGroupDTOs, importItemGroupDTO);
 	             		
 	             	 }
+	       		 }else {
+	       			 	       			
+	           		errorMsg = currentLine +" in wrong format,should have only one '=' in each line ";
+	           		
+	       			errorMsgs.add(errorMsg);
 	       		 }
 	       	 }
 		    }// end of while loop
@@ -917,6 +943,44 @@ private  ImportItemGroupDTO  convertToImportItemGroupDTO(String[] keyValueStr) {
 	     
 	    return importItemGroupDTO;
 	}
+/**
+ * SkipMatchCriteria = IG_LAB_O_OTHERCHEM.I_LAB_O_OR_ODATE, IG_LAB_O_OTHERCHEM.I_LAB_O_LABINFO
+ * convert : IG_LAB_O_OTHERCHEM.I_LAB_O_OR_ODATE to ImportItemGroupDTO
+ * @param keyValueStr
+ * @return
+ */
+private  ArrayList<ImportItemGroupDTO>  convertSkipMatchCriteriaToImportItemGroupDTO(String[] keyValueStr) {		
+	
+	ArrayList importItemGroupDTOs = new ArrayList<ImportItemGroupDTO>();
+    ImportItemGroupDTO importItemGroupDTO = null;	
+	
+	String val;
+	String skipMatchCriteriaStr;
+	String[] skipMatchCriteriaVal;
+
+	skipMatchCriteriaStr =  keyValueStr[1].trim().replaceAll("/n|||/r", "");    	
+	skipMatchCriteriaVal = this.toArray(skipMatchCriteriaStr,",");
+	
+    for(int i=0;i < skipMatchCriteriaVal.length; i++) {
+    	val = skipMatchCriteriaVal[i];    	                    
+    	String[] itemMappingvalue = toArray(val,".");
+    	
+        if(itemMappingvalue.length != 2) {
+        	
+        }
+        
+		String itemGroupOID = itemMappingvalue[0]; 
+		String itemOID = itemMappingvalue[1];
+		 
+		importItemGroupDTO = new ImportItemGroupDTO();
+		importItemGroupDTO.setItemGroupOID(itemGroupOID.trim());
+		importItemGroupDTO.getItemOIDs().add(itemOID.trim());	
+		
+		importItemGroupDTOs.add(importItemGroupDTO);
+    }
+        
+    return importItemGroupDTOs;
+}
 
 private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {		
 	
@@ -925,8 +989,9 @@ private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
 	String skipMatchCriteriaStr;
 	String[] skipMatchCriteriaVal;
 
-    if(keyValueStr.length < 2) {
-    	 ;
+    if(keyValueStr.length != 2) {
+    	 errorMsg = "SkipMatchCriteria in wrong format,may have more than one '=' sign ";
+		 return errorMsg;
     }else {
     	key = keyValueStr[0].trim();
     	skipMatchCriteriaStr =  keyValueStr[1].trim().replaceAll("/n|||/r", "");
@@ -936,8 +1001,11 @@ private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
         	 String val = skipMatchCriteriaVal[i];
         	 String[] itemMappingvalue = toArray(val,".");
         	 
-        	 if(itemMappingvalue.length <2) {
+        	 if(itemMappingvalue.length < 2) {
         		 errorMsg = "Missing the information of Item or Item Group OID setting in SkipMatchCriteria " + val + "\n";
+      			 return errorMsg;
+        	 }else if(itemMappingvalue.length > 2) {
+        		 errorMsg = "Wrong format in SkipMatchCriteria Item or Item Group OID setting, may have more than one '.' in  " + val + "\n";
       			 return errorMsg;
         	 }
                
@@ -952,7 +1020,11 @@ private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
       		if(itemOid == null || itemOid.trim().length() ==0) {
       			 errorMsg = "Missing the information of Item OID setting in SkipMatchCriteria" + val +  "\n";
       			 return errorMsg;
-      		 }	
+      		 }
+      		
+      		//continue to check item group and item oid 
+      		
+      		
         }
       	        
      }

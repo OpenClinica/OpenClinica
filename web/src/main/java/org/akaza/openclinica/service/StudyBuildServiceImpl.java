@@ -258,11 +258,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             return false;
     }
 
-    private void removeDeletedUserRoles(ArrayList<StudyUserRole> modifiedStudyUserRoles, Collection<StudyUserRole> existingStudyUserRoles) {
-        existingStudyUserRoles.removeIf(existingStudyUserRole -> modifiedStudyUserRoles.stream().anyMatch(
-                modifiedStudyUserRole -> existingStudyUserRole.getId().getStudyId().equals(modifiedStudyUserRole.getId().getStudyId())));
-        existingStudyUserRoles.forEach(studyToDelete -> studyUserRoleDao.getCurrentSession().delete(studyToDelete));
-    }
 
     private boolean checkIfParentExists(HttpServletRequest request, Study study, List<StudyEnvironmentRoleDTO> roles) {
         StudyEnvironmentRoleDTO role = roles.stream().filter(s -> s.getStudyEnvironmentUuid().equals(study.getStudy().getStudyEnvUuid())).findAny()
@@ -379,8 +374,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 }
             }
         }
-        // remove all the roles that are not there for this user
-        removeDeletedUserRoles(modifiedSURArray, existingStudyUserRoles);
+        // If role sizes are different update the flag
+        if (modifiedSURArray.size() != existingStudyUserRoles.size())
+            studyUserRoleUpdated = true;
         if (currentActiveStudyValid == false) {
             ub.setActiveStudy(placeHolderStudy);
             userAccountDao.saveOrUpdate(ub);

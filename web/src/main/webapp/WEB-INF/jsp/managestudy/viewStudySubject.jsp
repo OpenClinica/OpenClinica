@@ -288,7 +288,7 @@
   #inviteResultAlert > table {
     width: 600px;
   }
-  input[type=radio]:focus {
+  input[type=radio]:focus,input[type=checkbox]:focus {
     outline-style: solid;
   }
 </style>
@@ -1485,14 +1485,6 @@
                                   <span>Italy</span>&nbsp;&nbsp;<span class="the-country-code">+39</span>
                               </td>
                           </tr>
-                          <tr class="country-option" data-country="JP">
-                              <td class="flag-holder">
-                                  <div class="the-flag" style="background-position: 0px -429px;"></div>
-                              </td>
-                              <td>
-                                  <span>Japan</span>&nbsp;&nbsp;<span class="the-country-code">+81</span>
-                              </td>
-                          </tr>
                           <tr class="country-option" data-country="NL">
                               <td class="flag-holder">
                                   <div class="the-flag" style="background-position: 0px -1441px;"></div>
@@ -1573,7 +1565,7 @@
     <tr class="reset-participant-access-code hide">
       <td>
         <label>
-          <input type="checkbox" name="reset_participant_access_code" value="true">
+          <input type="checkbox" id="reset-participant-access-code">
           <fmt:message key="reset_participant_access_code" bundle="${resword}"/>
         </label>
         <br><br>
@@ -1742,12 +1734,12 @@
             $('#connect-button').attr('disabled', 'disabled');
     }
 
-    function getAccessCode() {
+    function getAccessCode(includeAccessCode) {
         jQuery.ajax({
             type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?includeAccessCode='+includeAccessCode,
             success: function(data) {
-                $('#access-code-input').val(data.accessCode);
+                $('#access-code-input').val(data.accessCode !=null ? data.accessCode:"loading...");
                 $('#access-url').text(data.host);
             },
             error: logDump
@@ -1778,7 +1770,8 @@
                 phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
                 inviteParticipant: $('#invite_via_email input:checked').val(),
                 inviteViaSms: $('#invite_via_sms input:checked').val(),
-                identifier: $('#secid-input').val()
+                identifier: $('#secid-input').val(),
+                resetAccessCode: $('#reset-participant-access-code').is(':checked')
             };
             if (data.inviteParticipant === 'true' || data.inviteViaSms === 'true') {
                 $('#inviting').show();
@@ -1812,16 +1805,18 @@
         });
 
         jQuery('#email-input').blur(function() {
-            var emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+            var maxLength = 255;
+            var emailPattern = /^[A-Za-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/;
             var input = $(this).val();
             var isEmpty = input.length === 0;
+            var tooLong = input.length > maxLength;
             var parts = input.split('@');
             var hasSingleAt = parts.length === 2;
             var afterAt = parts[1] || '';
             var afterAtHasDot = afterAt.includes('.');
             var dotRightAfterAt = afterAt[0] === '.';
             var endsWithDot = afterAt[afterAt.length - 1] === '.';
-            var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
+            var validEmail = emailPattern.test(input) && !tooLong && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
             if (validEmail || isEmpty) {
                 $('#email-input-error').hide();
             }
@@ -1832,10 +1827,10 @@
         });
 
         function checkPhoneMaxLength() {
-            var maxLength = 15;
-            var ccLength = $('#country-code').text().replace(/ |-|\+/g, '').length;
-            var phoneLength = $('#phone-input').val().replace(/ |-|\+/g, '').length;
-            var totalLength = ccLength + phoneLength;
+            var maxLength = 17;
+            var ccLength = $('#country-code').text().length;
+            var phoneLength = $('#phone-input').val().length;
+            var totalLength = ccLength + 1 + phoneLength;
             if (totalLength > maxLength) {
                 var extraLength = totalLength - maxLength;
                 $('#phone-input').val($('#phone-input').val().substring(0, phoneLength - extraLength));
@@ -1844,9 +1839,11 @@
 
         jQuery('#phone-input').on('input blur paste', function() {
             checkPhoneMaxLength();
-            var phonePattern = /^[0-9 -]*$/;
-            var isValid = phonePattern.test($(this).val());
-            if (isValid) {
+            var phonePattern = /^\+[0-9]{1,3} [0-9]{1,14}$/;
+            var fullPhone = $('#country-code').text() + ' ' + $(this).val();
+            var isValid = phonePattern.test(fullPhone);
+            var isEmpty = $(this).val().length === 0;
+            if (isValid || isEmpty) {
                 $('#phone-input-error').hide();
             }
             else {
@@ -1886,6 +1883,7 @@
         });
 
         jQuery('#participateAccess').click(function() {
+            getAccessCode("N");
             $('#eye').show();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
@@ -1909,7 +1907,7 @@
         });
 
         jQuery('#eye').click(function() {
-            getAccessCode();
+            getAccessCode("Y");
             $(this).hide();
             $('#access-code-input').attr('type', 'text');
         });
@@ -2026,13 +2024,6 @@
         },
         {
             backgroundPositionLeft: 0,
-            backgroundPositionTop: -429,
-            name: 'Japan',
-            phoneCode: '+81',
-            countryCode: 'JP'
-        },
-        {
-            backgroundPositionLeft: 0,
             backgroundPositionTop: -1441,
             name: 'Netherlands',
             phoneCode: '+31',
@@ -2076,10 +2067,10 @@
     ];
 
     var form = $('#contactInformationForm');
-    var inputs = form.find('input');
     form.on('keyup', 'input', function(e) {
         if (e.keyCode === 9) { // keycode 9 is Tab
             e.preventDefault;
+            enableDisableControls();
             return false;
         }
     });
@@ -2087,6 +2078,8 @@
         if (e.keyCode !== 9)
             return;
 
+        enableDisableControls();
+        var inputs = form.find('input:visible:not(:disabled)');
         var index = $.inArray(this, inputs);
         index += e.shiftKey ? -1 : 1;
         if (index < 0) {

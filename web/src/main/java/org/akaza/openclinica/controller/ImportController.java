@@ -19,7 +19,6 @@ import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
-import org.akaza.openclinica.domain.enumsupport.EndpointType;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -55,7 +54,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @RestController
 @RequestMapping( value = "/auth/api" )
-@Api( value = "ImportController", tags = {"Import"}, description = "REST API for Data Import" )
+@Api( value = "ImportController", tags = {"Clinical Data"}, description = "REST API for Data Import" )
 public class ImportController {
 
     @Autowired

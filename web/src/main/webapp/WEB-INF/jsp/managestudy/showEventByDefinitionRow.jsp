@@ -42,7 +42,7 @@
     
     </td>
         <%--<c:if test="${(userBean.sysAdmin || userRole.manageStudy || (currRow.bean.owner.id == userBean.id)) && study.status.available}">--%>
-        <c:if test="${study.status.available && !currRow.bean.status.deleted && currRow.bean.editable}">    
+        <c:if test="${study.status.available && !currRow.bean.status.deleted && currRow.bean.editable && !userRole.monitor}">    
         <td>
 
             <a href="UpdateStudyEvent?module=<c:out value="${module}"/>&event_id=<c:out value="${currRow.bean.id}"/>&ss_id=<c:out value="${currRow.bean.studySubjectId}"/>"

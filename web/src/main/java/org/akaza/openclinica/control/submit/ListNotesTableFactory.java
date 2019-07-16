@@ -107,8 +107,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
-        // https://jira.openclinica.com/browse/OC-9952
-        tableFacade.setMaxRows(50);
         tableFacade.setColumnProperties("discrepancyNoteBean.threadNumber", "studySubject.label", "siteId", "discrepancyNoteBean.disType","discrepancyNoteBean.resolutionStatus",
                 "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus",
                 "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.detailedNotes", "numberOfNotes", "discrepancyNoteBean.user",
@@ -175,6 +173,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
         int parentStudyId = 0;
 
+        // https://jira.openclinica.com/browse/OC-9952
+        tableFacade.setMaxRows(50);
+
         Limit limit = tableFacade.getLimit();
 
         if (!limit.isComplete()) {
@@ -226,7 +227,23 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("days", discrepancyNoteBean.getDays());
             h.put("siteId", discrepancyNoteBean.getSiteId());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
-            h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
+            if (discrepancyNoteBean.getDisType().equals(DiscrepancyNoteType.QUERY) &&
+                    (discrepancyNoteBean.getResStatus().equals(ResolutionStatus.UPDATED)) ||
+                    discrepancyNoteBean.getResStatus().equals(ResolutionStatus.CLOSED) ) {
+                // OC-10617 After update, Queries Table displays incorrect date created.
+                // use the first child createdDate
+                if (discrepancyNoteBean.getParentDnId() > 0) {
+                    dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findFirstChildByParent(
+                            discrepancyNoteBean.getParentDnId());
+                } else {
+                    // this entity is parent
+                    dNBean = (DiscrepancyNoteBean) discrepancyNoteDao.findFirstChildByParent(
+                            discrepancyNoteBean.getId());
+                }
+                h.put("discrepancyNoteBean.createdDate", dNBean.getCreatedDate());
+            } else {
+                h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
+            }
             h.put("discrepancyNoteBean.updatedDate", discrepancyNoteBean.getUpdatedDate());
             h.put("eventName", discrepancyNoteBean.getEventName());
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());

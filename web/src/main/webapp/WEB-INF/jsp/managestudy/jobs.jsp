@@ -72,9 +72,6 @@
   #tbl-jobs_filter {
     margin-bottom: 3px;
   }
-  #tbl-jobs_wrapper {
-    margin-top: 30px;
-  }
   .icon {
     cursor: pointer;
   }
@@ -90,6 +87,9 @@
   .highlight-red {
     color: red;
     font-weight: bold;
+  }
+  .right {
+    float: right;
   }
 </style>
 
@@ -121,7 +121,6 @@
     <div>
       <fmt:message key="jobs_description" bundle="${resword}"/>
     </div>
-    <br>
     <table id="tbl-jobs" class="datatable">
       <thead>
         <tr>
@@ -140,7 +139,7 @@
     </table>
 
     <script>
-      $('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html#/job-controller');
+      $('#jobs-doc').attr({href: '${pageContext.request.contextPath}/pages/swagger-ui.html', target: '_blank'});
       $.fn.dataTable.moment(dateFormat);
       var datatable = $('#tbl-jobs').DataTable({
         dom: 'frtilp',
@@ -151,7 +150,7 @@
           targets: -1,
           orderable: false
         }],
-        order: [[6, 'desc']],
+        order: [[4, 'desc'], [6, 'desc']],
         language: {
           emptyTable: 'Loading...',
           paginate: {
@@ -198,7 +197,6 @@
         datatable.settings()[0].oLanguage.sEmptyTable = formatError(e);
         datatable.draw();
       });
-      $('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_log" bundle="${resword}"/></b>');
       $('#tbl-jobs')
         .on('click', '.icon-trash', function() {
           if(confirm('<fmt:message key="jobs_del_confirm" bundle="${resword}"/>')) {
@@ -221,6 +219,9 @@
   <c:otherwise>
     <div id="loading">Loading...</div>
     <div id="job-details" class="hide">
+      <a class="right" href="${pageContext.request.contextPath}/Jobs">
+        <fmt:message key="go_back" bundle="${resword}"/>
+      </a>
       <h1>
         Log For <span id="job-log-for"></span>
       </h1>
@@ -273,6 +274,10 @@
     </div>
 
     <table id="tbl-job"></table>
+    <a class="right" href="${pageContext.request.contextPath}/Jobs">
+      <fmt:message key="go_back" bundle="${resword}"/>
+    </a>
+
     <script>
       var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/${param["uuid"]}/downloadFile?open=true';
       var jobResult = $.get(url, function(data) {
@@ -297,7 +302,14 @@
             return {title: title};
           }),
           paging: false,
-          dom: 'ft'
+          dom: 'ft',
+          "drawCallback": function( settings ) {
+            const dtWidth = $("#tbl-job").width();
+            const sidebarWidth = $("#sidebar_Instructions_closed").width();
+            const navbarWidth = dtWidth + sidebarWidth;
+            $("#tbl-job_wrapper").css({"width": "calc(" + dtWidth + "px + 1em)", "padding-right": "1em" });
+            $(".oc_nav").css({"width": "calc(" + navbarWidth + "px + 2em)"});
+          }
         });
       }).fail(function(e) {
         $('#loading').text(formatError(e));

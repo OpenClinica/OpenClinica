@@ -148,8 +148,13 @@ public class QueryServiceImpl implements QueryService {
                 parentDN.setUserAccount(childDN.getUserAccount());
                 setResolutionStatus(queryBean, parentDN);
                 parentDN.setUserAccountByOwnerId(helperBean.getContainer().getUser());
-                parentDN.setDetailedNotes(childDN.getDetailedNotes());
                 parentDN.setDiscrepancyNoteType(childDN.getDiscrepancyNoteType());
+                parentDN.setDetailedNotes(childDN.getDetailedNotes());
+
+                // OC-10617 After update, Queries Table displays incorrect date created.
+                // (don't update parent detailedNotes and dateCreated)
+                // parentDN.setDetailedNotes(childDN.getDetailedNotes());
+                // parentDN.setDateCreated(new Date());
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
                 helperBean.setDn(childDN);
@@ -338,7 +343,7 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
         message.append(
-             MessageFormat.format(respage.getString("mailDNParameters1"), enketoUrlService.addLeadingZeros(String.valueOf(helperBean.getParentDn().getThreadNumber())),helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
+             MessageFormat.format(respage.getString("mailDNParameters1"), String.valueOf(helperBean.getParentDn().getThreadNumber()),helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("entity_information"));
         message.append(respage.getString("email_body_separator"));

@@ -806,7 +806,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         }
         eventDiv.nbsp().nbsp().nbsp();
         for (int i = 1; i <= studyEventsSize; i++) {
-            eventDiv.ahref("javascript:StatusBoxSkip('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + "," + i + ");",
+            eventDiv.ahref("javascript:StatusBoxSkip('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + "," + i + ");",
                     String.valueOf(i));
             if (i < studyEventsSize) {
                 eventDiv.append("|");
@@ -825,7 +825,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                 .style("display: none;").close();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").style("display: none;").close();
-        eventDiv.a().href("javascript:StatusBoxBack('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
+        eventDiv.a().href("javascript:StatusBoxBack('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
         eventDiv.img().src("images/arrow_status_back.gif").border("0").close();
         eventDiv.aEnd();
         eventDiv.divEnd();
@@ -874,7 +874,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                 .style("display: none;").close();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").close();
-        eventDiv.a().href("javascript:StatusBoxNext('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
+        eventDiv.a().href("javascript:StatusBoxNext('" + studySubjectLabel.replaceAll("'", "\\\\'") + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
         eventDiv.img().src("images/arrow_status_next.gif").border("0").close();
         eventDiv.aEnd();
         eventDiv.divEnd();
@@ -1145,6 +1145,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     private void lockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
             StudyEventDefinitionBean sed) {
+        studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "layersShowOrHide('visible','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
@@ -1163,6 +1164,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     private void repeatingIconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
             StudyEventDefinitionBean sed) {
+        studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
         // String href1 = "javascript:leftnavExpand('Menu_on_" +
         // studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
@@ -1183,6 +1185,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     private void iconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
             StudyEventDefinitionBean sed) {
+        studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1Repeating = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size()
                 + "); ";
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
@@ -1204,6 +1207,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     private void divCloseRepeatinglinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
             StudyEventDefinitionBean sed) {
+        studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";
@@ -1217,6 +1221,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
     }
 
     private void linkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed) {
+        studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick1 = "layersShowOrHide('hidden','Lock_all'); ";

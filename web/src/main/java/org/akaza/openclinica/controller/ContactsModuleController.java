@@ -1,12 +1,9 @@
 package org.akaza.openclinica.controller;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.dto.ContactsModuleDTO;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.*;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -20,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
 
 /**
  * A simple example of an annotated Spring Controller. Notice that it is a POJO; it
@@ -55,14 +51,15 @@ public class ContactsModuleController {
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
 
-
-    @ApiOperation( value = "To update contacts Module Status " )
+    /*
+    @ApiOperation( value = "To update contacts Module Status ", hidden = true )
     @ApiResponses( value = {
             @ApiResponse( code = 200, message = "Successful operation" ),
             @ApiResponse( code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
                     + "<br />Error Code                                            Descriptions"
                     + "<br />Status    : Status should be either 'enabled' or 'disabled'."
             )} )
+    */
     @RequestMapping( value = "/{studyOID}/modules/contacts", method = RequestMethod.POST )
     public ResponseEntity updateContactModuleStatus(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,
                                                     @RequestBody ContactsModuleDTO contactsModuleDTO) {
@@ -92,8 +89,7 @@ public class ContactsModuleController {
         return ResponseEntity.status(HttpStatus.OK).body(contactsModuleDTO);
     }
 
-    @ApiOperation( value = "To get contacts Module Status " )
-
+    /*@ApiOperation( value = "To get contacts Module Status ", hidden = true )*/
     @RequestMapping( value = "/{studyOID}/modules/contacts", method = RequestMethod.GET )
     public ResponseEntity getContactModuleStatus(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid
     ) {

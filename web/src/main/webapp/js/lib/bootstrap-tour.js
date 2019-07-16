@@ -70,7 +70,7 @@ jQuery(document).ready(function() {
                                                         <tr> \
                                                             <td></td> \
                                                             <td> \
-                                                                <span style='font-style: italic; color: #555555;'>Finished report can be accessed in <a href='Jobs'>jobs page</a>.<br></span> \
+                                                                <span style='font-style: italic; color: #555555;'>Finished report can be accessed on <a href='Jobs'>the bulk actions log page</a>.<br></span> \
                                                                 <span style='font-style: italic; color: #555555;'>Please allow some time and refresh the page to see the report.</span> \
                                                             </td> \
                                                         </tr> \
@@ -83,7 +83,7 @@ jQuery(document).ready(function() {
                             </tr> \
                             <tr> \
                                 <td colspan='2' style='text-align: right;'> \
-                                    <div style='margin-top: 45px;'> \
+                                    <div style='margin-top: 25px;'> \
                                         <input type='button' value='Cancel' onclick='clearPIDVerificationForm()'/> \
                                         &nbsp; \
                                         <input type='button' value='Continue' onclick='validatePIDVerificationForm()'/> \

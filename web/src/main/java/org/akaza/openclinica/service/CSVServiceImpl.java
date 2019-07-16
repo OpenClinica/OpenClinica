@@ -3,6 +3,8 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
 import org.akaza.openclinica.controller.helper.PIIEnum;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.csv.CSVFormat;
@@ -27,12 +29,17 @@ import static org.akaza.openclinica.service.rest.errors.ErrorConstants.PARTICIPA
 @Service("CSVService")
 public class CSVServiceImpl implements CSVService {
     private final static Logger log = LoggerFactory.getLogger(CSVServiceImpl.class);
-    private static final String ParticipantID_header = "ParticipantID";
+    private static final String PARTICIPANT_ID = "ParticipantID";
     //Study event bulk schedule CSV file header
-    private static final String StudyEventOID_header = "StudyEventOID";
-    private static final String Ordinal_header = "Ordinal";
-    private static final String StartDate_header = "StartDate";
-    private static final String EndDate_header = "EndDate";
+    private static final String STUDY_EVENT_OID = "StudyEventOID";
+    private static final String STUDY_EVENT_REPEAT_KEY = "StudyEventRepeatKey";
+    private static final String START_DATE = "StartDate";
+    private static final String END_DATE = "EndDate";
+    private static final String STUDY_EVENT_STATUS = "StudyEventStatus";
+
+
+
+
 
     /**
      *
@@ -48,18 +55,18 @@ public class CSVServiceImpl implements CSVService {
         ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = new ArrayList<>();
 
         //Study event bulk schedule CSV file header position
-        int ParticipantID_index = -999;
-        int StudyEventOID_index = -999;
-        int Ordinal_index = -999;
-        int StartDate_index = -999;
-        int EndDate_index = -999;
+        int participantID_index = -1;
+        int studyEventOID_index = -1;
+        int studyEventRepeatKey_index = -1;
+        int startDate_index = -1;
+        int endDate_index = -1;
+        int studyEventStatus_index = -1;
 
         try(Scanner sc = new Scanner(file.getInputStream())){
 
             String line;
 
-            int lineNm = 1;
-            int position = 0;
+            int rowNumber = 1;
 
             while (sc.hasNextLine()) {
                 line = sc.nextLine();
@@ -72,24 +79,29 @@ public class CSVServiceImpl implements CSVService {
                 String[] lineVal= line.split(",", 0);
 
                 // check ParticipantID column number
-                if(lineNm ==1) {
+                if(rowNumber ==1) {
 
                     for(int i=0; i < lineVal.length;i++) {
                         String currentHeader = lineVal[i].trim();
-                        if(currentHeader.equalsIgnoreCase(ParticipantID_header)) {
-                            ParticipantID_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(StudyEventOID_header)) {
-                            StudyEventOID_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(Ordinal_header)) {
-                            Ordinal_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(StartDate_header)) {
-                            StartDate_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(EndDate_header)) {
-                            EndDate_index = i;
+
+                        if(currentHeader.equalsIgnoreCase(PARTICIPANT_ID)) {
+                                participantID_index = i;
+                        }else if(currentHeader.equalsIgnoreCase(STUDY_EVENT_OID)) {
+                                studyEventOID_index = i;
+                        }else if(currentHeader.equalsIgnoreCase(STUDY_EVENT_REPEAT_KEY)) {
+                            studyEventRepeatKey_index = i;
+                        }else if(currentHeader.equalsIgnoreCase(START_DATE)) {
+                                startDate_index = i;
+                        }else if(currentHeader.equalsIgnoreCase(END_DATE)) {
+                                endDate_index = i;
+                        }else if(currentHeader.equalsIgnoreCase(STUDY_EVENT_STATUS)) {
+                                studyEventStatus_index = i;
                         }else {
-                            ;
+                            // Incorrect Header name
+
                         }
                     }
+
                 }else {
                     StudyEventScheduleDTO studyEventScheduleDTO = new StudyEventScheduleDTO();
 
@@ -98,30 +110,33 @@ public class CSVServiceImpl implements CSVService {
                         studyEventScheduleDTO.setSiteOID(siteOID.trim());
                     }
 
-                    if(lineVal[ParticipantID_index] != null) {
-                        studyEventScheduleDTO.setSubjectKey(lineVal[ParticipantID_index].trim());
+                    if(participantID_index!=-1 &&  lineVal[participantID_index] != null && lineVal[participantID_index].trim().length()>0) {
+                        studyEventScheduleDTO.setSubjectKey(lineVal[participantID_index].trim());
                     }
 
-                    if(lineVal[StudyEventOID_index] != null) {
-                        studyEventScheduleDTO.setStudyEventOID(lineVal[StudyEventOID_index].trim());
+                    if(studyEventOID_index!=-1 &&lineVal[studyEventOID_index] != null && lineVal[studyEventOID_index].trim().length()>0) {
+                        studyEventScheduleDTO.setStudyEventOID(lineVal[studyEventOID_index].trim());
                     }
 
-                    if(lineVal[Ordinal_index] != null && lineVal[Ordinal_index].trim().length() > 0) {
-                        studyEventScheduleDTO.setOrdinal(lineVal[Ordinal_index].trim());
+                    if(studyEventRepeatKey_index!=-1 && lineVal[studyEventRepeatKey_index] != null && lineVal[studyEventRepeatKey_index].trim().length() > 0) {
+                        studyEventScheduleDTO.setOrdinal(lineVal[studyEventRepeatKey_index].trim());
                     }
-                    if(lineVal[StartDate_index] != null) {
-                        studyEventScheduleDTO.setStartDate(lineVal[StartDate_index].trim());
+                    if(startDate_index!=-1 && lineVal[startDate_index] != null && lineVal[startDate_index].trim().length()>0) {
+                        studyEventScheduleDTO.setStartDate(lineVal[startDate_index].trim());
                     }
-                    if(lineVal[EndDate_index] != null && lineVal[EndDate_index].trim().length()>0) {
-                        studyEventScheduleDTO.setEndDate(lineVal[EndDate_index].trim());
+                    if(endDate_index!=-1 && lineVal[endDate_index] != null && lineVal[endDate_index].trim().length()>0) {
+                        studyEventScheduleDTO.setEndDate(lineVal[endDate_index].trim());
                     }
 
-                    studyEventScheduleDTO.setRowNum(lineNm - 1);
+                    if(studyEventStatus_index!=-1 && lineVal[studyEventStatus_index] != null && lineVal[studyEventStatus_index].trim().length()>0) {
+                        studyEventScheduleDTO.setStudyEventStatus (lineVal[studyEventStatus_index].trim());
+                    }
+                    studyEventScheduleDTO.setRowNum(rowNumber-1);
 
                     studyEventScheduleDTOList.add(studyEventScheduleDTO);
                 }
 
-                lineNm++;
+                rowNumber++;
             }
 
         } catch (Exception e) {
@@ -158,7 +173,7 @@ public class CSVServiceImpl implements CSVService {
             Map<String, Integer> headerMap = csvParser.getHeaderMap();
             if (CollectionUtils.isEmpty(headerMap))
                 throw new Exception(PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA);
-            final long participantIDCount = headerMap.entrySet().stream().filter(x -> x.getKey().equals(ParticipantID_header)).count();
+            final long participantIDCount = headerMap.entrySet().stream().filter(x -> x.getKey().equals(PARTICIPANT_ID)).count();
 
             if (participantIDCount == 0) {
                 throw new Exception(PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA);
@@ -255,4 +270,81 @@ public class CSVServiceImpl implements CSVService {
 
         return subjectKeyList;
     }
+
+
+    public void validateCSVFileHeader(MultipartFile file, String studyOID, String siteOID) throws Exception {
+
+        //Study event bulk schedule CSV file header position
+        int participantID_index = -1;
+        int studyEventOID_index = -1;
+        int studyEventRepeatKey_index = -1;
+        int startDate_index = -1;
+        int endDate_index = -1;
+        int studyEventStatus_index = -1;
+
+        Scanner sc = new Scanner(file.getInputStream());
+        String line;
+        while (sc.hasNextLine()) {
+            line = sc.nextLine();
+
+            //in case the last column is empty
+            if (line.endsWith(",")) {
+                line = line + " ,";
+            }
+
+            String[] lineVal = line.split(",", 0);
+            for (int i = 0; i < lineVal.length; i++) {
+                String currentHeader = lineVal[i].trim();
+                if (currentHeader.equalsIgnoreCase(PARTICIPANT_ID)) {
+                    if (participantID_index == -1) {
+                        participantID_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_PARTICIPANT_ID_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(STUDY_EVENT_OID)) {
+                    if (studyEventOID_index == -1) {
+                        studyEventOID_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_STUDY_EVENT_OID_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(STUDY_EVENT_REPEAT_KEY)) {
+                    if (studyEventRepeatKey_index == -1) {
+                        studyEventRepeatKey_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_STUDY_EVENT_REPEAT_KEY_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(START_DATE)) {
+                    if (startDate_index == -1) {
+                        startDate_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_START_DATE_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(END_DATE)) {
+                    if (endDate_index == -1) {
+                        endDate_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_END_DATE_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(STUDY_EVENT_STATUS)) {
+                    if (studyEventStatus_index == -1) {
+                        studyEventStatus_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_STUDY_EVENT_STATUS_HEADERS);
+                    }
+                }
+            }
+            if (participantID_index == -1) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_PARTICIPANT_ID_DATA);
+
+            } else if (studyEventOID_index == -1) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_STUDY_EVENT_OID_DATA);
+
+            } else if (startDate_index == -1) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_START_DATE_DATA);
+            }
+        }
+    }
+
+
+
 }
