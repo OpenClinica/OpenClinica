@@ -33,6 +33,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.tika.Tika;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.XMLContext;
@@ -612,7 +613,7 @@ public class OpenRosaServices {
      */
 
     @GET
-    @Path("/{studyOID}/downloadMediaEncrypted")
+    @Path("/{studyOID}/downloadMediaEncrypted/{fileName}")
     public Response getMediaFile(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formLayoutMediaId") String formLayoutMediaId, @QueryParam(FORM_CONTEXT) String ecid,
             @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
@@ -625,16 +626,16 @@ public class OpenRosaServices {
         String decryptedFormLayoutMediaId = EncryptionUtil.decryptValue(formLayoutMediaId, encryptionKey);
         FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutMediaId(Integer.valueOf(decryptedFormLayoutMediaId));
 
-        File image = new File(Utils.getFilePath() + media.getPath() + media.getName());
-        FileInputStream fis = new FileInputStream(image);
+        File mediaFile = new File(Utils.getFilePath() + media.getPath() + media.getName());
+        FileInputStream fis = new FileInputStream(mediaFile);
         StreamingOutput stream = new MediaStreamingOutput(fis);
         ResponseBuilder builder = Response.ok(stream);
 
         // Set content type, if known
-        FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        String type = fileNameMap.getContentTypeFor(media.getPath() + media.getName());
-        if (type != null && !type.isEmpty()) {
-            builder = builder.header("Content-Type", type);
+        Tika tika = new Tika();
+        String mimeType = tika.detect(mediaFile);
+        if (mimeType != null && !mimeType.isEmpty()) {
+            builder = builder.header("Content-Type", mimeType);
         } else if (media.getName().endsWith(SVG)) {
             builder = builder.header("Content-Type", "image/svg+xml");
         }
