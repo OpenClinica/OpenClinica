@@ -8,10 +8,12 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +44,9 @@ public class UtilServiceImpl implements UtilService {
 
     @Autowired
     StudyDao studyDao;
+
+    @Autowired
+    StudySubjectDao studySubjectDao;
 
     @Autowired
     RestfulServiceHelper restfulServiceHelper;
@@ -87,6 +92,13 @@ public class UtilServiceImpl implements UtilService {
         return false;
     }
 
+    public boolean isParticipantUniqueToSite(String siteOID , String studySubjectId) {
+        Study site=studyDao.findByOcOID(siteOID);
+        StudySubject studySubject=studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectId,site);
+        if(studySubject!=null)
+            return true;
 
+        return false;
+    }
 
 }

@@ -30,4 +30,6 @@ public interface UtilService {
 
     boolean isParticipantIDSystemGenerated(StudyBean tenantStudy);
 
+    boolean isParticipantUniqueToSite(String siteOID , String studySubjectId);
+
 	}
