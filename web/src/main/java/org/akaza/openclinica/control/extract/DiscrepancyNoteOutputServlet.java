@@ -227,7 +227,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
     private Map<String, String> getFilters(HttpServletRequest request) {
         Map<String, String> filters = new HashMap<String, String>();
-        String ids[] = {"studySubject.label", "discrepancyNoteBean.threadNumber", "siteId", "studySubject.labelExact", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate",
+        String ids[] = {"discrepancyNoteBean.threadNumber", "studySubject.label", "siteId", "studySubject.labelExact", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate",
                 "discrepancyNoteBean.description", "discrepancyNoteBean.user", "discrepancyNoteBean.disType", "discrepancyNoteBean.entityType",
                 "discrepancyNoteBean.resolutionStatus", "age", "days",
 

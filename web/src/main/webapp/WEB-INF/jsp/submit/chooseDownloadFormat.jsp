@@ -30,8 +30,8 @@
 
             <%
                     String[] filterParams = {
-                         "studySubject.label",
                          "discrepancyNoteBean.threadNumber",
+                         "studySubject.label",
                          "siteId",
                          "studySubject.labelExact",
                          "discrepancyNoteBean.createdDate",
