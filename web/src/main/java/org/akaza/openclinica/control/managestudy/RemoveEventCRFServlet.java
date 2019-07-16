@@ -203,7 +203,7 @@ public class RemoveEventCRFServlet extends SecureController {
                                 dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
                                 dnb.setThreadUuid(itemParentNote.getThreadUuid());
                             }
-                            dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                            dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
                             dnb.setStudyId(currentStudy.getId());
                             dnb.setAssignedUserId(ub.getId());
                             dnb.setOwner(ub);
@@ -215,7 +215,7 @@ public class RemoveEventCRFServlet extends SecureController {
                             dnb.setDetailedNotes(detailedNotes);
                             dnDao.create(dnb);
                             dnDao.createMapping(dnb);
-                            itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                            itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
                             itemParentNote.setDetailedNotes(detailedNotes);
                             dnDao.update(itemParentNote);
                         }
