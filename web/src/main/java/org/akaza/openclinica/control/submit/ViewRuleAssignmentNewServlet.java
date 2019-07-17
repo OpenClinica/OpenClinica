@@ -32,6 +32,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -71,7 +72,14 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
         } else {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
-        createTable();
+
+        String action = request.getParameter("action");
+        if ("downloadtemplate".equalsIgnoreCase(action)) {
+            File file = getCoreResources().getFile("rules_template.xml",  "rules"+File.separator);
+            dowloadFile(file, "text/xml");
+        } else {
+            createTable();
+        }
 
     }
 
