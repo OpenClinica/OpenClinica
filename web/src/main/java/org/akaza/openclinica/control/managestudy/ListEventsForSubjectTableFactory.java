@@ -839,7 +839,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     private String eventDivBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed,
             StudySubjectBean studySubject) {
 
-        String studySubjectLabel = studySubject.getLabel();
+        String studySubjectLabel = studySubject.getLabel().replaceAll("'", "\\\\'");
 
         String divWidth = studyEvents.size() >= 3 ? "540" : studyEvents.size() == 2 ? "360" : "180";
 
@@ -890,7 +890,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         // String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
         String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
         Status eventSysStatus = studySubject.getStatus();
-        String studySubjectLabel = studySubject.getLabel();
+        String studySubjectLabel = studySubject.getLabel().replaceAll("'", "\\\\'");
 
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).close();
         eventDiv.append(subjectText).append(": ").append(studySubjectLabel).br();
