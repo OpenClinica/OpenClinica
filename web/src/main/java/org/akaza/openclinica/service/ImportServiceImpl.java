@@ -1160,15 +1160,15 @@ public class ImportServiceImpl implements ImportService {
         if (eventCrf == null) {
 
             String selectedVersionIds=edc.getSelectedVersionIds();
-            String[] ids = selectedVersionIds.split(",");
-            ArrayList<Integer> idList = new ArrayList<Integer>();
-            for (String id : ids) {
-                idList.add(Integer.valueOf(id));
-            }
-            if(!idList.contains(formLayout.getFormLayoutId()))
-                return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
-
-
+           if(selectedVersionIds!=null) {
+               String[] ids = selectedVersionIds.split(",");
+               ArrayList<Integer> idList = new ArrayList<Integer>();
+               for (String id : ids) {
+                   idList.add(Integer.valueOf(id));
+               }
+               if (!idList.contains(formLayout.getFormLayoutId()))
+                   return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
+           }
 
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
