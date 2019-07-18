@@ -40,6 +40,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.validator.ParticipantValidator;
 import org.apache.xerces.dom.AttributeMap;
 import org.apache.xerces.dom.DeferredAttrImpl;
 import org.slf4j.Logger;
@@ -97,15 +98,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     public static final String SECONDARYID = "secondaryid";
     public static final String EMAIL = "email";
     public static final String MOBILENUMBER = "mobilenumber";
+
     public static final String US_PHONE_PREFIX = "+1 ";
-    public static final String US_PHONE_PATTERN = "^[0-9]{10,10}$";
-    public static final String US_PHONE_ALLOWED_LENGTH = "EXACT 10";
-
-    public static final String INTL_PHONE_PATTERN = "^\\+[0-9]{1,3} [0-9]{1,14}$";
-    public static final String INTL_PHONE_ALLOWED_LENGTH = "LESS THAN OR EQUAL 17";
-
-    public static final String EMAIL_PATTERN = "^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$";
-    public static final String EMAIL_ALLOWED_LENGTH = "LESS THAN OR EQUAL 255";
 
 
 
@@ -429,7 +423,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             studySubject.getStudySubjectDetail().setEmail(itemValue);
             studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(MOBILENUMBER)) {
-            Pattern usPhonePattern = Pattern.compile(US_PHONE_PATTERN);
+            Pattern usPhonePattern = Pattern.compile(ParticipantValidator.US_PHONE_PATTERN);
             Matcher usPhoneMatch = usPhonePattern.matcher(itemValue);
             if(usPhoneMatch.matches() && itemValue.length()==10) {
                 itemValue=US_PHONE_PREFIX+itemValue;
