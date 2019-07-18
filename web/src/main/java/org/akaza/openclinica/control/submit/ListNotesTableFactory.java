@@ -107,16 +107,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
-        // https://jira.openclinica.com/browse/OC-9952
-        tableFacade.setMaxRows(50);
-        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.threadNumber", "siteId", "discrepancyNoteBean.disType","discrepancyNoteBean.resolutionStatus",
+        tableFacade.setColumnProperties("discrepancyNoteBean.threadNumber", "studySubject.label", "siteId", "discrepancyNoteBean.disType","discrepancyNoteBean.resolutionStatus",
                 "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus",
                 "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.detailedNotes", "numberOfNotes", "discrepancyNoteBean.user",
                 "actions");
 
         Row row = tableFacade.getTable().getRow();
-        configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.threadNumber"), resword.getString("query_id"), null, null, true, true);
+        configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
                 true);
@@ -174,6 +172,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
         int parentStudyId = 0;
+
+        // https://jira.openclinica.com/browse/OC-9952
+        tableFacade.setMaxRows(50);
 
         Limit limit = tableFacade.getLimit();
 

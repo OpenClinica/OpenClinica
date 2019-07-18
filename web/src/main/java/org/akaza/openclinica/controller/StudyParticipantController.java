@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.akaza.openclinica.bean.login.*;
@@ -84,7 +85,7 @@ public class StudyParticipantController {
 		protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 		
-		@ApiOperation(value = "To create a participant at site level",  notes = "Will read the subjectKey")
+		@ApiOperation(value = "Add a participant with or without their contact information to a given Study site.",  notes = "Will read the subjectKey")
         @ApiResponses(value = {
                 @ApiResponse(code = 200, message = "Successful operation"),
                 @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
@@ -108,10 +109,10 @@ public class StudyParticipantController {
 						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
         @RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteLevel(HttpServletRequest request,
-				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
-				@PathVariable("studyOID") String studyOID,
-				@PathVariable("siteOID") String siteOID,
-				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
+				@ApiParam(value = "Provide Participant ID and their contact information. Participant ID is required.", required = true) @RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
+				@ApiParam(value = "Study OID", required = true) @PathVariable("studyOID") String studyOID,
+				@ApiParam(value = "Site OID", required = true) @PathVariable("siteOID") String siteOID,
+				@ApiParam(value = "Use this parameter to register the participant to OpenClinica Participate module. Possible values - y or n. Note: Module should be active for the given study.", required = false) @RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
 
 			if (studyOID != null)
@@ -149,7 +150,7 @@ public class StudyParticipantController {
 		
 
 		
-		@ApiOperation(value = "To create participants at site level in bulk",  notes = "Will read subjectKeys and PII from the CSV file")
+		@ApiOperation(value = "Add or Update list of participants and their contact information for OpenClinica Participate module.",  notes = "Will read subjectKeys and PII from the CSV file")
 		@ApiResponses(value = {
 		        @ApiResponse(code = 200, message = "Successful operation"),
 		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
@@ -174,11 +175,11 @@ public class StudyParticipantController {
 		@Async
 		@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<String> createNewStudyParticipantAtSiteLevel(HttpServletRequest request,
-				@RequestParam("file") MultipartFile file,
+                @ApiParam(value = "A CSV file comprising of the headers - ParticipantID, FirstName, EmailAddress, MobileNumber. ParticipantID header value is a must for every record in the file.", required = true) @RequestParam("file") MultipartFile file,
 				//@RequestParam("size") Integer size,
-				@PathVariable("studyOid") String studyOid,
-				@PathVariable("siteOid") String siteOid,
-				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
+                @ApiParam(value = "Study OID", required = true) @PathVariable("studyOid") String studyOid,
+                @ApiParam(value = "Site OID", required = true) @PathVariable("siteOid") String siteOid,
+                @ApiParam(value = "Use this parameter to register the participants for OpenClinica Participate module. Possible values - y or n. Note: Module should be active for the given study.", required = false) @RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
 			if (studyOid != null)
 				studyOid = studyOid.toUpperCase();
@@ -196,7 +197,7 @@ public class StudyParticipantController {
 				participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
 			} catch (OpenClinicaSystemException e) {
 				String errorMsg = e.getErrorCode();
-				response = new ResponseEntity(errorMsg, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+				response = new ResponseEntity(errorMsg, HttpStatus.BAD_REQUEST);
 				return response;
 			}
 			Map<String, Object> map = new HashMap<>();
@@ -297,6 +298,9 @@ public class StudyParticipantController {
 
 	        DataBinder dataBinder = new DataBinder(subjectTransferBean);
 	        errors = dataBinder.getBindingResult();
+
+	        if(!utilService.isParticipantUniqueToSite(siteOID,subjectTransferBean.getStudySubjectId()))
+				errors.reject( ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
 
 
 			if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){
@@ -454,7 +458,7 @@ public class StudyParticipantController {
 		                map.put("siteOid", siteOid);
 		    			ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, map);
 		    			
-		        		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+		        		response = new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
 		        		
 		        		return response;
 		            }

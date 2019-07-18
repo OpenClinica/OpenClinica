@@ -12,6 +12,7 @@ public class DataImportReport {
     private String status;
     private String timeStamp;
     private String message;
+    private Integer rowNumber;
 
 
     public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID, String status, String timeStamp, String message) {
@@ -27,6 +28,16 @@ public class DataImportReport {
         this.timeStamp = timeStamp;
         this.message = message;
     }
+
+    public DataImportReport(Integer rowNumber, String studySubjectID, String studyEventOID, String studyEventRepeatKey,  String status, String message) {
+        this.studySubjectID = studySubjectID;
+        this.studyEventOID = studyEventOID;
+        this.studyEventRepeatKey = studyEventRepeatKey;
+        this.status = status;
+        this.message = message;
+        this.rowNumber=rowNumber;
+    }
+
 
     public String getSubjectKey() {
         return subjectKey;
@@ -114,5 +125,13 @@ public class DataImportReport {
 
     public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public Integer getRowNumber() {
+        return rowNumber;
+    }
+
+    public void setRowNumber(Integer rowNumber) {
+        this.rowNumber = rowNumber;
     }
 }

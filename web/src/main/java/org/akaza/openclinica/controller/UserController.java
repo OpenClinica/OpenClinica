@@ -1,6 +1,7 @@
 package org.akaza.openclinica.controller;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
@@ -183,10 +184,12 @@ public class UserController {
         return new ResponseEntity<List<OCUserDTO>>(userDTOs, HttpStatus.OK);
     }
 
-    @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
+    @ApiOperation( value = "Retrieve all participants contact information with or without their OpenClinica participate access code.", notes = "Will extract the data in a text file" )
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST )
-    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid,
-    		@RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo) throws InterruptedException {
+    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request,
+              @ApiParam(value = "Study OID", required = true) @PathVariable( "studyOID" ) String studyOid,
+              @ApiParam(value = "Site OID", required = true) @PathVariable( "siteOID" ) String siteOid,
+              @ApiParam(value = "Use this parameter to retrieve participant's access code for OpenClinica Participant module. Possible values - y or n.", required = false) @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
@@ -231,7 +234,7 @@ public class UserController {
             map.put("studyOid", studyOid);
             map.put("siteOid", siteOid);
             org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
-            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+            response = new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
             return response;
         }
 

@@ -267,17 +267,18 @@ public class DeleteEventCRFServlet extends SecureController {
         dnb.setDescription(description);
         dnb.setDetailedNotes(detailedNotes);
         dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
-        dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
+        dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed Modified
         dnb.setColumn("value"); // this is needed for DN Map object
         dnb.setAssignedUser(null);
         dnb.setOwner(ub);
         dnb.setParentDnId(parentDiscrepancyNote.getId());
         dnb.setActivated(false);
+        dnb.setThreadUuid(parentDiscrepancyNote.getThreadUuid());
         dnb = (DiscrepancyNoteBean) getDnDao().create(dnb); // create child DN
         getDnDao().createMapping(dnb); // create DN mapping
 
         DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) getDnDao().findByPK(dnb.getParentDnId());
-        itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
+        itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed Modified
         itemParentNote.setAssignedUser(null);
         itemParentNote.setOwner(ub);
         itemParentNote.setDetailedNotes(detailedNotes);

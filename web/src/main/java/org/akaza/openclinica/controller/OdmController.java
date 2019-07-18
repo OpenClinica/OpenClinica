@@ -2,6 +2,8 @@ package org.akaza.openclinica.controller;
 
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import springfox.documentation.annotations.ApiIgnore;
 
 import org.akaza.openclinica.bean.core.UserType;
@@ -293,11 +295,10 @@ public class OdmController {
            // convert to Json
             ObjectMapper Obj = new ObjectMapper();                                       
             jsonStr = Obj.writerWithDefaultPrettyPrinter().writeValueAsString(spDTO);                   
-        }             
-       
-
-        return ResponseEntity.ok(jsonStr);
-
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        return new ResponseEntity(jsonStr, headers, HttpStatus.OK);
     }
     
     public RestfulServiceHelper getRestfulServiceHelper() {

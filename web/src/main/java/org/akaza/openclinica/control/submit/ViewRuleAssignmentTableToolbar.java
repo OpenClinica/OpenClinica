@@ -57,11 +57,11 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().href("TestRule");
+            html.a().href("ViewRuleAssignment?action=downloadtemplate");
             html.quote();
             html.append(getAction());
             html.quote().close();
-            html.nbsp().append(reswords.getString("view_rules_test")).nbsp().aEnd();
+            html.nbsp().append(reswords.getString("view_rules_download_template")).nbsp().aEnd();
             return html.toString();
         }
     }

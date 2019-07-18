@@ -1514,7 +1514,21 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         } else {
             variables.put(Integer.valueOf(9), Integer.valueOf(sb.getAssignedUserId()));
         }
-        // variables.put(Integer.valueOf(9), Integer.valueOf(sb.getAssignedUserId()));
+
+
+        if (sb.getThreadUuid() == null) {
+            nullVars.put(Integer.valueOf(10), Integer.valueOf(Types.INTEGER));
+            variables.put(Integer.valueOf(10), null);
+        } else {
+            variables.put(Integer.valueOf(10), sb.getThreadUuid());
+        }
+
+        if (sb.getThreadNumber() == null) {
+            nullVars.put(Integer.valueOf(11), Integer.valueOf(Types.INTEGER));
+            variables.put(Integer.valueOf(11), null);
+        } else {
+            variables.put(Integer.valueOf(11), sb.getThreadNumber());
+        }
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {

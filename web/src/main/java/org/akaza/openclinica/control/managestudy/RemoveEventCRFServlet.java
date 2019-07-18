@@ -189,7 +189,7 @@ public class RemoveEventCRFServlet extends SecureController {
                         item.setUpdatedDate(new Date());
                         iddao.update(item);
                         DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
-                        List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(item.getId());
+                        List dnNotesOfRemovedItem = dnDao.findParentNotesOnlyByItemData(item.getId());
                         if (!dnNotesOfRemovedItem.isEmpty()) {
                             DiscrepancyNoteBean itemParentNote = null;
                             for (Object obj : dnNotesOfRemovedItem) {
@@ -201,8 +201,9 @@ public class RemoveEventCRFServlet extends SecureController {
                             if (itemParentNote != null) {
                                 dnb.setParentDnId(itemParentNote.getId());
                                 dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+                                dnb.setThreadUuid(itemParentNote.getThreadUuid());
                             }
-                            dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                            dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
                             dnb.setStudyId(currentStudy.getId());
                             dnb.setAssignedUserId(ub.getId());
                             dnb.setOwner(ub);
@@ -214,7 +215,7 @@ public class RemoveEventCRFServlet extends SecureController {
                             dnb.setDetailedNotes(detailedNotes);
                             dnDao.create(dnb);
                             dnDao.createMapping(dnb);
-                            itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                            itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
                             itemParentNote.setDetailedNotes(detailedNotes);
                             dnDao.update(itemParentNote);
                         }
