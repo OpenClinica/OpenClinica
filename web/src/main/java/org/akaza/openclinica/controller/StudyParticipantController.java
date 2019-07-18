@@ -299,6 +299,9 @@ public class StudyParticipantController {
 	        DataBinder dataBinder = new DataBinder(subjectTransferBean);
 	        errors = dataBinder.getBindingResult();
 
+	        if(!utilService.isParticipantUniqueToSite(siteOID,subjectTransferBean.getStudySubjectId()))
+				errors.reject( ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+
 
 			if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){
 				errors.reject( "errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
