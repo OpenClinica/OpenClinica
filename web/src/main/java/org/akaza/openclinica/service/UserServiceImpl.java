@@ -166,6 +166,8 @@ public class UserServiceImpl implements UserService {
         UserAccount pUserAccount = null;
 
         if (studySubject != null) {
+            UserStatus userStatus = null;
+            Integer userId = null;
             if (validateService.isParticipateActive(tenantStudy)) {
                 if (studySubject.getUserId() == null ) {
                     logger.info("Participate has not registered yet");
@@ -175,17 +177,15 @@ public class UserServiceImpl implements UserService {
                     // create participant user Account In Runtime
                     pUserAccount = createUserAccount(participantDTO, studySubject, userAccountBean, username, publicStudy, keycloakUserId);
                     // create study subject detail Account
-                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, pUserAccount.getUserId(), tenantStudy, userAccount);
-                    logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
+                    userStatus = UserStatus.CREATED;
+                    userId = pUserAccount.getUserId();
                 } else if (participantDTO.isResetAccessCode()) {
                     accessCode = generateAccessCode(accessToken, customerUuid);
                     keycloakClient.resetParticipateUserAccessCode(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
                 }
-            } else {
-                // update study subject detail Account
-                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null, tenantStudy, userAccount);
-                logger.info("Participate with user_id: {} ,it's user_status: {} is updated in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
             }
+            studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, userStatus, userId, tenantStudy, userAccount);
+            logger.info("Participate with user_id: {}, its user_status: {} is created/updated in study_subject table", studySubject.getUserId(), studySubject.getUserStatus());
         } else {
             logger.info("Participant does not exists or not added yet in OC ");
         }
