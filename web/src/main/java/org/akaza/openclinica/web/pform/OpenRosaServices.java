@@ -613,7 +613,7 @@ public class OpenRosaServices {
      */
 
     @GET
-    @Path("/{studyOID}/downloadMediaEncrypted/{fileName}")
+    @Path("/{studyOID}/downloadMediaEncrypted")
     public Response getMediaFile(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formLayoutMediaId") String formLayoutMediaId, @QueryParam(FORM_CONTEXT) String ecid,
             @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
