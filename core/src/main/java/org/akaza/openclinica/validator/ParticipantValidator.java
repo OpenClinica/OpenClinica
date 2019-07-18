@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ParticipantValidator extends SubjectTransferValidator {
 
@@ -35,7 +37,13 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	private StudyBean siteStudy;
 	
 	private boolean isBulkMode = false;
-	
+	public static final String US_PHONE_PATTERN = "^[0-9]{10,10}$";
+
+	public static final String INTL_PHONE_PATTERN = "^\\+[0-9]{1,3} [0-9]{1,14}$";
+
+	public static final String EMAIL_PATTERN = "^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$";
+
+
 	@Autowired
     private Configuration freemarkerConfiguration;
 
@@ -359,31 +367,39 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	}
 
 	public void validateParticipantData(SubjectTransferBean subjectTransferBean, Errors errors) {
-		if (subjectTransferBean.getFirstName()!=null && subjectTransferBean.getFirstName().length()>35){
-			errors.reject("errorCode.firsNameTooLong","First name length should not exceed 35 characters");
+		if (subjectTransferBean.getFirstName() != null && subjectTransferBean.getFirstName().length() > 35) {
+			errors.reject("errorCode.firsNameTooLong", "First name length should not exceed 35 characters");
 		}
-		if (subjectTransferBean.getLastName()!=null && subjectTransferBean.getLastName().length()>35){
-			errors.reject("errorCode.lastNameTooLong","Last name length should not exceed 35 characters");
+		if (subjectTransferBean.getLastName() != null && subjectTransferBean.getLastName().length() > 35) {
+			errors.reject("errorCode.lastNameTooLong", "Last name length should not exceed 35 characters");
 		}
-		if (subjectTransferBean.getIdentifier()!=null && subjectTransferBean.getIdentifier().length()>35){
-			errors.reject("errorCode.identifierTooLong","Identifier length should not exceed 35 characters");
-		}
-		if (subjectTransferBean.getEmailAddress()!=null &&  subjectTransferBean.getEmailAddress().length()>255){
-			errors.reject("errorCode.emailAddressTooLong","Email Address length should not exceed 255 characters");
+		if (subjectTransferBean.getIdentifier() != null && subjectTransferBean.getIdentifier().length() > 35) {
+			errors.reject("errorCode.identifierTooLong", "Identifier length should not exceed 35 characters");
 		}
 
-		if (subjectTransferBean.getEmailAddress()!=null &&  ! EmailValidator.getInstance().isValid(subjectTransferBean.getEmailAddress())&& subjectTransferBean.getEmailAddress().length()!=0){
-			errors.reject("errorCode.invalidEmailAddress","Email Address contains invalid characters or format");
+		String emailAddress = subjectTransferBean.getEmailAddress();
+		if (emailAddress != null) {
+			Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
+			Matcher emailMatch = emailPattern.matcher(emailAddress);
+
+			if (!(emailMatch.matches() && emailAddress.length() < 256)) {
+				errors.reject("errorCode.invalidEmailAddress", "Email Address is invalid");
+			}
 		}
 
-		if (subjectTransferBean.getPhoneNumber()!=null && subjectTransferBean.getPhoneNumber().length()>15){
-			errors.reject("errorCode.phoneNumberTooLong","Phone number length should not exceed 15 characters");
-		}
 
-		if (subjectTransferBean.getPhoneNumber()!=null && !onlyContainsNumbers(subjectTransferBean.getPhoneNumber()) && subjectTransferBean.getPhoneNumber().length()!=0) {
-			errors.reject("errorCode.invalidPhoneNumber","Phone number should not containe alphabetic characters");
-		}
+		String mobileNumber = subjectTransferBean.getPhoneNumber();
+		if (mobileNumber != null) {
+			Pattern usPhonePattern = Pattern.compile(US_PHONE_PATTERN);
+			Matcher usPhoneMatch = usPhonePattern.matcher(mobileNumber);
 
+			Pattern intlPhonePattern = Pattern.compile(INTL_PHONE_PATTERN);
+			Matcher intlPhoneMatch = intlPhonePattern.matcher(mobileNumber);
+
+			if (!(intlPhoneMatch.matches() && mobileNumber.length() < 18) && !(usPhoneMatch.matches() && mobileNumber.length() == 10)) {
+				errors.reject("errorCode.invalidPhoneNumber", "Phone number is invalid");
+			}
+		}
 	}
 
 	private boolean onlyContainsNumbers(String text) {

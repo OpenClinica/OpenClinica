@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -38,6 +40,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.validator.ParticipantValidator;
 import org.apache.xerces.dom.AttributeMap;
 import org.apache.xerces.dom.DeferredAttrImpl;
 import org.slf4j.Logger;
@@ -95,6 +98,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     public static final String SECONDARYID = "secondaryid";
     public static final String EMAIL = "email";
     public static final String MOBILENUMBER = "mobilenumber";
+
+    public static final String US_PHONE_PREFIX = "+1 ";
 
 
 
@@ -418,6 +423,11 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             studySubject.getStudySubjectDetail().setEmail(itemValue);
             studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(MOBILENUMBER)) {
+            Pattern usPhonePattern = Pattern.compile(ParticipantValidator.US_PHONE_PATTERN);
+            Matcher usPhoneMatch = usPhonePattern.matcher(itemValue);
+            if(usPhoneMatch.matches() && itemValue.length()==10) {
+                itemValue=US_PHONE_PREFIX+itemValue;
+            }
             studySubject.getStudySubjectDetail().setPhone(itemValue);
             studySubjectDao.saveOrUpdate(studySubject);
         }
