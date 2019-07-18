@@ -1763,11 +1763,15 @@
         });
 
         jQuery('#connect-button').click(function () {
+            var phoneNumber = $('#phone-input').val();
+            if (phoneNumber.trim())
+                phoneNumber = $('#country-code').text() + ' ' + phoneNumber;
+
             var data = {
                 firstName: $('#fname-input').val(),
                 lastName: $('#lname-input').val(),
                 email: $('#email-input').val(),
-                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
+                phoneNumber: phoneNumber,
                 inviteParticipant: $('#invite_via_email input:checked').val(),
                 inviteViaSms: $('#invite_via_sms input:checked').val(),
                 identifier: $('#secid-input').val(),
