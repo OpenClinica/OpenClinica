@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -95,6 +97,15 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     public static final String SECONDARYID = "secondaryid";
     public static final String EMAIL = "email";
     public static final String MOBILENUMBER = "mobilenumber";
+    public static final String US_PHONE_PREFIX = "+1 ";
+    public static final String US_PHONE_PATTERN = "^[0-9]{10,10}$";
+    public static final String US_PHONE_ALLOWED_LENGTH = "EXACT 10";
+
+    public static final String INTL_PHONE_PATTERN = "^\\+[0-9]{1,3} [0-9]{1,14}$";
+    public static final String INTL_PHONE_ALLOWED_LENGTH = "LESS THAN OR EQUAL 17";
+
+    public static final String EMAIL_PATTERN = "^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$";
+    public static final String EMAIL_ALLOWED_LENGTH = "LESS THAN OR EQUAL 255";
 
 
 
@@ -418,6 +429,11 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             studySubject.getStudySubjectDetail().setEmail(itemValue);
             studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(MOBILENUMBER)) {
+            Pattern usPhonePattern = Pattern.compile(US_PHONE_PATTERN);
+            Matcher usPhoneMatch = usPhonePattern.matcher(itemValue);
+            if(usPhoneMatch.matches() && itemValue.length()==10) {
+                itemValue=US_PHONE_PREFIX+itemValue;
+            }
             studySubject.getStudySubjectDetail().setPhone(itemValue);
             studySubjectDao.saveOrUpdate(studySubject);
         }
