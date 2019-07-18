@@ -170,6 +170,8 @@ public class ImportServiceImpl implements ImportService {
                     studySubject = (StudySubject) subjectObject;
                 }
 
+                tenantStudy=studySubject.getStudy();
+
                 ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
                 for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                     if (studyEventDataBean.getStudyEventOID() != null)
