@@ -26,6 +26,7 @@ import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.io.ByteOrderMark;
@@ -44,8 +45,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -68,6 +68,9 @@ public class ImportController {
 
     @Autowired
     private UtilService utilService;
+
+    @Autowired
+    TokenService tokenService;
 
     @Autowired
     private StudyDao studyDao;
@@ -178,26 +181,59 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.OK);
         }
 
-
-        if (siteOid != null) {
-            if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
-                return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
-            } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
-                return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
-            }
+        // If this is a randomize-service importing then we can skip the roles check.
+        if (isRandomizeImport(request)){
+            fileNm = "randomize-service";
         } else {
-            if (!validateService.isUserHasAccessToStudy(userRoles, studyOid)) {
-                return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
-            } else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles, studyOid)) {
-                return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+            if (siteOid != null) {
+                if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
+                    return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
+                } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                    return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+                }
+            } else {
+                if (!validateService.isUserHasAccessToStudy(userRoles, studyOid)) {
+                    return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
+                } else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles, studyOid)) {
+                    return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+                }
             }
         }
+
         String schema = CoreResources.getRequestSchema();
 
         String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm);
 
         logger.info("REST request to Import Job uuid {} ", uuid);
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+    }
+
+    // Currently the system level randomize client user should skip role checks.
+    private boolean isRandomizeImport(HttpServletRequest request){
+        boolean skipRoleCheck = false;
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null) {
+            StringTokenizer st = new StringTokenizer(authHeader);
+            if (st.hasMoreTokens()) {
+                String basic = st.nextToken();
+                if (basic.equalsIgnoreCase("Bearer")) {
+                        String accessToken = st.nextToken();
+                        final Map<String, Object> decodedToken = tokenService.decodeAndVerify(accessToken);
+                        if (accessToken != null) {
+                            LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
+                            String userType = (String) userContextMap.get("userType");
+                            if (userType.equals("System")){
+                                String clientId = decodedToken.get("clientId").toString();
+                                if (clientId.equals("randomize")){
+                                    skipRoleCheck = true;
+                                }
+
+                            }
+                        }
+                }
+            }
+        }
+        return skipRoleCheck;
     }
 
 
