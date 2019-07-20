@@ -95,19 +95,21 @@ public class UtilServiceImpl implements UtilService {
     public boolean isParticipantUniqueToSite(String siteOID, String studySubjectId) {
         Study site = studyDao.findByOcOID(siteOID);
         StudySubject studySubject = null;
-        if (site.getStudy() != null) {
-            ArrayList<StudySubject> studySubjects = studySubjectDao.findByLabelAndParentStudy(studySubjectId, site.getStudy());
-            if (studySubjects.size() == 0) {
-                return true;
+        if (site != null) {
+            if (site.getStudy() != null) {
+                ArrayList<StudySubject> studySubjects = studySubjectDao.findByLabelAndParentStudy(studySubjectId, site.getStudy());
+                if (studySubjects.size() == 0) {
+                    return true;
+                } else {
+                    studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectId, site);
+                    if (studySubject != null)
+                        return true;
+                }
             } else {
                 studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectId, site);
-                if (studySubject != null)
+                if (studySubject == null)
                     return true;
             }
-        } else {
-            studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectId, site);
-            if (studySubject == null)
-                return true;
         }
         return false;
     }
