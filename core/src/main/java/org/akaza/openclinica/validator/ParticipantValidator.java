@@ -382,21 +382,28 @@ public class ParticipantValidator extends SubjectTransferValidator {
 			Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
 			Matcher emailMatch = emailPattern.matcher(emailAddress);
 
-			if (!(emailMatch.matches() && emailAddress.length() < 256)) {
+			if (emailAddress.length() > 255) {
+				errors.reject("errorCode.emailAddressTooLong", "Email Address length should not exceed 255 characters");
+			}
+			if (!emailMatch.matches()) {
 				errors.reject("errorCode.invalidEmailAddress", "Email Address is invalid");
 			}
+
 		}
 
 
 		String mobileNumber = subjectTransferBean.getPhoneNumber();
 		if (mobileNumber != null) {
-			Pattern usPhonePattern = Pattern.compile(US_PHONE_PATTERN);
-			Matcher usPhoneMatch = usPhonePattern.matcher(mobileNumber);
 
 			Pattern intlPhonePattern = Pattern.compile(INTL_PHONE_PATTERN);
 			Matcher intlPhoneMatch = intlPhonePattern.matcher(mobileNumber);
 
-			if (!(intlPhoneMatch.matches() && mobileNumber.length() < 18) && !(usPhoneMatch.matches() && mobileNumber.length() == 10)) {
+			if (mobileNumber.length() > 17) {
+				errors.reject("errorCode.phoneNumberTooLong","International Phone number length should not exceed 17 characters");
+			}
+
+
+			if (!(intlPhoneMatch.matches() && mobileNumber.length() < 18)) {
 				errors.reject("errorCode.invalidPhoneNumber", "Phone number is invalid");
 			}
 		}
