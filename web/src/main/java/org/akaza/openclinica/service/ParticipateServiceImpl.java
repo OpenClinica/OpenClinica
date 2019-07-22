@@ -423,6 +423,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                     foundEventCrfMatch = true;
                     if (eventDefCrf.getParicipantForm()) {
                         eventCrf.setStatusId(Status.UNAVAILABLE.getCode());
+                        eventCrf.setDateCompleted(new Date());
                         eventCrfDao.saveOrUpdate(eventCrf);
                     } else if (eventCrf.getStatusId() != Status.UNAVAILABLE.getCode()) completeStudyEvent = false;
                 }
