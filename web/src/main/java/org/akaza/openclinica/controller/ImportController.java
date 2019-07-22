@@ -181,7 +181,7 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.OK);
         }
 
-        // If this is a randomize-service importing then we can skip the roles check.
+        // If this is randomize-service importing then we can skip the roles check.
         if (isRandomizeImport(request)){
             fileNm = "randomize-service";
         } else {
@@ -208,7 +208,6 @@ public class ImportController {
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
     }
 
-    // Currently the system level randomize client user should skip role checks.
     private boolean isRandomizeImport(HttpServletRequest request){
         boolean skipRoleCheck = false;
         String authHeader = request.getHeader("Authorization");

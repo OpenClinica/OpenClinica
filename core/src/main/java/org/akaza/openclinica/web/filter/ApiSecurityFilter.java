@@ -82,7 +82,6 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                         throw new Error("Couldn't retrieve authentication", e);
                     }
                 } else if (basic.equalsIgnoreCase("Bearer")) {
-                    // TODO
                     // 1. connect to root and update roles
                     // 2. create new user if doesn't exist and update roles
                     try {
@@ -112,18 +111,20 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             StudyBean publicStudyBean= (StudyBean) studyDAO.findByPK(ub.getActiveStudyId());
 
                             //TODO Check if user exists before creating.
+
                             if (userType.equals("System")){
                                 String clientId = decodedToken.get("clientId").toString();
                                 if (clientId.equals("randomize")){
-                                    // Then do randomize path
+                                    ub = (UserAccountBean) userAccountDAO.findByUserName("randomize");
+                                    if (ub.getName().isEmpty())
                                     try{
                                         HashMap<String, String> userAccount = createRandomizeUserAccount();
                                         ub = userService.createUser(request, userAccount);
                                     } catch (Exception e) {
                                         logger.error("Failed user creation:" + e.getMessage());
                                     }
+                                    ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
                                 }
-                                ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
                             }
 
                             // Username comes back populated but ocUserUuid is "systemuserUuid" so our UserAccountBean ub comes back empty.
@@ -235,6 +236,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         return map;
     }
 
+    //TODO Put this somewhere else?
     private HashMap<String, String>  createRandomizeUserAccount() throws Exception {
         HashMap<String, String> map = new HashMap<>();
         map.put("username", "randomize");
