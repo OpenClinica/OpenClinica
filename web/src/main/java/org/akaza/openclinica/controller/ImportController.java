@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
@@ -22,10 +23,7 @@ import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.service.ImportService;
-import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.service.UtilService;
-import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -70,7 +68,7 @@ public class ImportController {
     private UtilService utilService;
 
     @Autowired
-    TokenService tokenService;
+    private TokenService tokenService;
 
     @Autowired
     private StudyDao studyDao;
@@ -211,19 +209,19 @@ public class ImportController {
     private boolean isRandomizeImport(HttpServletRequest request){
         boolean skipRoleCheck = false;
         String authHeader = request.getHeader("Authorization");
-        if (authHeader != null) {
+        if (authHeader != null && !authHeader.isEmpty()) {
             StringTokenizer st = new StringTokenizer(authHeader);
             if (st.hasMoreTokens()) {
                 String basic = st.nextToken();
                 if (basic.equalsIgnoreCase("Bearer")) {
                         String accessToken = st.nextToken();
                         final Map<String, Object> decodedToken = tokenService.decodeAndVerify(accessToken);
-                        if (accessToken != null) {
+                        if (accessToken != null && !accessToken.isEmpty()) {
                             LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
                             String userType = (String) userContextMap.get("userType");
-                            if (userType.equals("System")){
+                            if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();
-                                if (clientId.equals("randomize")){
+                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
                                     skipRoleCheck = true;
                                 }
 

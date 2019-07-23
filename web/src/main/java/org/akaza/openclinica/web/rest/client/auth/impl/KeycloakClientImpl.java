@@ -51,6 +51,7 @@ public class KeycloakClientImpl {
     private static final String PATH_SEPARATOR = "/";
     private static final MessageFormat USERS_PATH = new MessageFormat("/realms/{0}/oc-rest/users");
     private static final String ACCESS_CODE = "access_code";
+    public static final String RANDOMIZE_CLIENT = "randomize";
 
     @Autowired
     CustomerServiceClientImpl customerServiceClient;

@@ -2,18 +2,22 @@ package org.akaza.openclinica.web.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.UserType;
 import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.keycloak.adapters.spi.KeycloakAccount;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -101,7 +105,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
                             String ocUserUuid = null;
                             String userType = (String) userContextMap.get("userType");
-                            if (userType.equals(org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
+                            if (userType.equals(UserType.PARTICIPATE.getName())) {
                                 ocUserUuid = (String) userContextMap.get("username");
                             } else {
                                 ocUserUuid = (String) userContextMap.get("userUuid");
@@ -110,20 +114,17 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((ocUserUuid));
                             StudyBean publicStudyBean= (StudyBean) studyDAO.findByPK(ub.getActiveStudyId());
 
-                            //TODO Check if user exists before creating.
-
-                            if (userType.equals("System")){
+                            if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();
-                                if (clientId.equals("randomize")){
+                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
                                     ub = (UserAccountBean) userAccountDAO.findByUserName("randomize");
                                     if (ub.getName().isEmpty())
                                     try{
-                                        HashMap<String, String> userAccount = createRandomizeUserAccount();
+                                        HashMap<String, String> userAccount = (HashMap) createRandomizeUserAccount();
                                         ub = userService.createUser(request, userAccount);
                                     } catch (Exception e) {
                                         logger.error("Failed user creation:" + e.getMessage());
                                     }
-                                    ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
                                 }
                             }
 
@@ -136,6 +137,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             }
                             else {
                                 // If the user doesn't exist then we try to do a lookup from user-service and use that data to create a new user.
+
                                 OCUserDTO userDTO = getUserDetails(request);
                                 if (userDTO.getUsername().equalsIgnoreCase("root")) {
                                     ub = CoreResources.setRootUserAccountBean(request, dataSource);
@@ -237,8 +239,8 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     }
 
     //TODO Put this somewhere else?
-    private HashMap<String, String>  createRandomizeUserAccount() throws Exception {
-        HashMap<String, String> map = new HashMap<>();
+    private Map<String, String>  createRandomizeUserAccount() throws Exception {
+        Map<String, String> map = new HashMap<>();
         map.put("username", "randomize");
         map.put("fName", "Randomize");
         map.put("lName", "Service");
