@@ -150,7 +150,7 @@ public class StudyParticipantController {
 		
 
 		
-		@ApiOperation(value = "Add or Update list of participants and their contact information for OpenClinica Participate module.",  notes = "Will read subjectKeys and PII from the CSV file")
+		@ApiOperation(value = "Add or Update list of participants and their contact information for OpenClinica Participate module.",  notes = "Will read subjectKeys and PII from the CSV file", hidden = true)
 		@ApiResponses(value = {
 		        @ApiResponse(code = 200, message = "Successful operation"),
 		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
@@ -302,7 +302,7 @@ public class StudyParticipantController {
 			Study tenantStudy = studyDao.findByOcOID(tenantstudyBean.getOid());
 
 			if(subjectTransferBean.isRegister() && !validateService.isParticipateActive(tenantStudy)){
-				errors.reject( "errorCode.participateModuleNotActive","Participant module is not active");
+				errors.reject( ErrorConstants.ERR_PARTICIPATE_INACTIVE,"Participant module is not active");
 			}
 
 			if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){
@@ -576,8 +576,8 @@ public class StudyParticipantController {
 			subjectTransferBean.setLastName(lastName);
 			subjectTransferBean.setIdentifier(identifier);
 
-			subjectTransferBean.setEmailAddress(emailAddress);
-			subjectTransferBean.setPhoneNumber(phoneNumber);
+			subjectTransferBean.setEmailAddress(emailAddress!=null && emailAddress.length()!=0?emailAddress:null);
+			subjectTransferBean.setPhoneNumber(phoneNumber!=null && phoneNumber.length()!=0?phoneNumber:null);
 
 			if(register.equalsIgnoreCase("Y")|| register.equalsIgnoreCase("YES"))
 				subjectTransferBean.setRegister(true);
