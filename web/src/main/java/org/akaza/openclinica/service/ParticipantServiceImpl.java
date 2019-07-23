@@ -203,7 +203,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
      * @param request
      * @return
      */
-    public StudyBean validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request) {
+    public StudyBean validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request) throws OpenClinicaSystemException{
 
         String userName = getUserAccount(request).getName();
         StudyBean study = null;
@@ -216,6 +216,8 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
             if (study == null) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier", "The study identifier you provided is not valid.");
             }
+            checkStudyOrSiteStatus(study);
+            
             StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
             if (studyLevelRole == null) {
                 throw new OpenClinicaSystemException("errorCode.noRoleSetUp",
@@ -232,11 +234,13 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier",
                         "The study identifier you provided is not valid.");
             }
+            checkStudyOrSiteStatus(study);
             
             if (site == null || site.getParentStudyId() != study.getId()) {
                 throw new OpenClinicaSystemException("errorCode.invalidSiteIdentifier",
                         "The site identifier you provided is not valid.");
             }
+            checkStudyOrSiteStatus(site);
             
             /**
              * check study level
@@ -263,6 +267,35 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         return study;
         
     }
+
+	/**
+	  * OC-11162
+	  * AC1: When bulk add participant API is called for a study OID which is either in Design, Frozen or Locked status then 
+	  * instead of starting the process, system should return an errorcode.studyNotAvailable.
+	  * AC2: When bulk add participant API is called for a site OID which is either in Design, Frozen or Locked status then 
+	  * instead of starting the process, system should return an errorcode.siteNotAvailable.
+	 * @param study
+	 * @throws OpenClinicaSystemException
+	 */
+	private void checkStudyOrSiteStatus(StudyBean study) throws OpenClinicaSystemException {
+		
+		int parentStudyId = study.getParentStudyId();
+		String errorCode=null;
+		String msg = null;
+		
+		if(parentStudyId > 0) {
+			errorCode = "errorCode.siteNotAvailable"; 
+			msg = "The site is not available.";
+		}else {
+			errorCode = "errorCode.studyNotAvailable"; 
+			msg = "The study is not available.";
+		}
+		
+		String studyStatus = study.getStatus().getName().toString().toLowerCase();
+		if(studyStatus != null && (studyStatus.equals("pending") || studyStatus.equals("locked") || studyStatus.equals("frozen"))) {
+			throw new OpenClinicaSystemException(errorCode, msg);
+		}
+	}
     
            
 
