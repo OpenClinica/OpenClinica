@@ -286,22 +286,24 @@ public class StudyParticipantController {
 			}catch(OpenClinicaSystemException oe) {
 				throw new Exception(oe.getErrorCode());				
 			}
-			
-			
+
+			ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
+			Errors errors = null;
+
+			DataBinder dataBinder = new DataBinder(subjectTransferBean);
+			errors = dataBinder.getBindingResult();
+
+
 			if(siteOID != null) {
 				StudyBean siteStudy = getStudyDAO().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
 				subjectTransferBean.setSiteStudy(siteStudy);
 			}
-			
-			ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
-	        Errors errors = null;
 
-	        DataBinder dataBinder = new DataBinder(subjectTransferBean);
-	        errors = dataBinder.getBindingResult();
+			Study tenantStudy = studyDao.findByOcOID(tenantstudyBean.getOid());
 
-	        if(!utilService.isParticipantUniqueToSite(siteOID,subjectTransferBean.getStudySubjectId()))
-				errors.reject( ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
-
+			if(subjectTransferBean.isRegister() && !validateService.isParticipateActive(tenantStudy)){
+				errors.reject( "errorCode.participateModuleNotActive","Participant module is not active");
+			}
 
 			if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){
 				errors.reject( "errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");

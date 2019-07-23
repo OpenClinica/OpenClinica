@@ -102,6 +102,6 @@
 </form>
 <br/>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadImportTemplate"><b><fmt:message key="download_import_template" bundle="${resword}"/></b></a></div>
-<div class="homebox_bullets"><a href="pages/Log/listFiles"><b>Bulk Job log</b></a></div>
+<!-- <div class="homebox_bullets"><a href="pages/Log/listFiles"><b>Bulk Job log</b></a></div> -->
 
 <jsp:include page="../include/footer.jsp"/>

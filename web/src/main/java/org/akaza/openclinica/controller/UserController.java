@@ -185,8 +185,8 @@ public class UserController {
     }
 
     @ApiOperation( value = "Retrieve all participants contact information with or without their OpenClinica participate access code.", notes = "Will extract the data in a text file" )
-    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST )
-    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request,
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractParticipantsInfo", method = RequestMethod.POST )
+    public ResponseEntity<Object> extractParticipantsInfo(HttpServletRequest request,
               @ApiParam(value = "Study OID", required = true) @PathVariable( "studyOID" ) String studyOid,
               @ApiParam(value = "Site OID", required = true) @PathVariable( "siteOID" ) String siteOid,
               @ApiParam(value = "Use this parameter to retrieve participant's access code for OpenClinica Participant module. Possible values - y or n.", required = false) @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo) throws InterruptedException {
