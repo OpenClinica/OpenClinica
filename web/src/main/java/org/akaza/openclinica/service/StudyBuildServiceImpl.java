@@ -374,6 +374,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 }
             }
         }
+        // remove all the roles that are not there for this user
+        removeDeletedUserRoles(modifiedSURArray, existingStudyUserRoles);
         // If role sizes are different update the flag
         if (modifiedSURArray.size() != existingStudyUserRoles.size())
             studyUserRoleUpdated = true;
@@ -607,6 +609,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
             request.getSession().setAttribute("baseUserRole", role.getRoleName());
         }
+    }
+    
+    private void removeDeletedUserRoles(ArrayList<StudyUserRole> modifiedStudyUserRoles, Collection<StudyUserRole> existingStudyUserRoles) {
+        existingStudyUserRoles.removeIf(existingStudyUserRole -> modifiedStudyUserRoles.stream().anyMatch(
+                modifiedStudyUserRole -> existingStudyUserRole.getId().getStudyId().equals(modifiedStudyUserRole.getId().getStudyId())));
+        existingStudyUserRoles.forEach(studyToDelete -> studyUserRoleDao.getCurrentSession().delete(studyToDelete));
     }
 
 }
