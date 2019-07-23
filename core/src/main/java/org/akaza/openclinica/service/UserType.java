@@ -7,7 +7,8 @@ public enum UserType {
     USER("User"),
     BUSINESS_ADMIN("Business Admin"),
     TECH_ADMIN("Tech Admin"),
-    PARTICIPATE("Participate User");
+    PARTICIPATE("Participate User"),
+    SYSTEM("System");
 
     String name;
 
