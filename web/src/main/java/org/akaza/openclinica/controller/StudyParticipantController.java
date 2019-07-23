@@ -186,14 +186,22 @@ public class StudyParticipantController {
 			if (siteOid != null)
 				siteOid = siteOid.toUpperCase();
 
+			boolean checkParticipateModuleStatus = false;
+			if(register != null && register.toUpperCase().equals("Y")) {
+				checkParticipateModuleStatus = true;
+			}
+			
 			utilService.setSchemaFromStudyOid(studyOid);
 			Study tenantStudy = studyDao.findByOcOID(studyOid);
 			ResponseEntity<String> response = null;
 			UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 			try {
-				if(!validateService.isParticipateActive(tenantStudy)) {
-					throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+				if(checkParticipateModuleStatus) {
+					if(!validateService.isParticipateActive(tenantStudy)) {
+						throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+					}
 				}
+				
 				participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
 			} catch (OpenClinicaSystemException e) {
 				String errorMsg = e.getErrorCode();
