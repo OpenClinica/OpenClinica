@@ -7,7 +7,6 @@ import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
-import org.akaza.openclinica.core.ExtendedBasicDataSource;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
@@ -37,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
@@ -56,7 +56,7 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     @Autowired
     @Qualifier("dataSource")
-    private ExtendedBasicDataSource dataSource;
+    private DataSource dataSource;
 
     @Autowired
     ServletContext context;
