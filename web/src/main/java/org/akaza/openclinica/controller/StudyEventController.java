@@ -299,7 +299,7 @@ public class StudyEventController {
 	}
 
 
-	@ApiOperation( value = "To schedule an event for participants at site level in bulk", notes = "Will read the information of StudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date" )
+	@ApiOperation( value = "To schedule an event for participants at site level in bulk", notes = "Will read the information of StudyOID,ParticipantID, StudyEventOID, Event Repeat Key, Start Date, End Date and Event Status" )
 	@ApiResponses( value = {
 			@ApiResponse( code = 200, message = "Successful operation" ),
 			@ApiResponse( code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> " )} )
