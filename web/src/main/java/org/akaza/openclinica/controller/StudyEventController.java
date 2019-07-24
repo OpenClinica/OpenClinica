@@ -339,7 +339,7 @@ public class StudyEventController {
 	}
 
 
-	@ApiOperation( value = "To schedule an event for participant at site level", notes = "Will read the information of StudyOID,ParticipantID, StudyEventOID, Event Repeat Key, Start Date, End Date and Event Status" )
+	@ApiOperation( value = "To schedule an event for participant at site level", notes = "Will read the information of StudyOID,ParticipantID, StudyEventOID, Start Date and End Date" )
 	@RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events", method = RequestMethod.POST )
 	public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
 														   @RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
