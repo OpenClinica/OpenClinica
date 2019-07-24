@@ -513,7 +513,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     public ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
 
         Optional<ModuleConfigDTO> moduleConfigDTO =
-                moduleConfigDTOs.stream().filter(config -> config.getStudyUuid().equals(study.getStudyEnvUuid()) && config.getModuleName().equalsIgnoreCase(module.name())).findAny();
+                moduleConfigDTOs.stream().filter(config -> config.getStudyUuid().equals(study.getStudyUuid()) && config.getModuleName().equalsIgnoreCase(module.name())).findAny();
         if (moduleConfigDTO.isPresent()) {
             logger.info("ModuleConfigDTO  is :" + moduleConfigDTO.get());
             return moduleConfigDTO.get();
