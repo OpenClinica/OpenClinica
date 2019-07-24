@@ -310,6 +310,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
             Study study = studyDao.findByStudyEnvUuid(uuidToFind);
 
+            
             if (study == null)
                 continue;
             boolean parentExists = false;
@@ -325,7 +326,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                     //request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
                 }
             }
-            if ((study.getStudyId() == userActiveStudyId) || parentExists) {
+            if (study.getStudyId() == userActiveStudyId) {
                 currentActiveStudyValid = true;
                 //session.setAttribute("customUserRole", role.getDynamicRoleName());
                 //session.setAttribute("baseUserRole", role.getRoleName());
@@ -335,8 +336,13 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             Study parentStudy = study.getStudy();
             Study toUpdate = parentStudy == null ? study : study.getStudy();
             // set this as the active study
-            if (ub.getActiveStudy() == null) {
-                ub.setActiveStudy(toUpdate);
+            if (ub.getActiveStudy() == null || !currentActiveStudyValid) {
+            	if(siteFlag) {
+            		 ub.setActiveStudy(study);
+            	}else {
+            		 ub.setActiveStudy(toUpdate);
+            	}
+               
                 userAccountDao.saveOrUpdate(ub);
                 currentActiveStudyValid = true;
                 //if (!parentExists)
@@ -382,6 +388,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         // remove all the roles that are not there for this user
         removeDeletedUserRoles(modifiedSURArray, existingStudyUserRoles);
+        
+       
+        
         // If role sizes are different update the flag
         if (modifiedSURArray.size() != existingStudyUserRoles.size())
             studyUserRoleUpdated = true;
