@@ -299,7 +299,7 @@ public class StudyEventController {
 	}
 
 
-	@ApiOperation( value = "To schedule an event for participants at site level in bulk", notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date" )
+	@ApiOperation( value = "To schedule an event for participants at site level in bulk", notes = "Will read the information of StudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date" )
 	@ApiResponses( value = {
 			@ApiResponse( code = 200, message = "Successful operation" ),
 			@ApiResponse( code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> " )} )
@@ -339,7 +339,7 @@ public class StudyEventController {
 	}
 
 
-	@ApiOperation( value = "To schedule an event for participant at site level", notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date" )
+	@ApiOperation( value = "To schedule an event for participant at site level", notes = "Will read the information of StudyOID,ParticipantID, StudyEventOID, Event Repeat Key, Start Date, End Date and Event Status" )
 	@RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events", method = RequestMethod.POST )
 	public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
 														   @RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
@@ -369,7 +369,7 @@ public class StudyEventController {
 		return null;
 	}
 
-	@ApiOperation( value = "To Update an event for participant at site level", notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date , Event Repeat Key , Event Status" )
+	@ApiOperation( value = "To Update an event for participant at site level", notes = "Will read the information of StudyOID, ParticipantID, StudyEventOID, Event Repeat Key, Start Date, End Date and Event Status" )
 	@RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events", method = RequestMethod.PUT )
 	public ResponseEntity<Object> updateEventAtSiteLevel(HttpServletRequest request,
 														 @RequestBody StudyEventUpdateRequestDTO studyEventUpdateRequestDTO,
