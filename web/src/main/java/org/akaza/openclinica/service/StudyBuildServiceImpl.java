@@ -326,7 +326,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                     //request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
                 }
             }
+            // if current active study is still valid, then need to keep,because the active study is not always 
+            // the first one in the study list come back from SBS call, so need to "refresh"
             if (study.getStudyId() == userActiveStudyId) {
+            	ub.setActiveStudy(study);        	           
+                userAccountDao.saveOrUpdate(ub);
+            
                 currentActiveStudyValid = true;
                 //session.setAttribute("customUserRole", role.getDynamicRoleName());
                 //session.setAttribute("baseUserRole", role.getRoleName());
