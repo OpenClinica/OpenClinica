@@ -1,8 +1,6 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
@@ -11,6 +9,10 @@ import org.hibernate.query.Query;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.toIntExact;
 
@@ -141,6 +143,23 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         eventList = (List<StudyEvent>) q.list();
         return eventList;
 
+    }
+
+
+    public List<ItemData> fetchItemData(List<String> eventOids, String studySubjectOid, List<String> itemOids) {
+
+        Query query = getCurrentSession().createQuery("select new org.akaza.openclinica.dao.hibernate.RandomizeQueryResult(s, i) from StudyEvent s join s.eventCrfs c join c.itemDatas i " +
+                "where s.studyEventDefinition.oc_oid in :eventOids " +
+                "and c.studySubject.ocOid = :studySubjectOid " +
+                "and i.item.ocOid in :itemOids and i.ordinal=1");
+
+        query.setParameter("eventOids", eventOids);
+        query.setParameter("studySubjectOid", studySubjectOid);
+        query.setParameter("itemOids", itemOids);
+        List<RandomizeQueryResult> resultList = query.getResultList();
+        List<ItemData> itemData = resultList.stream().map(RandomizeQueryResult::getItemData).collect(Collectors.toList());
+
+        return itemData;
     }
 
     @Transactional

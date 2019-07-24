@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
@@ -22,12 +20,13 @@ import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.randomize.ModuleProcessor;
+import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -48,6 +47,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Created by yogi on 11/10/16.
@@ -59,7 +59,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
     public static final String ACTIVE = "active";
-    public static final String PARTICIPATE = "participate";
 
 
     PermissionService permissionService;
@@ -77,6 +76,13 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     private UserAccountDao userAccountDao;
     @Autowired
     private UtilService utilService;
+
+    @Autowired
+    private RandomizationService randomizationService;
+
+    @Autowired
+    private ParticipateService participateService;
+
 
     @Autowired
     private RestfulServiceHelper serviceHelper;
@@ -434,43 +440,50 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
     }
 
-    public void updateParticipateModuleStatusInOC(String accessToken, String studyOid) {
+    public void processAllModules(String accessToken, String studyOid) {
+        Study study = getModuleStudy(studyOid);
+        List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
+        Stream.of(ModuleProcessor.Modules.values()).forEach(module -> {
+            processSingleModule(study, moduleConfigDTOs, module, accessToken);
+        });
+    }
+
+    private void processSingleModule(Study study, List<ModuleConfigDTO> moduleConfigDTOs, ModuleProcessor.Modules module, String accessToken) {
+        String moduleEnabled = isModuleEnabled(moduleConfigDTOs, study, module);
+        ModuleProcessor moduleProcessor = null;
+        switch(module) {
+            case PARTICIPATE:
+                moduleProcessor = participateService;
+                break;
+            case RANDOMIZE:
+                moduleProcessor = randomizationService;
+                break;
+            default:
+                break;
+        }
+        if (moduleProcessor != null)
+            moduleProcessor.processModule(study, moduleEnabled, accessToken);
+    }
+
+    public void processModule(String accessToken, String studyOid, ModuleProcessor.Modules module) {
+        Study study = getModuleStudy(studyOid);
+        List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
+        processSingleModule(study, moduleConfigDTOs, module, accessToken);
+    }
+
+
+    private Study getModuleStudy(String studyOid) {
         utilService.setSchemaFromStudyOid(studyOid);
         Study study = studyDao.findByOcOID(studyOid);
         if (study.getStudy() != null)
             study = study.getStudy();
-        persistparticipateModuleStatus(accessToken, study);
+        return study;
     }
 
 
-    public void persistparticipateModuleStatus(String accessToken, Study study) {
-        List<ModuleConfigDTO> moduleConfigDTOs = getParticipateModuleFromStudyService(accessToken, study);
-        persistparticipateModuleStatus(moduleConfigDTOs, study);
-    }
-
-
-    public void persistparticipateModuleStatus(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        String statusValue = DISABLED;
-        if (moduleConfigDTOs.size() != 0) {
-            statusValue = getModuleStatus(moduleConfigDTOs, study);
-        }
-        if (!spv.isActive()) {
-            spv = new StudyParameterValueBean();
-            spv.setStudyId(study.getStudyId());
-            spv.setParameter("participantPortal");
-            spv.setValue(statusValue);
-            spvdao.create(spv);
-        } else if (spv.isActive() && !spv.getValue().equals(statusValue)) {
-            spv.setValue(statusValue);
-            spvdao.update(spv);
-        }
-    }
-
-    public String getModuleStatus(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
+    public String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
         for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
-            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(PARTICIPATE)) {
+            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(module.name())) {
                 ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
                 if (moduleStatus.name().equalsIgnoreCase(ACTIVE)) {
                     logger.info("Module Status is Enabled");
@@ -483,12 +496,13 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
 
-    public ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
-        for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
-            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(PARTICIPATE)) {
-                logger.info("ModuleConfigDTO  is :" + moduleConfigDTO);
-                return moduleConfigDTO;
-            }
+    public ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
+
+        Optional<ModuleConfigDTO> moduleConfigDTO =
+                moduleConfigDTOs.stream().filter(config -> config.getStudyUuid().equals(study.getStudyEnvUuid()) && config.getModuleName().equalsIgnoreCase(module.name())).findAny();
+        if (moduleConfigDTO.isPresent()) {
+            logger.info("ModuleConfigDTO  is :" + moduleConfigDTO.get());
+            return moduleConfigDTO.get();
         }
         logger.info("ModuleConfigDTO  is null");
         return null;
@@ -506,7 +520,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
 
-    public List<ModuleConfigDTO> getParticipateModuleFromStudyService(String accessToken, Study study) {
+    public List<ModuleConfigDTO> getModuleConfigsFromStudyService(String accessToken, Study study) {
         if (StringUtils.isEmpty(study.getStudyUuid())) {
             // make call to study service to get study servie
             StudyEnvironmentDTO studyEnvironmentDTO = getStudyUuidFromStudyService(accessToken, study);

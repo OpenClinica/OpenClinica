@@ -1,8 +1,6 @@
 package org.akaza.openclinica.controller.dto;
 
 
-import io.swagger.annotations.ApiModelProperty;
-
 public class StudyEventResponseDTO {
 
     private String subjectKey;

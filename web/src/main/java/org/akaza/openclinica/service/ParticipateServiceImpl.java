@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import org.akaza.openclinica.core.ExtendedBasicDataSource;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
@@ -24,7 +25,6 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
@@ -41,9 +41,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.TimeZone;
 import java.util.*;
 
 /**
@@ -58,7 +56,7 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     @Autowired
     @Qualifier("dataSource")
-    private BasicDataSource dataSource;
+    private ExtendedBasicDataSource dataSource;
 
     @Autowired
     ServletContext context;
@@ -446,4 +444,20 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     }
 
+    @Override
+    public void processModule(Study study, String isModuleEnabled, String accessToken) {
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+        String statusValue = isModuleEnabled;
+        if (!spv.isActive()) {
+            spv = new StudyParameterValueBean();
+            spv.setStudyId(study.getStudyId());
+            spv.setParameter("participantPortal");
+            spv.setValue(statusValue);
+            spvdao.create(spv);
+        } else if (spv.isActive() && !spv.getValue().equals(statusValue)) {
+            spv.setValue(statusValue);
+            spvdao.update(spv);
+        }
+    }
 }
