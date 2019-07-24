@@ -10,6 +10,7 @@ import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.KeycloakUser;
+import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.keycloak.KeycloakPrincipal;
@@ -37,6 +38,10 @@ public class KeycloakController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
     CallbackService callbackService;
+
+    @Autowired
+    StudyBuildService studyBuildService;
+
     @Autowired
     StudyDao studyDao;
     @Autowired
@@ -155,7 +160,7 @@ public class KeycloakController {
                 }
 
                 String accessToken = (String) req.getSession().getAttribute("accessToken");
-                callbackService.updateParticipateModuleStatus(accessToken, publicStudy.getOid());
+                studyBuildService.processAllModules(accessToken, publicStudy.getOid());
 
                 SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOid(),dataSource));
             }

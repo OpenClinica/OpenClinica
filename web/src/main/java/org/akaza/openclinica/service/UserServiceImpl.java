@@ -25,6 +25,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.RandomStringUtils;
@@ -630,13 +631,12 @@ public class UserServiceImpl implements UserService {
              }
         }
        
-       
         if (tenantStudy.getStudy() != null)
             tenantStudy = tenantStudy.getStudy();
 
-        List<ModuleConfigDTO> moduleConfigDTOs = studyBuildService.getParticipateModuleFromStudyService(accessToken, tenantStudy);
+        List<ModuleConfigDTO> moduleConfigDTOs = studyBuildService.getModuleConfigsFromStudyService(accessToken, tenantStudy);
         if (moduleConfigDTOs != null && moduleConfigDTOs.size() != 0) {
-            ModuleConfigDTO moduleConfigDTO = studyBuildService.getModuleConfig(moduleConfigDTOs, tenantStudy);
+            ModuleConfigDTO moduleConfigDTO = studyBuildService.getModuleConfig(moduleConfigDTOs, tenantStudy, ModuleProcessor.Modules.PARTICIPATE);
             if (moduleConfigDTO != null) {
                 ModuleConfigAttributeDTO moduleConfigAttributeDTO = studyBuildService.getModuleConfigAttribute(moduleConfigDTO.getAttributes(), tenantStudy);
                 if (moduleConfigAttributeDTO != null) {

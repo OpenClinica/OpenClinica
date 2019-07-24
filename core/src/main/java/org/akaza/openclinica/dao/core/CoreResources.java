@@ -549,6 +549,31 @@ public class CoreResources implements ResourceLoaderAware {
         return study;
     }
 
+    public static StudyBean getParentPublicStudy(String ocId, DataSource ds) {
+        StudyDAO studyDAO = new StudyDAO(ds);
+        StudyBean resultBean;
+        HttpServletRequest request = getRequest();
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
+        StudyBean study = getPublicStudy(ocId, ds);
+        if (study.getParentStudyId() == 0) {
+            resultBean = study;
+        } else {
+            StudyBean parentStudy = (StudyBean) studyDAO.findByPK(study.getParentStudyId());
+            resultBean = parentStudy;
+        }
+        CoreResources.setRequestSchema(schema);
+        return resultBean;
+    }
+
     public static StudyBean getPublicStudy(int id, DataSource ds) {
         StudyDAO studyDAO = new StudyDAO(ds);
         HttpServletRequest request = getRequest();

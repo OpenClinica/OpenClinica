@@ -1,48 +1,26 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
-import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
-
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
-import org.akaza.openclinica.dao.hibernate.ItemDao;
-import org.akaza.openclinica.dao.hibernate.ItemDataDao;
-import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
-import org.akaza.openclinica.dao.hibernate.RepeatCountDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.randomize.RandomizationConfiguration;
+import org.akaza.openclinica.domain.randomize.RandomizationDTO;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.validator.ParticipantValidator;
-import org.apache.xerces.dom.AttributeMap;
-import org.apache.xerces.dom.DeferredAttrImpl;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +29,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
+
+import javax.sql.DataSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
 
 @Component
 @Order(value = 7)
@@ -87,6 +77,9 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     @Autowired
     RepeatCountDao repeatCountDao;
 
+    @Autowired
+    private RandomizationService randomizationService;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String STUDYEVENT = "study_event";
     public static final String STUDYSUBJECT = "study_subject";
@@ -100,7 +93,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     public static final String MOBILENUMBER = "mobilenumber";
 
     public static final String US_PHONE_PREFIX = "+1 ";
-
 
 
 
@@ -278,15 +270,14 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 }
 
                 ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
+                ItemData randomizeDataCheck = null;
                 if (existingItemData == null) {
                     newItemData.setStatus(Status.UNAVAILABLE);
                     itemDataDao.saveOrUpdate(newItemData);
                     updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
-
-                } else if (existingItemData.getValue().equals(newItemData.getValue())) {
-
-                } else {
+                    randomizeDataCheck = newItemData;
+                } else if (!existingItemData.getValue().equals(newItemData.getValue())) {
                     // Existing item. Value changed. Update existing value.
                     existingItemData.setInstanceId(container.getInstanceId());
                     existingItemData.setValue(newItemData.getValue());
@@ -295,6 +286,14 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     itemDataDao.saveOrUpdate(existingItemData);
                     updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
+                    randomizeDataCheck = existingItemData;
+                }
+                // check for Randomization
+                try {
+                    checkRandomization(randomizeDataCheck, container);
+                } catch (Exception e) {
+                    logger.error("Failed checkRandomization:" + e);
+                    throw e;
                 }
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
@@ -309,8 +308,119 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     logger.error("Field Submission failed ");
                     throw new Exception(" Field Submission failed due to Item '" + itemName + "' does not exist in form");
                 }
-                }
+            }
         }
+    }
+
+    private void checkRandomization(ItemData thisItemData, SubmissionContainer container) throws Exception {
+        StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(thisItemData.getEventCrf().getStudySubject().getStudy().getOc_oid(), dataSource);
+        boolean isEnabled = randomizationService.isEnabled(parentPublicStudy.getStudyEnvUuid());
+        if (!isEnabled)
+            return;
+        RandomizationConfiguration studyConfig = randomizationService.getStudyConfig(parentPublicStudy.getStudyEnvUuid());
+
+        if (studyConfig == null) {
+            logger.debug("No RandomizeConfiguration found for this study:" + parentPublicStudy.getName());
+            return;
+        }
+
+        List<List<String>> stratGroups = new ArrayList<>();
+
+        // make an array out of event_oids and item_oids
+
+        studyConfig.getStratificationFactors().values().stream()
+                .collect(Collectors.toCollection(ArrayList::new)).stream()
+                .forEach(line-> {
+                    String[] elements = Arrays.stream(line.split("\\.")).toArray(String[]::new);
+                    for (int index = 0; index < elements.length; index++) {
+                        if (stratGroups.size() < index + 1)
+                            stratGroups.add(new ArrayList<>());
+                        stratGroups.get(index).add(elements[index]);
+                    }
+                });
+
+        if (stratGroups.size() == 0)
+            return;
+
+        // check event and item from thisItemData are part of the strat factors
+        if (!isItemPartOfStratFactors(stratGroups, thisItemData))
+            return;
+
+        Map<String, String> subjectContext =  container.getSubjectContext();
+        String accessToken = subjectContext.get("accessToken");
+        String studySubjectOID = container.getSubject().getOcOid();
+        String eventOID = studyConfig.targetField.getEventOID();
+        String itemOid = studyConfig.targetField.getItemOID();
+        List<ItemData> itemData = studyEventDao.fetchItemData(new ArrayList<>(Arrays.asList(eventOID)), studySubjectOID, new ArrayList<>(Arrays.asList(itemOid)));
+        List<ItemData> newItemData;
+
+        // target fields should not be populated
+        if ((CollectionUtils.isEmpty(itemData) || StringUtils.isEmpty(itemData.get(0).getValue()))) {
+            // check values in all strat factors to be not null
+            if ((newItemData = stratFactorValuesAvailable(stratGroups, studyConfig, studySubjectOID)) != null) {
+                // send these values over
+                sendStratFactors(stratGroups, parentPublicStudy, studyConfig, studySubjectOID, newItemData, accessToken);
+            }
+        }
+    }
+
+    private boolean isItemPartOfStratFactors(List<List<String>> stratGroups, ItemData thisItemData) {
+        boolean result = false;
+        String currentEventOid = thisItemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid();
+        String currentItemOid = thisItemData.getItem().getOcOid();
+        List<String> eventOids = stratGroups.get(0);
+        List<String>itemOids = stratGroups.get(3);
+        int index = 0;
+        for (String eventOid : eventOids) {
+            if (StringUtils.equals(currentEventOid, eventOid)) {
+                if (StringUtils.equals(currentItemOid, itemOids.get(index)))
+                    return true;
+            }
+            ++index;
+        }
+        return result;
+    }
+
+    private void sendStratFactors(List<List<String>> stratGroups, StudyBean publicStudy, RandomizationConfiguration studyConfig, String studySubjectOID,
+                                  List<ItemData> itemData, String accessToken) {
+
+        RandomizationDTO randomizationDTO = new RandomizationDTO();
+        randomizationDTO.setStudyUuid(publicStudy.getStudyUuid());
+        randomizationDTO.setStudyEnvironmentUuid(publicStudy.getStudyEnvUuid());
+        randomizationDTO.setSubjectOid(studySubjectOID);
+        Map<String, String> stratFactors = new LinkedHashMap<>();
+        StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
+        stratFactors.put("studyOid",         studySubject.getStudy().getOc_oid());
+        stratFactors.put("siteId", studySubject.getStudy().getUniqueIdentifier());
+        stratFactors.put("siteName", studySubject.getStudy().getName());
+        String[] questions = studyConfig.getStratificationFactors().keySet().toArray(new String[0]);
+        long count = IntStream.range(0, questions.length)
+                .mapToObj(i -> populateStratFactors(i, StringUtils.substringAfter(questions[i], RandomizationService.STRATIFICATION_FACTOR + "."),
+                        itemData, stratFactors)).count();
+        randomizationDTO.setStratificationFactors(stratFactors);
+        logger.debug("Questions processed:" + count);
+        randomizationService.sendStratificationFactors(randomizationDTO, accessToken);
+    }
+
+    private Map<String, String>  populateStratFactors(int index, String question, List<ItemData> itemData, Map<String, String> stratFactors) {
+        if (itemData.size() <= index) {
+            logger.error("Index out of bound:" + index);
+            return null;
+        }
+        stratFactors.put(question, itemData.get(index).getValue());
+        return stratFactors;
+
+    }
+    private List<ItemData> stratFactorValuesAvailable(List<List<String>> stratGroups, RandomizationConfiguration studyConfig, String studySubjectOID) {
+
+        // 0 is event oid and 3 is item oid
+        List<ItemData> itemDatas = studyEventDao.fetchItemData(stratGroups.get(0), studySubjectOID, stratGroups.get(3));
+
+        // if all of the items in strat factors have values then return the itemData list
+        if (stratGroups.get(0).size() == itemDatas.size())
+            return itemDatas;
+
+        return null;
     }
 
     private boolean shouldProcessItemNode(Node itemNode) {

@@ -165,10 +165,5 @@ public class CallbackServiceImpl implements CallbackService {
         userAccountController.createOrUpdateAccount(request, map);
         return (UserAccountBean) request.getAttribute("createdUaBean");
     }
-
-    public void updateParticipateModuleStatus(String accessToken,String studyOid){
-        studyBuildService.updateParticipateModuleStatusInOC(accessToken, studyOid);
-    }
-
 }
 

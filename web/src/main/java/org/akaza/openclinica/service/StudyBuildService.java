@@ -6,6 +6,7 @@ import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -34,12 +35,15 @@ public interface StudyBuildService {
 
     UserAccount getUserAccountObject(UserAccountBean ubIn);
 
-    void updateParticipateModuleStatusInOC(String accessToken, String studyOid);
+    List<ModuleConfigDTO> getModuleConfigsFromStudyService(String accessToken, Study study);
 
-    List<ModuleConfigDTO> getParticipateModuleFromStudyService(String accessToken, Study study);
-
-    ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study);
+    ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module);
 
     ModuleConfigAttributeDTO getModuleConfigAttribute(Set<ModuleConfigAttributeDTO> moduleConfigAttributeDTOs, Study study);
 
-    }
+    void processModule(String accessToken, String studyOid, ModuleProcessor.Modules module);
+
+    void processAllModules(String accessToken, String studyOid);
+
+
+}
