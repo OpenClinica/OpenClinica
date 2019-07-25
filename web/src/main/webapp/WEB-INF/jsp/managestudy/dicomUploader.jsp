@@ -10,33 +10,84 @@
 
 <jsp:include page="../include/managestudy-header.jsp"/>
 
-
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+  <td class="sidebar_tab">
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+    <fmt:message key="instructions" bundle="${restext}"/>
+    <div class="sidebar_tab_content"></div>
+  </td>
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: all">
+  <td class="sidebar_tab">
+  <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
+  <fmt:message key="instructions" bundle="${restext}"/>
+  </td>
+</tr>
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
-
-		<fmt:message key="instructions" bundle="${restext}"/>
-
-		<div class="sidebar_tab_content">
-
-		</div>
-
-		</td>
-
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
-
-		<fmt:message key="instructions" bundle="${restext}"/>
-
-		</td>
-  </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
+<h1>
+  <fmt:message key="upload_dicom_title" bundle="${resword}"/>
+</h1>
+<p>
+  <fmt:message key="upload_dicom_desc" bundle="${resword}"/>
+</p>
+
+<form>
+  <table>
+    <tr>
+      <td>
+        <fmt:message key="participant_ID" bundle="${resword}"/>
+      </td>
+      <td>
+        <input type="text">
+      </td>
+      <td>
+        <fmt:message key="accession" bundle="${resword}"/>
+      </td>
+      <td>
+        <input type="text">
+      </td>
+    <tr>
+  </table>
+  <div style="width: 400px">
+    <div class="box_T">
+      <div class="box_L">
+        <div class="box_R">
+          <div class="box_B">
+            <div class="box_TL">
+              <div class="box_TR">
+                <div class="box_BL">
+                  <div class="box_BR">
+                    <div class="textbox_center">
+                      <table border="0" cellpadding="0" cellspacing="0">
+                        <tbody>
+                          <tr>
+                            <td class="formlabel"></td>
+                            <td>
+                              <div class="formfieldFile_BG">
+                                <input type="file" name="file">
+                              </div>
+                              <br>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br clear="all">
+  <input type="submit" value="<fmt:message key='upload' bundle='${resword}'/>" class="button_long">
+  <input type="button" onclick="window.close();" value="<fmt:message key='cancel' bundle='${resword}'/>" class="button_medium">
+</form>
