@@ -16,7 +16,9 @@
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
   <td class="sidebar_tab">
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+      <span class="icon icon-caret-down gray"></span>
+    </a>
     <fmt:message key="instructions" bundle="${restext}"/>
     <div class="sidebar_tab_content"></div>
   </td>
@@ -28,6 +30,20 @@
   </td>
 </tr>
 
+<style>
+  .form-inputs td {
+    padding-right: 10px;
+  }
+  .form-inputs .empty {
+    width: 50px;
+  }
+  .form-inputs input {
+    width: 125px;
+    font-weight: bold;
+    color: #bbb;
+  }
+</style>
+
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <h1>
@@ -38,19 +54,20 @@
 </p>
 
 <form>
-  <table>
+  <table class="form-inputs">
     <tr>
       <td>
         <fmt:message key="participant_ID" bundle="${resword}"/>
       </td>
       <td>
-        <input type="text">
+        <input type="text" id="participant-id" readonly="readonly" class="readonly">
       </td>
+      <td class="empty">&nbsp;</td>
       <td>
         <fmt:message key="accession" bundle="${resword}"/>
       </td>
       <td>
-        <input type="text">
+        <input type="text" id="accession" readonly="readonly" class="readonly">
       </td>
     <tr>
   </table>
@@ -91,3 +108,9 @@
   <input type="submit" value="<fmt:message key='upload' bundle='${resword}'/>" class="button_long">
   <input type="button" onclick="window.close();" value="<fmt:message key='cancel' bundle='${resword}'/>" class="button_medium">
 </form>
+
+<script>
+  var url = new URL(location);
+  $("#participant-id").val(url.searchParams.get("participantId"));
+  $("#accession").val(url.searchParams.get("accession"));
+</script>
