@@ -1359,6 +1359,11 @@
         <servlet-name>EnketoFormServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.EnketoFormServlet</servlet-class>
     </servlet>
+    <servlet>
+        <display-name>DicomUploader</display-name>
+        <servlet-name>DicomUploaderServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.DicomUploaderServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
         <url-pattern>/LockCRFVersion</url-pattern>
@@ -2011,6 +2016,10 @@
     <servlet-mapping>
         <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DicomUploaderServlet</servlet-name>
+        <url-pattern>/DicomUploader</url-pattern>
     </servlet-mapping>
 
     <!--  Export Excel -->

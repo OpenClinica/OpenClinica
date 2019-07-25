@@ -575,6 +575,8 @@ public enum Page {
     RESTORE_SUBJECT ("/WEB-INF/jsp/" + "admin/restoreSubject.jsp", "restore a subject"),
 
     SET_USER_ROLE ("/WEB-INF/jsp/" + "admin/setUserRole.jsp", "set a study user role for a user"),
+
+    DICOM_UPLOADER ("/WEB-INF/jsp/" + "managestudy/dicomUploader.jsp", "Upload dicom files"),
     /**
      * Page for listing subjects.
      */
