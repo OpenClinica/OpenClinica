@@ -19,7 +19,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import javafx.print.PrinterJob;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
