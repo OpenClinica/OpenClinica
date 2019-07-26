@@ -14,13 +14,9 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.randomize.RandomizationConfiguration;
-import org.akaza.openclinica.domain.randomize.RandomizationDTO;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.validator.ParticipantValidator;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +33,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
 
@@ -293,7 +287,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     checkRandomization(randomizeDataCheck, container);
                 } catch (Exception e) {
                     logger.error("Failed checkRandomization:" + e);
-                    throw e;
                 }
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
@@ -314,131 +307,10 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     private void checkRandomization(ItemData thisItemData, SubmissionContainer container) throws Exception {
         StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(thisItemData.getEventCrf().getStudySubject().getStudy().getOc_oid(), dataSource);
-        boolean isEnabled = randomizationService.isEnabled(parentPublicStudy.getStudyEnvUuid());
-        if (!isEnabled)
-            return;
-        RandomizationConfiguration studyConfig = randomizationService.getStudyConfig(parentPublicStudy.getStudyEnvUuid());
-
-        if (studyConfig == null) {
-            logger.error("No RandomizeConfiguration found for this study:" + parentPublicStudy.getName());
-            return;
-        }
-
-        List<List<String>> stratGroups = new ArrayList<>();
-
-        // make an array out of event_oids and item_oids
-
-        studyConfig.getStratificationFactors().values().stream()
-                .collect(Collectors.toCollection(ArrayList::new)).stream()
-                .forEach(line-> {
-                    String[] elements = Arrays.stream(line.split("\\.")).toArray(String[]::new);
-                    for (int index = 0; index < elements.length; index++) {
-                        if (stratGroups.size() < index + 1)
-                            stratGroups.add(new ArrayList<>());
-                        stratGroups.get(index).add(elements[index]);
-                    }
-                });
-
-        if (stratGroups.size() == 0) {
-            logger.error("Randomize configuration does not have stratification factors defined.");
-            return;
-        }
-        // check event and item from thisItemData are part of the strat factors
-        if (!isItemPartOfStratFactors(stratGroups, thisItemData))
-            return;
-
         Map<String, String> subjectContext =  container.getSubjectContext();
         String accessToken = subjectContext.get("accessToken");
         String studySubjectOID = container.getSubject().getOcOid();
-        String eventOID = studyConfig.targetField.getEventOID();
-        String itemOid = studyConfig.targetField.getItemOID();
-        List<RandomizeQueryResult> randomizeQueryResult = studyEventDao.fetchItemData(new ArrayList<>(Arrays.asList(eventOID)), studySubjectOID, new ArrayList<>(Arrays.asList(itemOid)));
-        List<RandomizeQueryResult> newRandomizeQueryResult;
-
-        // target fields should not be populated if it already has a value
-        if ((CollectionUtils.isEmpty(randomizeQueryResult) || StringUtils.isEmpty(randomizeQueryResult.get(0).getItemData().getValue()))) {
-            // check values in all strat factors to be not null
-            if ((newRandomizeQueryResult = stratFactorValuesAvailable(stratGroups, studyConfig, studySubjectOID)) != null) {
-                // send these values over
-                sendStratFactors(stratGroups, parentPublicStudy, studyConfig, studySubjectOID, newRandomizeQueryResult, accessToken);
-            }
-        }
-    }
-
-    private boolean isItemPartOfStratFactors(List<List<String>> stratGroups, ItemData thisItemData) {
-        boolean result = false;
-        String currentEventOid = thisItemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid();
-        String currentItemOid = thisItemData.getItem().getOcOid();
-        List<String> eventOids = stratGroups.get(0);
-        List<String>itemOids = stratGroups.get(3);
-        int index = 0;
-        for (String eventOid : eventOids) {
-            if (StringUtils.equals(currentEventOid, eventOid)) {
-                if (StringUtils.equals(currentItemOid, itemOids.get(index)))
-                    return true;
-            }
-            ++index;
-        }
-        return result;
-    }
-
-    private void sendStratFactors(List<List<String>> stratGroups, StudyBean publicStudy, RandomizationConfiguration studyConfig, String studySubjectOID,
-                                  List<RandomizeQueryResult> randomizeQueryResult, String accessToken) {
-
-        RandomizationDTO randomizationDTO = new RandomizationDTO();
-        randomizationDTO.setStudyUuid(publicStudy.getStudyUuid());
-        randomizationDTO.setStudyEnvironmentUuid(publicStudy.getStudyEnvUuid());
-        randomizationDTO.setSubjectOid(studySubjectOID);
-        Map<String, String> stratFactors = new LinkedHashMap<>();
-        StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
-        stratFactors.put("studyOid",         studySubject.getStudy().getOc_oid());
-        stratFactors.put("siteId", studySubject.getStudy().getUniqueIdentifier());
-        stratFactors.put("siteName", studySubject.getStudy().getName());
-        String[] questions = studyConfig.getStratificationFactors().keySet().toArray(new String[0]);
-        List<String> stratFactorValueList = new ArrayList<>();
-
-        // database query results are coming back in different order. Build a list of strings with event and item oids concatenated and compare them with the list received from the database to find the matching entry
-        for (int stratIndex = 0; stratIndex < stratGroups.get(0).size(); stratIndex++) {
-            stratFactorValueList.add(stratGroups.get(0).get(stratIndex) + stratGroups.get(3).get(stratIndex));
-        }
-        List<String> databaseValues = randomizeQueryResult.stream().map(x -> x.getStudyEvent().getStudyEventDefinition().getOc_oid() + x.getItemData().getItem().getOcOid()).collect(Collectors.toList());
-
-        long count = IntStream.range(0, questions.length)
-                .mapToObj(i -> populateStratFactors(stratFactorValueList.get(i), i, StringUtils.substringAfter(questions[i], RandomizationService.STRATIFICATION_FACTOR + "."), databaseValues,
-                        randomizeQueryResult, stratFactors)).count();
-        randomizationDTO.setStratificationFactors(stratFactors);
-        logger.debug("Questions processed:" + count);
-        randomizationService.sendStratificationFactors(randomizationDTO, accessToken);
-    }
-
-    private Map<String, String>  populateStratFactors(String stratFactorValue, int index, String question,  List<String> databaseValues,
-                                                      List<RandomizeQueryResult> randomizeQueryResult, Map<String, String> stratFactors) {
-        if (randomizeQueryResult.size() <= index) {
-            logger.error("Index out of bound:" + index);
-            return null;
-        }
-        OptionalInt first = IntStream.range(0, databaseValues.size())
-                .filter(i -> stratFactorValue.equals(databaseValues.get(i)))
-                .findFirst();
-
-        if (first.isPresent()) {
-            int itemDataIndex = first.getAsInt();
-            stratFactors.put(question, randomizeQueryResult.get(itemDataIndex).getItemData().getValue());
-        }
-
-        return stratFactors;
-
-    }
-    private List<RandomizeQueryResult> stratFactorValuesAvailable(List<List<String>> stratGroups, RandomizationConfiguration studyConfig, String studySubjectOID) {
-
-        // 0 is event oid and 3 is item oid
-        List<RandomizeQueryResult> randomizeDataList = studyEventDao.fetchItemData(stratGroups.get(0), studySubjectOID, stratGroups.get(3));
-
-        // if all of the items in strat factors have values then return the itemData list
-        if (stratGroups.get(0).size() == randomizeDataList.size())
-            return randomizeDataList;
-
-        return null;
+        randomizationService.processRandomization(thisItemData, parentPublicStudy, accessToken, studySubjectOID);
     }
 
     private boolean shouldProcessItemNode(Node itemNode) {
