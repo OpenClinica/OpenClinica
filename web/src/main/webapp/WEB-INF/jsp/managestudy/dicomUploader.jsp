@@ -53,7 +53,7 @@
   <fmt:message key="upload_dicom_desc" bundle="${resword}"/>
 </p>
 
-<form>
+<form id="form-upload">
   <table class="form-inputs">
     <tr>
       <td>
@@ -67,7 +67,7 @@
         <fmt:message key="accession" bundle="${resword}"/>
       </td>
       <td>
-        <input type="text" id="accession" readonly="readonly" class="readonly">
+        <input type="text" id="accession-id" readonly="readonly" class="readonly">
       </td>
     <tr>
   </table>
@@ -87,7 +87,7 @@
                             <td class="formlabel"></td>
                             <td>
                               <div class="formfieldFile_BG">
-                                <input type="file" name="file">
+                                <input type="file" name="file" id="file-input">
                               </div>
                               <br>
                             </td>
@@ -105,12 +105,32 @@
     </div>
   </div>
   <br clear="all">
-  <input type="submit" value="<fmt:message key='upload' bundle='${resword}'/>" class="button_long">
+  <input type="button" id="btn-upload" value="<fmt:message key='upload' bundle='${resword}'/>" class="button_long">
   <input type="button" onclick="window.close();" value="<fmt:message key='cancel' bundle='${resword}'/>" class="button_medium">
 </form>
 
 <script>
   var url = new URL(location);
-  $("#participant-id").val(url.searchParams.get("participantId"));
-  $("#accession").val(url.searchParams.get("accession"));
+  var participantId = url.searchParams.get("participantId");
+  var accessionId = url.searchParams.get("accession");
+  $("#participant-id").val(participantId);
+  $("#accession-id").val(accessionId);
+
+  $('#btn-upload').on('click', function() {
+    let data = new FormData($("#form-upload")[0]);
+
+    $.ajax({
+      url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/${participantID}/accessionID/${accessionID}/upload',
+      type: 'POST',
+      data: data,
+      processData: false,
+      contentType: false,
+      success: function(r) {
+        console.log('success', r);
+      },
+      error: function(r) {
+        console.log('error', r);
+      }
+    });
+  });
 </script>
