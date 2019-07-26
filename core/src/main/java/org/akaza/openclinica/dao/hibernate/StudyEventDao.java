@@ -146,16 +146,23 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
     }
 
 
-    public List<RandomizeQueryResult> fetchItemData(List<String> eventOids, String studySubjectOid, List<String> itemOids) {
+    public List<RandomizeQueryResult> fetchItemData(List<String> eventOids, String studySubjectOid, List<String> formOids,
+                                                    List<String>itemGroups, List<String> itemOids) {
 
-        Query query = getCurrentSession().createQuery("select new org.akaza.openclinica.dao.hibernate.RandomizeQueryResult(s, i) from StudyEvent s join s.eventCrfs c join c.itemDatas i " +
+        Query query = getCurrentSession().createQuery("select new org.akaza.openclinica.dao.hibernate.RandomizeQueryResult(s, c, ig, i) " +
+                "from StudyEvent s join s.eventCrfs c join c.formLayout.crf.itemGroups ig join c.itemDatas i " +
                 "where s.studyEventDefinition.oc_oid in :eventOids " +
                 "and c.studySubject.ocOid = :studySubjectOid " +
+                "and c.formLayout.crf.ocOid in :formOids " +
+                "and ig.ocOid in :itemGroups " +
                 "and i.item.ocOid in :itemOids and i.ordinal=1");
 
         query.setParameter("eventOids", eventOids);
         query.setParameter("studySubjectOid", studySubjectOid);
         query.setParameter("itemOids", itemOids);
+        query.setParameter("formOids", formOids);
+        query.setParameter("itemGroups", itemGroups);
+
         List<RandomizeQueryResult> resultList = query.getResultList();
         return resultList;
     }
