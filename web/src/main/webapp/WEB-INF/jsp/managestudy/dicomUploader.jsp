@@ -117,11 +117,18 @@
   $("#accession-id").val(accessionId);
 
   $('#btn-upload').on('click', function() {
-    let data = new FormData($("#form-upload")[0]);
-
+    var data = new FormData();
+    jQuery.each(jQuery('#form-upload')[0].files, function(i, file) {
+        data.append('file-'+i, file);
+    });
+    
     $.ajax({
-      url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/${participantID}/accessionID/${accessionID}/upload',
+      url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
+      method: 'POST',
       type: 'POST',
+      headers: {
+        Authorization: "Bearer ${accessToken}"
+      },
       data: data,
       processData: false,
       contentType: false,
