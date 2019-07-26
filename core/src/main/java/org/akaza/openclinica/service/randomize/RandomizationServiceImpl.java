@@ -231,7 +231,7 @@ public class RandomizationServiceImpl implements RandomizationService {
                 .collect(Collectors.toList());
 
         long count = IntStream.range(0, questions.length)
-                .mapToObj(i -> populateStratFactors(stratFactorValueList.get(i), i, StringUtils.substringAfter(questions[i], RandomizationService.STRATIFICATION_FACTOR + "."), databaseValues,
+                .mapToObj(i -> populateStratFactors(stratFactorValueList.get(i), i, StringUtils.substringAfter(questions[i], STRATIFICATION_FACTOR + "."), databaseValues,
                         randomizeQueryResult, stratFactors)).count();
         randomizationDTO.setStratificationFactors(stratFactors);
         log.debug("Questions processed:" + count);
@@ -320,7 +320,7 @@ public class RandomizationServiceImpl implements RandomizationService {
         List<RandomizeQueryResult> randomizeDataList = studyEventDao.fetchItemData(stratGroups.get(0), studySubjectOID,
                 stratGroups.get(1), stratGroups.get(2), stratGroups.get(3));
 
-        // if all of the items in strat factors have values then return the itemData list
+        // check if all of the items that are specified in the strat factors have values
         if (stratGroups.get(0).size() == randomizeDataList.size()) {
             // are ALL the forms completed?
             if (randomizeDataList.stream().filter(x -> x.getEventCrf().getStatusId()== Status.UNAVAILABLE.getCode()).count() == randomizeDataList.size())
