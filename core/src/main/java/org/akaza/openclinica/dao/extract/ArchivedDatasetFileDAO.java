@@ -63,8 +63,11 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         this.setTypeExpected(5, TypeNames.STRING);// file_reference
         this.setTypeExpected(6, TypeNames.INT);// run_time
         this.setTypeExpected(7, TypeNames.INT);// file_size
-        this.setTypeExpected(8, TypeNames.DATE);// date_created
+        this.setTypeExpected(8, TypeNames.TIMESTAMP);// date_created
         this.setTypeExpected(9, TypeNames.INT);// owner id
+        this.setTypeExpected(10, TypeNames.STRING);// format
+        this.setTypeExpected(11, TypeNames.STRING);// status
+
     }
 
     public EntityBean create(EntityBean eb) {
@@ -78,6 +81,10 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(5), Integer.valueOf(fb.getFileSize()));
         variables.put(Integer.valueOf(6), new Double(fb.getRunTime()));
         variables.put(Integer.valueOf(7), Integer.valueOf(fb.getOwnerId()));
+        variables.put(Integer.valueOf(8), new java.sql.Timestamp(fb.getDateCreated().getTime()));
+        variables.put(Integer.valueOf(9), fb.getFormat());
+        variables.put(Integer.valueOf(10), fb.getStatus());
+
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
             fb.setId(getLatestPK());
@@ -96,8 +103,15 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(5), Integer.valueOf(fb.getFileSize()));
         variables.put(Integer.valueOf(6), new Double(fb.getRunTime()));
         variables.put(Integer.valueOf(7), Integer.valueOf(fb.getOwnerId()));
-        variables.put(Integer.valueOf(8), Integer.valueOf(fb.getId()));
+        variables.put(Integer.valueOf(8), new java.sql.Timestamp(fb.getDateCreated().getTime()));
+        variables.put(Integer.valueOf(9), fb.getFormat());
+        variables.put(Integer.valueOf(10), fb.getStatus());
+        variables.put(Integer.valueOf(11), Integer.valueOf(fb.getId()));
+
         this.execute(digester.getQuery("update"), variables, nullVars);
+        if (isQuerySuccessful()) {
+            fb.setActive(true);
+        }
         return fb;
     }
 
@@ -105,7 +119,6 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
         fb.setId(((Integer) hm.get("archived_dataset_file_id")).intValue());
         fb.setDateCreated((Date) hm.get("date_created"));
-
         fb.setName((String) hm.get("name"));
         fb.setId(((Integer) hm.get("archived_dataset_file_id")).intValue());
         fb.setDatasetId(((Integer) hm.get("dataset_id")).intValue());
@@ -114,6 +127,8 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setRunTime(((Integer) hm.get("run_time")).doubleValue());
         fb.setFileSize(((Integer) hm.get("file_size")).intValue());
         fb.setOwnerId(((Integer) hm.get("owner_id")).intValue());
+        fb.setFormat((String) hm.get("format"));
+        fb.setStatus((String) hm.get("status"));
         UserAccountDAO uaDAO = new UserAccountDAO(this.ds);
         UserAccountBean owner = (UserAccountBean) uaDAO.findByPK(fb.getOwnerId());
         fb.setOwner(owner);

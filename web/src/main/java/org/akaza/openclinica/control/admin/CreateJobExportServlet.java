@@ -13,6 +13,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -22,8 +23,10 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
@@ -236,7 +239,7 @@ public class CreateJobExportServlet extends SecureController {
                         SQLInitServlet.getField("filePath") + "xslt", 
                         xsltService.getTriggerGroupNameForExportJobs(),
                         currentPublicStudy,
-                        currentStudy);
+                        currentStudy,null);
 
                 //Updating the original trigger with user given inputs
                 trigger = trigger.getTriggerBuilder()

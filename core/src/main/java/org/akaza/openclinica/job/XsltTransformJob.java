@@ -19,6 +19,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import javafx.print.PrinterJob;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -43,6 +44,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTag;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
+import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
@@ -161,6 +163,12 @@ public class XsltTransformJob extends QuartzJobBean {
 
 
             int dsId = dataMap.getInt(DATASET_ID);
+             int archivedDatasetFileBeanId = dataMap.getInt(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID);
+             ArchivedDatasetFileBean archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.findByPK(archivedDatasetFileBeanId);
+            archivedDatasetFileBean.setStatus(JobStatus.IN_PROGRESS.name());
+            archivedDatasetFileBean.setFileReference("");
+            archivedDatasetFileBean.setDateCreated(new Date());
+            archivedDatasetFileBean=(ArchivedDatasetFileBean) archivedDatasetFileDao.update(archivedDatasetFileBean);
 
             // JN: Change from earlier versions, cannot get static reference as
             // static references don't work. Reason being for example there could be
@@ -339,7 +347,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
                     fbFinal =
                             generateFileRecord(archivedFile, outputPath, datasetBean, done, new File(outputPath + File.separator + archivedFile).length(),
-                                    ExportFormatBean.PDFFILE, userAccountId,edcSet);
+                                    ExportFormatBean.PDFFILE, userAccountId,edcSet,epBean,archivedDatasetFileBean);
 
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
@@ -440,7 +448,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
                 fbFinal =
                         generateFileRecord(archivedFilename, outputPath, datasetBean, done, new File(outputPath + File.separator + archivedFilename).length(),
-                                ExportFormatBean.TXTFILE, userAccountId,edcSet);
+                                ExportFormatBean.TXTFILE, userAccountId,edcSet,epBean,archivedDatasetFileBean);
 
 
                 if (jobName != null) {
@@ -666,7 +674,7 @@ public class XsltTransformJob extends QuartzJobBean {
         for (ArchivedDatasetFileBean fbExisting : al) {
             logger.debug("The file to checking?" + fbExisting.getFileReference() + "Does the file exist?" + new File(fbExisting.getFileReference()).exists());
             logger.debug("check if it still exists in archive set before" + archivedDatasetFileDao.findByDatasetId(fbExisting.getDatasetId()).size());
-            if (!new File(fbExisting.getFileReference()).exists()) {
+            if (!fbExisting.getFileReference().equals("") && !new File(fbExisting.getFileReference()).exists()) {
                 logger.debug(fbExisting.getFileReference() + "Doesnt exist,deleting it from archiveset data");
 
                 deleteArchivedDataset(fbExisting);
@@ -840,39 +848,36 @@ public class XsltTransformJob extends QuartzJobBean {
     }
 
     private ArchivedDatasetFileBean generateFileRecord(String name, String dir, DatasetBean datasetBean, double time, long fileLength, ExportFormatBean efb,
-                                                       int userBeanId,Set<Integer> edcSet) {
-        ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
+                                                       int userBeanId,Set<Integer> edcSet,ExtractPropertyBean epBean,ArchivedDatasetFileBean archivedDatasetFileBean) {
 
-        ArchivedDatasetFileBean fbInitial = new ArchivedDatasetFileBean();
         // Deleting off the original file archive dataset file.
 
         if(ClinicalDataCollector.datasetFiltered.equals("YES")) {
-            fbInitial.setName("filtered-"+ name);
+            archivedDatasetFileBean.setName("filtered-"+ name);
         }else{
-            fbInitial.setName(name);
+            archivedDatasetFileBean.setName(name);
         }
 
-        fbInitial.setFileReference(dir + name);
+        archivedDatasetFileBean.setFileReference(dir + name);
 
         // JN: the following is to convert to KB, not possible without changing
         // database schema
-        fbInitial.setFileSize((int) fileLength);
+        archivedDatasetFileBean.setFileSize((int) fileLength);
 
         // set the above to compressed size?
         // JN: the following commented out code is to convert from milli secs to
         // secs
         // seconds
-        fbInitial.setRunTime( time);// to convert to seconds
+        archivedDatasetFileBean.setRunTime( time);// to convert to seconds
         // need to set this in milliseconds, get it passed from above
         // methods?
-        fbInitial.setDatasetId(datasetBean.getId());
-        fbInitial.setExportFormatBean(efb);
-        fbInitial.setExportFormatId(efb.getId());
-        fbInitial.setOwnerId(userBeanId);
-        fbInitial.setDateCreated(new Date(System.currentTimeMillis()));
+        archivedDatasetFileBean.setExportFormatBean(efb);
+        archivedDatasetFileBean.setExportFormatId(efb.getId());
+        archivedDatasetFileBean.setDateCreated(new Date());
+        archivedDatasetFileBean.setStatus(JobStatus.COMPLETED.name());
 
-        fbFinal = createArchivedDataset(fbInitial , edcSet);
-        return fbFinal;
+        archivedDatasetFileBean = updateArchivedDatasetFileToComplete(archivedDatasetFileBean , edcSet);
+        return archivedDatasetFileBean;
     }
 
     private void sendErrorEmail(String message, JobExecutionContext context, String target) {
@@ -929,6 +934,13 @@ public class XsltTransformJob extends QuartzJobBean {
         ArchivedDatasetFileBean   fbFinal = (ArchivedDatasetFileBean) archivedDatasetFileDao.create(adf);
         persistPermissionTags( edcSet,fbFinal.getId());
 
+        return fbFinal;
+    }
+
+
+    private ArchivedDatasetFileBean updateArchivedDatasetFileToComplete(ArchivedDatasetFileBean adf , Set<Integer> edcSet) {
+        ArchivedDatasetFileBean   fbFinal = (ArchivedDatasetFileBean) archivedDatasetFileDao.update(adf);
+        persistPermissionTags( edcSet,fbFinal.getId());
         return fbFinal;
     }
 

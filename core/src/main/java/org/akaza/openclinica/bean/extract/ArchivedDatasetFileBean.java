@@ -41,6 +41,9 @@ public class ArchivedDatasetFileBean extends EntityBean {
     private double runTime;
     private Date dateCreated;
     private int ownerId;
+    private String format;
+    private String status;
+
 
     public int getId() {
         return id;
@@ -199,5 +202,21 @@ public class ArchivedDatasetFileBean extends EntityBean {
      */
     public void setOwner(UserAccountBean owner) {
         this.owner = owner;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

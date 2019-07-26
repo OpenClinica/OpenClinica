@@ -13,21 +13,22 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import javafx.print.PrinterJob;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.job.AutowiringSpringBeanJobFactory;
-import org.akaza.openclinica.job.JobExecutionExceptionListener;
-import org.akaza.openclinica.job.JobTriggerListener;
-import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
+import org.akaza.openclinica.job.*;
 import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.service.extract.ExtractUtils;
@@ -35,6 +36,7 @@ import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
+import org.quartz.JobDataMap;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -202,6 +204,20 @@ public class ExtractController {
         }
 
 
+
+        ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
+        archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
+        archivedDatasetFileBean.setFormat(epBean.getFormatDescription());
+        archivedDatasetFileBean.setOwnerId(userBean.getId());
+        archivedDatasetFileBean.setDatasetId(dsBean.getId());
+        archivedDatasetFileBean.setDateCreated(new Date());
+        archivedDatasetFileBean.setExportFormatId(1);
+        archivedDatasetFileBean.setFileReference("");
+
+        ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(dataSource);
+        archivedDatasetFileBean=(ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
+
+
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
         simpleTrigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                 generalFileDir, // xml_file_path
@@ -215,7 +231,8 @@ public class ExtractController {
                 SQLInitServlet.getField("filePath") + "xslt",
                 this.TRIGGER_GROUP_NAME,
                 (StudyBean) request.getSession().getAttribute("publicStudy"),
-                (StudyBean) request.getSession().getAttribute("study"));
+                (StudyBean) request.getSession().getAttribute("study"),
+                archivedDatasetFileBean);
         // System.out.println("just set locale: " + LocaleResolver.getLocale(request).getLanguage());
 
         cnt++;

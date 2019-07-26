@@ -17,7 +17,7 @@ public class XsltStatefulJob extends XsltTransformJob implements InterruptableJo
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        jobTerminationMonitor = JobTerminationMonitor.createInstance(context.getJobDetail().getDescription());
+   //     jobTerminationMonitor = JobTerminationMonitor.createInstance(context.getJobDetail().getDescription());
         super.executeInternal(context);
     }
 
