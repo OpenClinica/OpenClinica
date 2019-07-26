@@ -71,7 +71,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                     criteria =
                         criteria
                             + " ec.crf_version_id in (select distinct crf_version_id from crf_version crfv, crf cr, event_definition_crf edc where crfv.crf_id = cr.crf_id AND cr.crf_id = edc.crf_id AND edc.crf_id in (select crf_id from event_definition_crf where (study_id  = "
-                            + studyId + " or study_id in (select study_id from study where parent_study_id = " + studyId + ")) ";
+                            + studyId + " or study_id in (select parent_study_id from study where study_id = " + studyId + ")) ";
                     criteria += " AND ( ";
                     for (int i = 0; i < reqs.size(); i++) {
                         criteria += i != 0 ? " OR " : "";
