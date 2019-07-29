@@ -14,13 +14,9 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.randomize.RandomizationConfiguration;
-import org.akaza.openclinica.domain.randomize.RandomizationDTO;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.validator.ParticipantValidator;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +33,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
 
@@ -293,7 +287,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     checkRandomization(randomizeDataCheck, container);
                 } catch (Exception e) {
                     logger.error("Failed checkRandomization:" + e);
-                    throw e;
                 }
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
@@ -314,113 +307,10 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     private void checkRandomization(ItemData thisItemData, SubmissionContainer container) throws Exception {
         StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(thisItemData.getEventCrf().getStudySubject().getStudy().getOc_oid(), dataSource);
-        boolean isEnabled = randomizationService.isEnabled(parentPublicStudy.getStudyEnvUuid());
-        if (!isEnabled)
-            return;
-        RandomizationConfiguration studyConfig = randomizationService.getStudyConfig(parentPublicStudy.getStudyEnvUuid());
-
-        if (studyConfig == null) {
-            logger.debug("No RandomizeConfiguration found for this study:" + parentPublicStudy.getName());
-            return;
-        }
-
-        List<List<String>> stratGroups = new ArrayList<>();
-
-        // make an array out of event_oids and item_oids
-
-        studyConfig.getStratificationFactors().values().stream()
-                .collect(Collectors.toCollection(ArrayList::new)).stream()
-                .forEach(line-> {
-                    String[] elements = Arrays.stream(line.split("\\.")).toArray(String[]::new);
-                    for (int index = 0; index < elements.length; index++) {
-                        if (stratGroups.size() < index + 1)
-                            stratGroups.add(new ArrayList<>());
-                        stratGroups.get(index).add(elements[index]);
-                    }
-                });
-
-        if (stratGroups.size() == 0)
-            return;
-
-        // check event and item from thisItemData are part of the strat factors
-        if (!isItemPartOfStratFactors(stratGroups, thisItemData))
-            return;
-
         Map<String, String> subjectContext =  container.getSubjectContext();
         String accessToken = subjectContext.get("accessToken");
         String studySubjectOID = container.getSubject().getOcOid();
-        String eventOID = studyConfig.targetField.getEventOID();
-        String itemOid = studyConfig.targetField.getItemOID();
-        List<ItemData> itemData = studyEventDao.fetchItemData(new ArrayList<>(Arrays.asList(eventOID)), studySubjectOID, new ArrayList<>(Arrays.asList(itemOid)));
-        List<ItemData> newItemData;
-
-        // target fields should not be populated
-        if ((CollectionUtils.isEmpty(itemData) || StringUtils.isEmpty(itemData.get(0).getValue()))) {
-            // check values in all strat factors to be not null
-            if ((newItemData = stratFactorValuesAvailable(stratGroups, studyConfig, studySubjectOID)) != null) {
-                // send these values over
-                sendStratFactors(stratGroups, parentPublicStudy, studyConfig, studySubjectOID, newItemData, accessToken);
-            }
-        }
-    }
-
-    private boolean isItemPartOfStratFactors(List<List<String>> stratGroups, ItemData thisItemData) {
-        boolean result = false;
-        String currentEventOid = thisItemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid();
-        String currentItemOid = thisItemData.getItem().getOcOid();
-        List<String> eventOids = stratGroups.get(0);
-        List<String>itemOids = stratGroups.get(3);
-        int index = 0;
-        for (String eventOid : eventOids) {
-            if (StringUtils.equals(currentEventOid, eventOid)) {
-                if (StringUtils.equals(currentItemOid, itemOids.get(index)))
-                    return true;
-            }
-            ++index;
-        }
-        return result;
-    }
-
-    private void sendStratFactors(List<List<String>> stratGroups, StudyBean publicStudy, RandomizationConfiguration studyConfig, String studySubjectOID,
-                                  List<ItemData> itemData, String accessToken) {
-
-        RandomizationDTO randomizationDTO = new RandomizationDTO();
-        randomizationDTO.setStudyUuid(publicStudy.getStudyUuid());
-        randomizationDTO.setStudyEnvironmentUuid(publicStudy.getStudyEnvUuid());
-        randomizationDTO.setSubjectOid(studySubjectOID);
-        Map<String, String> stratFactors = new LinkedHashMap<>();
-        StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
-        stratFactors.put("studyOid",         studySubject.getStudy().getOc_oid());
-        stratFactors.put("siteId", studySubject.getStudy().getUniqueIdentifier());
-        stratFactors.put("siteName", studySubject.getStudy().getName());
-        String[] questions = studyConfig.getStratificationFactors().keySet().toArray(new String[0]);
-        long count = IntStream.range(0, questions.length)
-                .mapToObj(i -> populateStratFactors(i, StringUtils.substringAfter(questions[i], RandomizationService.STRATIFICATION_FACTOR + "."),
-                        itemData, stratFactors)).count();
-        randomizationDTO.setStratificationFactors(stratFactors);
-        logger.debug("Questions processed:" + count);
-        randomizationService.sendStratificationFactors(randomizationDTO, accessToken);
-    }
-
-    private Map<String, String>  populateStratFactors(int index, String question, List<ItemData> itemData, Map<String, String> stratFactors) {
-        if (itemData.size() <= index) {
-            logger.error("Index out of bound:" + index);
-            return null;
-        }
-        stratFactors.put(question, itemData.get(index).getValue());
-        return stratFactors;
-
-    }
-    private List<ItemData> stratFactorValuesAvailable(List<List<String>> stratGroups, RandomizationConfiguration studyConfig, String studySubjectOID) {
-
-        // 0 is event oid and 3 is item oid
-        List<ItemData> itemDatas = studyEventDao.fetchItemData(stratGroups.get(0), studySubjectOID, stratGroups.get(3));
-
-        // if all of the items in strat factors have values then return the itemData list
-        if (stratGroups.get(0).size() == itemDatas.size())
-            return itemDatas;
-
-        return null;
+        randomizationService.processRandomization(thisItemData, parentPublicStudy, accessToken, studySubjectOID);
     }
 
     private boolean shouldProcessItemNode(Node itemNode) {
