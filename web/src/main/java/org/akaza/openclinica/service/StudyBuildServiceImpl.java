@@ -28,7 +28,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -296,6 +296,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (userActiveStudyId > 0) {
             activeStudy = studyDao.findById(userActiveStudyId);
             getRoleAssociatedWithActiveStudy(activeStudy,userRoles.getBody(),request);
+            String baseRole = (String) request.getSession().getAttribute("baseUserRole");
+            // If a user is a DM at a study level, SBS won't send us a site role for this user. RT allows DMs to have site as a active study.
+            if (StringUtils.isNotEmpty(baseRole) && baseRole.equals("Data Manager")
+                    && (activeStudy.getStudy() != null && activeStudy.getStudy().getStudyId() != 0)) {
+                currentActiveStudyValid = true;
+            }
         }
 
         // TODO: refactor this loop seems complex and error-prone & seems to break SRP.
@@ -313,6 +319,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             
             if (study == null)
                 continue;
+
             boolean parentExists = false;
             if (siteFlag) {
                 // see if the parent is in this list. If found, assign the custom role of the parent
@@ -333,9 +340,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 userAccountDao.saveOrUpdate(ub);
             
                 currentActiveStudyValid = true;
-                //session.setAttribute("customUserRole", role.getDynamicRoleName());
-                //session.setAttribute("baseUserRole", role.getRoleName());
-
             }
 
             Study parentStudy = study.getStudy();
