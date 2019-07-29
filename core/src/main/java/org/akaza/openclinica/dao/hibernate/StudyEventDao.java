@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.random;
 import static java.lang.Math.toIntExact;
 
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware {
@@ -155,7 +156,10 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
                 "and c.studySubject.ocOid = :studySubjectOid " +
                 "and c.formLayout.crf.ocOid in :formOids " +
                 "and ig.ocOid in :itemGroups " +
-                "and i.item.ocOid in :itemOids and i.ordinal=1");
+                "and i.item.ocOid in :itemOids " +
+                "and i.ordinal=1 " +
+                "and i.value is not null " +
+                "and i.value <> ''");
 
         query.setParameter("eventOids", eventOids);
         query.setParameter("studySubjectOid", studySubjectOid);
@@ -164,6 +168,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         query.setParameter("itemGroups", itemGroups);
 
         List<RandomizeQueryResult> resultList = query.getResultList();
+        logger.debug("Item data result size: {}", resultList.size());
         return resultList;
     }
 
