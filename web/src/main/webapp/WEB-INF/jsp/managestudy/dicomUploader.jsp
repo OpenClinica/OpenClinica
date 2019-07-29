@@ -122,7 +122,6 @@
         data.append('file-'+i, file);
     });
     
-    alert('${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload');
     $.ajax({
       url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
       method: 'POST',
