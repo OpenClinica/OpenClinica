@@ -161,7 +161,7 @@ public class RandomizationServiceImpl implements RandomizationService {
         }
     }
 
-    public boolean isItemPartOfStratFactors(List<List<String>> stratGroups, ItemData thisItemData) {
+    private boolean isItemPartOfStratFactors(List<List<String>> stratGroups, ItemData thisItemData) {
         boolean result = false;
         String currentEventOid = thisItemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid();
         String currentItemOid = thisItemData.getItem().getOcOid();
@@ -257,8 +257,12 @@ public class RandomizationServiceImpl implements RandomizationService {
 
     }
 
-    public void processRandomization(ItemData thisItemData, StudyBean parentPublicStudy, String accessToken, String studySubjectOID) {
+    public void processRandomization(StudyBean parentPublicStudy, String accessToken, String studySubjectOID, ItemData... optionalItemData) {
 
+        ItemData itemData = null;
+        if (optionalItemData.length > 0) {
+            itemData = optionalItemData[0];
+        }
         boolean isEnabled = isEnabled(parentPublicStudy.getStudyEnvUuid());
         if (!isEnabled)
             return;
@@ -286,11 +290,12 @@ public class RandomizationServiceImpl implements RandomizationService {
                 });
 
         if (stratGroups.size() == 0) {
-            log.error("Randomize configuration does not have stratification factors defined.");
+            log.error("Randomize configuration does not have stratification factors defined for this study:" + parentPublicStudy.getName()
+                    + " ParticipantId: " + studySubjectOID);
             return;
         }
         // check event and item from thisItemData are part of the strat factors
-        if (!isItemPartOfStratFactors(stratGroups, thisItemData))
+        if (itemData != null && !isItemPartOfStratFactors(stratGroups, itemData))
             return;
 
 
@@ -325,6 +330,8 @@ public class RandomizationServiceImpl implements RandomizationService {
             // are ALL the forms completed?
             if (randomizeDataList.stream().filter(x -> x.getEventCrf().getStatusId()== Status.UNAVAILABLE.getCode()).count() == randomizeDataList.size())
                 return randomizeDataList;
+            else
+                log.debug("<RANDOMIZE> All forms are not completed for ParticipantId: " + studySubjectOID);
         }
         return null;
     }
