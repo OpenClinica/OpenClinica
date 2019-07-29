@@ -286,7 +286,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 try {
                     checkRandomization(randomizeDataCheck, container);
                 } catch (Exception e) {
-                    logger.error("Failed checkRandomization:" + e);
+                    logger.error("<RANDOMIZE> Failed checkRandomization for form: " + formLayout.getCrf().getOcOid() + e);
                 }
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
