@@ -1,6 +1,5 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
@@ -12,9 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static java.lang.Math.random;
 import static java.lang.Math.toIntExact;
 
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware {
