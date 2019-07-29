@@ -119,7 +119,7 @@
   $('#btn-upload').click(function() {
     var data = new FormData();
     jQuery.each($('#file-input')[0].files, function(i, file) {
-        data.append('file-'+i, file);
+        data.append('file', file);
     });
     
     $.ajax({
