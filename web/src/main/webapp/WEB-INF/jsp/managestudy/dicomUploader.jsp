@@ -116,12 +116,13 @@
   $("#participant-id").val(participantId);
   $("#accession-id").val(accessionId);
 
-  $('#btn-upload').on('click', function() {
+  $('#btn-upload').click(function() {
     var data = new FormData();
-    jQuery.each(jQuery('#form-upload')[0].files, function(i, file) {
+    jQuery.each($('#file-input')[0].files, function(i, file) {
         data.append('file-'+i, file);
     });
     
+    alert('${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload');
     $.ajax({
       url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
       method: 'POST',
