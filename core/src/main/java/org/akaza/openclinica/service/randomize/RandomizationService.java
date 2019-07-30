@@ -15,5 +15,5 @@ public interface RandomizationService extends ModuleProcessor {
     boolean isEnabled(String studyEnvUuid);
     String STRATIFICATION_FACTOR = "stratificationFactor";
     RandomizationConfiguration getStudyConfig(String studyEnvUuid);
-    void processRandomization(ItemData thisItemData, StudyBean parentPublicStudy, String accessToken, String studySubjectOID);
+    void processRandomization(StudyBean parentPublicStudy, String accessToken, String studySubjectOID, ItemData... optionalItemData);
 }

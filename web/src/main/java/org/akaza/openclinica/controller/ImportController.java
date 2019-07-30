@@ -6,26 +6,18 @@ import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
-import org.akaza.openclinica.controller.dto.StudyEventUpdateRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.auth.TokenService;
-import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -180,7 +172,8 @@ public class ImportController {
         }
 
         // If this is randomize-service importing then we can skip the roles check.
-        if (isRandomizeImport(request)){
+        boolean isRandomizeImport = isRandomizeImport(request);
+        if (isRandomizeImport){
             fileNm = "randomize-service";
         } else {
             if (siteOid != null) {
@@ -200,7 +193,12 @@ public class ImportController {
 
         String schema = CoreResources.getRequestSchema();
 
-        String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm);
+        String uuid;
+        try {
+            uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm, isRandomizeImport);
+        } catch (CustomParameterizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
         logger.info("REST request to Import Job uuid {} ", uuid);
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -238,23 +236,35 @@ public class ImportController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean, String fileNm) {
+    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid,
+                                 UserAccountBean userAccountBean, String fileNm, boolean isRandomizeImport) {
         utilService.setSchemaFromStudyOid(studyOid);
 
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, fileNm);
-        CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
-            try {
-                importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
-            } catch (Exception e) {
-                logger.error("Exception is thrown while processing dataImport: " + e);
+        if (isRandomizeImport) {
+            // For randomization imports, instead of running import as an asynchronous job, run it synchronously
+            logger.debug("Running import synchronously");
+            boolean isImportSuccessful = importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, null, isRandomizeImport);
+            if (!isImportSuccessful) {
+                // Throw an error if import fails such that randomize service can update the status accordingly
+                throw new CustomParameterizedException(ErrorConstants.ERR_IMPORT_FAILED);
             }
             return null;
+        } else {
+            JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, fileNm);
+            CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, isRandomizeImport);
+                } catch (Exception e) {
+                    logger.error("Exception is thrown while processing dataImport: " + e);
+                }
+                return null;
 
-        });
-        return jobDetail.getUuid();
+            });
+            return jobDetail.getUuid();
+        }
     }
 
     public File getXSDFile(HttpServletRequest request, String fileNm) {

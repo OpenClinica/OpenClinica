@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.FileProperties;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -11,6 +12,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
+import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.File;
 import java.util.*;
 
@@ -88,6 +91,12 @@ public class OpenRosaSubmissionController {
 
     @Autowired
     private ItemDataDao itemDataDao;
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Autowired
+    private RandomizationService randomizationService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
@@ -226,6 +235,7 @@ public class OpenRosaSubmissionController {
             eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
             eventCrfDao.saveOrUpdate(eventCrf);
+            checkRandomization(subjectContext, studyOID, studySubjectOID);
         }
 
         updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount);
@@ -235,6 +245,13 @@ public class OpenRosaSubmissionController {
 
         String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
         return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
+    }
+
+
+    private void checkRandomization(Map<String, String> subjectContext, String studyOid, String subjectOid) throws Exception {
+        StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(studyOid, dataSource);
+        String accessToken = subjectContext.get("accessToken");
+        randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
     }
 
     private StudySubject unsignSignedParticipant(StudySubject studySubject) {

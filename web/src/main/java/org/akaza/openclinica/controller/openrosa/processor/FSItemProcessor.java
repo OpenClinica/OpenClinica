@@ -286,7 +286,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 try {
                     checkRandomization(randomizeDataCheck, container);
                 } catch (Exception e) {
-                    logger.error("Failed checkRandomization:" + e);
+                    logger.error("<RANDOMIZE> Failed checkRandomization for form: " + formLayout.getCrf().getOcOid() + e);
                 }
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
@@ -310,7 +310,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         Map<String, String> subjectContext =  container.getSubjectContext();
         String accessToken = subjectContext.get("accessToken");
         String studySubjectOID = container.getSubject().getOcOid();
-        randomizationService.processRandomization(thisItemData, parentPublicStudy, accessToken, studySubjectOID);
+        randomizationService.processRandomization(parentPublicStudy, accessToken, studySubjectOID, thisItemData);
     }
 
     private boolean shouldProcessItemNode(Node itemNode) {
