@@ -16,7 +16,6 @@ public class DicomUploaderServlet extends SecureController {
     public final static String ITEM_GROUP_OID = "itemGroupOID";
     public final static String ITEM_GROUP_REPEAT_KEY = "itemGroupRepeatKey";
     public final static String ITEM_OID = "itemOID";
-    public final static String ACCESS_TOKEN = "accessToken";
 
     @Override
     protected void processRequest() throws Exception {
@@ -40,7 +39,6 @@ public class DicomUploaderServlet extends SecureController {
         request.setAttribute(ITEM_GROUP_OID, itemGroupOID);
         request.setAttribute(ITEM_GROUP_REPEAT_KEY, itemGroupRepeatKey);
         request.setAttribute(ITEM_OID, itemOID);
-        request.setAttribute(ACCESS_TOKEN, request.getSession().getAttribute("accessToken"));
 
         forwardPage(Page.DICOM_UPLOADER);
     }
