@@ -105,14 +105,17 @@
     </div>
   </div>
   <br clear="all">
-  <input type="button" id="btn-upload" value="<fmt:message key='upload' bundle='${resword}'/>" class="button_long">
+  <button id="btn-upload" class="button_long">
+    <fmt:message key='upload' bundle='${resword}'/>
+    <img src="${pageContext.request.contextPath}/images/25.svg">
+  </button>
   <input type="button" onclick="window.close();" value="<fmt:message key='cancel' bundle='${resword}'/>" class="button_medium">
 </form>
 
 <script>
   var url = new URL(location);
   var participantId = url.searchParams.get("participantId");
-  var accessionId = url.searchParams.get("accession");
+  var accessionId = url.searchParams.get("accessionId");
   $("#participant-id").val(participantId);
   $("#accession-id").val(accessionId);
 

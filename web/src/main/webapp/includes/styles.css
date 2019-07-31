@@ -53,9 +53,9 @@ input.navSearch::placeholder {
   margin-left: 10px;
 }
 
-input[type="submit"], input[type="button"] {
+input[type="submit"], input[type="button"], button {
   -webkit-appearance: none; }
-  input[type="submit"]:not(.navSearchButton), input[type="button"]:not(.navSearchButton) {
+  input[type="submit"]:not(.navSearchButton), input[type="button"]:not(.navSearchButton), button {
     background: #618ebb;
     background: linear-gradient(to bottom, #618ebb 0%, #3e6891 100%);
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
@@ -65,7 +65,7 @@ input[type="submit"], input[type="button"] {
     border: 0;
     padding: .4em .9em;
     margin: 0 .25em; }
-    input[type="submit"]:not(.navSearchButton):hover, input[type="button"]:not(.navSearchButton):hover {
+    input[type="submit"]:not(.navSearchButton):hover, input[type="button"]:not(.navSearchButton):hover, button:hover {
       background: #3e6891;
       background: linear-gradient(to top, #618ebb 0%, #3e6891 100%); }
 
