@@ -14,16 +14,18 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: none">
+<tr id="sidebar_Instructions_open">
   <td class="sidebar_tab">
     <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
       <span class="icon icon-caret-down gray"></span>
     </a>
     <fmt:message key="instructions" bundle="${restext}"/>
-    <div class="sidebar_tab_content"></div>
+    <div class="sidebar_tab_content">
+      <fmt:message key='upload_dicom_instructions' bundle='${resword}'/>
+    </div>
   </td>
 </tr>
-<tr id="sidebar_Instructions_closed" style="display: all">
+<tr id="sidebar_Instructions_closed" style="display:none;">
   <td class="sidebar_tab">
   <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
   <fmt:message key="instructions" bundle="${restext}"/>
@@ -87,7 +89,7 @@
                             <td class="formlabel"></td>
                             <td>
                               <div class="formfieldFile_BG">
-                                <input type="file" name="file" id="file-input">
+                                <input type="file" name="file" id="file-input" accept=".zip">
                               </div>
                               <br>
                             </td>
@@ -105,7 +107,7 @@
     </div>
   </div>
   <br clear="all">
-  <button id="btn-upload" class="button_long">
+  <button id="btn-upload" disabled="disabled">
     <fmt:message key='upload' bundle='${resword}'/>
     <img id="loading" src="${pageContext.request.contextPath}/images/25.svg" style="display:none;">
   </button>
@@ -119,11 +121,18 @@
   $("#participant-id").val(participantId);
   $("#accession-id").val(accessionId);
 
+  $('#file-input').on('change', function() {
+    if ($(this).val())
+      $('#btn-upload').removeAttr('disabled');
+    else
+      $('#btn-upload').attr('disabled', 'disabled');
+  });
+
   $('#btn-upload').click(function() {
     $('#loading').show();
     var data = new FormData();
-    jQuery.each($('#file-input')[0].files, function(i, file) {
-        data.append('file', file);
+    $.each($('#file-input')[0].files, function(i, file) {
+      data.append('file', file);
     });
     
     $.ajax({

@@ -191,7 +191,7 @@ a:hover {
   content: '\e900';
 }
 
-.disabled {
+.disabled, button:disabled, input[type=button]:disabled, input[type=submit]:disabled, input[type=reset]:disabled {
   opacity: .4; }
 
 .icon {
