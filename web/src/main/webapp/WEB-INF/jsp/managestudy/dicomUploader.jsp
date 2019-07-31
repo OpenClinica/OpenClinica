@@ -107,7 +107,7 @@
   <br clear="all">
   <button id="btn-upload" class="button_long">
     <fmt:message key='upload' bundle='${resword}'/>
-    <img src="${pageContext.request.contextPath}/images/25.svg">
+    <img id="loading" src="${pageContext.request.contextPath}/images/25.svg" style="display:none;">
   </button>
   <input type="button" onclick="window.close();" value="<fmt:message key='cancel' bundle='${resword}'/>" class="button_medium">
 </form>
@@ -120,27 +120,28 @@
   $("#accession-id").val(accessionId);
 
   $('#btn-upload').click(function() {
+    $('#loading').show();
     var data = new FormData();
     jQuery.each($('#file-input')[0].files, function(i, file) {
         data.append('file', file);
     });
     
     $.ajax({
-      url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
+      url: '${pageContext.request.contextPath}/pages/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
       method: 'POST',
       type: 'POST',
-      headers: {
-        Authorization: "Bearer ${accessToken}"
-      },
       data: data,
       processData: false,
       contentType: false,
       success: function(r) {
         console.log('success', r);
+        $('#loading').hide();
       },
       error: function(r) {
         console.log('error', r);
+        $('#loading').hide();
       }
     });
+    return false;
   });
 </script>
