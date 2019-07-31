@@ -12,6 +12,15 @@
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
+<script>
+  $('#sidebar_Alerts_open > .sidebar_tab > .sidebar_tab_content').append(
+    $('<div>', {id:'upload-failed'})
+      .append('<h3><fmt:message key="upload_dicom_failed" bundle="${resword}"/></h3>')
+      .append('<p>- <fmt:message key="upload_dicom_failed_1" bundle="${resword}"/></p>')
+      .append('<p>- <fmt:message key="upload_dicom_failed_2" bundle="${resword}"/></p>')
+      .hide()
+  );
+</script>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open">
@@ -27,7 +36,9 @@
 </tr>
 <tr id="sidebar_Instructions_closed" style="display:none;">
   <td class="sidebar_tab">
-  <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
+  <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
+    <span class="icon icon-caret-right gray"></span>
+  </a>
   <fmt:message key="instructions" bundle="${restext}"/>
   </td>
 </tr>
@@ -43,6 +54,10 @@
     width: 125px;
     font-weight: bold;
     color: #bbb;
+  }
+  #sidebar_Alerts_open .sidebar_tab_content {
+    color: #ED7800;
+    font-style: italic;
   }
 </style>
 
@@ -130,6 +145,7 @@
 
   $('#btn-upload').click(function() {
     $('#loading').show();
+    $('#upload-failed').hide();
     var data = new FormData();
     $.each($('#file-input')[0].files, function(i, file) {
       data.append('file', file);
@@ -148,6 +164,11 @@
       },
       error: function(r) {
         console.log('error', r);
+        $('#upload-failed').show();
+        if (!$('#sidebar_Alerts_open').is(':visible')) {
+          leftnavExpand('sidebar_Alerts_open');
+          leftnavExpand('sidebar_Alerts_closed');
+        }
         $('#loading').hide();
       }
     });
