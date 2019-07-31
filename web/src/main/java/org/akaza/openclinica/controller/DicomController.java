@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping(value = "/api/dicom")
+@RequestMapping(value = "/auth/api/dicom")
 public class DicomController {
 
     @RequestMapping(value = "/participantID/{participantID}/accessionID/{accessionID}/upload", method = RequestMethod.POST)
