@@ -19,6 +19,11 @@
       .append('<p>- <fmt:message key="upload_dicom_failed_1" bundle="${resword}"/></p>')
       .append('<p>- <fmt:message key="upload_dicom_failed_2" bundle="${resword}"/></p>')
       .hide()
+  ).append(
+    $('<div>', {id:'upload-success'})
+      .append('<h3><fmt:message key="upload_dicom_success" bundle="${resword}"/></h3>')
+      .append('<p>- <fmt:message key="upload_dicom_success_1" bundle="${resword}"/></p>')
+      .hide()
   );
 </script>
 
@@ -59,58 +64,66 @@
     color: #ED7800;
     font-style: italic;
   }
+  #success-page {
+    text-align: center;
+  }
+  h1.success {
+    color: #70b728;
+    margin-top: 100px;
+  }
 </style>
 
 <jsp:include page="../include/sideInfo.jsp"/>
+<div id="upload-page">
+  <h1>
+    <fmt:message key="upload_dicom_title" bundle="${resword}"/>
+  </h1>
+  <p>
+    <fmt:message key="upload_dicom_desc" bundle="${resword}"/>
+  </p>
 
-<h1>
-  <fmt:message key="upload_dicom_title" bundle="${resword}"/>
-</h1>
-<p>
-  <fmt:message key="upload_dicom_desc" bundle="${resword}"/>
-</p>
-
-<form id="form-upload">
-  <table class="form-inputs">
-    <tr>
-      <td>
-        <fmt:message key="participant_ID" bundle="${resword}"/>
-      </td>
-      <td>
-        <input type="text" id="participant-id" readonly="readonly" class="readonly">
-      </td>
-      <td class="empty">&nbsp;</td>
-      <td>
-        <fmt:message key="accession" bundle="${resword}"/>
-      </td>
-      <td>
-        <input type="text" id="accession-id" readonly="readonly" class="readonly">
-      </td>
-    <tr>
-  </table>
-  <div style="width: 400px">
-    <div class="box_T">
-      <div class="box_L">
-        <div class="box_R">
-          <div class="box_B">
-            <div class="box_TL">
-              <div class="box_TR">
-                <div class="box_BL">
-                  <div class="box_BR">
-                    <div class="textbox_center">
-                      <table border="0" cellpadding="0" cellspacing="0">
-                        <tbody>
-                          <tr>
-                            <td class="formlabel"></td>
-                            <td>
-                              <div class="formfieldFile_BG">
-                                <input type="file" name="file" id="file-input" accept=".zip">
-                              </div>
-                              <br>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+  <form id="form-upload">
+    <table class="form-inputs">
+      <tr>
+        <td>
+          <fmt:message key="participant_ID" bundle="${resword}"/>
+        </td>
+        <td>
+          <input type="text" id="participant-id" readonly="readonly" class="readonly">
+        </td>
+        <td class="empty">&nbsp;</td>
+        <td>
+          <fmt:message key="accession" bundle="${resword}"/>
+        </td>
+        <td>
+          <input type="text" id="accession-id" readonly="readonly" class="readonly">
+        </td>
+      <tr>
+    </table>
+    <div style="width: 400px">
+      <div class="box_T">
+        <div class="box_L">
+          <div class="box_R">
+            <div class="box_B">
+              <div class="box_TL">
+                <div class="box_TR">
+                  <div class="box_BL">
+                    <div class="box_BR">
+                      <div class="textbox_center">
+                        <table border="0" cellpadding="0" cellspacing="0">
+                          <tbody>
+                            <tr>
+                              <td class="formlabel"></td>
+                              <td>
+                                <div class="formfieldFile_BG">
+                                  <input type="file" name="file" id="file-input" accept=".zip">
+                                </div>
+                                <br>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -120,14 +133,22 @@
         </div>
       </div>
     </div>
-  </div>
-  <br clear="all">
-  <button id="btn-upload" disabled="disabled">
-    <fmt:message key='upload' bundle='${resword}'/>
-    <img id="loading" src="${pageContext.request.contextPath}/images/25.svg" style="display:none;">
-  </button>
-  <input type="button" id="btn-cancel" value="<fmt:message key='cancel' bundle='${resword}'/>">
-</form>
+    <br clear="all">
+    <button id="btn-upload" disabled="disabled">
+      <fmt:message key='upload' bundle='${resword}'/>
+      <img id="loading" src="${pageContext.request.contextPath}/images/25.svg" style="display:none;">
+    </button>
+    <input type="button" id="btn-cancel" value="<fmt:message key='cancel' bundle='${resword}'/>">
+  </form>
+</div>
+<div id="success-page">
+  <h1 class="success">
+    <fmt:message key='upload_dicom_success_2' bundle='${resword}'/>
+  </h1>
+  <h2 class="success">
+    <fmt:message key='upload_dicom_success_3' bundle='${resword}'/>
+  </h2>
+</div>
 
 <script>
   var url = new URL(location);
@@ -145,7 +166,7 @@
 
   $('#btn-upload').click(function() {
     $('#loading').show();
-    $('#upload-failed').hide();
+    $('#upload-failed, #upload-success').hide();
     var data = new FormData();
     $.each($('#file-input')[0].files, function(i, file) {
       data.append('file', file);
@@ -160,6 +181,11 @@
       contentType: false,
       success: function(r) {
         console.log('success', r);
+        $('#upload-success').show();
+        if (!$('#sidebar_Alerts_open').is(':visible')) {
+          leftnavExpand('sidebar_Alerts_open');
+          leftnavExpand('sidebar_Alerts_closed');
+        }
         $('#loading').hide();
       },
       error: function(r) {
