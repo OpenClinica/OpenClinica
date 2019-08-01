@@ -126,7 +126,7 @@
     <fmt:message key='upload' bundle='${resword}'/>
     <img id="loading" src="${pageContext.request.contextPath}/images/25.svg" style="display:none;">
   </button>
-  <input type="button" onclick="window.close();" value="<fmt:message key='cancel' bundle='${resword}'/>" class="button_medium">
+  <input type="button" id="btn-cancel" value="<fmt:message key='cancel' bundle='${resword}'/>">
 </form>
 
 <script>
@@ -173,5 +173,13 @@
       }
     });
     return false;
+  });
+
+  $('#btn-cancel').click(function() {
+    var confirmed = confirm('<fmt:message key="upload_dicom_cancel" bundle="${resword}"/>');
+    if (confirmed) {
+      window.close();
+      window.opener.closeChildWindow(window);
+    }
   });
 </script>
