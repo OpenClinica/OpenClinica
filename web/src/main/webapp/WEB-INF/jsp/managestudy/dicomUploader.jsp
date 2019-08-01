@@ -69,7 +69,13 @@
   }
   h1.success {
     color: #70b728;
-    margin-top: 100px;
+    margin-top: 110px;
+    margin-bottom: 20px;
+  }
+  h2.success {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
   }
 </style>
 
@@ -141,7 +147,7 @@
     <input type="button" id="btn-cancel" value="<fmt:message key='cancel' bundle='${resword}'/>">
   </form>
 </div>
-<div id="success-page">
+<div id="success-page" class="hide">
   <h1 class="success">
     <fmt:message key='upload_dicom_success_2' bundle='${resword}'/>
   </h1>
@@ -173,7 +179,7 @@
     });
     
     $.ajax({
-      url: '${pageContext.request.contextPath}/pages/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
+      url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
       method: 'POST',
       type: 'POST',
       data: data,
@@ -181,7 +187,8 @@
       contentType: false,
       success: function(r) {
         console.log('success', r);
-        $('#upload-success').show();
+        $('#upload-success, #success-page').show();
+        $('#upload-page').slideUp();
         if (!$('#sidebar_Alerts_open').is(':visible')) {
           leftnavExpand('sidebar_Alerts_open');
           leftnavExpand('sidebar_Alerts_closed');
