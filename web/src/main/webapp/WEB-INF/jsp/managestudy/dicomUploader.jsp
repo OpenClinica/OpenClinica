@@ -158,8 +158,8 @@
 
 <script>
   var url = new URL(location);
-  var participantId = url.searchParams.get("participantId");
-  var accessionId = url.searchParams.get("accessionId");
+  var participantId = url.searchParams.get("p");
+  var accessionId = url.searchParams.get("a");
   $("#participant-id").val(participantId);
   $("#accession-id").val(accessionId);
 

@@ -2019,7 +2019,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DicomUploaderServlet</servlet-name>
-        <url-pattern>/DicomUploader</url-pattern>
+        <url-pattern>/Dicom</url-pattern>
     </servlet-mapping>
 
     <!--  Export Excel -->
