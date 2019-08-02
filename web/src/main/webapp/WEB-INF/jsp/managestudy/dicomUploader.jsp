@@ -232,6 +232,5 @@
 
   $('#btn-close').click(function() {
     window.close();
-    window.opener.closeChildWindow(window);
   });
 </script>
