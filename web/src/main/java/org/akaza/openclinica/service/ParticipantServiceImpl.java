@@ -282,18 +282,33 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
 		int parentStudyId = study.getParentStudyId();
 		String errorCode=null;
 		String msg = null;
+		boolean isNotAvailableStatus = false;
 		
+		// site
 		if(parentStudyId > 0) {
 			errorCode = "errorCode.siteNotAvailable"; 
-			msg = "The site is not available.";
+			msg = "The site is not available,";
 		}else {
 			errorCode = "errorCode.studyNotAvailable"; 
-			msg = "The study is not available.";
+			msg = "The study is not available,";
 		}
 		
 		String studyStatus = study.getStatus().getName().toString().toLowerCase();
-		if(studyStatus != null && (studyStatus.equals("pending") || studyStatus.equals("locked") || studyStatus.equals("frozen"))) {
-			throw new OpenClinicaSystemException(errorCode, msg);
+		if(studyStatus != null ) {
+			if(studyStatus.equals("design")) {
+				isNotAvailableStatus = true;				
+				msg = msg + "it is in design status.";
+			}else if(studyStatus.equals("locked")) {
+				isNotAvailableStatus = true;				
+				msg = msg + "it is in locked status.";
+			}else if(studyStatus.equals("frozen")) {
+				isNotAvailableStatus = true;				
+				msg = msg + "it is in frozen status.";
+			}
+			if(isNotAvailableStatus) {
+				throw new OpenClinicaSystemException(errorCode, msg);
+			}
+			
 		}
 	}
     
