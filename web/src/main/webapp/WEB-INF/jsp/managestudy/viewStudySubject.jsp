@@ -1881,6 +1881,7 @@
             $('#email-input-error').hide();
             $('#phone-input-error').hide();
             $('#invite_via_email input[value=' + participateInfo.inviteParticipant + ']').click();
+            $('#reset-participant-access-code').prop('checked', false);
 
             enableDisableControls();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
