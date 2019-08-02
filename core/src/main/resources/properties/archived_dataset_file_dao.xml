@@ -19,7 +19,7 @@
 		<name>update</name>
 		<sql>UPDATE ARCHIVED_DATASET_FILE SET NAME=?,DATASET_ID=?,
 		EXPORT_FORMAT_ID=?,FILE_REFERENCE=?,FILE_SIZE=?,RUN_TIME=?,
-		OWNER_ID=? WHERE 
+		OWNER_ID=?,DATE_CREATED=? ,FORMAT=? ,STATUS=? WHERE
 	    ARCHIVED_DATASET_FILE_ID=?</sql>
 	</query>
     <query>
@@ -31,8 +31,8 @@
 		<name>create</name>
 		<sql>INSERT INTO ARCHIVED_DATASET_FILE (NAME, DATASET_ID, 
 		EXPORT_FORMAT_ID, FILE_REFERENCE, FILE_SIZE, RUN_TIME, 
-		OWNER_ID, DATE_CREATED) 
-		VALUES (?,?,?,?,?,?,?,NOW())</sql>
+		OWNER_ID, DATE_CREATED ,FORMAT ,STATUS)
+		VALUES (?,?,?,?,?,?,?,?,?,?)</sql>
 	</query>
 	<query>
 		<name>getCurrentPK</name>

@@ -58,8 +58,8 @@ public class ShowFileServlet extends SecureController {
         ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(newFileList);
         EntityBeanTable table = fp.getEntityBeanTable();
         String[] columns =
-            { resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
-                resword.getString("created_by") };
+            {resword.getString("dataset_format"), resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
+                resword.getString("created_by"),resword.getString("status") };
 
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(0);
@@ -67,6 +67,8 @@ public class ShowFileServlet extends SecureController {
         table.hideColumnLink(2);
         table.hideColumnLink(3);
         table.hideColumnLink(4);
+        table.hideColumnLink(5);
+        table.hideColumnLink(6);
 
         // table.setQuery("ExportDataset?datasetId=" +db.getId(), new
         // HashMap());

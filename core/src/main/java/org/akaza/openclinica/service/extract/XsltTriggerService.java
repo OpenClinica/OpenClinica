@@ -2,6 +2,7 @@ package org.akaza.openclinica.service.extract;
 
 import java.math.BigInteger;
 
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -39,6 +40,8 @@ public class XsltTriggerService {
     public static final String EXPORT_FORMAT = "exportFormat";
     public static final String EXPORT_FORMAT_ID = "exportFormatId";
     public static final String JOB_NAME = "jobName";
+    public static final String ARCHIVED_DATASET_FILE_BEAN_ID = "archived_dataset_file_bean_id";
+
 
     //POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD="postProcDeleteOld";
@@ -50,7 +53,7 @@ public class XsltTriggerService {
 
     public SimpleTrigger generateXsltTrigger(Scheduler scheduler, String xslFile, String xmlFile, String endFilePath,
             String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath, String triggerGroupName,
-            StudyBean currentPublicStudy,StudyBean currentStudy) {
+            StudyBean currentPublicStudy,StudyBean currentStudy, ArchivedDatasetFileBean archivedDatasetFileBean) {
         //Date startDateTime = new Date(System.currentTimeMillis());
         String jobName =  datasetId+ "_"+epBean.getExportFileName()[0];
         if(triggerGroupName!=null)
@@ -64,7 +67,7 @@ public class XsltTriggerService {
             e.printStackTrace();
         }
         SimpleTriggerFactoryBean triggerFactoryBean = context.getBean(
-                SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath, currentPublicStudy, currentStudy);
+                SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath, currentPublicStudy, currentStudy,archivedDatasetFileBean);
         SimpleTrigger trigger = triggerFactoryBean.getObject();
 
         return trigger;
