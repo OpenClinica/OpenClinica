@@ -125,7 +125,7 @@ public class ImportServiceImpl implements ImportService {
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Transactional
-    public void validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail) {
+    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isRandomizeImport) {
         CoreResources.setRequestSchema(schema);
         Study tenantStudy = null;
         if (siteOid != null) {
@@ -327,14 +327,14 @@ public class ImportServiceImpl implements ImportService {
 
                         if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) && itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {                         // update eventcrf status into Complete
                             // Update Event Crf Status into Complete
-                            eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE);
+                            eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE,new Date());
                             openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
 
                             logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
 
                         } else if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {                         // update eventcrf status into data entry status
                             // Update Event Crf Status into Initial Data Entry
-                            eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE);
+                            eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE,null);
                         }
                         // check if all Forms within this Event is Complete
                     } // formDataBean for loop
@@ -348,7 +348,18 @@ public class ImportServiceImpl implements ImportService {
 
 
         writeToFile(dataImportReports, fileName,JobType.XML_IMPORT);
-        userService.persistJobCompleted(jobDetail, fileName);
+        if (isRandomizeImport) {
+            // For randomization import, check if the import failed and return the status
+            boolean hasImportFailed = dataImportReports.stream()
+                    .filter(dataImportReport1 -> dataImportReport1.getStatus().equals(FAILED))
+                    .findAny()
+                    .isPresent();
+            return !hasImportFailed;
+        } else {
+            // For all other imports, mark the job as completed and always return true
+            userService.persistJobCompleted(jobDetail, fileName);
+            return true;
+        }
 
     }
 
@@ -548,11 +559,13 @@ public class ImportServiceImpl implements ImportService {
         return eventCrf;
     }
 
-    private EventCrf updateEventCrf(EventCrf eventCrf, UserAccount userAccount, Status formStatus) {
+    private EventCrf updateEventCrf(EventCrf eventCrf, UserAccount userAccount, Status formStatus,Date dateCompleted) {
         eventCrf.setDateUpdated(new Date());
         eventCrf.setUpdateId(userAccount.getUserId());
         eventCrf.setOldStatusId(eventCrf.getStatusId());
         eventCrf.setStatusId(formStatus.getCode());
+        if(dateCompleted!=null)
+            eventCrf.setDateCompleted(dateCompleted);
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("Updating Event Crf Id {}", eventCrf.getEventCrfId());
         return eventCrf;

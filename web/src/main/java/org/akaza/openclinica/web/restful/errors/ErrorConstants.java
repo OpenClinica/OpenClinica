@@ -87,6 +87,7 @@ public class ErrorConstants {
     public static final String ERR_INVALID_EVENT_REPEAT_KEY = "errorCode.invalidStudyEventRepeatKey";
 
     public static final String ERR_ITEM_TYPE_NOT_SUPPORTED = "errorCode.itemTypeNotSupportedInImport";
+    public static final String ERR_IMPORT_FAILED = "errorCode.importFailed";
     public static final String ERR_VALUE_CHOICE_NOT_FOUND = "errorCode.valueChoiceCodeNotFound";
     public static final String ERR_INVALID_DATE_FORMAT = "errorCode.invalidDateFormat";
     public static final String ERR_VALUE_TYPE_MISMATCH = "errorCode.valueTypeMismatch";

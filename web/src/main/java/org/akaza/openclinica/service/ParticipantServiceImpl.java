@@ -89,6 +89,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     private ValidateService validateService;
 
     @Autowired
+    private UtilService utilService;
+
+    @Autowired
 	@Qualifier("dataSource")
 	private DataSource dataSource;
 
@@ -120,6 +123,10 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         if(!validateService.isStudyAvailable(siteStudy.getOid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
+
+        if(!utilService.isParticipantUniqueToSite(siteStudy.getOid(),subjectTransfer.getStudySubjectId()))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+
 
         if(studySubjectBean==null || !studySubjectBean.isActive()) {
             // Create New Study Subject

@@ -1,48 +1,22 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
-import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
-
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
-import org.akaza.openclinica.dao.hibernate.ItemDao;
-import org.akaza.openclinica.dao.hibernate.ItemDataDao;
-import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
-import org.akaza.openclinica.dao.hibernate.RepeatCountDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.validator.ParticipantValidator;
-import org.apache.xerces.dom.AttributeMap;
-import org.apache.xerces.dom.DeferredAttrImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +25,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
+
+import javax.sql.DataSource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
 
 @Component
 @Order(value = 7)
@@ -87,6 +71,9 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     @Autowired
     RepeatCountDao repeatCountDao;
 
+    @Autowired
+    private RandomizationService randomizationService;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String STUDYEVENT = "study_event";
     public static final String STUDYSUBJECT = "study_subject";
@@ -100,7 +87,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     public static final String MOBILENUMBER = "mobilenumber";
 
     public static final String US_PHONE_PREFIX = "+1 ";
-
 
 
 
@@ -278,15 +264,14 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 }
 
                 ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
+                ItemData randomizeDataCheck = null;
                 if (existingItemData == null) {
                     newItemData.setStatus(Status.UNAVAILABLE);
                     itemDataDao.saveOrUpdate(newItemData);
                     updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
-
-                } else if (existingItemData.getValue().equals(newItemData.getValue())) {
-
-                } else {
+                    randomizeDataCheck = newItemData;
+                } else if (!existingItemData.getValue().equals(newItemData.getValue())) {
                     // Existing item. Value changed. Update existing value.
                     existingItemData.setInstanceId(container.getInstanceId());
                     existingItemData.setValue(newItemData.getValue());
@@ -295,6 +280,13 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     itemDataDao.saveOrUpdate(existingItemData);
                     updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
+                    randomizeDataCheck = existingItemData;
+                }
+                // check for Randomization
+                try {
+                    checkRandomization(randomizeDataCheck, container);
+                } catch (Exception e) {
+                    logger.error("<RANDOMIZE> Failed checkRandomization for form: " + formLayout.getCrf().getOcOid() + e);
                 }
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
@@ -309,8 +301,16 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     logger.error("Field Submission failed ");
                     throw new Exception(" Field Submission failed due to Item '" + itemName + "' does not exist in form");
                 }
-                }
+            }
         }
+    }
+
+    private void checkRandomization(ItemData thisItemData, SubmissionContainer container) throws Exception {
+        StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(thisItemData.getEventCrf().getStudySubject().getStudy().getOc_oid(), dataSource);
+        Map<String, String> subjectContext =  container.getSubjectContext();
+        String accessToken = subjectContext.get("accessToken");
+        String studySubjectOID = container.getSubject().getOcOid();
+        randomizationService.processRandomization(parentPublicStudy, accessToken, studySubjectOID, thisItemData);
     }
 
     private boolean shouldProcessItemNode(Node itemNode) {

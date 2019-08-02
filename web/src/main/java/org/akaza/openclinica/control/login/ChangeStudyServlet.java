@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
+import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -250,7 +251,7 @@ public class ChangeStudyServlet extends SecureController {
             udao.update(ub);
 
             String accessToken = (String) request.getSession().getAttribute("accessToken");
-            getStudyBuildService().updateParticipateModuleStatusInOC(accessToken,newPublicStudy.getOid());
+            getStudyBuildService().processAllModules(accessToken, newPublicStudy.getOid());
             request.setAttribute("changeStudySchema", newStudySchema);
             StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
             StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);

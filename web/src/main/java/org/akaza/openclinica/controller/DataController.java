@@ -109,7 +109,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @RestController
 @RequestMapping(value = "/auth/api/clinicaldata")
-@Api(value = "DataImport", tags = {"DataImport"}, description = "REST API for Study Data Import")
+@Api(value = "DataImport", tags = {"Clinical Data"}, description = "REST API for Data Import")
 public class DataController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -140,7 +140,7 @@ public class DataController {
     private ImportDataResponseSuccessDTO responseSuccessDTO;
     private XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 
-    @ApiOperation(value = "To import study data in XML file", notes = "Will read the data in XML file and validate study,event and participant against the  setup first, for more detail please refer to OpenClinica online document  ")
+    @ApiOperation(value = "To import study data in XML file (Deprecated, please use /clinicaldata/import endpoint)", notes = "Will read the data in XML file and validate study,event and participant against the  setup first, for more detail please refer to OpenClinica online document  ")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful operation"),
             @ApiResponse(code = 400, message = "Bad Request -- Normally means found validation errors, for detail please see the error message")})
@@ -648,7 +648,7 @@ public class DataController {
     }
     
    
-    @ApiOperation(value = "To import study data in Pipe Delimited Text File", notes = "Will read both the data text files and  one mapping text file, then validate study,event and participant against the  setup first, for more detail please refer to OpenClinica online document  ")
+    @ApiOperation(value = "To import study data in Pipe Delimited Text File (Supports Common events with non-repeating item groups only)", notes = "Will read both the data text files and  one mapping text file, then validate study,event and participant against the  setup first, for more detail please refer to OpenClinica online document  ")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful operation"),
             @ApiResponse(code = 400, message = "Bad Request -- Normally means found validation errors, for detail please see the error message")})

@@ -2,19 +2,22 @@ package org.akaza.openclinica.web.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.akaza.openclinica.bean.core.UserType;
+import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.UserType;
 import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.keycloak.adapters.spi.KeycloakAccount;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -22,24 +25,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.jwt.Jwt;
-import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.jwt.crypto.sign.RsaVerifier;
-import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
-import org.springframework.security.oauth2.common.util.JsonParser;
-import org.springframework.security.oauth2.common.util.JsonParserFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
-import sun.security.rsa.RSAPublicKeyImpl;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.io.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -57,8 +52,6 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     @Autowired CreateUserCoreService userService;
     @Autowired
     TokenService tokenService;
-
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -93,7 +86,6 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                         throw new Error("Couldn't retrieve authentication", e);
                     }
                 } else if (basic.equalsIgnoreCase("Bearer")) {
-                    // TODO
                     // 1. connect to root and update roles
                     // 2. create new user if doesn't exist and update roles
                     try {
@@ -113,7 +105,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
                             String ocUserUuid = null;
                             String userType = (String) userContextMap.get("userType");
-                            if (userType.equals(org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
+                            if (userType.equals(UserType.PARTICIPATE.getName())) {
                                 ocUserUuid = (String) userContextMap.get("username");
                             } else {
                                 ocUserUuid = (String) userContextMap.get("userUuid");
@@ -122,12 +114,30 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((ocUserUuid));
                             StudyBean publicStudyBean= (StudyBean) studyDAO.findByPK(ub.getActiveStudyId());
 
+                            if (userType.equals(UserType.SYSTEM.getName())){
+                                String clientId = decodedToken.get("clientId").toString();
+                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
+                                    ub = (UserAccountBean) userAccountDAO.findByUserName("randomize");
+                                    if (ub.getName().isEmpty())
+                                    try{
+                                        HashMap<String, String> userAccount = (HashMap) createRandomizeUserAccount();
+                                        ub = userService.createUser(request, userAccount);
+                                    } catch (Exception e) {
+                                        logger.error("Failed user creation:" + e.getMessage());
+                                    }
+                                }
+                            }
+
+                            // Username comes back populated but ocUserUuid is "systemuserUuid" so our UserAccountBean ub comes back empty.
                             if (StringUtils.isNotEmpty(_username) && ub.getId() != 0) {
                                 Authentication authentication = new UsernamePasswordAuthenticationToken(_username, null,
                                         AuthorityUtils.createAuthorityList("ROLE_USER"));
                                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                            } else {
+                            }
+                            else {
+                                // If the user doesn't exist then we try to do a lookup from user-service and use that data to create a new user.
+
                                 OCUserDTO userDTO = getUserDetails(request);
                                 if (userDTO.getUsername().equalsIgnoreCase("root")) {
                                     ub = CoreResources.setRootUserAccountBean(request, dataSource);
@@ -135,7 +145,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                     userAccountDAO.update(ub);
                                 } else {
                                     try {
-                                        HashMap<String, String> userAccount = createUserAccount(request, userDTO);
+                                        HashMap<String, String> userAccount = createUserAccount(userDTO);
                                           ub = userService.createUser(request, userAccount);
                                     } catch (Exception e) {
                                         logger.error("Failed user creation:" + e.getMessage());
@@ -205,7 +215,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
             return null;
         return response.getBody();
     }
-    private HashMap<String, String>  createUserAccount(HttpServletRequest request, OCUserDTO user) throws Exception {
+    private HashMap<String, String>  createUserAccount(OCUserDTO user) throws Exception {
         HashMap<String, String> map = new HashMap<>();
         map.put("username", user.getUsername());
         if (StringUtils.isNotEmpty(user.getFirstName()))
@@ -224,6 +234,21 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         map.put("user_type", userType.getName());
         map.put("authorize_soap", "true");
         map.put("email", user.getEmail());
+        map.put("institution", "OC");
+        return map;
+    }
+
+    //TODO Put this somewhere else?
+    private Map<String, String>  createRandomizeUserAccount() throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put("username", "randomize");
+        map.put("fName", "Randomize");
+        map.put("lName", "Service");
+        map.put("role_name", "Data Manager");
+        map.put("user_uuid", "randomizeSystemUserUuid");
+        map.put("user_type", org.akaza.openclinica.service.UserType.TECH_ADMIN.getName());
+        map.put("authorize_soap", "true");
+        map.put("email", "openclinica-developers@openclinica.com");
         map.put("institution", "OC");
         return map;
     }

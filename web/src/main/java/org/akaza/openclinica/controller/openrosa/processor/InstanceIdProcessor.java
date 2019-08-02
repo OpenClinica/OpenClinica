@@ -19,7 +19,8 @@ public class InstanceIdProcessor implements Processor {
         if (container.getProcessorEnum() != ProcessorEnum.INSTANCE_ID_PROCESSOR)
             return ProcessorEnum.PROCEED;
 
-        // do processing for instance id
+        // do processing for instance id here
+        // currently we are just skippig this
         return ProcessorEnum.DO_NOT_PROCEED;
 
     }

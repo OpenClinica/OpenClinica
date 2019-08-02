@@ -6595,7 +6595,9 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     event.eventName = eventName;
     event.memo = memo;
 
-    element.dispatchEvent(event);
+    if (element.dispatchEvent) {
+      element.dispatchEvent(event);
+    }
     return event;
   }
 

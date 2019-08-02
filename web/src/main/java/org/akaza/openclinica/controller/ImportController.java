@@ -2,31 +2,22 @@ package org.akaza.openclinica.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
-import org.akaza.openclinica.controller.dto.StudyEventUpdateRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.service.ImportService;
-import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.service.UtilService;
-import org.akaza.openclinica.service.ValidateService;
-import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.service.*;
+import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -44,8 +35,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -68,6 +58,9 @@ public class ImportController {
 
     @Autowired
     private UtilService utilService;
+
+    @Autowired
+    private TokenService tokenService;
 
     @Autowired
     private StudyDao studyDao;
@@ -178,26 +171,64 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.OK);
         }
 
-
-        if (siteOid != null) {
-            if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
-                return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
-            } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
-                return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
-            }
+        // If this is randomize-service importing then we can skip the roles check.
+        boolean isRandomizeImport = isRandomizeImport(request);
+        if (isRandomizeImport){
+            fileNm = "randomize-service";
         } else {
-            if (!validateService.isUserHasAccessToStudy(userRoles, studyOid)) {
-                return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
-            } else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles, studyOid)) {
-                return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+            if (siteOid != null) {
+                if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
+                    return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
+                } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                    return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+                }
+            } else {
+                if (!validateService.isUserHasAccessToStudy(userRoles, studyOid)) {
+                    return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
+                } else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles, studyOid)) {
+                    return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+                }
             }
         }
+
         String schema = CoreResources.getRequestSchema();
 
-        String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm);
+        String uuid;
+        try {
+            uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm, isRandomizeImport);
+        } catch (CustomParameterizedException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
         logger.info("REST request to Import Job uuid {} ", uuid);
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+    }
+
+    private boolean isRandomizeImport(HttpServletRequest request){
+        boolean skipRoleCheck = false;
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && !authHeader.isEmpty()) {
+            StringTokenizer st = new StringTokenizer(authHeader);
+            if (st.hasMoreTokens()) {
+                String basic = st.nextToken();
+                if (basic.equalsIgnoreCase("Bearer")) {
+                        String accessToken = st.nextToken();
+                        final Map<String, Object> decodedToken = tokenService.decodeAndVerify(accessToken);
+                        if (accessToken != null && !accessToken.isEmpty()) {
+                            LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
+                            String userType = (String) userContextMap.get("userType");
+                            if (userType.equals(UserType.SYSTEM.getName())){
+                                String clientId = decodedToken.get("clientId").toString();
+                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
+                                    skipRoleCheck = true;
+                                }
+
+                            }
+                        }
+                }
+            }
+        }
+        return skipRoleCheck;
     }
 
 
@@ -205,23 +236,35 @@ public class ImportController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean, String fileNm) {
+    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid,
+                                 UserAccountBean userAccountBean, String fileNm, boolean isRandomizeImport) {
         utilService.setSchemaFromStudyOid(studyOid);
 
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, fileNm);
-        CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
-            try {
-                importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
-            } catch (Exception e) {
-                logger.error("Exception is thrown while processing dataImport: " + e);
+        if (isRandomizeImport) {
+            // For randomization imports, instead of running import as an asynchronous job, run it synchronously
+            logger.debug("Running import synchronously");
+            boolean isImportSuccessful = importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, null, isRandomizeImport);
+            if (!isImportSuccessful) {
+                // Throw an error if import fails such that randomize service can update the status accordingly
+                throw new CustomParameterizedException(ErrorConstants.ERR_IMPORT_FAILED);
             }
             return null;
+        } else {
+            JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, fileNm);
+            CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, isRandomizeImport);
+                } catch (Exception e) {
+                    logger.error("Exception is thrown while processing dataImport: " + e);
+                }
+                return null;
 
-        });
-        return jobDetail.getUuid();
+            });
+            return jobDetail.getUuid();
+        }
     }
 
     public File getXSDFile(HttpServletRequest request, String fileNm) {

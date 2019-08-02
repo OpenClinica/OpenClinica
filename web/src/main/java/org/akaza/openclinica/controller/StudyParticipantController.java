@@ -150,7 +150,7 @@ public class StudyParticipantController {
 		
 
 		
-		@ApiOperation(value = "Add or Update list of participants and their contact information for OpenClinica Participate module.",  notes = "Will read subjectKeys and PII from the CSV file")
+		@ApiOperation(value = "Add or Update list of participants and their contact information for OpenClinica Participate module.",  notes = "Will read subjectKeys and PII from the CSV file", hidden = true)
 		@ApiResponses(value = {
 		        @ApiResponse(code = 200, message = "Successful operation"),
 		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
@@ -186,17 +186,26 @@ public class StudyParticipantController {
 			if (siteOid != null)
 				siteOid = siteOid.toUpperCase();
 
+			boolean checkParticipateModuleStatus = false;
+			if(register != null && register.toUpperCase().equals("Y")) {
+				checkParticipateModuleStatus = true;
+			}
+			
 			utilService.setSchemaFromStudyOid(studyOid);
 			
 			ResponseEntity<String> response = null;
 			UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 			try {
+
 				participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
-				
+
 				Study tenantStudy = studyDao.findByOcOID(studyOid);
-				if(!validateService.isParticipateActive(tenantStudy)) {
-					throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+				if(checkParticipateModuleStatus) {
+					if(!validateService.isParticipateActive(tenantStudy)) {
+						throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+					}
 				}
+				
 				
 			} catch (OpenClinicaSystemException e) {
 				String errorMsg = e.getErrorCode();
@@ -289,22 +298,24 @@ public class StudyParticipantController {
 			}catch(OpenClinicaSystemException oe) {
 				throw new Exception(oe.getErrorCode());				
 			}
-			
-			
+
+			ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
+			Errors errors = null;
+
+			DataBinder dataBinder = new DataBinder(subjectTransferBean);
+			errors = dataBinder.getBindingResult();
+
+
 			if(siteOID != null) {
 				StudyBean siteStudy = getStudyDAO().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
 				subjectTransferBean.setSiteStudy(siteStudy);
 			}
-			
-			ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
-	        Errors errors = null;
 
-	        DataBinder dataBinder = new DataBinder(subjectTransferBean);
-	        errors = dataBinder.getBindingResult();
+			Study tenantStudy = studyDao.findByOcOID(tenantstudyBean.getOid());
 
-	        if(!utilService.isParticipantUniqueToSite(siteOID,subjectTransferBean.getStudySubjectId()))
-				errors.reject( ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
-
+			if(subjectTransferBean.isRegister() && !validateService.isParticipateActive(tenantStudy)){
+				errors.reject( ErrorConstants.ERR_PARTICIPATE_INACTIVE,"Participant module is not active");
+			}
 
 			if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){
 				errors.reject( "errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
@@ -577,8 +588,8 @@ public class StudyParticipantController {
 			subjectTransferBean.setLastName(lastName);
 			subjectTransferBean.setIdentifier(identifier);
 
-			subjectTransferBean.setEmailAddress(emailAddress);
-			subjectTransferBean.setPhoneNumber(phoneNumber);
+			subjectTransferBean.setEmailAddress(emailAddress!=null && emailAddress.length()!=0?emailAddress:null);
+			subjectTransferBean.setPhoneNumber(phoneNumber!=null && phoneNumber.length()!=0?phoneNumber:null);
 
 			if(register.equalsIgnoreCase("Y")|| register.equalsIgnoreCase("YES"))
 				subjectTransferBean.setRegister(true);
