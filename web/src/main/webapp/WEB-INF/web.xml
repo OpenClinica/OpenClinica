@@ -1360,9 +1360,9 @@
         <servlet-class>org.akaza.openclinica.control.submit.EnketoFormServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>DicomUploader</display-name>
-        <servlet-name>DicomUploaderServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.DicomUploaderServlet</servlet-class>
+        <display-name>Dicom</display-name>
+        <servlet-name>DicomServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.DicomServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
@@ -2018,7 +2018,7 @@
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>DicomUploaderServlet</servlet-name>
+        <servlet-name>DicomServlet</servlet-name>
         <url-pattern>/Dicom</url-pattern>
     </servlet-mapping>
 
