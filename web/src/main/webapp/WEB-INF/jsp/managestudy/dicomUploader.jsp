@@ -77,6 +77,9 @@
     font-style: italic;
     font-weight: bold;
   }
+  #btn-close {
+    margin-top: 50px;
+  }
 </style>
 
 <jsp:include page="../include/sideInfo.jsp"/>
@@ -141,7 +144,12 @@
     </div>
     <br clear="all">
     <button id="btn-upload" disabled="disabled">
-      <fmt:message key='upload' bundle='${resword}'/>
+      <span id="btn-label-upload">
+        <fmt:message key='upload' bundle='${resword}'/>
+      </span>
+      <span id="btn-label-uploading" class="hide">
+        <fmt:message key='uploading' bundle='${resword}'/>
+      </span>
       <img id="loading" src="${pageContext.request.contextPath}/images/25.svg" style="display:none;">
     </button>
     <input type="button" id="btn-cancel" value="<fmt:message key='cancel' bundle='${resword}'/>">
@@ -154,12 +162,13 @@
   <h2 class="success">
     <fmt:message key='upload_dicom_success_3' bundle='${resword}'/>
   </h2>
+  <input type="button" id="btn-close" value="<fmt:message key='close' bundle='${resword}'/>">
 </div>
 
 <script>
   var url = new URL(location);
-  var participantId = url.searchParams.get("p");
-  var accessionId = url.searchParams.get("a");
+  var participantId = url.searchParams.get('pid');
+  var accessionId = url.searchParams.get('accid');
   $("#participant-id").val(participantId);
   $("#accession-id").val(accessionId);
 
@@ -171,12 +180,32 @@
   });
 
   $('#btn-upload').click(function() {
-    $('#loading').show();
-    $('#upload-failed, #upload-success').hide();
+    $('#upload-failed, #upload-success, #btn-label-upload').hide();
+    $('#loading, #btn-label-uploading').show();
     var data = new FormData();
     $.each($('#file-input')[0].files, function(i, file) {
       data.append('file', file);
     });
+
+    function success(r) {
+      console.log('success', r);
+      $('#upload-success, #success-page').show();
+      $('#upload-page').slideUp();
+      if (!$('#sidebar_Alerts_open').is(':visible')) {
+        leftnavExpand('sidebar_Alerts_open');
+        leftnavExpand('sidebar_Alerts_closed');
+      }
+    }
+
+    function failed(r) {
+      console.log('error', r);
+      $('#upload-failed, #btn-label-upload').show();
+      $('#loading, #btn-label-uploading').hide();
+      if (!$('#sidebar_Alerts_open').is(':visible')) {
+        leftnavExpand('sidebar_Alerts_open');
+        leftnavExpand('sidebar_Alerts_closed');
+      }
+    }
     
     $.ajax({
       url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
@@ -186,33 +215,23 @@
       processData: false,
       contentType: false,
       success: function(r) {
-        console.log('success', r);
-        $('#upload-success, #success-page').show();
-        $('#upload-page').slideUp();
-        if (!$('#sidebar_Alerts_open').is(':visible')) {
-          leftnavExpand('sidebar_Alerts_open');
-          leftnavExpand('sidebar_Alerts_closed');
-        }
-        $('#loading').hide();
+        if (r == 'UPLOAD SUCCESS')
+          success(r);
+        else
+          failed(r);
       },
-      error: function(r) {
-        console.log('error', r);
-        $('#upload-failed').show();
-        if (!$('#sidebar_Alerts_open').is(':visible')) {
-          leftnavExpand('sidebar_Alerts_open');
-          leftnavExpand('sidebar_Alerts_closed');
-        }
-        $('#loading').hide();
-      }
+      error: failed
     });
     return false;
   });
 
   $('#btn-cancel').click(function() {
-    var confirmed = confirm('<fmt:message key="upload_dicom_cancel" bundle="${resword}"/>');
-    if (confirmed) {
-      window.close();
-      window.opener.closeChildWindow(window);
-    }
+    if (confirm('<fmt:message key="upload_dicom_cancel" bundle="${resword}"/>'))
+      $('#btn-close').click();
+  });
+
+  $('#btn-close').click(function() {
+    window.close();
+    window.opener.closeChildWindow(window);
   });
 </script>
