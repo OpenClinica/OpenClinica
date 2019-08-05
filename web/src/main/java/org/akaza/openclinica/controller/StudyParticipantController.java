@@ -192,17 +192,21 @@ public class StudyParticipantController {
 			}
 			
 			utilService.setSchemaFromStudyOid(studyOid);
-			Study tenantStudy = studyDao.findByOcOID(studyOid);
+			
 			ResponseEntity<String> response = null;
 			UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 			try {
+
+				participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
+
+				Study tenantStudy = studyDao.findByOcOID(studyOid);
 				if(checkParticipateModuleStatus) {
 					if(!validateService.isParticipateActive(tenantStudy)) {
 						throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
 					}
 				}
 				
-				participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
+				
 			} catch (OpenClinicaSystemException e) {
 				String errorMsg = e.getErrorCode();
 				response = new ResponseEntity(errorMsg, HttpStatus.BAD_REQUEST);
@@ -403,7 +407,7 @@ public class StudyParticipantController {
 				String siteOID, MultipartFile file) throws Exception {
 
 			StudyBean studyBean = null;
-			studyBean = participantService.validateRequestAndReturnStudy(studyOID, siteOID,request);
+			studyBean =  this.getStudyDAO().findByOid(studyOID);
         	if(utilService.isParticipantIDSystemGenerated(studyBean)) {
 
 				 throw new OpenClinicaSystemException("errorCode.bulkUploadNotSupportSystemGeneratedSetting","This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
