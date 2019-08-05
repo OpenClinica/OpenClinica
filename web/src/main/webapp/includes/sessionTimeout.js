@@ -3,7 +3,9 @@ function setCurrentUser(thisUser) {
     storage.onConnect()
         .then(function() {
             console.log("setting current user to:" + thisUser);
-            return storage.set(CURRENT_USER, thisUser);
+            return storage.set(CURRENT_USER, thisUser).then(function(res) {
+                return res;
+            });
         })['catch'](function(err) {
         console.log(err);
     });
@@ -28,7 +30,9 @@ function getPromise(value) {
 function processCurrentUser(currentTime, newExpiration) {
     storage.onConnect()
     .then(function() {
-        return storage.get(CURRENT_USER);
+        return storage.get(CURRENT_USER).then(function(res) {
+            return res;
+        });
     }).then(function(res) {
         console.log("Current user in processCurrentUser****************" + res);
         // working around for bug title on edge(https://jira.openclinica.com/browse/OC-8814)
@@ -132,6 +136,12 @@ function processUserData(inputPromise) {
         console.log("set all storage processCurrentUser");
     })
 }
+
+// leaving this function in here even if it is not currently used for future debugging
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function updateOCAppTimeout() {
     processTimedOuts(false, true);
 }
@@ -143,14 +153,17 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
         processCurrentUser(currentTime, newExpiration);
     }
 
-
     storage.onConnect()
         .then(function() {
-            return storage.get(ocAppTimeoutKey);
+            return storage.get(ocAppTimeoutKey).then(function (res1) {
+                return res1;
+            });
         }).then(function(res) {
             if (res == null) {
-                //console.log("*****setting new expiration1:" + newExpiration);
-                return storage.set(ocAppTimeoutKey, newExpiration);
+                console.log("*****setting new expiration:" + newExpiration);
+                return storage.set(ocAppTimeoutKey, newExpiration).then(function (res1) {
+                    return res1;
+                });
             } else if (res){
                 var existingTimeout = res;
                 console.log("processTimedOuts: currentTime: " + currentTime + " existingTimeout: " + existingTimeout);
@@ -168,7 +181,9 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
                 } else {
                     if (storageFlag) {
                         console.log("setting newExpiration:" + newExpiration);
-                        return storage.set(ocAppTimeoutKey, newExpiration);
+                        return storage.set(ocAppTimeoutKey, newExpiration).then(function (res1) {
+                            return res1;
+                        });
                     }
                     jQuery.get(myContextPath + '/pages/keepAlive')
                         .error(function (jqXHR, textStatus, errorThrown) {
