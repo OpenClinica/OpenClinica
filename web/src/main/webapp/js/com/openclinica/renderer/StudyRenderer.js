@@ -711,6 +711,21 @@ function StudyRenderer(json) {
 		var eventDef = undefined;
 		var formOID = undefined;
 		
+		if (renderMode == "UNPOPULATED_FORM_CRF"
+			|| renderMode == "UNPOPULATED_GLOBAL_CRF" ||renderMode == "POPULATED_FORM_CRF") {
+			// select CRF by OID
+			if(app_formVersionOID=='*'){
+				formDef = app_formDefs[0];
+			}else{
+				for ( var i = 0; i < app_formDefs.length; i++) {
+					if (app_formDefs[i]["@OID"] == app_formVersionOID) {
+						formDef = app_formDefs[i];
+						break;
+					}
+				}
+			}
+		}	
+		
 		if(app_eventOID=='*' && renderMode =='STUDY_ALL_SUBJECT_CASE_BOOK'){		
 						
 			this.renderString = this.renderPrintableFormDefByRenderMode(formDef, eventDef,renderMode);
