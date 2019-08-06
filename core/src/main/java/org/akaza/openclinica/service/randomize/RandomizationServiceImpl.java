@@ -96,7 +96,8 @@ public class RandomizationServiceImpl implements RandomizationService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        ResponseEntity<ModuleConfigDTO> response = restTemplate.exchange(randomizeUrl + "study-environments/" + studyEnvUuid + "/configuration", HttpMethod.GET, entity, ModuleConfigDTO.class);
+        ResponseEntity<ModuleConfigDTO> response = restTemplate.exchange(randomizeUrl + "study-environments/" + studyEnvUuid
+                + "/configuration", HttpMethod.GET, entity, ModuleConfigDTO.class);
         if (response.hasBody())
             return mapModuleConfigToConfig(response.getBody());
         return null;

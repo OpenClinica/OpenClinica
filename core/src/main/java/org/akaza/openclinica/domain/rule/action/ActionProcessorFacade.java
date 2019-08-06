@@ -30,8 +30,6 @@ public class ActionProcessorFacade {
             return new HideActionProcessor(ds, itemMetadataService, ruleSet);
         case INSERT:
             return new InsertActionProcessor(ds, itemMetadataService, ruleActionRunLogDao, ruleSet, ruleSetRule);
-        case RANDOMIZE:
-            return new RandomizeActionProcessor(ds, itemMetadataService, ruleActionRunLogDao, ruleSet, ruleSetRule);
         default:
             throw new OpenClinicaSystemException("actionType", "Unrecognized action type!");
         }

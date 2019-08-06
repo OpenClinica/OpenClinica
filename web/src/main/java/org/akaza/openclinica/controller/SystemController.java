@@ -478,9 +478,6 @@ public class SystemController {
 			HashMap<String, Object> mapParticipantModule = getParticipateModule(studyBean);
 			listOfModules.add(mapParticipantModule);
 
-			HashMap<String, Object> mapRandomizeModule = getRandomizeModule(studyBean);
-			listOfModules.add(mapRandomizeModule);
-
 			HashMap<String, Object> mapRuleDesignerModule = getRuleDesignerModuleInSession(studyBean, session);
 			listOfModules.add(mapRuleDesignerModule);
 
@@ -535,46 +532,6 @@ public class SystemController {
 
 		for (StudyBean studyBean : studyList) {
 			HashMap<String, Object> mapParticipantModule = getParticipateModule(studyBean);
-
-			HashMap<String, Object> mapStudy = new HashMap<>();
-			mapStudy.put("Module", mapParticipantModule);
-			mapStudy.put("Study Oid", studyBean.getOid());
-			studyListMap.add(mapStudy);
-		}
-
-		return new ResponseEntity<ArrayList<HashMap<String, Object>>>(studyListMap, org.springframework.http.HttpStatus.OK);
-	}
-
-	/**
-	 * @api {get} /pages/auth/api/v1/system/modules/randomize Retrieve Randomize Module Info
-	 * @apiName getRandomizeModule
-	 * @apiPermission Authenticate using api-key. admin
-	 * @apiVersion 3.8.0
-	 * @apiGroup System
-	 * @apiDescription Retrieves Randomize Module Status Info Per Study
-	 * @apiSuccessExample {json} Success-Response: HTTP/1.1 200 OK
-	 *                    [{
-	 *                    "Study Oid": "S_BL101",
-	 *                    "Module": {
-	 *                    "Randomize": {
-	 *                    "enabled": "False",
-	 *                    "status": "INACTIVE",
-	 *                    "metadata": {}
-	 *                    }
-	 *                    }
-	 *                    }]
-	 */
-
-	@RequestMapping(value = "/modules/randomize", method = RequestMethod.GET)
-	public ResponseEntity<ArrayList<HashMap<String, Object>>> getRandomizeModule() throws Exception {
-		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-
-		ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
-
-		ArrayList<StudyBean> studyList = getStudyList();
-
-		for (StudyBean studyBean : studyList) {
-			HashMap<String, Object> mapParticipantModule = getRandomizeModule(studyBean);
 
 			HashMap<String, Object> mapStudy = new HashMap<>();
 			mapStudy.put("Module", mapParticipantModule);
@@ -1219,50 +1176,6 @@ public class SystemController {
 
 		HashMap<String, Object> mapModule = new HashMap<>();
 		mapModule.put("Participate", mapParticipate);
-
-		return mapModule;
-	}
-
-	public HashMap<String, Object> getRandomizeModule(StudyBean studyBean) {
-		StudyParameterValueBean spvBean = getParticipateMod(studyBean, "randomization");
-		String ocRandomizeStatus = "";
-		if (spvBean.isActive()) {
-			ocRandomizeStatus = spvBean.getValue().toString(); // enabled , disabled
-		}
-		SeRandomizationDTO seRandomizationDTO = null;
-		String ocuiRandomizeStatus = "";
-		URL randomizeUrl = null;
-		HashMap<String, String> mapMetadata = new HashMap<>();
-
-		if (ocRandomizeStatus.equals("enabled")) {
-			try {
-
-				RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-				seRandomizationDTO = randomizationRegistrar.getRandomizationDTOObject(studyBean.getOid());
-				if (seRandomizationDTO != null && seRandomizationDTO.getStatus() != null) {
-					ocuiRandomizeStatus = seRandomizationDTO.getStatus();
-					if (seRandomizationDTO.getUrl() != null) {
-						randomizeUrl = new URL(seRandomizationDTO.getUrl());
-					}
-					mapMetadata.put("Randomize URL", randomizeUrl == null ? "" : randomizeUrl.toString());
-				}
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		HashMap<String, Object> mapRandomize = new HashMap<>();
-		mapRandomize.put("enabled", ocRandomizeStatus.equals("enabled") ? "True" : "False");
-		mapRandomize.put("status", ocuiRandomizeStatus.equals("") ? "INACTIVE" : ocuiRandomizeStatus);
-		mapRandomize.put("metadata", mapMetadata);
-
-		HashMap<String, Object> mapModule = new HashMap<>();
-		mapModule.put("Randomize", mapRandomize);
 
 		return mapModule;
 	}
