@@ -235,7 +235,8 @@ public class DataController {
                 }
         }*/
         
-       
+        String logFileName = request.getHeader("logFileName"); 
+        request.setAttribute("logFileName", logFileName);
 
         try {
             // check more xml format--  can't be blank

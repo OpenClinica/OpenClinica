@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.io.*;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -435,6 +436,12 @@ public class RestfulServiceHelper {
 	 			}else {
 	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
 	 				
+	 				 // prepare log file
+	 	 	 	 	String logFileName = null;
+	 	 	 	 	logFileName = buildLogFileName(file.getName()); 
+	 	 	 	    this.getImportDataHelper().copyMappingFileToLogFile(mappingFile, logFileName,request);
+	 	 	 	    request.setAttribute("logFileName", logFileName);
+	 	 	 	    
 	 				Iterator dataFilesIt = dataFileList.iterator();
 	 				
 	 				File rowFile = null;
@@ -465,6 +472,7 @@ public class RestfulServiceHelper {
 		 	 	 	 		
 		 	 	 	 		String originalFileName = rowFile.getName();
 		 	 	 	 	    post.setHeader("originalFileName", originalFileName);
+		 	 	 	 	    post.setHeader("logFileName", logFileName);
 		 	 	 			
 		 	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 		 	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -680,5 +688,23 @@ public class RestfulServiceHelper {
 
 		public void setMessageLogger(MessageLogger messageLogger) {
 			this.messageLogger = messageLogger;
+		}
+		
+		/**
+		 * @param originalFileName
+		 * @return logFileName
+		 */
+		private String buildLogFileName(String originalFileName) {
+			String logFileName = null;
+			if(originalFileName !=null) {	            	
+				originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".txt"));
+			}
+
+			Date now = new Date();	
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
+			String timeStamp = simpleDateFormat.format(now);
+			logFileName =originalFileName+"_"+ timeStamp+"_log.txt";
+			
+			return logFileName;
 		}
 }
