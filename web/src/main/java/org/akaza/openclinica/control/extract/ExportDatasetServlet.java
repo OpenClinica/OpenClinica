@@ -423,15 +423,18 @@ public class ExportDatasetServlet extends SecureController {
                 EntityBeanTable table = fp.getEntityBeanTable();
                 table.setSortingIfNotExplicitlySet(3, false);// sort by date
                 String[] columns =
-                    { resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
-                        resword.getString("created_by") };
-
+                        { resword.getString("dataset_format"),resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
+                                resword.getString("created_by"),resword.getString("status"), resword.getString("action") };
                 table.setColumns(new ArrayList(Arrays.asList(columns)));
                 table.hideColumnLink(0);
                 table.hideColumnLink(1);
                 table.hideColumnLink(2);
                 table.hideColumnLink(3);
                 table.hideColumnLink(4);
+                table.hideColumnLink(5);
+                table.hideColumnLink(6);
+                table.hideColumnLink(7);
+
 
                 // table.setQuery("ExportDataset?datasetId=" +db.getId(), new
                 // HashMap());
@@ -548,13 +551,9 @@ public class ExportDatasetServlet extends SecureController {
             // asdfBean.setWebPath(DATASET_DIR+db.getId()+File.separator+
             // asdfBean.getName());
             asdfBean.setWebPath(asdfBean.getFileReference());
-            if (new File(asdfBean.getFileReference()).isFile()) {
-                // logger.warn(asdfBean.getFileReference()+" is a
-                // file!");
+
                 fileList.add(asdfBean);
-            } else {
-                logger.warn(asdfBean.getFileReference() + " is NOT a file!");
-            }
+
         }
 
         logger.warn("");
@@ -565,8 +564,8 @@ public class ExportDatasetServlet extends SecureController {
         EntityBeanTable table = fp.getEntityBeanTable();
         table.setSortingIfNotExplicitlySet(3, false);// sort by date
         String[] columns =
-            { resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
-                resword.getString("created_by"), resword.getString("action") };
+                { resword.getString("dataset_format"),resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
+                        resword.getString("created_by"),resword.getString("status"), resword.getString("action") };
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(0);
         table.hideColumnLink(1);
@@ -574,6 +573,8 @@ public class ExportDatasetServlet extends SecureController {
         table.hideColumnLink(3);
         table.hideColumnLink(4);
         table.hideColumnLink(5);
+        table.hideColumnLink(6);
+        table.hideColumnLink(7);
 
         table.setQuery("ExportDataset?datasetId=" + db.getId(), new HashMap());
         // trying to continue...

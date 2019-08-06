@@ -54,8 +54,11 @@ public class ExtractPropertyBean implements Serializable{
 	private String odmType;
 	
 	private String datasetName;
-	
-	public String getOdmType() {
+
+    private String formatDescription;
+
+
+    public String getOdmType() {
         return odmType;
     }
 
@@ -276,5 +279,13 @@ public class ExtractPropertyBean implements Serializable{
 
     public String getDatasetName() {
         return datasetName;
+    }
+
+    public String getFormatDescription() {
+        return formatDescription;
+    }
+
+    public void setFormatDescription(String formatDescription) {
+        this.formatDescription = formatDescription;
     }
 }

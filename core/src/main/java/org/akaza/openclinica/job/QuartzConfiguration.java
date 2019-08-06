@@ -1,28 +1,6 @@
 package org.akaza.openclinica.job;
   
-import static org.akaza.openclinica.service.extract.XsltTriggerService.COUNT;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.DATASET_ID;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.DELETE_OLD;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.EMAIL;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.EP_BEAN;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.EXTRACT_PROPERTY;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.FAILURE_MESSAGE;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.LOCALE;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_FILE_NAME;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_FILE_PATH;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_PROC_DELETE_OLD;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_PROC_EXPORT_NAME;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_PROC_LOCATION;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_PROC_ZIP;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.STUDY_ID;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.SUCCESS_MESSAGE;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.TENANT_SCHEMA;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.USER_ID;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.XML_FILE_PATH;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.XSLT_PATH;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.XSL_FILE_PATH;
-import static org.akaza.openclinica.service.extract.XsltTriggerService.ZIPPED;
-
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -36,6 +14,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
+import static org.akaza.openclinica.service.extract.XsltTriggerService.*;
+
 @Configuration
 @EnableAspectJAutoProxy
 public class QuartzConfiguration {
@@ -43,10 +23,11 @@ public class QuartzConfiguration {
 	@Scope("prototype")
     @Lazy
     public SimpleTriggerFactoryBean simpleTriggerFactoryBean(String xslFile, String xmlFile, String endFilePath,
-            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath,
-            StudyBean currentPublicStudy, StudyBean currentStudy){
+															 String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale, int cnt, String xsltPath,
+															 StudyBean currentPublicStudy, StudyBean currentStudy, ArchivedDatasetFileBean archivedDatasetFileBean){
 		SimpleTriggerFactoryBean triggerFactoryBean = new SimpleTriggerFactoryBean();
 
+		triggerFactoryBean.setName("Bean Name "+ System.currentTimeMillis());
 		triggerFactoryBean.setBeanName("trigger1");
 		triggerFactoryBean.setGroup("group1");
 		triggerFactoryBean.setRepeatInterval(1);
@@ -81,6 +62,7 @@ public class QuartzConfiguration {
 		jobDataMap.put(POST_PROC_EXPORT_NAME, epBean.getPostProcExportName());
 		jobDataMap.put(COUNT,cnt);
 		jobDataMap.put(XSLT_PATH,xsltPath);
+		jobDataMap.put(ARCHIVED_DATASET_FILE_BEAN_ID,archivedDatasetFileBean.getId());
 		// jobDataMap.put(DIRECTORY, directory);
 		// jobDataMap.put(ExampleSpringJob.LOCALE, locale);
 		jobDataMap.put(EP_BEAN, epBean);

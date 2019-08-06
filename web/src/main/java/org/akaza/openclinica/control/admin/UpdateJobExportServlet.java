@@ -221,7 +221,7 @@ public class UpdateJobExportServlet extends SecureController {
                         SQLInitServlet.getField("filePath") + "xslt", 
                         TRIGGER_GROUP_JOB,
                         currentPublicStudy,
-                        currentStudy);
+                        currentStudy,null);
 
                 //Updating the original trigger with user given inputs
                 trigger = trigger.getTriggerBuilder()
