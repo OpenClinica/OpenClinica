@@ -63,9 +63,6 @@
     padding-top: 0.75em;
     padding-left: 1.5em;
   }
-  #tbl-jobs, #tbl-job {
-    width: 100% !important;
-  }
   #tbl-jobs td:last-child {
     white-space: nowrap;
   }
@@ -79,10 +76,6 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 6px;
-  }
-  .highlight-green {
-    background-color: green;
-    color: white;
   }
   .highlight-red {
     color: red;
@@ -108,6 +101,27 @@
     url += '/sites/' + siteOid;
   url += '/jobs';
   var jobs = jQuery.ajax({type: 'get', url: url});
+
+  function sizetable(selector) {
+    return function(settings) {
+      const dtWidth = $(selector).width() + 1;
+      const sidebarWidth = $("#sidebar_Instructions_closed").width();
+      const navbarWidth = dtWidth + sidebarWidth;
+      $(selector + "_wrapper").css({"width": "calc(" + dtWidth + "px + 1em)", "padding-right": "1em" });
+      let windowWidth = $(window).width();
+      if (!(windowWidth > navbarWidth)) {
+        $(".oc_nav").css({"width": "calc(" + navbarWidth + "px + 2em)"});
+      }
+      $(window).resize(function() {
+        windowWidth = $(window).width() + 1;
+        if (windowWidth > navbarWidth) {
+          $(".oc_nav").css({"width": windowWidth + "px"});
+        } else {
+          $(".oc_nav").css({"width": "calc(" + navbarWidth + "px + 2em)"});
+        }
+      });
+    };
+  }
 </script>
 
 <c:choose>
@@ -163,7 +177,8 @@
           infoEmpty: '<fmt:message key="results_zero_of_zero" bundle="${resword}"/>',
           infoFiltered: '<span class="info-filtered"><fmt:message key="results_filtered" bundle="${resword}"/></span>',
           lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
-        }
+        },
+        drawCallback: sizetable('#tbl-jobs')
       });
       jobs.done(function(data) {
         datatable.rows.add(data.map(function (logEntry) {
@@ -303,24 +318,7 @@
           }),
           paging: false,
           dom: 'ft',
-          "drawCallback": function( settings ) {
-            const dtWidth = $("#tbl-job").width() + 1;
-            const sidebarWidth = $("#sidebar_Instructions_closed").width();
-            const navbarWidth = dtWidth + sidebarWidth;
-            $("#tbl-job_wrapper").css({"width": "calc(" + dtWidth + "px + 1em)", "padding-right": "1em" });
-            let windowWidth = $(window).width();
-            if (!(windowWidth > navbarWidth)) {
-              $(".oc_nav").css({"width": "calc(" + navbarWidth + "px + 2em)"});
-            }
-            $( window ).resize(function() {
-              windowWidth = $(window).width() + 1;
-              if (windowWidth > navbarWidth) {
-                $(".oc_nav").css({"width": windowWidth + "px"});
-              } else {
-                $(".oc_nav").css({"width": "calc(" + navbarWidth + "px + 2em)"});
-              }
-            });
-          }
+          drawCallback: sizetable('#tbl-job')
         });
       }).fail(function(e) {
         $('#loading').text(formatError(e));
