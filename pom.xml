@@ -151,7 +151,7 @@
             <dependency>
                 <groupId>com.openclinica</groupId>
                 <artifactId>jwt-verifier</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.6</version>
             </dependency>
             <dependency>
                 <groupId>org.jmesa</groupId>
@@ -366,11 +366,6 @@
                 <groupId>struts</groupId>
                 <artifactId>struts</artifactId>
                 <version>1.2.4</version>
-            </dependency>
-            <dependency>
-                <groupId>oracle.ojdbc14</groupId>
-                <artifactId>ojdbc14</artifactId>
-                <version>10g</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.castor</groupId>
