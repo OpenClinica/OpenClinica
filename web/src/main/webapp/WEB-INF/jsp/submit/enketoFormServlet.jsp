@@ -88,7 +88,8 @@
 <body style="width:1024px;" class="main_BG">
 
 <script type="application/javascript">
-    var storage = new CrossStorageClient(crossStorageURL);
+    var storage = new CrossStorageClient(crossStorageURL, {
+        timeout: 7000});
     updateOCAppTimeout();
     processTimedOuts(true, false);
 </script>
