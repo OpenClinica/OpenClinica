@@ -681,7 +681,14 @@ public class DataController {
             	  boolean foundMappingFile = false;
             	  
             	 File[] files = this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().convert(mFiles,studyOID);
-            	  
+            	 
+            	 if(files.length < 2) {
+	           		  throw new OpenClinicaSystemException("errorCode.notCorrectFileNumber", "When send files, Please send at least one data text files and  one mapping text file in correct format ");
+	           	  }
+            	 
+            	 File mappingFileTxt = null;
+            	 String logFileName = null;
+            	 
             	  for (File file : files) {           
                       
                       if (file == null || file.getName() == null) {
@@ -693,14 +700,20 @@ public class DataController {
                       		logger.info("Found mapping property file and uploaded");
                       		
                       		hm = this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().validateMappingFile(file);
-                      		break;
+                      		mappingFileTxt = file;
+                      		
+                      	}else {
+                      		 
+         	 	 	 	 	 logFileName = this.getRestfulServiceHelper().buildLogFileName(file.getName());
+         	 	 	 	     request.setAttribute("logFileName", logFileName);
                       	}
                       }
                   }
             	 
-            	  if(files.length < 2) {
-            		  throw new OpenClinicaSystemException("errorCode.notCorrectFileNumber", "When send files, Please send at least one data text files and  one mapping text file in correct format ");
+            	  if(mappingFileTxt != null && logFileName !=null) {
+            		  this.getRestfulServiceHelper().getImportDataHelper().copyMappingFileToLogFile(mappingFileTxt, logFileName, request);
             	  }
+            	  
             	  if (!foundMappingFile) {            		
             		  throw new OpenClinicaSystemException("errorCode.noMappingfile", "When send files, please include one correct mapping file, named like *mapping.txt ");
             	  }
