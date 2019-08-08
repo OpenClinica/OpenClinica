@@ -92,6 +92,7 @@
   </p>
 
   <form id="form-upload">
+    <input type="hidden" id="target-id"/>
     <table class="form-inputs">
       <tr>
         <td>
@@ -169,8 +170,10 @@
   var url = new URL(location);
   var participantId = url.searchParams.get('pid');
   var accessionId = url.searchParams.get('accid');
+  var target = url.searchParams.get('target');
   $("#participant-id").val(participantId);
   $("#accession-id").val(accessionId);
+  $("#target-id").val(target);
 
   $('#file-input').on('change', function() {
     if ($(this).val())
@@ -186,7 +189,9 @@
     $.each($('#file-input')[0].files, function(i, file) {
       data.append('file', file);
     });
-
+    data.append('participantId', participantId);
+    data.append('accessionId', accessionId);
+    data.append('target', target);
     function success(r) {
       console.log('success', r);
       $('#upload-success, #success-page').show();
@@ -208,19 +213,18 @@
     }
     
     $.ajax({
-      url: '${pageContext.request.contextPath}/pages/auth/api/dicom/participantID/' + participantId + '/accessionID/' + accessionId + '/upload',
+      url: '${pageContext.request.contextPath}/pages/auth/api/dicom',
       method: 'POST',
       type: 'POST',
       data: data,
       processData: false,
       contentType: false,
       success: function(r) {
-        if (r == 'UPLOAD SUCCESS')
-          success(r);
-        else
-          failed(r);
+        success(r);
       },
-      error: failed
+      error: function(r) {
+        failed(r);
+      }
     });
     return false;
   });
