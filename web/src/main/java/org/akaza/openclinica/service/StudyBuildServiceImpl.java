@@ -56,10 +56,6 @@ import java.util.stream.Stream;
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class StudyBuildServiceImpl implements StudyBuildService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    public static final String ENABLED = "enabled";
-    public static final String DISABLED = "disabled";
-    public static final String ACTIVE = "active";
-
 
     PermissionService permissionService;
     @Autowired

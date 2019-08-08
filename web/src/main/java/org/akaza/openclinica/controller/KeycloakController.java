@@ -11,6 +11,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.KeycloakUser;
 import org.akaza.openclinica.service.StudyBuildService;
+import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.keycloak.KeycloakPrincipal;
@@ -160,7 +161,7 @@ public class KeycloakController {
                 }
 
                 String accessToken = (String) req.getSession().getAttribute("accessToken");
-                studyBuildService.processAllModules(accessToken, publicStudy.getOid());
+                studyBuildService.processModule(accessToken, publicStudy.getOid(), ModuleProcessor.Modules.PARTICIPATE);
 
                 SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOid(),dataSource));
             }
