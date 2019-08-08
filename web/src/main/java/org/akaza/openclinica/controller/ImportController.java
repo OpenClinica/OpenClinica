@@ -171,11 +171,9 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.OK);
         }
 
-        // If this is randomize-service importing then we can skip the roles check.
-        boolean isRandomizeImport = isRandomizeImport(request);
-        if (isRandomizeImport){
-            fileNm = "randomize-service";
-        } else {
+        // If the import is performed by a system user, then we can skip the roles check.
+        boolean isSystemUserImport = isSystemUserImport(request);
+        if (!isSystemUserImport){
             if (siteOid != null) {
                 if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
                     return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
@@ -195,7 +193,7 @@ public class ImportController {
 
         String uuid;
         try {
-            uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm, isRandomizeImport);
+            uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm, isSystemUserImport);
         } catch (CustomParameterizedException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -204,7 +202,7 @@ public class ImportController {
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
     }
 
-    private boolean isRandomizeImport(HttpServletRequest request){
+    private boolean isSystemUserImport(HttpServletRequest request){
         boolean skipRoleCheck = false;
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && !authHeader.isEmpty()) {
@@ -219,7 +217,7 @@ public class ImportController {
                             String userType = (String) userContextMap.get("userType");
                             if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();
-                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
+                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT) || clientId.equalsIgnoreCase(ApplicationConstants.DICOM_CLIENT)){
                                     skipRoleCheck = true;
                                 }
 
@@ -237,16 +235,16 @@ public class ImportController {
     }
 
     public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid,
-                                 UserAccountBean userAccountBean, String fileNm, boolean isRandomizeImport) {
+                                 UserAccountBean userAccountBean, String fileNm, boolean isSystemUserImport) {
         utilService.setSchemaFromStudyOid(studyOid);
 
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        if (isRandomizeImport) {
-            // For randomization imports, instead of running import as an asynchronous job, run it synchronously
+        if (isSystemUserImport) {
+            // For system level imports, instead of running import as an asynchronous job, run it synchronously
             logger.debug("Running import synchronously");
-            boolean isImportSuccessful = importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, null, isRandomizeImport);
+            boolean isImportSuccessful = importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, null, isSystemUserImport);
             if (!isImportSuccessful) {
                 // Throw an error if import fails such that randomize service can update the status accordingly
                 throw new CustomParameterizedException(ErrorConstants.ERR_IMPORT_FAILED);
@@ -256,7 +254,7 @@ public class ImportController {
             JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, fileNm);
             CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
                 try {
-                    importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, isRandomizeImport);
+                    importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, isSystemUserImport);
                 } catch (Exception e) {
                     logger.error("Exception is thrown while processing dataImport: " + e);
                 }
