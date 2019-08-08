@@ -35,9 +35,6 @@
             -->
             <xs:element ref="EventAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="NotificationAction" minOccurs="0" maxOccurs="unbounded"/>
-            <!--
-            <xs:element ref="RandomizeAction" minOccurs="0" maxOccurs="unbounded"/>
-            -->
         </xs:sequence>
         <xs:attributeGroup ref="RuleRefAttributeType"/>
     </xs:complexType>
@@ -105,23 +102,6 @@
         <xs:sequence>
             <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="DestinationProperty" type="PropertyType" maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
-        <xs:attribute name="OID" type="xs:string"></xs:attribute>
-    </xs:complexType>
-    
-   <xs:element name="RandomizeAction" type="RandomizeActionType"/>
-    <xs:complexType name="RandomizeActionType">
-        <xs:sequence>
-            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
-            <xs:element name="DestinationProperty" type="SubPropertyType" maxOccurs="unbounded"/>
-            <xs:element name="StratificationFactors" minOccurs="0" maxOccurs="1">
-             <xs:complexType>
-                 <xs:sequence>
-                      <xs:element type="xs:string" name="StratificationFactor" maxOccurs="unbounded" minOccurs="0"/>
-                 </xs:sequence>
-             </xs:complexType>
-           </xs:element>            
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
         <xs:attribute name="OID" type="xs:string"></xs:attribute>

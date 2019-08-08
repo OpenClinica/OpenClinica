@@ -26,6 +26,7 @@ import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -96,9 +97,16 @@ public class RandomizationServiceImpl implements RandomizationService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        ResponseEntity<ModuleConfigDTO> response = restTemplate.exchange(randomizeUrl + "study-environments/" + studyEnvUuid + "/configuration", HttpMethod.GET, entity, ModuleConfigDTO.class);
-        if (response.hasBody())
-            return mapModuleConfigToConfig(response.getBody());
+        try {
+            ResponseEntity<ModuleConfigDTO> response = restTemplate.exchange(randomizeUrl + "study-environments/" + studyEnvUuid
+                    + "/configuration", HttpMethod.GET, entity, ModuleConfigDTO.class);
+            if (response.hasBody())
+                return mapModuleConfigToConfig(response.getBody());
+        } catch (RestClientException e) {
+            // we just log the exception here since we don't want to prevent user login by throwing this exception
+            log.error("Error getting Randomize configuration for studyEnvUuid:" + studyEnvUuid);
+            log.error("Exception:" + e);
+        }
         return null;
     }
 
