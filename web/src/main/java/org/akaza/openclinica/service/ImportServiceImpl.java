@@ -125,7 +125,7 @@ public class ImportServiceImpl implements ImportService {
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Transactional
-    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isRandomizeImport) {
+    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport) {
         CoreResources.setRequestSchema(schema);
         Study tenantStudy = null;
         if (siteOid != null) {
@@ -348,8 +348,8 @@ public class ImportServiceImpl implements ImportService {
 
 
         writeToFile(dataImportReports, fileName,JobType.XML_IMPORT);
-        if (isRandomizeImport) {
-            // For randomization import, check if the import failed and return the status
+        if (isSystemUserImport) {
+            // For system level import, check if the import failed and return the status
             boolean hasImportFailed = dataImportReports.stream()
                     .filter(dataImportReport1 -> dataImportReport1.getStatus().equals(FAILED))
                     .findAny()

@@ -1,7 +1,10 @@
 package org.akaza.openclinica.controller;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.service.DicomServiceClient;
 import org.akaza.openclinica.service.UtilService;
+import org.akaza.openclinica.service.randomize.RandomizationService;
+import org.akaza.openclinica.web.util.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +25,16 @@ public class DicomController {
 
     @Autowired
     private UtilService utilService;
+    @Autowired
+    private DicomServiceClient dicomServiceClient;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    @RequestMapping(value = "/participantID/{participantID}/accessionID/{accessionID}/upload", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> importDataPipeDelimitedFile(HttpServletRequest request,
-                                                              @PathVariable( "participantID" ) String participantID,
-                                                              @PathVariable( "accessionID" ) String accessionID,
+                                                              @RequestParam( "participantId" ) String participantID,
+                                                              @RequestParam( "accessionId" ) String accessionID,
+                                                              @RequestParam( "target" ) String target,
                                                               @RequestParam( "file" ) MultipartFile file) throws Exception {
 
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
@@ -37,30 +43,12 @@ public class DicomController {
         }
 
         if (file.isEmpty()) {
-            System.out.println("@@@@@@@@@ MISSING FILE @@@@@@@@@");
-            return ResponseEntity.ok("MISSING FILE");
+            logger.error("@@@@@@@@@ MISSING FILE @@@@@@@@@");
+            return ResponseEntity.badRequest()
+                    .body(ErrorConstants.ERR_MISSING_FILE);
         } else {
-            try {
-                String filename = file.getOriginalFilename();
-                System.out.println("@@@@@@@@@ Upload  "+ filename);
-                long filesize = file.getSize();
-                double kilobytes = (filesize / 1024);
-                double megabytes = (kilobytes / 1024);
-                System.out.println("@@@@@@@@@ Size  : "+ megabytes + " MB");
-            } catch (Exception e) {
-                System.out.println("@@@@@@@@@ Error Upload : "+ e.getMessage());
-            }
-        }
-
-        if (participantID.equalsIgnoreCase("1")) {
-            System.out.println("@@@@@@@@@ UPLOAD SUCCESS @@@@@@@@@");
-            return ResponseEntity.ok("UPLOAD SUCCESS");
-        } else if (participantID.equalsIgnoreCase("2")) {
-            System.out.println("@@@@@@@@@ UPLOAD FAILED @@@@@@@@@");
-            return ResponseEntity.ok("UPLOAD FAILED");
-        } else {
-            System.out.println("@@@@@@@@@ UPLOAD PARTIAL @@@@@@@@@");
-            return ResponseEntity.ok("UPLOAD PARTIAL");
+            String accessToken = (String) request.getSession().getAttribute("accessToken");
+            return dicomServiceClient.uploadDicom(accessToken, file, participantID, accessionID, target);
         }
     }
 }
