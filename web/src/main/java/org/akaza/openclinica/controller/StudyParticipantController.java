@@ -522,6 +522,15 @@ public class StudyParticipantController {
 
 				ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);
 				responseSuccess.setStudyParticipants(studyParticipantDTOs);
+				responseSuccess.setSiteOID(siteOid);
+				if (siteOid != null) {
+					StudyBean site = this.getStudyDAO().findByOid(siteOid);
+					responseSuccess.setSiteID(site.getId());
+					responseSuccess.setSiteName(site.getName());
+				} else {
+					responseSuccess.setSiteID(0);
+					responseSuccess.setSiteName(null);
+				}
 
 				response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 			}
