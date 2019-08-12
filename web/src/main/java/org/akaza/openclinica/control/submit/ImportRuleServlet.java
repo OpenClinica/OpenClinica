@@ -18,6 +18,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -46,6 +47,7 @@ public class ImportRuleServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
+    RulesPostImportContainerService rulesPostImportContainerService;
 
     @Override
     public void processRequest() throws Exception {
@@ -106,6 +108,8 @@ public class ImportRuleServlet extends SecureController {
                 
                 RulesPostImportContainer importedRules = handleLoadCastor(f);
                 logger.info(ub.getFirstName());
+                importedRules = getRulesPostImportContainerService().validateRuleDefs(importedRules);
+                importedRules = getRulesPostImportContainerService().validateRuleSetDefs(importedRules);
                 session.setAttribute("importedData", importedRules);
                 provideMessage(importedRules);
                 forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET);
@@ -195,6 +199,16 @@ public class ImportRuleServlet extends SecureController {
     private void logRuleImport(RulesPostImportContainer ruleImport) {
         logger.info("Total Number of RuleDefs Being imported : {} ", ruleImport.getRuleDefs().size());
         logger.info("Total Number of RuleAssignments Being imported : {} ", ruleImport.getRuleSets().size());
+    }
+
+    private RulesPostImportContainerService getRulesPostImportContainerService() {
+        rulesPostImportContainerService =
+            this.rulesPostImportContainerService != null ? rulesPostImportContainerService : (RulesPostImportContainerService) SpringServletAccess
+                    .getApplicationContext(context).getBean("rulesPostImportContainerService");
+        rulesPostImportContainerService.setCurrentStudy(currentStudy);
+        rulesPostImportContainerService.setRespage(respage);
+        rulesPostImportContainerService.setUserAccount(ub);
+        return rulesPostImportContainerService;
     }
 
     private CoreResources getCoreResources() {
