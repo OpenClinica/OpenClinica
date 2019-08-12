@@ -3,6 +3,7 @@ package org.akaza.openclinica.logic.importdata;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -530,14 +531,14 @@ public class ImportDataHelper {
 	    	;
 	    }else {
 	    	 try {
-	             int count =1;	    	
-	 	    		    	
+              		 	    	
+	            String recordNum =  msg.substring(0,msg.indexOf("|"));
 	 	    	File logFile;
 	 	    	String importFileDir = this.getPersonalImportFileDir(request);
 	     	    
-	 	    	//orginalFileName like: pipe_delimited_local_skip
-	 	    	
-	 	    	logFileName = importFileDir + orginalFileName + "_log.txt";
+	 	    	//get logFileName
+	 	    	logFileName = (String) request.getAttribute("logFileName");
+	 	    	logFileName = importFileDir + logFileName;
 	 			logFile = new File(logFileName);
 	 			
 	 			/**
@@ -553,7 +554,7 @@ public class ImportDataHelper {
 	 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
 	 			bw = new BufferedWriter(fw);
 	             
-	 			if(isNewFile) {				
+	 			if(isNewFile || recordNum.equals("1")) {	 			
 	 				bw.write("RowNo|ParticipantID|Status|Message");	
 	 				bw.write("\n");
 	 			}
@@ -582,7 +583,71 @@ public class ImportDataHelper {
 	   	    
 	}  
     
-    /**
+    public void copyMappingFileToLogFile(File mappingFile, String logfileNm,HttpServletRequest request) throws IOException {
+    	BufferedWriter bw = null;
+		FileWriter fw = null;
+    	boolean isNewFile = false;
+    	
+    	try {	 	 
+ 	    	File logFile;
+ 	    	String importFileDir = this.getPersonalImportFileDir(request);
+     	    
+ 	    	//get logFileName
+ 	    	String logFileName = null;
+ 	    	if(logfileNm != null) {
+ 	    		logFileName =logfileNm;
+ 	    	}else {
+ 	    		logFileName = (String) request.getAttribute("logFileName"); 	 	    	 	 				
+ 	    	}
+ 	    	
+ 	    	logFileName = importFileDir + logFileName;
+	 		logFile = new File(logFileName);
+ 	    	
+ 			/**
+ 			 *  create new file and add first line
+ 			 *  RowNo | ParticipantID | Status | Message
+ 			 */
+ 			if(!logFile.exists()) {
+ 				logFile.createNewFile();
+ 				isNewFile = true;				
+ 			}
+ 			
+ 			// true = append file
+ 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
+ 			bw = new BufferedWriter(fw);
+             
+ 			if(isNewFile ) {	 			
+ 				try(Scanner sc = new Scanner(mappingFile)){
+ 				   	 String currentLine;
+ 					
+ 				   	 while (sc.hasNextLine()) {
+ 				   		 currentLine = sc.nextLine();        		 
+ 					      bw.write(currentLine);
+ 					      bw.write("\n");
+ 					     }
+ 					
+ 					 }	 	 
+ 			}
+ 			
+ 			
+ 			bw.close();						
+ 	       
+ 	    } catch (Exception e) {
+ 	    	logger.error("Exception occurred", e);
+ 	    }finally {
+ 			try {
+ 				if (bw != null)
+ 					bw.close();
+ 				if (fw != null)
+ 					fw.close();
+ 			} catch (IOException ex) {
+ 				logger.error("Exception occurred", ex);
+ 			}
+ 		}
+		 
+	}
+
+	/**
      * 
      * @param request
      * @return

@@ -231,6 +231,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(",");
             writer.append("Event Name");
             writer.append(",");
+            writer.append("Event Date");
+            writer.append(",");
             writer.append("Event Occurrence");
             writer.append(",");
             writer.append("CRF Name");
@@ -310,6 +312,13 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getEventName()));
+        writer.append(",");
+
+        if (discNoteBean.getEventStart() != null) {
+            writer.append(discNoteBean.getEventStart());
+        } else {
+            writer.append(escapeQuotesInCSV(tn));
+        }
         writer.append(",");
 
         String eventOccurrence = null != discNoteBean.getStudyEventDefinitionBean()

@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.io.*;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -284,6 +285,10 @@ public class RestfulServiceHelper {
 	 			
 	 		}
 	  		
+	  		// prepare log file
+	  		String logFileName = null;	 	 	 	
+	  		logFileName =   (String) request.getAttribute("logFileName");
+	 	 	    
 		  	int i = 1;	  		
 	 		for (File file : files) {
 	 			// skip mapping file
@@ -293,90 +298,109 @@ public class RestfulServiceHelper {
 	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
 	 				
 	 				Iterator dataFilesIt = dataFileList.iterator();
-	 				
+	 				File rowFile = null;
 	 				while(dataFilesIt.hasNext()) {
-	 					File rowFile = (File) dataFilesIt.next();
+	 					try {
+	 						rowFile = (File) dataFilesIt.next();
+		 					
+		 					HttpPost post = new HttpPost(importDataWSUrl);
+		 	 	 	  		/**
+		 	 	 	  		 *  add header Authorization
+		 	 	 	  		 */
+		 	 	 	 		String accessToken = (String) request.getSession().getAttribute("accessToken");
+		 	 	 	  		post.setHeader("Authorization", "Bearer " + accessToken);
+		 	 	 	  		
+		 	 	 	  		String basePath = getBasePath(request);
+		 	 	 	  		post.setHeader("OCBasePath", basePath);
+		 	 	 	  		
+	 	 	 	 	  	    //PIPETEXT
+		 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
+
+		 	 	 	  		//SkipMatchCriteria
+		 	 	 	  		String skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile); 
+		 	 	 	  	    post.setHeader("SkipMatchCriteria", skipMatchCriteria);
+		 	 	 	  	
+		 	 	 	 		post.setHeader("Accept", 
+		 	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+		 	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
+		 	 	 	 		post.setHeader("Connection", "keep-alive");
+		 	 	 	 		
+		 	 	 	 		String originalFileName = rowFile.getName();
+		 	 	 	 	    post.setHeader("originalFileName", originalFileName);
+		 	 	 	 	    post.setHeader("logFileName", logFileName);
+		 	 	 			
+		 	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+		 	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+		 	 	 		  	String partNm = null;
+		 	 	 		  	/**
+		 	 	 		  	 *  Here will only send ODM XML to OC API
+		 	 	 		  	 *  
+		 	 	 		  	 */
+		 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile,hm);
+		 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName,studyOID);
+		 	 	 		    tempODMFileList.add(odmXmlFile);
+		 	 	 		 
+		 	 	 			FileBody fileBody = new FileBody(odmXmlFile, ContentType.TEXT_PLAIN);
+		 	 	 			partNm = "uploadedData" + i;
+		 	 	 	  		builder.addPart(partNm, fileBody);
+		 	 	 	  	    builder.addBinaryBody("file", odmXmlFile);
+		 	 	 	  		
+		 	 	 	  		
+		 	 	 	  		HttpEntity entity = builder.build();   		
+		 	 	 	  		post.setEntity(entity);
+		 	 	 	  		
+		 	 	 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
+		 	 	 	  		HttpResponse response = httpClient.execute(post);
+		 	 	 	  		
+		 	 	 	  	    //print result	
+		 	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
+
+		 	 	 	 		//System.out.println("\nSending 'POST' request to URL : " + importDataWSUrl); 	
+		 	 	 	 		//System.out.println("Response Code : " + responseCode);
+
+		 	 	 	 		BufferedReader rd = new BufferedReader(
+		 	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
+
+		 	 	 	 		StringBuffer result = new StringBuffer();
+		 	 	 	 		String line = "";
+		 	 	 	 		while ((line = rd.readLine()) != null) {
+		 	 	 	 			result.append(line);
+		 	 	 	 		}
+		 	 	 	        
+		 	 	 	 		String responseStr = result.toString();
+		 	 	 	 		if(responseStr!=null && responseStr.toLowerCase().indexOf("error")>-1) {
+		 	 	 	 			importCRFInfoSummary.setFailCnt(importCRFInfoSummary.getFailCnt()+1);
+		 	 	 	 		}else {
+		 	 	 	 			importCRFInfoSummary.setPassCnt(importCRFInfoSummary.getPassCnt() +1);
+		 	 	 	 		}
+		 	 	 	 
+		 	 	 	 	    importCRFInfoSummary.getDetailMessages().add(responseStr);
+		 	 	 	 		//System.out.println(responseStr);
+		 	 	 	 		
+		 	 	 	 	    //TimeUnit.MILLISECONDS.sleep(5);
+	 					}catch(OpenClinicaSystemException e) {
+	 						/*
+	 	                	 *  write error to log file            	 *  
+	 	                	 */
+	 						String originalFileName = rowFile.getName();            	
+	 		            	String recordNum = null;
+	 		            	String participantID = this.getImportDataHelper().getParticipantID(mappingFile, rowFile);
+	 		            	if(originalFileName !=null) {
+	 		            		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+	 		            		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+	 		            	}
+	 		            	String msg = e.getErrorCode() + ":" + e.getMessage();
+	 		            	msg = recordNum + "|" + participantID + "|FAILED|" + msg;
+	 			    		this.getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+	 		            
+	 					}
 	 					
-	 					HttpPost post = new HttpPost(importDataWSUrl);
-	 	 	 	  		/**
-	 	 	 	  		 *  add header Authorization
-	 	 	 	  		 */
-	 	 	 	 		String accessToken = (String) request.getSession().getAttribute("accessToken");
-	 	 	 	  		post.setHeader("Authorization", "Bearer " + accessToken);
-	 	 	 	  		
-	 	 	 	  		String basePath = getBasePath(request);
-	 	 	 	  		post.setHeader("OCBasePath", basePath);
-	 	 	 	  		
- 	 	 	 	  	    //PIPETEXT
-	 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
-
-	 	 	 	  		//SkipMatchCriteria
-	 	 	 	  		String skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile); 
-	 	 	 	  	    post.setHeader("SkipMatchCriteria", skipMatchCriteria);
-	 	 	 	  	
-	 	 	 	 		post.setHeader("Accept", 
-	 	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-	 	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
-	 	 	 	 		post.setHeader("Connection", "keep-alive");
-	 	 	 	 		
-	 	 	 	 		String originalFileName = rowFile.getName();
-	 	 	 	 	    post.setHeader("originalFileName", originalFileName);
-	 	 	 			
-	 	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-	 	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-	 	 	 		  	String partNm = null;
-	 	 	 		  	/**
-	 	 	 		  	 *  Here will only send ODM XML to OC API
-	 	 	 		  	 *  
-	 	 	 		  	 */
-	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile,hm);
-	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName,studyOID);
-	 	 	 		    tempODMFileList.add(odmXmlFile);
-	 	 	 		 
-	 	 	 			FileBody fileBody = new FileBody(odmXmlFile, ContentType.TEXT_PLAIN);
-	 	 	 			partNm = "uploadedData" + i;
-	 	 	 	  		builder.addPart(partNm, fileBody);
-	 	 	 	  	    builder.addBinaryBody("file", odmXmlFile);
-	 	 	 	  		
-	 	 	 	  		
-	 	 	 	  		HttpEntity entity = builder.build();   		
-	 	 	 	  		post.setEntity(entity);
-	 	 	 	  		
-	 	 	 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
-	 	 	 	  		HttpResponse response = httpClient.execute(post);
-	 	 	 	  		
-	 	 	 	  	    //print result	
-	 	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
-
-	 	 	 	 		//System.out.println("\nSending 'POST' request to URL : " + importDataWSUrl); 	
-	 	 	 	 		//System.out.println("Response Code : " + responseCode);
-
-	 	 	 	 		BufferedReader rd = new BufferedReader(
-	 	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
-
-	 	 	 	 		StringBuffer result = new StringBuffer();
-	 	 	 	 		String line = "";
-	 	 	 	 		while ((line = rd.readLine()) != null) {
-	 	 	 	 			result.append(line);
-	 	 	 	 		}
-	 	 	 	        
-	 	 	 	 		String responseStr = result.toString();
-	 	 	 	 		if(responseStr!=null && responseStr.toLowerCase().indexOf("error")>-1) {
-	 	 	 	 			importCRFInfoSummary.setFailCnt(importCRFInfoSummary.getFailCnt()+1);
-	 	 	 	 		}else {
-	 	 	 	 			importCRFInfoSummary.setPassCnt(importCRFInfoSummary.getPassCnt() +1);
-	 	 	 	 		}
-	 	 	 	 
-	 	 	 	 	    importCRFInfoSummary.getDetailMessages().add(responseStr);
-	 	 	 	 		//System.out.println(responseStr);
-	 	 	 	 		
-	 	 	 	 	    //TimeUnit.MILLISECONDS.sleep(5);
 	 				}
 	 				
 	 			   // after sent, then delete from disk
 	 				dataFilesIt = dataFileList.iterator();
 	 				while(dataFilesIt.hasNext()) {
-	 					File rowFile = (File) dataFilesIt.next();					 					
+	 					rowFile = (File) dataFilesIt.next();					 					
 		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile,studyOID);
 		 	 	  		
 	 				}
@@ -435,6 +459,12 @@ public class RestfulServiceHelper {
 	 			}else {
 	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
 	 				
+	 				 // prepare log file
+	 	 	 	 	String logFileName = null;
+	 	 	 	 	logFileName = buildLogFileName(file.getName()); 
+	 	 	 	    this.getImportDataHelper().copyMappingFileToLogFile(mappingFile, logFileName,request);
+	 	 	 	    request.setAttribute("logFileName", logFileName);
+	 	 	 	    
 	 				Iterator dataFilesIt = dataFileList.iterator();
 	 				
 	 				File rowFile = null;
@@ -465,6 +495,7 @@ public class RestfulServiceHelper {
 		 	 	 	 		
 		 	 	 	 		String originalFileName = rowFile.getName();
 		 	 	 	 	    post.setHeader("originalFileName", originalFileName);
+		 	 	 	 	    post.setHeader("logFileName", logFileName);
 		 	 	 			
 		 	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 		 	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -680,5 +711,23 @@ public class RestfulServiceHelper {
 
 		public void setMessageLogger(MessageLogger messageLogger) {
 			this.messageLogger = messageLogger;
+		}
+		
+		/**
+		 * @param originalFileName
+		 * @return logFileName
+		 */
+		public String buildLogFileName(String originalFileName) {
+			String logFileName = null;
+			if(originalFileName !=null) {	            	
+				originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".txt"));
+			}
+
+			Date now = new Date();	
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
+			String timeStamp = simpleDateFormat.format(now);
+			logFileName =originalFileName+"_"+ timeStamp+"_log.txt";
+			
+			return logFileName;
 		}
 }

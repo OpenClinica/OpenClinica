@@ -116,12 +116,22 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
                             if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();
+                                HashMap<String, String> userAccountToCreate = null;
                                 if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
                                     ub = (UserAccountBean) userAccountDAO.findByUserName("randomize");
-                                    if (ub.getName().isEmpty())
-                                    try{
-                                        HashMap<String, String> userAccount = (HashMap) createRandomizeUserAccount();
-                                        ub = userService.createUser(request, userAccount);
+                                    if (ub.getName().isEmpty()) {
+                                        userAccountToCreate = createRandomizeUserAccount();
+                                    }
+                                } else if (clientId.equals(ApplicationConstants.DICOM_CLIENT)) {
+                                    ub = (UserAccountBean) userAccountDAO.findByUserName("dicom");
+                                    if (ub.getName().isEmpty()) {
+                                        userAccountToCreate = createDicomUserAccount();
+                                    }
+                                }
+
+                                if (userAccountToCreate != null) {
+                                    try {
+                                        ub = userService.createUser(request, userAccountToCreate);
                                     } catch (Exception e) {
                                         logger.error("Failed user creation:" + e.getMessage());
                                     }
@@ -239,13 +249,26 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     }
 
     //TODO Put this somewhere else?
-    private Map<String, String>  createRandomizeUserAccount() throws Exception {
-        Map<String, String> map = new HashMap<>();
+    private HashMap<String, String>  createRandomizeUserAccount() {
+        HashMap<String, String> map = new HashMap<>();
         map.put("username", "randomize");
         map.put("fName", "Randomize");
         map.put("lName", "Service");
         map.put("role_name", "Data Manager");
         map.put("user_uuid", "randomizeSystemUserUuid");
+        map.put("user_type", org.akaza.openclinica.service.UserType.TECH_ADMIN.getName());
+        map.put("authorize_soap", "true");
+        map.put("email", "openclinica-developers@openclinica.com");
+        map.put("institution", "OC");
+        return map;
+    }
+    private HashMap<String, String>  createDicomUserAccount() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("username", "dicom");
+        map.put("fName", "Dicom");
+        map.put("lName", "Service");
+        map.put("role_name", "Data Manager");
+        map.put("user_uuid", "dicomSystemUserUuid");
         map.put("user_type", org.akaza.openclinica.service.UserType.TECH_ADMIN.getName());
         map.put("authorize_soap", "true");
         map.put("email", "openclinica-developers@openclinica.com");
