@@ -103,6 +103,7 @@ public class RandomizationServiceImpl implements RandomizationService {
                         } catch (Exception e) {
                             // we just log the exception here since we don't want to prevent user login by throwing this exception
                             log.error("Error getting Randomize configuration for studyEnvUuid:" + study.getStudyEnvUuid());
+                            log.error("Exception:" + e);
                         }
 
                 });

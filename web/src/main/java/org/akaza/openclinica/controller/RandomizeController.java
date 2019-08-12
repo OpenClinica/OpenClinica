@@ -39,10 +39,10 @@ public class RandomizeController {
         if (StringUtils.isEmpty(accessToken))
             return new ResponseEntity<>("Access token not specified.", HttpStatus.BAD_REQUEST);
 
-        String role = tokenService.getRole(accessToken);
+        String userType = tokenService.getUserType(accessToken);
 
-        if (!StringUtils.equals(role, UserType.TECH_ADMIN.getName()))
-            return new ResponseEntity<>("Tech Admin role is needed to call this service.", HttpStatus.BAD_REQUEST);
+        if (!StringUtils.equals(userType, UserType.TECH_ADMIN.getName()))
+            return new ResponseEntity<>("Tech Admin user type is needed to call this service.", HttpStatus.FORBIDDEN);
 
         randomizationService.refreshConfigurations(accessToken);
         return new ResponseEntity("Success", HttpStatus.NO_CONTENT);

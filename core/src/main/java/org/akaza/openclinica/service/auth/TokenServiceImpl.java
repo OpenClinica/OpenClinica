@@ -57,7 +57,7 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
-    public String getRole(String token) {
+    public String getUserType(String token) {
         Map<String, Object> decodedToken = decodeAndVerify(token);
         if (MapUtils.isEmpty(decodedToken))
             return null;
