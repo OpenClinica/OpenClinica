@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/auth/api/v1/randomize")
@@ -44,7 +46,11 @@ public class RandomizeController {
         if (!StringUtils.equals(userType, UserType.TECH_ADMIN.getName()))
             return new ResponseEntity<>("Tech Admin user type is needed to call this service.", HttpStatus.FORBIDDEN);
 
-        randomizationService.refreshConfigurations(accessToken);
-        return new ResponseEntity("Success", HttpStatus.NO_CONTENT);
+        Map<String, String> configMap = new HashMap<>();
+        boolean isSuccess = randomizationService.refreshConfigurations(accessToken, configMap);
+        if (isSuccess)
+            return new ResponseEntity(configMap, HttpStatus.NO_CONTENT);
+        else
+            return new ResponseEntity(configMap, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

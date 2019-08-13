@@ -19,7 +19,6 @@ import org.akaza.openclinica.dto.randomize.RandomizationDTO;
 import org.akaza.openclinica.dto.randomize.RandomizationTarget;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -52,6 +51,8 @@ public class RandomizationServiceImpl implements RandomizationService {
     @Autowired
     private StudyBuildService studyBuildService;
 
+    private static final String SUCCESS_STR = "SUCCESS";
+
     private static String initServiceUrl() {
         int index = sbsUrl.indexOf("//");
         String protocol = sbsUrl.substring(0, index) + "//";
@@ -61,8 +62,8 @@ public class RandomizationServiceImpl implements RandomizationService {
     };
     static String randomizeUrl = initServiceUrl();
 
-    private static PassiveExpiringMap<String, RandomizationData> randomizationMap =
-            new PassiveExpiringMap<>(24, TimeUnit.HOURS);
+    private static ConcurrentHashMap<String, RandomizationData> randomizationMap =
+            new ConcurrentHashMap<>();
 
     private class RandomizationData {
         private boolean isEnabled;
@@ -89,7 +90,8 @@ public class RandomizationServiceImpl implements RandomizationService {
         }
     }
 
-    public void refreshConfigurations(String accessToken) {
+    public boolean refreshConfigurations(String accessToken, Map<String, String> results) {
+        boolean isSuccess = true;
         List<RandomizationConfiguration> randomizationConfigurations = new ArrayList<>();
         ArrayList<Study> studies = studyDao.findAll();
         studies.stream().filter(study->study.getStatus() == Status.AVAILABLE
@@ -100,22 +102,28 @@ public class RandomizationServiceImpl implements RandomizationService {
                     if (StringUtils.equalsIgnoreCase(moduleEnabled, StudyBuildService.ENABLED))
                         try {
                             randomizationConfigurations.add(retrieveConfiguration(study.getStudyEnvUuid(), accessToken));
+                            results.put(study.getOc_oid(), SUCCESS_STR);
                         } catch (Exception e) {
                             // we just log the exception here since we don't want to prevent user login by throwing this exception
                             log.error("Error getting Randomize configuration for studyEnvUuid:" + study.getStudyEnvUuid());
                             log.error("Exception:" + e);
+                            results.put(study.getOc_oid(), "FAILED. Error:" + e.getMessage());
                         }
 
                 });
-        // only clear the map once all of the configurations are retrieved
-        synchronized (randomizationMap) {
-            randomizationMap.clear();
-        }
-        randomizationConfigurations.stream().forEach(config->{
-            synchronized (randomizationMap) {
-                randomizationMap.put(config.getStudyEnvUuid(), new RandomizationData(true, config));
+
+        // if the study config is not in the existing map, then remove it
+        // Don't need to do anything crazy with thread safety here as this end point is very restricted and not multi-tenant
+        randomizationMap.entrySet().stream().forEach(entry->{
+            if (results.get(entry.getValue().getConfiguration().getStudyOID()) == null) {
+                randomizationMap.remove(entry.getKey());
             }
         });
+        randomizationConfigurations.stream().forEach(config->{
+            randomizationMap.put(config.getStudyEnvUuid(), new RandomizationData(true, config));
+        });
+        isSuccess = results.size() == randomizationConfigurations.size() ? true: false;
+        return isSuccess;
     }
     private RandomizationConfiguration retrieveConfiguration(String studyEnvUuid, String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
@@ -182,9 +190,7 @@ public class RandomizationServiceImpl implements RandomizationService {
     public void processModule(Study study, String isModuleEnabled, String accessToken) {
         if (StringUtils.equalsIgnoreCase(isModuleEnabled, ENABLED)) {
             RandomizationConfiguration configuration = retrieveConfiguration(study.getStudyEnvUuid(), accessToken);
-            synchronized (randomizationMap) {
-                randomizationMap.put(study.getStudyEnvUuid(), new RandomizationData(true, configuration));
-            }
+            randomizationMap.put(study.getStudyEnvUuid(), new RandomizationData(true, configuration));
         }
     }
 
