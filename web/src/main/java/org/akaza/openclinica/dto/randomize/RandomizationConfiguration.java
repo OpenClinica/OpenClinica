@@ -1,4 +1,4 @@
-package org.akaza.openclinica.domain.randomize;
+package org.akaza.openclinica.dto.randomize;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -64,11 +64,11 @@ public class RandomizationConfiguration implements Serializable {
     public void addAttribute(String key, String value) {
         attributes.put(key, value);}
 
-     public String findAndRemove(String key){
-         String stratValue = attributes.get(key);
-         attributes.remove(key);
-         return stratValue;
-        }
+    public String findAndRemove(String key){
+        String stratValue = attributes.get(key);
+        attributes.remove(key);
+        return stratValue;
+    }
 
     @JsonIgnore
     public List<String> getStratificationFactorsAsList(){
@@ -93,14 +93,14 @@ public class RandomizationConfiguration implements Serializable {
     @Override
     public String toString() {
         return "RandomizationConfiguration{" +
-            "studyUuid='" + studyUuid + '\'' +
-            ", studyEnvUuid='" + studyEnvUuid + '\'' +
-            ", runtimeURL='" + runtimeURL + '\'' +
-            ", managerURL='" + managerURL + '\'' +
-            ", studyOID='" + studyOID + '\'' +
-            ", targetField=" + targetField +
-            ", stratificationFactors=" + getStratificationFactorsAsList().toString() +
-            ", attributes=" + getAttributesAsList().toString() +
-            '}';
+                "studyUuid='" + studyUuid + '\'' +
+                ", studyEnvUuid='" + studyEnvUuid + '\'' +
+                ", runtimeURL='" + runtimeURL + '\'' +
+                ", managerURL='" + managerURL + '\'' +
+                ", studyOID='" + studyOID + '\'' +
+                ", targetField=" + targetField +
+                ", stratificationFactors=" + getStratificationFactorsAsList().toString() +
+                ", attributes=" + getAttributesAsList().toString() +
+                '}';
     }
 }

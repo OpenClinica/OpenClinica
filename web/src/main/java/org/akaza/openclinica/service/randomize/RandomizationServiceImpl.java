@@ -3,21 +3,22 @@ package org.akaza.openclinica.service.randomize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
+import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RandomizeQueryResult;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudySubject;
-import org.akaza.openclinica.domain.randomize.RandomizationConfiguration;
-import org.akaza.openclinica.domain.randomize.RandomizationDTO;
-import org.akaza.openclinica.domain.randomize.RandomizationTarget;
-import org.akaza.openclinica.service.dto.ModuleConfigAttributeDTO;
-import org.akaza.openclinica.service.dto.ModuleConfigDTO;
+import org.akaza.openclinica.dto.randomize.RandomizationConfiguration;
+import org.akaza.openclinica.dto.randomize.RandomizationDTO;
+import org.akaza.openclinica.dto.randomize.RandomizationTarget;
+import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,10 @@ import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -45,6 +45,14 @@ public class RandomizationServiceImpl implements RandomizationService {
     @Autowired
     private StudyEventDao studyEventDao;
 
+    @Autowired
+    private StudyDao studyDao;
+
+    @Autowired
+    private StudyBuildService studyBuildService;
+
+    private static final String SUCCESS_STR = "SUCCESS";
+
     private static String initServiceUrl() {
         int index = sbsUrl.indexOf("//");
         String protocol = sbsUrl.substring(0, index) + "//";
@@ -54,8 +62,8 @@ public class RandomizationServiceImpl implements RandomizationService {
     };
     static String randomizeUrl = initServiceUrl();
 
-    private static PassiveExpiringMap<String, RandomizationData> randomizationMap =
-            new PassiveExpiringMap<>(24, TimeUnit.HOURS);
+    private static ConcurrentHashMap<String, RandomizationData> randomizationMap =
+            new ConcurrentHashMap<>();
 
     private class RandomizationData {
         private boolean isEnabled;
@@ -65,7 +73,6 @@ public class RandomizationServiceImpl implements RandomizationService {
             this.isEnabled = isEnabled;
             this.configuration = configuration;
         }
-
         public boolean isEnabled() {
             return isEnabled;
         }
@@ -83,6 +90,45 @@ public class RandomizationServiceImpl implements RandomizationService {
         }
     }
 
+    public boolean refreshConfigurations(String accessToken, Map<String, String> results) {
+        boolean isSuccess = true;
+        List<RandomizationConfiguration> randomizationConfigurations = new ArrayList<>();
+        ArrayList<Study> studies = studyDao.findAll();
+        studies.stream().filter(study->study.getStatus() == Status.AVAILABLE
+                && StringUtils.isNotEmpty(study.getStudyEnvUuid()))
+                .forEach(study-> {
+                    List<ModuleConfigDTO> configs = studyBuildService.getModuleConfigsFromStudyService(accessToken, study);
+                    String moduleEnabled = studyBuildService.isModuleEnabled(configs, study, Modules.RANDOMIZE);
+                    if (StringUtils.equalsIgnoreCase(moduleEnabled, ModuleStatus.ENABLED.name())) {
+                        boolean isRetrieveSuccess = false;
+                        try {
+                            randomizationConfigurations.add(retrieveConfiguration(study.getStudyEnvUuid(), accessToken));
+                            isRetrieveSuccess = true;
+                        } catch (Exception e) {
+                            // we just log the exception here since we don't want to prevent user login by throwing this exception
+                            log.error("Error getting Randomize configuration for studyEnvUuid:" + study.getStudyEnvUuid());
+                            log.error("Exception:" + e);
+                            results.put(study.getOc_oid(), "FAILED. Error:" + e.getMessage());
+                        }
+                        if (isRetrieveSuccess)
+                            results.put(study.getOc_oid(), SUCCESS_STR);
+                    }
+
+                });
+
+        // if the study config is not in the existing map, then remove it
+        // Don't need to do anything crazy with thread safety here as this end point is very restricted and not multi-tenant
+        randomizationMap.entrySet().stream().forEach(entry->{
+            if (results.get(entry.getValue().getConfiguration().getStudyOID()) == null) {
+                randomizationMap.remove(entry.getKey());
+            }
+        });
+        randomizationConfigurations.stream().forEach(config->{
+            randomizationMap.put(config.getStudyEnvUuid(), new RandomizationData(true, config));
+        });
+        isSuccess = results.size() == randomizationConfigurations.size() ? true: false;
+        return isSuccess;
+    }
     private RandomizationConfiguration retrieveConfiguration(String studyEnvUuid, String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -97,16 +143,10 @@ public class RandomizationServiceImpl implements RandomizationService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        try {
-            ResponseEntity<ModuleConfigDTO> response = restTemplate.exchange(randomizeUrl + "study-environments/" + studyEnvUuid
+        ResponseEntity<ModuleConfigDTO> response = restTemplate.exchange(randomizeUrl + "study-environments/" + studyEnvUuid
                     + "/configuration", HttpMethod.GET, entity, ModuleConfigDTO.class);
-            if (response.hasBody())
-                return mapModuleConfigToConfig(response.getBody());
-        } catch (RestClientException e) {
-            // we just log the exception here since we don't want to prevent user login by throwing this exception
-            log.error("Error getting Randomize configuration for studyEnvUuid:" + studyEnvUuid);
-            log.error("Exception:" + e);
-        }
+        if (response.hasBody())
+            return mapModuleConfigToConfig(response.getBody());
         return null;
     }
 
@@ -152,20 +192,9 @@ public class RandomizationServiceImpl implements RandomizationService {
     }
     @Override
     public void processModule(Study study, String isModuleEnabled, String accessToken) {
-        // if there is already an entry in the map, don't put it again
-        RandomizationData data = randomizationMap.get(study.getStudyEnvUuid());
-        if (data != null)
-            return;
-
-        if (StringUtils.equalsIgnoreCase(isModuleEnabled, ENABLED)) {
+        if (StringUtils.equalsIgnoreCase(isModuleEnabled, ModuleStatus.ENABLED.name())) {
             RandomizationConfiguration configuration = retrieveConfiguration(study.getStudyEnvUuid(), accessToken);
-            synchronized (randomizationMap) {
-                randomizationMap.put(study.getStudyEnvUuid(), new RandomizationData(true, configuration));
-            }
-        } else {
-            synchronized (randomizationMap) {
-                randomizationMap.put(study.getStudyEnvUuid(), new RandomizationData(false, null));
-            }
+            randomizationMap.put(study.getStudyEnvUuid(), new RandomizationData(true, configuration));
         }
     }
 

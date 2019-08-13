@@ -23,7 +23,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
-import org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.service.randomize.RandomizationService;
@@ -56,10 +55,6 @@ import java.util.stream.Stream;
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class StudyBuildServiceImpl implements StudyBuildService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    public static final String ENABLED = "enabled";
-    public static final String DISABLED = "disabled";
-    public static final String ACTIVE = "active";
-
 
     PermissionService permissionService;
     @Autowired
@@ -295,7 +290,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         Study activeStudy = null;
         if (userActiveStudyId > 0) {
             activeStudy = studyDao.findById(userActiveStudyId);
-            getRoleAssociatedWithActiveStudy(activeStudy,userRoles.getBody(),request);
+            if (validRoleAssociatedWithActiveStudy(activeStudy, userRoles.getBody(),request))
+                currentActiveStudyValid = true;
         }
 
         // TODO: refactor this loop seems complex and error-prone & seems to break SRP.
@@ -498,15 +494,15 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     public String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
         for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
             if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(module.name())) {
-                ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
-                if (moduleStatus.name().equalsIgnoreCase(ACTIVE)) {
+                org.akaza.openclinica.domain.enumsupport.ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
+                if (moduleStatus.name().equalsIgnoreCase(ModuleProcessor.ModuleStatus.ACTIVE.name())) {
                     logger.info("Module Status is Enabled");
-                    return ENABLED;
+                    return ModuleProcessor.ModuleStatus.ENABLED.name();
                 }
             }
         }
         logger.info("Module Status is Disabled");
-        return DISABLED;
+        return ModuleProcessor.ModuleStatus.DISABLED.name();
     }
 
 
@@ -603,7 +599,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return serviceHelper;
     }
 
-    private void getRoleAssociatedWithActiveStudy(Study study,
+    private boolean validRoleAssociatedWithActiveStudy(Study study,
                                                   List<StudyEnvironmentRoleDTO> roles,
                                                   HttpServletRequest request) {
 
@@ -636,7 +632,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (role != null) {
             request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
             request.getSession().setAttribute("baseUserRole", role.getRoleName());
+            return true;
         }
+        return false;
     }
     
     private void removeDeletedUserRoles(ArrayList<StudyUserRole> modifiedStudyUserRoles, Collection<StudyUserRole> existingStudyUserRoles) {
