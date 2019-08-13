@@ -23,7 +23,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
-import org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.service.randomize.RandomizationService;
@@ -495,15 +494,15 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     public String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
         for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
             if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(module.name())) {
-                ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
-                if (moduleStatus.name().equalsIgnoreCase(ACTIVE)) {
+                org.akaza.openclinica.domain.enumsupport.ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
+                if (moduleStatus.name().equalsIgnoreCase(ModuleProcessor.ModuleStatus.ACTIVE.name())) {
                     logger.info("Module Status is Enabled");
-                    return ENABLED;
+                    return ModuleProcessor.ModuleStatus.ENABLED.name();
                 }
             }
         }
         logger.info("Module Status is Disabled");
-        return DISABLED;
+        return ModuleProcessor.ModuleStatus.DISABLED.name();
     }
 
 

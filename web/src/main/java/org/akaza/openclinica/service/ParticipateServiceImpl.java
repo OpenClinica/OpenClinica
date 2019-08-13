@@ -17,7 +17,6 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
@@ -420,10 +419,10 @@ public class ParticipateServiceImpl implements ParticipateService {
                 if (eventDefCrf.getCrf().getCrfId() == eventCrf.getFormLayout().getCrf().getCrfId()) {
                     foundEventCrfMatch = true;
                     if (eventDefCrf.getParicipantForm()) {
-                        eventCrf.setStatusId(Status.UNAVAILABLE.getCode());
+                        eventCrf.setStatusId(ModuleStatus.UNAVAILABLE.getCode());
                         eventCrf.setDateCompleted(new Date());
                         eventCrfDao.saveOrUpdate(eventCrf);
-                    } else if (eventCrf.getStatusId() != Status.UNAVAILABLE.getCode()) completeStudyEvent = false;
+                    } else if (eventCrf.getStatusId() != ModuleStatus.UNAVAILABLE.getCode()) completeStudyEvent = false;
                 }
             }
             if (!foundEventCrfMatch && !eventDefCrf.getParicipantForm()) completeStudyEvent = false;

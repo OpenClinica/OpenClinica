@@ -99,16 +99,20 @@ public class RandomizationServiceImpl implements RandomizationService {
                 .forEach(study-> {
                     List<ModuleConfigDTO> configs = studyBuildService.getModuleConfigsFromStudyService(accessToken, study);
                     String moduleEnabled = studyBuildService.isModuleEnabled(configs, study, Modules.RANDOMIZE);
-                    if (StringUtils.equalsIgnoreCase(moduleEnabled, StudyBuildService.ENABLED))
+                    if (StringUtils.equalsIgnoreCase(moduleEnabled, ModuleStatus.ENABLED.name())) {
+                        boolean isRetrieveSuccess = false;
                         try {
                             randomizationConfigurations.add(retrieveConfiguration(study.getStudyEnvUuid(), accessToken));
-                            results.put(study.getOc_oid(), SUCCESS_STR);
+                            isRetrieveSuccess = true;
                         } catch (Exception e) {
                             // we just log the exception here since we don't want to prevent user login by throwing this exception
                             log.error("Error getting Randomize configuration for studyEnvUuid:" + study.getStudyEnvUuid());
                             log.error("Exception:" + e);
                             results.put(study.getOc_oid(), "FAILED. Error:" + e.getMessage());
                         }
+                        if (isRetrieveSuccess)
+                            results.put(study.getOc_oid(), SUCCESS_STR);
+                    }
 
                 });
 
@@ -188,7 +192,7 @@ public class RandomizationServiceImpl implements RandomizationService {
     }
     @Override
     public void processModule(Study study, String isModuleEnabled, String accessToken) {
-        if (StringUtils.equalsIgnoreCase(isModuleEnabled, ENABLED)) {
+        if (StringUtils.equalsIgnoreCase(isModuleEnabled, ModuleStatus.ENABLED.name())) {
             RandomizationConfiguration configuration = retrieveConfiguration(study.getStudyEnvUuid(), accessToken);
             randomizationMap.put(study.getStudyEnvUuid(), new RandomizationData(true, configuration));
         }

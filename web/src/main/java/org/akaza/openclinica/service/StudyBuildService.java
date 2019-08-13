@@ -20,10 +20,6 @@ import java.util.Set;
  */
 public interface StudyBuildService {
     Logger logger = LoggerFactory.getLogger(StudyBuildService.class);
-    String ENABLED = "enabled";
-    String DISABLED = "disabled";
-    String ACTIVE = "active";
-
 
     StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception;
 

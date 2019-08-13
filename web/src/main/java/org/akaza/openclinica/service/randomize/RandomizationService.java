@@ -7,8 +7,6 @@ import org.akaza.openclinica.dto.randomize.RandomizationConfiguration;
 import java.util.Map;
 
 public interface RandomizationService extends ModuleProcessor {
-    String ENABLED = "enabled";
-    String DISABLED = "disabled";
     boolean isEnabled(String studyEnvUuid);
     String STRATIFICATION_FACTOR = "stratificationFactor";
     RandomizationConfiguration getStudyConfig(String studyEnvUuid);
