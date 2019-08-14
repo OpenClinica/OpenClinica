@@ -110,7 +110,7 @@ public class ValidateServiceImpl implements ValidateService {
     public boolean isParticipateActive(Study tenantStudy) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         String participateFormStatus = spvdao.findByHandleAndStudy(tenantStudy.getStudy() != null ? tenantStudy.getStudy().getStudyId() : tenantStudy.getStudyId(), "participantPortal").getValue();
-        if (participateFormStatus.equals(ENABLED))
+        if (participateFormStatus.equalsIgnoreCase(ENABLED))
             return true;
         return false;
     }

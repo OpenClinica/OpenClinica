@@ -389,7 +389,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("studySubject.status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("studySubject.oid");
-        if(getParticipateModuleStatus().equals(ENABLED))
+        if(getParticipateModuleStatus().equalsIgnoreCase(ENABLED))
             columnNamesList.add("participate.status");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
