@@ -98,7 +98,6 @@
     function setRedirection(formObj) {
         var params = new URLSearchParams(window.location.search);
         params.delete('redirection');
-        alert(params.toString());
         formObj.redirection.value = '${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp?' + params.toString();
     }
 
