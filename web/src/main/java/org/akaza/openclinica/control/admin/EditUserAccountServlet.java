@@ -99,9 +99,12 @@ public class EditUserAccountServlet extends SecureController {
         request.setAttribute("studies", studies);
 
         int userId = fp.getInt(ARG_USERID);
+        
+        
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
 
+        techAdminProtect(user);
         int stepNum = fp.getInt(ARG_STEPNUM);
 
         if (!fp.isSubmitted()) {
@@ -221,6 +224,28 @@ public class EditUserAccountServlet extends SecureController {
             throw new InconsistentStateException(Page.ADMIN_SYSTEM, resexception.getString("an_invalid_step_was_specified"));
         }
     }
+
+	/**
+	 * @param userId
+	 * @throws InsufficientPermissionException
+	 */
+	private void techAdminProtect(UserAccountBean userBean) throws InsufficientPermissionException {		
+		
+		if(userBean.isTechAdmin())
+		{
+			// only techAdmin can change techAdmin (like root user) password			       
+        	 if (!ub.isTechAdmin()) {
+                 addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+                 throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("you_may_not_perform_administrative_functions"), "1");
+                 
+                
+             }
+
+             return;
+			
+		}        		
+        
+	}
 
     // public void processRequest(HttpServletRequest request,
     // HttpServletResponse
