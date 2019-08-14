@@ -448,7 +448,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     public void processModule(Study study, String isModuleEnabled, String accessToken) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        String statusValue = isModuleEnabled.toLowerCase();
+        String statusValue = isModuleEnabled;
         if (!spv.isActive()) {
             spv = new StudyParameterValueBean();
             spv.setStudyId(study.getStudyId());
