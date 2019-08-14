@@ -14,9 +14,13 @@ public interface ModuleProcessor {
         ENABLED("enabled"),
         DISABLED("disabled"),
         ACTIVE("active");
-        private String name;
-        ModuleStatus(String name) {
-            this.name = name;
+        private String value;
+        ModuleStatus(String value) {
+            this.value = value;
+        }
+        @Override
+        public String toString() {
+            return value;
         }
     }
     void processModule(Study study, String isModuleEnabled, String accessToken);
