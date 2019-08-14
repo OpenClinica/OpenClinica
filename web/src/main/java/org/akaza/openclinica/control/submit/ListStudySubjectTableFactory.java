@@ -135,7 +135,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
         ++index;
-       if(getParticipateModuleStatus().equalsIgnoreCase(ENABLED)){
+       if(getParticipateModuleStatus().equals(ENABLED)){
         configureColumn(row.getColumn(columnNames[index]), resword.getString("participate_status"), null, new ParticipateStatusDroplistFilterEditor());
         ++index;}
         // group class columns
@@ -389,7 +389,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("studySubject.status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("studySubject.oid");
-        if(getParticipateModuleStatus().equalsIgnoreCase(ENABLED))
+        if(getParticipateModuleStatus().equals(ENABLED))
             columnNamesList.add("participate.status");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());

@@ -391,7 +391,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(pStudy.getId(), "participantPortal");
         String participateStatus = pStatus.getValue().toString();
 
-        if( participateStatus.equalsIgnoreCase("enabled") && study.getStatus().isAvailable()){
+        if( participateStatus.equals("enabled") && study.getStatus().isAvailable()){
             accessPermission = true;
         }
         return accessPermission;
@@ -448,7 +448,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     public void processModule(Study study, String isModuleEnabled, String accessToken) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        String statusValue = isModuleEnabled;
+        String statusValue = isModuleEnabled.toLowerCase();
         if (!spv.isActive()) {
             spv = new StudyParameterValueBean();
             spv.setStudyId(study.getStudyId());
