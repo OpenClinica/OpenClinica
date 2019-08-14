@@ -135,7 +135,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
         ++index;
-       if(getParticipateModuleStatus().equals(ENABLED)){
+       if(getParticipateModuleStatus().equalsIgnoreCase(ENABLED)){
         configureColumn(row.getColumn(columnNames[index]), resword.getString("participate_status"), null, new ParticipateStatusDroplistFilterEditor());
         ++index;}
         // group class columns
