@@ -187,7 +187,7 @@ function StudyDataLoader(study, json) {
    */ 
   this.loadStudyEventDefs = function() {
     debug("loading study events", util_logDebug );
-    app_studyEventDefs = this.study["MetaDataVersion"]["StudyEventDef"];
+    app_studyEventDefs = util_ensureArray(this.study["MetaDataVersion"]["StudyEventDef"]);
     if (app_studyEventDefs == undefined) { 
       app_studyEventDefs = new Array();
       if(this.study["MetaDataVersion"]["StudyEventDef"]){
@@ -301,60 +301,145 @@ function StudyDataLoader(study, json) {
     app_thisClinicalData = clinicalData;
     app_thisSubjectsData = subjectData;
     app_allSubjectsData = subjectData;
+	
     //app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
     
-    var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
-    if(studyEventsData)
-    for (var i=0;i<studyEventsData.length;i++) {
-    	 studyEventData = studyEventsData[i];
-    	if(app_eventOID!="*")
-    	{
-    		if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
-    	       app_thisStudyEvent = studyEventData;
-    	       app_thisStudyEventRepeatKeyForSingleEvents = studyEventData["@StudyEventRepeatKey"];
-    	       var formsData = util_ensureArray(studyEventData["FormData"]);
-    	       this.loadFormsData(studyEventData["@StudyEventOID"],studyEventData["@StudyEventRepeatKey"],formsData);
-    	       break;
-    		}
-    	}
-     else{
-    	 if(!app_thisStudyEventDataMap)
-    		 app_thisStudyEventDataMap = {};
-    	 var studyEventrepeatKey = studyEventData["@StudyEventRepeatKey"];
-    	 var studyEventOID = studyEventData["@StudyEventOID"];
-    	 if(studyEventOID in app_thisStudyEventDataMap == false){
-    		 app_thisStudyEventDataMap[studyEventOID]={};
-    	 }
-    	 app_thisStudyEventDataMap[studyEventOID][studyEventrepeatKey] = studyEventData;
-    	 app_thisStudyEvent = studyEventData;
-         var formsData = util_ensureArray(studyEventData["FormData"]);
-         this.loadFormsData(studyEventOID,studyEventrepeatKey,formsData);
-     }
+    if(app_thisSubjectsData.constructor === Array){
+    	for ( var a = 0; a < app_thisSubjectsData.length; a++) {
+			var app_thisSubjectDataObj = app_thisSubjectsData[a];
+			if(app_thisSubjectDataObj.constructor === Array){
+				for ( var b = 0; b < app_thisSubjectDataObj.length; b++) {
+					app_thisSubjectData = app_thisSubjectDataObj[b];
+					var sujectOID = app_thisSubjectData["@SubjectKey"];
+					var studyEventsData = util_ensureArray(app_thisSubjectData["StudyEventData"]);					
+					app_renderMode = renderMode;
+					 
+					    if(studyEventsData){
+					    	for (var i=0;i<studyEventsData.length;i++) {
+					       	 studyEventData = studyEventsData[i];
+					       	if(app_eventOID!="*")
+					       	{
+					       		if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
+					       	       app_thisStudyEvent = studyEventData;
+					       	       app_thisStudyEventRepeatKeyForSingleEvents = studyEventData["@StudyEventRepeatKey"];
+					       	       var formsData = util_ensureArray(studyEventData["FormData"]);
+					       	       this.loadFormsData(sujectOID,studyEventData["@StudyEventOID"],studyEventData["@StudyEventRepeatKey"],formsData);
+					       	       break;
+					       		}
+					       	}
+					        else{
+					       	 if(!app_thisStudyEventDataMap)
+					       		 app_thisStudyEventDataMap = {};
+					       	 var studyEventrepeatKey = studyEventData["@StudyEventRepeatKey"];
+					       	 var studyEventOID = studyEventData["@StudyEventOID"];
+					       	 if(studyEventOID in app_thisStudyEventDataMap == false){
+					       		 app_thisStudyEventDataMap[studyEventOID]={};
+					       	 }
+					       	 app_thisStudyEventDataMap[studyEventOID][studyEventrepeatKey] = studyEventData;
+					       	 app_thisStudyEvent = studyEventData;
+					            var formsData = util_ensureArray(studyEventData["FormData"]);
+					            this.loadFormsData(sujectOID,studyEventOID,studyEventrepeatKey,formsData);
+					        }
+					       }
+					    }
+		    	
+				}
+			}else{
+				app_thisSubjectData = app_thisSubjectDataObj;
+				var studyEventsData = util_ensureArray(app_thisSubjectDataObj["StudyEventData"]);					
+				app_renderMode = renderMode;
+				 
+				    if(studyEventsData){
+				    	for (var i=0;i<studyEventsData.length;i++) {
+				       	 studyEventData = studyEventsData[i];
+				       	if(app_eventOID!="*")
+				       	{
+				       		if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
+				       	       app_thisStudyEvent = studyEventData;
+				       	       app_thisStudyEventRepeatKeyForSingleEvents = studyEventData["@StudyEventRepeatKey"];
+				       	       var formsData = util_ensureArray(studyEventData["FormData"]);
+				       	       this.loadFormsData(sujectOID,studyEventData["@StudyEventOID"],studyEventData["@StudyEventRepeatKey"],formsData);
+				       	       break;
+				       		}
+				       	}
+				        else{
+				       	 if(!app_thisStudyEventDataMap)
+				       		 app_thisStudyEventDataMap = {};
+				       	 var studyEventrepeatKey = studyEventData["@StudyEventRepeatKey"];
+				       	 var studyEventOID = studyEventData["@StudyEventOID"];
+				       	 if(studyEventOID in app_thisStudyEventDataMap == false){
+				       		 app_thisStudyEventDataMap[studyEventOID]={};
+				       	 }
+				       	 app_thisStudyEventDataMap[studyEventOID][studyEventrepeatKey] = studyEventData;
+				       	 app_thisStudyEvent = studyEventData;
+				            var formsData = util_ensureArray(studyEventData["FormData"]);
+				            this.loadFormsData(sujectOID,studyEventOID,studyEventrepeatKey,formsData);
+				        }
+				       }
+				    }
+	    	
+			}
+			}
+    }else{
+		 app_thisSubjectData = subjectData;
+		 var sujectOID = app_thisSubjectData["@SubjectKey"];
+    	 var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
+    	    if(studyEventsData){
+    	    	for (var i=0;i<studyEventsData.length;i++) {
+    	       	 studyEventData = studyEventsData[i];
+    	       	if(app_eventOID!="*")
+    	       	{
+    	       		if(studyEventsData[i]["@StudyEventOID"] == app_eventOID && studyEventsData[i]["@StudyEventRepeatKey"] == app_eventOrdinal) { 
+    	       	       app_thisStudyEvent = studyEventData;
+    	       	       app_thisStudyEventRepeatKeyForSingleEvents = studyEventData["@StudyEventRepeatKey"];
+    	       	       var formsData = util_ensureArray(studyEventData["FormData"]);
+    	       	       this.loadFormsData(sujectOID,studyEventData["@StudyEventOID"],studyEventData["@StudyEventRepeatKey"],formsData);
+    	       	       break;
+    	       		}
+    	       	}
+    	        else{
+    	       	 if(!app_thisStudyEventDataMap)
+    	       		 app_thisStudyEventDataMap = {};
+    	       	 var studyEventrepeatKey = studyEventData["@StudyEventRepeatKey"];
+    	       	 var studyEventOID = studyEventData["@StudyEventOID"];
+    	       	 if(studyEventOID in app_thisStudyEventDataMap == false){
+    	       		 app_thisStudyEventDataMap[studyEventOID]={};
+    	       	 }
+    	       	 app_thisStudyEventDataMap[studyEventOID][studyEventrepeatKey] = studyEventData;
+    	       	 app_thisStudyEvent = studyEventData;
+    	            var formsData = util_ensureArray(studyEventData["FormData"]);
+    	            this.loadFormsData(sujectOID,studyEventOID,studyEventrepeatKey,formsData);
+    	        }
+    	       }
+    	    }
     }
+    
+   
+    
   }
  
   
-  this.loadFormsData = function(studyEventOID,studyEventRepeatKey,formsData){
+  this.loadFormsData = function(sujectOID,studyEventOID,studyEventRepeatKey,formsData){
 	  if (formsData == undefined) {
 	      return;
 	    }
 	    if(app_formVersionOID!="*")
 	    {
 	    	for (var i=0;i<formsData.length;i++) {
-	     if(formsData[i]["@FormOID"] == app_formVersionOID) { 
-       var formOID = formsData[i]["@FormOID"];
-       app_formData = formsData[i];
-	        app_thisFormData = app_formData;
+	    		if(formsData[i]["@FormOID"] == app_formVersionOID) { 
+	    			var formOID = formsData[i]["@FormOID"];
+	    			app_formData = formsData[i];
+	    			app_thisFormData = app_formData;
    //      if (app_displayDNs =='y')   app_eventCRFdns[formOID] = formsData[i]["OpenClinica:DiscrepancyNotes"];
     //     if (app_displayAudits =='y')   app_eventCRFaudits[formOID] = formsData[i]["OpenClinica:AuditLogs"];
 	//        break;
-	      }
-	    }
-	   // load itemGroupData into a hash map and determine repeating group row lengths 
-	   var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
-	   if (itemGroupData) {
-		   this.loadItemGroupData(studyEventOID,studyEventRepeatKey,itemGroupData);
-	   }
+	    		}
+	    	}
+		   // load itemGroupData into a hash map and determine repeating group row lengths 
+		   var itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
+		   if (itemGroupData) {
+			   this.loadItemGroupData(sujectOID,studyEventOID,studyEventRepeatKey,itemGroupData);
+		   }
 	   }
 	    else{
 	    	for(var i=0;i<formsData.length;i++){
@@ -362,7 +447,7 @@ function StudyDataLoader(study, json) {
 	    		app_thisFormData = app_formData;
 	    		itemGroupData = util_ensureArray(app_formData["ItemGroupData"]);
 	    		if (itemGroupData) {
-	    			   this.loadItemGroupData(studyEventOID,studyEventRepeatKey,itemGroupData);
+	    			   this.loadItemGroupData(sujectOID,studyEventOID,studyEventRepeatKey,itemGroupData);
 	    		   }
 	    	}
 	    }
@@ -370,7 +455,7 @@ function StudyDataLoader(study, json) {
   }
   
   
-  this.loadItemGroupData = function(studyEventOID,studyEventRepeatKey,itemGroupData){
+  this.loadItemGroupData = function(sujectOID,studyEventOID,studyEventRepeatKey,itemGroupData){
 	    for (var i=0;i<itemGroupData.length;i++) {
 	        var repeatKey = itemGroupData[i]["@ItemGroupRepeatKey"];
 	        var itemGroupOID = itemGroupData[i]["@ItemGroupOID"];
@@ -385,7 +470,7 @@ function StudyDataLoader(study, json) {
 	          var itemValue = itemsData[j]["@Value"];
 	          var itemOID = itemsData[j]["@ItemOID"];
 	          var dash="-";
-	          var key = studyEventOID+dash+studyEventRepeatKey+dash+itemOID;
+	          var key = sujectOID+dash+studyEventOID+dash+studyEventRepeatKey+dash+itemOID;
 	          var keyAndRepeat = key+dash+repeatKey;
 	          if (keyAndRepeat in app_itemValuesMap == false){
 	        	  app_itemValuesMap[keyAndRepeat] = {}; 

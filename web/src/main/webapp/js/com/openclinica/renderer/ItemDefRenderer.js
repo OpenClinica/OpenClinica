@@ -28,6 +28,9 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber,
   this.studyEventRepeatKey = studyEventRepeatKey;
   this.dash="-";
   this.key=this.studyEventOID+this.dash+this.studyEventRepeatKey+this.dash+this.OID;
+  if(app_thisSubjectData){
+	  this.key=app_thisSubjectData["@SubjectKey"]+this.dash+this.studyEventOID+this.dash+this.studyEventRepeatKey+this.dash+this.OID;
+  }
   this.keyAndRepeat=this.key+this.dash+repeatRowNumber;
   
   

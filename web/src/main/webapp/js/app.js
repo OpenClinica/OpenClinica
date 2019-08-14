@@ -60,6 +60,7 @@ var app_thisClinicalData = undefined;
 var app_thisStudyEvent = undefined;
 var app_thisStudyEventDataMap = undefined;
 var app_thisSubjectsData = undefined;
+var app_thisSubjectData = undefined;
 var app_allSubjectsData = undefined;
 var app_thisFormData = undefined;
 var app_studyEventDefMap = {};
