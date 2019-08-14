@@ -497,12 +497,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 org.akaza.openclinica.domain.enumsupport.ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
                 if (moduleStatus.name().equalsIgnoreCase(ModuleProcessor.ModuleStatus.ACTIVE.name())) {
                     logger.info("Module Status is Enabled");
-                    return ModuleProcessor.ModuleStatus.ENABLED.toString();
+                    return ModuleProcessor.ModuleStatus.ENABLED.getValue();
                 }
             }
         }
         logger.info("Module Status is Disabled");
-        return ModuleProcessor.ModuleStatus.DISABLED.toString();
+        return ModuleProcessor.ModuleStatus.DISABLED.getValue();
     }
 
 
