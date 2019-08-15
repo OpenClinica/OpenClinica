@@ -95,10 +95,17 @@
 <c:if test="${sSdvRestore=='false'}"><c:set var="restore" value="false"/></c:if>
 
 <script type="text/javascript">
+    function setRedirection(formObj) {
+        var params = new URLSearchParams(window.location.search);
+        params.delete('redirection');
+        formObj.redirection.value = '${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp?' + params.toString();
+    }
+
     function prompt(formObj,crfId){
         var bool = confirm(
                 "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
         if(bool){
+            setRedirection(formObj);
             formObj.action='${pageContext.request.contextPath}/pages/handleSDVRemove';
             formObj.crfId.value=crfId;
             formObj.submit();
@@ -106,6 +113,7 @@
     }
 
     function submitSdv(formObj,crfId) {
+        setRedirection(formObj);
         formObj.action='${pageContext.request.contextPath}/pages/handleSDVGet';
         formObj.crfId.value=crfId;
         formObj.submit();

@@ -421,7 +421,11 @@ public class SDVController {
 
         //model.addAttribute("allParams",parameterMap);
         //model.addAttribute("verified",updateCRFs);
-        sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
+        try {
+            response.sendRedirect(redirection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //The name of the view, as in allSdvResult.jsp
         return null;
@@ -455,7 +459,11 @@ public class SDVController {
 
         //model.addAttribute("allParams",parameterMap);
         //model.addAttribute("verified",updateCRFs);
-        sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
+        try {
+            response.sendRedirect(redirection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //The name of the view, as in allSdvResult.jsp
         return null;
