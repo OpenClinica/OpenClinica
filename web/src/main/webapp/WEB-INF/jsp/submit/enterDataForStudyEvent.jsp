@@ -364,7 +364,7 @@
 
 <td class="table_cell">
     <c:if test="${dedc.eventCRF != null && dedc.eventCRF.owner != null}">
-        ${dedc.eventCRF.owner.name}
+        ${dedc.eventCRF.updater.name}
     </c:if>
     &nbsp;</td>
 
@@ -460,7 +460,7 @@
         </c:otherwise>
     </c:choose>
 </td>
-<td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
+<td class="table_cell"><c:out value="${dec.eventCRF.updater.name}" />&nbsp;</td>
 
 <td class="table_cell" style="width:180px;">
     <c:set var="actionQuery" value="" />
