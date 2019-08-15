@@ -22,6 +22,7 @@ import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
+import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -391,7 +392,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(pStudy.getId(), "participantPortal");
         String participateStatus = pStatus.getValue().toString();
 
-        if( participateStatus.equalsIgnoreCase("enabled") && study.getStatus().isAvailable()){
+        if( participateStatus.equals(ModuleProcessor.ModuleStatus.ENABLED.getValue()) && study.getStatus().isAvailable()){
             accessPermission = true;
         }
         return accessPermission;
