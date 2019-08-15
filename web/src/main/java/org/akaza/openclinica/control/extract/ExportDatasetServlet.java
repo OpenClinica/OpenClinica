@@ -162,23 +162,25 @@ public class ExportDatasetServlet extends SecureController {
             boolean success = false;
 
             ArchivedDatasetFileBean adfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(adfId);
-            boolean permissionToDeletedAllowed=checkPermissionsBeforeDeleteArchivedDataset(adfBean);
-            if(!permissionToDeletedAllowed){
+            boolean permissionToDeletedAllowed = checkPermissionsBeforeDeleteArchivedDataset(adfBean);
+            if (!permissionToDeletedAllowed) {
                 return;
             }
 
+            if(adfBean!=null || adfBean.getId()!=0){
             File file = new File(adfBean.getFileReference());
             if (!file.canWrite()) {
                 addPageMessage(respage.getString("write_protected"));
             } else {
                 success = file.delete();
                 if (success) {
-                    deleteArchivedDataset(asdfdao,adfBean);
+                    deleteArchivedDataset(asdfdao, adfBean);
                     addPageMessage(respage.getString("file_removed"));
                 } else {
                     addPageMessage(respage.getString("error_removing_file"));
                 }
             }
+        }
             loadList(db, asdfdao, datasetId, fp, eb);
             forwardPage(Page.EXPORT_DATASETS);
         } else {
