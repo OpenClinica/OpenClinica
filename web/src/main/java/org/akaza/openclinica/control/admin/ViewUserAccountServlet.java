@@ -52,6 +52,7 @@ public class ViewUserAccountServlet extends SecureController {
 
         UserAccountBean user = getBean(udao, userId);
 
+        techAdminProtect(user);
         if (user.isActive()) {
             request.setAttribute("user", user);
         } else {

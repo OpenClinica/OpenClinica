@@ -61,6 +61,8 @@ public class SetUserRoleServlet extends SecureController {
         } else {
             String action = request.getParameter("action");
             UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
+            
+            techAdminProtect(user);
             ArrayList studies = (ArrayList) sdao.findAll();
             ArrayList studiesHaveRole = (ArrayList) sdao.findAllByUser(user.getName());
             studies.removeAll(studiesHaveRole);

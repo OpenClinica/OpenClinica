@@ -62,7 +62,9 @@ public class DeleteUserServlet extends SecureController {
         int action = fp.getInt(ARG_ACTION);
 
         UserAccountBean u = (UserAccountBean) udao.findByPK(userId);
-
+ 
+        techAdminProtect(u);
+        
         String message;
         if (!u.isActive()) {
             message = respage.getString("the_specified_user_not_exits");

@@ -225,27 +225,7 @@ public class EditUserAccountServlet extends SecureController {
         }
     }
 
-	/**
-	 * @param userId
-	 * @throws InsufficientPermissionException
-	 */
-	private void techAdminProtect(UserAccountBean userBean) throws InsufficientPermissionException {		
-		
-		if(userBean.isTechAdmin())
-		{
-			// only techAdmin can change techAdmin (like root user) password			       
-        	 if (!ub.isTechAdmin()) {
-                 addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-                 throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("you_may_not_perform_administrative_functions"), "1");
-                 
-                
-             }
-
-             return;
-			
-		}        		
-        
-	}
+	
 
     // public void processRequest(HttpServletRequest request,
     // HttpServletResponse
