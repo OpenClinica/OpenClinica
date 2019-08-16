@@ -42,6 +42,8 @@ OpenClinica 3 is actively maintained, however for the most part major new featur
 
 To report an issue or request a feature please submit a ticket on [Jira](https://jira.openclinica.com/) or start a discussion on the [OpenClinica Forum](http://forums.openclinica.com).
 
+If you believe you've discovered a security flaw or vulnerability, please email [compliance@openclinica.com](mailto:compliance@openclinica.com)
+
 ##Screenshots
 ![Imgur](http://i.imgur.com/ACXj3L7.jpg "Home screen") 
 ##![Imgur](http://i.imgur.com/DqHQ05Z.jpg "Subject Matrix")
