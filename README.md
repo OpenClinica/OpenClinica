@@ -30,6 +30,7 @@ OpenClinica 3 is actively maintained, however for the most part major new featur
 
 ## Getting Started
 
+- [Get a demo of OC4](https://www.openclinica.com/#demoform) or [Download OC3](https://docs.openclinica.com/downloads)
 - [System requirements](https://docs.openclinica.com/installation/system-requirements)
 - [Release notes](https://docs.openclinica.com/release-notes)
 - [Documentation](https://docs.openclinica.com/)
@@ -44,7 +45,7 @@ To report an issue or request a feature please submit a ticket on [Jira](https:/
 
 If you believe you've discovered a security flaw or vulnerability, please email [compliance@openclinica.com](mailto:compliance@openclinica.com)
 
-##Screenshots
+##OpenClinica 3 Screenshots
 ![Imgur](http://i.imgur.com/ACXj3L7.jpg "Home screen") 
 ##![Imgur](http://i.imgur.com/DqHQ05Z.jpg "Subject Matrix")
 
