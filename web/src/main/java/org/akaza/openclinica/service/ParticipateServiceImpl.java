@@ -23,6 +23,7 @@ import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.service.randomize.ModuleProcessor;
+import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -60,25 +61,28 @@ public class ParticipateServiceImpl implements ParticipateService {
     private DataSource dataSource;
 
     @Autowired
-    ServletContext context;
+    private ServletContext context;
 
     @Autowired
-    EventCrfDao eventCrfDao;
+    private EventCrfDao eventCrfDao;
 
     @Autowired
-    StudyEventDao studyEventDao;
+    private StudyEventDao studyEventDao;
 
     @Autowired
-    StudySubjectDao studySubjectDao;
+    private StudySubjectDao studySubjectDao;
 
     @Autowired
-    StudyDao studyDao;
+    private StudyDao studyDao;
 
     @Autowired
-    OpenRosaServices openRosaServices;
+    private OpenRosaServices openRosaServices;
 
     @Autowired
-    FormLayoutDao formLayoutDao;
+    private FormLayoutDao formLayoutDao;
+
+    @Autowired
+    private RandomizationService randomizationService;
 
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
@@ -411,9 +415,10 @@ public class ParticipateServiceImpl implements ParticipateService {
     }
 
     @Transactional
-    public void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs) throws Exception{
+    public void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs
+            , String accessToken, String studyOid, String subjectOid) throws Exception{
         boolean completeStudyEvent = true;
-
+        StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(studyOid, dataSource);
         // Loop thru event CRFs and complete all that are participant events.
         for (EventDefinitionCrf eventDefCrf:eventDefCrfs) {
             boolean foundEventCrfMatch = false;
@@ -424,6 +429,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                         eventCrf.setStatusId(Status.UNAVAILABLE.getCode());
                         eventCrf.setDateCompleted(new Date());
                         eventCrfDao.saveOrUpdate(eventCrf);
+                        randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
                     } else if (eventCrf.getStatusId() != Status.UNAVAILABLE.getCode()) completeStudyEvent = false;
                 }
             }
