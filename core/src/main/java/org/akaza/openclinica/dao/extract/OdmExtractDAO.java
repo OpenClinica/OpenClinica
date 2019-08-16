@@ -2214,9 +2214,9 @@ public class OdmExtractDAO extends DatasetDAO {
         logger.debug("Begin to GetSubjectEventFormSql");
         if (odmVersion.startsWith("oc")) {
             logger.info(
-                    "getOCSubjectEventFormSql=" + getOCSubjectEventFormSqlSSRewritten(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
+                    "getOCSubjectEventFormSql=" + getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected(odmVersion);
-            ArrayList viewRows = select(getOCSubjectEventFormSqlSSRewritten(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
+            ArrayList viewRows = select(getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
             this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType,permissionTagsString);
         } else {
@@ -2291,9 +2291,9 @@ public class OdmExtractDAO extends DatasetDAO {
 
         this.setEventGroupItemDataWithUnitTypesExpected();
         logger.debug("Begin to GetEventGroupItemWithUnitSql");
-        ArrayList viewRows = select(getEventGroupItemWithUnitSqlRewritten(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
+        ArrayList viewRows = select(getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
         logger.info("getEventGroupItemWithUnitSql : "
-                + getEventGroupItemWithUnitSqlRewritten(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
+                + getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
         String idataIds = "";
         if (viewRows.size() > 0) {
             Iterator iter = viewRows.iterator();
@@ -3552,35 +3552,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 + " and edc.crf_id = cv.crf_id and ec.crf_version_id = cv.crf_version_id order by ss.oc_oid, sed.ordinal, se.sample_ordinal, edc.ordinal, ss.sgc_id";
     }
 
-    protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
-            String studySubjectIds) {
-        return "select ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
-                + " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
-                + " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
-                + " se.end_time_flag, se.subject_event_status_id as event_status_id, edc.ordinal as crf_order, edc.event_definition_crf_id as edc_id, "
-                + " fl.oc_oid as form_layout_oid, fl.name as form_layout, fl.status_id as fl_status_id, ec.status_id as ec_status_id, ec.event_crf_id, ec.date_interviewed,"
-                + " ec.interviewer_name, ec.validator_id ,sed.name as definition_name from (select study_event_id, study_event_definition_id, study_subject_id, location as se_location,"
-                + " sample_ordinal, date_start, date_end, subject_event_status_id, start_time_flag, end_time_flag from study_event "
-                + " where study_event_definition_id in " + sedIds + " and study_subject_id in (" + studySubjectIds
-                + ")) se, ( select st_sub.oc_oid, st_sub.study_subject_id, st_sub.label,"
-                + " st_sub.secondary_label, st_sub.subject_id, st_sub.unique_identifier, st_sub.gender, st_sub.date_of_birth, st_sub.status_id,"
-                + " sb_g.sgc_id, sb_g.sgc_name, sb_g.sg_id, sb_g.sg_name from (select ss.oc_oid, ss.study_subject_id, ss.label, ss.secondary_label, ss.subject_id,"
-                + " s.unique_identifier, s.gender, s.date_of_birth, s.status_id from study_subject ss, subject s where ss.study_subject_id in ("
-                + studySubjectIds + ") "
-                + " and ss.subject_id = s.subject_id)st_sub left join (select sgm.study_subject_id, sgc.study_group_class_id as sgc_id, sgc.name as sgc_name,"
-                + " sg.study_group_id as sg_id, sg.name as sg_name from subject_group_map sgm, study_group_class sgc, study_group sg where sgc.study_id in ("
-                + studyIds + ") and sgm.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = sg.study_group_class_id"
-                + " and sgm.study_group_id = sg.study_group_id) sb_g on st_sub.study_subject_id = sb_g.study_subject_id) ss, "
-                + " study_event_definition sed, event_definition_crf edc,"
-                + " (select event_crf_id, form_layout_id, study_event_id, status_id, date_interviewed, interviewer_name, validator_id from event_crf where event_crf_id in ("
-                + getEventCrfIdsByItemDataSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds) + ")) ec, form_layout fl"
-                + " where sed.study_event_definition_id in " + sedIds
-                + " and sed.study_event_definition_id = se.study_event_definition_id and se.study_subject_id = ss.study_subject_id"
-                + " and sed.study_event_definition_id = edc.study_event_definition_id and se.study_event_id = ec.study_event_id"
-                + " and edc.crf_id = fl.crf_id and ec.form_layout_id = fl.form_layout_id order by ss.oc_oid, sed.ordinal, se.sample_ordinal, edc.ordinal, ss.sgc_id";
-    }
 
-    protected String getOCSubjectEventFormSqlSSRewritten(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
+
+    protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
                                                 String studySubjectIds) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
@@ -3618,25 +3592,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
     }
 
-        protected String getEventGroupItemSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
-            String studySubjectIds) {
-        String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
-        return "select cvidata.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
-                + " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id, cvidata.item_data_id , cvidata.item_name"
-                + " from (select ec.event_crf_id, ec.crf_version_id, item.item_id, item.oc_oid as item_oid,"
-                + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id as item_data_id, item.name as item_name from item,"
-                + " (select event_crf_id, item_id, ordinal, value, item_data_id from item_data where (status_id " + itStatusConstraint + ")"
-                + " and event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
-                + " ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ")) and study_event_id"
-                + " in (select distinct study_event_id from study_event" + " where study_event_definition_id in " + sedIds + " and study_subject_id in ("
-                + " select distinct ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ")"
-                + "))))idata," + " (select event_crf_id, crf_version_id from event_crf where status_id " + ecStatusConstraint + ")ec"
-                + " where item.item_id in " + itemIds + " and length(idata.value) > 0 and item.item_id = idata.item_id and idata.event_crf_id = ec.event_crf_id"
-                + " order by ec.event_crf_id, ec.crf_version_id, item.item_id, idata.ordinal) cvidata, item_group_metadata igm,"
-                + " item_group ig where cvidata.crf_version_id = igm.crf_version_id and cvidata.item_id = igm.item_id"
-                + " and igm.item_group_id = ig.item_group_id order by cvidata.event_crf_id, ig.item_group_id, cvidata.item_id, cvidata.item_data_ordinal";
-    }
+
 
     protected String getEventGroupItemSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
@@ -3706,7 +3662,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 + "and item.units = mu.name order by mu.oc_oid";
     }
 
-    protected String getEventGroupItemWithUnitSqlRewritten(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
+    protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
                                                   String studySubjectIds) {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
@@ -3740,14 +3696,6 @@ public class OdmExtractDAO extends DatasetDAO {
                 "ORDER BY table1.event_crf_id, table1.item_group_id, table1.item_id, table1.item_data_ordinal";
     }
 
-    protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
-            String studySubjectIds) {
-        return "select cvit.*, mu.oc_oid as mu_oid from ("
-                + this.getEventGroupItemSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds)
-                + " )cvit left join (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu where vm.item_id in " + itemIds
-                + " and vm.item_id = item.item_id and item.units = mu.name )mu on cvit.item_id = mu.item_id"
-                + " ORDER BY cvit.event_crf_id, cvit.item_group_id, cvit.item_id, cvit.item_data_ordinal";
-    }
 
     protected String getItemGroupAndItemMetaWithUnitSql(String crfVersionIds) {
         crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
