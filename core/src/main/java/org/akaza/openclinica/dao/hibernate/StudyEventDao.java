@@ -149,11 +149,13 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
         Query query = getCurrentSession().createQuery("select new org.akaza.openclinica.dao.hibernate.RandomizeQueryResult(s, c, ig, i) " +
                 "from StudyEvent s join s.eventCrfs c join c.formLayout.crf.itemGroups ig join c.itemDatas i " +
+                "join ig.itemGroupMetadatas igm " +
                 "where s.studyEventDefinition.oc_oid in :eventOids " +
                 "and c.studySubject.ocOid = :studySubjectOid " +
                 "and c.formLayout.crf.ocOid in :formOids " +
                 "and ig.ocOid in :itemGroups " +
                 "and i.item.ocOid in :itemOids " +
+                "and igm.item.itemId = i.item.itemId " +
                 "and i.ordinal=1 " +
                 "and i.value is not null " +
                 "and i.value <> ''");
