@@ -24,7 +24,7 @@ Here's a blog post describing OC4 and some of the majore differences from OC3: P
 
 New features, improvements, and fixes are being rapidly added to OpenClinica 4. 
 
-**OpenClinica 3** is the world's most widely used open source clinical trial software for Electronic Data Capture (EDC) Clinical Data Management (CDM). It can be downloaded and used in a stand-alone fashion. [Download the latest version](https://docs.openclinica.com/downloads) (free registration required) or check out the code from the latest 3.x branch in this repository (e.g. [3.15](https://github.com/OpenClinica/OpenClinica/tree/3.15).
+**OpenClinica 3** is the world's most widely used open source clinical trial software for Electronic Data Capture (EDC) Clinical Data Management (CDM). It can be downloaded and used in a stand-alone fashion. [Download the latest version](https://docs.openclinica.com/downloads) (free registration required) or check out the code from the latest 3.x branch in this repository (e.g. [3.15](https://github.com/OpenClinica/OpenClinica/tree/3.15)).
 
 OpenClinica 3 is actively maintained, however for the most part major new features are only being added to OC4. 
 
