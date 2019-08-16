@@ -1,35 +1,50 @@
 # Welcome!
 
-OpenClinica is an open source software for Electronic Data Capture (EDC) and Clinical Data Management (CDM) used to optimize clinical trial workflow in a smart and secure fashion. Use OpenClinica to:
+OpenClinica is open source software for Electronic Data Capture (EDC) and Clinical Data Management (CDM). It optimizes clinical trial workflows and maximizes data quality in a smart and secure fashion. Use OpenClinica for:
 
-- Build studies
-- Create eCRFs
-- Design rules/edit checks
-- Schedule patient visits 
-- Capture eCRF data from study sites via the web
-- Monitor and manage clinical data
+- Building studies
+- Creating eCRFs
+- Designing rules/edit checks
+- Scheduling patient visits 
+- Capturing eCRF data from study sites via the web
+- Monitoring and managing clinical data
 - Audit trails and electronic signatures
 - Role-based access controls
-- Import/Export Data
-- Extract data for analysis and reporting
+- Import/Export of Data
+- Extracting data for analysis and reporting
 - and much more!
+
+## OpenClinica 3 vs 4
+
+**OpenClinica 4** is the latest generation of OpenClinica, a hosted service available from OpenClinica LLC. For more information, see [openclinica.com](https://www.openclinica.com) or [contact OpenClinica](https://www.openclinica.com/#demoform) for a demonstration. OC4 departs from the monolithic application model of OC3 and utilizes a multi-tenant, microservices model optimized for the cloud. The core 'runtime' environment for OC4, in the 4.x/master branches of this repository, is open source and you may review the code herein. It's currently not in a state where it can be deployed and used locally very easily, as it relies on multiple other components for study build, authentication, forms, etc. not all of which are open source.
+
+Here's a blog post describing OC4: Parts [1](http://blog.openclinica.com/2017/10/18/introducing-the-new-openclinica/), [2](http://blog.openclinica.com/2017/10/24/the-new-openclinica-is-here-part-2-of-3/), and [3](http://blog.openclinica.com/2017/10/26/the-new-openclinica-is-here-part-3-of-3/). 
+
+New features, improvements, and fixes are being rapidly added to OpenClinica 4. 
+
+**OpenClinica 3**
+
+OpenClinica 3 is the world's most widely used open source clinical trial software for Electronic Data Capture (EDC) Clinical Data Management (CDM). [Download the latest version](https://docs.openclinica.com/downloads) (free registration required) or check out the code from the latest 3.x branch in this repository.
+
+OpenClinica 3 is being actively maintained, however for the most part new features are only being added to OC4. 
 
 ## Getting Started
 
 - [System requirements](https://docs.openclinica.com/installation/system-requirements)
-- [Report an issue](https://jira.openclinica.com/)
 - [Release notes](https://docs.openclinica.com/release-notes)
+- [Documentation](https://docs.openclinica.com/)
 - [Extensions/Contributions](https://community.openclinica.com/extensions)
 - [Installation](https://github.com/OpenClinica/OpenClinica/wiki)
+- [Community wikibook](https://en.wikibooks.org/wiki/OpenClinica_User_Manual)
+- [Blog](http://blog.openclinica.com/)
 
-## Request a feature
+## Report an Issue or Request a feature
 
-To request a feature please submit a ticket on [Jira](https://jira.openclinica.com/) or start a discussion on the [OpenClinica Forum](http://forums.openclinica.com).
+To report an issue or request a feature please submit a ticket on [Jira](https://jira.openclinica.com/) or start a discussion on the [OpenClinica Forum](http://forums.openclinica.com).
 
 ##Screenshots
 ![Imgur](http://i.imgur.com/ACXj3L7.jpg "Home screen") 
 ##![Imgur](http://i.imgur.com/DqHQ05Z.jpg "Subject Matrix")
-
 
 
 ## License
