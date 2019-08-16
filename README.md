@@ -20,11 +20,11 @@ OpenClinica is open source software for Electronic Data Capture (EDC) and Clinic
 
 The core 'runtime' environment for OC4, in the 4.x/master branches of this repository, is open source and you may review the code herein. It's currently not in a state where it can be deployed and used locally very easily, as it relies on many other components for study build, authentication, forms, etc. not all of which are open source.
 
-Here's a blog post describing OC4: Parts [1](http://blog.openclinica.com/2017/10/18/introducing-the-new-openclinica/), [2](http://blog.openclinica.com/2017/10/24/the-new-openclinica-is-here-part-2-of-3/), and [3](http://blog.openclinica.com/2017/10/26/the-new-openclinica-is-here-part-3-of-3/). 
+Here's a blog post describing OC4 and some of the majore differences from OC3: Parts [1](http://blog.openclinica.com/2017/10/18/introducing-the-new-openclinica/), [2](http://blog.openclinica.com/2017/10/24/the-new-openclinica-is-here-part-2-of-3/), and [3](http://blog.openclinica.com/2017/10/26/the-new-openclinica-is-here-part-3-of-3/). 
 
 New features, improvements, and fixes are being rapidly added to OpenClinica 4. 
 
-**OpenClinica 3** is the world's most widely used open source clinical trial software for Electronic Data Capture (EDC) Clinical Data Management (CDM). [Download the latest version](https://docs.openclinica.com/downloads) (free registration required) or check out the code from the latest 3.x branch in this repository (e.g. [3.15](https://github.com/OpenClinica/OpenClinica/tree/3.15).
+**OpenClinica 3** is the world's most widely used open source clinical trial software for Electronic Data Capture (EDC) Clinical Data Management (CDM). It can be downloaded and used in a stand-alone fashion. [Download the latest version](https://docs.openclinica.com/downloads) (free registration required) or check out the code from the latest 3.x branch in this repository (e.g. [3.15](https://github.com/OpenClinica/OpenClinica/tree/3.15).
 
 OpenClinica 3 is actively maintained, however for the most part major new features are only being added to OC4. 
 
