@@ -153,7 +153,6 @@ public class StudyEventController {
 			logger.info("userAccount is null");
 			return null;
 		}
-		StudyBean currentStudy = participateService.getStudy(studyOid);
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 
 		String userName = ub.getName();
@@ -181,7 +180,8 @@ public class StudyEventController {
 
 
 		try {
-			participateService.completeData(studyEvent, eventDefCrfs, eventCrfs);
+			String accessToken = (String) request.getSession().getAttribute("accessToken");
+			participateService.completeData(studyEvent, eventDefCrfs, eventCrfs, accessToken, studyOid, subjectOid);
 		} catch (Exception e) {
 			// Transaction has been rolled back due to an exception.
 			logger.error("Error encountered while completing Study Event: " + e.getMessage());
