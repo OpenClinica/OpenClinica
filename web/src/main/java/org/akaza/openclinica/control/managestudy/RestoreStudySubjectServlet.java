@@ -152,7 +152,7 @@ public class RestoreStudySubjectServlet extends SecureController {
                 }
 
                 String emailBody =
-                    respage.getString("the_subject") + " " + subject.getName() + " " + respage.getString("has_been_restored_to_the_study") + " "
+                    respage.getString("the_subject") + " " + studySub.getName() + " " + respage.getString("has_been_restored_to_the_study") + " "
                         + study.getName() + ".";
                     addPageMessage(emailBody);
 //                try{

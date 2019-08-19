@@ -162,7 +162,7 @@ public class RemoveStudySubjectServlet extends SecureController {
                 }
 
                 String emailBody =
-                    respage.getString("the_subject") + " " + subject.getName() + " " + respage.getString("has_been_removed_from_the_study") + study.getName()
+                    respage.getString("the_subject") + " " + studySub.getName() + " " + respage.getString("has_been_removed_from_the_study") + study.getName()
                         + ".";
 
                 addPageMessage(emailBody);
