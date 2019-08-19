@@ -197,9 +197,13 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (!odmFilter.isCrossForm() || (odmFilter.isCrossForm() && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
                     // For developers, please do not change order of properties sorted, it will break OpenRosaService
                     // Manifest Call for odm file
+                   StudyEventDefinitionBean sed = seddao.findByOid(se.getStudyEventOID());
                     xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                        xml.append("\" StudyEventRepeatKey=\"" + se.getStudyEventRepeatKey());
+
+                      if(sed.isRepeating() || (!sed.isRepeating()&& sed.isTypeCommon())) {
+                          xml.append("\" StudyEventRepeatKey=\"" + se.getStudyEventRepeatKey());
+                      }
                         String eventName = se.getEventName();
                         if (eventName != null && eventName.length() > 0) {
                             xml.append("\" OpenClinica:EventName=\"" + StringEscapeUtils.escapeXml(eventName));
