@@ -36,59 +36,59 @@ function processCurrentUser(currentTime, newExpiration) {
                     return res;
                 });
             }).then(function (res) {
-            console.log("Current user in processCurrentUser****************" + res);
-            // working around for bug title on edge(https://jira.openclinica.com/browse/OC-8814)
-            document.title = 'OpenClinica';
-            dupeFirstUserCheck = firstLoginCheck;
-            if (firstLoginCheck === "true") {
-                var prevUser = res;
-                console.log("prevUser in firstLoginCheck:" + prevUser);
-                if (prevUser !== ""
-                    && prevUser !== null) {
-                    console.log("prevUser is not blank");
-                    storage.get(ocAppTimeoutKey).then(function (res) {
-                        // the user closed the browser session before the session timeout and reopened it after the timeout
-                        // exceeded
-                        var prevTimeout = res;
-                        console.log("prevTimeout:processCurrentUser:" + prevTimeout);
-                        if (prevTimeout < currentTime) {
-                            console.log("prevTimeout: " + prevTimeout
-                                + " is less than currentTime:" + currentTime);
-                            storage.set(CURRENT_USER, "").then(function () {
-                                processUserData(getPromise(""));
-                            });
-                        } else {
-                            console.log("prevTimeout: " + prevTimeout
-                                + " is greater than currentTime:" + currentTime);
-                            console.log("setting current user to:" + userName);
-                            storage.set(CURRENT_USER, userName).then(function () {
-                                storage.set(ocAppTimeoutKey, newExpiration).then(function () {
-                                    processUserData(getPromise("-1"));
+                console.log("Current user in processCurrentUser****************" + res);
+                // working around for bug title on edge(https://jira.openclinica.com/browse/OC-8814)
+                document.title = 'OpenClinica';
+                dupeFirstUserCheck = firstLoginCheck;
+                if (firstLoginCheck === "true") {
+                    var prevUser = res;
+                    console.log("prevUser in firstLoginCheck:" + prevUser);
+                    if (prevUser !== ""
+                        && prevUser !== null) {
+                        console.log("prevUser is not blank");
+                        storage.get(ocAppTimeoutKey).then(function (res) {
+                            // the user closed the browser session before the session timeout and reopened it after the timeout
+                            // exceeded
+                            var prevTimeout = res;
+                            console.log("prevTimeout:processCurrentUser:" + prevTimeout);
+                            if (prevTimeout < currentTime) {
+                                console.log("prevTimeout: " + prevTimeout
+                                    + " is less than currentTime:" + currentTime);
+                                storage.set(CURRENT_USER, "").then(function () {
+                                    processUserData(getPromise(""));
                                 });
-                            }) ['catch'](function (err) {
-                                console.log(err);
-                            });
-                        }
-                    });
-                } else {
-                    console.log("setting current user to:" + userName);
-                    storage.set(CURRENT_USER, userName).then(function () {
-                        console.log("current user:" + userName
-                            + " setting new expiration:" + newExpiration);
-                        storage.set(ocAppTimeoutKey, newExpiration).then(function () {
-                            processUserData(getPromise("-1"));
+                            } else {
+                                console.log("prevTimeout: " + prevTimeout
+                                    + " is greater than currentTime:" + currentTime);
+                                console.log("setting current user to:" + userName);
+                                storage.set(CURRENT_USER, userName).then(function () {
+                                    storage.set(ocAppTimeoutKey, newExpiration).then(function () {
+                                        processUserData(getPromise("-1"));
+                                    });
+                                }) ['catch'](function (err) {
+                                    console.log(err);
+                                });
+                            }
                         });
-                    }) ['catch'](function (err) {
-                        console.log(err);
+                    } else {
+                        console.log("setting current user to:" + userName);
+                        storage.set(CURRENT_USER, userName).then(function () {
+                            console.log("current user:" + userName
+                                + " setting new expiration:" + newExpiration);
+                            storage.set(ocAppTimeoutKey, newExpiration).then(function () {
+                                processUserData(getPromise("-1"));
+                            });
+                        }) ['catch'](function (err) {
+                            console.log(err);
+                        });
+                    }
+                } else {
+                    storage.get(CURRENT_USER).then(function (res1) {
+                        processUserData(getPromise(res1));
                     });
                 }
-            } else {
-                storage.get(CURRENT_USER).then(function (res1) {
-                    processUserData(getPromise(res1));
-                });
-            }
         })['catch'](function (err) {
-            console.log(err);
+                console.log(err);
         })
     });
 }
