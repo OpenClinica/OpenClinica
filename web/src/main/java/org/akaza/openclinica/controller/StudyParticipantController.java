@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.ParticipantRestfulRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -448,6 +449,76 @@ public class StudyParticipantController {
 		}
 
 
+		@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission")
+		@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participant", method = RequestMethod.GET)
+		public ResponseEntity<Object> getStudySubjectInfo(
+				@ApiParam(value = "Study OID", required = true) @PathVariable("studyOID") String studyOid,
+				@ApiParam(value = "Site OID",required = true) @PathVariable("sitesOID") String siteOid,
+				@ApiParam(value = "participant ID", required = true) @RequestParam( value = "participantID") String participantID,
+				@ApiParam(value = "Use this parameter to retrieve participant's access code for OpenClinica Participant module. Possible values - y or n.", required = false) @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo,
+				HttpServletRequest request) throws Exception {
+			if (studyOid != null)
+				studyOid = studyOid.toUpperCase();
+
+			if (siteOid != null)
+				siteOid = siteOid.toUpperCase();
+			
+			boolean includeRelatedInfo = false;
+	        if(includeParticipateInfo!=null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
+	        	includeRelatedInfo = true;
+	        }
+			
+			return getStudySubjectInfo(studyOid, siteOid, participantID,includeRelatedInfo,request);
+		}
+		
+		/**
+		 * @param studyOid
+		 * @param siteOid
+		 * @param request
+		 * @return
+		 * @throws Exception
+		 */
+		private ResponseEntity<Object> getStudySubjectInfo(String studyOid, String siteOid, String participantID,boolean includeRelatedInfo,HttpServletRequest request)
+				throws Exception {
+			ResponseEntity<Object> response = null;
+			try {
+		         	     
+		            StudyBean study = null;
+		            try {
+		            	study = this.getRestfulServiceHelper().setSchema(studyOid, request);
+		            	study = participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
+		            	
+		            	if(study != null) {
+			            	StudyParticipantDetailDTO responseSuccess =  new StudyParticipantDetailDTO();
+			            	
+			            	responseSuccess = getStudyParticipantDTO(request,studyOid, siteOid,study,participantID,includeRelatedInfo);            	  		 	            
+			 	         
+			 	            response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+			            }	 
+		            	
+		            } catch (OpenClinicaSystemException e) {	                	               	                
+		                
+		                String errorMsg = e.getErrorCode();
+		                HashMap<String, String> map = new HashMap<>();
+		                map.put("studyOid", studyOid);
+		                map.put("siteOid", siteOid);
+		                map.put("participantID", participantID);
+		    			ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, map);
+		    			
+		        		response = new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
+		        		
+		        		return response;
+		            }
+		            
+		                      
+		           
+		        } catch (Exception eee) {
+		            eee.printStackTrace();
+		            throw eee;
+		        }
+			 
+			return response;
+		}
 		/**
 		 * @param studyOid
 		 * @param siteOid
@@ -543,6 +614,36 @@ public class StudyParticipantController {
 		        
 		        return studyParticipantDTOs;
 		    }
+
+
+		 /**
+			 * @param studyOid
+			 * @param siteOid
+			 * @param study
+			 * @return
+			 * @throws Exception
+			 */
+			 private StudyParticipantDetailDTO getStudyParticipantDTO(HttpServletRequest request,String studyOid, String siteOid,StudyBean study,String participantID,boolean incRelatedInfo) throws Exception {
+				 	      
+				  StudyBean studyToCheck;   
+				  /**
+			         *  pass in site OID, so will return data in site level
+			         */
+			       if(siteOid != null) {
+			    	   studyToCheck = this.getStudyDAO().findByOid(siteOid);
+			       }else {
+			    	   studyToCheck = study;
+			       }
+			      
+			       String accessToken = utilService.getAccessTokenFromRequest(request);
+			       String customerUuid = utilService.getCustomerUuidFromRequest(request);
+			       UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+			       utilService.setSchemaFromStudyOid(studyOid);
+			       String schema = CoreResources.getRequestSchema();
+			       StudyParticipantDetailDTO spDTO = userService.extractParticipantInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema,participantID,incRelatedInfo);
+	      			     			        
+			       return spDTO;
+			    }
 
 
 

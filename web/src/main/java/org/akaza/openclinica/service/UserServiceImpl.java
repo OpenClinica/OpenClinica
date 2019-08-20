@@ -6,6 +6,7 @@ import org.akaza.openclinica.ParticipateInviteEnum;
 import org.akaza.openclinica.ParticipateInviteStatusEnum;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
+import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
@@ -386,6 +387,87 @@ public class UserServiceImpl implements UserService {
             logger.error(" Access code Job Creation Failed ");
         }
         persistJobCompleted(jobDetail, fileName);
+    }
+    
+    @Transactional
+    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema,String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
+    {
+
+        CoreResources.setRequestSchema(schema);
+
+        Study site = studyDao.findByOcOID(siteOid);
+        Study study = studyDao.findByOcOID(studyOid);
+
+
+        // Get all list of StudySubjects by studyId
+        StudySubject studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(participantID, study);
+        OCUserDTO ocuserDTO = null;
+        StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
+        
+        if(studySubject == null) {
+        	String errorCode ="errorCode.participantNotAvailable";
+        	String msg = "Can't find the participant with ID:" + participantID;
+        	throw new OpenClinicaSystemException(errorCode, msg);
+        }
+            
+        try {
+          
+            	if (!studySubject.getStatus().equals(Status.DELETED)
+                        && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
+
+            		 /**
+                     * OC-10640
+                     * AC4: Participant contact information and their Participate related information should only be returned
+                     *  for participants that are in available or signed status.
+                     */
+                    if (studySubject.getStatus().equals(Status.AVAILABLE)
+                            || studySubject.getStatus().equals(Status.SIGNED)) {
+
+                        
+                        //Get accessToken from Keycloak                      
+                    	ocuserDTO = buildOcUserDTO(studySubject,incRelatedInfo);
+                        ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo,incRelatedInfo);
+                        
+                        
+                        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
+                        	ocuserDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                        }                                             
+                    }
+                    
+                  
+		        	
+		        	spDTO.setSubjectOid(studySubject.getOcOid());
+		        	spDTO.setSubjectKey(studySubject.getLabel());
+		        	
+		        	if(incRelatedInfo) {
+		        		spDTO.setStatus(studySubject.getStatus().getName());
+		        		spDTO.setAccessCode(ocuserDTO.getAccessCode());
+		        	}
+		        	
+		        	
+		        	
+		        	if(ocuserDTO != null) {
+		        		spDTO.setFirstName(ocuserDTO.getFirstName());
+		        		spDTO.setLastName(ocuserDTO.getLastName());
+		        		spDTO.setEmail(ocuserDTO.getEmail());
+		        		spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());
+		        		
+		        	}
+			        	
+			   
+			        
+			        return spDTO;
+                    
+            	}            		
+               
+            
+           
+        } catch (Exception e) {
+           
+            logger.error(" Access code Job Creation Failed :"+ e.getMessage());
+        }
+		return spDTO;
+        
     }
 
     public OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken) {
