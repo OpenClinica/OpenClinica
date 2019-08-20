@@ -15,6 +15,8 @@
         <c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">
             (<c:out value="${currRow.bean.studyEvent.sampleOrdinal}"/>)
         </c:if>
+        <br>
+             <c:out value="${currRow.bean.studyEvent.additionalNotes}"/>
      </td>
      <td class="table_cell"><fmt:formatDate value="${currRow.bean.studyEvent.dateStarted}" pattern="${dteFormat}"/>
      </td>
