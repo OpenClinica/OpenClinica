@@ -81,14 +81,12 @@
 	<td class="formlabel"><!--<fmt:message key="xml_file_to_upload" bundle="${resterms}"/>:--></td>
 	<td>
 		<div class="formfieldFile_BG">
-			<input type="file" name="xml_file" >
-
+			<input type="file" id="file-input" accept=".xml">
 		</div>
 		<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
 	</td>
 </tr>
 <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-
 
 </table>
 </div>
@@ -96,12 +94,74 @@
 </div>
 
 <br clear="all">
-<input type="submit" value="<fmt:message key="preview" bundle="${resword}"/>" class="button_long">
+<input type="button" id="btn-upload" value="<fmt:message key="upload" bundle="${resword}"/>">
 <input type="button" onclick="goBack()"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 
 </form>
 <br/>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadImportTemplate"><b><fmt:message key="download_import_template" bundle="${resword}"/></b></a></div>
 <!-- <div class="homebox_bullets"><a href="pages/Log/listFiles"><b>Bulk Job log</b></a></div> -->
+
+<script>
+  $('#file-input').on('change', function() {
+    if ($(this).val())
+      $('#btn-upload').removeAttr('disabled');
+    else
+      $('#btn-upload').attr('disabled', 'disabled');
+  });
+
+  $('#btn-upload').click(function() {
+    $('#upload-failed, #upload-success, #btn-label-upload').hide();
+    $('#loading, #btn-label-uploading').show();
+    var data = new FormData();
+    $.each($('#file-input')[0].files, function(i, file) {
+      data.append('file', file);
+    });
+    function success(r) {
+      console.log('success', r);
+      $('#upload-success, #success-page').show();
+      $('#upload-page').slideUp();
+      if (!$('#sidebar_Alerts_open').is(':visible')) {
+        leftnavExpand('sidebar_Alerts_open');
+        leftnavExpand('sidebar_Alerts_closed');
+      }
+    }
+
+    function failed(r) {
+      console.log('error', r);
+      $('#upload-failed, #btn-label-upload').show();
+      $('#loading, #btn-label-uploading').hide();
+      if (!$('#sidebar_Alerts_open').is(':visible')) {
+        leftnavExpand('sidebar_Alerts_open');
+        leftnavExpand('sidebar_Alerts_closed');
+      }
+    }
+    
+    $.ajax({
+      url: '${pageContext.request.contextPath}/rest/clinicaldata/import',
+      method: 'POST',
+      type: 'POST',
+      data: data,
+      processData: false,
+      contentType: false,
+      success: function(r) {
+        success(r);
+      },
+      error: function(r) {
+        failed(r);
+      }
+    });
+    return false;
+  });
+
+  $('#btn-cancel').click(function() {
+    if (confirm('<fmt:message key="upload_dicom_cancel" bundle="${resword}"/>'))
+      $('#btn-close').click();
+  });
+
+  $('#btn-close').click(function() {
+    window.close();
+  });
+</script>
 
 <jsp:include page="../include/footer.jsp"/>
