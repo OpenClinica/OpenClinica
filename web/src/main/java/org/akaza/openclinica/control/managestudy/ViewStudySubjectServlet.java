@@ -26,12 +26,13 @@ import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.*;
-import org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.view.Page;
@@ -76,6 +77,11 @@ public class ViewStudySubjectServlet extends SecureController {
     // request attribute for a discrepancy note
     public final static String ENROLLMENT_NOTE = "enrollmentNote";
     public final static String COMMON = "common";
+    public final static String OPEN_BRACKET = "[";
+    public final static String CLOSE_BRACKET = "]";
+    public final static String DOT_ESCAPED = "\\.";
+
+    public final static String visitBasedEventItempath=CoreResources.getField("visitBasedEventItem");
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -145,9 +151,15 @@ public class ViewStudySubjectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        FormLayoutDAO formLayoutDAO = new FormLayoutDAO(sm.getDataSource());
+        CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+        EventCRFDAO eventCRFDAO = new EventCRFDAO(sm.getDataSource());
+        ItemDataDAO itemDataDAO = new ItemDataDAO(sm.getDataSource());
+        ItemDAO itemDAO = new ItemDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int studySubId = fp.getInt("id", true);// studySubjectId
         String from = fp.getString("from");
@@ -290,8 +302,47 @@ public class ViewStudySubjectServlet extends SecureController {
             }
             displayEvents = new ArrayList(tempList);
 
+            String givenStudyOid=null ;
+            String givenEventOid=null ;
+            String givenFormOid=null ;
+            String givenGroupRepeat=null ;
+            String givenItemOid=null ;
+            if(!StringUtils.isEmpty(visitBasedEventItempath)) {
+                 givenStudyOid = visitBasedEventItempath.split(DOT_ESCAPED)[0];
+                 givenEventOid = visitBasedEventItempath.split(DOT_ESCAPED)[1];
+                 givenFormOid = visitBasedEventItempath.split(DOT_ESCAPED)[2];
+                 givenGroupRepeat = StringUtils.substringBetween(visitBasedEventItempath.split(DOT_ESCAPED)[3], OPEN_BRACKET, CLOSE_BRACKET);
+                 givenItemOid = visitBasedEventItempath.split(DOT_ESCAPED)[4];
+            }
+            StudyBean parentStudyBean = (StudyBean) studyDAO.findByPK(parentStudyId);
+
             for (int i = 0; i < displayEvents.size(); i++) {
                 DisplayStudyEventBean decb = displayEvents.get(i);
+                StudyEventBean seBean = decb.getStudyEvent();
+                StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seBean.getStudyEventDefinitionId());
+
+                if (
+                        parentStudyBean.getOid().equals(givenStudyOid)
+                                && sedBean.getOid().equals(givenEventOid)
+                ) {
+                    List<EventCRFBean> eventCRFBeans = eventCRFDAO.findAllByStudyEvent(seBean);
+                    for (EventCRFBean eventCRFBean : eventCRFBeans) {
+                        FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
+                        CRFBean crfBean = (CRFBean) crfdao.findByPK(formLayoutBean.getCrfId());
+
+                        if (crfBean.getOid().equals(givenFormOid)) {
+                            List<ItemBean> itemBeans = itemDAO.findByOid(givenItemOid);
+                            if (itemBeans != null) {
+                                ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFIdAndOrdinal(itemBeans.get(0).getId(), eventCRFBean.getId(), Integer.valueOf(givenGroupRepeat));
+                                if (itemDataBean != null && itemDataBean.getId()!=0)
+                                    decb.getStudyEvent().setAdditionalNotes(itemDataBean.getValue());
+                            }
+                            break;
+                        }
+                    }
+
+                }
+
                 if (!(currentRole.isDirector() || currentRole.isCoordinator()) && decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
                     decb.getStudyEvent().setEditable(false);
                 }
@@ -676,5 +727,12 @@ public class ViewStudySubjectServlet extends SecureController {
         }
 
     }
+
+
+
+
+
+
+
 
 }
