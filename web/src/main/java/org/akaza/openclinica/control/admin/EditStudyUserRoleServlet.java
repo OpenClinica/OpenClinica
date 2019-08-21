@@ -59,6 +59,10 @@ public class EditStudyUserRoleServlet extends SecureController {
         String uName = fp.getString(ARG_USER_NAME);
         StudyUserRoleBean studyUserRole = udao.findRoleByUserNameAndStudyId(uName, studyId);
 
+        UserAccountBean user = (UserAccountBean) udao.findByUserName(uName);
+        
+        techAdminProtect(user);
+        
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyBean sb = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
         if (sb != null) {

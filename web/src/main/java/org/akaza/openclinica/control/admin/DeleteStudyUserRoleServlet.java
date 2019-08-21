@@ -47,6 +47,8 @@ public class DeleteStudyUserRoleServlet extends SecureController {
         int studyId = fp.getInt(ARG_STUDYID);
         String uName = fp.getString(ARG_USERNAME);
         UserAccountBean user = (UserAccountBean) udao.findByUserName(uName);
+        techAdminProtect(user);
+        
         int action = fp.getInt(ARG_ACTION);
 
         StudyUserRoleBean s = udao.findRoleByUserNameAndStudyId(uName, studyId);
