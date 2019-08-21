@@ -3,18 +3,16 @@ package org.akaza.openclinica.controller;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.service.DicomServiceClient;
 import org.akaza.openclinica.service.UtilService;
-import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.web.util.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
  * Controller to handle DICOM upload.
  * @author svadla@openclinica.com
  */
-@Controller
+@RestController
 @RequestMapping(value = "/auth/api/dicom")
 public class DicomController {
 
@@ -35,7 +33,7 @@ public class DicomController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @RequestMapping(method = RequestMethod.POST, consumes = {"multipart/form-data"})
-    public ResponseEntity<Object> importDataPipeDelimitedFile(HttpServletRequest request,
+    public ResponseEntity<String> uploadDicom(HttpServletRequest request,
                                                               @RequestParam( "participantId" ) String participantID,
                                                               @RequestParam( "accessionId" ) String accessionID,
                                                               @RequestParam( "target" ) String target,

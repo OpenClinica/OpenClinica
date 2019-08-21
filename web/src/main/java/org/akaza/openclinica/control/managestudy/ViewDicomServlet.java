@@ -42,6 +42,6 @@ public class ViewDicomServlet extends SecureController {
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
-
+        // There are no access restrictions for this page. Anyone with the link to this page should be able to view DICOM images.
     }
 }

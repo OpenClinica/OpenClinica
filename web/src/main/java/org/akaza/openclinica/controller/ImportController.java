@@ -21,6 +21,7 @@ import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang.StringUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.slf4j.Logger;
@@ -28,14 +29,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -217,7 +223,8 @@ public class ImportController {
                             String userType = (String) userContextMap.get("userType");
                             if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();
-                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT) || clientId.equalsIgnoreCase(ApplicationConstants.DICOM_CLIENT)){
+                                if (StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
+                                        || StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)){
                                     skipRoleCheck = true;
                                 }
 

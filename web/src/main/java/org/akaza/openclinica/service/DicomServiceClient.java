@@ -30,6 +30,7 @@ import java.util.Map;
 public class DicomServiceClient {
     private static final String SBS_URL = CoreResources.getField("SBSUrl");
     private static final String DICOM_SERVICE_URL = getDicomServiceUrl();
+    private static final String DICOM_PATH = "/dicom";
     private static final String DICOM_FILE_PARAM = "dicomFile";
     private static final String PARTICIPANT_ID_PARAM = "participantId";
     private static final String ACCESSION_ID_PARAM = "accessionId";
@@ -46,7 +47,7 @@ public class DicomServiceClient {
      * @param targetPath path to the item for saving the result of upload
      * @return the response returned by dicom-service
      */
-    public ResponseEntity<Object> uploadDicom(String accessToken, MultipartFile dicomFile, String participantId, String accessionId, String targetPath) {
+    public ResponseEntity<String> uploadDicom(String accessToken, MultipartFile dicomFile, String participantId, String accessionId, String targetPath) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
@@ -66,7 +67,7 @@ public class DicomServiceClient {
         requestBody.add(TARGET_PATH_PARAM, targetPath);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
         RestTemplate restTemplate = new RestTemplate();
-        String uploadDicomUrl = DICOM_SERVICE_URL + "/dicom";
+        String uploadDicomUrl = DICOM_SERVICE_URL + DICOM_PATH;
         try {
             logger.debug("Calling dicom-service to upload dicom file");
             restTemplate.postForEntity(uploadDicomUrl, requestEntity, Object.class);
@@ -98,7 +99,7 @@ public class DicomServiceClient {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        String viewDicomUrl = DICOM_SERVICE_URL + "/dicom";
+        String viewDicomUrl = DICOM_SERVICE_URL + DICOM_PATH;
         UriComponentsBuilder viewDicomUrlBuilder = UriComponentsBuilder.fromHttpUrl(viewDicomUrl);
 
         if (StringUtils.isNotBlank(participantId)) {
