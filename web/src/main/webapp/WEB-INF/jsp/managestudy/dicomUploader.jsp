@@ -68,7 +68,7 @@
     text-align: center;
   }
   h1.success {
-    color: #70b728;
+    color: #ED7800;
     margin-top: 110px;
     margin-bottom: 20px;
   }
