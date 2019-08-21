@@ -455,7 +455,7 @@ public class StudyParticipantController {
 				@ApiParam(value = "Study OID", required = true) @PathVariable("studyOID") String studyOid,
 				@ApiParam(value = "Site OID",required = true) @PathVariable("sitesOID") String siteOid,
 				@ApiParam(value = "participant ID", required = true) @RequestParam( value = "participantID") String participantID,
-				@ApiParam(value = "Use this parameter to retrieve participant's access code for OpenClinica Participant module. Possible values - y or n.", required = false) @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo,
+				@ApiParam(value = "Use this parameter to retrieve participant's access code and status for OpenClinica Participant module. Possible values - y or n.", required = false) @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo,
 				HttpServletRequest request) throws Exception {
 			if (studyOid != null)
 				studyOid = studyOid.toUpperCase();
@@ -513,7 +513,7 @@ public class StudyParticipantController {
 		                      
 		           
 		        } catch (Exception eee) {
-		            eee.printStackTrace();
+		            logger.error("Error...", eee);
 		            throw eee;
 		        }
 			 
