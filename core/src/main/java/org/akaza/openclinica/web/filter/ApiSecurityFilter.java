@@ -14,10 +14,8 @@ import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.keycloak.adapters.spi.KeycloakAccount;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -116,15 +114,9 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
                             if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();
-                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
-                                    ub = (UserAccountBean) userAccountDAO.findByUserName("randomize");
-                                    if (ub.getName().isEmpty())
-                                    try{
-                                        HashMap<String, String> userAccount = (HashMap) createRandomizeUserAccount();
-                                        ub = userService.createUser(request, userAccount);
-                                    } catch (Exception e) {
-                                        logger.error("Failed user creation:" + e.getMessage());
-                                    }
+                                UserAccountBean systemUser = createSystemUser(clientId, userAccountDAO, request);
+                                if (systemUser != null) {
+                                    ub = systemUser;
                                 }
                             }
 
@@ -145,7 +137,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                     userAccountDAO.update(ub);
                                 } else {
                                     try {
-                                        HashMap<String, String> userAccount = createUserAccount(userDTO);
+                                        Map<String, String> userAccount = createUserAccount(userDTO);
                                           ub = userService.createUser(request, userAccount);
                                     } catch (Exception e) {
                                         logger.error("Failed user creation:" + e.getMessage());
@@ -239,8 +231,8 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     }
 
     //TODO Put this somewhere else?
-    private Map<String, String>  createRandomizeUserAccount() throws Exception {
-        Map<String, String> map = new HashMap<>();
+    private HashMap<String, String>  createRandomizeUserAccount() {
+        HashMap<String, String> map = new HashMap<>();
         map.put("username", "randomize");
         map.put("fName", "Randomize");
         map.put("lName", "Service");
@@ -251,6 +243,44 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         map.put("email", "openclinica-developers@openclinica.com");
         map.put("institution", "OC");
         return map;
+    }
+    private HashMap<String, String>  createDicomUserAccount() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("username", "dicom");
+        map.put("fName", "Dicom");
+        map.put("lName", "Service");
+        map.put("role_name", "Data Manager");
+        map.put("user_uuid", "dicomSystemUserUuid");
+        map.put("user_type", org.akaza.openclinica.service.UserType.TECH_ADMIN.getName());
+        map.put("authorize_soap", "true");
+        map.put("email", "openclinica-developers@openclinica.com");
+        map.put("institution", "OC");
+        return map;
+    }
+
+    private UserAccountBean createSystemUser(String clientId, UserAccountDAO userAccountDAO, HttpServletRequest request) {
+        UserAccountBean userAccountBean = null;
+        Map<String, String> userAccountToCreate = null;
+        if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
+            userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.RANDOMIZE_USERNAME);
+            if (userAccountBean.getName().isEmpty()) {
+                userAccountToCreate = createRandomizeUserAccount();
+            }
+        } else if (clientId.equals(ApplicationConstants.DICOM_CLIENT)) {
+            userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.DICOM_USERNAME);
+            if (userAccountBean.getName().isEmpty()) {
+                userAccountToCreate = createDicomUserAccount();
+            }
+        }
+
+        if (userAccountToCreate != null) {
+            try {
+                userAccountBean = userService.createUser(request, userAccountToCreate);
+            } catch (Exception e) {
+                logger.error("Failed user creation:", e.getMessage());
+            }
+        }
+        return userAccountBean;
     }
 
 }

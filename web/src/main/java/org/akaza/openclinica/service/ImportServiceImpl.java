@@ -2,20 +2,18 @@ package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.crfdata.*;
-import org.akaza.openclinica.controller.dto.*;
+import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +123,7 @@ public class ImportServiceImpl implements ImportService {
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Transactional
-    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isRandomizeImport) {
+    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport) {
         CoreResources.setRequestSchema(schema);
         Study tenantStudy = null;
         if (siteOid != null) {
@@ -348,8 +346,8 @@ public class ImportServiceImpl implements ImportService {
 
 
         writeToFile(dataImportReports, fileName,JobType.XML_IMPORT);
-        if (isRandomizeImport) {
-            // For randomization import, check if the import failed and return the status
+        if (isSystemUserImport) {
+            // For system level import, check if the import failed and return the status
             boolean hasImportFailed = dataImportReports.stream()
                     .filter(dataImportReport1 -> dataImportReport1.getStatus().equals(FAILED))
                     .findAny()
