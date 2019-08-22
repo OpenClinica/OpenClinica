@@ -18,6 +18,12 @@
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
+<style>
+  #sidebar_Alerts_open .sidebar_tab_content {
+    color: #ED7800;
+    font-style: italic;
+  }
+</style>
 <script>
   $('#sidebar_Alerts_open > .sidebar_tab > .sidebar_tab_content').append(
     $('<div>', {id:'upload-failed'})
@@ -26,7 +32,7 @@
   ).append(
     $('<div>', {id:'upload-success'})
       .append('<fmt:message key="import_data_success" bundle="${resword}"/>')
-      .append('<b><fmt:message key="import_data_success_2" bundle="${resword}"/></b>')
+      .append('<strong> <fmt:message key="import_data_success_2" bundle="${resword}"/> </strong>')
       .append('<fmt:message key="import_data_success_3" bundle="${resword}"/>')
       .hide()
   );
@@ -108,7 +114,7 @@
 
 <br clear="all">
 <input type="button" id="btn-upload" value="<fmt:message key="submit" bundle="${resword}"/>">
-<input type="reset" value="<fmt:message key="cancel" bundle="${resword}"/>"/>
+<input type="reset" id="btn-cancel" value="<fmt:message key="cancel" bundle="${resword}"/>"/>
 
 </form>
 <br/>
@@ -126,10 +132,12 @@
   $('#btn-upload').click(function() {
     $('#upload-failed, #upload-success, #btn-label-upload').hide();
     $('#loading, #btn-label-uploading').show();
+
     var data = new FormData();
     $.each($('#file-input')[0].files, function(i, file) {
       data.append('file', file);
     });
+
     function success(r) {
       console.log('success', r);
       $('#upload-success, #btn-label-upload').show();
@@ -139,6 +147,7 @@
         leftnavExpand('sidebar_Alerts_closed');
       }
     }
+
 
     function failed(r) {
       console.log('error', r);
@@ -168,12 +177,6 @@
   });
 
   $('#btn-cancel').click(function() {
-    if (confirm('<fmt:message key="upload_dicom_cancel" bundle="${resword}"/>'))
-      $('#btn-close').click();
-  });
-
-  $('#btn-close').click(function() {
-    window.close();
   });
 </script>
 
