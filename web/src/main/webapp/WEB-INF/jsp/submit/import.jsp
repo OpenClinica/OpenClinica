@@ -18,6 +18,19 @@
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
+<script>
+  $('#sidebar_Alerts_open > .sidebar_tab > .sidebar_tab_content').append(
+    $('<div>', {id:'upload-failed'})
+      .append('<fmt:message key="import_data_failed" bundle="${resword}"/>')
+      .hide()
+  ).append(
+    $('<div>', {id:'upload-success'})
+      .append('<fmt:message key="import_data_success" bundle="${resword}"/>')
+      .append('<b><fmt:message key="import_data_success_2" bundle="${resword}"/></b>')
+      .append('<fmt:message key="import_data_success_3" bundle="${resword}"/>')
+      .hide()
+  );
+</script>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
@@ -94,8 +107,8 @@
 </div>
 
 <br clear="all">
-<input type="button" id="btn-upload" value="<fmt:message key="upload" bundle="${resword}"/>">
-<input type="button" onclick="goBack()"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
+<input type="button" id="btn-upload" value="<fmt:message key="submit" bundle="${resword}"/>">
+<input type="reset" value="<fmt:message key="cancel" bundle="${resword}"/>"/>
 
 </form>
 <br/>
@@ -119,8 +132,8 @@
     });
     function success(r) {
       console.log('success', r);
-      $('#upload-success, #success-page').show();
-      $('#upload-page').slideUp();
+      $('#upload-success, #btn-label-upload').show();
+      $('#loading, #btn-label-uploading').hide();
       if (!$('#sidebar_Alerts_open').is(':visible')) {
         leftnavExpand('sidebar_Alerts_open');
         leftnavExpand('sidebar_Alerts_closed');
@@ -138,7 +151,7 @@
     }
     
     $.ajax({
-      url: '${pageContext.request.contextPath}/rest/clinicaldata/import',
+      url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/import',
       method: 'POST',
       type: 'POST',
       data: data,
