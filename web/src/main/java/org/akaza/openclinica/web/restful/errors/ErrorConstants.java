@@ -76,6 +76,7 @@ public class ErrorConstants {
     public static final String ERR_SITE_NOT_Valid_OID = "errorCode.siteNotValidOid";
     public static final String ERR_STUDY_TO_SITE_NOT_Valid_OID = "errorCode.studyTositeNotValidOid";
     public static final String ERR_PARTICIPATE_INACTIVE = "errorCode.participateInActive";
+    public static final String ERR_PARTICIPATE_NOT_AVAILABLE = "errorCode.participantNotAvailable";
 
     public static final String ERR_INVALID_XML_FILE = "errorCode.invalidXMLFile";
     public static final String ERR_FILE_FORMAT_NOT_SUPPORTED = "errorCode.fileFormatNotSupported";

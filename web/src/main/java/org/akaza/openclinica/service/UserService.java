@@ -3,6 +3,7 @@
  */
 package org.akaza.openclinica.service;
 
+import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -11,6 +12,7 @@ import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.cdisc.ns.odm.v130.ODM;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -44,6 +46,8 @@ public interface UserService {
     List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken, String participantId, String firstName, String lastName, String identifier, UserAccountBean userAccountBean);
 
     void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo);
+    
+    StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema,String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException;
 
     JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy, JobType jobType, String sourceFileName);
 

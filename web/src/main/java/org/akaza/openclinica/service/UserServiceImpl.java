@@ -6,6 +6,7 @@ import org.akaza.openclinica.ParticipateInviteEnum;
 import org.akaza.openclinica.ParticipateInviteStatusEnum;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
+import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
@@ -27,6 +28,7 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -350,35 +352,12 @@ public class UserServiceImpl implements UserService {
         String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
 
         try {
+        	 OCUserDTO userDTO = null;
             for (StudySubject studySubject : studySubjects) {
-            	if (!studySubject.getStatus().equals(Status.DELETED)
-                        && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
-
-            		 /**
-                     * OC-10640
-                     * AC4: Participant contact information and their Participate related information should only be returned
-                     *  for participants that are in available or signed status.
-                     */
-                    if (studySubject.getStatus().equals(Status.AVAILABLE)
-                            || studySubject.getStatus().equals(Status.SIGNED)) {
-
-                        
-                        //Get accessToken from Keycloak                      
-                    	OCUserDTO userDTO = buildOcUserDTO(studySubject,incRelatedInfo);
-                        ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo,incRelatedInfo);
-                        
-                        
-                        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
-                            userDTO.setAccessCode(participantAccessDTO.getAccessCode());
-                        }	
-                        
-                        userDTOS.add(userDTO);
-
-                    }
-                    
-            	}            		
-               
+            	userDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,studySubject);                        
+                userDTOS.add(userDTO);                    		               
             }
+            
             // add a new method to write this object into text file
             writeToFile(userDTOS, studyOid, fileName);
         } catch (Exception e) {
@@ -387,6 +366,98 @@ public class UserServiceImpl implements UserService {
         }
         persistJobCompleted(jobDetail, fileName);
     }
+    
+    @Transactional
+    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema,String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
+    {
+
+        CoreResources.setRequestSchema(schema);
+
+        Study site = studyDao.findByOcOID(siteOid);
+        Study study = studyDao.findByOcOID(studyOid);
+
+
+        // Get the StudySubject by studyId and participantID
+        StudySubject studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(participantID, study);
+        OCUserDTO ocuserDTO = null;
+        StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
+        
+        if(studySubject == null) {
+        	String errorCode =ErrorConstants.ERR_PARTICIPATE_NOT_AVAILABLE;
+        	String msg = "Can't find the participant with ID:" + participantID;
+        	throw new OpenClinicaSystemException(errorCode, msg);
+        }
+            
+        try {          
+        	ocuserDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,
+					studySubject);
+        	
+        	spDTO.setSubjectOid(studySubject.getOcOid());
+        	spDTO.setSubjectKey(studySubject.getLabel());
+        	
+        	if(incRelatedInfo) {
+        		spDTO.setStatus(studySubject.getStatus().getName());
+        		spDTO.setAccessCode(ocuserDTO.getAccessCode());
+        	}		        			        	
+        	
+        	if(ocuserDTO != null) {
+        		spDTO.setFirstName(ocuserDTO.getFirstName());
+        		spDTO.setLastName(ocuserDTO.getLastName());
+        		spDTO.setEmail(ocuserDTO.getEmail());
+        		spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());
+        		
+        	}			        			   
+	        
+	        return spDTO;
+             
+           
+        } catch (Exception e) {
+           
+            logger.error(" get access code Failed :", e);
+        }
+		return spDTO;
+        
+    }
+
+	/**
+	 * @param siteOid
+	 * @param accessToken
+	 * @param customerUuid
+	 * @param userAccountBean
+	 * @param incRelatedInfo
+	 * @param studySubject
+	 * @param ocuserDTO
+	 * @return
+	 */
+	private OCUserDTO getOCUserDTO(String siteOid, String accessToken, String customerUuid,
+			UserAccountBean userAccountBean, boolean incRelatedInfo, StudySubject studySubject) {
+		
+		OCUserDTO ocuserDTO = null;
+		if (!studySubject.getStatus().equals(Status.DELETED)
+		        && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
+
+			 /**
+		     * OC-10640
+		     * AC4: Participant contact information and their Participate related information should only be returned
+		     *  for participants that are in available or signed status.
+		     */
+		    if (studySubject.getStatus().equals(Status.AVAILABLE)
+		            || studySubject.getStatus().equals(Status.SIGNED)) {
+
+		        
+		        //Get accessToken from Keycloak                      
+		    	ocuserDTO = buildOcUserDTO(studySubject,incRelatedInfo);
+		        ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo,incRelatedInfo);
+		        
+		        
+		        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
+		        	ocuserDTO.setAccessCode(participantAccessDTO.getAccessCode());
+		        }                                             
+		    }
+		    
+		}
+		return ocuserDTO;
+	}
 
     public OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken) {
 
