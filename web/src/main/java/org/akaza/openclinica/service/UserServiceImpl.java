@@ -394,7 +394,15 @@ public class UserServiceImpl implements UserService {
         	
         	spDTO.setSubjectOid(studySubject.getOcOid());
         	spDTO.setSubjectKey(studySubject.getLabel());
+        	spDTO.setSecondaryID(studySubject.getStudySubjectDetail().getIdentifier());
         	
+        	if(studySubject.getDateCreated()!=null) {
+        		spDTO.setCreatedAt(studySubject.getDateCreated().toLocaleString());
+        	}
+        	if(studySubject.getDateUpdated() !=null) {
+        		spDTO.setLastModified(studySubject.getDateUpdated().toLocaleString());
+        	}
+        	        	        	
         	if(incRelatedInfo) {
         		spDTO.setStatus(studySubject.getStatus().getName());
         		spDTO.setAccessCode(ocuserDTO.getAccessCode());
