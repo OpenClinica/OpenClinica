@@ -157,8 +157,8 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         }
         // OC-11095 Adding Contact information Through Rest API on a signed participant is failing
-//        if(studySubjectBean!=null && !studySubjectBean.getStatus().equals(Status.AVAILABLE))
-//            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
+        if(studySubjectBean!=null && !(studySubjectBean.getStatus().equals(Status.AVAILABLE) || studySubjectBean.getStatus().equals(Status.SIGNED)))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
 
         studySubject = saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,userAccountBean);
 
