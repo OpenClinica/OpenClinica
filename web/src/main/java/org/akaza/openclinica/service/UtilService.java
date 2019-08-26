@@ -7,6 +7,8 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -31,5 +33,7 @@ public interface UtilService {
     boolean isParticipantIDSystemGenerated(StudyBean tenantStudy);
 
     boolean isParticipantUniqueToSite(String siteOID , String studySubjectId);
+
+    ResponseEntity checkFileFormat(MultipartFile file, String fileHeaderMappring);
 
 	}

@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
 import org.akaza.openclinica.controller.helper.PIIEnum;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -26,10 +27,14 @@ import java.util.*;
 import static org.akaza.openclinica.service.rest.errors.ErrorConstants.PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA;
 import static org.akaza.openclinica.service.rest.errors.ErrorConstants.PARTICIPANT_ID_MULTIPLE_PARTICIPANT_ID_HEADERS;
 
-@Service("CSVService")
+@Service( "CSVService" )
 public class CSVServiceImpl implements CSVService {
     private final static Logger log = LoggerFactory.getLogger(CSVServiceImpl.class);
     private static final String PARTICIPANT_ID = "ParticipantID";
+    private static final String FIRST_NAME = "FirstName";
+    private static final String LAST_NAME = "LastName";
+    private static final String EMAIL_ADDRESS = "EmailAddress";
+    private static final String MOBILE_NUMBER = "MobileNumber";
     //Study event bulk schedule CSV file header
     private static final String STUDY_EVENT_OID = "StudyEventOID";
     private static final String STUDY_EVENT_REPEAT_KEY = "StudyEventRepeatKey";
@@ -40,9 +45,7 @@ public class CSVServiceImpl implements CSVService {
 
 
 
-
     /**
-     *
      * @param file
      * @param studyOID
      * @param siteOID
@@ -62,7 +65,7 @@ public class CSVServiceImpl implements CSVService {
         int endDate_index = -1;
         int studyEventStatus_index = -1;
 
-        try(Scanner sc = new Scanner(file.getInputStream())){
+        try (Scanner sc = new Scanner(file.getInputStream())) {
 
             String line;
 
@@ -72,64 +75,64 @@ public class CSVServiceImpl implements CSVService {
                 line = sc.nextLine();
 
                 //in case the last column is empty
-                if(line.endsWith(",")) {
+                if (line.endsWith(",")) {
                     line = line + " ,";
                 }
 
-                String[] lineVal= line.split(",", 0);
+                String[] lineVal = line.split(",", 0);
 
                 // check ParticipantID column number
-                if(rowNumber ==1) {
+                if (rowNumber == 1) {
 
-                    for(int i=0; i < lineVal.length;i++) {
+                    for (int i = 0; i < lineVal.length; i++) {
                         String currentHeader = lineVal[i].trim();
 
-                        if(currentHeader.equalsIgnoreCase(PARTICIPANT_ID)) {
-                                participantID_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(STUDY_EVENT_OID)) {
-                                studyEventOID_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(STUDY_EVENT_REPEAT_KEY)) {
+                        if (currentHeader.equalsIgnoreCase(PARTICIPANT_ID)) {
+                            participantID_index = i;
+                        } else if (currentHeader.equalsIgnoreCase(STUDY_EVENT_OID)) {
+                            studyEventOID_index = i;
+                        } else if (currentHeader.equalsIgnoreCase(STUDY_EVENT_REPEAT_KEY)) {
                             studyEventRepeatKey_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(START_DATE)) {
-                                startDate_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(END_DATE)) {
-                                endDate_index = i;
-                        }else if(currentHeader.equalsIgnoreCase(STUDY_EVENT_STATUS)) {
-                                studyEventStatus_index = i;
-                        }else {
+                        } else if (currentHeader.equalsIgnoreCase(START_DATE)) {
+                            startDate_index = i;
+                        } else if (currentHeader.equalsIgnoreCase(END_DATE)) {
+                            endDate_index = i;
+                        } else if (currentHeader.equalsIgnoreCase(STUDY_EVENT_STATUS)) {
+                            studyEventStatus_index = i;
+                        } else {
                             // Incorrect Header name
 
                         }
                     }
 
-                }else {
+                } else {
                     StudyEventScheduleDTO studyEventScheduleDTO = new StudyEventScheduleDTO();
 
                     studyEventScheduleDTO.setStudyOID(studyOID.trim());
-                    if(siteOID != null) {
+                    if (siteOID != null) {
                         studyEventScheduleDTO.setSiteOID(siteOID.trim());
                     }
 
-                    if(participantID_index!=-1 &&  lineVal[participantID_index] != null && lineVal[participantID_index].trim().length()>0) {
+                    if (participantID_index != -1 && lineVal[participantID_index] != null && lineVal[participantID_index].trim().length() > 0) {
                         studyEventScheduleDTO.setSubjectKey(lineVal[participantID_index].trim());
                     }
 
-                    if(studyEventOID_index!=-1 &&lineVal[studyEventOID_index] != null && lineVal[studyEventOID_index].trim().length()>0) {
+                    if (studyEventOID_index != -1 && lineVal[studyEventOID_index] != null && lineVal[studyEventOID_index].trim().length() > 0) {
                         studyEventScheduleDTO.setStudyEventOID(lineVal[studyEventOID_index].trim());
                     }
 
-                    if(studyEventRepeatKey_index!=-1 && lineVal[studyEventRepeatKey_index] != null && lineVal[studyEventRepeatKey_index].trim().length() > 0) {
+                    if (studyEventRepeatKey_index != -1 && lineVal[studyEventRepeatKey_index] != null && lineVal[studyEventRepeatKey_index].trim().length() > 0) {
                         studyEventScheduleDTO.setOrdinal(lineVal[studyEventRepeatKey_index].trim());
                     }
-                    if(startDate_index!=-1 && lineVal[startDate_index] != null && lineVal[startDate_index].trim().length()>0) {
+                    if (startDate_index != -1 && lineVal[startDate_index] != null && lineVal[startDate_index].trim().length() > 0) {
                         studyEventScheduleDTO.setStartDate(lineVal[startDate_index].trim());
                     }
-                    if(endDate_index!=-1 && lineVal[endDate_index] != null && lineVal[endDate_index].trim().length()>0) {
+                    if (endDate_index != -1 && lineVal[endDate_index] != null && lineVal[endDate_index].trim().length() > 0) {
                         studyEventScheduleDTO.setEndDate(lineVal[endDate_index].trim());
                     }
 
-                    if(studyEventStatus_index!=-1 && lineVal[studyEventStatus_index] != null && lineVal[studyEventStatus_index].trim().length()>0) {
-                        studyEventScheduleDTO.setStudyEventStatus (lineVal[studyEventStatus_index].trim());
+                    if (studyEventStatus_index != -1 && lineVal[studyEventStatus_index] != null && lineVal[studyEventStatus_index].trim().length() > 0) {
+                        studyEventScheduleDTO.setStudyEventStatus(lineVal[studyEventStatus_index].trim());
                     }
                     studyEventScheduleDTO.setRowNum(rowNumber-1);
 
@@ -147,6 +150,77 @@ public class CSVServiceImpl implements CSVService {
 
         return studyEventScheduleDTOList;
     }
+
+    public ArrayList<AddParticipantRequestDTO> readAddParticipantBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception {
+
+        ArrayList<AddParticipantRequestDTO> addParticipantRequestDTOs = new ArrayList<>();
+
+        //Study event bulk schedule CSV file header position
+        int participantID_index = -1;
+        int firstName_index = -1;
+        int lastName_index = -1;
+        int emailAddress_index = -1;
+        int mobileNumber_index = -1;
+        try (Scanner sc = new Scanner(file.getInputStream())) {
+            String line;
+            int rowNumber = 1;
+            while (sc.hasNextLine()) {
+                line = sc.nextLine();
+
+                //in case the last column is empty
+                if (line.endsWith(",")) {
+                    line = line + " ,";
+                }
+                String[] lineVal = line.split(",", 0);
+
+                // check ParticipantID column number
+                if (rowNumber == 1) {
+                    for (int i = 0; i < lineVal.length; i++) {
+                        String currentHeader = lineVal[i].trim();
+                        if (currentHeader.equalsIgnoreCase(PARTICIPANT_ID)) {
+                            participantID_index = i;
+                        } else if (currentHeader.equalsIgnoreCase(FIRST_NAME)) {
+                            firstName_index = i;
+                        } else if (currentHeader.equalsIgnoreCase(LAST_NAME)) {
+                            lastName_index = i;
+                        } else if (currentHeader.equalsIgnoreCase(EMAIL_ADDRESS)) {
+                            emailAddress_index = i;
+                        } else if (currentHeader.equalsIgnoreCase(MOBILE_NUMBER)) {
+                            mobileNumber_index = i;
+                        } else {
+                            // Incorrect Header name
+                        }
+                    }
+                } else {
+                    AddParticipantRequestDTO addParticipantRequestDTO = new AddParticipantRequestDTO();
+
+                    if (participantID_index != -1 && lineVal[participantID_index] != null && lineVal[participantID_index].trim().length() > 0) {
+                        addParticipantRequestDTO.setSubjectKey(lineVal[participantID_index].trim());
+                    }
+                    if (firstName_index != -1 && lineVal[firstName_index] != null && lineVal[firstName_index].trim().length() > 0) {
+                        addParticipantRequestDTO.setFirstName(lineVal[firstName_index].trim());
+                    }
+                    if (lastName_index != -1 && lineVal[lastName_index] != null && lineVal[lastName_index].trim().length() > 0) {
+                        addParticipantRequestDTO.setLastName(lineVal[lastName_index].trim());
+                    }
+                    if (emailAddress_index != -1 && lineVal[emailAddress_index] != null && lineVal[emailAddress_index].trim().length() > 0) {
+                        addParticipantRequestDTO.setEmailAddress(lineVal[emailAddress_index].trim());
+                    }
+                    if (mobileNumber_index != -1 && lineVal[mobileNumber_index] != null && lineVal[mobileNumber_index].trim().length() > 0) {
+                        addParticipantRequestDTO.setPhoneNumber(lineVal[mobileNumber_index].trim());
+                    }
+                    addParticipantRequestDTO.setRowNumber(rowNumber - 1);
+                    addParticipantRequestDTOs.add(addParticipantRequestDTO);
+                }
+                rowNumber++;
+            }
+
+        } catch (Exception e) {
+            log.error("Exception with cause = {} {}", e.getCause(), e.getMessage());
+        }
+        return addParticipantRequestDTOs;
+    }
+
 
     /**
      * @param file
@@ -242,7 +316,7 @@ public class CSVServiceImpl implements CSVService {
         return transferBeans;
     }
 
-    public  List<SubjectTransferBean> readBulkParticipantCSVFile(MultipartFile file) throws Exception {
+    public List<SubjectTransferBean> readBulkParticipantCSVFile(MultipartFile file) throws Exception {
 
         List<SubjectTransferBean> subjectKeyList = null;
         CSVParser csvParser = null;
@@ -263,7 +337,7 @@ public class CSVServiceImpl implements CSVService {
             if (StringUtils.isNotEmpty(e.getMessage()))
                 message = e.getMessage();
             throw new Exception(message);
-        }  finally {
+        } finally {
             if (csvParser != null)
                 csvParser.close();
         }
@@ -272,7 +346,7 @@ public class CSVServiceImpl implements CSVService {
     }
 
 
-    public void validateCSVFileHeader(MultipartFile file, String studyOID, String siteOID) throws Exception {
+    public void validateCSVFileHeaderForScheduleEvents(MultipartFile file, String studyOID, String siteOID) throws Exception {
 
         //Study event bulk schedule CSV file header position
         int participantID_index = -1;
@@ -345,6 +419,62 @@ public class CSVServiceImpl implements CSVService {
         }
     }
 
+    public void validateCSVFileHeaderForAddParticipants(MultipartFile file, String studyOID, String siteOID) throws Exception {
+        int participantID_index = -1;
+        int firstName_index = -1;
+        int lastName_index = -1;
+        int emailAddress_index = -1;
+        int phoneNumber_index = -1;
+        Scanner sc = new Scanner(file.getInputStream());
+        String line;
+        while (sc.hasNextLine()) {
+            line = sc.nextLine();
+
+            //in case the last column is empty
+            if (line.endsWith(",")) {
+                line = line + " ,";
+            }
+
+            String[] lineVal = line.split(",", 0);
+            for (int i = 0; i < lineVal.length; i++) {
+                String currentHeader = lineVal[i].trim();
+                if (currentHeader.equalsIgnoreCase(PARTICIPANT_ID)) {
+                    if (participantID_index == -1) {
+                        participantID_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_PARTICIPANT_ID_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(FIRST_NAME)) {
+                    if (firstName_index == -1) {
+                        firstName_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_FIRST_NAME_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(LAST_NAME)) {
+                    if (lastName_index == -1) {
+                        lastName_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_LAST_NAME_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(EMAIL_ADDRESS)) {
+                    if (emailAddress_index == -1) {
+                        emailAddress_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_EMAIL_ADDRESS_HEADERS);
+                    }
+                } else if (currentHeader.equalsIgnoreCase(MOBILE_NUMBER)) {
+                    if (phoneNumber_index == -1) {
+                        phoneNumber_index = i;
+                    } else {
+                        throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_MOBILE_PHONE_HEADERS);
+                    }
+                }
+            }
+            if (participantID_index == -1) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_PARTICIPANT_ID_DATA);
+            }
+        }
+    }
 
 
 }

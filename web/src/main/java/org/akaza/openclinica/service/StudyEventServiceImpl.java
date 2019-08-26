@@ -952,7 +952,6 @@ public class StudyEventServiceImpl implements StudyEventService {
             logger.error("Error " + e.getMessage());
         }
 
-        userService.persistJobCompleted(jobDetail, fileName);
 
     }
 

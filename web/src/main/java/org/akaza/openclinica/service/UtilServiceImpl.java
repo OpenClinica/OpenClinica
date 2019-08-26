@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.RestReponseDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -14,15 +15,23 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -113,5 +122,49 @@ public class UtilServiceImpl implements UtilService {
         }
         return false;
     }
+
+    public ResponseEntity checkFileFormat(MultipartFile file,String fileHeaderMappring) {
+        ResponseEntity response = null;
+        RestReponseDTO responseDTO = new RestReponseDTO();
+        String finalMsg = null;
+
+        //only support csv file
+        if (file != null && file.getSize() > 0) {
+            String fileNm = file.getOriginalFilename();
+
+            if (fileNm != null && fileNm.endsWith(".csv")) {
+                String line;
+                BufferedReader reader;
+                InputStream is;
+                try {
+                    is = file.getInputStream();
+                    reader = new BufferedReader(new InputStreamReader(is));
+                    CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(fileHeaderMappring).withFirstRecordAsHeader().withTrim();
+
+                    CSVParser csvParser = new CSVParser(reader, csvFileFormat);
+                    csvParser.parse(reader, csvFileFormat);
+                } catch (Exception e) {
+                    finalMsg = ErrorConstants.ERR_NOT_CSV_FILE + ":The file format is not supported, please use correct CSV file, like *.csv ";
+                    responseDTO.setMessage(finalMsg);
+                    response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+                }
+
+            } else {
+                finalMsg = ErrorConstants.ERR_NOT_CSV_FILE + ":The file format is not supported, please use correct CSV file, like *.csv ";
+                responseDTO.setMessage(finalMsg);
+                response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+            }
+
+
+        } else {
+            finalMsg = ErrorConstants.ERR_BLANK_FILE + ":The file null or blank";
+            responseDTO.setMessage(finalMsg);
+            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        return response;
+    }
+
+
 
 }
