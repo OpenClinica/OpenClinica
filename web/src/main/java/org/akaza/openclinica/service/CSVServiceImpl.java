@@ -471,7 +471,7 @@ public class CSVServiceImpl implements CSVService {
                 }
             }
             if (participantID_index == -1) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_PARTICIPANT_ID_DATA);
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_PARTICIPANT_ID);
             }
         }
     }
