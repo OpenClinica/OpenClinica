@@ -342,6 +342,7 @@
           }),
           paging: false,
           dom: 'ft',
+          order: [], // set no default order OC-11342
           drawCallback: sizetable('#tbl-job')
         });
       }).fail(function(e) {
