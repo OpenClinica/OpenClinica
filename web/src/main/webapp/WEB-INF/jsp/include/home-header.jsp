@@ -24,7 +24,7 @@
     console.log("***********************************Getting crossStorage:"+ crossStorageURL);
     var ocAppTimeoutKey = "OCAppTimeout";
     var firstLoginCheck = '<%= session.getAttribute("firstLoginCheck")%>';
-    console.log("First time first:" + firstLoginCheck);
+    console.log("Firstr time first:" + firstLoginCheck);
     var currentUser = "currentUser";
     var appName = "RT";
 </script>

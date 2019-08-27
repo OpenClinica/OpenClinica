@@ -3,7 +3,9 @@ function setCurrentUser(thisUser) {
     storage.onConnect()
         .then(function() {
             console.log("setting current user to:" + thisUser);
-            return storage.set(CURRENT_USER, thisUser);
+            return storage.set(CURRENT_USER, thisUser).then(function(res) {
+                return res;
+            });
         })['catch'](function(err) {
         console.log(err);
     });
@@ -16,19 +18,19 @@ function getPromise(value) {
             if (value != null) {
                 resolve(value); // fulfilled
             } else {
-                var reason = new Error('test');
-                reject(reason); // reject
+                var reason = new Error('Error in getPromise');
+                reject(reason).then(function(error) { console.log('caught', error.message); });
             }
-
-        }
-    );
+        });
     return returnPromise;
 }
 
 function processCurrentUser(currentTime, newExpiration) {
     storage.onConnect()
     .then(function() {
-        return storage.get(CURRENT_USER);
+        return storage.get(CURRENT_USER).then(function(res) {
+            return res;
+        });
     }).then(function(res) {
         console.log("Current user in processCurrentUser****************" + res);
         // working around for bug title on edge(https://jira.openclinica.com/browse/OC-8814)
@@ -41,8 +43,6 @@ function processCurrentUser(currentTime, newExpiration) {
                 && prevUser !== null) {
                 console.log("prevUser is not blank");
                 storage.get(ocAppTimeoutKey).then(function(res) {
-                    // the user closed the browser session before the session timeout and reopened it after the timeout
-                    // exceeded
                     var prevTimeout = res;
                     console.log("prevTimeout:processCurrentUser:" + prevTimeout);
                     if (prevTimeout < currentTime) {
@@ -132,6 +132,12 @@ function processUserData(inputPromise) {
         console.log("set all storage processCurrentUser");
     })
 }
+
+// leaving this function in here even if it is not currently used for future debugging
+function sleep(ms) {
+    return new Promise(function(resolve) { setTimeout(resolve, ms)});
+}
+
 function updateOCAppTimeout() {
     processTimedOuts(false, true);
 }
@@ -143,14 +149,17 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
         processCurrentUser(currentTime, newExpiration);
     }
 
-
     storage.onConnect()
         .then(function() {
-            return storage.get(ocAppTimeoutKey);
+            return storage.get(ocAppTimeoutKey).then(function (res1) {
+                return res1;
+            });
         }).then(function(res) {
             if (res == null) {
-                //console.log("*****setting new expiration1:" + newExpiration);
-                return storage.set(ocAppTimeoutKey, newExpiration);
+                console.log("*****setting new expiration:" + newExpiration);
+                return storage.set(ocAppTimeoutKey, newExpiration).then(function (res1) {
+                    return res1;
+                });
             } else if (res){
                 var existingTimeout = res;
                 console.log("processTimedOuts: currentTime: " + currentTime + " existingTimeout: " + existingTimeout);
@@ -168,7 +177,9 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
                 } else {
                     if (storageFlag) {
                         console.log("setting newExpiration:" + newExpiration);
-                        return storage.set(ocAppTimeoutKey, newExpiration);
+                        return storage.set(ocAppTimeoutKey, newExpiration).then(function (res1) {
+                            return res1;
+                        });
                     }
                     jQuery.get(myContextPath + '/pages/keepAlive')
                         .error(function (jqXHR, textStatus, errorThrown) {
