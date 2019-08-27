@@ -11,6 +11,7 @@ function setCurrentUser(thisUser) {
     });
 
 }
+
 function getPromise(value) {
     // Promise
     var returnPromise = new Promise(
@@ -18,10 +19,12 @@ function getPromise(value) {
             if (value != null) {
                 resolve(value); // fulfilled
             } else {
-                var reason = new Error('Error in getPromise');
-                reject(reason).then(function(error) { console.log('caught', error.message); });
+                var reason = new Error('test');
+                reject(reason); // reject
             }
-        });
+
+        }
+    );
     return returnPromise;
 }
 
@@ -135,7 +138,7 @@ function processUserData(inputPromise) {
 
 // leaving this function in here even if it is not currently used for future debugging
 function sleep(ms) {
-    return new Promise(function(resolve) { setTimeout(resolve, ms)});
+    return new Promise(function(resolve) { setTimeout(resolve, ms);});
 }
 
 function updateOCAppTimeout() {
