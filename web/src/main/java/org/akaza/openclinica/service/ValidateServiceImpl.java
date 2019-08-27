@@ -252,13 +252,12 @@ public class ValidateServiceImpl implements ValidateService {
 
     }
 
-    public ResponseEntity<Object> getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid) {
+    public ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid) {
         String errorMsg = e.getErrorCode();
         HashMap<String, String> map = new HashMap<>();
         map.put("studyOid", studyOid);
         map.put("siteOid", siteOid);
-        org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
-        return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
+      return  new ParameterizedErrorVM(errorMsg, map);
     }
 
 

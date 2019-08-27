@@ -99,7 +99,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
 
 
-    public Object addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, String studyOid, String siteOid , String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
+    public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, String studyOid, String siteOid , String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
         boolean createNewParticipant=false;
         Study tenantStudy = studyHibDao.findByOcOID(studyOid);
         Study tenantSite = studyHibDao.findByOcOID(siteOid);
@@ -107,35 +107,40 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         StudyBean tenantSiteBean = getStudyDao().findByOid(siteOid);
 
         if (StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()))
-            return new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_PARTICIPANT_ID_DATA);
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_PARTICIPANT_ID_DATA);
+
         if (!StringUtils.isEmpty(addParticipantRequestDTO.getFirstName()) && addParticipantRequestDTO.getFirstName().length() > 35)
-            return new ErrorObj(FAILED, ErrorConstants.ERR_FIRST_NAME_TOO_LONG);
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_FIRST_NAME_TOO_LONG);
+
+
         if (!StringUtils.isEmpty(addParticipantRequestDTO.getLastName()) && addParticipantRequestDTO.getLastName().length() > 35)
-            return new ErrorObj(FAILED, ErrorConstants.ERR_LAST_NAME_TOO_LONG);
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_LAST_NAME_TOO_LONG);
+
         if (!StringUtils.isEmpty(addParticipantRequestDTO.getIdentifier()) && addParticipantRequestDTO.getIdentifier().length() > 35)
-            return new ErrorObj(FAILED, ErrorConstants.ERR_IDENTIFIER_TOO_LONG);
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_IDENTIFIER_TOO_LONG);
 
         if (!StringUtils.isEmpty(addParticipantRequestDTO.getEmailAddress())) {
             Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
             Matcher emailMatch = emailPattern.matcher(addParticipantRequestDTO.getEmailAddress());
             if (addParticipantRequestDTO.getEmailAddress().length() > 255)
-                return new ErrorObj(FAILED, ErrorConstants.ERR_EMAIL_ADDRESS_TOO_LONG);
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_EMAIL_ADDRESS_TOO_LONG);
             if (!emailMatch.matches())
-                return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_EMAIL_ADDRESS);
+                throw new OpenClinicaSystemException( ErrorConstants.ERR_INVALID_EMAIL_ADDRESS);
         }
 
         if (!StringUtils.isEmpty(addParticipantRequestDTO.getPhoneNumber())) {
             Pattern intlPhonePattern = Pattern.compile(INTL_PHONE_PATTERN);
             Matcher intlPhoneMatch = intlPhonePattern.matcher(addParticipantRequestDTO.getPhoneNumber());
             if (addParticipantRequestDTO.getPhoneNumber().length() > 17)
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PHONE_NUMBER_TOO_LONG);
+                throw new OpenClinicaSystemException( ErrorConstants.ERR_PHONE_NUMBER_TOO_LONG);
             if (!(intlPhoneMatch.matches() && addParticipantRequestDTO.getPhoneNumber().length() < 18))
-                return new ErrorObj(FAILED, ErrorConstants.ERR_INVALID_PHONE_NUMBER);
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PHONE_NUMBER);
         }
 
 
         if (!utilService.isParticipantUniqueToSite(siteOid, addParticipantRequestDTO.getSubjectKey()))
-            return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+            throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+
 
         Subject subject = null;
         StudySubject studySubject = null;
@@ -213,21 +218,18 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         List<DataImportReport> dataImportReports = new ArrayList<>();
         try {
             // read csv file
-            ArrayList<AddParticipantRequestDTO> addParticipantRequestDTOs = csvService.readAddParticipantBulkCSVFile(file, study.getOc_oid(), site.getOc_oid());
+            List<AddParticipantRequestDTO> addParticipantRequestDTOs = csvService.readAddParticipantBulkCSVFile(file, study.getOc_oid(), site.getOc_oid());
 
             for (AddParticipantRequestDTO addParticipantRequestDTO : addParticipantRequestDTOs) {
                 String participantId = addParticipantRequestDTO.getSubjectKey();
                 Integer rowNumber = addParticipantRequestDTO.getRowNumber();
-                Object result = null;
+                AddParticipantResponseDTO result = null;
                 DataImportReport dataImportReport = null;
-
-                result = addParticipant(addParticipantRequestDTO, userAccountBean, study.getOc_oid(), site.getOc_oid(), customerUuid, textsBundle, accessToken, register);
-
-                if (result instanceof AddParticipantResponseDTO) {
-                    dataImportReport = new DataImportReport( participantId,((AddParticipantResponseDTO) result).getSubjectOid(),((AddParticipantResponseDTO) result).getStatus(),((AddParticipantResponseDTO) result).getParticipateStatus(), SUCCESS ,rowNumber);
-                }
-                if (result instanceof ErrorObj) {
-                    dataImportReport = new DataImportReport(rowNumber, participantId, ((ErrorObj) result).getCode(), ((ErrorObj) result).getMessage());
+                try {
+                    result = addParticipant(addParticipantRequestDTO, userAccountBean, study.getOc_oid(), site.getOc_oid(), customerUuid, textsBundle, accessToken, register);
+                    dataImportReport = new DataImportReport(participantId, ((AddParticipantResponseDTO) result).getSubjectOid(), ((AddParticipantResponseDTO) result).getStatus(), ((AddParticipantResponseDTO) result).getParticipateStatus(), SUCCESS, rowNumber);
+                } catch (OpenClinicaSystemException ose) {
+                    dataImportReport = new DataImportReport(rowNumber, participantId, FAILED, ose.getMessage());
                 }
                 dataImportReports.add(dataImportReport);
             }

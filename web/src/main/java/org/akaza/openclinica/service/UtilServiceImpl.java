@@ -15,6 +15,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -123,7 +124,7 @@ public class UtilServiceImpl implements UtilService {
         return false;
     }
 
-    public ResponseEntity checkFileFormat(MultipartFile file,String fileHeaderMappring) {
+    public void checkFileFormat(MultipartFile file, String fileHeaderMappring) {
         ResponseEntity response = null;
         RestReponseDTO responseDTO = new RestReponseDTO();
         String finalMsg = null;
@@ -144,25 +145,18 @@ public class UtilServiceImpl implements UtilService {
                     CSVParser csvParser = new CSVParser(reader, csvFileFormat);
                     csvParser.parse(reader, csvFileFormat);
                 } catch (Exception e) {
-                    finalMsg = ErrorConstants.ERR_NOT_CSV_FILE + ":The file format is not supported, please use correct CSV file, like *.csv ";
-                    responseDTO.setMessage(finalMsg);
-                    response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+                    throw new OpenClinicaSystemException(ErrorConstants.ERR_NOT_CSV_FILE);
                 }
 
             } else {
-                finalMsg = ErrorConstants.ERR_NOT_CSV_FILE + ":The file format is not supported, please use correct CSV file, like *.csv ";
-                responseDTO.setMessage(finalMsg);
-                response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NOT_CSV_FILE);
             }
 
 
         } else {
-            finalMsg = ErrorConstants.ERR_BLANK_FILE + ":The file null or blank";
-            responseDTO.setMessage(finalMsg);
-            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_BLANK_FILE);
         }
 
-        return response;
     }
 
 

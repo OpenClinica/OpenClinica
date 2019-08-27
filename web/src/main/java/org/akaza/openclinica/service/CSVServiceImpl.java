@@ -53,9 +53,9 @@ public class CSVServiceImpl implements CSVService {
      * @throws Exception
      */
 
-    public ArrayList<StudyEventScheduleDTO> readStudyEventScheduleBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception {
+    public List<StudyEventScheduleDTO> readStudyEventScheduleBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception {
 
-        ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = new ArrayList<>();
+        List<StudyEventScheduleDTO> studyEventScheduleDTOList = new ArrayList<>();
 
         //Study event bulk schedule CSV file header position
         int participantID_index = -1;
@@ -151,9 +151,9 @@ public class CSVServiceImpl implements CSVService {
         return studyEventScheduleDTOList;
     }
 
-    public ArrayList<AddParticipantRequestDTO> readAddParticipantBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception {
+    public List<AddParticipantRequestDTO> readAddParticipantBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception {
 
-        ArrayList<AddParticipantRequestDTO> addParticipantRequestDTOs = new ArrayList<>();
+        List<AddParticipantRequestDTO> addParticipantRequestDTOs = new ArrayList<>();
 
         //Study event bulk schedule CSV file header position
         int participantID_index = -1;

@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public interface ValidateService {
 
      void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean);
 
-     ResponseEntity<Object> getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
+    ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
 
 
     }
