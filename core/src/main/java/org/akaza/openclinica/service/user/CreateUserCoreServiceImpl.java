@@ -31,7 +31,7 @@ public class CreateUserCoreServiceImpl implements CreateUserCoreService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public UserAccountBean createUser(HttpServletRequest request, HashMap<String, String> map) throws Exception {
+    public UserAccountBean createUser(HttpServletRequest request, Map<String, String> map) throws Exception {
         logger.info("In createUserAccount");
         UserAccountBean uBean = null;
 

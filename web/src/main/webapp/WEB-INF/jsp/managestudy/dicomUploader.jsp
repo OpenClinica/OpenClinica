@@ -68,7 +68,11 @@
     text-align: center;
   }
   h1.success {
+<<<<<<< HEAD
     color: #70b728;
+=======
+    color: #ED7800;
+>>>>>>> upstream/4.8.1
     margin-top: 110px;
     margin-bottom: 20px;
   }
@@ -211,7 +215,7 @@
         leftnavExpand('sidebar_Alerts_closed');
       }
     }
-    
+
     $.ajax({
       url: '${pageContext.request.contextPath}/pages/auth/api/dicom',
       method: 'POST',
@@ -237,4 +241,8 @@
   $('#btn-close').click(function() {
     window.close();
   });
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> upstream/4.8.1
