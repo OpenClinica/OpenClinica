@@ -1,21 +1,30 @@
 package org.akaza.openclinica.service;
 
+import liquibase.util.StringUtils;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -202,6 +211,53 @@ public class ValidateServiceImpl implements ValidateService {
             }
         }
         return false;
+    }
+
+    public void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean) {
+
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+        if (studyOid != null)
+            studyOid = studyOid.toUpperCase();
+        if (siteOid != null)
+            siteOid = siteOid.toUpperCase();
+
+
+        if (!isStudyOidValid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+        }
+        if (!isStudyOidValidStudyLevelOid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+        }
+        if (!isSiteOidValid(siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
+        }
+        if (!isSiteOidValidSiteLevelOid(siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+        }
+        if (!isStudyAvailable(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
+        }
+        if (siteOid != null && !isStudyAvailable(siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
+        }
+        if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+        }
+
+        if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        }
+
+    }
+
+    public ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid) {
+        String errorMsg = e.getErrorCode();
+        HashMap<String, String> map = new HashMap<>();
+        map.put("studyOid", studyOid);
+        map.put("siteOid", siteOid);
+      return  new ParameterizedErrorVM(errorMsg, map);
     }
 
 

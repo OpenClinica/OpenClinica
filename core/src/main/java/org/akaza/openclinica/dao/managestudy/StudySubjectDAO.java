@@ -1217,8 +1217,17 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
             variables.put(new Integer(ind), sb.getUserId());
         }
         ind++;
-        variables.put(new Integer(ind), new Integer(sb.getUserStatus()!=null?sb.getUserStatus().getCode():null));
-        ind++;
+
+        if(sb.getUserStatus() == null) {
+            nullVars.put(new Integer(ind), new Integer(Types.VARCHAR));
+            variables.put(new Integer(ind), null);
+            ind++;
+        }else{
+            variables.put(new Integer(ind), sb.getUserStatus().getCode());
+            ind++;
+        }
+
+
         variables.put(new Integer(ind), new Integer(sb.getId()));
         ind++;
 

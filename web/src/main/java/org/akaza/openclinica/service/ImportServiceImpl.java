@@ -29,6 +29,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
+
 /**
  * This Service class is used with View Study Subject Page
  *
@@ -378,7 +380,8 @@ public class ImportServiceImpl implements ImportService {
                 writer.print(writeImportToTextFile(dataImportReports));
             else if (jobType.equals(JobType.SCHEDULE_EVENT))
                 writer.print(writeBulkEventScheduleOrUpdateToTextFile(dataImportReports));
-
+            else if (jobType.equals(JobType.BULK_ADD_PARTICIPANTS))
+                writer.print(writeBulkAddParticipantToTextFile(dataImportReports));
             closeFile(writer);
         }
         StringBuilder body = new StringBuilder();
@@ -459,6 +462,47 @@ public class ImportServiceImpl implements ImportService {
             stringBuffer.append(dataImportReport.getMessage() != null ? dataImportReport.getMessage() : "");
             stringBuffer.append('\n');
         }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(stringBuffer.toString() + "\n");
+
+        return sb.toString();
+    }
+
+    private String writeBulkAddParticipantToTextFile(List<DataImportReport> dataImportReports) {
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("Row");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("ParticipantID");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Participant OID");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Participate Status");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Status");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Message");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append('\n');
+
+
+        dataImportReports.forEach(p->{
+            stringBuffer.append(p.getRowNumber());
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getStudySubjectID() != null ? p.getStudySubjectID() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getSubjectKey() != null ? p.getSubjectKey() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getParticipateStatus() != null ? p.getParticipateStatus() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getStatus() != null ? p.getStatus() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getMessage() != null ? p.getMessage() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append('\n');
+        });
+
 
         StringBuilder sb = new StringBuilder();
         sb.append(stringBuffer.toString() + "\n");
@@ -1173,7 +1217,7 @@ public class ImportServiceImpl implements ImportService {
         if (eventCrf == null) {
 
             String selectedVersionIds=edc.getSelectedVersionIds();
-           if(selectedVersionIds!=null) {
+           if(!StringUtils.isEmpty(selectedVersionIds)) {
                String[] ids = selectedVersionIds.split(",");
                ArrayList<Integer> idList = new ArrayList<Integer>();
                for (String id : ids) {
