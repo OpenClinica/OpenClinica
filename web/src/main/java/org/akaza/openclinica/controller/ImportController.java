@@ -77,7 +77,7 @@ public class ImportController {
 
     @ApiOperation( value = "To import data in an .xml file", notes = "Will import the data in a xml file " )
     @RequestMapping( value = "/clinicaldata/import", method = RequestMethod.POST )
-    public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, MultipartFile file) throws Exception {
+    public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, @RequestParam("file") MultipartFile file) throws Exception {
         String fileNm = "";
         String importXml = null;
         if (file != null) {
