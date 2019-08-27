@@ -33,6 +33,7 @@
     if (doNotInvalidate === "true")
         firstLoginCheck = doNotInvalidate;
 
+
     console.log("***********************************firstLoginCheck as a parameter:" + firstLoginCheck);
     var CURRENT_USER = "currentUser";
     var appName = "RT";
@@ -56,16 +57,11 @@
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/client.js"></script>
         <script type="text/javascript">
-            var storage = new CrossStorageClient(crossStorageURL);
+            var storage = new CrossStorageClient(crossStorageURL, {
+                timeout: 7000});
         </script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/sessionTimeout.js"></script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/auth0/captureKeyboardMouseEvents.js"></script>
-        <script type="text/javascript">
-            console.log("***********************************Getting crossStorage");
-            var storage = new CrossStorageClient(crossStorageURL, {
-                timeout: 7000
-            });
-        </script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:when>
     <c:otherwise>
