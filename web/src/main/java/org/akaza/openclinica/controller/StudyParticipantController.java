@@ -97,68 +97,6 @@ public class StudyParticipantController {
 	public static final String FILE_HEADER_MAPPING = "ParticipantID, StudyEventOID, Ordinal, StartDate, EndDate";
 
 
-	@ApiOperation(value = "Add a participant with or without their contact information to a given Study site.",  notes = "Will read the subjectKey", hidden = true)
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successful operation"),
-			@ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
-					+ "<br />Error Code                                            Descriptions"
-					+ "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
-					+ "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
-					+ "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
-					+ "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
-					+ "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
-					+ "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
-					+ "<br />participantIDNotUnique                        : Participant ID already exists."
-					+ "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
-					+ "<br />firstNameTooLong                              : First Name length should not exceed 35 characters."
-					+ "<br />lastNameTooLong                               : Last Name length should not exceed 35 characters."
-					+ "<br />identifierTooLong                             : Identifier Name length should not exceed 35 characters."
-					+ "<br />emailAddressTooLong                           : Email Address length should not exceed 255 characters."
-					+ "<br />invalidEmailAddress                           : Email Address contains invalid characters or format."
-					+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
-					+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
-					+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
-					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
-	@RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/participantsOriginal", method = RequestMethod.POST)
-	public ResponseEntity<Object> createNewStudyParticipantAtSiteLevel(HttpServletRequest request,
-																	   @ApiParam(value = "Provide Participant ID and their contact information. Participant ID is required.", required = true) @RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
-																	   @ApiParam(value = "Study OID", required = true) @PathVariable("studyOID") String studyOID,
-																	   @ApiParam(value = "Site OID", required = true) @PathVariable("siteOID") String siteOID,
-																	   @ApiParam(value = "Use this parameter to register the participant to OpenClinica Participate module. Possible values - y or n. Note: Module should be active for the given study.", required = false) @RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
-
-
-		if (studyOID != null)
-			studyOID = studyOID.toUpperCase();
-		if (siteOID != null)
-			siteOID = siteOID.toUpperCase();
-
-
-		utilService.setSchemaFromStudyOid(studyOID);
-		UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
-		HashMap<String, Object> map = new HashMap<>();
-		map.put("subjectKey", participantRestfulRequestDTO.getSubjectKey());
-		map.put("firstName", participantRestfulRequestDTO.getFirstName());
-		map.put("emailAddress", participantRestfulRequestDTO.getEmailAddress());
-		map.put("phoneNumber", participantRestfulRequestDTO.getPhoneNumber());
-		map.put("lastName", participantRestfulRequestDTO.getLastName());
-		map.put("identifier", participantRestfulRequestDTO.getIdentifier());
-		map.put("register", register);
-		ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
-		responseFailureStudyParticipantSingleDTO.setSubjectKey((String) map.get("subjectKey"));
-		try {
-			return this.createNewStudySubject(request, map, studyOID, siteOID,userAccountBean);
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-
-			String errorMsg = e.getMessage();
-			HashMap<String, String> pmap = new HashMap<>();
-			pmap.put("studyOid", studyOID);
-			pmap.put("siteOid", siteOID);
-			ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, pmap);
-			ResponseEntity response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-			return response;
-		}
-	}
 
 	@ApiOperation(value = "Add a participant with or without their contact information to a given Study site.",  notes = "Will read the subjectKey", hidden = false)
 	@ApiResponses(value = {
@@ -184,41 +122,34 @@ public class StudyParticipantController {
 					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 	@RequestMapping( value = "/studies/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST )
 	public ResponseEntity<Object> addParticipantAtSiteLevel(HttpServletRequest request,
-																	@ApiParam( value = "Provide Participant ID and their contact information. Participant ID is required.", required = true ) @RequestBody AddParticipantRequestDTO addParticipantRequestDTO,
-																	@ApiParam( value = "Study OID", required = true ) @PathVariable( "studyOID" ) String studyOid,
-																	@ApiParam( value = "Site OID", required = true ) @PathVariable( "siteOID" ) String siteOid,
-																	@ApiParam( value = "Use this parameter to register the participant to OpenClinica Participate module. Possible values - y or n. Note: Module should be active for the given study.", required = false ) @RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
+															@ApiParam( value = "Provide Participant ID and their contact information. Participant ID is required.", required = true ) @RequestBody AddParticipantRequestDTO addParticipantRequestDTO,
+															@ApiParam( value = "Study OID", required = true ) @PathVariable( "studyOID" ) String studyOid,
+															@ApiParam( value = "Site OID", required = true ) @PathVariable( "siteOID" ) String siteOid,
+															@ApiParam( value = "Use this parameter to register the participant to OpenClinica Participate module. Possible values - y or n. Note: Module should be active for the given study.", required = false ) @RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
 
 		utilService.setSchemaFromStudyOid(studyOid);
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String accessToken = utilService.getAccessTokenFromRequest(request);
-        Study tenantStudy = studyDao.findByOcOID(studyOid);
-        StudyDAO sDao = new StudyDAO(dataSource);
-        StudyBean tenantStudyBean=sDao.findByOid(studyOid);
+		Study tenantStudy = studyDao.findByOcOID(studyOid);
+		StudyDAO sDao = new StudyDAO(dataSource);
+		StudyBean tenantStudyBean = sDao.findByOid(studyOid);
 		ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(request.getLocale());
-
+		AddParticipantResponseDTO result=null;
 		try {
 			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);
-			if ((register.equalsIgnoreCase("y") || register.equalsIgnoreCase("yes") ) && !validateService.isParticipateActive(tenantStudy))
+			if ((register.equalsIgnoreCase("y") || register.equalsIgnoreCase("yes")) && !validateService.isParticipateActive(tenantStudy))
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
 			if (utilService.isParticipantIDSystemGenerated(tenantStudyBean))
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_SYSTEM_GENERATED_ID_ENABLED);
-			} catch (OpenClinicaSystemException e) {
-			return validateService.getResponseForException(e, studyOid, siteOid);
-		}
-		Object result = studyParticipantService.addParticipant(addParticipantRequestDTO,userAccountBean, studyOid, siteOid,customerUuid,textsBundle,accessToken,register);
+			 result = studyParticipantService.addParticipant(addParticipantRequestDTO, userAccountBean, studyOid, siteOid, customerUuid, textsBundle, accessToken, register);
 
-		try {
-			if (result instanceof ErrorObj)
-				throw new OpenClinicaSystemException(((ErrorObj) result).getMessage());
-			else if (result instanceof AddParticipantResponseDTO)
-				return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (OpenClinicaSystemException e) {
-			return validateService.getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
 		}
-		return null;
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 
 
@@ -278,7 +209,8 @@ public class StudyParticipantController {
 			csvService.validateCSVFileHeaderForAddParticipants( file, study.getOc_oid(), siteOid);
 
 		} catch (OpenClinicaSystemException e) {
-			return validateService.getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
 		}
 
 		String uuid = startBulkAddParticipantJob(file, schema, studyOid, siteOid, userAccountBean,customerUuid,textsBundle,accessToken,register);
@@ -289,73 +221,7 @@ public class StudyParticipantController {
 	}
 
 
-	@ApiOperation(value = "Add or Update list of participants and their contact information for OpenClinica Participate module.",  notes = "Will read subjectKeys and PII from the CSV file", hidden = true)
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successful operation"),
-			@ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
-					+ "<br />Error Code                                            Descriptions"
-					+ "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
-					+ "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
-					+ "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
-					+ "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
-					+ "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
-					+ "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
-					+ "<br />participantIDNotUnique                        : Participant ID already exists."
-					+ "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
-					+ "<br />firstNameTooLong                              : First Name length should not exceed 35 characters."
-					+ "<br />lastNameTooLong                               : Last Name length should not exceed 35 characters."
-					+ "<br />identifierTooLong                             : Identifier Name length should not exceed 35 characters."
-					+ "<br />emailAddressTooLong                           : Email Address length should not exceed 255 characters."
-					+ "<br />invalidEmailAddress                           : Email Address contains invalid characters or format."
-					+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
-					+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
-					+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
-					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
-	@Async
-	@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/bulkOriginal", method = RequestMethod.POST,consumes = {"multipart/form-data"})
-	public ResponseEntity<String> createNewStudyParticipantAtSiteLevel(HttpServletRequest request,
-																	   @ApiParam(value = "A CSV file comprising of the headers - ParticipantID, FirstName, EmailAddress, MobileNumber. ParticipantID header value is a must for every record in the file.", required = true) @RequestParam("file") MultipartFile file,
-																	   //@RequestParam("size") Integer size,
-																	   @ApiParam(value = "Study OID", required = true) @PathVariable("studyOid") String studyOid,
-																	   @ApiParam(value = "Site OID", required = true) @PathVariable("siteOid") String siteOid,
-																	   @ApiParam(value = "Use this parameter to register the participants for OpenClinica Participate module. Possible values - y or n. Note: Module should be active for the given study.", required = false) @RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
-		if (studyOid != null)
-			studyOid = studyOid.toUpperCase();
-		if (siteOid != null)
-			siteOid = siteOid.toUpperCase();
-
-		boolean checkParticipateModuleStatus = false;
-		if(register != null && register.toUpperCase().equals("Y")) {
-			checkParticipateModuleStatus = true;
-		}
-
-		utilService.setSchemaFromStudyOid(studyOid);
-
-		ResponseEntity<String> response = null;
-		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-		try {
-
-			participantService.validateRequestAndReturnStudy(studyOid, siteOid, request);
-
-			Study tenantStudy = studyDao.findByOcOID(studyOid);
-			if(checkParticipateModuleStatus) {
-				if(!validateService.isParticipateActive(tenantStudy)) {
-					throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
-				}
-			}
-
-
-		} catch (OpenClinicaSystemException e) {
-			String errorMsg = e.getErrorCode();
-			response = new ResponseEntity(errorMsg, HttpStatus.BAD_REQUEST);
-			return response;
-		}
-		Map<String, Object> map = new HashMap<>();
-		map.put("register", StringUtils.containsAny(register, "y", "Y") ? true : false);
-
-		return createNewStudyParticipantsInBulk(request, file, studyOid, siteOid, map);
-	}
 
 
 	/**

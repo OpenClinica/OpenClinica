@@ -283,7 +283,7 @@ public class StudyEventController {
 			csvService.validateCSVFileHeaderForScheduleEvents( file, study.getOc_oid(), siteOid);
 
 		} catch (OpenClinicaSystemException e) {
-			return validateService.getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
 		}
 
 
@@ -292,10 +292,6 @@ public class StudyEventController {
 
 		logger.info("REST request to Import Job uuid {} ", uuid);
 		return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
-
-
-
-
 	}
 
 
@@ -312,7 +308,7 @@ public class StudyEventController {
 		try {
 			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);
 		} catch (OpenClinicaSystemException e) {
-			return validateService.getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
 		}
 
 		ODMContainer odmContainer = new ODMContainer();
@@ -324,7 +320,8 @@ public class StudyEventController {
 			else if (result instanceof StudyEventResponseDTO)
 				return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (OpenClinicaSystemException e) {
-			return validateService.getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
 		}
 		return null;
 	}
@@ -342,7 +339,8 @@ public class StudyEventController {
 		try {
 			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);
 		} catch (OpenClinicaSystemException e) {
-			return validateService.getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
 		}
 
 		ODMContainer odmContainer = new ODMContainer();
@@ -355,7 +353,8 @@ public class StudyEventController {
 			else if (result instanceof StudyEventResponseDTO)
 				return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (OpenClinicaSystemException e) {
-			return validateService.getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
 		}
 		return null;
 	}

@@ -34,6 +34,6 @@ public interface UtilService {
 
     boolean isParticipantUniqueToSite(String siteOID , String studySubjectId);
 
-    ResponseEntity checkFileFormat(MultipartFile file, String fileHeaderMappring);
+    void checkFileFormat(MultipartFile file, String fileHeaderMappring);
 
 	}
