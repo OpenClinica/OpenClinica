@@ -17,15 +17,13 @@ import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
-import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -50,7 +48,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -120,8 +117,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     JobService jobService;
 
-    private RestfulServiceHelper restfulServiceHelper;
-
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
     public static final String PARTICIPATE_EDIT = "participate-edit";
@@ -138,6 +133,7 @@ public class UserServiceImpl implements UserService {
     private String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
 
     StudyDAO sdao;
+    private StudySubjectDAO ssDao;
 
 
     public StudySubject getStudySubject(String ssid, Study study) {
@@ -368,35 +364,46 @@ public class UserServiceImpl implements UserService {
     }
     
     @Transactional
-    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema,String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
+    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
     {
 
-        CoreResources.setRequestSchema(schema);
-
+        
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
 
 
         // Get the StudySubject by studyId and participantID
-        StudySubject studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(participantID, study);
+        StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantID, study);
         OCUserDTO ocuserDTO = null;
         StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
-        
-        if(studySubject == null) {
-        	String errorCode =ErrorConstants.ERR_PARTICIPATE_NOT_AVAILABLE;
-        	String msg = "Can't find the participant with ID:" + participantID;
-        	throw new OpenClinicaSystemException(errorCode, msg);
+      
+        if(ss == null) {
+        	
+        	throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_NOT_AVAILABLE);
         }
             
         try {          
         	ocuserDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,
-					studySubject);
+					ss);
         	
-        	spDTO.setSubjectOid(studySubject.getOcOid());
-        	spDTO.setSubjectKey(studySubject.getLabel());
+        	spDTO.setSubjectOid(ss.getOcOid());
+        	spDTO.setSubjectKey(ss.getLabel());
+        	spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
         	
+        	spDTO.setCreatedBy(ss.getUserAccount().getUserName());        	        	
+        	spDTO.setLastModifiedBy(userAccountDao.findById(ss.getUpdateId()).getUserName());        	        	
+        	
+        	if(ss.getDateCreated()!=null) {
+        		spDTO.setCreatedAt(ss.getDateCreated().toLocaleString());
+        	}
+        	if(ss.getDateUpdated() !=null) {
+        		spDTO.setLastModified(ss.getDateUpdated().toLocaleString());
+        	}
+        	        	        	
         	if(incRelatedInfo) {
-        		spDTO.setStatus(studySubject.getStatus().getName());
+        		if(ss.getUserStatus() !=null) {
+        			spDTO.setStatus(ss.getUserStatus().getValue());
+        		}
         		spDTO.setAccessCode(ocuserDTO.getAccessCode());
         	}		        			        	
         	
@@ -408,8 +415,6 @@ public class UserServiceImpl implements UserService {
         		
         	}			        			   
 	        
-	        return spDTO;
-             
            
         } catch (Exception e) {
            
