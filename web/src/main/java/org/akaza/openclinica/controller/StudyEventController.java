@@ -209,47 +209,7 @@ public class StudyEventController {
 	}
 
 
-	private ResponseEntity checkFileFormat(MultipartFile file) {
-		ResponseEntity response = null;
-		RestReponseDTO responseDTO = new RestReponseDTO();
-		String finalMsg = null;
 
-		//only support csv file
-		if (file != null && file.getSize() > 0) {
-			String fileNm = file.getOriginalFilename();
-
-			if (fileNm != null && fileNm.endsWith(".csv")) {
-				String line;
-				BufferedReader reader;
-				InputStream is;
-				try {
-					is = file.getInputStream();
-					reader = new BufferedReader(new InputStreamReader(is));
-					CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER_MAPPING).withFirstRecordAsHeader().withTrim();
-
-					CSVParser csvParser = new CSVParser(reader, csvFileFormat);
-					csvParser.parse(reader, csvFileFormat);
-				} catch (Exception e) {
-					finalMsg = ErrorConstants.ERR_NOT_CSV_FILE + ":The file format is not supported, please use correct CSV file, like *.csv ";
-					responseDTO.setMessage(finalMsg);
-					response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-				}
-
-			} else {
-				finalMsg = ErrorConstants.ERR_NOT_CSV_FILE + ":The file format is not supported, please use correct CSV file, like *.csv ";
-				responseDTO.setMessage(finalMsg);
-				response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-			}
-
-
-		} else {
-			finalMsg = ErrorConstants.ERR_BLANK_FILE + ":The file null or blank";
-			responseDTO.setMessage(finalMsg);
-			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-		}
-
-		return response;
-	}
 
 
 
@@ -318,12 +278,12 @@ public class StudyEventController {
 		Study study = studyDao.findByOcOID(studyOid.trim());
 
 		try {
-			checkFileFormat(file);
-			validateStudyAndRoles(studyOid, siteOid, userAccountBean);
-			csvService.validateCSVFileHeader( file, study.getOc_oid(), siteOid);
+			utilService.checkFileFormat(file,FILE_HEADER_MAPPING);
+			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);
+			csvService.validateCSVFileHeaderForScheduleEvents( file, study.getOc_oid(), siteOid);
 
 		} catch (OpenClinicaSystemException e) {
-			return getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
 		}
 
 
@@ -332,10 +292,6 @@ public class StudyEventController {
 
 		logger.info("REST request to Import Job uuid {} ", uuid);
 		return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
-
-
-
-
 	}
 
 
@@ -350,9 +306,9 @@ public class StudyEventController {
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 
 		try {
-			validateStudyAndRoles(studyOid, siteOid, userAccountBean);
+			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);
 		} catch (OpenClinicaSystemException e) {
-			return getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
 		}
 
 		ODMContainer odmContainer = new ODMContainer();
@@ -364,7 +320,8 @@ public class StudyEventController {
 			else if (result instanceof StudyEventResponseDTO)
 				return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (OpenClinicaSystemException e) {
-			return getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
 		}
 		return null;
 	}
@@ -380,9 +337,10 @@ public class StudyEventController {
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 
 		try {
-			validateStudyAndRoles(studyOid, siteOid, userAccountBean);
+			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);
 		} catch (OpenClinicaSystemException e) {
-			return getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
 		}
 
 		ODMContainer odmContainer = new ODMContainer();
@@ -395,59 +353,12 @@ public class StudyEventController {
 			else if (result instanceof StudyEventResponseDTO)
 				return new ResponseEntity<Object>(result, HttpStatus.OK);
 		} catch (OpenClinicaSystemException e) {
-			return getResponseForException(e, studyOid, siteOid);
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
 		}
 		return null;
 	}
 
-	private void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean) {
-
-		ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-		if (studyOid != null)
-			studyOid = studyOid.toUpperCase();
-		if (siteOid != null)
-			siteOid = siteOid.toUpperCase();
-
-
-		if (!validateService.isStudyOidValid(studyOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
-		}
-		if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
-		}
-		if (!validateService.isSiteOidValid(siteOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
-		}
-		if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
-		}
-		if (!validateService.isStudyAvailable(studyOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
-		}
-		if (siteOid != null && !validateService.isStudyAvailable(siteOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
-		}
-		if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
-		}
-
-		if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && !validateService.isUserHasAccessToSite(userRoles, siteOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-		} else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
-			throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-		}
-
-	}
-
-
-	private ResponseEntity<Object> getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid) {
-		String errorMsg = e.getErrorCode();
-		HashMap<String, String> map = new HashMap<>();
-		map.put("studyOid", studyOid);
-		map.put("siteOid", siteOid);
-		org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
-		return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-	}
 
 	public String startBulkEventJob(MultipartFile file, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean) {
 		utilService.setSchemaFromStudyOid(studyOid);
