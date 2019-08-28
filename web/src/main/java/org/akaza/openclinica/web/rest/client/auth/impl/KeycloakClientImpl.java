@@ -1,9 +1,5 @@
 package org.akaza.openclinica.web.rest.client.auth.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.CustomParameterizedException;
 import org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.service.UserType;
@@ -12,27 +8,31 @@ import org.akaza.openclinica.web.rest.client.cs.impl.CustomerServiceClientImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.javers.common.collections.Lists;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.terracotta.modules.ehcache.async.exceptions.ProcessingException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +43,7 @@ public class KeycloakClientImpl {
     private static final String CUSTOMER_UUID_ATTRIBUTE = "customerUuid";
     private static final String ACCESS_CODE_ATTRIBUTE = "accessCode";
     private static final String STUDY_ENV_UUID_ATTRIBUTE = "studyEnvUuid";
-
+    private static final String OC_API_CLIENT_ID = "oc-api";
     private static final String USER_TYPE_ATTRIBUTE = "userType";
     String DB_CONNECTION_KEY = "dbConnection";
     public static final String IDENTITY_SERVER_CALL_FAILED = "errorCode.identityServerCallFailed";
@@ -205,7 +205,46 @@ public class KeycloakClientImpl {
 
     }
 
+    public String getSystemToken(String realm) {
+        logger.debug("Create OC-API System Token");
 
+        try {
+            logger.debug("Getting access token for realm: {} and client: {}", realm, OC_API_CLIENT_ID);
+            ClientsResource clientsResource = keycloak
+                    .realm(realm)
+                    .clients();
+            ClientRepresentation ocApiClientRepresentation = clientsResource
+                    .findByClientId(OC_API_CLIENT_ID)
+                    .get(0);
+            String ocApiClientSecret = clientsResource
+                    .get(ocApiClientRepresentation.getId())
+                    .getSecret()
+                    .getValue();
+            AuthzClient authzClient = AuthzClient.create();
+            String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
+
+            logger.debug("oc-api client secret for realm: {} is {}", realm, ocApiClientSecret);
+            // Get the keycloak instance specific to the given realm
+            Keycloak keycloakRealmInstance = KeycloakBuilder.builder()
+                    .serverUrl(keycloakBaseUrl)
+                    .realm(realm)
+                    .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                    .clientId(OC_API_CLIENT_ID)
+                    .clientSecret(ocApiClientSecret)
+                    .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(1).build())
+                    .build();
+
+            String accessToken = keycloakRealmInstance
+                    .tokenManager()
+                    .getAccessToken()
+                    .getToken();
+            logger.debug("Keycloak Access Token: {}", accessToken);
+            return accessToken;
+        } catch (Exception e) {
+            logger.error("Could not read keycloak.json", e);
+            return null;
+        }
+    }
 
 
 }

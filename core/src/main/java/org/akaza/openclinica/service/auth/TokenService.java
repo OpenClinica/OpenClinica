@@ -5,5 +5,4 @@ import java.util.Map;
 public interface TokenService {
     Map<String, Object> decodeAndVerify (String token);
     String getUserType(String token);
-    String getSystemToken();
 }

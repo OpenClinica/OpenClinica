@@ -2,9 +2,15 @@ package org.akaza.openclinica.service.auth;
 
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.collections4.MapUtils;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.util.JsonSerialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,21 +83,5 @@ public class TokenServiceImpl implements TokenService {
             return null;
         String userType = (String) userContextMap.get("userType");
         return userType;
-    }
-    public String getSystemToken() {
-        logger.debug("Create System Token");
-
-        try {
-            InputStream inputStream = new ClassPathResource("keycloak.json", this.getClass().getClassLoader()).getInputStream();
-            AuthzClient authzClient = AuthzClient.create(JsonSerialization.readValue(inputStream, Configuration.class));
-            AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
-            if (accessTokenResponse != null)
-                return accessTokenResponse.getToken();
-        } catch (IOException e) {
-            logger.error("Could not read keycloak.json", e);
-            return null;
-        }
-        return null;
-
     }
 }
