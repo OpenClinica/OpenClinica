@@ -1,13 +1,11 @@
 package org.akaza.openclinica.config;
 
-import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-import org.keycloak.authorization.client.AuthzClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
@@ -101,10 +99,7 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         return () -> {
             logger.info("Calling Randomize service to initialize configuration.");
             Map<String, String> configMap = new HashMap<>();
-            AuthzClient authzClient = AuthzClient.create();
-            String realm = authzClient.getConfiguration().getRealm();
-
-            String accessToken = keycloakClient.getSystemToken(realm);
+            String accessToken = keycloakClient.getSystemToken();
             boolean isSuccess = randomizationService.refreshConfigurations(accessToken, configMap);
             if (isSuccess || configMap.size() > 0)
                 logger.info("Initialized Randomize configuration with " + configMap.size() + " entries.");

@@ -205,10 +205,12 @@ public class KeycloakClientImpl {
 
     }
 
-    public String getSystemToken(String realm) {
+    public String getSystemToken() {
         logger.debug("Create OC-API System Token");
 
         try {
+            AuthzClient authzClient = AuthzClient.create();
+            String realm = authzClient.getConfiguration().getRealm();
             logger.debug("Getting access token for realm: {} and client: {}", realm, OC_API_CLIENT_ID);
             ClientsResource clientsResource = keycloak
                     .realm(realm)
@@ -220,7 +222,7 @@ public class KeycloakClientImpl {
                     .get(ocApiClientRepresentation.getId())
                     .getSecret()
                     .getValue();
-            AuthzClient authzClient = AuthzClient.create();
+
             String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
 
             logger.debug("oc-api client secret for realm: {} is {}", realm, ocApiClientSecret);
