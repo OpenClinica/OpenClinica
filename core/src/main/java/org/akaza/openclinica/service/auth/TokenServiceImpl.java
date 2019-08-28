@@ -2,7 +2,14 @@ package org.akaza.openclinica.service.auth;
 
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.collections4.MapUtils;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
+import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.util.JsonSerialization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.RsaVerifier;
@@ -15,6 +22,8 @@ import sun.security.rsa.RSAPublicKeyImpl;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.LinkedHashMap;
@@ -22,6 +31,8 @@ import java.util.Map;
 
 @Service("tokenService")
 public class TokenServiceImpl implements TokenService {
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     private JsonParser objectMapper = JsonParserFactory.create();
     final String EXP = "exp";
 
@@ -67,5 +78,20 @@ public class TokenServiceImpl implements TokenService {
         String userType = (String) userContextMap.get("userType");
         return userType;
     }
+    public String getSystemToken() {
+        logger.debug("Create System Token");
 
+        try {
+            InputStream inputStream = new ClassPathResource("keycloak.json", this.getClass().getClassLoader()).getInputStream();
+            AuthzClient authzClient = AuthzClient.create(JsonSerialization.readValue(inputStream, Configuration.class));
+            AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
+            if (accessTokenResponse != null)
+                return accessTokenResponse.getToken();
+        } catch (IOException e) {
+            logger.error("Could not read keycloak.json", e);
+            return null;
+        }
+        return null;
+
+    }
 }
