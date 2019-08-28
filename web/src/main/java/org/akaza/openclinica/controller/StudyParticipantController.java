@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
 import org.akaza.openclinica.controller.dto.ParticipantRestfulRequestDTO;
+import org.akaza.openclinica.controller.dto.StudyEventResponseDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -461,6 +462,17 @@ public class StudyParticipantController {
 			@ApiParam(value = "participant ID", required = true) @RequestParam( value = "participantID") String participantID,
 			@ApiParam(value = "Use this parameter to retrieve participant's access code and status for OpenClinica Participant module. Possible values - y or n.", required = false) @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo,
 			HttpServletRequest request) throws Exception {
+
+		utilService.setSchemaFromStudyOid(studyOid);
+		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+
+		try {
+			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);
+		} catch (OpenClinicaSystemException e) {
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
+		}
+
 		if (studyOid != null)
 			studyOid = studyOid.toUpperCase();
 
@@ -472,7 +484,21 @@ public class StudyParticipantController {
 			includeRelatedInfo = true;
 		}
 
-		return getStudySubjectInfo(studyOid, siteOid, participantID,includeRelatedInfo,request);
+		Object result = getStudySubjectInfo(studyOid, siteOid, participantID,includeRelatedInfo,request);
+		
+		try {
+			if (result instanceof ErrorObj)
+				throw new OpenClinicaSystemException(((ErrorObj) result).getMessage());
+			else if (result instanceof StudyParticipantDetailDTO)
+				return new ResponseEntity<Object>(result, HttpStatus.OK);
+			else if (result instanceof ParameterizedErrorVM)
+				return new ResponseEntity<Object>(result, HttpStatus.BAD_REQUEST);
+			
+		} catch (OpenClinicaSystemException e) {
+			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+
+		}
+		return null;
 	}
 
 	/**
@@ -482,9 +508,9 @@ public class StudyParticipantController {
 	 * @return
 	 * @throws Exception
 	 */
-	private ResponseEntity<Object> getStudySubjectInfo(String studyOid, String siteOid, String participantID,boolean includeRelatedInfo,HttpServletRequest request)
+	private Object getStudySubjectInfo(String studyOid, String siteOid, String participantID,boolean includeRelatedInfo,HttpServletRequest request)
 			throws Exception {
-		ResponseEntity<Object> response = null;
+		Object response = null;
 		try {
 
 			StudyBean study = null;
@@ -497,7 +523,7 @@ public class StudyParticipantController {
 
 					responseSuccess = getStudyParticipantDTO(request,studyOid, siteOid,study,participantID,includeRelatedInfo);
 
-					response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+					return responseSuccess;
 				}
 
 			} catch (OpenClinicaSystemException e) {
@@ -507,18 +533,16 @@ public class StudyParticipantController {
 				map.put("studyOid", studyOid);
 				map.put("siteOid", siteOid);
 				map.put("participantID", participantID);
-				ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, map);
+				ParameterizedErrorVM responseErrorDTO =new ParameterizedErrorVM(errorMsg, map);
 
-				response = new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-
-				return response;
+				return responseErrorDTO;
 			}
 
 
 
 		} catch (Exception eee) {
 			logger.error("Error...", eee);
-			throw eee;
+			return new ErrorObj("Unexpected error:",eee.getMessage());
 		}
 
 		return response;

@@ -9,7 +9,6 @@ import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
@@ -23,11 +22,8 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
-import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -52,7 +48,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -121,8 +116,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JobService jobService;
-
-    private RestfulServiceHelper restfulServiceHelper;
 
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
@@ -384,8 +377,7 @@ public class UserServiceImpl implements UserService {
         StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantID, study);
         OCUserDTO ocuserDTO = null;
         StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
-        
-        StudySubjectBean ssBean = getStudySubjectDAO().findByOidAndStudy(ss.getOcOid(), study.getStudyId());
+      
         if(ss == null) {
         	String errorCode =ErrorConstants.ERR_PARTICIPATE_NOT_AVAILABLE;
         	String msg = "Can't find the participant with ID:" + participantID;
@@ -399,13 +391,9 @@ public class UserServiceImpl implements UserService {
         	spDTO.setSubjectOid(ss.getOcOid());
         	spDTO.setSubjectKey(ss.getLabel());
         	spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
-        	if(ssBean.getOwner() !=null) {
-        		spDTO.setCreatedBy(ssBean.getOwner().getName());
-        	}
-        	if(ssBean.getUpdater()!=null) {
-        		spDTO.setLastModifiedBy(ssBean.getUpdater().getName());
-        	}
         	
+        	spDTO.setCreatedBy(ss.getUserAccount().getUserName());        	        	
+        	spDTO.setLastModifiedBy(userAccountDao.findById(ss.getUpdateId()).getUserName());        	        	
         	
         	if(ss.getDateCreated()!=null) {
         		spDTO.setCreatedAt(ss.getDateCreated().toLocaleString());
@@ -929,9 +917,5 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public StudySubjectDAO getStudySubjectDAO() {
-        ssDao = ssDao != null ? ssDao : new StudySubjectDAO(dataSource);
-        return ssDao;
-    }
 
 }
