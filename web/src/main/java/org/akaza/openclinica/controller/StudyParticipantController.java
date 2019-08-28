@@ -464,89 +464,28 @@ public class StudyParticipantController {
 			HttpServletRequest request) throws Exception {
 
 		utilService.setSchemaFromStudyOid(studyOid);
-		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-
-		try {
-			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);
-		} catch (OpenClinicaSystemException e) {
-			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
-
-		}
-
-		if (studyOid != null)
-			studyOid = studyOid.toUpperCase();
-
-		if (siteOid != null)
-			siteOid = siteOid.toUpperCase();
-
+		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);		
+		
 		boolean includeRelatedInfo = false;
 		if(includeParticipateInfo!=null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
 			includeRelatedInfo = true;
 		}
-
-		Object result = getStudySubjectInfo(studyOid, siteOid, participantID,includeRelatedInfo,request);
 		
-		try {
-			if (result instanceof ErrorObj)
-				throw new OpenClinicaSystemException(((ErrorObj) result).getMessage());
-			else if (result instanceof StudyParticipantDetailDTO)
-				return new ResponseEntity<Object>(result, HttpStatus.OK);
-			else if (result instanceof ParameterizedErrorVM)
-				return new ResponseEntity<Object>(result, HttpStatus.BAD_REQUEST);
-			
+		String accessToken = utilService.getAccessTokenFromRequest(request);
+		String customerUuid = utilService.getCustomerUuidFromRequest(request);					
+		StudyParticipantDetailDTO result =  null;
+		
+		try {			
+			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);							
+			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,customerUuid,userAccountBean,participantID,includeRelatedInfo);
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
-
-		}
-		return null;
-	}
-
-	/**
-	 * @param studyOid
-	 * @param siteOid
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
-	private Object getStudySubjectInfo(String studyOid, String siteOid, String participantID,boolean includeRelatedInfo,HttpServletRequest request)
-			throws Exception {
-		Object response = null;
-		try {
-
-			StudyBean study = null;
-			try {
-				study = this.getRestfulServiceHelper().setSchema(studyOid, request);
-				study = participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
-
-				if(study != null) {
-					StudyParticipantDetailDTO responseSuccess =  new StudyParticipantDetailDTO();
-
-					responseSuccess = getStudyParticipantDTO(request,studyOid, siteOid,study,participantID,includeRelatedInfo);
-
-					return responseSuccess;
-				}
-
-			} catch (OpenClinicaSystemException e) {
-
-				String errorMsg = e.getErrorCode();
-				HashMap<String, String> map = new HashMap<>();
-				map.put("studyOid", studyOid);
-				map.put("siteOid", siteOid);
-				map.put("participantID", participantID);
-				ParameterizedErrorVM responseErrorDTO =new ParameterizedErrorVM(errorMsg, map);
-
-				return responseErrorDTO;
-			}
-
-
-
-		} catch (Exception eee) {
-			logger.error("Error...", eee);
-			return new ErrorObj("Unexpected error:",eee.getMessage());
 		}
 
-		return response;
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
+
+	
 	/**
 	 * @param studyOid
 	 * @param siteOid
@@ -642,37 +581,6 @@ public class StudyParticipantController {
 
 		return studyParticipantDTOs;
 	}
-
-
-	/**
-	 * @param studyOid
-	 * @param siteOid
-	 * @param study
-	 * @return
-	 * @throws Exception
-	 */
-	private StudyParticipantDetailDTO getStudyParticipantDTO(HttpServletRequest request,String studyOid, String siteOid,StudyBean study,String participantID,boolean incRelatedInfo) throws Exception {
-
-		StudyBean studyToCheck;
-		/**
-		 *  pass in site OID, so will return data in site level
-		 */
-		if(siteOid != null) {
-			studyToCheck = this.getStudyDAO().findByOid(siteOid);
-		}else {
-			studyToCheck = study;
-		}
-
-		String accessToken = utilService.getAccessTokenFromRequest(request);
-		String customerUuid = utilService.getCustomerUuidFromRequest(request);
-		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-		utilService.setSchemaFromStudyOid(studyOid);
-		String schema = CoreResources.getRequestSchema();
-		StudyParticipantDetailDTO spDTO = userService.extractParticipantInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema,participantID,incRelatedInfo);
-
-		return spDTO;
-	}
-
 
 
 	/**

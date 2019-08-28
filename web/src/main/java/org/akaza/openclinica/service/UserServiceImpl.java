@@ -364,11 +364,10 @@ public class UserServiceImpl implements UserService {
     }
     
     @Transactional
-    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema,String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
+    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
     {
 
-        CoreResources.setRequestSchema(schema);
-
+        
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
 
@@ -379,9 +378,8 @@ public class UserServiceImpl implements UserService {
         StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
       
         if(ss == null) {
-        	String errorCode =ErrorConstants.ERR_PARTICIPATE_NOT_AVAILABLE;
-        	String msg = "Can't find the participant with ID:" + participantID;
-        	throw new OpenClinicaSystemException(errorCode, msg);
+        	
+        	throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_NOT_AVAILABLE);
         }
             
         try {          
@@ -403,7 +401,9 @@ public class UserServiceImpl implements UserService {
         	}
         	        	        	
         	if(incRelatedInfo) {
-        		spDTO.setStatus(ss.getStatus().getName());
+        		if(ss.getUserStatus() !=null) {
+        			spDTO.setStatus(ss.getUserStatus().getValue());
+        		}
         		spDTO.setAccessCode(ocuserDTO.getAccessCode());
         	}		        			        	
         	
@@ -415,8 +415,6 @@ public class UserServiceImpl implements UserService {
         		
         	}			        			   
 	        
-	        return spDTO;
-             
            
         } catch (Exception e) {
            
