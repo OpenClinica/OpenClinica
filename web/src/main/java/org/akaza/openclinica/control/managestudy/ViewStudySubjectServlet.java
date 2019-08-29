@@ -313,12 +313,11 @@ public class ViewStudySubjectServlet extends SecureController {
             StudyBean parentStudyBean = (StudyBean) studyDAO.findByPK(parentStudyId);
 
             for(String itemPath :itemPathList ) {
-
-                givenStudyOid = itemPath.split(DOT_ESCAPED)[0];
-                givenEventOid = itemPath.split(DOT_ESCAPED)[1];
-                givenFormOid = itemPath.split(DOT_ESCAPED)[2];
-                givenGroupRepeat = StringUtils.substringBetween(itemPath.split(DOT_ESCAPED)[3], OPEN_BRACKET, CLOSE_BRACKET);
-                givenItemOid = itemPath.split(DOT_ESCAPED)[4];
+                givenStudyOid = itemPath.split(DOT_ESCAPED)[0].trim();
+                givenEventOid = itemPath.split(DOT_ESCAPED)[1].trim();
+                givenFormOid = itemPath.split(DOT_ESCAPED)[2].trim();
+                givenGroupRepeat = StringUtils.substringBetween(itemPath.split(DOT_ESCAPED)[3], OPEN_BRACKET, CLOSE_BRACKET).trim();
+                givenItemOid = itemPath.split(DOT_ESCAPED)[4].trim();
 
 
                 for (int i = 0; i < displayEvents.size(); i++) {
