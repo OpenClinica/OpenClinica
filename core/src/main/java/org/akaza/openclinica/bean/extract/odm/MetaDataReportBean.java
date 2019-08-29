@@ -138,7 +138,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             String newResult = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
             // The result of this is being double escaped. Somewhere the Castor library is escaping the XML specific
             // characters when they have already been escaped.
-            newResult = StringEscapeUtils.unescapeXml(newResult);
+            newResult = StringEscapeUtils.escapeXml(newResult);
             return newResult;
 
         } catch (FileNotFoundException ex) {
