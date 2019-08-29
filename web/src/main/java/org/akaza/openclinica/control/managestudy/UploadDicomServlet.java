@@ -5,7 +5,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-public class DicomServlet extends SecureController {
+public class UploadDicomServlet extends SecureController {
 
     public final static String PARTICIPANT_ID = "pid";
     public final static String ACCESSION_ID = "accid";
@@ -27,6 +27,6 @@ public class DicomServlet extends SecureController {
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
-
+        // There are no access restrictions for this page. Anyone with the link to this page should be able to upload DICOM images.
     }
 }

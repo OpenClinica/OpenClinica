@@ -575,7 +575,7 @@ public class StudyController {
         AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
         AsyncStudyHelper.put(parameters.uniqueStudyID, asyncStudyHelper);
 
-        ResponseEntity<HashMap<String, Object>> responseEntity = processSSOUserContext(request, parameters.studyEnvUuid);
+        ResponseEntity<Map<String, Object>> responseEntity = processSSOUserContext(request, parameters.studyEnvUuid);
 
         UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
         if (ownerUserAccount == null) {
@@ -918,8 +918,8 @@ public class StudyController {
         return response;
     }
 
-    private ResponseEntity<HashMap<String, Object>> processSSOUserContext(HttpServletRequest request, String studyEnvUuid) throws Exception {
-        ResponseEntity<HashMap<String, Object>> responseEntity = null;
+    private ResponseEntity<Map<String, Object>> processSSOUserContext(HttpServletRequest request, String studyEnvUuid) throws Exception {
+        ResponseEntity<Map<String, Object>> responseEntity = null;
         HttpSession session = request.getSession();
         if (session == null) {
             logger.error("Cannot proceed without a valid session.");
@@ -929,7 +929,7 @@ public class StudyController {
         if (userContextMap == null)
             return responseEntity;
         ResponseEntity<List<StudyEnvironmentRoleDTO>> studyUserRoles = studyBuildService.getUserRoles(request, false);
-        HashMap<String, String> userMap = getUserInfo(request, userContextMap, studyUserRoles);
+        Map<String, String> userMap = getUserInfo(request, userContextMap, studyUserRoles);
         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 
         if ((ub == null || ub.getId() == 0) ||
@@ -950,15 +950,15 @@ public class StudyController {
             userDTO.put("firstName", ub.getFirstName());
             userDTO.put("lastName", ub.getLastName());
             userDTO.put("apiKey", ub.getApiKey());
-            responseEntity = new ResponseEntity<HashMap<String, Object>>(userDTO, org.springframework.http.HttpStatus.OK);
+            responseEntity = new ResponseEntity<Map<String, Object>>(userDTO, org.springframework.http.HttpStatus.OK);
         }
         return responseEntity;
     }
 
-    private HashMap<String, String> getUserInfo(HttpServletRequest request, Map<String, Object> userContextMap,
+    private Map<String, String> getUserInfo(HttpServletRequest request, Map<String, Object> userContextMap,
                                                 ResponseEntity<List<StudyEnvironmentRoleDTO>> studyUserRoles) throws Exception {
         String studyEnvUuid = (String) request.getAttribute("studyEnvUuid");
-        HashMap<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         ArrayList<LinkedHashMap<String, String>> roles = new ArrayList<>();
 
         for (StudyEnvironmentRoleDTO role : studyUserRoles.getBody()) {
@@ -1880,12 +1880,12 @@ public class StudyController {
         return ownerUserAccount;
     }
 
-    public UserAccountBean getStudyOwnerAccountWithCreatedUser(HttpServletRequest request, ResponseEntity<HashMap<String, Object>> responseEntity) {
+    public UserAccountBean getStudyOwnerAccountWithCreatedUser(HttpServletRequest request, ResponseEntity<Map<String, Object>> responseEntity) {
         UserAccountBean ownerUserAccount = null;
         if (responseEntity != null) {
-            HashMap hashMap = responseEntity.getBody();
-            if (hashMap != null && hashMap.get("username") != null) {
-                String usernmae = (String) hashMap.get("username");
+            Map<String, Object> responseBody = responseEntity.getBody();
+            if (responseBody != null && responseBody.get("username") != null) {
+                String usernmae = (String) responseBody.get("username");
                 UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
                 ownerUserAccount = (UserAccountBean) userAccountDAO.findByUserName(usernmae);
             }

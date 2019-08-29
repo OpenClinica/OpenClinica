@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1")
@@ -89,16 +90,16 @@ public class UserAccountController {
 	 */
 
 	@RequestMapping(value = "/createuseraccount", method = RequestMethod.POST)
-	public ResponseEntity<HashMap<String, Object>> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
+	public ResponseEntity<Map<String, Object>> createOrUpdateAccount(HttpServletRequest request, @RequestBody Map<String, String> map) throws Exception {
 		UserAccountBean  uBean = userCoreService.createUser(request, map);
-		HashMap<String, Object> userDTO = new HashMap<String, Object>();
+		Map<String, Object> userDTO = new HashMap<String, Object>();
 		userDTO.put("username", uBean.getName());
 		userDTO.put("password", uBean.getPasswd());
 		userDTO.put("firstName", uBean.getFirstName());
 		userDTO.put("lastName", uBean.getLastName());
 		userDTO.put("apiKey", uBean.getApiKey());
 		userDTO.put("userUuid", uBean.getUserUuid());
-		return new ResponseEntity<HashMap<String, Object>>(userDTO, org.springframework.http.HttpStatus.OK);
+		return new ResponseEntity<>(userDTO, org.springframework.http.HttpStatus.OK);
 	}
 
 	protected UserDetails getUserDetails() {
