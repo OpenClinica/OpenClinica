@@ -241,8 +241,4 @@
   $('#btn-close').click(function() {
     window.close();
   });
-<<<<<<< HEAD
 </script>
-=======
-</script>
->>>>>>> upstream/4.8.1

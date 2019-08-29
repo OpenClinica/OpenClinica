@@ -2030,10 +2030,6 @@
         <servlet-name>ViewDicomServlet</servlet-name>
         <url-pattern>/ViewDicom</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DicomServlet</servlet-name>
-        <url-pattern>/Dicom</url-pattern>
-    </servlet-mapping>
 
     <!--  Export Excel -->
     <servlet-mapping>
