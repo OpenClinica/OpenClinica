@@ -2,6 +2,8 @@ package org.akaza.openclinica.service.auth;
 
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
@@ -22,6 +24,8 @@ import java.util.Map;
 
 @Service("tokenService")
 public class TokenServiceImpl implements TokenService {
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     private JsonParser objectMapper = JsonParserFactory.create();
     final String EXP = "exp";
 
@@ -67,5 +71,4 @@ public class TokenServiceImpl implements TokenService {
         String userType = (String) userContextMap.get("userType");
         return userType;
     }
-
 }
