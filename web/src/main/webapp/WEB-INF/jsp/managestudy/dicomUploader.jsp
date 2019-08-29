@@ -68,11 +68,7 @@
     text-align: center;
   }
   h1.success {
-<<<<<<< HEAD
-    color: #70b728;
-=======
     color: #ED7800;
->>>>>>> upstream/4.8.1
     margin-top: 110px;
     margin-bottom: 20px;
   }
