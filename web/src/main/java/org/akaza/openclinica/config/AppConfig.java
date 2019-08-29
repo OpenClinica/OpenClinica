@@ -1,10 +1,14 @@
 package org.akaza.openclinica.config;
 
+import org.akaza.openclinica.service.randomize.RandomizationService;
+import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-import org.keycloak.admin.client.Keycloak;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -29,6 +33,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 @KeycloakConfiguration
@@ -40,12 +46,17 @@ import java.net.URL;
 
 public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
 
-
+    private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private String securedRoute = "/**";
 
     @Value(value = "${SBSUrl}")
     private String sbsUrl;
+
+    @Autowired
+    private KeycloakClientImpl keycloakClient;
+    @Autowired
+    private RandomizationService randomizationService;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -73,6 +84,29 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     public MultipartResolver multipartResolver() {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
         return multipartResolver;
+    }
+
+    /***
+     * Bean to initialize Randomize configuration at RT startup.
+     * This callback variant is somewhat similar to ContextRefreshedEvent but doesn't require an implementation of ApplicationListener,
+     * with no need to filter context references across a context hierarchy etc.
+     * It also implies a more minimal dependency on just the beans package and is being honored by standalone ListableBeanFactory implementations,
+     * not just in an ApplicationContext environment.
+     * @return
+     */
+    @Bean
+    public SmartInitializingSingleton loadRandomizeConfigurations() {
+        return () -> {
+            logger.info("Calling Randomize service to initialize configuration.");
+            Map<String, String> configMap = new HashMap<>();
+            String accessToken = keycloakClient.getSystemToken();
+            boolean isSuccess = randomizationService.refreshConfigurations(accessToken, configMap);
+            if (isSuccess || configMap.size() > 0)
+                logger.info("Initialized Randomize configuration with " + configMap.size() + " entries.");
+            else {
+                logger.error("No studies configured or Randomize  startup configuration failed.");
+            }
+        };
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
