@@ -312,44 +312,45 @@ public class ViewStudySubjectServlet extends SecureController {
             }
             StudyBean parentStudyBean = (StudyBean) studyDAO.findByPK(parentStudyId);
 
-            for(String itemPath :itemPathList ) {
-                givenStudyOid = itemPath.split(DOT_ESCAPED)[0].trim();
-                givenEventOid = itemPath.split(DOT_ESCAPED)[1].trim();
-                givenFormOid = itemPath.split(DOT_ESCAPED)[2].trim();
-                givenGroupRepeat = StringUtils.substringBetween(itemPath.split(DOT_ESCAPED)[3], OPEN_BRACKET, CLOSE_BRACKET).trim();
-                givenItemOid = itemPath.split(DOT_ESCAPED)[4].trim();
-
-
                 for (int i = 0; i < displayEvents.size(); i++) {
                     DisplayStudyEventBean decb = displayEvents.get(i);
                     StudyEventBean seBean = decb.getStudyEvent();
                     StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(seBean.getStudyEventDefinitionId());
 
-                    if (
-                            parentStudyBean.getOid().equals(givenStudyOid)
-                                    && sedBean.getOid().equals(givenEventOid)
-                    ) {
-                        List<EventCRFBean> eventCRFBeans = eventCRFDAO.findAllByStudyEvent(seBean);
-                        for (EventCRFBean eventCRFBean : eventCRFBeans) {
-                            FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
-                            CRFBean crfBean = (CRFBean) crfdao.findByPK(formLayoutBean.getCrfId());
+                   if(itemPathList!=null) {
+                       for (String itemPath : itemPathList) {
+                           givenStudyOid = itemPath.split(DOT_ESCAPED)[0].trim();
+                           givenEventOid = itemPath.split(DOT_ESCAPED)[1].trim();
+                           givenFormOid = itemPath.split(DOT_ESCAPED)[2].trim();
+                           givenGroupRepeat = StringUtils.substringBetween(itemPath.split(DOT_ESCAPED)[3], OPEN_BRACKET, CLOSE_BRACKET).trim();
+                           givenItemOid = itemPath.split(DOT_ESCAPED)[4].trim();
+                           if (
+                                   parentStudyBean.getOid().equals(givenStudyOid)
+                                           && sedBean.getOid().equals(givenEventOid)
+                           ) {
+                               List<EventCRFBean> eventCRFBeans = eventCRFDAO.findAllByStudyEvent(seBean);
+                               for (EventCRFBean eventCRFBean : eventCRFBeans) {
+                                   FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
+                                   CRFBean crfBean = (CRFBean) crfdao.findByPK(formLayoutBean.getCrfId());
 
-                            if (crfBean.getOid().equals(givenFormOid)) {
-                                List<ItemBean> itemBeans = itemDAO.findByOid(givenItemOid);
-                                if (itemBeans != null) {
-                                    ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFIdAndOrdinal(itemBeans.get(0).getId(), eventCRFBean.getId(), Integer.valueOf(givenGroupRepeat));
-                                    if (itemDataBean != null && itemDataBean.getId() != 0)
-                                        decb.getStudyEvent().setAdditionalNotes(itemDataBean.getValue());
-                                }
-                                break;
-                            }
-                        }
+                                   if (crfBean.getOid().equals(givenFormOid)) {
+                                       List<ItemBean> itemBeans = itemDAO.findByOid(givenItemOid);
+                                       if (itemBeans != null) {
+                                           ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFIdAndOrdinal(itemBeans.get(0).getId(), eventCRFBean.getId(), Integer.valueOf(givenGroupRepeat));
+                                           if (itemDataBean != null && itemDataBean.getId() != 0)
+                                               decb.getStudyEvent().setAdditionalNotes(itemDataBean.getValue());
+                                       }
+                                       break;
+                                   }
+                               }
 
-                    }
+                           }
+                       }
+                   }
                     if (!(currentRole.isDirector() || currentRole.isCoordinator()) && decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
                         decb.getStudyEvent().setEditable(false);
                     }
-                }
+
             }
             if (currentStudy.getParentStudyId() > 0) {
                 HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
