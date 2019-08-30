@@ -100,7 +100,13 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
             logger.info("Calling Randomize service to initialize configuration.");
             Map<String, String> configMap = new HashMap<>();
             String accessToken = keycloakClient.getSystemToken();
-            boolean isSuccess = randomizationService.refreshConfigurations(accessToken, configMap);
+            boolean isSuccess = false;
+            try {
+                isSuccess = randomizationService.refreshConfigurations(accessToken, configMap);
+            } catch (Exception e) {
+                // Since this run at the startup, we need to catch the exception and log it. If we don't do this, it will prevent RT from starting
+                logger.error("Refresh configuration failed:" + e);
+            }
             if (isSuccess || configMap.size() > 0)
                 logger.info("Initialized Randomize configuration with " + configMap.size() + " entries.");
             else {
