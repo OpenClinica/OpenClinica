@@ -74,7 +74,7 @@
             realInterval = sessionTimeoutVal;
 
         setInterval(function () {
-                processTimedOuts(true, false);
+                processTimeOuts(true, false);
             },
             realInterval * 1000
         );
@@ -91,7 +91,7 @@
     var storage = new CrossStorageClient(crossStorageURL, {
         timeout: 7000});
     updateOCAppTimeout();
-    processTimedOuts(true, false);
+    processTimeOuts(true, false);
 </script>
 <div style="-webkit-overflow-scrolling:touch">
     <iframe id="enketo" style="z-index:1011;width:100vw;height:100vh;">

@@ -33,7 +33,6 @@
     if (doNotInvalidate === "true")
         firstLoginCheck = doNotInvalidate;
 
-
     console.log("***********************************firstLoginCheck as a parameter:" + firstLoginCheck);
     var CURRENT_USER = "currentUser";
     var appName = "RT";
@@ -57,8 +56,10 @@
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/client.js"></script>
         <script type="text/javascript">
+            console.log("***********************************Getting crossStorage");
             var storage = new CrossStorageClient(crossStorageURL, {
-                timeout: 7000});
+                timeout: 7000
+            });
         </script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/sessionTimeout.js"></script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/auth0/captureKeyboardMouseEvents.js"></script>
@@ -124,7 +125,7 @@
         }
     }
     var doWork = function () {
-        processTimedOuts(true, false);
+        processTimeOuts(true, false);
     };
     // Define what to do if something goes wrong
     var doError = function() {
@@ -135,7 +136,7 @@
     ticker.start();
     */
     setInterval(function () {
-            processTimedOuts(true, false);
+            processTimeOuts(true, false);
         },
         realInterval * 1000
     );
@@ -143,7 +144,7 @@
 </script>
 
 <script type="text/javaScript">
-    processTimedOuts(true, false);
+    processTimeOuts(true, false);
     //Piwik
     var _paq = _paq || [];
     /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
@@ -222,7 +223,7 @@
 
     function processLogoutClick(returnTo) {
         setCurrentUser("");
-        storage.clear();
+        sessionStorage && sessionStorage.clear();
     }
 </script>
 
@@ -565,10 +566,10 @@
                     <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-            <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
+                <c:if test="${study.status.available}">
+                    <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
+                </c:if>
                 <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
-            </c:if>
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>

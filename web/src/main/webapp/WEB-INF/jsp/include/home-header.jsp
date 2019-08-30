@@ -86,7 +86,7 @@
 <script type="text/javascript" language="JavaScript" src="includes/auth0/captureKeyboardMouseEvents.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
 <script type="text/javaScript">
-    processTimedOuts(true, false);
+    processTimeOuts(true, false);
 </script>
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class="background">
