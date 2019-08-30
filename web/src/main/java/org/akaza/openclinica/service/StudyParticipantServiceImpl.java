@@ -182,8 +182,6 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
                 updateStudySubjectSize(tenantSite,tenantSiteBean);
                 // update at parent level
                 updateStudySubjectSize(tenantStudy,tenantStudyBean);
-        }else{
-            logger.debug("Error message should be here");
         }
 
         if ((register.equalsIgnoreCase("y") || register.equalsIgnoreCase("yes") ) && validateService.isParticipateActive(tenantStudy)) {
