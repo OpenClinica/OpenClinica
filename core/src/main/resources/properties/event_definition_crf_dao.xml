@@ -378,9 +378,9 @@
             (sed.oc_oid = ANY(string_to_array(?,',')))  
                   and    
             (s.oc_oid = ANY(string_to_array(?,',')))  			
-			and (? != ANY
-			(string_to_array(selected_version_ids,',')) or ? != ANY
-			(string_to_array(selected_version_ids,',')) )
+			and (NOT (? = ANY
+			(string_to_array(selected_version_ids,','))) or NOT (? = ANY
+			(string_to_array(selected_version_ids,','))) )
 		</sql>
 	</query>
 </queries>
