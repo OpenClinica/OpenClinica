@@ -34,8 +34,8 @@ public class RandomizationRegistrar {
     private net.sf.ehcache.Cache cache;
 
     public RandomizationRegistrar() {
-        cacheManager = CacheManager.getInstance();
-        this.cache = cacheManager.getCache(CACHE_KEY);
+        this.cacheManager = CacheManager.getInstance();
+        this.cache = this.cacheManager.getCache(CACHE_KEY);
 
     }
 
@@ -48,12 +48,13 @@ public class RandomizationRegistrar {
         requestFactory.setReadTimeout(RANDOMIZATION_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
 
+        SeRandomizationDTO response = null;
         try {
-            SeRandomizationDTO response = rest.getForObject(randomizationUrl, SeRandomizationDTO.class);
-            if (response.getStudyOid() != null) {
-                return response;
-            } else {
-                return null;
+            response = rest.getForObject(randomizationUrl, SeRandomizationDTO.class);
+
+            // There is no DTO to return when study OID is missing
+            if (response != null && response.getStudyOid() == null) {
+                response = null;
             }
 
         } catch (Exception e) {
@@ -63,14 +64,14 @@ public class RandomizationRegistrar {
             System.out.println(ExceptionUtils.getStackTrace(e));
 
         }
-        return null;
+        return response;
     }
 
     public SeRandomizationDTO getCachedRandomizationDTOObject(String studyOid, Boolean resetCache) throws Exception {
         SeRandomizationDTO seRandomizationDTO = null; // check if exist in cache ;
         String ocUrl = CoreResources.getField("sysURL.base");
         String mapKey = ocUrl + studyOid;
-        Element element = cache.get(mapKey);
+        Element element = cache != null ? cache.get(mapKey) : null;
         if (element != null && element.getObjectValue() != null && !resetCache) {
             seRandomizationDTO = (SeRandomizationDTO) element.getObjectValue();
         }
