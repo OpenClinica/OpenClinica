@@ -896,17 +896,20 @@ public class SDVUtil {
             tempSDVBean.setCrfNameVersion(getCRFName(eventCRFBean.getCRFVersionId()) + "/ " + getFormLayoutName(eventCRFBean.getFormLayoutId()));
 
             if (eventCRFBean.getStatus() != null) {
-
                 Integer status = eventCRFBean.getStage().getId();
-
                 if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED
                         || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SKIPPED) {
                     status = DataEntryStage.LOCKED.getId();
-
                 }
 
-                tempSDVBean.setCrfStatus(getCRFStatusIconPath(status, request, studySubjectBean.getId(), eventCRFBean.getId(), eventCRFBean.getCRFVersionId(),
-                        eventCRFBean.getFormLayoutId(), eventCRFBean.getStudyEventId(), studyBean.getId(), request.getQueryString().replaceAll("&", "%26")));
+                String queryString = request.getQueryString();
+                if (null == queryString) {
+                    queryString = "";
+                }
+                tempSDVBean.setCrfStatus(getCRFStatusIconPath(
+                    status, request, studySubjectBean.getId(), eventCRFBean.getId(), eventCRFBean.getCRFVersionId(),
+                    eventCRFBean.getFormLayoutId(), eventCRFBean.getStudyEventId(), studyBean.getId(), queryString.replaceAll("&", "%26")
+                ));
             }
 
             tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());

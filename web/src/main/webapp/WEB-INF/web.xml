@@ -1360,9 +1360,14 @@
         <servlet-class>org.akaza.openclinica.control.submit.EnketoFormServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>Dicom</display-name>
-        <servlet-name>DicomServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.DicomServlet</servlet-class>
+        <display-name>UploadDicom</display-name>
+        <servlet-name>UploadDicomServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.UploadDicomServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <display-name>ViewDicom</display-name>
+        <servlet-name>ViewDicomServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ViewDicomServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
@@ -2016,10 +2021,14 @@
     <servlet-mapping>
         <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
+    </servlet-mapping>]
+    <servlet-mapping>
+        <servlet-name>UploadDicomServlet</servlet-name>
+        <url-pattern>/Dicom</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>DicomServlet</servlet-name>
-        <url-pattern>/Dicom</url-pattern>
+        <servlet-name>ViewDicomServlet</servlet-name>
+        <url-pattern>/ViewDicom</url-pattern>
     </servlet-mapping>
 
     <!--  Export Excel -->

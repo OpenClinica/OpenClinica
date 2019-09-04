@@ -124,7 +124,7 @@ public class UtilServiceImpl implements UtilService {
         return false;
     }
 
-    public void checkFileFormat(MultipartFile file, String fileHeaderMappring) {
+    public void checkFileFormat(MultipartFile file, String fileHeaderMapping) {
         ResponseEntity response = null;
         RestReponseDTO responseDTO = new RestReponseDTO();
         String finalMsg = null;
@@ -140,10 +140,12 @@ public class UtilServiceImpl implements UtilService {
                 try {
                     is = file.getInputStream();
                     reader = new BufferedReader(new InputStreamReader(is));
-                    CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(fileHeaderMappring).withFirstRecordAsHeader().withTrim();
+                    CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(fileHeaderMapping).withFirstRecordAsHeader().withTrim();
 
                     CSVParser csvParser = new CSVParser(reader, csvFileFormat);
                     csvParser.parse(reader, csvFileFormat);
+                } catch (IllegalArgumentException e) {
+                    throw new OpenClinicaSystemException(ErrorConstants.ERR_MULTIPLE_PARTICIPANT_ID_HEADERS);
                 } catch (Exception e) {
                     throw new OpenClinicaSystemException(ErrorConstants.ERR_NOT_CSV_FILE);
                 }

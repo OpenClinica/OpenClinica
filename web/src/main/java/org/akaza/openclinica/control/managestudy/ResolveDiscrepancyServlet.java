@@ -280,6 +280,23 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             String xformOutput = "";
             int studyFilePath = parentStudyBean.getFilePath();
+            
+            if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+                // This section is for version migration ,where item does not exist in the current formLayout
+                boolean itemExistInFormLayout = false;
+                request.setAttribute(STUDYSUBJECTID, "");
+                List<VersioningMap> vms = versioningMapDao.findByVersionIdAndItemId(ecb.getCRFVersionId(), item.getId());
+                for (VersioningMap vm : vms) {
+                    if (vm.getFormLayout().getFormLayoutId() == formLayout.getId()) {
+                        itemExistInFormLayout = true;
+                        break;
+                    }
+                }
+               // Get Original formLayout file from data directory
+                if (!itemExistInFormLayout) {
+                	formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());                    
+                }                    
+            }
 
             do {
                 xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid(),QUERY_FLAVOR);
@@ -296,20 +313,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             List<Instance> instances = model.getInstance();
 
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-                // This section is for version migration ,where item does not exist in the current formLayout
-                boolean itemExistInFormLayout = false;
-                request.setAttribute(STUDYSUBJECTID, "");
-                List<VersioningMap> vms = versioningMapDao.findByVersionIdAndItemId(ecb.getCRFVersionId(), item.getId());
-                for (VersioningMap vm : vms) {
-                    if (vm.getFormLayout().getFormLayoutId() == formLayout.getId()) {
-                        itemExistInFormLayout = true;
-                        break;
-                    }
-                }
-                if (!itemExistInFormLayout)
-                    formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());
-                // Get Original formLayout file from data directory
-
+               
                 binds = getBindElements(binds, item);
                 Itext itext = model.getItext();
 

@@ -98,6 +98,8 @@
     function setRedirection(formObj) {
         var params = new URLSearchParams(window.location.search);
         params.delete('redirection');
+        if (!params.has('studyId'))
+            params.append('studyId', '${study.id}');
         formObj.redirection.value = '${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp?' + params.toString();
     }
 

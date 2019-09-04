@@ -171,6 +171,7 @@ public class ErrorConstants {
     public static final String ERR_FIRST_NAME_TOO_LONG = "errorCode.firstNameTooLong";
     public static final String ERR_LAST_NAME_TOO_LONG = "errorCode.lastNameTooLong";
     public static final String ERR_IDENTIFIER_TOO_LONG = "errorCode.identifierTooLong";
+    public static final String ERR_PARTICIPANT_ID_TOO_LONG = "errorCode.participantIdTooLong";
 
     public static final String ERR_SYSTEM_GENERATED_ID_ENABLED = "errorCode.studyHasSystemGeneratedIdEnabled";
 
