@@ -678,7 +678,7 @@ public class SDVUtil {
         SDVToolbar sDVToolbar = new SDVToolbar(showMoreLink);
 
         // if(totalRowCount > 0){
-        sDVToolbar.setMaxRowsIncrements(new int[] { 15, 25, 50 });
+        sDVToolbar.setMaxRowsIncrements(new int[] { 15, 25, 50, 100 });
         tableFacade.setToolbar(sDVToolbar);
         tableFacade.setView(new SDVView(LocaleResolver.getLocale(request), request));
 

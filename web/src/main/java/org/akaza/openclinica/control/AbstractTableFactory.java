@@ -145,7 +145,7 @@ public abstract class AbstractTableFactory {
     }
 
     public int[] getMaxRowIncrements() {
-        return new int[] { 15, 25, 50 };
+        return new int[] { 15, 25, 50, 100 };
     }
 
     /**
