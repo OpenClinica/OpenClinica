@@ -10,6 +10,7 @@ release.properties
 .project
 .settings/
 .idea/
+LibreClinica.iml
 OpenClinica.iml
 web/src/main/resources/datainfo.properties
 core/*.iml
