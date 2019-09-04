@@ -1,16 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.akaza.openclinica</groupId>
-	<artifactId>OpenClinica</artifactId>
+	<groupId>org.libreclinica</groupId>
+	<artifactId>LibreClinica</artifactId>
 	<packaging>pom</packaging>
-	<version>3.14</version>
-	<name>OpenClinica</name>
-	<description>OpenClinica</description>
+	<version>0.2.0</version>
+	<name>LibreClinica</name>
+	<description>LibreClinica</description>
 
 	<modules>
-		<module>odm</module>
 		<module>core</module>
+		<module>odm</module>
 		<module>web</module>
 		<module>ws</module>
 	</modules>
@@ -23,7 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Project's source control URL -->
-		<git.url>git://github.com/reliatec-gmbh/LibreClinica</git.url>
+		<git.url>https://github.com/reliatec-gmbh/LibreClinica.git</git.url>
 
 		<!-- Config file - required by liquibase plugin -->
 		<config.file>src/main/resources/datainfo.properties</config.file>
@@ -95,8 +95,8 @@
 				<version>2.4.2-oc</version>
 			</dependency>
 			<dependency>
-				<groupId>org.libreclinica.odm</groupId>
-				<artifactId>LibreClinica-odm</artifactId>
+				<groupId>org.akaza.openclinica.odm</groupId>
+				<artifactId>openclinica-odm</artifactId>
 				<version>2.2</version>
 			</dependency>
 			<dependency>
@@ -124,6 +124,26 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>2.9.8</version>
             </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.3.3</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.5</version>
+            </dependency>
+			<dependency>
+				<groupId>net.sf.saxon</groupId>
+				<artifactId>saxon</artifactId>
+				<version>8.7</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.saxon</groupId>
+				<artifactId>saxon-dom</artifactId>
+				<version>8.7</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -367,25 +387,25 @@
 			<version>1.8.3</version>
 		</dependency>
 		<dependency>
-	<groupId>io.dropwizard.metrics</groupId>
-	<artifactId>metrics-core</artifactId>
-	<version>3.1.2</version>
-</dependency>
-<dependency>
-	<groupId>io.dropwizard.metrics</groupId>
-	<artifactId>metrics-healthchecks</artifactId>
-	<version>3.1.0</version>
-</dependency>
-<dependency>
-	<groupId>io.dropwizard.metrics</groupId>
-	<artifactId>metrics-jvm</artifactId>
-	<version>3.1.2</version>
-</dependency>
-	<dependency>
-    	<groupId>org.apache.httpcomponents</groupId>
-    	<artifactId>httpclient</artifactId>
-    	<version>4.5.7</version>
-	</dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-healthchecks</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-jvm</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.7</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>

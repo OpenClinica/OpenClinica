@@ -92,11 +92,6 @@ form element in red --%>
       <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
   </c:if>
 
-<script language="JavaScript" src="includes/global_functions_javascript.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
-
-
-
 <%-- A way to deal with the lack of 'break' out of forEach loop--%>
 
 <c:choose>

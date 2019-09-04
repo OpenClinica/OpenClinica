@@ -164,8 +164,11 @@ public class UploadFileServlet extends SecureController {
                 fileName = fileName.replaceAll("\\W+", "_");
             }
             try {
-            	newName = pathAndName.substring(0, n) + File.separator + fileName +
-            			checksum(f, content) + pathAndName.substring(p);
+            	String prefix = fileName + checksum(f, content) + "_";
+            	String suffix = pathAndName.substring(p);
+            	File directory = new File(pathAndName.substring(0, n));
+            	File newFile = File.createTempFile(prefix, suffix, directory);
+            	newName = newFile.getAbsolutePath();
             } catch (Throwable e) {
             	e.printStackTrace();
             	return null;

@@ -100,7 +100,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private AuditEventDAO auditEventDAO;
     private DatasetDAO datasetDao;
 
-    private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+    private final TransformerFactory transformerFactory = new net.sf.saxon.TransformerFactoryImpl();
 
     // POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD = "postProcDeleteOld";

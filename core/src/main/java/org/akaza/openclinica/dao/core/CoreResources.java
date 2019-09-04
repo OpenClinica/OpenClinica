@@ -362,8 +362,8 @@ public class CoreResources implements ResourceLoaderAware {
         DATAINFO.setProperty("rss.more", rss_more);
 
         String supportURL = DATAINFO.getProperty("supportURL");
-        if (supportURL == null || supportURL.isEmpty())
-            supportURL = "https://www.openclinica.com/support";
+        if (supportURL == null || supportURL.trim().isEmpty())
+            supportURL = "";
         DATAINFO.setProperty("supportURL", supportURL);
 
         DATAINFO.setProperty("show_unique_id", "1");

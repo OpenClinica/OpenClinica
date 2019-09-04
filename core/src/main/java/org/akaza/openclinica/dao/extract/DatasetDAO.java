@@ -704,7 +704,7 @@ public class DatasetDAO extends AuditableEntityDAO {
     }
 
     protected String getDefinitionCrfItemSql(String sedIds, String itemIds) {
-        return "select item.*, sed.study_event_definition_id as sed_id, sed.name as sed_name, crf.crf_id, crf.name as crf_name"
+        return "select DISTINCT item.*, sed.study_event_definition_id as sed_id, sed.name as sed_name, crf.crf_id, crf.name as crf_name"
             + " from study_event_definition sed, event_definition_crf edc, crf, crf_version cv,item_form_metadata ifm, item"
             + " where sed.study_event_definition_id in " + sedIds + " and item.item_id in " + itemIds
             + " and sed.study_event_definition_id = edc.study_event_definition_id and edc.crf_id = crf.crf_id"

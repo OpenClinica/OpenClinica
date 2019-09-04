@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>OpenClinica-core</artifactId>
+    <artifactId>LibreClinica-core</artifactId>
     <packaging>jar</packaging>
-    <name>OpenClinica Core</name>
+    <name>LibreClinica Core</name>
     <parent>
-        <groupId>org.akaza.openclinica</groupId>
-        <artifactId>OpenClinica</artifactId>
-      <version>3.14</version>
+        <groupId>org.libreclinica</groupId>
+        <artifactId>LibreClinica</artifactId>
+      <version>0.2.0</version>
     </parent>
     <dependencies>
 		<dependency>
@@ -125,13 +125,11 @@
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-			<version>1.2.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -264,6 +262,14 @@
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-lgpl</artifactId>
 			<version>1.8.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>saxon</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>saxon-dom</artifactId>
 		</dependency>
 	</dependencies>
 	<!-- @pgawade 16-NOV-2010 unit tests through maven -->
