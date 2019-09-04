@@ -386,11 +386,6 @@ public class ImportServiceImpl implements ImportService {
                 writer.print(writeBulkAddParticipantToTextFile(dataImportReports));
             closeFile(writer);
         }
-        StringBuilder body = new StringBuilder();
-
-
-        logger.info(body.toString());
-
 
     }
 
