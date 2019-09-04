@@ -109,6 +109,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         if (StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_PARTICIPANT_ID_DATA);
 
+        if (!StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()) && addParticipantRequestDTO.getSubjectKey() .length() > 30)
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_TOO_LONG);
+
         if (!StringUtils.isEmpty(addParticipantRequestDTO.getFirstName()) && addParticipantRequestDTO.getFirstName().length() > 35)
             throw new OpenClinicaSystemException(ErrorConstants.ERR_FIRST_NAME_TOO_LONG);
 
