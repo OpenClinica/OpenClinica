@@ -290,8 +290,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         Study activeStudy = null;
         if (userActiveStudyId > 0) {
             activeStudy = studyDao.findById(userActiveStudyId);
-            if (validRoleAssociatedWithActiveStudy(activeStudy, userRoles.getBody(),request))
-                currentActiveStudyValid = true;
+            getRoleAssociatedWithActiveStudy(activeStudy,userRoles.getBody(),request);
         }
 
         // TODO: refactor this loop seems complex and error-prone & seems to break SRP.
@@ -597,7 +596,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return serviceHelper;
     }
 
-    private boolean validRoleAssociatedWithActiveStudy(Study study,
+    private void getRoleAssociatedWithActiveStudy(Study study,
                                                   List<StudyEnvironmentRoleDTO> roles,
                                                   HttpServletRequest request) {
 
@@ -630,9 +629,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (role != null) {
             request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
             request.getSession().setAttribute("baseUserRole", role.getRoleName());
-            return true;
         }
-        return false;
     }
     
     private void removeDeletedUserRoles(ArrayList<StudyUserRole> modifiedStudyUserRoles, Collection<StudyUserRole> existingStudyUserRoles) {
