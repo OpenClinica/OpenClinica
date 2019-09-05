@@ -5,10 +5,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.akaza.openclinica.config.AppConfig;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
-import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +15,6 @@ import org.springframework.stereotype.Service;
 @Service("keycloakUserService")
 public class KeycloakUserServiceImpl implements KeycloakUserService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    @Autowired
-    private AppConfig appConfig;
 
     public boolean authenticateKeycloakUser(String username, String password) {
         HttpResponse<String> response = null;

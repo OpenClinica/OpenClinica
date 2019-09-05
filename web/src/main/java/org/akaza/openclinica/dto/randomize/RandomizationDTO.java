@@ -1,11 +1,10 @@
-package org.akaza.openclinica.domain.randomize;
+package org.akaza.openclinica.dto.randomize;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akaza.openclinica.service.AbstractAuditingDTO;
 
-import javax.persistence.Lob;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
@@ -141,13 +140,13 @@ public class RandomizationDTO extends AbstractAuditingDTO implements Serializabl
     @Override
     public String toString() {
         return "RandomizationDTO{" +
-            ", uuid='" + getUuid() + "'" +
-            ", status='" + getStatus() + "'" +
-            ", subjectOid='" + getSubjectOid() + "'" +
-            ", randomizeValue='" + getRandomizeValue() + "'" +
-            ", studyEnvironmentUuid='" + getStudyEnvironmentUuid() + "'" +
-            ", studyUuid='" + getStudyUuid() + "'" +
-            ", stratificationFactors='" + getStratificationFactors() + "'" +
-            "}";
+                ", uuid='" + getUuid() + "'" +
+                ", status='" + getStatus() + "'" +
+                ", subjectOid='" + getSubjectOid() + "'" +
+                ", randomizeValue='" + getRandomizeValue() + "'" +
+                ", studyEnvironmentUuid='" + getStudyEnvironmentUuid() + "'" +
+                ", studyUuid='" + getStudyUuid() + "'" +
+                ", stratificationFactors='" + getStratificationFactors() + "'" +
+                "}";
     }
 }

@@ -7,6 +7,9 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,4 +49,9 @@ public interface ValidateService {
 
     boolean isUserHas_DM_DEP_DS_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOid);
 
-}
+     void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean);
+
+    ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
+
+
+    }

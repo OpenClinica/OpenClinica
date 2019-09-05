@@ -1,4 +1,4 @@
-package org.akaza.openclinica.domain.randomize;
+package org.akaza.openclinica.dto.randomize;
 
 public class RandomizationTarget {
 

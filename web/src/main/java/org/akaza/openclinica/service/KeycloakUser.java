@@ -1,11 +1,6 @@
 package org.akaza.openclinica.service;
 
-import com.auth0.jwt.interfaces.Claim;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

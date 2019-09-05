@@ -2,20 +2,18 @@ package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.crfdata.*;
-import org.akaza.openclinica.controller.dto.*;
+import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -125,7 +125,7 @@ public class ImportServiceImpl implements ImportService {
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Transactional
-    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isRandomizeImport) {
+    public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport) {
         CoreResources.setRequestSchema(schema);
         Study tenantStudy = null;
         if (siteOid != null) {
@@ -348,8 +348,8 @@ public class ImportServiceImpl implements ImportService {
 
 
         writeToFile(dataImportReports, fileName,JobType.XML_IMPORT);
-        if (isRandomizeImport) {
-            // For randomization import, check if the import failed and return the status
+        if (isSystemUserImport) {
+            // For system level import, check if the import failed and return the status
             boolean hasImportFailed = dataImportReports.stream()
                     .filter(dataImportReport1 -> dataImportReport1.getStatus().equals(FAILED))
                     .findAny()
@@ -380,7 +380,8 @@ public class ImportServiceImpl implements ImportService {
                 writer.print(writeImportToTextFile(dataImportReports));
             else if (jobType.equals(JobType.SCHEDULE_EVENT))
                 writer.print(writeBulkEventScheduleOrUpdateToTextFile(dataImportReports));
-
+            else if (jobType.equals(JobType.BULK_ADD_PARTICIPANTS))
+                writer.print(writeBulkAddParticipantToTextFile(dataImportReports));
             closeFile(writer);
         }
         StringBuilder body = new StringBuilder();
@@ -461,6 +462,47 @@ public class ImportServiceImpl implements ImportService {
             stringBuffer.append(dataImportReport.getMessage() != null ? dataImportReport.getMessage() : "");
             stringBuffer.append('\n');
         }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(stringBuffer.toString() + "\n");
+
+        return sb.toString();
+    }
+
+    private String writeBulkAddParticipantToTextFile(List<DataImportReport> dataImportReports) {
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("Row");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("ParticipantID");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Participant OID");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Participate Status");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Status");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Message");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append('\n');
+
+
+        dataImportReports.forEach(p->{
+            stringBuffer.append(p.getRowNumber());
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getStudySubjectID() != null ? p.getStudySubjectID() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getSubjectKey() != null ? p.getSubjectKey() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getParticipateStatus() != null ? p.getParticipateStatus() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getStatus() != null ? p.getStatus() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getMessage() != null ? p.getMessage() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append('\n');
+        });
+
 
         StringBuilder sb = new StringBuilder();
         sb.append(stringBuffer.toString() + "\n");
@@ -1175,7 +1217,7 @@ public class ImportServiceImpl implements ImportService {
         if (eventCrf == null) {
 
             String selectedVersionIds=edc.getSelectedVersionIds();
-           if(selectedVersionIds!=null) {
+           if(!StringUtils.isEmpty(selectedVersionIds)) {
                String[] ids = selectedVersionIds.split(",");
                ArrayList<Integer> idList = new ArrayList<Integer>();
                for (String id : ids) {

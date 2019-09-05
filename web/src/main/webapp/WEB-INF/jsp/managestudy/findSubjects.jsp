@@ -40,6 +40,15 @@
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/ListStudySubjects?'+ parameterString;
     }
+    function URLSearchParams(name){
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results == null){
+           return null;
+        }
+        else {
+           return decodeURI(results[1]) || 0;
+        }
+    }
 
     jQuery(document).ready(function() {
         jQuery('#addSubject').click(function() {
@@ -51,8 +60,7 @@
             return false;
         });
 
-        var params = new URLSearchParams(window.location.search);
-        if (params.get('addNewSubject')) {
+        if (URLSearchParams('addNewSubject')) {
             jQuery('#addSubject').click();
         }
 

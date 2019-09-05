@@ -122,6 +122,26 @@
       });
     };
   }
+
+  // https://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript-which-contains-comma-in-data
+  // Return array of string values, or NULL if CSV string not well formed.
+  function CSVtoArray(text) {
+	var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
+	// Return NULL if input string is not well formed CSV string.
+	var a = [];                     // Initialize array to receive values.
+	text.replace(re_value, // "Walk" the string using replace with callback.
+	  function(m0, m1, m2, m3) {
+	    // Remove backslash from \' in single quoted values.
+	    if (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
+	    // Remove backslash from \" in double quoted values.
+	    else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
+	    else if (m3 !== undefined) a.push(m3);
+        return ''; // Return empty string.
+	  });
+	// Handle special case of empty last value.
+	if (/,\s*$/.test(text)) a.push('');
+	return a;
+  };
 </script>
 
 <c:choose>
@@ -311,13 +331,18 @@
         var cols = bycoma.length > bypipe.length ? bycoma : bypipe;
         $('#tbl-job').DataTable({
           data: rows.slice(1).map(function(row) {
-            return row.split(cols.separator);
+            if (cols.separator === ',') {
+              return CSVtoArray(row)
+            } else {
+              return row.split(cols.separator);
+            }
           }),
           columns: cols.titles.map(function(title) {
             return {title: title};
           }),
           paging: false,
           dom: 'ft',
+          order: [], // set no default order OC-11342
           drawCallback: sizetable('#tbl-job')
         });
       }).fail(function(e) {

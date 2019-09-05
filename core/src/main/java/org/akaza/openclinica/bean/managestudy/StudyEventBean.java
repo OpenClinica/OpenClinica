@@ -65,6 +65,7 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
     private boolean startTimeFlag = false;
     private boolean endTimeFlag = false;
     private String attestation = "";
+    private String additionalNotes;
 
     // BWP: for display discrepancy notes in a matrix-type study/event grid; 5/2/2008
     private ArrayList<DiscrepancyNoteBean> discBeanList = new ArrayList<DiscrepancyNoteBean>();
@@ -381,4 +382,11 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
         this.attestation = attestation;
     }
 
+    public String getAdditionalNotes() {
+        return additionalNotes;
+    }
+
+    public void setAdditionalNotes(String additionalNotes) {
+        this.additionalNotes = additionalNotes;
+    }
 }

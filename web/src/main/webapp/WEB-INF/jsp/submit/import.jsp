@@ -18,6 +18,25 @@
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
+<style>
+  #sidebar_Alerts_open .sidebar_tab_content {
+    color: #ED7800;
+    font-style: italic;
+  }
+</style>
+<script>
+  $('#sidebar_Alerts_open > .sidebar_tab > .sidebar_tab_content').append(
+    $('<div>', {id:'upload-failed'})
+      .append('<fmt:message key="import_data_failed" bundle="${resword}"/>')
+      .hide()
+  ).append(
+    $('<div>', {id:'upload-success'})
+      .append('<fmt:message key="import_data_success" bundle="${resword}"/>')
+      .append('<strong> <fmt:message key="import_data_success_2" bundle="${resword}"/> </strong>')
+      .append('<fmt:message key="import_data_success_3" bundle="${resword}"/>')
+      .hide()
+  );
+</script>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
@@ -81,14 +100,12 @@
 	<td class="formlabel"><!--<fmt:message key="xml_file_to_upload" bundle="${resterms}"/>:--></td>
 	<td>
 		<div class="formfieldFile_BG">
-			<input type="file" name="xml_file" >
-
+			<input type="file" id="file-input" accept=".xml">
 		</div>
 		<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
 	</td>
 </tr>
 <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-
 
 </table>
 </div>
@@ -96,12 +113,71 @@
 </div>
 
 <br clear="all">
-<input type="submit" value="<fmt:message key="preview" bundle="${resword}"/>" class="button_long">
-<input type="button" onclick="goBack()"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
+<input type="button" id="btn-upload" value="<fmt:message key="submit" bundle="${resword}"/>">
+<input type="reset" id="btn-cancel" value="<fmt:message key="cancel" bundle="${resword}"/>"/>
 
 </form>
 <br/>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadImportTemplate"><b><fmt:message key="download_import_template" bundle="${resword}"/></b></a></div>
 <!-- <div class="homebox_bullets"><a href="pages/Log/listFiles"><b>Bulk Job log</b></a></div> -->
+
+<script>
+  $('#file-input').on('change', function() {
+    if ($(this).val())
+      $('#btn-upload').removeAttr('disabled');
+    else
+      $('#btn-upload').attr('disabled', 'disabled');
+  });
+
+  $('#btn-upload').click(function() {
+    $('#upload-failed, #upload-success, #btn-label-upload').hide();
+    $('#loading, #btn-label-uploading').show();
+
+    var data = new FormData();
+    $.each($('#file-input')[0].files, function(i, file) {
+      data.append('file', file);
+    });
+
+    function success(r) {
+      console.log('success', r);
+      $('#upload-success, #btn-label-upload').show();
+      $('#loading, #btn-label-uploading').hide();
+      if (!$('#sidebar_Alerts_open').is(':visible')) {
+        leftnavExpand('sidebar_Alerts_open');
+        leftnavExpand('sidebar_Alerts_closed');
+      }
+    }
+
+
+    function failed(r) {
+      console.log('error', r);
+      $('#upload-failed, #btn-label-upload').show();
+      $('#loading, #btn-label-uploading').hide();
+      if (!$('#sidebar_Alerts_open').is(':visible')) {
+        leftnavExpand('sidebar_Alerts_open');
+        leftnavExpand('sidebar_Alerts_closed');
+      }
+    }
+    
+    $.ajax({
+      url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/import',
+      method: 'POST',
+      type: 'POST',
+      data: data,
+      processData: false,
+      contentType: false,
+      success: function(r) {
+        success(r);
+      },
+      error: function(r) {
+        failed(r);
+      }
+    });
+    return false;
+  });
+
+  $('#btn-cancel').click(function() {
+  });
+</script>
 
 <jsp:include page="../include/footer.jsp"/>

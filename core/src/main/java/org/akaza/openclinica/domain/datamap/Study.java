@@ -115,6 +115,7 @@ public class Study extends DataMapDomainObject {
     private boolean published;
     private int filePath;
     private String studyUuid;
+    private int subjectCount;
 
     @Column(name = "study_env_uuid", unique = false, nullable = false)
     public String getStudyEnvUuid() {
@@ -866,5 +867,13 @@ public class Study extends DataMapDomainObject {
 
     public void setStudyUuid(String studyUuid) {
         this.studyUuid = studyUuid;
+    }
+
+    public int getSubjectCount() {
+        return subjectCount;
+    }
+    @Column(name = "subject_count")
+    public void setSubjectCount(int subjectCount) {
+        this.subjectCount = subjectCount;
     }
 }

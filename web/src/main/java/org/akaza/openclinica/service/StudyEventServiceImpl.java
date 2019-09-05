@@ -896,7 +896,7 @@ public class StudyEventServiceImpl implements StudyEventService {
         try {
 
             // read csv file
-            ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = csvService.readStudyEventScheduleBulkCSVFile(file, study.getOc_oid(), siteOid);
+            List<StudyEventScheduleDTO> studyEventScheduleDTOList = csvService.readStudyEventScheduleBulkCSVFile(file, study.getOc_oid(), siteOid);
             for (StudyEventScheduleDTO studyEventScheduleDTO : studyEventScheduleDTOList) {
                 String studyEventOID = studyEventScheduleDTO.getStudyEventOID();
                 String participantId = studyEventScheduleDTO.getSubjectKey();
@@ -952,7 +952,6 @@ public class StudyEventServiceImpl implements StudyEventService {
             logger.error("Error " + e.getMessage());
         }
 
-        userService.persistJobCompleted(jobDetail, fileName);
 
     }
 

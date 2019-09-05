@@ -21,6 +21,7 @@ import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang.StringUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.slf4j.Logger;
@@ -28,14 +29,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -77,7 +84,7 @@ public class ImportController {
 
     @ApiOperation( value = "To import data in an .xml file", notes = "Will import the data in a xml file " )
     @RequestMapping( value = "/clinicaldata/import", method = RequestMethod.POST )
-    public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, MultipartFile file) throws Exception {
+    public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, @RequestParam("file") MultipartFile file) throws Exception {
         String fileNm = "";
         String importXml = null;
         if (file != null) {
@@ -171,11 +178,9 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.OK);
         }
 
-        // If this is randomize-service importing then we can skip the roles check.
-        boolean isRandomizeImport = isRandomizeImport(request);
-        if (isRandomizeImport){
-            fileNm = "randomize-service";
-        } else {
+        // If the import is performed by a system user, then we can skip the roles check.
+        boolean isSystemUserImport = isSystemUserImport(request);
+        if (!isSystemUserImport){
             if (siteOid != null) {
                 if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
                     return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
@@ -195,7 +200,7 @@ public class ImportController {
 
         String uuid;
         try {
-            uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm, isRandomizeImport);
+            uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm, isSystemUserImport);
         } catch (CustomParameterizedException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -204,7 +209,7 @@ public class ImportController {
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
     }
 
-    private boolean isRandomizeImport(HttpServletRequest request){
+    private boolean isSystemUserImport(HttpServletRequest request){
         boolean skipRoleCheck = false;
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && !authHeader.isEmpty()) {
@@ -219,7 +224,8 @@ public class ImportController {
                             String userType = (String) userContextMap.get("userType");
                             if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();
-                                if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
+                                if (StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
+                                        || StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)){
                                     skipRoleCheck = true;
                                 }
 
@@ -237,16 +243,16 @@ public class ImportController {
     }
 
     public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid,
-                                 UserAccountBean userAccountBean, String fileNm, boolean isRandomizeImport) {
+                                 UserAccountBean userAccountBean, String fileNm, boolean isSystemUserImport) {
         utilService.setSchemaFromStudyOid(studyOid);
 
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        if (isRandomizeImport) {
-            // For randomization imports, instead of running import as an asynchronous job, run it synchronously
+        if (isSystemUserImport) {
+            // For system level imports, instead of running import as an asynchronous job, run it synchronously
             logger.debug("Running import synchronously");
-            boolean isImportSuccessful = importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, null, isRandomizeImport);
+            boolean isImportSuccessful = importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, null, isSystemUserImport);
             if (!isImportSuccessful) {
                 // Throw an error if import fails such that randomize service can update the status accordingly
                 throw new CustomParameterizedException(ErrorConstants.ERR_IMPORT_FAILED);
@@ -256,7 +262,7 @@ public class ImportController {
             JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, fileNm);
             CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
                 try {
-                    importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, isRandomizeImport);
+                    importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, isSystemUserImport);
                 } catch (Exception e) {
                     logger.error("Exception is thrown while processing dataImport: " + e);
                 }

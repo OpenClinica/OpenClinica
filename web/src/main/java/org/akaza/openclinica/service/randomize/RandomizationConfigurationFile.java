@@ -1,7 +1,7 @@
 package org.akaza.openclinica.service.randomize;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.akaza.openclinica.domain.randomize.RandomizationTarget;
+import org.akaza.openclinica.dto.randomize.RandomizationTarget;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -45,5 +45,8 @@ public interface StudyBuildService {
 
     void processAllModules(String accessToken, String studyOid);
 
+    String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module);
 
-}
+
+
+    }

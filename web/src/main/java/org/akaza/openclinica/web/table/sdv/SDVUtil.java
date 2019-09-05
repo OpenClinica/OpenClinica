@@ -896,17 +896,20 @@ public class SDVUtil {
             tempSDVBean.setCrfNameVersion(getCRFName(eventCRFBean.getCRFVersionId()) + "/ " + getFormLayoutName(eventCRFBean.getFormLayoutId()));
 
             if (eventCRFBean.getStatus() != null) {
-
                 Integer status = eventCRFBean.getStage().getId();
-
                 if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED
                         || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SKIPPED) {
                     status = DataEntryStage.LOCKED.getId();
-
                 }
 
-                tempSDVBean.setCrfStatus(getCRFStatusIconPath(status, request, studySubjectBean.getId(), eventCRFBean.getId(), eventCRFBean.getCRFVersionId(),
-                        eventCRFBean.getFormLayoutId(), eventCRFBean.getStudyEventId(), studyBean.getId()));
+                String queryString = request.getQueryString();
+                if (null == queryString) {
+                    queryString = "";
+                }
+                tempSDVBean.setCrfStatus(getCRFStatusIconPath(
+                    status, request, studySubjectBean.getId(), eventCRFBean.getId(), eventCRFBean.getCRFVersionId(),
+                    eventCRFBean.getFormLayoutId(), eventCRFBean.getStudyEventId(), studyBean.getId(), queryString.replaceAll("&", "%26")
+                ));
             }
 
             tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
@@ -1024,7 +1027,7 @@ public class SDVUtil {
     }
 
     private String getCRFStatusIconPath(int statusId, HttpServletRequest request, int studySubjectId, int eventDefinitionCRFId, int crfVersionId,
-            int formLayoutId, int studyEventId, int studyId) {
+            int formLayoutId, int studyEventId, int studyId, String redirect) {
 
         HtmlBuilder html = new HtmlBuilder();
         // html.a().onclick(
@@ -1045,7 +1048,7 @@ public class SDVUtil {
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
         input.append(statusId).append("\" />");
         String href = request.getContextPath() + "/EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId="
-                + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?sdv_restore=true%26studyId=" + studyId + "&mode=view";
+                + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?" + redirect + "&mode=view";
         builder.append(
                 "<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + " accessCheck' border='0' href='" + href + "' ></a></center>");
         // "<input type=\"hidden\" statusId=\"1\" />"

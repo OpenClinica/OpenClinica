@@ -1,6 +1,9 @@
 package org.akaza.openclinica.service.auth;
 
 import org.akaza.openclinica.service.user.CreateUserCoreService;
+import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
@@ -8,7 +11,6 @@ import org.springframework.security.jwt.crypto.sign.RsaVerifier;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.common.util.JsonParser;
 import org.springframework.security.oauth2.common.util.JsonParserFactory;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.stereotype.Service;
 import sun.security.rsa.RSAPublicKeyImpl;
 
@@ -17,10 +19,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service("tokenService")
 public class TokenServiceImpl implements TokenService {
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     private JsonParser objectMapper = JsonParserFactory.create();
     final String EXP = "exp";
 
@@ -54,5 +59,16 @@ public class TokenServiceImpl implements TokenService {
         catch (Exception e) {
             throw new InvalidTokenException("Cannot convert access token to JSON", e);
         }
+    }
+
+    public String getUserType(String token) {
+        Map<String, Object> decodedToken = decodeAndVerify(token);
+        if (MapUtils.isEmpty(decodedToken))
+            return null;
+        LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
+        if (MapUtils.isEmpty(userContextMap))
+            return null;
+        String userType = (String) userContextMap.get("userType");
+        return userType;
     }
 }

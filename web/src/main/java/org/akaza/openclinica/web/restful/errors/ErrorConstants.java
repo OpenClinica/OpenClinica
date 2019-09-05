@@ -76,6 +76,7 @@ public class ErrorConstants {
     public static final String ERR_SITE_NOT_Valid_OID = "errorCode.siteNotValidOid";
     public static final String ERR_STUDY_TO_SITE_NOT_Valid_OID = "errorCode.studyTositeNotValidOid";
     public static final String ERR_PARTICIPATE_INACTIVE = "errorCode.participateInActive";
+    public static final String ERR_PARTICIPATE_NOT_AVAILABLE = "errorCode.participantNotAvailable";
 
     public static final String ERR_INVALID_XML_FILE = "errorCode.invalidXMLFile";
     public static final String ERR_FILE_FORMAT_NOT_SUPPORTED = "errorCode.fileFormatNotSupported";
@@ -160,5 +161,23 @@ public class ErrorConstants {
     public static final String ERR_MULTIPLE_START_DATE_HEADERS = "errorCode.multipleStartDateHeaders";
     public static final String ERR_MULTIPLE_END_DATE_HEADERS = "errorCode.multipleEndDateHeaders";
     public static final String ERR_MULTIPLE_STUDY_EVENT_STATUS_HEADERS = "errorCode.multipleStudyEventStatusHeaders";
+
+    public static final String ERR_EMAIL_ADDRESS_TOO_LONG = "errorCode.emailAddressTooLong";
+    public static final String ERR_INVALID_EMAIL_ADDRESS = "errorCode.invalidEmailAddress";
+
+    public static final String ERR_PHONE_NUMBER_TOO_LONG = "errorCode.phoneNumberTooLong";
+    public static final String ERR_INVALID_PHONE_NUMBER = "errorCode.invalidPhoneNumber";
+
+    public static final String ERR_FIRST_NAME_TOO_LONG = "errorCode.firstNameTooLong";
+    public static final String ERR_LAST_NAME_TOO_LONG = "errorCode.lastNameTooLong";
+    public static final String ERR_IDENTIFIER_TOO_LONG = "errorCode.identifierTooLong";
+    public static final String ERR_PARTICIPANT_ID_TOO_LONG = "errorCode.participantIdTooLong";
+
+    public static final String ERR_SYSTEM_GENERATED_ID_ENABLED = "errorCode.studyHasSystemGeneratedIdEnabled";
+
+    public static final String ERR_MULTIPLE_FIRST_NAME_HEADERS = "errorCode.multipleFirstNameHeaders";
+    public static final String ERR_MULTIPLE_LAST_NAME_HEADERS = "errorCode.multipleLastNameHeaders";
+    public static final String ERR_MULTIPLE_EMAIL_ADDRESS_HEADERS = "errorCode.multipleEmailAddressHeaders";
+    public static final String ERR_MULTIPLE_MOBILE_PHONE_HEADERS = "errorCode.multipleMobilePhoneHeaders";
 
 }

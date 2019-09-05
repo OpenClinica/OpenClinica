@@ -23,6 +23,8 @@ public final class ErrorConstants {
     public static final String ERR_INVALID_UUID = "error.invalidUuid";
     public static final String ERR_NO_SUFFICIENT_PRIVILEGES = "errorCode.noSufficientPrivileges";
     public static final String ERR_NO_ROLE_SETUP = "errorCode.noRoleSetUp";
+    public static final String ERR_MISSING_FILE = "errorCode.missingFile";
+    public static final String ERR_UNABLE_TO_READ_FILE = "errorCode.unableToReadFile";
 
 
     private ErrorConstants() {
