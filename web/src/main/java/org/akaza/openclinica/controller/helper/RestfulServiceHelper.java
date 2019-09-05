@@ -727,7 +727,7 @@ public class RestfulServiceHelper {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
 			String timeStamp = simpleDateFormat.format(now);
 			logFileName =originalFileName+"_"+ timeStamp+"_log.txt";
-			
+						
 			return logFileName;
 		}
 }
