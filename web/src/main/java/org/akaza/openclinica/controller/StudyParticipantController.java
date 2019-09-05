@@ -415,7 +415,6 @@ public class StudyParticipantController {
 		StudyBean studyBean = null;
 		studyBean =  this.getStudyDAO().findByOid(studyOID);
 		if(utilService.isParticipantIDSystemGenerated(studyBean)) {
-
 			throw new OpenClinicaSystemException("errorCode.bulkUploadNotSupportSystemGeneratedSetting","This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
 		}
 
@@ -516,13 +515,18 @@ public class StudyParticipantController {
 			}
 
 			if(study != null) {
-				ResponseSuccessListAllParticipantsByStudyDTO responseSuccess =  new ResponseSuccessListAllParticipantsByStudyDTO();
+        ResponseSuccessListAllParticipantsByStudyDTO responseSuccess =  new ResponseSuccessListAllParticipantsByStudyDTO();
 
-				ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);
-				responseSuccess.setStudyParticipants(studyParticipantDTOs);
-
-				response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
-			}
+        ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);            	  		 	            
+        responseSuccess.setStudyParticipants(studyParticipantDTOs);
+        responseSuccess.setSiteOID(siteOid);
+        if (siteOid != null) {
+          StudyBean site = this.getStudyDAO().findByOid(siteOid);
+          responseSuccess.setSiteID(site.getId());
+          responseSuccess.setSiteName(site.getName());
+        }       	
+		 	  response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+		  }	
 
 		} catch (Exception eee) {
 			eee.printStackTrace();
