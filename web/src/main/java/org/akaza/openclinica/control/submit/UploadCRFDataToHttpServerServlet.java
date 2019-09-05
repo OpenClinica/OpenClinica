@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-
 import javax.servlet.AsyncContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -265,16 +264,14 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
         } else if ("download".equalsIgnoreCase(action)) {
         	String studyID= request.getParameter("studyId");
         	String parentNm= request.getParameter("parentNm");
-            String fileName= request.getParameter("fileId");
-            fileName = fileName.replace("%2B", "+");
+            String fileName= request.getParameter("fileId");          
             File file = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
             dowloadFile(file, "text/xml");
             
         } else if ("delete".equalsIgnoreCase(action)) {
         	String studyID= request.getParameter("studyId");
         	String parentNm= request.getParameter("parentNm");
-            String fileName= request.getParameter("fileId");
-            fileName = fileName.replace("%2B", "+");
+            String fileName= request.getParameter("fileId");           
             File tempFile = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
            
         	if(tempFile!=null && tempFile.exists()) {
