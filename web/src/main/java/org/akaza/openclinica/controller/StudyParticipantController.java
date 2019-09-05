@@ -455,8 +455,8 @@ public class StudyParticipantController {
 		return listStudySubjects(studyOid, siteOid, request);
 	}
 
-	@ApiIgnore
-	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission")
+	
+	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission", hidden = true)
 	@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participant", method = RequestMethod.GET)
 	public ResponseEntity<Object> getStudySubjectInfo(
 			@ApiParam(value = "Study OID", required = true) @PathVariable("studyOID") String studyOid,
