@@ -187,11 +187,11 @@
    						        if(passTime >= 5000){
 									
 								%>
-                                <a target="_new" href="UploadCRFData?fromUrl=UploadCRFData&action=download&fileId=<%=fname%>&studyId=<%=studyId%>&parentNm=<%=parentNm%>">
+                                <a target="_new" href="UploadCRFData?fromUrl=UploadCRFData&action=download&fileId=<%=fname.replace("+","%2B")%>&studyId=<%=studyId%>&parentNm=<%=parentNm%>">
 									<span name="bt_Download1" class="icon icon-download" border="0" align="left" hspace="6"
 										 alt="<fmt:message key="download" bundle="${resword}"/>" title="<fmt:message key="download" bundle="${resword}"/>">
 								</a>								
-								<a href="UploadCRFData?fromUrl=UploadCRFData&action=delete&fileId=<%=fname%>&studyId=<%=studyId%>&parentNm=<%=parentNm%>">
+								<a href="UploadCRFData?fromUrl=UploadCRFData&action=delete&fileId=<%=fname.replace("+","%2B")%>&studyId=<%=studyId%>&parentNm=<%=parentNm%>">
 									<span name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
 										 title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"
 										 onClick='return confirm("Please confirm that you want to delete log file <%=fname%>");'>
