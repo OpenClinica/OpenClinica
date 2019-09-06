@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.internal.SessionImpl;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate5.HibernateTemplate;
@@ -32,9 +33,9 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     public T findById(Integer id) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.id = :id";
-        org.hibernate.query.Query q = getCurrentSession().createQuery(query);
+        Query<T> q = getCurrentSession().createQuery(query);
         q.setParameter("id", id);
-        return (T) q.uniqueResult();
+        return q.uniqueResult();
     }
 
     @SuppressWarnings("unchecked")
@@ -42,17 +43,17 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     public ArrayList<T> findAll() {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do";
-        org.hibernate.query.Query q = getCurrentSession().createQuery(query);
-        return (ArrayList<T>) q.list();
+        Query<T> q = getCurrentSession().createQuery(query);
+        return new ArrayList<T>(q.list());
     }
     
     @SuppressWarnings("unchecked")
 	public T findByOcOID(String OCOID){
     	 getSessionFactory().getStatistics().logSummary();
          String query = "from " + getDomainClassName() + " do  where do.oc_oid = :oc_oid";
-         org.hibernate.query.Query q = getCurrentSession().createQuery(query);
+         Query<T> q = getCurrentSession().createQuery(query);
          q.setParameter("oc_oid", OCOID);
-         return (T) q.uniqueResult();
+         return q.uniqueResult();
     }
 
     @Transactional
@@ -72,10 +73,10 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
     @Transactional
     public T findByColumnName(Object id, String key) {
         String query = "from " + getDomainClassName() + " do where do." + key + " = :key_value";
-        org.hibernate.query.Query q = getCurrentSession().createQuery(query);
+        Query<T> q = getCurrentSession().createQuery(query);
         q.setParameter("key_value", id);
-        return (T) q.uniqueResult();
-    } 
+        return q.uniqueResult();
+    }    
     
     public Long count() {
         return (Long) getCurrentSession().createQuery("select count(*) from " + domainClass().getName()).uniqueResult();
@@ -111,7 +112,6 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         return session;
     }
 
-    @SuppressWarnings("unused")
     public HibernateTemplate getHibernateTemplate() {
         return hibernateTemplate;
     }
