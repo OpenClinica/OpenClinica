@@ -641,7 +641,7 @@ public class RestfulServiceHelper {
 		        
 		       
 		    } catch (Exception e) {
-		        e.printStackTrace();
+		        log.error("Error while accessing the process the data: ",e);
 		    }
 		    
 			return fileList;

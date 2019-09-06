@@ -30,7 +30,7 @@ public class LoginController {
         try {
             res.sendRedirect(redirectUri);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error while redirecting to KeyCloak: ",e);
         }
     }
 }

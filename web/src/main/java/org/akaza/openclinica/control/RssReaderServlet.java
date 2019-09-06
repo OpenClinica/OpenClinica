@@ -12,6 +12,8 @@ import com.sun.syndication.fetcher.impl.FeedFetcherCache;
 import com.sun.syndication.fetcher.impl.HashMapFeedInfoCache;
 import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
 import com.sun.syndication.io.FeedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class RssReaderServlet extends HttpServlet {
 
+    private static final Logger logger= LoggerFactory.getLogger(RssReaderServlet.class);
     private static final long serialVersionUID = 1L;
     FeedFetcherCache feedInfoCache = HashMapFeedInfoCache.getInstance();
     FeedFetcher feedFetcher = new HttpURLFeedFetcher(feedInfoCache);
@@ -58,21 +61,17 @@ public class RssReaderServlet extends HttpServlet {
             feed = feedFetcher.retrieveFeed(new URL(rssUrl));
             htmlFeed = feedHtml(feed);
         } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
             htmlFeed = errorFeedHtml(e.getMessage());
-            e.printStackTrace();
+            logger.error("Feed is not having corret arugments: ",e);
         } catch (FeedException e) {
-            // TODO Auto-generated catch block
             htmlFeed = errorFeedHtml(e.getMessage());
-            e.printStackTrace();
+            logger.error("Feed is not received properly: ",e);
         } catch (FetcherException e) {
             htmlFeed = errorFeedHtml(e.getMessage());
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Fetcher is not properly working: ",e);
         } catch (Exception e) {
             htmlFeed = errorFeedHtml(e.getMessage());
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Problem with Feed and FeedFetcher: ",e);
         } finally {
             pw.println(htmlFeed);
             pw.close();

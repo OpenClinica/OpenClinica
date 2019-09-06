@@ -4,6 +4,8 @@ import org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierRe
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,6 +21,7 @@ import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdent
  * Created by yogi on 1/31/17.
  */
 public class SpringMvcInterceptor extends HandlerInterceptorAdapter {
+    private final static Logger logger = LoggerFactory.getLogger(SpringMvcInterceptor.class);
     @Autowired HibernateTemplate hibernateTemplate;
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -33,8 +36,8 @@ public class SpringMvcInterceptor extends HandlerInterceptorAdapter {
                 session.setAttribute(CURRENT_TENANT_ID, request.getParameter("studyOID"));
             }
         }
-        System.out.println("request parameter:" + request.getParameter("studyOid"));
-        System.out.println("request parameter:" + request.getParameter("studyOID"));
+        logger.debug("request parameter:{}",request.getParameter("studyOid"));
+        logger.debug("request parameter:{}",request.getParameter("studyOID"));
         return true;
     }
 }

@@ -23,6 +23,5 @@
 	<logger name="liquibase" level="ERROR" />
 	<root level="${logLevel}">
 		<appender-ref ref="FILE" />
-		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>

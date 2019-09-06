@@ -17,6 +17,5 @@ public class KeepSessionAliveController {
     @RequestMapping(value="/keepAlive", method = RequestMethod.GET)
     protected void signatureCallback(final HttpServletRequest req, final HttpServletResponse res) throws IOException {
        logger.debug("keeping the session alive");
-        System.out.println("keeping the session alive");
     }
 }

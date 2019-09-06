@@ -557,11 +557,11 @@ public class AddNewSubjectServlet extends SecureController {
             logger.info("Template ID  :" + wtr.toString());
 
         } catch (TemplateException te) {
-            te.printStackTrace();
+            logger.error("Template is not able to be parsed properly: ",te);
 
 
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            logger.error("Template is not working properly: ",ioe);
 
 
         }

@@ -9,6 +9,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
@@ -18,6 +20,7 @@ public class XsltTriggerService {
 
     }
 
+    private static final Logger logger= LoggerFactory.getLogger(XsltTriggerService.class);
     public static final String DATASET_ID = "dsId";
     public static final String EMAIL = "contactEmail";
     public static final String USER_ID = "user_id";
@@ -64,7 +67,7 @@ public class XsltTriggerService {
         try {
             context = (ApplicationContext) scheduler.getContext().get("applicationContext");
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            logger.error("Cannot reach applicationContext: ",e);
         }
         SimpleTriggerFactoryBean triggerFactoryBean = context.getBean(
                 SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath, currentPublicStudy, currentStudy,archivedDatasetFileBean);

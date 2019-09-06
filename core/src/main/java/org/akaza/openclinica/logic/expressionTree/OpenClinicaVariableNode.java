@@ -167,8 +167,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         
         // logger.info("e" + expressionWrapper.getRuleSet());
         }else if((expressionWrapper.getRuleSet() != null) && (getExpressionService().checkIfExpressionIsForScheduling(expressionWrapper.getRuleSet().getTarget().getValue())) && !number.endsWith(STARTDATE) && !number.endsWith(STATUS))  {
-          System.out.println("the Target value is  " + expressionWrapper.getRuleSet().getTarget().getValue());        	
-          System.out.println("the number is  " + number );        	
+          logger.debug("the Target value is  {}" , expressionWrapper.getRuleSet().getTarget().getValue());
+          logger.debug("the number is ",number);
             throw new OpenClinicaSystemException("OCRERR_0046", new Object[] { number });
         
         }else if (!getExpressionService().ruleExpressionChecker(number)) {

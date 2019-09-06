@@ -127,8 +127,7 @@ public class ImportCRFDataServlet extends SecureController {
                 f = uploadFile(theDir, version);
 
             } catch (Exception e) {
-                logger.warn("*** Found exception during file upload***");
-                e.printStackTrace();
+                logger.warn("*** Found exception during file upload***",e);
 
             }
             if (f == null) {
@@ -203,10 +202,9 @@ public class ImportCRFDataServlet extends SecureController {
                 // if you havent thrown it, you wont throw it here
                 addPageMessage(respage.getString("passed_xml_validation"));
             } catch (Exception me1) {
-                me1.printStackTrace();
                 // expanding it to all exceptions, but hoping to catch Marshal
                 // Exception or SAX Exceptions
-                logger.info("found exception with xml transform");
+                logger.info("found exception with xml transform", me1);
                 //
                 logger.info("trying 1.2.1");
                 try {
@@ -407,8 +405,7 @@ public class ImportCRFDataServlet extends SecureController {
                     } catch (NullPointerException npe1) {
                         // what if you have 2 event crfs but the third is a fake?
                         fail = true;
-                        logger.debug("threw a NPE after calling lookup validation errors");
-                        System.out.println(ExceptionUtils.getStackTrace(npe1));
+                        logger.debug("threw a NPE after calling lookup validation errors",ExceptionUtils.getStackTrace(npe1));
                         addPageMessage(respage.getString("an_error_was_thrown_while_validation_errors"));
                         // npe1.printStackTrace();
                     } catch (OpenClinicaException oce1) {

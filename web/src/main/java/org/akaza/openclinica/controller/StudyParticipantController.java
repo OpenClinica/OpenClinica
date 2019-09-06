@@ -525,7 +525,7 @@ public class StudyParticipantController {
 			}
 
 		} catch (Exception eee) {
-			eee.printStackTrace();
+			logger.error("Error while listing study subjects: ",eee);
 			throw eee;
 		}
 

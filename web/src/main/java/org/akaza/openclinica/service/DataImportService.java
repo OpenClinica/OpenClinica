@@ -224,7 +224,7 @@ public class DataImportService {
 
         } catch (NullPointerException npe1) {
             // what if you have 2 event crfs but the third is a fake?
-            npe1.printStackTrace();
+            logger.error("Error while validating data",npe1);
             errors.add(respage.getString("an_error_was_thrown_while_validation_errors"));
             logger.debug("=== threw the null pointer, import === " + npe1.getMessage());
         } catch (OpenClinicaException oce1) {

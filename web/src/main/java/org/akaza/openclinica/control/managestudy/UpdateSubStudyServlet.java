@@ -33,6 +33,8 @@ import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jxu
@@ -41,6 +43,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  *          Exp $
  */
 public class UpdateSubStudyServlet extends SecureController {
+    private Logger logger=LoggerFactory.getLogger(getClass().getName());
     public static final String INPUT_START_DATE = "startDate";
     public static final String INPUT_VER_DATE = "protocolDateVerification";
     public static final String INPUT_END_DATE = "endDate";
@@ -299,9 +302,8 @@ public class UpdateSubStudyServlet extends SecureController {
                     boolean isDouble = !StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim()) ? true : false;
                     boolean hasPassword = !StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim()) ? true : false;
                     boolean isHide = !StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim()) ? true : false;
-
-                    System.out.println("crf name :" + edcBean.getCrfName());
-                    System.out.println("submissionUrl: " + submissionUrl);
+                    logger.debug("crf name : {}" ,edcBean.getCrfName());
+                    logger.debug("submissionUrl: {}", submissionUrl);
 
                     if (edcBean.getParentId() > 0) {
                         int dbDefaultVersionId = edcBean.getDefaultVersionId();
@@ -504,8 +506,8 @@ public class UpdateSubStudyServlet extends SecureController {
             boolean isExist = false;
             for (EventDefinitionCRFBean eventDef : eventDefCrfList) {
                 sessionBean = edcsInSession.get(i);
-                System.out.println("iter:           " + eventDef.getId() + "--db:    " + eventDef.getSubmissionUrl());
-                System.out.println("edcsInSession:  " + sessionBean.getId() + "--session:" + sessionBean.getSubmissionUrl());
+                logger.debug("iter:           {} --db: {}" , eventDef.getId() , eventDef.getSubmissionUrl());
+                logger.debug("edcsInSession:  {}--session: {}", sessionBean.getId() , sessionBean.getSubmissionUrl());
                 if (sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() == null) {
                     break;
                 } else {
@@ -515,14 +517,12 @@ public class UpdateSubStudyServlet extends SecureController {
                                     && (eventDef.getId() == sessionBean.getId()) && eventDef.getId() == 0)) {
                         v.addValidation("submissionUrl" + order, Validator.SUBMISSION_URL_NOT_UNIQUE);
                         sed.setPopulated(true);
-                        System.out.println("Duplicate ****************************");
-                        System.out.println();
+                        logger.debug("Duplicate *****************");
                         isExist = true;
                         break;
                     } else if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())
                             && (eventDef.getId() == sessionBean.getId())) {
-                        System.out.println("Not Duplicate  ***********");
-                        System.out.println();
+                        logger.debug("Not Duplicate **********");
                         isExist = true;
                         break;
                     }

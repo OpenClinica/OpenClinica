@@ -109,7 +109,7 @@ public class ChangeCRFVersionController {
             try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Redirecting response failed: ",e);
             }
             return null;
         }
@@ -211,7 +211,7 @@ public class ChangeCRFVersionController {
                     "User " + userAccount.getUserName() + " is currently entering data.\\n " +
                     resword.getString("CRF_perform_action") + "\\n", "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Getting error data failed due to unsupported encoding: ",e);
         }
         return errorData;
     }
@@ -653,7 +653,7 @@ public class ChangeCRFVersionController {
         try {
             response.sendRedirect(request.getContextPath() + location);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error while redirecting the request: ",e);
         }
         return null;
 

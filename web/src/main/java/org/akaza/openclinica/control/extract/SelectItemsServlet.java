@@ -113,8 +113,6 @@ public class SelectItemsServlet extends SecureController {
         }
         request.setAttribute("eventlist", events);
         logger.info("found dob setting: " + currentStudy.getStudyParameterConfig().getCollectDob());
-        // System.out.println("found dob setting: " +
-        // currentStudy.getStudyParameterConfig().getCollectDob());
 
         if (crfId == 0) {// no crf selected
             if (eventAttr == 0 && subAttr == 0 && CRFAttr == 0 && groupAttr == 0 && discAttr == 0) {

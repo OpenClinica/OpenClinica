@@ -838,8 +838,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                             url.append(viewParticipateBuilder(studySubjectBean));
                         }
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        logger.error("Error appending StudySubject into URL: ",e);
                     }
                 }
                 value = url.toString();
@@ -901,7 +900,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         StudyBean study = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
         StudyBean pStudy = getParentStudy(study.getOid());
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());
-        System.out.println("URL:  " + url);
+        logger.info("URL: {}",url);
 
         HtmlBuilder actionLink = new HtmlBuilder();
         // actionLink.a().href("url?id=" + studySubject.getId());

@@ -129,7 +129,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
                 op.flush();
                 op.close();
             } catch (Exception ee) {
-                ee.printStackTrace();
+                logger.error("Input Stream is not working properly: ",ee);
             } finally {
                 if (in != null) {
                     in.close();

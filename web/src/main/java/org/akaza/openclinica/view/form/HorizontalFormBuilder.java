@@ -8,6 +8,8 @@ import org.jdom.Element;
 import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -29,6 +31,7 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
     // according to the ordinal of each DisplayItemGroupBean's
     // ItemGroupMetadataBean.
     private List<DisplayItemGroupBean> displayItemGroups;
+    private static final Logger logger= LoggerFactory.getLogger(HorizontalFormBuilder.class);
     // Used for displaying the section title, subtitle, and instructions,
     // if necessary
     private SectionBean sectionBean;
@@ -322,7 +325,7 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
         try {
             outp.output(doc, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error while writing to XML:",e);
         }
         return writer.toString();
     }
