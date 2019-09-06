@@ -379,7 +379,7 @@ public class UserServiceImpl implements UserService {
       
         if(ss == null) {
         	
-        	throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+        	throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_NOT_AVAILABLE);
         }
             
         try {          
