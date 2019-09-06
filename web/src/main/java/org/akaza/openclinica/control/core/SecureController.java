@@ -761,7 +761,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static String getStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        logger.error("",t);
+        logger.error("Error throwed in the Stack trace: ",t);
         pw.flush();
         sw.flush();
         return sw.toString();
@@ -781,7 +781,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             logger.debug("Request");
             process(request, response);
         } catch (Exception e) {
-            logger.error("",e);
+            logger.error("Error while calling the process method: ",e);
         }
     }
 
@@ -799,7 +799,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             logger.debug("Post");
             process(request, response);
         } catch (Exception e) {
-            logger.error("",e);
+            logger.error("Error while calling the process method:",e);
         }
     }
 
@@ -1036,7 +1036,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 response.sendRedirect(url);
             }
         } catch (Exception ex) {
-            logger.error("",ex);
+            logger.error("Error while redirecting to {} ",url, ex);
         }
     }
 
@@ -1058,7 +1058,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 response.sendRedirect(url);
             }
         } catch (Exception ex) {
-            logger.error("",ex);
+            logger.error("Error while redirecting to {} ",url,ex);
         }
 
     }
@@ -1163,7 +1163,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
-            logger.error("",me);
+            logger.error("Error while sending mail: ",me);
             if (failMessage != null && sendMessage) {
                 addPageMessage(failMessage);
             }
@@ -1214,7 +1214,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             op.flush();
             op.close();
         } catch (Exception ee) {
-            logger.error("",ee);
+            logger.error("Error while downloading the file: ",ee);
         } finally {
             if (in != null) {
                 in.close();
