@@ -251,7 +251,61 @@ public class ValidateServiceImpl implements ValidateService {
         }
 
     }
+    
+    /**
+     *  this method is used when get/extract participant information
+     *  
+     * @param studyOid
+     * @param siteOid
+     * @param userAccountBean
+     * @param includeAccessCode
+     */
+    public void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includeAccessCode) {
 
+    	Study tenantStudy = getTenantStudy(studyOid);
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();      
+
+        if (!isStudyOidValid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+        }
+        if (!isStudyOidValidStudyLevelOid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+        }
+        if (!isSiteOidValid(siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
+        }
+        if (!isSiteOidValidSiteLevelOid(siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+        }
+       
+        if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+        }
+
+        if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        } else {
+        	if(includeAccessCode) {
+        		if (!isUserHas_CRC_INV_RoleInSite(userRoles, siteOid)) {
+                    throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        		}
+            }else {
+            	if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+    	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+    	        }
+            }           	        	
+        }
+        
+        if (!isParticipateActive(tenantStudy)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+        }
+
+    }
+
+    private Study getTenantStudy(String studyOid) {
+        return studyDao.findByOcOID(studyOid);
+    }
+    
     public ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid) {
         String errorMsg = e.getErrorCode();
         HashMap<String, String> map = new HashMap<>();

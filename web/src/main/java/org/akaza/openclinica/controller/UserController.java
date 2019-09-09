@@ -203,31 +203,8 @@ public class UserController {
         }
 
         try {
-            if (!validateService.isStudyOidValid(studyOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
-            }
-            if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
-            }
-            if (!validateService.isSiteOidValid(siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
-            }
-            if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
-            }
-            if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
-            }
-
-            if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && !validateService.isUserHasAccessToSite(userRoles, siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-            } else if (!validateService.isUserHas_CRC_INV_RoleInSite(userRoles, siteOid)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-            }
-
-            if (!validateService.isParticipateActive(tenantStudy)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
-            }
+           validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean, incRelatedInfo);           
+           
         } catch (OpenClinicaSystemException e) {
             String errorMsg = e.getErrorCode();
             HashMap<String, String> map = new HashMap<>();

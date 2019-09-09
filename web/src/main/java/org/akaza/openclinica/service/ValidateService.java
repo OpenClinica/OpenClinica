@@ -50,6 +50,7 @@ public interface ValidateService {
     boolean isUserHas_DM_DEP_DS_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOid);
 
      void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean);
+     void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includeAccessCode);
 
     ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
 
