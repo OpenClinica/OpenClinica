@@ -56,7 +56,7 @@ public class CrfVersion extends DataMapDomainObject {
     private List<Section> sections;
     private List<EventDefinitionCrf> eventDefinitionCrfs;
     private Set decisionConditions = new HashSet(0);
-    private Set<ItemGroupMetadata> itemGroupMetadatas;;
+    private Set<ItemGroupMetadata> itemGroupMetadatas;
 
     public CrfVersion() {
     }
@@ -211,7 +211,7 @@ public class CrfVersion extends DataMapDomainObject {
         this.xform = xform;
     }
 
-    @Column(name = "xformName")
+    @Column(name = "xform_name")
     public String getXformName() {
         return xformName;
     }
