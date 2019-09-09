@@ -167,6 +167,7 @@ public class ExtractController {
         jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
         jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());
         jobDetailBean.setDurability(true); // need durability? YES - we will want to see if it's finished
+        jobDetailBean.afterPropertiesSet(); // fixes the job details and initializes the job detail object property
 
         try {
             Date dateStart = scheduler.scheduleJob(jobDetailBean.getObject(), simpleTrigger);

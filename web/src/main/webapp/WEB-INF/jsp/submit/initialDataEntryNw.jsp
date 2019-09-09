@@ -36,6 +36,7 @@
         var checkboxObject;
     </script>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
     <script type="text/javascript"  language="JavaScript" src=
@@ -52,9 +53,10 @@
 	    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
 	    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
     <!-- End -->
-
+    
+	
 </head>
-<body class="aka_bodywidth" onload=" document.getElementById('here').style.display='none'; document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
+<body class="aka_bodywidth" onload="<c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if> document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
 
 <c:import url="../submit/showItemInputToolTipsJS.jsp"></c:import>
 
@@ -385,7 +387,10 @@ function initmb(){
 
 }
 
-window.onload = initmb;
+// this is neccessary since body.onload is overwritten 
+// by window.onload
+oldOnload = document.body.onload;
+window.onload = function(){oldOnload(); initmb();};
 
 //-->
 </script>

@@ -2249,7 +2249,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         int tabId = fp.getInt("tab", true);
         if (tabId <= 0) {
-            tabId = 1;
+            if(sb != null && sb.getOrdinal() > 0) {
+            	tabId = sb.getOrdinal();
+            } else {
+            	tabId = 1;
+            }
         }
         request.setAttribute(INPUT_TAB, new Integer(tabId));
         request.setAttribute(SECTION_BEAN, sb);

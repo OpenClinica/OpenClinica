@@ -1,20 +1,24 @@
 package org.akaza.openclinica.web.filter;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-
-import java.util.Date;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 /**
  * Call Super Class SecurityContextLogoutHandler that Performs a logout by modifying the {@see org.springframework.security.context.SecurityContextHolder}.
@@ -23,7 +27,7 @@ import javax.sql.DataSource;
  * 
  * @author Krikor Krumlian
  */
-public class OpenClinicaSecurityContextLogoutHandler extends SecurityContextLogoutHandler {
+public class OpenClinicaSecurityContextLogoutHandler extends SecurityContextLogoutHandler implements LogoutSuccessHandler {
 
     AuditUserLoginDao auditUserLoginDao;
     UserAccountDAO userAccountDao;
@@ -80,4 +84,13 @@ public class OpenClinicaSecurityContextLogoutHandler extends SecurityContextLogo
         this.auditUserLoginDao = auditUserLoginDao;
     }
 
+	@Override
+	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+			throws IOException, ServletException {
+		logout(request, response, authentication);
+        
+        String logoutSuccessUrl = request.getContextPath() + "/MainMenu";
+        response.setStatus(HttpStatus.OK.value());
+        response.sendRedirect(logoutSuccessUrl);
+	}
 }

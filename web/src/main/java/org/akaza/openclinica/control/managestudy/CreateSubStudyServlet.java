@@ -181,6 +181,9 @@ public class CreateSubStudyServlet extends SecureController {
 
         } else {
             if ("confirm".equalsIgnoreCase(action)) {
+            	// reset the event StudyEventDefinitionBeans, otherwise the changes won't be recognized propably
+                StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+            	session.setAttribute("definitions", this.initDefinitions(newStudy));
                 confirmStudy();
 
             } else if ("back".equalsIgnoreCase(action)) {
@@ -576,65 +579,54 @@ public class CreateSubStudyServlet extends SecureController {
                         // only if definition-crf has been modified, will it be
                         // saved for the site
                         int defaultId = defaultVersionId > 0 ? defaultVersionId : edcBean.getDefaultVersionId();
-                        if (defaultId == defaultVersionId) {
-                            if (isRequired == edcBean.isRequiredCRF()) {
-                                if (isDouble == edcBean.isDoubleEntry()) {
-                                    if (hasPassword == edcBean.isElectronicSignature()) {
-                                        if (isHide == edcBean.isHideCrf()) {
-                                            if (submissionUrl.equals("")) {
-
-                                            if (selectedVersionIdListSize > 0) {
-                                                if (selectedVersionIdListSize == edcBean.getVersions().size()) {
-                                                    if (sdvId > 0) {
-                                                        if (sdvId != edcBean.getSourceDataVerification().getCode()) {
-                                                            changed = true;
-                                                            edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
-                                                            edcBean.setSubmissionUrl(submissionUrl);
-                                                        }
-                                                    }
-                                                } else {
-                                                    changed = true;
-                                                    String[] ids = selectedVersionIds.split(",");
-                                                    ArrayList<Integer> idList = new ArrayList<Integer>();
-                                                    for (String id : ids) {
-                                                        idList.add(Integer.valueOf(id));
-                                                    }
-                                                    edcBean.setSelectedVersionIdList(idList);
-                                                    edcBean.setSelectedVersionIds(selectedVersionIds);
-                                                    edcBean.setSubmissionUrl(submissionUrl);
-
-                                                }
-                                            }
-                                        } else {
-                                            changed = true;
-                                            edcBean.setSubmissionUrl(submissionUrl);
-                                        }
-                                        } else {
-                                            changed = true;
-                                            edcBean.setHideCrf(isHide);
-                                            edcBean.setSubmissionUrl(submissionUrl);
-                                        }
-                                    } else {
-                                        changed = true;
-                                        edcBean.setElectronicSignature(hasPassword);
-                                        edcBean.setSubmissionUrl(submissionUrl);
-                                    }
-                                } else {
-                                    changed = true;
-                                    edcBean.setDoubleEntry(isDouble);
-                                    edcBean.setSubmissionUrl(submissionUrl);
-                                }
-                            } else {
-                                changed = true;
-                                edcBean.setRequiredCRF(isRequired);
-                                edcBean.setSubmissionUrl(submissionUrl);
-                            }
-                        } else {
+                        if (defaultId != defaultVersionId) {
                             changed = true;
                             CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultVersionId);
                             edcBean.setDefaultVersionId(defaultVersionId);
                             edcBean.setDefaultVersionName(defaultVersion.getName());
                         }
+                        if (isRequired != edcBean.isRequiredCRF()) {
+                            changed = true;
+                            edcBean.setRequiredCRF(isRequired);
+                            edcBean.setSubmissionUrl(submissionUrl);
+                        }
+                        if (isDouble != edcBean.isDoubleEntry()) {
+                            changed = true;
+                            edcBean.setDoubleEntry(isDouble);
+                            edcBean.setSubmissionUrl(submissionUrl);
+                        }
+                        if (hasPassword != edcBean.isElectronicSignature()) {
+                            changed = true;
+                            edcBean.setElectronicSignature(hasPassword);
+                            edcBean.setSubmissionUrl(submissionUrl);
+                        }
+                        if (isHide != edcBean.isHideCrf()) {
+                            changed = true;
+                            edcBean.setHideCrf(isHide);
+                            edcBean.setSubmissionUrl(submissionUrl);
+                        }
+                        if (!submissionUrl.equals("")) {
+                            changed = true;
+                            edcBean.setSubmissionUrl(submissionUrl);
+                        }
+						if (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode()) {
+							changed = true;
+							edcBean.setSourceDataVerification(SourceDataVerification.getByCode(sdvId));
+							edcBean.setSubmissionUrl(submissionUrl);
+						}
+						if (selectedVersionIdListSize > 0
+								&& selectedVersionIdListSize != edcBean.getVersions().size()) {
+							changed = true;
+							String[] ids = selectedVersionIds.split(",");
+							ArrayList<Integer> idList = new ArrayList<Integer>();
+							for (String id : ids) {
+								idList.add(Integer.valueOf(id));
+							}
+							edcBean.setSelectedVersionIdList(idList);
+							edcBean.setSelectedVersionIds(selectedVersionIds);
+							edcBean.setSubmissionUrl(submissionUrl);
+
+						}
                     }
                     changes.put(sed.getId() + "-" + edcBean.getId(), changed);
                     ++start;

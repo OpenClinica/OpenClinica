@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.hibernate.query.Query;
 
 public class StudyUserRoleDao extends CompositeIdAbstractDomainDao<StudyUserRole> {
 
@@ -16,11 +17,11 @@ public class StudyUserRoleDao extends CompositeIdAbstractDomainDao<StudyUserRole
     public ArrayList<StudyUserRole> findAllUserRolesByUserAccount(UserAccount userAccount, int studyId, int parentStudyId) {
         String query = "from " + getDomainClassName()
                 + "   where   user_name=:username  AND  status_id=1  AND  ( study_id=:studyId OR study_id=:parentStudyId) ";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        Query<StudyUserRole> q = getCurrentSession().createQuery(query);
         q.setParameter("username", userAccount.getUserName());
-        q.setInteger("studyId", studyId);
-        q.setInteger("parentStudyId", parentStudyId);
-        return (ArrayList<StudyUserRole>) q.list();
+        q.setParameter("studyId", studyId);
+        q.setParameter("parentStudyId", parentStudyId);
+        return new ArrayList<StudyUserRole>(q.list());
     }
 
 }

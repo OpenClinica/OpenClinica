@@ -116,7 +116,7 @@ public class MainMenuServlet extends SecureController {
             // "Forge" a password change date for LDAP user
             lastPwdChangeDate = new Date();
         }
-System.out.println("is ub a ldapuser??"+ub.isLdapUser());
+    	logger.debug("is ub a ldapuser??"+ub.isLdapUser());
 
 
         //@pgawade 18-Sep-2012: fix for issue #14506 (https://issuetracker.openclinica.com/view.php?id=14506#c58197)
@@ -171,7 +171,11 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
                 //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
                 //  + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
                 //Yufang code added by Jamuna, to optimize the query on MainMenu
-                Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(ub.getId(), currentStudy.getId());
+                Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(
+					" AND dn.assigned_user_id =" + +ub.getId()
+							+ " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)",
+					currentStudy);
+                
                 request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
                 int parentStudyId = currentStudy.getParentStudyId()>0?currentStudy.getParentStudyId():currentStudy.getId();
