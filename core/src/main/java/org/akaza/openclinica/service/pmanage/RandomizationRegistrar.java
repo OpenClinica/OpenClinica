@@ -34,9 +34,9 @@ public class RandomizationRegistrar {
     private net.sf.ehcache.Cache cache;
 
     public RandomizationRegistrar() {
-        this.cacheManager = CacheManager.getInstance();
-        this.cache = this.cacheManager.getCache(CACHE_KEY);
-
+        cacheManager = CacheManager.getInstance();
+        this.cache = cacheManager.getCache(CACHE_KEY);
+        
     }
 
     // Rest Call to OCUI to get Randomization
@@ -48,13 +48,12 @@ public class RandomizationRegistrar {
         requestFactory.setReadTimeout(RANDOMIZATION_READ_TIMEOUT);
         RestTemplate rest = new RestTemplate(requestFactory);
 
-        SeRandomizationDTO response = null;
         try {
-            response = rest.getForObject(randomizationUrl, SeRandomizationDTO.class);
-
-            // There is no DTO to return when study OID is missing
-            if (response != null && response.getStudyOid() == null) {
-                response = null;
+            SeRandomizationDTO response = rest.getForObject(randomizationUrl, SeRandomizationDTO.class);
+            if (response.getStudyOid() != null) {
+                return response;
+            } else {
+                return null;
             }
 
         } catch (Exception e) {
@@ -64,18 +63,22 @@ public class RandomizationRegistrar {
             System.out.println(ExceptionUtils.getStackTrace(e));
 
         }
-        return response;
+        return null;
     }
 
     public SeRandomizationDTO getCachedRandomizationDTOObject(String studyOid, Boolean resetCache) throws Exception {
         SeRandomizationDTO seRandomizationDTO = null; // check if exist in cache ;
         String ocUrl = CoreResources.getField("sysURL.base");
         String mapKey = ocUrl + studyOid;
-        Element element = cache != null ? cache.get(mapKey) : null;
+        Element element;
+        if (cache != null) {
+            element = cache.get(mapKey);
+        } else {
+            throw new IllegalStateException("Cache " + CACHE_KEY + " not found");
+        }
         if (element != null && element.getObjectValue() != null && !resetCache) {
             seRandomizationDTO = (SeRandomizationDTO) element.getObjectValue();
         }
-
         if (seRandomizationDTO == null) {
             seRandomizationDTO = getRandomizationDTOObject(studyOid);
         }

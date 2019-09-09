@@ -79,14 +79,20 @@ public class ViewStudyServlet extends SecureController {
             if(participantStatusInOC=="") participantStatusInOC="disabled";
             if(randomizationStatusInOC=="") randomizationStatusInOC="disabled";
 
-            RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-            SeRandomizationDTO seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid(), false);
-
-            if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")){
+            SeRandomizationDTO seRandomizationDTO = null;
+            try {
+                RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
+                seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid(), false);
+            }
+            catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                e.printStackTrace();
+            }
+            if (seRandomizationDTO != null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")) {
                 study.getStudyParameterConfig().setRandomization("enabled");
-            }else{
+            } else {
                 study.getStudyParameterConfig().setRandomization("disabled");
-             };
+            }
 
 
              ParticipantPortalRegistrar  participantPortalRegistrar = new ParticipantPortalRegistrar();
