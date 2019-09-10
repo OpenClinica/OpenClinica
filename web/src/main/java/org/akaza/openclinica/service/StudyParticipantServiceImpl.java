@@ -175,6 +175,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             Date now = new Date();
             studySubjectBean.setCreatedDate(now);
             studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
+        }else{
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_ALREADY_EXISTS);
         }
         if (studySubjectBean != null && !(studySubjectBean.getStatus().equals(Status.AVAILABLE) || studySubjectBean.getStatus().equals(Status.SIGNED)))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
