@@ -345,7 +345,7 @@ public class EnketoAPI {
                 response = rest.exchange(enketoURL + "/accounts/api/v1/account", HttpMethod.PUT, request, EnketoAccountResponse.class,
                         new HashMap<String, String>());
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error("Error while changing the EnketoURL: ", e);
             }
         }
         return response.getBody();

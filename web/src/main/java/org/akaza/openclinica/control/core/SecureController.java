@@ -704,20 +704,19 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // Set if enrollment is capped. Used by navBar.jsp to hide "Add Participant" link in the menu
             processRequest();
         } catch (InconsistentStateException ise) {
-            logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: {}" , ise.getMessage(), ise);
+            logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: ", ise);
             addPageMessage(ise.getOpenClinicaMessage());
             forwardPage(ise.getGoTo());
         } catch (InsufficientPermissionException ipe) {
-            logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.SecureController: {}" , ipe.getMessage(),ipe);
+            logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.SecureController: ", ipe);
             // addPageMessage(ipe.getOpenClinicaMessage());
             forwardPage(ipe.getGoTo());
         } catch (OutOfMemoryError ome) {
-            logger.error("Memmory full in the process: ",ome);
+            logger.error("Memmory full in the process: ", ome);
             long heapSize = Runtime.getRuntime().totalMemory();
             session.setAttribute("ome", "yes");
         } catch (Exception e) {
-            logger.error("Process is throwing exception: ",e);
-            logger.error(SecureController.getStackTrace(e));
+            logger.error("Process is throwing exception: ", e);
 
             forwardPage(Page.ERROR);
         }
@@ -761,7 +760,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static String getStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        logger.error("Error throwed in the Stack trace: ",t);
+        logger.error("Error throwed in the Stack trace: ", t);
         pw.flush();
         sw.flush();
         return sw.toString();
@@ -781,7 +780,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             logger.debug("Request");
             process(request, response);
         } catch (Exception e) {
-            logger.error("Error while calling the process method: ",e);
+            logger.error("Error while calling the process method: ", e);
         }
     }
 
@@ -799,7 +798,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             logger.debug("Post");
             process(request, response);
         } catch (Exception e) {
-            logger.error("Error while calling the process method:",e);
+            logger.error("Error while calling the process method:", e);
         }
     }
 
@@ -835,7 +834,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             request.setAttribute("currentPageUrl", URLEncoder.encode(request.getRequestURL().toString() + "?" + paramsString, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            logger.error("Error getting parameters:" + e);
+            logger.error("Error getting parameters:", e);
         }
 
         if (request.getAttribute(POP_UP_URL) == null) {
@@ -1214,7 +1213,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             op.flush();
             op.close();
         } catch (Exception ee) {
-            logger.error("Error while downloading the file: ",ee);
+            logger.error("Error while downloading the file: ", ee);
         } finally {
             if (in != null) {
                 in.close();

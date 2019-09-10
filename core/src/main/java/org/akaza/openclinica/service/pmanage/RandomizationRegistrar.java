@@ -57,7 +57,7 @@ public class RandomizationRegistrar {
             }
 
         } catch (Exception e) {
-            logger.error("Response in not getting generated properly: {} ",e.getMessage(),e);
+            logger.error("Response in not getting generated properly:  ", e);
 
         }
         return null;

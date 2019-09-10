@@ -178,7 +178,7 @@ public class BeanPropertyService{
 				studyEvent.setDateStart(df.parse((String) result));
 
 			} catch (ParseException e) {
-				LOGGER.info("Date is not getting parsed properly: ",e);
+				LOGGER.error("Date is not getting parsed properly: ",e);
 			}
             changeDetails.setRunningInTransaction(isTransaction);
 

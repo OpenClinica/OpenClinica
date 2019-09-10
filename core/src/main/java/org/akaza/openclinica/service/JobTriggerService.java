@@ -102,7 +102,7 @@ public class JobTriggerService {
 
 					if(ruleSet.getItemId()!=null){
 						// item Specific Rule
-						logger.info("*** Item Specific Rule ***");
+						logger.debug("*** Item Specific Rule ***");
 						ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
 						StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
 						ResourceBundleProvider.updateLocale(Locale.getDefault());
@@ -111,7 +111,7 @@ public class JobTriggerService {
 						ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
 					} else {
 						// Event Specific Rule
-						logger.info("*** Event Specific Rule ***");
+						logger.debug("*** Event Specific Rule ***");
 						StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);
 						ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
 						ExpressionBean eBean = new ExpressionBean();

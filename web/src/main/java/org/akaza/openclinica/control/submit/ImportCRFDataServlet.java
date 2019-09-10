@@ -405,7 +405,7 @@ public class ImportCRFDataServlet extends SecureController {
                     } catch (NullPointerException npe1) {
                         // what if you have 2 event crfs but the third is a fake?
                         fail = true;
-                        logger.debug("threw a NPE after calling lookup validation errors",ExceptionUtils.getStackTrace(npe1));
+                        logger.debug("threw a NPE after calling lookup validation errors", npe1);
                         addPageMessage(respage.getString("an_error_was_thrown_while_validation_errors"));
                         // npe1.printStackTrace();
                     } catch (OpenClinicaException oce1) {
