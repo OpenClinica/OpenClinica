@@ -115,8 +115,13 @@ public class ParticipantServiceImpl implements ParticipantService {
         // create subject
         StudyBean siteStudy = subjectTransfer.getSiteStudy();
         StudySubject studySubject=null;
-        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudy(subjectTransfer.getPersonId(), currentStudy);
 
+        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudy(subjectTransfer.getPersonId(), currentStudy,Boolean.TRUE);
+
+        StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
+        if (currentStudy.getParentStudyId() > 0) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyAtStudyLevel(subjectTransfer.getPersonId(), currentStudy.getParentStudyId());// <
+        }
         if(!validateService.isStudyAvailable(currentStudy.getOid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
 
@@ -128,7 +133,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
 
 
-        if(studySubjectBean==null || !studySubjectBean.isActive()) {
+        if(studySubjectBean==null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             // Create New Study Subject
             SubjectBean subjectBean = new SubjectBean();
             subjectBean.setStatus(Status.AVAILABLE);
@@ -477,7 +482,8 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                 }
 
                 if (errorMsgs != null && errorMsgs.size() != 0) {
-                    StudySubjectBean byLabelAndStudy = getStudySubjectDao().findByLabelAndStudy(subject.getPersonId(), study);
+
+                    StudySubjectBean byLabelAndStudy = getStudySubjectDao().findByLabelAndStudy(subject.getPersonId(), study,Boolean.TRUE);
 
                     OCParticipateImportDTO p = new OCParticipateImportDTO();
                     p.setRow(index);
