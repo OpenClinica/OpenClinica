@@ -260,7 +260,7 @@ public class ValidateServiceImpl implements ValidateService {
      * @param userAccountBean
      * @param includeAccessCode
      */
-    public void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includeAccessCode) {
+    public void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includePII) {
 
     	Study tenantStudy = getTenantStudy(studyOid);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();      
@@ -285,7 +285,7 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
         } else {
-        	if(includeAccessCode) {
+        	if(includePII) {
         		if (!isUserHas_CRC_INV_RoleInSite(userRoles, siteOid)) {
                     throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         		}

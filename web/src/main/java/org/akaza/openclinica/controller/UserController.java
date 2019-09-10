@@ -203,7 +203,7 @@ public class UserController {
         }
 
         try {
-           validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean, incRelatedInfo);           
+           validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean, incRelatedInfo);           
            
         } catch (OpenClinicaSystemException e) {
             String errorMsg = e.getErrorCode();
