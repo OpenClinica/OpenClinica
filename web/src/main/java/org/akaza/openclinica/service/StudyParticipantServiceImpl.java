@@ -147,9 +147,13 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
         Subject subject = null;
         StudySubject studySubject = null;
-        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudy(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean);
+        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudy(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean,Boolean.TRUE);
 
-        if (studySubjectBean == null || !studySubjectBean.isActive()) {
+        StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
+        if (tenantStudyBean.getParentStudyId() > 0) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyAtStudyLevel(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getParentStudyId());// <
+        }
+        if (studySubjectBean == null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             createNewParticipant=true;
             // Create New Study Subject
             SubjectBean subjectBean = new SubjectBean();
