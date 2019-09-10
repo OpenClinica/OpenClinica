@@ -400,7 +400,7 @@ public class StudyEventServiceImpl implements StudyEventService {
              */
             StudySubjectDAO sdao = this.getMsStudySubjectDAO();
 
-            studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(participantId, currentStudy);
+            studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(participantId, currentStudy,Boolean.FALSE);
             if (studySubject == null || (studySubject.getId() == 0 && studySubject.getLabel().trim().length() == 0)) {
                 errMsg = "The study subject {" + studySubjectKey + "} can not be found in the system.";
                 logger.info(errMsg);
