@@ -36,7 +36,9 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -84,7 +86,21 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         // https://jira.openclinica.com/browse/OC-9952
-        tableFacade.setMaxRows(50);
+        try {
+            String maxrows = WebUtils.findParameterValue(request, "maxRows");
+            Integer.parseInt(maxrows);
+            Cookie cookie = new Cookie("maxrows", maxrows);
+            cookie.setMaxAge(7 * 24 * 60 * 60);
+            response.addCookie(cookie);
+        }
+        catch (Exception e) {
+        }
+        try {
+            tableFacade.setMaxRows(Integer.parseInt(WebUtils.getCookie(request, "maxrows").getValue()));            
+        }
+        catch (Exception e) {
+            tableFacade.setMaxRows(50);            
+        }
         setDataAndLimitVariables(tableFacade);
         configureTableFacade(response, tableFacade);
         if (!tableFacade.getLimit().isExported()) {
