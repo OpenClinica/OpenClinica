@@ -433,7 +433,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         return answer;
     }
 
-    public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
+    public StudySubjectBean findByLabelAndStudy(String label, StudyBean study,boolean participantCreation) {
         StudySubjectBean answer = new StudySubjectBean();
         this.setTypesExpected();
 
@@ -442,7 +442,14 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         variables.put(new Integer(2), new Integer(study.getId()));
         variables.put(new Integer(3), new Integer(study.getId()));
 
-        String sql = digester.getQuery("findByLabelAndStudy");
+        String sql=null;
+        if(participantCreation){
+            variables.put(new Integer(1), label.toLowerCase());
+            variables.get(1);
+            sql=digester.getQuery("findByLabelAndStudyForCreatingParticipant");
+        }
+        else
+            sql = digester.getQuery("findByLabelAndStudy");
 
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
@@ -478,21 +485,22 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
      * Finds a study subject which has the same label provided in the same study
      *
      * @param label
-     * @param studyId
-     * @param id
+     * @param parentStudyId
      * @return
      */
-    public StudySubjectBean findSameByLabelAndStudy(String label, int studyId, int id) {
+    public StudySubjectBean findByLabelAndStudyAtStudyLevel(String label, int parentStudyId) {
         StudySubjectBean answer = new StudySubjectBean();
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), label);
-        variables.put(new Integer(2), new Integer(studyId));
-        variables.put(new Integer(3), new Integer(studyId));
-        variables.put(new Integer(4), new Integer(id));
+        variables.put(new Integer(1), label.toLowerCase());
+        //This method is called only during creation of participants
+        // Hence, the label is case insensitive
 
-        String sql = digester.getQuery("findSameByLabelAndStudy");
+        variables.put(new Integer(2), new Integer(parentStudyId));
+        variables.put(new Integer(3), new Integer(parentStudyId));
+
+        String sql = digester.getQuery("findByLabelAndStudyAtStudyLevel");
 
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
