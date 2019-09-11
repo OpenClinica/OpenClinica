@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -100,6 +101,8 @@ public class StudyParticipantController {
 	public static final String FILE_HEADER_MAPPING = "ParticipantID, StudyEventOID, Ordinal, StartDate, EndDate";
 
 
+	@Value("${db123}")
+	private String stringProperty;
 
 	@ApiOperation(value = "Add a participant with or without their contact information to a given Study site.",  notes = "Will read the subjectKey", hidden = false)
 	@ApiResponses(value = {
@@ -131,7 +134,6 @@ public class StudyParticipantController {
 															@ApiParam( value = "Site OID", required = true ) @PathVariable( "siteOID" ) String siteOid,
 															@ApiParam( value = "Use this parameter to register the participant to OpenClinica Participate module. Possible values - y or n. Note: Module should be active for the given study.", required = false ) @RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
 
-
 		utilService.setSchemaFromStudyOid(studyOid);
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
@@ -155,7 +157,6 @@ public class StudyParticipantController {
 		}
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
-
 
 	@ApiOperation(value = "Add or Update list of participants and their contact information for OpenClinica Participate module.",  notes = "Will read subjectKeys and PII from the CSV file", hidden = false)
 	@ApiResponses(value = {
