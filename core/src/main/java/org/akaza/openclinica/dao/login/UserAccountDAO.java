@@ -502,7 +502,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setPasswdChallengeAnswer(passwdChallengeAnswer);
 
         // pull out the roles and privs here, tbh
-        if (!userName.contains(".")) {
+        if (!userName.contains(".") || userName.contains("@")) {
             ArrayList userRoleBeans = (ArrayList) this.findAllRolesByUserName(eb.getName());
             eb.setRoles(userRoleBeans);
         }
