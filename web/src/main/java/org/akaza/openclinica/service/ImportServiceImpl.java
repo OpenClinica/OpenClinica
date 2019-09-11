@@ -628,7 +628,7 @@ public class ImportServiceImpl implements ImportService {
 
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
-        studyEvent = saveOrUpdateStudyEvent(studyEvent);
+        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         logger.debug("Creating new Study Event");
         return studyEvent;
     }
@@ -639,7 +639,7 @@ public class ImportServiceImpl implements ImportService {
         setEventStartAndEndDate(studyEvent, startDate, endDate);
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
-        studyEvent = saveOrUpdateStudyEvent(studyEvent);
+        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -649,7 +649,7 @@ public class ImportServiceImpl implements ImportService {
         setEventStartAndEndDate(studyEvent, startDate, endDate);
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
-        studyEvent = saveOrUpdateStudyEvent(studyEvent);
+        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -659,7 +659,7 @@ public class ImportServiceImpl implements ImportService {
         studyEvent.setSubjectEventStatusId(subjectEventStatus.getCode());
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
-        studyEvent = saveOrUpdateStudyEvent(studyEvent);
+        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -1392,12 +1392,6 @@ public class ImportServiceImpl implements ImportService {
         return formLayout;
     }
 
-    private StudyEvent saveOrUpdateStudyEvent(StudyEvent studyEvent){
-        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
-        changeDetails.setStartDateChanged(true);
-        changeDetails.setStatusChanged(true);
-        StudyEventContainer studyEventContainer = new StudyEventContainer(studyEvent,changeDetails);
-        return studyEventDao.saveOrUpdate(studyEventContainer);
-    }
+
 
 }

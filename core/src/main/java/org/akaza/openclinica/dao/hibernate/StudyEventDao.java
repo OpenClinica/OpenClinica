@@ -187,13 +187,13 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
     @Transactional
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
-        StudyEvent event = saveOrUpdate(container.getEvent());
+        StudyEvent event = super.saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
         return event;
     }
 
     public StudyEvent saveOrUpdateTransactional(StudyEventContainer container) {
-        StudyEvent event = saveOrUpdate(container.getEvent());
+        StudyEvent event = super.saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
         return event;
     }
@@ -207,4 +207,11 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         this.changeDetails = changeDetails;
     }
 
+    public StudyEvent saveOrUpdate(StudyEvent studyEvent){
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
+        changeDetails.setStartDateChanged(true);
+        changeDetails.setStatusChanged(true);
+        StudyEventContainer studyEventContainer = new StudyEventContainer(studyEvent,changeDetails);
+        return saveOrUpdate(studyEventContainer);
+    }
 }
