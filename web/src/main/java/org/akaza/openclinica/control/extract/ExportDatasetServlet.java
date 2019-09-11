@@ -112,9 +112,7 @@ public class ExportDatasetServlet extends SecureController {
                 datasetId = dsb.getId();
                 logger.info("dataset id was zero, trying session: " + datasetId);
             } catch (NullPointerException e) {
-
-                e.printStackTrace();
-                logger.info("tripped over null pointer exception");
+                logger.info("tripped over null pointer exception",e);
             }
         }
         DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
@@ -265,7 +263,7 @@ public class ExportDatasetServlet extends SecureController {
                         Date dateStart = scheduler.scheduleJob(JobDetailFactoryBean.getObject(), simpleTrigger);
                         logger.info("== found job date: " + dateStart.toString());
                     } catch (SchedulerException se) {
-                        se.printStackTrace();
+                        logger.error("job cannot be fetched: ",se);
                     }
                 }
             } else if ("txt".equalsIgnoreCase(action)) {
@@ -522,8 +520,7 @@ public class ExportDatasetServlet extends SecureController {
 
             zipFile.close();
           } catch (java.io.IOException ioe) {
-        	  logger.error("Unhandled exception:");
-            ioe.printStackTrace();
+        	  logger.error("Unhandled exception:", ioe);
             return;
           }
     }

@@ -53,7 +53,7 @@ public class ArchivedStudyServiceImpl implements ArchivedStudyService {
     @Override
     public boolean archiveStudy(String uniqueId) {
         Study study = studyDao.findByUniqueId(uniqueId);
-        System.out.println("Study:" + study.getSchemaName());
+        LOGGER.debug("Study: {}",study.getSchemaName());
         byte[] data = getStudy(study);
         return storeStudy(study, data);
     }
@@ -101,7 +101,7 @@ public class ArchivedStudyServiceImpl implements ArchivedStudyService {
         try {
             p = pb.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("ProcessBuilder is not getting initialized properly: ",e);
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -109,7 +109,7 @@ public class ArchivedStudyServiceImpl implements ArchivedStudyService {
             IOUtils.copy(p.getInputStream(), bos);
             return bos.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Process not able to copy the file: ",e);
         } finally {
             try {
                 bos.close();

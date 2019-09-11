@@ -14,6 +14,8 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
@@ -30,6 +32,7 @@ import java.util.regex.Pattern;
 
 public class ParticipantValidator extends SubjectTransferValidator {
 
+	private static final Logger logger= LoggerFactory.getLogger(ParticipantValidator.class);
 	private StudySubjectDAO studySubjectDao;
 	private UserAccountDAO userAccountDAO;
 	private StudyParameterValueDAO studyParameterValueDAO;
@@ -150,11 +153,11 @@ public class ParticipantValidator extends SubjectTransferValidator {
             template.process(data, wtr);
 
         } catch (TemplateException te) {
-            te.printStackTrace();
+            logger.error("Template is not getting parsed properly: ",te);
 
 
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+        	logger.error("Template is not initialized properly: ",ioe);
 
 
         }

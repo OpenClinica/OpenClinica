@@ -22,7 +22,7 @@ import java.util.Properties;
 
 public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+   protected static final Logger logger = LoggerFactory.getLogger(HibernateOcDbTestCase.class);
    // public static PlatformTransactionManager transactionManager;
     protected static ApplicationContext context;
 
@@ -143,7 +143,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         try {
             properties.load(HibernateOcDbTestCase.class.getResourceAsStream(getPropertiesFilePath()));
         } catch (Exception ioExc) {
-            ioExc.printStackTrace();
+            logger.error("Hibernate property loading is not working properly: ",ioExc);
         }
     }
 
@@ -215,8 +215,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         ds.getConnection().close();
        // getDataSource().getConnection().close();
     } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+          logger.error("TransactionManager is not commiting and closing properly: ",e);
     }
   }
 }

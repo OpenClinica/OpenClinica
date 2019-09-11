@@ -550,7 +550,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error while accessing file: ",e);
         } finally {
             writer.print(writeToStringBuffer(participateImportDTOS));
             closeFile(writer);

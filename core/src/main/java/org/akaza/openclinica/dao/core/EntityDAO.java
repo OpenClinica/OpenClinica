@@ -561,7 +561,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     }
 
     private void logMe(String message) {
-        // System.out.println(message);
         logger.debug(message);
     }
 

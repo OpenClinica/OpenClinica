@@ -1,3 +1,4 @@
+package org.akaza.openclinica.control.managestudy;
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
@@ -5,7 +6,6 @@
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
-package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +43,8 @@ import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jxu
@@ -52,7 +54,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class UpdateEventDefinitionServlet extends SecureController {
     EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
-
+    private Logger logger = LoggerFactory.getLogger(getClass().getName());
     /**
      * 
      */
@@ -147,8 +149,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + i);
                 String submissionUrl = fp.getString("submissionUrl" + i);
                 String offline = fp.getString("offline" + i);
-
-                System.out.println("submission :" + submissionUrl);
+                logger.debug("submission: {}",submissionUrl);
 
                 if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
                     edcBean.setHideCrf(true);
@@ -420,9 +421,8 @@ public class UpdateEventDefinitionServlet extends SecureController {
                     isExist = true;
                     break;
                 }
-                System.out.println("iter:           " + eventDef.getId() + "--db:    " + eventDef.getSubmissionUrl());
-                System.out.println("edcsInSession:  " + sessionBean.getId() + "--session:" + sessionBean.getSubmissionUrl());
-                System.out.println();
+                logger.debug("iter:           {} --db:   {}",  eventDef.getId(), eventDef.getSubmissionUrl());
+                logger.debug("edcsInSession:  {} --session:", sessionBean.getId() , sessionBean.getSubmissionUrl());
                 if (sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() == null) {
                     break;
                 } else {
@@ -430,12 +430,12 @@ public class UpdateEventDefinitionServlet extends SecureController {
                             || (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())
                                     && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId() == 0)) {
                         v.addValidation("submissionUrl" + i, Validator.SUBMISSION_URL_NOT_UNIQUE);
-                        System.out.println("Duplicate ****************************");
+                        logger.debug("Duplicate *********************");
                         isExist = true;
                         break;
                     } else if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())
                             && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId() != 0) {
-                        System.out.println("Not Duplicate  ***********");
+                        logger.debug("Not Duplicate ********");
                         isExist = true;
                         break;
                     }

@@ -795,7 +795,7 @@ public class UserServiceImpl implements UserService {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error while accessing file for writing: ",e);
         } finally {
             writer.print(writeToTextFile(userDTOs));
             closeFile(writer);
