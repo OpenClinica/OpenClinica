@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.openclinica.org/ns/RulesTest/v3.1"
+           xmlns:OpenClinicaRules="http://www.openclinica.org/ns/rules/v3.1"
+           targetNamespace="http://www.openclinica.org/ns/RulesTest/v3.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+    <xs:import schemaLocation="rules-ODM.xsd" namespace="http://www.openclinica.org/ns/rules/v3.1" />
+
+
+    <xs:element name="RulesTest">
+        <xs:annotation>
+            <xs:documentation> The top level root element. Allows the definition of default values
+                for all nested bean definitions. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="OpenClinicaRules:Rules"/>
+                <xs:element name="Valid" type="xs:boolean"/>
+                <xs:element ref="Parameters" maxOccurs="unbounded"/>
+                <xs:element ref="RulesTestMessages" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Parameters" type="ParameterType"/>
+    <xs:complexType name="ParameterType">
+        <xs:sequence>
+            <xs:element name="Key" type="xs:string"/>
+            <xs:element name="Value" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="RulesTestMessages" type="RulesTestMessagesType"/>
+    <xs:complexType name="RulesTestMessagesType">
+        <xs:sequence>
+            <xs:element name="Key" type="xs:string"/>
+            <xs:element name="Value" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

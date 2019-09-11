@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.openclinica.org/ns/response/v3.1"
+           targetNamespace="http://www.openclinica.org/ns/response/v3.1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+
+    <xs:element name="Response">
+        <xs:annotation>
+            <xs:documentation> The top level root element. Allows the definition of default values
+                for all nested bean definitions. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Valid" type="xs:boolean"/>
+                <xs:element ref="Messages" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Messages" type="MessagesType"/>
+    <xs:complexType name="MessagesType">
+        <xs:sequence>
+            <xs:element name="Message" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
