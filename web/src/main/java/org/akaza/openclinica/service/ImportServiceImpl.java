@@ -2,6 +2,7 @@ package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.submit.crfdata.*;
+import org.akaza.openclinica.controller.StudyEventController;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
@@ -11,6 +12,8 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -625,7 +628,7 @@ public class ImportServiceImpl implements ImportService {
 
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
-        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studyEvent = saveOrUpdateStudyEvent(studyEvent);
         logger.debug("Creating new Study Event");
         return studyEvent;
     }
@@ -636,7 +639,7 @@ public class ImportServiceImpl implements ImportService {
         setEventStartAndEndDate(studyEvent, startDate, endDate);
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
-        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studyEvent = saveOrUpdateStudyEvent(studyEvent);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -646,7 +649,7 @@ public class ImportServiceImpl implements ImportService {
         setEventStartAndEndDate(studyEvent, startDate, endDate);
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
-        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studyEvent = saveOrUpdateStudyEvent(studyEvent);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -656,7 +659,7 @@ public class ImportServiceImpl implements ImportService {
         studyEvent.setSubjectEventStatusId(subjectEventStatus.getCode());
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
-        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+        studyEvent = saveOrUpdateStudyEvent(studyEvent);
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -1389,5 +1392,12 @@ public class ImportServiceImpl implements ImportService {
         return formLayout;
     }
 
+    private StudyEvent saveOrUpdateStudyEvent(StudyEvent studyEvent){
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
+        changeDetails.setStartDateChanged(true);
+        changeDetails.setStatusChanged(true);
+        StudyEventContainer studyEventContainer = new StudyEventContainer(studyEvent,changeDetails);
+        return studyEventDao.saveOrUpdate(studyEventContainer);
+    }
 
 }
