@@ -101,9 +101,6 @@ public class StudyParticipantController {
 	public static final String FILE_HEADER_MAPPING = "ParticipantID, StudyEventOID, Ordinal, StartDate, EndDate";
 
 
-	@Value("${db123}")
-	private String stringProperty;
-
 	@ApiOperation(value = "Add a participant with or without their contact information to a given Study site.",  notes = "Will read the subjectKey", hidden = false)
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successful operation"),
