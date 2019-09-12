@@ -486,8 +486,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setOwnerId(ownerId.intValue());
         eb.setUpdaterId(updateId.intValue());
 
+        boolean isParticipateUser = UserType.get(userTypeId.intValue()).equals(UserType.PARTICIPATE);
+
         // below block is set up to avoid recursion, etc.
-        if (findOwner && !userName.contains(".")) {
+        if (findOwner && !isParticipateUser) {
             UserAccountBean owner = (UserAccountBean) this.findByPK(ownerId.intValue(), false);
             eb.setOwner(owner);
             UserAccountBean updater = (UserAccountBean) this.findByPK(updateId.intValue(), false);
@@ -502,7 +504,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setPasswdChallengeAnswer(passwdChallengeAnswer);
 
         // pull out the roles and privs here, tbh
-        if (!userName.contains(".")) {
+        if (!isParticipateUser) {
             ArrayList userRoleBeans = (ArrayList) this.findAllRolesByUserName(eb.getName());
             eb.setRoles(userRoleBeans);
         }
