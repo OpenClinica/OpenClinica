@@ -30,7 +30,10 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
@@ -318,7 +321,7 @@ public class CoreResources implements ResourceLoaderAware {
         setDataInfoVals();
         if (DATAINFO.getProperty("filePath") == null || DATAINFO.getProperty("filePath").length() <= 0)
             DATAINFO.setProperty("filePath", filePath);
-
+        DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
         // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);

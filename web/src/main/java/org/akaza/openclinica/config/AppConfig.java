@@ -41,9 +41,6 @@ import java.util.Properties;
 @SuppressWarnings("unused")
 @KeycloakConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-//@PropertySources({
-//        @PropertySource("classpath:datainfo.properties")
-//})
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 
 public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
@@ -52,8 +49,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     private String securedRoute = "/**";
 
-//    @Value(value = "${SBSUrl}")
-//    private String sbsUrl;
 
     @Autowired
     private KeycloakClientImpl keycloakClient;
@@ -187,6 +182,5 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     public String getSbsurl(){
         return CoreResources.getField("SBSUrl");
-//        return new CoreResources().getDATAINFO().getProperty("SBSUrl");
     }
 }
