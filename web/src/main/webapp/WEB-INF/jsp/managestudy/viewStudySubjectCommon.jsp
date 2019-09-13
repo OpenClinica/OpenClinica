@@ -548,7 +548,8 @@ $(function() {
 
                     var form = studyEvent.forms[formRef];
                     if (form) {
-                        form.addNew = link['@href'];
+                        if (odm.ClinicalData.SubjectData['@OpenClinica:Status'] === 'Available')
+                            form.addNew = link['@href'];
                         form.showMe = studyEvent.showMe = true;                        
                     }
                     else {
