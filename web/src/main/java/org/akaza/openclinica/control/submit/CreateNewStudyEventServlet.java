@@ -328,7 +328,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 
             // StudySubjectBean studySubject = (StudySubjectBean) sdao.findByPK(fp.getInt(INPUT_STUDY_SUBJECT));
             // sdao.findByLabelAndStudy(label, study)
-            StudySubjectBean studySubject = sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL), currentStudy,Boolean.FALSE);
+            StudySubjectBean studySubject = sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL), currentStudy);
             // >> 4358 tbh, 11/2009
             // what if we are sent here from AddNewSubjectServlet.java??? we need to get that study subject bean
             if (request.getAttribute(INPUT_STUDY_SUBJECT) != null) {

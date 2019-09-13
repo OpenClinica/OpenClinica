@@ -122,7 +122,7 @@ public class StudyParticipantController {
 					+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
 					+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
 					+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
-					+ "<br />participantIDAlreadyExists					   : Participant id is already exists (not case sensitive)."
+					+ "<br />participantIDAlreadyExists					   : Participant id is already exists."
 					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 	@RequestMapping( value = "/studies/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST )
 	public ResponseEntity<Object> addParticipantAtSiteLevel(HttpServletRequest request,
@@ -178,7 +178,7 @@ public class StudyParticipantController {
 					+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
 					+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
 					+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
-					+ "<br />participantIDAlreadyExists					   : Participant id is already exists (not case sensitive)."
+					+ "<br />participantIDAlreadyExists					   : Participant id is already exists."
 					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 	@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 	public ResponseEntity<Object> createStudyParticipantAtSiteLevelInBulk(HttpServletRequest request,

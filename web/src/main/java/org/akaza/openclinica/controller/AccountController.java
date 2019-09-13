@@ -693,7 +693,7 @@ public class AccountController {
 
 	private StudySubjectBean getStudySubject(String label, StudyBean study) {
 		ssdao = new StudySubjectDAO(dataSource);
-		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByLabelAndStudy(label, study, Boolean.FALSE);
+		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByLabelAndStudy(label, study);
 		return studySubjectBean;
 	}
 

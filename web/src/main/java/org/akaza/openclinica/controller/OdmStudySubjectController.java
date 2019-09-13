@@ -82,7 +82,7 @@ public class OdmStudySubjectController {
             studyBean = studyDAO.findByOid(studyOID);
             if (studyBean != null) {
 
-                studySubjectBean = (StudySubjectBean) studySubjectDAO.findByLabelAndStudy(studySubjectLabel, studyBean,Boolean.FALSE);
+                studySubjectBean = (StudySubjectBean) studySubjectDAO.findByLabelAndStudy(studySubjectLabel, studyBean);
                 if (!mayProceed(studyOID, studySubjectBean))
                     return null;
 

@@ -300,7 +300,7 @@ public class EventService implements EventServiceInterface {
 			study = getStudyDao().findSiteByUniqueIdentifier(studyUniqueId, siteUniqueId);
 		}
 		StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(eventDefinitionOID, study.getId(), parentStudyId);
-		StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study,Boolean.FALSE);
+		StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study);
 
 		Integer studyEventOrdinal = null;
 		if (canSubjectScheduleAnEvent(studyEventDefinition, studySubject)) {

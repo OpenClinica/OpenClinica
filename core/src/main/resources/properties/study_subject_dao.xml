@@ -210,7 +210,7 @@
 		<sql>
 			SELECT ss.*
 			FROM study_subject ss, study st
-			WHERE LOWER(ss.label)=?
+			WHERE LOWER(ss.label)=LOWER(?)
 			AND ss.study_id=st.study_id
 			AND (st.study_id=? or st.parent_study_id=?)
 		</sql>
@@ -231,16 +231,6 @@
 			SELECT ss.*
 			FROM study_subject ss
 			WHERE ss.label=?
-		</sql>
-	</query>
-	<query>
-		<name>findByLabelAndStudyAtStudyLevel</name>
-		<sql>
-			SELECT ss.*
-			FROM study_subject ss, study st
-			WHERE LOWER(ss.label)=?
-				AND ss.study_id=st.study_id
-				AND (st.study_id=? or st.parent_study_id=?)
 		</sql>
 	</query>
 	<query>

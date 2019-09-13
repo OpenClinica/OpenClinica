@@ -365,7 +365,7 @@ public class ODMClinicaDataResource {
         else {
             StudyDAO studyDAO = new StudyDAO(getDataSource());
             StudyBean study = studyDAO.findByOid(studyOID);
-            studySubject = studySubjectDAO.findByLabelAndStudy(subjectIdentifier, study,Boolean.FALSE);
+            studySubject = studySubjectDAO.findByLabelAndStudy(subjectIdentifier, study);
             if (studySubject != null && studySubject.getOid() != null)
                 return studySubject.getOid();
             else

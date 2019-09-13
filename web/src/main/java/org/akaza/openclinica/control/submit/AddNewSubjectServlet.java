@@ -226,13 +226,11 @@ public class AddNewSubjectServlet extends SecureController {
                 Validator.addError(errors, INPUT_LABEL, resexception
                         .getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
             }
-            Boolean isParticipantCreation=Boolean.TRUE;
-            StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy,isParticipantCreation);
+            StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getId());
 
             StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
-            // tbh
             if (currentStudy.getParentStudyId() > 0) {
-                subjectWithSameLabelInParent = ssd.findByLabelAndStudyAtStudyLevel(label, currentStudy.getParentStudyId());// <
+                subjectWithSameLabelInParent = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getParentStudyId());
 
             }
             if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
