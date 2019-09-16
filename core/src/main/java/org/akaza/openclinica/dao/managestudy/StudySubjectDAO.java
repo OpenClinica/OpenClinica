@@ -480,8 +480,6 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
 
         return answer;
     }
-
-  
     public StudySubjectBean findByLabelAndOnlyByStudy(String label, StudyBean study) {
         StudySubjectBean answer = new StudySubjectBean();
         this.setTypesExpected();
