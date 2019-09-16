@@ -482,7 +482,6 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                 }
 
                 if (errorMsgs != null && errorMsgs.size() != 0) {
-
                     StudySubjectBean byLabelAndStudy = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subject.getPersonId(), study.getId());
 
                     OCParticipateImportDTO p = new OCParticipateImportDTO();
