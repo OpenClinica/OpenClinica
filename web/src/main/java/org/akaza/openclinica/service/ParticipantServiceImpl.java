@@ -120,7 +120,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
         if (currentStudy.getParentStudyId() > 0) {
-            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getParentStudyId());// <
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getParentStudyId());
         }
         if(!validateService.isStudyAvailable(currentStudy.getOid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
