@@ -36,6 +36,22 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	private StudyBean currentStudy;
 	private StudyBean siteStudy;
 	
+	public StudyBean getCurrentStudy() {
+		return currentStudy;
+	}
+
+	public void setCurrentStudy(StudyBean currentStudy) {
+		this.currentStudy = currentStudy;
+	}
+
+	public StudyBean getSiteStudy() {
+		return siteStudy;
+	}
+
+	public void setSiteStudy(StudyBean siteStudy) {
+		this.siteStudy = siteStudy;
+	}
+
 	private boolean isBulkMode = false;
 	public static final String US_PHONE_PATTERN = "^[0-9]{10,10}$";
 
@@ -71,7 +87,7 @@ public class ParticipantValidator extends SubjectTransferValidator {
         return this.studyParameterValueDAO != null ? studyParameterValueDAO : new StudyParameterValueDAO(dataSource);
     }
          
-    protected boolean isEnrollmentCapped(){
+    public boolean isEnrollmentCapped(){
 
         boolean capIsOn = isEnrollmentCapEnforced();
 

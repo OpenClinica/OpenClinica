@@ -24,6 +24,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.validator.ParticipantValidator;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -86,6 +87,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     private StudyDAO studyDao;
     private StudySubjectDAO studySubjectDao;
     private SubjectDAO subjectDao;
+    private ParticipantValidator participantValidator;
 
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
     public static final String DASH = "-";
@@ -106,6 +108,12 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         StudyBean tenantStudyBean = getStudyDao().findByOid(studyOid);
         StudyBean tenantSiteBean = getStudyDao().findByOid(siteOid);
 
+        participantValidator = this.getParticipantValidator();
+        participantValidator.setCurrentStudy(tenantStudyBean);
+        participantValidator.setSiteStudy(tenantSiteBean);
+        if (participantValidator.isEnrollmentCapped())
+            throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
+        
         if (StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_PARTICIPANT_ID_DATA);
 
@@ -324,5 +332,22 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         study.setSubjectCount(subjectCount+1);
         studyHibDao.saveOrUpdate(study);
     }
+
+
+	public ParticipantValidator getParticipantValidator() {
+		if(participantValidator != null) {
+			return participantValidator;
+		}else {
+			participantValidator = new ParticipantValidator(dataSource);
+		}
+		
+		return participantValidator;
+		
+	}
+
+
+	public void setParticipantValidator(ParticipantValidator participantValidator) {
+		this.participantValidator = participantValidator;
+	}
 
 }
