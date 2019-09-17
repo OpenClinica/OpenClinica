@@ -51,6 +51,8 @@ public class CoreResources implements ResourceLoaderAware {
     private Properties dataInfoProp;
     private Properties extractInfo;
     private Properties extractProp;
+    private Properties dataInfoExternal;
+    private Properties extractInfoExternal;
 
     public static final Integer PDF_ID = 10;
     public static final Integer TAB_ID = 8;
@@ -164,14 +166,17 @@ public class CoreResources implements ResourceLoaderAware {
              * if (OC_dataExtractProperties != null)
              * extractInfo = OC_dataExtractProperties;
              *
-             */ String dbName = dataInfo.getProperty("dbType");
+             */
+            overwriteExternalPropOnInternalProp(dataInfo,dataInfoExternal);
+            String dbName = dataInfo.getProperty("dbType");
 
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
             // instance
             tenantSchema.set(DATAINFO.getProperty("schema"));
-            EXTRACTINFO = extractInfo;
 
+            overwriteExternalPropOnInternalProp(extractInfo,extractInfoExternal);
+            EXTRACTINFO = extractInfo;
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
@@ -199,6 +204,13 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
+
+    public void overwriteExternalPropOnInternalProp(Properties internalProp, Properties externalProp){
+        if(externalProp!=null && !externalProp.isEmpty()){
+            Set<String> externalKeys= externalProp.stringPropertyNames();
+            externalKeys.forEach(key -> internalProp.setProperty(key, externalProp.getProperty(key)));
+        }
+    }
     public static UserAccountBean setRootUserAccountBean(HttpServletRequest request, DataSource dataSource) {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName("root");
@@ -309,9 +321,7 @@ public class CoreResources implements ResourceLoaderAware {
         setDataInfoVals();
         if (DATAINFO.getProperty("filePath") == null || DATAINFO.getProperty("filePath").length() <= 0)
             DATAINFO.setProperty("filePath", filePath);
-
         DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
-
         // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);
@@ -427,7 +437,6 @@ public class CoreResources implements ResourceLoaderAware {
         } else {
             logger.debug("Module Manager URL IS Defined in datainfo:  " + moduleManager);
         }
-
         return DATAINFO;
 
     }
@@ -1217,11 +1226,16 @@ public class CoreResources implements ResourceLoaderAware {
     public Properties getDataInfo() {
         return DATAINFO;
     }
-
     public void setDataInfo(Properties dataInfo) {
         this.dataInfo = dataInfo;
     }
 
+    public void setDataInfoExternal(Properties dataInfoExternal) {
+        this.dataInfoExternal = dataInfoExternal;
+    }
+    public void setExtractInfoExternal(Properties extractInfoExternal) {
+        this.extractInfoExternal= extractInfoExternal;
+    }
     public Properties getExtractInfo() {
         return extractInfo;
     }

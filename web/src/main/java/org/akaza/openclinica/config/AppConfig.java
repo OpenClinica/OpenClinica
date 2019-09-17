@@ -1,5 +1,6 @@
 package org.akaza.openclinica.config;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.keycloak.adapters.KeycloakConfigResolver;
@@ -35,13 +36,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 @SuppressWarnings("unused")
 @KeycloakConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@PropertySources({
-        @PropertySource("classpath:datainfo.properties")
-})
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 
 public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
@@ -50,8 +49,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     private String securedRoute = "/**";
 
-    @Value(value = "${SBSUrl}")
-    private String sbsUrl;
 
     @Autowired
     private KeycloakClientImpl keycloakClient;
@@ -162,7 +159,7 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
         corsConfigurationSource.setAlwaysUseFullPath(true);
 
-        URL studyManagerUrl = new URL(sbsUrl);
+        URL studyManagerUrl = new URL(getSbsurl());
         String studyManagerHost = studyManagerUrl.getProtocol() + "://" + studyManagerUrl.getAuthority();
 
         // Set up CORS configuration for REST API endpoints
@@ -181,5 +178,9 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Bean
     public KeycloakConfigResolver keycloakConfigResolver() {
         return new CustomKeycloakConfigResolver();
+    }
+
+    public String getSbsurl(){
+        return CoreResources.getField("SBSUrl");
     }
 }
