@@ -88,8 +88,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     public static final String EMAIL_PATTERN = "^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$";
 
 
-    private  StudyBean currentStudy;
-    private  StudyBean siteStudy;
+   
 
     public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, String studyOid, String siteOid , String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
         boolean createNewParticipant=false;
@@ -98,9 +97,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         StudyBean tenantStudyBean = getStudyDao().findByOid(studyOid);
         StudyBean tenantSiteBean = getStudyDao().findByOid(siteOid);
        
-        currentStudy = tenantStudyBean;
-        siteStudy = tenantSiteBean;
-        if (isEnrollmentCapped())
+        if (isEnrollmentCapped(tenantStudyBean,tenantSiteBean))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
         
         if (StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()))
@@ -329,9 +326,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     }
 
 
-    public boolean isEnrollmentCapped(){
+    private boolean isEnrollmentCapped(StudyBean currentStudy,StudyBean siteStudy){
 
-        boolean capIsOn = isEnrollmentCapEnforced();
+        boolean capIsOn = isEnrollmentCapEnforced(currentStudy,siteStudy);
 
         StudySubjectDAO studySubjectDAO = this.getStudySubjectDao();
         int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
@@ -355,7 +352,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
      * if it's site level, then also need to check study 
      * @return
      */
-    private boolean isEnrollmentCapEnforced(){
+    private boolean isEnrollmentCapEnforced(StudyBean currentStudy,StudyBean siteStudy){
         StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(this.dataSource);
        
         boolean capEnforcedSite = false;
