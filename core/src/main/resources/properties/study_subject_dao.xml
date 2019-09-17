@@ -206,6 +206,16 @@
 		</sql>
 	</query>
 	<query>
+		<name>findByLabelAndStudyForCreatingParticipant</name>
+		<sql>
+			SELECT ss.*
+			FROM study_subject ss, study st
+			WHERE LOWER(ss.label)=LOWER(?)
+			AND ss.study_id=st.study_id
+			AND (st.study_id=? or st.parent_study_id=?)
+		</sql>
+	</query>
+	<query>
 		<name>findByLabelAndOnlyByStudy</name>
 		<sql>
 			SELECT ss.*
@@ -221,17 +231,6 @@
 			SELECT ss.*
 			FROM study_subject ss
 			WHERE ss.label=?
-		</sql>
-	</query>
-	<query>
-		<name>findSameByLabelAndStudy</name>
-		<sql>
-			SELECT ss.*
-			FROM study_subject ss, study st
-			WHERE ss.label=?
-				AND ss.study_id=st.study_id
-				AND (st.study_id=? or st.parent_study_id=?)
-				AND ss.study_subject_id != ?
 		</sql>
 	</query>
 	<query>

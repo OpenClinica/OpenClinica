@@ -147,9 +147,13 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
         Subject subject = null;
         StudySubject studySubject = null;
-        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudy(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean);
+        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getId());
 
-        if (studySubjectBean == null || !studySubjectBean.isActive()) {
+        StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
+        if (tenantStudyBean.getParentStudyId() > 0) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getParentStudyId());// <
+        }
+        if (studySubjectBean == null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             createNewParticipant=true;
             // Create New Study Subject
             SubjectBean subjectBean = new SubjectBean();
@@ -171,6 +175,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             Date now = new Date();
             studySubjectBean.setCreatedDate(now);
             studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
+        }else{
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_ALREADY_EXISTS);
         }
         if (studySubjectBean != null && !(studySubjectBean.getStatus().equals(Status.AVAILABLE) || studySubjectBean.getStatus().equals(Status.SIGNED)))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
