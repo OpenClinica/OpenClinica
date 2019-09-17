@@ -771,7 +771,6 @@ public class ItemFormMetadataDAO<K extends String, V extends ArrayList> extends 
 
     private void logMe(String message) {
         logger.debug(message);
-        // System.out.println(message);
     }
 
     public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {

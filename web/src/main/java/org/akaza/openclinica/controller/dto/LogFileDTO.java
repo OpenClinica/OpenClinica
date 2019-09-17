@@ -1,5 +1,8 @@
 package org.akaza.openclinica.controller.dto;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class LogFileDTO {
 
+	private static final Logger logger= LoggerFactory.getLogger(LogFileDTO.class);
 	private File file;
 	private String jobType;
 	private String parentRootDir;
@@ -53,7 +57,7 @@ public class LogFileDTO {
 			return attr.creationTime().to(TimeUnit.MILLISECONDS);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error accessing the file for extracting created time: ",e);
 		}
 
 		 return 0;

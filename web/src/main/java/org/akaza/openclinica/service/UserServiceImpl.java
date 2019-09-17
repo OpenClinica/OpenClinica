@@ -388,8 +388,10 @@ public class UserServiceImpl implements UserService {
         	
         	spDTO.setSubjectOid(ss.getOcOid());
         	spDTO.setSubjectKey(ss.getLabel());
-        	spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
-        	
+        	if(ss.getStudySubjectDetail() != null) {
+        		spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
+        	}
+       	        	
         	spDTO.setCreatedBy(ss.getUserAccount().getUserName());        	        	
         	spDTO.setLastModifiedBy(userAccountDao.findById(ss.getUpdateId()).getUserName());        	        	
         	
@@ -793,7 +795,7 @@ public class UserServiceImpl implements UserService {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error while accessing file for writing: ",e);
         } finally {
             writer.print(writeToTextFile(userDTOs));
             closeFile(writer);

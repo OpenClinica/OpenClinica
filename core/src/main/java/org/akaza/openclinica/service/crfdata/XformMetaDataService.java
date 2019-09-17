@@ -443,14 +443,14 @@ public class XformMetaDataService {
                 IOUtils.write(response.getBody(), output);
                 fileItem = new DiskFileItem("media_file", response.getHeaders().get("Content-Type").get(0), false, fileName, 100000000, file);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("File is not able to be created: ",e);
             } finally {
                 try {
                     if (output != null) {
                         output.close();
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("file is not able to be closed: ",e);
                 }
             }
         }
@@ -485,14 +485,11 @@ public class XformMetaDataService {
                         try {
                             jsonList = mapper.readValue(vForm, mapType);
                         } catch (JsonParseException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                             logger.error("Unable to parse the json properly: ",e);
                         } catch (JsonMappingException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            logger.error("Unable to map the Json: ",e);
                         } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            logger.error("",e);
                         }
                         XformContainer xformContainer = new XformContainer();
                         xformContainer.setGroups(jsonList);

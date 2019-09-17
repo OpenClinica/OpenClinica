@@ -111,6 +111,7 @@ public class StudyParticipantController {
 					+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
 					+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
 					+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
+					+ "<br />participantIDAlreadyExists					   : Participant ID already exists."
 					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 	@RequestMapping( value = "/studies/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST )
 	public ResponseEntity<Object> addParticipantAtSiteLevel(HttpServletRequest request,
@@ -166,6 +167,7 @@ public class StudyParticipantController {
 					+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
 					+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
 					+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
+					+ "<br />participantIDAlreadyExists					   : Participant ID already exists."
 					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 	@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 	public ResponseEntity<Object> createStudyParticipantAtSiteLevelInBulk(HttpServletRequest request,
@@ -239,7 +241,7 @@ public class StudyParticipantController {
 	}
 
 	
-	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission", hidden = true)
+	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participant", method = RequestMethod.GET)
 	public ResponseEntity<Object> getStudySubjectInfo(
 			@ApiParam(value = "Study OID", required = true) @PathVariable("studyOID") String studyOid,
@@ -261,7 +263,7 @@ public class StudyParticipantController {
 		StudyParticipantDetailDTO result =  null;
 		
 		try {			
-			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);							
+			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);							
 			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,customerUuid,userAccountBean,participantID,includeRelatedInfo);
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
@@ -315,7 +317,7 @@ public class StudyParticipantController {
 		  }	
 
 		} catch (Exception eee) {
-			eee.printStackTrace();
+			logger.error("Error while listing study subjects: ",eee);
 			throw eee;
 		}
 

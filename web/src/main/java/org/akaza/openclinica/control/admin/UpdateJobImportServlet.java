@@ -157,7 +157,7 @@ public class UpdateJobImportServlet extends SecureController {
                     addPageMessage("Your job has been successfully modified.");
                     forwardPage(Page.VIEW_IMPORT_JOB_SERVLET);
                 } catch (SchedulerException se) {
-                    se.printStackTrace();
+                    logger.error("Job is not able to be deleted: ",se);
                     // set a message here with the exception message
                     setUpServlet(trigger);
                     addPageMessage("There was an unspecified error with your creation, please contact an administrator.");

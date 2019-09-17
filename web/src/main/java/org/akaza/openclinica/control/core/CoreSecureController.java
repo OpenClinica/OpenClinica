@@ -231,7 +231,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 }
             }
         } catch (SchedulerException se) {
-            se.printStackTrace();
+            LOGGER.error("job cannot be reached: ",se);
         }
 
     }
@@ -497,12 +497,10 @@ public abstract class CoreSecureController extends HttpServlet {
             //   pingJobServer(request);
             processRequest(request, response);
         } catch (InconsistentStateException ise) {
-            ise.printStackTrace();
             LOGGER.warn("InconsistentStateException: org.akaza.openclinica.control.CoreSecureController: ", ise);
             addPageMessage(ise.getOpenClinicaMessage(), request);
             forwardPage(ise.getGoTo(), request, response);
         } catch (InsufficientPermissionException ipe) {
-            ipe.printStackTrace();
             LOGGER.warn("InsufficientPermissionException: org.akaza.openclinica.control.CoreSecureController: ", ipe);
             // addPageMessage(ipe.getOpenClinicaMessage());
             forwardPage(ipe.getGoTo(), request, response);
@@ -776,7 +774,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 response.sendRedirect(url);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Study is not present: ",ex);
         }
     }
 
@@ -800,7 +798,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 response.sendRedirect(url);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Study is not present:",ex);
         }
 
     }
@@ -899,7 +897,6 @@ public abstract class CoreSecureController extends HttpServlet {
             }
             LOGGER.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
-            me.printStackTrace();
             if (failMessage != null && sendMessage) {
                 addPageMessage(failMessage, request);
             }

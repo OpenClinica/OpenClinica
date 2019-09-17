@@ -95,7 +95,7 @@ public class OdmImportController {
             return new ResponseEntity<Object>(null, HttpStatus.OK);
         });
         String uuid = UUID.randomUUID().toString();
-        System.out.println(uuid);
+        logger.debug(uuid);
         synchronized (expiringMap) {
             expiringMap.put(uuid, future);
         }
@@ -119,25 +119,23 @@ public class OdmImportController {
                 ResponseEntity<Object> objectResponseEntity = future.get();
                 return new ResponseEntity<>("Completed", HttpStatus.OK);
             } catch (InterruptedException e) {
-                e.printStackTrace();
-                logger.info("InterruptedException for :" + publishUuid + e.getMessage());
+                logger.info("InterruptedException for :{} " , publishUuid, e);
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             } catch (CustomRuntimeException e) {
-                logger.info("CustomRuntimeException for :" + publishUuid + e.getMessage());
-                logger.info("CustomRuntimeException for :" + publishUuid + e.getErrList().toString());
+                logger.info("CustomRuntimeException for :{} {}" , publishUuid , e.getMessage());
+                logger.info("CustomRuntimeException for :{} {}" , publishUuid , e.getErrList().toString());
                 return new ResponseEntity<>(e.getErrList(), HttpStatus.BAD_REQUEST);
             } catch (ExecutionException e) {
                 Throwable cause = e.getCause();
                 if (cause != null && cause instanceof CustomRuntimeException) {
-                    logger.info("ExecutionException for :" + publishUuid + e.getMessage());
-                    logger.info("ExecutionException for :" + publishUuid + ((CustomRuntimeException) cause).getErrList().toString());
+                    logger.info("ExecutionException for : {} {}" , publishUuid , e.getMessage());
+                    logger.info("ExecutionException for :{} {}" , publishUuid , ((CustomRuntimeException) cause).getErrList().toString());
                     return new ResponseEntity<>(((CustomRuntimeException) cause).getErrList(), HttpStatus.BAD_REQUEST);
                 } else {
                     List<ErrorObj> err = new ArrayList<>();
                     ErrorObj errorObj = new ErrorObj(e.getMessage(), e.getMessage());
                     err.add(errorObj);
-                    e.printStackTrace();
-                    logger.info("ExecutionException but not CustomRuntimeException for :" + publishUuid, e);
+                    logger.info("ExecutionException but not CustomRuntimeException for : {}" , publishUuid, e);
                     return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
                 }
             }

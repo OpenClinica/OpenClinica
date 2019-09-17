@@ -412,7 +412,7 @@ public class QueryServiceImpl implements QueryService {
             try {
                 return new InternetAddress(address);
             } catch (AddressException e) {
-                e.printStackTrace();
+                logger.error("Error while creating the InternetAddress: ",e);
             }
             return null;
         }).toArray(InternetAddress[]::new);

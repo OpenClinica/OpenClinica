@@ -216,7 +216,7 @@ import java.util.*;
             try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error while redirecting to MainMenu: ",e);
             }
             return null;
         }
@@ -364,7 +364,7 @@ import java.util.*;
                 randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid(), true);
             } catch (Exception e1) {
                 // TODO Auto-generated catch block
-                e1.printStackTrace();
+                logger.error("Error while accessing randomization registrar: ",e1);
             }
         }
 

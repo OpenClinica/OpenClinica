@@ -10,12 +10,15 @@ import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Helper methods will be placed in this class - DRY
  */
 public class ImportHelper {
 
+    private static final Logger logger= LoggerFactory.getLogger(ImportHelper.class);
     /**
      * @param dib
      *            A DisplayItemBean representing an input on the CRF.
@@ -170,7 +173,7 @@ public class ImportHelper {
                         try {
                             customValidation = Validator.processCRFValidationFunction(customValidationString);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.error("Error while processing CRF validation function: ",e);
                         }
                     } else if (customValidationString.startsWith("regexp:")) {
                         try {

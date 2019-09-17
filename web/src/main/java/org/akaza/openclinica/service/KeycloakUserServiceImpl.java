@@ -28,7 +28,7 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
                     .header("content-type", "application/json")
                     .asString();
         } catch (UnirestException e) {
-            e.printStackTrace();
+            logger.error("Error accessing the Unirest: ",e);
         }
 
         if (response == null || response.getBody() == null)

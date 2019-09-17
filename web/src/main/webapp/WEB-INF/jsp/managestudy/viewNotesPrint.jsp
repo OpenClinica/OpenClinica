@@ -14,7 +14,7 @@
 <body onload="javascript:alert('<fmt:message key="alert_to_print" bundle="${restext}"/>')">
 
 <h1><span class="title_manage">
-	<fmt:message key="view_discrepancy_notes" bundle="${resword}"/> 
+    <fmt:message key="view_discrepancy_notes" bundle="${resword}"/> 
 <!--<a href="javascript:openDocWindow('help/4_8_discrepancyNotes_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
  -->
 </span></h1>
@@ -22,32 +22,33 @@
 <jsp:include page="../include/alertbox.jsp" />
 
 <table border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td> 	
-	 <!-- These DIVs define shaded box borders -->
+    <tr>
+        <td>    
+     <!-- These DIVs define shaded box borders -->
   <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
   <div class="tablebox_center">
 
-  <table border="0" cellpadding="0" cellspacing="0"> 		
-	<tr valign="top">						
-	<td class="table_header_row"><fmt:message key="query_id" bundle="${resword}"/></td>
-	<td class="table_header_row_left"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="site_id" bundle="${resword}"/></td>
+  <table border="0" cellpadding="0" cellspacing="0">        
+    <tr valign="top">                       
+    <td class="table_header_row"><fmt:message key="query_id" bundle="${resword}"/></td>
+    <td class="table_header_row_left"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="site_id" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="type" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="resolution_status" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="date_updated" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="days_open" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="days_since_updated" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="event_name" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="event_date" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="CRF" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="entity_name" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="entity_value" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="entity_type" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="detailed_notes" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="of_notes" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="assigned_user" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="date_updated" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="days_open" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="days_since_updated" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="event_name" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="event_date" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="CRF" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="entity_name" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="entity_value" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="entity_type" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="detailed_notes" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="of_notes" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="assigned_user" bundle="${resword}"/></td>
   </tr>
    <c:forEach var="note" items="${allNotes}">
   <tr valign="top">
@@ -63,6 +64,7 @@
     </td>
     <td class="table_cell_left"><c:out value="${note.studySub.label}" /></td>
     <td class="table_cell"><c:out value="${note.siteId}" /></td>
+    <td class="table_cell"><c:out value="${note.disType.name}" /></td>
     <td class="table_cell"><c:out value="${note.resStatus.name}" /></td>
     <td class="table_cell"><fmt:formatDate value="${note.createdDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><fmt:formatDate value="${note.updatedDate}" pattern="${dteFormat}"/></td>
@@ -82,24 +84,24 @@
     <td class="table_cell"><c:out value="${note.crfName}" />&nbsp;</td>
     <td class="table_cell"><c:out value="${note.crfStatus}" />&nbsp;</td>
     <td class="table_cell">
-	    <c:out value="${note.entityName}"/>&nbsp;	 
-	</td>
-	<td class="table_cell"><c:out value="${note.entityValue}" />&nbsp;</td>
-	<td class="table_cell"><c:out value="${note.entityType}" />&nbsp;</td>
-    <td class="table_cell" width="400">		
-	 <c:out value="${note.detailedNotes}" />&nbsp; 
-	</td>
-	<td class="table_cell" align="right"><c:out value="${note.numChildren}" /></td>
-	<td class="table_cell"><c:out value="${note.assignedUser.name}" /></td>	
-	
+        <c:out value="${note.entityName}"/>&nbsp;    
+    </td>
+    <td class="table_cell"><c:out value="${note.entityValue}" />&nbsp;</td>
+    <td class="table_cell"><c:out value="${note.entityType}" />&nbsp;</td>
+    <td class="table_cell" width="400">     
+     <c:out value="${note.detailedNotes}" />&nbsp; 
+    </td>
+    <td class="table_cell" align="right"><c:out value="${note.numChildren}" /></td>
+    <td class="table_cell"><c:out value="${note.assignedUser.name}" /></td> 
+    
  </tr>
 </c:forEach>
 </table>
 
 </div>
 </div></div></div></div></div></div></div></div>
-		</td>
-	</tr>
+        </td>
+    </tr>
 </table>
 </body>
 </html>

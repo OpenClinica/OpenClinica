@@ -467,7 +467,7 @@ public class EnketoUrlService {
                 break;
             }
         }
-        System.out.println(instance);
+        logger.debug(instance);
         return instance;
     }
 

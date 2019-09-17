@@ -107,8 +107,13 @@ public class ParticipantServiceImpl implements ParticipantService {
         // create subject
         StudyBean siteStudy = subjectTransfer.getSiteStudy();
         StudySubject studySubject=null;
-        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudy(subjectTransfer.getPersonId(), currentStudy);
 
+        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getId());
+
+        StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
+        if (currentStudy.getParentStudyId() > 0) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getParentStudyId());
+        }
         if(!validateService.isStudyAvailable(currentStudy.getOid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
 
@@ -120,7 +125,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
 
 
-        if(studySubjectBean==null || !studySubjectBean.isActive()) {
+        if(studySubjectBean==null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             // Create New Study Subject
             SubjectBean subjectBean = new SubjectBean();
             subjectBean.setStatus(Status.AVAILABLE);
@@ -409,8 +414,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         }
         return subjectCount;
     }
-
-    
+ 
     public StudySubjectDAO getStudySubjectDAO() {
         ssDao = ssDao != null ? ssDao : new StudySubjectDAO(dataSource);
         return ssDao;
@@ -425,7 +429,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error while accessing file: ",e);
         } finally {
             writer.print(writeToStringBuffer(participateImportDTOS));
             closeFile(writer);

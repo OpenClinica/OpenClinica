@@ -372,8 +372,7 @@ public class ExampleSpringJob extends QuartzJobBean {
         } catch (Exception e) {
             // TODO Auto-generated catch block -- ideally should generate a fail
             // msg here, tbh 02/2009
-            logger.debug("-- found exception: " + e.getMessage());
-            e.printStackTrace();
+            logger.debug("-- found exception: " ,e);
         }
     }
 
@@ -412,8 +411,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            // logger.debug("-- found an exception: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error while accessing application context: ",e);
         }
 
         return dataSource;

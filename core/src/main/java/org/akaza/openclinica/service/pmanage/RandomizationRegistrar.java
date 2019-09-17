@@ -57,10 +57,7 @@ public class RandomizationRegistrar {
             }
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-            System.out.println(e.getMessage());
-            System.out.println(ExceptionUtils.getStackTrace(e));
+            logger.error("Response in not getting generated properly:  ", e);
 
         }
         return null;
@@ -129,10 +126,7 @@ public class RandomizationRegistrar {
                 return response.getStatus();
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-            System.out.println(e.getMessage());
-            System.out.println(ExceptionUtils.getStackTrace(e));
+            logger.error("Response in not getting generated properly: {} ",e.getMessage(),e);
 
         }
         return "";

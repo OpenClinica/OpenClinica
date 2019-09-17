@@ -129,7 +129,7 @@ public class DownloadAttachedFileServlet extends SecureController {
                 outStream.flush();
                 outStream.close();
             } catch (Exception ee) {
-                ee.printStackTrace();
+                logger.error("InputStream is not working properly: ",ee);
             } finally {
                 if (inStream != null) {
                     inStream.close();

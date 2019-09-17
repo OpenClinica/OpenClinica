@@ -226,13 +226,11 @@ public class AddNewSubjectServlet extends SecureController {
                 Validator.addError(errors, INPUT_LABEL, resexception
                         .getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
             }
-
-            StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
+            StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getId());
 
             StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
-            // tbh
             if (currentStudy.getParentStudyId() > 0) {
-                subjectWithSameLabelInParent = ssd.findSameByLabelAndStudy(label, currentStudy.getParentStudyId(), 0);// <
+                subjectWithSameLabelInParent = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getParentStudyId());
 
             }
             if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
@@ -557,11 +555,11 @@ public class AddNewSubjectServlet extends SecureController {
             logger.info("Template ID  :" + wtr.toString());
 
         } catch (TemplateException te) {
-            te.printStackTrace();
+            logger.error("Template is not able to be parsed properly: ",te);
 
 
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            logger.error("Template is not working properly: ",ioe);
 
 
         }

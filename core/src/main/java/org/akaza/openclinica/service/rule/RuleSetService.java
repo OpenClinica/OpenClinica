@@ -338,7 +338,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
         ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
-        System.out.println("in runRulesinBulk method");
+        logger.debug("in runRulesinBulk method");
         return ruleRunner.runRulesBulkFromRuleSetScreen(ruleSets, executionMode, currentStudy, null, ub);
         // return runRulesBulkFromRuleSetScreen(ruleSets, dryRun, currentStudy, null, ub);
     }
@@ -638,7 +638,6 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     private void logMe(String message){
-    //    System.out.println(message);
         logger.debug(message);
 
     }
