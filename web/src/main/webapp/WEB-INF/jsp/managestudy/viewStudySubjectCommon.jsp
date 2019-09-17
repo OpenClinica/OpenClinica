@@ -215,9 +215,14 @@
 <script>
 $(function() {
 
-    function collection(x) {
-        if (x)
-            return x.length ? x : [x];
+    function collection() {
+        var obj = arguments[0];
+        for (var i=1; i<arguments.length; i++) {
+            if (obj)
+                obj = obj[arguments[i]];
+        }
+        if (obj)
+            return obj.length ? obj : [obj];
         return [];
     }
 
@@ -248,8 +253,8 @@ $(function() {
     var linksOrder = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
     function collectLinks(studyEventData, formData) {
         var links = [];
-        $.merge(links, collection(studyEventData['OpenClinica:Links']['OpenClinica:Link']));
-        $.merge(links, collection(formData['OpenClinica:Links']['OpenClinica:Link']));
+        $.merge(links, collection(studyEventData, 'OpenClinica:Links', 'OpenClinica:Link'));
+        $.merge(links, collection(formData, 'OpenClinica:Links', 'OpenClinica:Link'));
         links.sort(function(a, b) {
             return linksOrder.indexOf(a['@rel']) - linksOrder.indexOf(b['@rel']);
         });
@@ -535,7 +540,7 @@ $(function() {
                     form.submissions = [];
                 }
 
-                foreach(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link'], function(link) {
+                foreach(collection(odm.ClinicalData.SubjectData, 'OpenClinica:Links', 'OpenClinica:Link'), function(link) {
                     if (link['@rel'] !== 'common-add-new')
                         return;
 
