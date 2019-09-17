@@ -25,5 +25,6 @@ public interface StudyParticipantService {
 
     void startBulkAddParticipantJob(MultipartFile file, Study study, Study site,UserAccountBean userAccountBean,  JobDetail jobDetail, String schema,String customerUuid, ResourceBundle textsBundle,String accessToken, String register);
 
+    public boolean isEnrollmentCapped();
 
 }

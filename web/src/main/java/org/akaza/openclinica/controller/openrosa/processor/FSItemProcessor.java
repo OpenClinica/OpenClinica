@@ -16,7 +16,6 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.randomize.RandomizationService;
-import org.akaza.openclinica.validator.ParticipantValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +86,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     public static final String MOBILENUMBER = "mobilenumber";
 
     public static final String US_PHONE_PREFIX = "+1 ";
-
+	public static final String US_PHONE_PATTERN = "^[0-9]{10,10}$";
 
 
 
@@ -423,7 +422,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             studySubject.getStudySubjectDetail().setEmail(itemValue);
             studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(MOBILENUMBER)) {
-            Pattern usPhonePattern = Pattern.compile(ParticipantValidator.US_PHONE_PATTERN);
+            Pattern usPhonePattern = Pattern.compile(US_PHONE_PATTERN);
             Matcher usPhoneMatch = usPhonePattern.matcher(itemValue);
             if(usPhoneMatch.matches() && itemValue.length()==10) {
                 itemValue=US_PHONE_PREFIX+itemValue;
