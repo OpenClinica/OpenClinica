@@ -432,7 +432,33 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
 
         return answer;
     }
+    /**
+     * Finds a study subject which has the same label (without case-sensitive) provided in the same study
+     *This method is called only during creation of participants
+     * @param label
+     * @param siteOrStudyId
+     * @return
+     */
+    public StudySubjectBean findByLabelAndStudyForCreatingParticipant(String label, int siteOrStudyId) {
+        StudySubjectBean answer = new StudySubjectBean();
+        this.setTypesExpected();
 
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), label);
+        variables.put(new Integer(2), new Integer(siteOrStudyId));
+        variables.put(new Integer(3), new Integer(siteOrStudyId));
+
+        String sql = digester.getQuery("findByLabelAndStudyForCreatingParticipant");
+
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            answer = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+
+        return answer;
+    }
     public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
         StudySubjectBean answer = new StudySubjectBean();
         this.setTypesExpected();
@@ -442,7 +468,8 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         variables.put(new Integer(2), new Integer(study.getId()));
         variables.put(new Integer(3), new Integer(study.getId()));
 
-        String sql = digester.getQuery("findByLabelAndStudy");
+        String sql=null;
+        sql = digester.getQuery("findByLabelAndStudy");
 
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
@@ -453,8 +480,6 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
 
         return answer;
     }
-
-  
     public StudySubjectBean findByLabelAndOnlyByStudy(String label, StudyBean study) {
         StudySubjectBean answer = new StudySubjectBean();
         this.setTypesExpected();
@@ -464,35 +489,6 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         variables.put(new Integer(2), new Integer(study.getId()));      
 
         String sql = digester.getQuery("findByLabelAndOnlyByStudy");
-
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
-
-        if (it.hasNext()) {
-            answer = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
-        }
-
-        return answer;
-    }
-    /**
-     * Finds a study subject which has the same label provided in the same study
-     *
-     * @param label
-     * @param studyId
-     * @param id
-     * @return
-     */
-    public StudySubjectBean findSameByLabelAndStudy(String label, int studyId, int id) {
-        StudySubjectBean answer = new StudySubjectBean();
-        this.setTypesExpected();
-
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), label);
-        variables.put(new Integer(2), new Integer(studyId));
-        variables.put(new Integer(3), new Integer(studyId));
-        variables.put(new Integer(4), new Integer(id));
-
-        String sql = digester.getQuery("findSameByLabelAndStudy");
 
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();

@@ -77,7 +77,6 @@ import freemarker.template.Template;
 @Api(value = "Study", tags = { "Study" }, description = "REST API for Study")
 @RequestMapping(value = "/auth/api/v1/studies")
 public class StudyController {
-
     public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
@@ -1695,7 +1694,7 @@ public class StudyController {
         if (!studyType.equalsIgnoreCase(resadmin.getString("interventional"))
                 && !studyType.equalsIgnoreCase(resadmin.getString("observational"))
                 && !studyType.equalsIgnoreCase(resadmin.getString("other"))) {
-            System.out.println("Study Type not supported");
+            logger.info("Study Type not supported");
             return false;
         }
         return true;
@@ -1874,7 +1873,6 @@ public class StudyController {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
         if (!ownerUserAccount.isTechAdmin() && !ownerUserAccount.isSysAdmin()) {
             logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
-            System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");
             return null;
         }
         return ownerUserAccount;
@@ -1895,7 +1893,6 @@ public class StudyController {
 
         if (!ownerUserAccount.isTechAdmin() && !ownerUserAccount.isSysAdmin()) {
             logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
-            System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");
             return null;
         }
         return ownerUserAccount;
@@ -2092,12 +2089,12 @@ public class StudyController {
 
 
             } catch (TemplateException te) {
-                te.printStackTrace();
+                logger.error("Error while instantiating template for verify template id: ",te);
                 ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid.", "templateID");
                 errorObjects.add(errorObject);
 
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                logger.error("Error while processing template: ",ioe);
                 ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid.", "templateID");
                 errorObjects.add(errorObject);
 

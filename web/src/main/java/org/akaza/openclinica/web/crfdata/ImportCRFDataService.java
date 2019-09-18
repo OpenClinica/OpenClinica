@@ -2590,7 +2590,7 @@ public class ImportCRFDataService {
 		try {
 			ordinal = new Integer(studyEventDataBean.getStudyEventRepeatKey()).intValue();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error while accessing study event bean: ",e);
 		}
 		StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
 		sedBean.getId(), ordinal);
@@ -2669,7 +2669,7 @@ public class ImportCRFDataService {
 								  groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(),groupOrdinal);
 								}
 							} catch (Exception e) {
-								e.printStackTrace();
+								logger.error("Error while accessing itemGroupDataBean: ",e);
 							}
 						}
 						ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean, importItemDataBean.getValue(), ub, groupOrdinal);

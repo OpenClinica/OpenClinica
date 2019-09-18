@@ -16,14 +16,11 @@ import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.SubjectDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobType;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -35,16 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.akaza.openclinica.service.UserService.BULK_JOBS;
-import static org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
 
 /**
  * This Service class is used with Add Participant Rest Api
@@ -85,7 +76,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
     private StudyDAO studyDao;
     private StudySubjectDAO studySubjectDao;
-    private SubjectDAO subjectDao;
+    private SubjectDAO subjectDao;  
 
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
     public static final String DASH = "-";
@@ -97,7 +88,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     public static final String EMAIL_PATTERN = "^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$";
 
 
-
+   
 
     public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, String studyOid, String siteOid , String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
         boolean createNewParticipant=false;
@@ -105,7 +96,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         Study tenantSite = studyHibDao.findByOcOID(siteOid);
         StudyBean tenantStudyBean = getStudyDao().findByOid(studyOid);
         StudyBean tenantSiteBean = getStudyDao().findByOid(siteOid);
-
+       
+        if (isEnrollmentCapped(tenantStudyBean,tenantSiteBean))
+            throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
+        
         if (StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_MISSING_PARTICIPANT_ID_DATA);
 
@@ -147,9 +141,13 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
         Subject subject = null;
         StudySubject studySubject = null;
-        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudy(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean);
+        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getId());
 
-        if (studySubjectBean == null || !studySubjectBean.isActive()) {
+        StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
+        if (tenantStudyBean.getParentStudyId() > 0) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getParentStudyId());// <
+        }
+        if (studySubjectBean == null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             createNewParticipant=true;
             // Create New Study Subject
             SubjectBean subjectBean = new SubjectBean();
@@ -171,6 +169,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             Date now = new Date();
             studySubjectBean.setCreatedDate(now);
             studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
+        }else{
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_ALREADY_EXISTS);
         }
         if (studySubjectBean != null && !(studySubjectBean.getStatus().equals(Status.AVAILABLE) || studySubjectBean.getStatus().equals(Status.SIGNED)))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
@@ -324,5 +324,57 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         study.setSubjectCount(subjectCount+1);
         studyHibDao.saveOrUpdate(study);
     }
+
+
+    private boolean isEnrollmentCapped(StudyBean currentStudy,StudyBean siteStudy){
+
+        boolean capIsOn = isEnrollmentCapEnforced(currentStudy,siteStudy);
+
+        StudySubjectDAO studySubjectDAO = this.getStudySubjectDao();
+        int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
+
+        StudyDAO studyDAO = this.getStudyDao();
+        StudyBean sb = null;
+        if(currentStudy.getParentStudyId()!=0){
+            sb = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
+        }else{
+             sb = (StudyBean) studyDAO.findByPK(currentStudy.getId());
+        }
+        int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
+
+        if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * if it's site level, then also need to check study 
+     * @return
+     */
+    private boolean isEnrollmentCapEnforced(StudyBean currentStudy,StudyBean siteStudy){
+        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(this.dataSource);
+       
+        boolean capEnforcedSite = false;
+        String  enrollmentCapStatusSite = null;
+        
+        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
+        boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
+        
+        // check at the site level
+        if(siteStudy != null) {
+        	int siteId = siteStudy.getId();
+        	enrollmentCapStatusSite = studyParameterValueDAO.findByHandleAndStudy(siteId, "enforceEnrollmentCap").getValue();
+        	capEnforcedSite = Boolean.valueOf(enrollmentCapStatusSite);        	
+        }
+        
+        if(capEnforcedSite || capEnforced) {
+        	return true;
+        }else {
+        	return false;
+        }
+        
+    }
+
 
 }

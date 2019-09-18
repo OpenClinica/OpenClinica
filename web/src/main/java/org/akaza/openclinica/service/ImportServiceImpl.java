@@ -398,7 +398,7 @@ public class ImportServiceImpl implements ImportService {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error while accessing file to start writing: ",e);
         } finally {
             if(jobType.equals(JobType.XML_IMPORT))
                 writer.print(writeImportToTextFile(dataImportReports));
@@ -1200,7 +1200,7 @@ public class ImportServiceImpl implements ImportService {
                     return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error while validating study subject: ",e);
                 return new ErrorObj(FAILED, ErrorConstants.ERR_MULTIPLE_PARTICIPANTS_FOUND);
             }
 

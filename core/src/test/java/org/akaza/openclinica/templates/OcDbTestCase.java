@@ -6,6 +6,8 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -15,6 +17,7 @@ import java.util.Properties;
 
 public abstract class OcDbTestCase extends DataSourceBasedDBTestCase {
 
+    private static final Logger logger= LoggerFactory.getLogger(OcDbTestCase.class);
     // @pgawade 10272010 - Added the ApplicationContext attribute
     private ApplicationContext context;
 
@@ -69,7 +72,7 @@ public abstract class OcDbTestCase extends DataSourceBasedDBTestCase {
         try {
             properties.load(OcDbTestCase.class.getResourceAsStream(getPropertiesFilePath()));
         } catch (Exception ioExc) {
-            ioExc.printStackTrace();
+            logger.error("Properties does not able to load properly: ",ioExc);
         }
     }
 

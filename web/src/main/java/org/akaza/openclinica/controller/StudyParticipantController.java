@@ -5,16 +5,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import springfox.documentation.annotations.ApiIgnore;
-
 import org.akaza.openclinica.bean.login.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
-import org.akaza.openclinica.controller.dto.ParticipantRestfulRequestDTO;
-import org.akaza.openclinica.controller.dto.StudyEventResponseDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -29,22 +25,15 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
-import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
-import org.akaza.openclinica.validator.ParticipantValidator;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.DataBinder;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -100,7 +89,6 @@ public class StudyParticipantController {
 	public static final String FILE_HEADER_MAPPING = "ParticipantID, StudyEventOID, Ordinal, StartDate, EndDate";
 
 
-
 	@ApiOperation(value = "Add a participant with or without their contact information to a given Study site.",  notes = "Will read the subjectKey", hidden = false)
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successful operation"),
@@ -122,6 +110,7 @@ public class StudyParticipantController {
 					+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
 					+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
 					+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
+					+ "<br />participantIDAlreadyExists					   : Participant ID already exists."
 					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 	@RequestMapping( value = "/studies/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST )
 	public ResponseEntity<Object> addParticipantAtSiteLevel(HttpServletRequest request,
@@ -129,7 +118,6 @@ public class StudyParticipantController {
 															@ApiParam( value = "Study OID", required = true ) @PathVariable( "studyOID" ) String studyOid,
 															@ApiParam( value = "Site OID", required = true ) @PathVariable( "siteOID" ) String siteOid,
 															@ApiParam( value = "Use this parameter to register the participant to OpenClinica Participate module. Possible values - y or n. Note: Module should be active for the given study.", required = false ) @RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
-
 
 		utilService.setSchemaFromStudyOid(studyOid);
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
@@ -155,7 +143,6 @@ public class StudyParticipantController {
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 
-
 	@ApiOperation(value = "Add or Update list of participants and their contact information for OpenClinica Participate module.",  notes = "Will read subjectKeys and PII from the CSV file", hidden = false)
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successful operation"),
@@ -177,6 +164,7 @@ public class StudyParticipantController {
 					+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
 					+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
 					+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
+					+ "<br />participantIDAlreadyExists					   : Participant ID already exists."
 					+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 	@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 	public ResponseEntity<Object> createStudyParticipantAtSiteLevelInBulk(HttpServletRequest request,
@@ -227,213 +215,8 @@ public class StudyParticipantController {
 
 
 
-	/**
-	 * @param request
-	 * @param file
-	 * @param studyOID
-	 * @param siteOID
-	 * @return
-	 * @throws Exception
-	 */
-	private ResponseEntity<String> createNewStudyParticipantsInBulk(HttpServletRequest request, MultipartFile file,
-																	String studyOID, String siteOID, Map<String, Object> map) throws Exception {
-		ResponseEntity response = null;
 
-		UserAccountBean  user = this.participantService.getUserAccount(request);
-		String message = null;
-
-		if (!file.isEmpty()) {
-
-			try {
-				String fileNm = file.getOriginalFilename();
-				//only support CSV file
-				if(!(fileNm.endsWith(".csv")) ){
-					throw new OpenClinicaSystemException("errorCode.notSupportedFileFormat","The file format is not supported at this time, please send CSV file, like *.csv ");
-				}
-
-				csvService.validateBulkParticipantCSVFile(file);
-
-				return this.createNewStudySubjectsInBulk(request, map, studyOID, siteOID, file);
-
-			}catch(OpenClinicaSystemException e) {
-				String validation_failed_message = e.getErrorCode();
-				message = validation_failed_message;
-			}catch (Exception e) {
-
-				String validation_failed_message = e.getMessage();
-				message = validation_failed_message;
-			}
-
-		} else {
-			message = "Can not read file " + file.getOriginalFilename();
-		}
-
-		response = new ResponseEntity(message, HttpStatus.BAD_REQUEST);
-		return response;
-	}
-
-
-	/**
-	 *
-	 * @param request
-	 * @param map
-	 * @return
-	 * @throws Exception
-	 */
-	public ResponseEntity<Object> createNewStudySubject(HttpServletRequest request,
-														@RequestBody HashMap<String, Object> map,
-														String studyOID,
-														String siteOID,UserAccountBean userAccountBean) throws Exception {
-
-		ArrayList<String> errorMessages = new ArrayList<String>();
-		ResponseEntity<Object> response = null;
-
-		SubjectTransferBean subjectTransferBean = this.transferToSubject(map);
-		subjectTransferBean.setStudyOid(studyOID);
-		String uri = request.getRequestURI();
-		if(uri.indexOf("/sites/") >  0) {
-			subjectTransferBean.setSiteIdentifier(siteOID);
-		}
-
-		StudyParticipantDTO studyParticipantDTO = this.buildStudyParticipantDTO(map);
-
-		subjectTransferBean.setOwner(this.participantService.getUserAccount(request));
-
-		StudyBean tenantstudyBean = null;
-		try {
-			tenantstudyBean = this.getRestfulServiceHelper().setSchema(studyOID, request);
-			subjectTransferBean.setStudy(tenantstudyBean);
-		}catch(OpenClinicaSystemException oe) {
-			throw new Exception(oe.getErrorCode());
-		}
-
-		ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
-		Errors errors = null;
-
-		DataBinder dataBinder = new DataBinder(subjectTransferBean);
-		errors = dataBinder.getBindingResult();
-
-
-		if(siteOID != null) {
-			StudyBean siteStudy = getStudyDAO().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
-			subjectTransferBean.setSiteStudy(siteStudy);
-		}
-
-		Study tenantStudy = studyDao.findByOcOID(tenantstudyBean.getOid());
-
-		if(subjectTransferBean.isRegister() && !validateService.isParticipateActive(tenantStudy)){
-			errors.reject( ErrorConstants.ERR_PARTICIPATE_INACTIVE,"Participant module is not active");
-		}
-
-		if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){
-			errors.reject( "errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
-		}
-		participantValidator.validateParticipantData(subjectTransferBean, errors);
-
-		participantValidator.validate(subjectTransferBean, errors);
-
-
-		if(errors.hasErrors()) {
-			ArrayList validerrors = new ArrayList(errors.getAllErrors());
-			Iterator errorIt = validerrors.iterator();
-
-			while(errorIt.hasNext()) {
-				ObjectError oe = (ObjectError) errorIt.next();
-				if(oe.getCode()!=null) {
-					errorMessages.add(oe.getCode());
-				}else {
-					errorMessages.add(oe.getDefaultMessage());
-				}
-
-
-			}
-		}
-
-		if (errorMessages != null && errorMessages.size() != 0) {
-			String errorMsg = errorMessages.get(0);
-			HashMap<String, String> pmap = new HashMap<>();
-			pmap.put("studyOid", studyOID);
-			pmap.put("siteOid", subjectTransferBean.getSiteIdentifier());
-			ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg,pmap);
-			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-		} else {
-			String accessToken = utilService.getAccessTokenFromRequest(request);
-			String customerUuid = utilService.getCustomerUuidFromRequest(request);
-
-			String label = participantService.createParticipant(subjectTransferBean,tenantstudyBean, accessToken, customerUuid, userAccountBean, request.getLocale());
-			studyParticipantDTO.setSubjectKey(label);
-
-			StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
-
-			studyParticipantDTO.setSubjectOid(subject.getOid());
-
-			ResponseSuccessStudyParticipantDTO responseSuccess = new ResponseSuccessStudyParticipantDTO();
-
-			responseSuccess.setSubjectKey(studyParticipantDTO.getSubjectKey());
-			responseSuccess.setSubjectOid(studyParticipantDTO.getSubjectOid());
-			responseSuccess.setStatus("Available");
-			responseSuccess.setParticipateStatus(subject.getUserStatus()!=null?subject.getUserStatus().getValue():"");
-
-			response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
-		}
-
-		return response;
-
-	}
-
-	public String startParticipantImportJob(String studyOid, String siteOid, HttpServletRequest request, String accessToken,
-											String customerUuid, UserAccountBean userAccountBean, MultipartFile file, Map<String, Object> map) {
-		utilService.setSchemaFromStudyOid(studyOid);
-		Study site = studyDao.findByOcOID(siteOid);
-		Study study = studyDao.findByOcOID(studyOid);
-		StudyBean siteBean = getStudyDAO().findSiteByOid(studyOid, siteOid);
-		StudyBean studyBean = getStudyDAO().findByOid(studyOid);
-
-		UserAccount userAccount = uDao.findById(userAccountBean.getId());
-		JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.BULK_ADD_PARTICIPANTS,file.getOriginalFilename());
-		CompletableFuture.supplyAsync(() -> {
-			try {
-				participantService.processBulkParticipants(studyBean, studyOid, siteBean, siteOid, userAccountBean, accessToken, customerUuid, file,
-						jobDetail, request.getLocale(), request.getRequestURI(), map);
-			} catch (Exception e) {
-				logger.error("Error in Bulk participant job:" + e);
-			}
-			return null;
-		});
-		return jobDetail.getUuid();
-	}
-
-	/**
-	 * @param request
-	 * @param map
-	 * @return
-	 * @throws Exception
-	 */
-	public ResponseEntity<String> createNewStudySubjectsInBulk(HttpServletRequest request,
-															   @RequestBody Map<String, Object> map,
-															   String studyOID,
-															   String siteOID, MultipartFile file) throws Exception {
-
-		StudyBean studyBean = null;
-		studyBean =  this.getStudyDAO().findByOid(studyOID);
-		if(utilService.isParticipantIDSystemGenerated(studyBean)) {
-			throw new OpenClinicaSystemException("errorCode.bulkUploadNotSupportSystemGeneratedSetting","This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
-		}
-
-
-		UserAccountBean  user = this.participantService.getUserAccount(request);
-
-		String accessToken = utilService.getAccessTokenFromRequest(request);
-		String customerUuid = utilService.getCustomerUuidFromRequest(request);
-
-		String uuid = startParticipantImportJob( studyOID,  siteOID,  request, accessToken,  customerUuid,  user, file, map);
-
-		logger.info("REST request to Extract Participants info ");
-		return new ResponseEntity<String>("job uuid: "+ uuid,HttpStatus.OK);
-
-	}
-
-
+	
 	@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 	public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
@@ -455,7 +238,7 @@ public class StudyParticipantController {
 	}
 
 	
-	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission", hidden = true)
+	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participant", method = RequestMethod.GET)
 	public ResponseEntity<Object> getStudySubjectInfo(
 			@ApiParam(value = "Study OID", required = true) @PathVariable("studyOID") String studyOid,
@@ -477,7 +260,7 @@ public class StudyParticipantController {
 		StudyParticipantDetailDTO result =  null;
 		
 		try {			
-			validateService.validateStudyAndRoles(studyOid, siteOid, userAccountBean);							
+			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);							
 			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,customerUuid,userAccountBean,participantID,includeRelatedInfo);
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
@@ -531,7 +314,7 @@ public class StudyParticipantController {
 		  }	
 
 		} catch (Exception eee) {
-			eee.printStackTrace();
+			logger.error("Error while listing study subjects: ",eee);
 			throw eee;
 		}
 

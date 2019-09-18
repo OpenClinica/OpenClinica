@@ -101,7 +101,7 @@ public class ExtractController {
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error("Error in redirecting the response: ",e);
             }
             return null;
         }
@@ -184,7 +184,7 @@ public class ExtractController {
         try {
             context = (ApplicationContext) scheduler.getContext().get("applicationContext");
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            logger.error("Error in receiving application context: ",e);
         }
         jobScheduler = getSchemaScheduler(request, context, jobScheduler);
         String permissionTagsString =permissionService.getPermissionTagsString((StudyBean)request.getSession().getAttribute("study"),request);
@@ -199,7 +199,7 @@ public class ExtractController {
             jobScheduler.getContext().put("permissionTagsList",permissionTagsList);
             jobScheduler.getContext().put("odmFilter", odmFilter);
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            logger.error("Error in setting the permissions: ",e);
         }
 
 
@@ -245,7 +245,7 @@ public class ExtractController {
             logger.debug("== found job date: " + dateStart.toString());
 
         } catch (SchedulerException se) {
-            se.printStackTrace();
+            logger.error("Error while accesssing job date: ",se);
         }
 
         request.setAttribute("datasetId", datasetId);
@@ -272,10 +272,11 @@ public class ExtractController {
                     try {
                         jobScheduler = (Scheduler) context.getBean(schema);
                     } catch (BeansException e1) {
-                        e1.printStackTrace();
+                        logger.error("Bean for scheduler is not able to accessed after creating scheduled factory bean: ",e1);
+
                     }
                 } catch (BeansException e) {
-                    e.printStackTrace();
+                    logger.error("Bean for scheduler is not able to accessed: ",e);
 
                 }
             }

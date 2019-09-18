@@ -104,7 +104,7 @@ public class SDVController {
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error("Error while redirecting to MainMenu: ",e);
             }
             return null;
         }
@@ -184,7 +184,7 @@ public class SDVController {
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error("Error while redirecting to MainMenu: ",e);
             }
             return null;
         }
@@ -387,7 +387,7 @@ public class SDVController {
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error("Error while redirecting to MainMenu: ",e);
             }
             return null;
         }
@@ -424,7 +424,7 @@ public class SDVController {
         try {
             response.sendRedirect(redirection);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error while redirecting: ",e);
         }
 
         //The name of the view, as in allSdvResult.jsp
@@ -462,7 +462,7 @@ public class SDVController {
         try {
             response.sendRedirect(redirection);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error while redirecting: ",e);
         }
 
         //The name of the view, as in allSdvResult.jsp
@@ -654,7 +654,6 @@ public class SDVController {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 
         Date date = sdf.parse("01/01/2007");
-        System.out.println("date = " + date);
 
     }
 

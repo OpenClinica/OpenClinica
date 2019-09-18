@@ -57,7 +57,6 @@ public class CreateUserCoreServiceImpl implements CreateUserCoreService {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
         if (!ownerUserAccount.isActive() && (!ownerUserAccount.isTechAdmin() || !ownerUserAccount.isSysAdmin())) {
             logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
-            System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");
             return uBean;
         }
         String password = "password";

@@ -112,7 +112,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = "DataImport", tags = {"Clinical Data"}, description = "REST API for Data Import")
 public class DataController {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    protected static final Logger logger = LoggerFactory.getLogger(DataController.class);
     private final Locale locale = new Locale("en_US");
     public static final String USER_BEAN_NAME = "userBean";
   
@@ -191,13 +191,13 @@ public class DataController {
           
             errorMsgs = importDataInTransaction(importXml, request);
         } catch (OpenClinicaSystemException e) {
-        	e.printStackTrace();
+        	logger.error("Error importing the XML: ",e);
             String err_msg = e.getMessage();
             ErrorMessage error = createErrorMessage(e.getErrorCode(), err_msg);
             errorMsgs.add(error);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error processing import request: ",e);
             String err_msg = "Error processing data import request.";
             ErrorMessage error = createErrorMessage("errorCode.Exception", err_msg);
             errorMsgs.add(error);
@@ -298,10 +298,9 @@ public class DataController {
                 odmContainer = (ODMContainer) um1.unmarshal(isr);
 
             } catch (Exception me1) {
-                me1.printStackTrace();
                 // expanding it to all exceptions, but hoping to catch Marshal
                 // Exception or SAX Exceptions
-                logger.info("found exception with xml transform");
+                logger.error("found exception with xml transform: ",me1);
                 logger.info("trying 1.2.1");
                 try {
                     schemaValidator.validateAgainstSchema(importXml, xsdFile2);
@@ -531,8 +530,7 @@ public class DataController {
             return errorMsgs;
 
         } catch (Exception e) {
-            logger.error("Error processing data import request");
-            e.printStackTrace();
+            logger.error("Error processing data import request ",e );
             throw new Exception(e);
         }
     }
@@ -642,9 +640,9 @@ public class DataController {
             // Install the all-trusting host verifier
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error("Disabling SSL Verification failed: ",e);
         } catch (KeyManagementException e) {
-            e.printStackTrace();
+            logger.error("Disabling SSL Verification failed: ",e);
         }
     }
     
@@ -730,7 +728,7 @@ public class DataController {
             errorMsgs.add(error);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error processing data import request: ",e);
             String err_msg = "Error processing data import request.";
             ErrorMessage error = createErrorMessage("errorCode.Exception", err_msg);
             errorMsgs.add(error);

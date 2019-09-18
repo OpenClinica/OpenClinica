@@ -27,9 +27,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.validator.ParticipantValidator;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,18 +38,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.DataBinder;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.akaza.openclinica.service.UserService.BULK_JOBS;
@@ -115,8 +107,13 @@ public class ParticipantServiceImpl implements ParticipantService {
         // create subject
         StudyBean siteStudy = subjectTransfer.getSiteStudy();
         StudySubject studySubject=null;
-        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudy(subjectTransfer.getPersonId(), currentStudy);
 
+        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getId());
+
+        StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
+        if (currentStudy.getParentStudyId() > 0) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getParentStudyId());
+        }
         if(!validateService.isStudyAvailable(currentStudy.getOid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
 
@@ -128,7 +125,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
 
 
-        if(studySubjectBean==null || !studySubjectBean.isActive()) {
+        if(studySubjectBean==null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             // Create New Study Subject
             SubjectBean subjectBean = new SubjectBean();
             subjectBean.setStatus(Status.AVAILABLE);
@@ -417,125 +414,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         }
         return subjectCount;
     }
-
-
-    /**
-     * Create the Subject object if it is not already in the system.
-     */
-    @Transactional
-    public void processBulkParticipants(StudyBean study, String studyOid, StudyBean siteStudy, String siteOid,
-                                         UserAccountBean user, String accessToken, String customerUuid, MultipartFile file,
-                                        JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) throws Exception {
-
-        List<OCParticipateImportDTO> ocParticipateImportDTOs = new ArrayList<>();
-        String fileName = null;
-        int index = 1;
-        try {
-            List<SubjectTransferBean> subjects = csvService.readBulkParticipantCSVFile(file);
-            fileName = study.getIdentifier()
-                    + UserServiceImpl.DASH
-                    + study.getEnvType()
-                    + PARTICIPANT_IMPORT + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
-            ResourceBundleProvider.updateLocale(locale);
-            final boolean siteImport = uri.indexOf("/sites/") > 0 ? true: false;
-
-            for (SubjectTransferBean subject: subjects) {
-                ArrayList<String> errorMsgs = new ArrayList<String>();
-                subject.setPersonId((String) subject.getStudySubjectId());
-                subject.setStudyOid(studyOid);
-                subject.setStudy(study);
-                subject.setOwner(user);
-                subject.setSiteStudy(siteStudy);
-                subject.setRegister((boolean) map.get("register"));
-                if (siteImport)
-                    subject.setSiteIdentifier(siteOid);
-
-
-                StudyParticipantDTO studyParticipantDTO = new StudyParticipantDTO();
-                studyParticipantDTO.setSubjectKey(subject.getStudySubjectId());
-
-                ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
-                participantValidator.setBulkMode(true);
-                Errors errors = null;
-
-                DataBinder dataBinder = new DataBinder(subject);
-                errors = dataBinder.getBindingResult();
-                participantValidator.validateBulk(subject, errors);
-
-                if (errors.hasErrors()) {
-                    ArrayList validerrors = new ArrayList(errors.getAllErrors());
-                    Iterator errorIt = validerrors.iterator();
-                    while (errorIt.hasNext()) {
-                        ObjectError oe = (ObjectError) errorIt.next();
-
-                        if (oe.getCode() != null) {
-                            errorMsgs.add(oe.getCode());
-                        } else {
-                            errorMsgs.add(oe.getDefaultMessage());
-                        }
-                    }
-                }
-
-                if (errorMsgs != null && errorMsgs.size() != 0) {
-                    StudySubjectBean byLabelAndStudy = getStudySubjectDao().findByLabelAndStudy(subject.getPersonId(), study);
-
-                    OCParticipateImportDTO p = new OCParticipateImportDTO();
-                    p.setRow(index);
-                    p.setParticipantId(subject.getStudySubjectId());
-
-                    if (byLabelAndStudy != null && byLabelAndStudy.getOid() != null) {
-                        p.setParticipantOid(byLabelAndStudy.getOid());
-                        p.setParticipateStatus(byLabelAndStudy.getStatus().getName());
-                    }
-                    p.setStatus("Failed");
-
-                    p.setMessage(errorMsgs.get(0));
-                    ocParticipateImportDTOs.add(p);
-                } else {
-                    String label = null;
-                    try {
-                        label = createParticipant(subject, study, accessToken, customerUuid, user, locale);
-                    } catch (Exception e) {
-                        OCParticipateImportDTO p = new OCParticipateImportDTO();
-                        p.setRow(index);
-                        p.setParticipantId(subject.getStudySubjectId());
-                        p.setStatus("Failed");
-
-                        p.setMessage(e.getMessage());
-                        ocParticipateImportDTOs.add(p);
-                        ++index;
-                        continue;
-                    }
-                    StudySubjectBean subjectBean = this.getStudySubjectDAO().findByLabel(label);
-                    studyParticipantDTO.setSubjectOid(subjectBean.getOid());
-
-                    OCParticipateImportDTO p = new OCParticipateImportDTO();
-                    p.setRow(index);
-                    p.setParticipantId(subjectBean.getLabel());
-                    p.setParticipantOid(subjectBean.getOid());
-                    p.setParticipateStatus(subjectBean.getStatus() != null ? subjectBean.getStatus().getName() : "");
-                    p.setStatus("Success");
-                    p.setMessage("");
-                    ocParticipateImportDTOs.add(p);
-
-                }
-                ++index;
-            }
-        } catch (Exception e) {
-            logger.error("Exception while processing batch file." + e);
-        } finally {
-            // write out any DTOs that have been processed
-            if (CollectionUtils.isNotEmpty(ocParticipateImportDTOs)) {
-                writeToFile(ocParticipateImportDTOs, studyOid, fileName);
-                logger.info(ocParticipateImportDTOs.size() + " records were processed");
-            } else {
-                logger.error("No records were processed.");
-            }
-        }
-        logger.info("Bulk participant job completed");
-        userService.persistJobCompleted(jobDetail, fileName);
-    }
-
+ 
     public StudySubjectDAO getStudySubjectDAO() {
         ssDao = ssDao != null ? ssDao : new StudySubjectDAO(dataSource);
         return ssDao;
@@ -550,7 +429,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error while accessing file: ",e);
         } finally {
             writer.print(writeToStringBuffer(participateImportDTOS));
             closeFile(writer);

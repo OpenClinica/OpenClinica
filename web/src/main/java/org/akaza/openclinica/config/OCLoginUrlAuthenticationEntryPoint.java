@@ -1,6 +1,8 @@
 package org.akaza.openclinica.config;
 
 import org.akaza.openclinica.bean.core.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -14,6 +16,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
+    private static final Logger logger= LoggerFactory.getLogger(OCLoginUrlAuthenticationEntryPoint.class);
     public OCLoginUrlAuthenticationEntryPoint(String loginFormUrl) {
         super(loginFormUrl);
     }
@@ -27,7 +30,7 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
         try {
             paramsString = Utils.getParamsString(request.getParameterMap());
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Encoding is not UTF-8: ",e);
         }
         String loginUrl = getLoginFormUrl()  + "?" + paramsString;
         return loginUrl;

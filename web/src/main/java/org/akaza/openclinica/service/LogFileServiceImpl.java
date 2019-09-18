@@ -324,7 +324,7 @@ public class LogFileServiceImpl implements LogFileService {
             op.flush();
             op.close();
         } catch (Exception ee) {
-            ee.printStackTrace();
+            logger.error("Error while writing to the output stream: ",ee);
         } finally {
             if (in != null) {
                 in.close();

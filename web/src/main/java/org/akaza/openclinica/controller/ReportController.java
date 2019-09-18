@@ -78,7 +78,7 @@ public class ReportController {
 
 		HashMap<String, Boolean> map = new HashMap<>();
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		System.out.println("I'm in rest call");
+		logger.debug("I'm in rest call");
 		Boolean result = ruleSetService.calculateTimezoneDiff(TimeZone.getTimeZone(serverZoneId), TimeZone.getTimeZone(ssZoneId), Integer.valueOf(runTime), Integer.valueOf(serverTime));
 		map.put("result", result);
 
@@ -119,7 +119,7 @@ public class ReportController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		String ssZoneId = hashMap.get("ssZoneId");
 		String serverZoneId = hashMap.get("serverZoneId");
-		System.out.println("I'm in rest call");
+		logger.debug("I'm in rest call");
 		HashMap<String, String> map = expressionService.getSSDate(ssZoneId, serverZoneId);
 		return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
@@ -143,7 +143,7 @@ public class ReportController {
 	public ResponseEntity<HashMap> getRunTime() throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		HashMap<String, Integer> map = new HashMap<>();
-		System.out.println("I'm in rest call for RunTime");
+		logger.debug("I'm in rest call for RunTime");
 		int result = ruleSetService.getRunTimeWhenTimeIsNotSet();
 		map.put("result", result);
 		return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);

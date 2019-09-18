@@ -71,6 +71,8 @@ import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.view.html.editor.HtmlCellEditor;
 import org.jmesa.web.WebContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindingResult;
 
 /**
@@ -78,6 +80,7 @@ import org.springframework.validation.BindingResult;
  */
 public class SDVUtil {
 
+    private static final Logger logger= LoggerFactory.getLogger(SDVUtil.class);
     private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
     private final static String VIEW_ICON_FORSUBJECT_SUFFIX = "\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-serach\" name=\"bt_View1\"/></a>";
     private final static String ICON_FORCRFSTATUS_PREFIX = "<span hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' class='icon icon-search'>";
@@ -1326,9 +1329,9 @@ public class SDVUtil {
         try {
             request.getRequestDispatcher(path).forward(request, response);
         } catch (ServletException e) {
-            e.printStackTrace();
+            logger.error("Error while forwarding to other location: ",e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error while forwarding to other location: ",e);
         }
     }
 

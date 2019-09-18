@@ -37,7 +37,6 @@ public abstract class BaseWidget implements Widget {
 		case "pdate":
 		default: 
 			log.debug("Unsupported item data type encountered.  Returning null.");
-			System.out.println("Unsupported item data type encountered: " + type + ".  Returning null.");
 			return null;
 		}
 	}

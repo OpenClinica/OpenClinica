@@ -412,7 +412,7 @@ public class ViewStudySubjectServlet extends SecureController {
                         sea.setNewSubjectEventStatus(newStatus);
                     }
                 } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                    logger.error("Subject event status is not able to be fetched: ",e);
                 }
                 UserAccountBean updater = (UserAccountBean) udao.findByPK(avb.getUserId());
                 sea.setUpdater(updater);

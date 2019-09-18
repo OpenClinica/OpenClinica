@@ -248,8 +248,7 @@ public class ImportSpringJob extends QuartzJobBean {
                     }
                 } catch (OpenClinicaSystemException e) {
                     // Do nothing
-                    logger.error("=== throw an ocse === " + e.getMessage());
-                    e.printStackTrace();
+                    logger.error("Error in mailSender {}", e.getMessage(),e);
                 }
 
             } else {
@@ -270,8 +269,7 @@ public class ImportSpringJob extends QuartzJobBean {
             // service.generateSummaryStatsBean(for the email we send out later)
         } catch (Exception e) {
             // more detailed reporting here
-            logger.error("found a fail exception: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("found a fail exception: " ,e);
             auditEventDAO.createRowForExtractDataJobFailure(triggerBean, e.getMessage());
             try {
                 mailSender.sendEmail(contactEmail, respage.getString("job_failure_for") + " " + triggerBean.getFullName(), e.getMessage(), true);
@@ -510,9 +508,8 @@ public class ImportSpringJob extends QuartzJobBean {
                     displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
                 } catch (NullPointerException npe1) {
                     // what if you have 2 event crfs but the third is a fake?
-                    npe1.printStackTrace();
                     fail = true;
-                    logger.debug("threw a NPE after calling lookup validation errors");
+                    logger.debug("threw a NPE after calling lookup validation errors ",npe1);
                     msg.append(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");
                     auditMsg.append(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");
                     out.write(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");

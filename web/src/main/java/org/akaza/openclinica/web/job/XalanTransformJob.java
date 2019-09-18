@@ -4,6 +4,8 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -29,6 +31,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class XalanTransformJob extends QuartzJobBean {
     
+    private static final Logger logger= LoggerFactory.getLogger(XalanTransformJob.class);
     public static final String DATASET_ID = "dsId";
     public static final String EMAIL = "contactEmail";
     public static final String USER_ID = "user_id";
@@ -67,16 +70,16 @@ public class XalanTransformJob extends QuartzJobBean {
            // System.out.println("--> job completed in " + done + " ms");
         } catch (TransformerConfigurationException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("",e);
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("XLS file not found: ",e);
         } catch (TransformerFactoryConfigurationError e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("TransformerFactory was not configured properly: ",e);
         } catch (TransformerException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error while transforming: ",e);
         }
     }
 

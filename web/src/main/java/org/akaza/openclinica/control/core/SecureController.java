@@ -157,7 +157,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    protected static final Logger logger = LoggerFactory.getLogger(SecureController.class);
     protected String logDir;
     protected String logLevel;
     protected HttpSession session;
@@ -373,7 +373,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
             }
         } catch (SchedulerException se) {
-            se.printStackTrace();
+            logger.error("Pinging job server is failing due to ",se);
         }
 
     }
@@ -399,7 +399,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
 
-        System.out.println("Metric0" + new Date());
+        logger.debug("Metric0 {}"+new Date());
         this.request = request;
         this.response = response;
         request.setCharacterEncoding("UTF-8");
@@ -482,7 +482,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
 
             String ocUserUuid = null;
-            System.out.println("Metric1" + new Date());
+            logger.debug("Metric1 {}",new Date());
 
             try {
                 ocUserUuid = controller.getOcUserUuid(request);
@@ -491,7 +491,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 forwardPage(Page.ERROR);
                 return;
             }
-            System.out.println("Metric2" + new Date());
+            logger.debug("Metric2: {}",new Date());
 
             if (ocUserUuid != null) {
                 if (ub == null || StringUtils.isEmpty(ub.getName())) {
@@ -704,28 +704,23 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // Set if enrollment is capped. Used by navBar.jsp to hide "Add Participant" link in the menu
             processRequest();
         } catch (InconsistentStateException ise) {
-            ise.printStackTrace();
-            logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: " + ise.getMessage());
-
+            logger.warn("InconsistentStateException: org.akaza.openclinica.control.SecureController: ", ise);
             addPageMessage(ise.getOpenClinicaMessage());
             forwardPage(ise.getGoTo());
         } catch (InsufficientPermissionException ipe) {
-            ipe.printStackTrace();
-            logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.SecureController: " + ipe.getMessage());
-
+            logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.SecureController: ", ipe);
             // addPageMessage(ipe.getOpenClinicaMessage());
             forwardPage(ipe.getGoTo());
         } catch (OutOfMemoryError ome) {
-            ome.printStackTrace();
+            logger.error("Memmory full in the process: ", ome);
             long heapSize = Runtime.getRuntime().totalMemory();
             session.setAttribute("ome", "yes");
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(SecureController.getStackTrace(e));
+            logger.error("Process is throwing exception: ", e);
 
             forwardPage(Page.ERROR);
         }
-        System.out.println("Metric4" + new Date());
+        logger.debug("Metric4 {}",new Date());
     }
 
     private boolean shouldProcessUser() {
@@ -765,7 +760,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static String getStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw, true);
-        t.printStackTrace(pw);
+        logger.error("Error throwed in the Stack trace: ", t);
         pw.flush();
         sw.flush();
         return sw.toString();
@@ -785,7 +780,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             logger.debug("Request");
             process(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error while calling the process method: ", e);
         }
     }
 
@@ -803,7 +798,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             logger.debug("Post");
             process(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error while calling the process method:", e);
         }
     }
 
@@ -839,7 +834,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             request.setAttribute("currentPageUrl", URLEncoder.encode(request.getRequestURL().toString() + "?" + paramsString, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            logger.error("Error getting parameters:" + e);
+            logger.error("Error getting parameters:", e);
         }
 
         if (request.getAttribute(POP_UP_URL) == null) {
@@ -1040,7 +1035,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 response.sendRedirect(url);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Error while redirecting to {} ",url, ex);
         }
     }
 
@@ -1062,7 +1057,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 response.sendRedirect(url);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Error while redirecting to {} ",url,ex);
         }
 
     }
@@ -1167,7 +1162,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
-            me.printStackTrace();
+            logger.error("Error while sending mail: ",me);
             if (failMessage != null && sendMessage) {
                 addPageMessage(failMessage);
             }
@@ -1218,7 +1213,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             op.flush();
             op.close();
         } catch (Exception ee) {
-            ee.printStackTrace();
+            logger.error("Error while downloading the file: ", ee);
         } finally {
             if (in != null) {
                 in.close();
@@ -1622,7 +1617,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
             }
         }
-        System.out.println("Setting this role in session: {}" + currentRole.getRoleName());
+        logger.debug("Setting this role in session: {}" + currentRole.getRoleName());
         req.getSession().setAttribute("userRole", currentRole);
     }
 

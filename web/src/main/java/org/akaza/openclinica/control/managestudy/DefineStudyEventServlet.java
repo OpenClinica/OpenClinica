@@ -150,11 +150,11 @@ public class DefineStudyEventServlet extends SecureController {
                         }
                     }
                 } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                    logger.error("nextAction value is not proper: ",e);
                     addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
                     forwardPage(Page.LIST_DEFINITION_SERVLET);
                 } catch (NullPointerException e) {
-                    e.printStackTrace();
+                    logger.error("Process in study event is not defined properly: ",e);
                     addPageMessage(respage.getString("the_new_event_definition_creation_cancelled"));
                     forwardPage(Page.LIST_DEFINITION_SERVLET);
                 }
@@ -614,9 +614,8 @@ public class DefineStudyEventServlet extends SecureController {
                     isExist = true;
                     break;
                 }
-                System.out.println("iter:           " + eventDef.getId() + "--db:    " + eventDef.getSubmissionUrl());
-                System.out.println("edcsInSession:  " + sessionBean.getId() + "--session:" + sessionBean.getSubmissionUrl());
-                System.out.println();
+                logger.debug("iter:           {}--db:    {}",eventDef.getId() , eventDef.getSubmissionUrl());
+                logger.debug("edcsInSession:  {}--session: ",  sessionBean.getId() , sessionBean.getSubmissionUrl());
                 if (sessionBean.getSubmissionUrl() == null || sessionBean.getSubmissionUrl() == "") {
                     break;
                 } else {
@@ -624,12 +623,12 @@ public class DefineStudyEventServlet extends SecureController {
                             || (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())
                                     && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId() == 0)) {
                         v.addValidation("submissionUrl" + i, Validator.SUBMISSION_URL_NOT_UNIQUE);
-                        System.out.println("Duplicate ****************************");
+                        logger.debug("Duplicate *************************");
                         isExist = true;
                         break;
                     } else if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())
                             && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId() != 0) {
-                        System.out.println("Not Duplicate  ***********");
+                        logger.debug("Not Duplicate *********");
                         isExist = true;
                         break;
                     }
