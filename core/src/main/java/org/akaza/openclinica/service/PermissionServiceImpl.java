@@ -212,16 +212,6 @@ public class PermissionServiceImpl implements PermissionService {
         return getTagList(roles, study);
     }
 
-    public String getPermissionTagsString(StudyBean study, HttpServletRequest request) {
-        List<String> tagsList = getPermissionTagsList(study, request);
-        return getTagsString(tagsList);
-    }
-
-    public String[] getPermissionTagsStringArray(StudyBean study, HttpServletRequest request) {
-        List<String> tagsList = getPermissionTagsList(study, request);
-        return getStringArray(tagsList);
-    }
-
     public boolean isUserHasPermission(String column,HttpServletRequest request,StudyBean studyBean) {
         String sedOid = column.split("\\.")[0];
         String formOid = column.split("\\.")[1];
@@ -240,5 +230,12 @@ public class PermissionServiceImpl implements PermissionService {
     private List<String> getPermissionTags(HttpServletRequest request) {
         return (List<String>) request.getSession().getAttribute("userPermissionTags");
     }
+    public String getPermissionTagsString(StudyBean study,HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(study ,request);
+        return getTagsString(tagsList);    }
+
+    public String[] getPermissionTagsStringArray(StudyBean study,HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(study,request);
+        return getStringArray(tagsList);    }
 
 }

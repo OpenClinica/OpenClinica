@@ -159,14 +159,13 @@ public class CoreResources implements EnvironmentAware{
 
     private void extractKeyCloakConfig(Properties dataInfo) {
         KEYCLOAKCONFIG=new KeyCloakConfiguration();
-        KEYCLOAKCONFIG.setRealm(dataInfo.getProperty("keycloak.realm"));
-        KEYCLOAKCONFIG.setAuthServerUrl(dataInfo.getProperty("keycloak.auth-server-url"));
+        KEYCLOAKCONFIG.setRealm(DATAINFO.getProperty("keycloak.realm"));
+        KEYCLOAKCONFIG.setAuthServerUrl(DATAINFO.getProperty("keycloak.auth-server-url"));
         String secretKey="secret";
-        String secretValue=dataInfo.getProperty("keycloak.credentials.secret");
+        String secretValue=DATAINFO.getProperty("keycloak.credectials.secret");
         Map<String,Object> credentials=new TreeMap<String,Object>(){{put(secretKey, secretValue);}};
         KEYCLOAKCONFIG.setCredentials(credentials);
     }
-
 
     public static Configuration getKeyCloakConfig(){
         return KEYCLOAKCONFIG;
@@ -689,7 +688,7 @@ public class CoreResources implements EnvironmentAware{
         resources = resolver.getResources("classpath*:properties/rules_template*.xml");
         resourcesTemplate = resolver.getResources("classpath*:properties/import_template*.xml");
         resourcesPipeDelimitedTemplate =resolver.getResources("classpath*:properties/template_pipe*.txt");
-        
+
         File dest = new File(getField("filePath") + "rules");
         if (!dest.exists()) {
             if (!dest.mkdirs()) {
@@ -712,7 +711,7 @@ public class CoreResources implements EnvironmentAware{
             out.close();
 
         }
-        
+
         for (Resource r : resourcesPipeDelimitedTemplate) {
             File f = new File(dest, r.getFilename());
 
