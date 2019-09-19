@@ -52,7 +52,6 @@ public class PermissionServiceImpl implements PermissionService {
     private static final String CREATE_TOKEN_API_PATH = "/oauth/token";
 
 
-
     private boolean checkStudyUuid(String studyUuid, int parentStudyId) {
         if (parentStudyId == 0) return false;
         Study study = studyDao.findById(parentStudyId);
@@ -215,21 +214,5 @@ public class PermissionServiceImpl implements PermissionService {
     public String[] getPermissionTagsStringArray(StudyBean study,HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(study,request);
         return getStringArray(tagsList);    }
-
-    public String getAccessToken() {
-        logger.debug("Creating Auth0 Api Token");
-
-        try {
-            InputStream inputStream = new ClassPathResource("keycloak.json", this.getClass().getClassLoader()).getInputStream();
-            AuthzClient authzClient = AuthzClient.create(JsonSerialization.readValue(inputStream, Configuration.class));
-            AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
-            if (accessTokenResponse != null)
-                return accessTokenResponse.getToken();
-        } catch (IOException e) {
-            logger.error("Could not read keycloak.json", e);
-            return null;
-        }
-        return null;
-    }
 
 }
