@@ -25,4 +25,5 @@ public interface PermissionService {
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);
 
     boolean isUserHasPermission(String column,HttpServletRequest request,StudyBean studyBean);
+
 }
