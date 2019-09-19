@@ -346,6 +346,7 @@ public class CoreResources implements EnvironmentAware{
 
         DATAINFO.setProperty("coordinator", "Study_Coordinator");
         DATAINFO.setProperty("monitor", "Monitor");
+        DATAINFO.setProperty("ccts.waitBeforeCommit", "6000");
 
         String rss_url = DATAINFO.getProperty("rssUrl");
         if (rss_url == null || rss_url.isEmpty())
@@ -374,6 +375,8 @@ public class CoreResources implements EnvironmentAware{
         DATAINFO.setProperty("show_unique_id", "1");
 
         DATAINFO.setProperty("auth_mode", "password");
+        if (DATAINFO.getProperty("userAccountNotification") != null)
+            DATAINFO.setProperty("user_account_notification", DATAINFO.getProperty("userAccountNotification"));
         logger.debug("DataInfo..." + DATAINFO);
 
         String designerURL = DATAINFO.getProperty("designerURL");
@@ -613,13 +616,18 @@ public class CoreResources implements EnvironmentAware{
 
         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+        DATAINFO.setProperty("archiveUsername", DATAINFO.getProperty("archiveDbUser"));
+        DATAINFO.setProperty("archivePassword", DATAINFO.getProperty("archiveDbPass"));
         String dbSSLsetting = String.valueOf(DATAINFO.getOrDefault("dbSSL", "false"));
 
         String url = null, driver = null, hibernateDialect = null;
+        String archiveUrl = null;
         if (database.equalsIgnoreCase("postgres")) {
             url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db");
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQL94Dialect";
+            archiveUrl = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("archiveDbHost") + ":" + DATAINFO.getProperty("archiveDbPort") + "/"
+                    + DATAINFO.getProperty("archiveDb");
             if (dbSSLsetting.equals("true")){
                 url = url + "?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
             }
@@ -631,6 +639,7 @@ public class CoreResources implements EnvironmentAware{
 
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
+        DATAINFO.setProperty("archiveUrl", archiveUrl);
         DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
         DATAINFO.setProperty("driver", driver);
 

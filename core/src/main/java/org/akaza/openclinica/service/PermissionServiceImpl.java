@@ -237,5 +237,4 @@ public class PermissionServiceImpl implements PermissionService {
     public String[] getPermissionTagsStringArray(StudyBean study,HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(study,request);
         return getStringArray(tagsList);    }
-
 }
