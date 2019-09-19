@@ -65,7 +65,6 @@ public class CoreResources implements InitializingBean {
     private static ArrayList<ExtractPropertyBean> extractProperties;
 
     public static String ODM_MAPPING_DIR;
-
     // TODO:Clean up all system outs
     // default no arg constructor
     public CoreResources() {
