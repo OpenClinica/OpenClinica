@@ -7,6 +7,11 @@ import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
+import org.akaza.openclinica.controller.openrosa.QueryService;
+import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
+import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
+import org.akaza.openclinica.core.form.xform.QueryBean;
+import org.akaza.openclinica.core.form.xform.QueryType;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.EventCRFStatus;
@@ -113,7 +118,11 @@ public class ImportServiceImpl implements ImportService {
     @Qualifier( "dataSource" )
     private BasicDataSource dataSource;
 
-    DiscrepancyNoteService discrepancyNoteService;
+    @Autowired
+    QueryService queryService;
+    
+    @Autowired
+    private DiscrepancyNoteDao discrepancyNoteDao;
     
     public static final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
@@ -130,6 +139,9 @@ public class ImportServiceImpl implements ImportService {
     public static final String INSERTED = "Inserted";
     public static final String UPDATED = "Updated";
     public static final String NO_CHANGE = "No Change";
+    public static final String DiscrepancyNoteMessage = "import XML";
+    public static final String DetailedNotes = "Update via Import";
+	
     List<DataImportReport> dataImportReports = null;
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -307,7 +319,7 @@ public class ImportServiceImpl implements ImportService {
                                 Item item = null;
                                 Object itemObject = null;
 
-                                itemObject = validateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm,tenantStudy.getStudyId(),userAccountBean);
+                                itemObject = validateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm,tenantStudy,studySubject);
                                 if (itemObject instanceof ErrorObj) {
                                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), ((ErrorObj) itemObject).getCode(), null, ((ErrorObj) itemObject).getMessage());
                                     dataImportReports.add(dataImportReport);
@@ -978,7 +990,7 @@ public class ImportServiceImpl implements ImportService {
     		return true;
     	}else if(eventCrf.getStatusId() == EventCRFStatus.DOUBLE_DATA_ENTRY_COMPLETE.getCode()) {
     		return true;
-    	}else if(eventCrf.getStatusId() == 2) {
+    	}else if(eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
     		return true;
     	}else {
     		return false;
@@ -1298,7 +1310,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private Object validateItem(ImportItemDataBean itemDataBean, CrfBean crf, EventCrf eventCrf, ImportItemGroupDataBean itemGroupDataBean, UserAccount userAccount, ItemCountInForm itemCountInForm,int studyId,UserAccountBean userAccountBean) {
+    private Object validateItem(ImportItemDataBean itemDataBean, CrfBean crf, EventCrf eventCrf, ImportItemGroupDataBean itemGroupDataBean, UserAccount userAccount, ItemCountInForm itemCountInForm,Study study,StudySubject studySubject) {
         ErrorObj errorObj = null;
         if (itemDataBean.getItemOID() == null) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
@@ -1346,13 +1358,36 @@ public class ImportServiceImpl implements ImportService {
                 return new ErrorObj(NO_CHANGE, null);
 
             } else {
-            	if(isEventCrfCompleted(eventCrf)) {            		
-            		String message = "import XML";
-            		String detailedNotes = "Update via Import";
-                	int discrepancyNoteTypeId = DiscrepancyNoteType.REASON_FOR_CHANGE.getId();
-                    DiscrepancyNoteBean parentDn = getDiscrepancyNoteService().createDiscrepancyNote(item.getName(), message, eventCrf, itemData, null, userAccountBean, dataSource,
-                    		studyId,detailedNotes,discrepancyNoteTypeId);
-                    getDiscrepancyNoteService().createDiscrepancyNote(item.getName(), message, eventCrf, itemData, parentDn.getId(), userAccountBean, dataSource, studyId,detailedNotes,discrepancyNoteTypeId);
+            	if(isEventCrfCompleted(eventCrf)) {         		            		                
+                    
+					try {
+						QueryBean queryBean = new QueryBean();
+						queryBean.setType(QueryType.REASON.getName());
+						queryBean.setComment(this.DetailedNotes);
+						
+						QueryServiceHelperBean helperBean = new QueryServiceHelperBean();
+						helperBean.setItemData(itemData);
+						SubmissionContainer container = new SubmissionContainer(null, null, null, null, null, null, null, null);
+						container.setStudy(study);
+						container.setUser(userAccount);
+						container.setSubject(studySubject);
+						helperBean.setContainer(container);
+						
+						DiscrepancyNote parentDn = (DiscrepancyNote) queryService.createQuery(helperBean, queryBean, true);						
+						parentDn.setDescription(this.DiscrepancyNoteMessage);
+						
+						discrepancyNoteDao.saveOrUpdate(parentDn);
+						helperBean.setDn(parentDn);
+						queryService.saveQueryItemDatamap(helperBean);
+			            
+			            DiscrepancyNote childDN = queryService.createQuery(helperBean, queryBean,false);
+		                childDN.setParentDiscrepancyNote(parentDn);
+		                childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+					} catch (Exception e) {
+						return new ErrorObj(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
+					}
+					
+                    
                     
             	}
                 itemData = updateItemData(itemData, userAccount, itemDataBean.getValue());
@@ -1436,11 +1471,6 @@ public class ImportServiceImpl implements ImportService {
         }
 
         return formLayout;
-    }
-
-    private DiscrepancyNoteService getDiscrepancyNoteService() {
-        discrepancyNoteService = this.discrepancyNoteService != null ? discrepancyNoteService : new DiscrepancyNoteService(this.dataSource);
-        return discrepancyNoteService;
     }
 
 }
