@@ -465,11 +465,6 @@
 		    <version>1.5</version>
 		</dependency>
         <dependency>
-            <groupId>org.javers</groupId>
-            <artifactId>javers-core</artifactId>
-            <version>3.7.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
             <version>1.22</version>

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.core;
 
+import org.akaza.openclinica.bean.core.KeyCloakConfiguration;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -11,12 +12,12 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
@@ -47,12 +48,12 @@ import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
-@Configuration
+@org.springframework.context.annotation.Configuration
 @PropertySources({
         @PropertySource("classpath:datainfo.properties"),
-        @PropertySource(value = "file:${HOME}/runtime-config/datainfo.properties",ignoreResourceNotFound = true),
+        @PropertySource(value = "file:${user.home}/runtime-config/datainfo.properties",ignoreResourceNotFound = true),
         @PropertySource("classpath:extract.properties"),
-        @PropertySource(value = "file:${HOME}/runtime-config/extract.properties",ignoreResourceNotFound = true)
+        @PropertySource(value = "file:${user.home}/runtime-config/extract.properties",ignoreResourceNotFound = true)
 })
 public class CoreResources implements EnvironmentAware{
     Environment env;
@@ -62,6 +63,8 @@ public class CoreResources implements EnvironmentAware{
     public static ThreadLocal<String> tenantSchema = new ThreadLocal<>();
     private static Properties DATAINFO;
     private static Properties EXTRACTINFO;
+    private static KeyCloakConfiguration KEYCLOAKCONFIG;
+
     private Properties dataInfo;
     private Properties dataInfoProp;
     private Properties extractInfo;
@@ -83,7 +86,6 @@ public class CoreResources implements EnvironmentAware{
     private static ArrayList<ExtractPropertyBean> extractProperties;
 
     public static String ODM_MAPPING_DIR;
-
     // TODO:Clean up all system outs
     // default no arg constructor
     public CoreResources() {
@@ -155,6 +157,20 @@ public class CoreResources implements EnvironmentAware{
         }
     }
 
+
+    private void extractKeyCloakConfig(Properties dataInfo) {
+        KEYCLOAKCONFIG=new KeyCloakConfiguration();
+        KEYCLOAKCONFIG.setRealm(dataInfo.getProperty("keycloak.realm"));
+        KEYCLOAKCONFIG.setAuthServerUrl(dataInfo.getProperty("keycloak.auth-server-url"));
+        String secretKey="secret";
+        String secretValue=dataInfo.getProperty("keycloak.credentials.secret");
+        Map<String,Object> credentials=new TreeMap<String,Object>(){{put(secretKey, secretValue);}};
+        KEYCLOAKCONFIG.setCredentials(credentials);
+    }
+
+    public static Configuration getKeyCloakConfig(){
+        return KEYCLOAKCONFIG;
+    }
     public void overwriteExternalPropOnInternalProp(Properties internalProp, Properties externalProp){
         if(externalProp!=null && !externalProp.isEmpty()){
             Set<String> externalKeys= externalProp.stringPropertyNames();
@@ -431,6 +447,7 @@ public class CoreResources implements EnvironmentAware{
             statement.close();
         }
     }
+
 
     public static String getRequestSchema() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -1192,7 +1209,7 @@ public class CoreResources implements EnvironmentAware{
         String webAppName = null;
         if (null != servletCtxRealPath) {
             String[] tokens = servletCtxRealPath.split("/");
-            webAppName = tokens[(tokens.length - 1)].trim();
+            webAppName = tokens[(tokens.length - 3)].trim();
         }
         return webAppName;
     }
@@ -1227,6 +1244,7 @@ public class CoreResources implements EnvironmentAware{
                 copyImportRulesFiles();
                 // copyConfig();
             }
+            extractKeyCloakConfig(dataInfo);
         } catch (OpenClinicaSystemException e) {
             logger.debug(e.getMessage());
             logger.debug(e.toString());

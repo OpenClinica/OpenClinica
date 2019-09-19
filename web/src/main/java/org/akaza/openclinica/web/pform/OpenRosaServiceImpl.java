@@ -7,6 +7,7 @@ import org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.service.OCUserRoleDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.*;
+import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,8 @@ public class OpenRosaServiceImpl implements OpenRosaService {
     OpenRosaXMLUtil openRosaXMLUtil;
     @Autowired
     PermissionService permissionService;
+    @Autowired
+    private KeycloakClientImpl keycloakClient;
 
     private static final String AUTH0_ERROR_MESSAGE_ATTRIBUTE = "message";
     public static final String AUTH0_CALL_FAILED = "errorCode.auth0CallFailed";
@@ -97,7 +100,7 @@ public class OpenRosaServiceImpl implements OpenRosaService {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
             if (StringUtils.isEmpty(accessToken))
-                accessToken = permissionService.getAccessToken();
+                accessToken = keycloakClient.getSystemToken();
             headers.add("Authorization", "Bearer " + accessToken);
             headers.add("Accept-Charset", "UTF-8");
             HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -198,7 +201,7 @@ public class OpenRosaServiceImpl implements OpenRosaService {
                 HttpClientErrorException ex = (HttpClientErrorException) t;
                 if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
                     logger.error("**********Auth0 access token expired. Creating a new one.");
-                    accessToken = permissionService.getAccessToken();
+                    accessToken =keycloakClient.getSystemToken();
                     logger.error("*********Calling the api again with the new token.");
                     response = supplier.get();
                 } else {
