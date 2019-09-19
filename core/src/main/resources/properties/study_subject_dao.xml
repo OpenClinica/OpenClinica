@@ -85,7 +85,7 @@
     <query>
         <name>getCountWithFilter</name>
         <sql>
-			select COUNT(DISTINCT(ss.*)) from study_subject ss,study_event se  where ss.study_subject_id in (select study_subject_id from study_subject ss where ss.study_id in (select study_id from study st where ST.study_id=93 or ST.parent_study_id=93))
+			select COUNT(DISTINCT(ss.*)) from study_subject ss,study_event se  where ss.study_subject_id in (select study_subject_id from study_subject ss where ss.study_id in (select study_id from study st where ST.study_id=? or ST.parent_study_id=?))
 			and se.study_subject_id=ss.study_subject_id
         </sql>
     </query>
