@@ -12,7 +12,7 @@
 <tr>
     <td class="table_cell_left">
         <c:choose>
-            <c:when test='${currRow.bean.status.name == "removed"}'>
+            <c:when test='${currRow.bean.status.name == "Removed"}'>
                 <font color='gray'><c:out value="${currRow.bean.name}" /></font>
             </c:when>
             <c:otherwise>
@@ -32,7 +32,7 @@
           <c:when test="${userBean.sysAdmin}">
               <tr>
                 <c:choose>
-                    <c:when test='${currRow.bean.status.name == "removed"}'>
+                    <c:when test='${currRow.bean.status.name == "Removed"}'>
                         <%-- parts to be added later, look at showUserAccountRow.jsp, tbh --%>
                         <td><a href="RestoreDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                             onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
@@ -73,7 +73,7 @@
           <c:otherwise>
               <tr>
                 <c:choose>
-                    <c:when test='${currRow.bean.status.name == "removed"}'>
+                    <c:when test='${currRow.bean.status.name == "Removed"}'>
                         <c:choose>
                          <c:when test="${currRow.bean.owner.name == userBean.name}">   
                         <%-- parts to be added later, look at showUserAccountRow.jsp, tbh --%>
@@ -99,8 +99,7 @@
                     name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
 
-                    <td>
-                    <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"><span
+                    <td><a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"><span
                     name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
                     </c:if>
