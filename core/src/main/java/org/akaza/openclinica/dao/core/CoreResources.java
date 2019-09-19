@@ -208,7 +208,7 @@ public class CoreResources implements ResourceLoaderAware {
         KEYCLOAKCONFIG.setRealm(DATAINFO.getProperty("keycloak.realm"));
         KEYCLOAKCONFIG.setAuthServerUrl(DATAINFO.getProperty("keycloak.auth-server-url"));
         String secretKey="secret";
-        String secretValue=DATAINFO.getProperty("keycloak.credectials.secret");
+        String secretValue=DATAINFO.getProperty("keycloak.credentials.secret");
         Map<String,Object> credentials=new TreeMap<String,Object>(){{put(secretKey, secretValue);}};
         KEYCLOAKCONFIG.setCredentials(credentials);
     }
