@@ -5,6 +5,10 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.DefaultToolbar;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.Component;
+import org.akaza.openclinica.service.Page;
+import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;
@@ -14,7 +18,10 @@ import org.jmesa.view.html.toolbar.ToolbarItem;
 import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class ListStudySubjectTableToolbar extends DefaultToolbar {
@@ -25,15 +32,23 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
     private String participateModuleStatus;
     private final String ENABLED = "enabled";
+    private ViewStudySubjectService viewStudySubjectService;
+    private PermissionService permissionService;
+    private StudyBean studyBean;
+    private HttpServletRequest request;
 
     public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
-            boolean addSubjectLinkShow, boolean showMoreLink , String participateModuleStatus) {
+            boolean addSubjectLinkShow, boolean showMoreLink , String participateModuleStatus,ViewStudySubjectService viewStudySubjectService,PermissionService permissionService,StudyBean studyBean,HttpServletRequest request) {
         super();
         this.studyEventDefinitions = studyEventDefinitions;
         this.studyGroupClasses = studyGroupClasses;
         this.addSubjectLinkShow = addSubjectLinkShow;
         this.showMoreLink = showMoreLink;
         this.participateModuleStatus=participateModuleStatus;
+        this.viewStudySubjectService=viewStudySubjectService;
+        this.permissionService=permissionService;
+        this.studyBean=studyBean;
+        this.request=request;
     }
 
     @Override
@@ -105,13 +120,37 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
          *      java.util.Locale)
          */
         String getIndexes() {
-            String result = "1,2,3";
-            if(participateModuleStatus.equals(ENABLED))
-                 result = "1,2,3,4";
+            int siteIdColumn = 1;
+            int statusColumn = 2;
+            int oidColumn = 3;
+            int participantStatusColumn = 4;
+            int itemsColumnCount=0;
 
-            for (int i = 0; i < studyGroupClasses.size(); i++) {
-                result += "," + (4 + i + 1);
+            List<Component> components = viewStudySubjectService.getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
+           if(components!=null) {
+               for (Component component : components) {
+                   if (component.getColumns() != null) {
+                       if (permissionService.isUserHasPermission(component, request, studyBean)) {
+                           List<String> itemOids = Arrays.asList(component.getColumns());
+                           for (String itemOid : itemOids) {
+                               itemsColumnCount++;
+                           }
+                       }
+
+                   }
+               }
+           }
+
+            if (components != null ) {
+                statusColumn = itemsColumnCount + 2;
+                oidColumn = itemsColumnCount + 3;
+                participantStatusColumn = itemsColumnCount + 4;
             }
+
+            String result = String.valueOf(siteIdColumn) + "," + String.valueOf(statusColumn)+ "," + String.valueOf(oidColumn);
+            if (participateModuleStatus.equals(ENABLED))
+                result = result + "," + String.valueOf(participantStatusColumn);
+
             return result;
         }
 

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +28,7 @@ public interface OdmImportService {
 	 * @param accessToken
 	 * @return
 	 */
-	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, String accessToken) throws Exception;
+	public Map<String, Object> importOdm(ODM odm, List<Page> pages, String boardId, String accessToken) throws Exception;
 
 	/**
 	 * This method will be used to change the Status of Site Definition into DELETED

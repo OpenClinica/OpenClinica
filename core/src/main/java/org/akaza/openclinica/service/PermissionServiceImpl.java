@@ -48,6 +48,10 @@ public class PermissionServiceImpl implements PermissionService {
     private EventCrfDao eventCrfDao;
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    private StudyEventDefinitionDao studyEventDefinitionDao;
+    @Autowired
+    private CrfDao crfDao;
 
     private static final String CREATE_TOKEN_API_PATH = "/oauth/token";
 
@@ -232,4 +236,27 @@ public class PermissionServiceImpl implements PermissionService {
         return null;
     }
 
+    public boolean isUserHasPermission(Component component,HttpServletRequest request,StudyBean studyBean) {
+        String sedOid = component.getName().split("\\.")[0];
+        String formOid = component.getName().split("\\.")[1];
+        StudyEventDefinition sed = studyEventDefinitionDao.findByOcOID(sedOid);
+        CrfBean crf = crfDao.findByOcOID(formOid);
+        EventDefinitionCrf eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getStudyEventDefinitionId(), crf.getCrfId(), studyBean.getParentStudyId()!=0 ?studyBean.getParentStudyId():studyBean.getId());
+        List<String> tagsInEDC = permissionTagDao.findTagsForEDC(eventDefCrf);
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(tagsInEDC)) {
+            List<String> list = tagsInEDC.stream().filter(getPermissionTags(request)::contains).collect(Collectors.toList());
+            if (org.apache.commons.collections.CollectionUtils.isEmpty(list))
+                return false;
+        }
+        return true;
+    }
+
+    private List<String> getPermissionTags(HttpServletRequest request) {
+        List<String> permissionTags = (List<String>) request.getSession().getAttribute("permissionTags");
+        if (permissionTags == null) {
+            permissionTags = getPermissionTagsList(request);
+            request.getSession().setAttribute("permissionTags", permissionTags);
+        }
+        return permissionTags;
+    }
 }

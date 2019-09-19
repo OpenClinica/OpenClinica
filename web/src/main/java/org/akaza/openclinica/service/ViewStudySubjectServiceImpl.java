@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -194,18 +195,24 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         return commonEventContainerDTO;
     }
 
-    public Page getPage(HttpServletRequest request, String studyOid, String name) {
+    public Page getPage( String name) {
         Page page = null;
-        Study publicstudy = studyDao.findByOcOID(studyOid);
-        request.setAttribute("requestSchema", publicstudy.getSchemaName());
         PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(name);
         if (pageLayout != null) {
             page = (Page) SerializationUtils.deserialize(pageLayout.getDefinition());
             logger.info("Page Object retrieved from database with page name: {}", pageLayout.getName());
         }
-
         return page;
     }
+
+    public List<Component> getPageComponents(String name){
+        Page page =  getPage(name);
+        if(page!=null && page.getComponents()!=null){
+            return page.getComponents();
+        }
+        return null;
+    }
+
 
 
     /**
