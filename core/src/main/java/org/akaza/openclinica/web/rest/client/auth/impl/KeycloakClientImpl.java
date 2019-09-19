@@ -244,7 +244,7 @@ public class KeycloakClientImpl {
             logger.debug("Keycloak Access Token: {}", accessToken);
             return accessToken;
         } catch (Exception e) {
-            logger.error("Could not read keycloak.json", e);
+            logger.error("Error reading keycloak properties from DataInfo.properties", e);
             return null;
         }
     }
