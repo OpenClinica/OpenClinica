@@ -23,6 +23,4 @@ public interface PermissionService {
     String[] getPermissionTagsStringArray(StudyBean study ,HttpServletRequest request);
 
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);
-
-    String getAccessToken();
 }

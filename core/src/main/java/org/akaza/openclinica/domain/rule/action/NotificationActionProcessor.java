@@ -27,6 +27,7 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.rule.RuleSetService;
+import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
@@ -34,6 +35,7 @@ import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.util.JsonSerialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.mail.MailException;
@@ -79,12 +81,13 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	NotificationService notificationService;
 	String userUuid;
 
-
 	public static String sbsUrl = CoreResources.getField("SBSUrl");
 	public static String messageServiceUri = StringUtils.substringBefore(sbsUrl, "//")
 			+ "//" + StringUtils.substringBetween(sbsUrl, "//", "/") + "/message-service/api/messages/text";
 	public static String subDomain = sbsUrl.substring(sbsUrl.indexOf("//")  + 2,  sbsUrl.indexOf("."));
 
+	@Autowired
+	private KeycloakClientImpl keycloakClient;
 
 	public NotificationActionProcessor() {
 	}
@@ -229,7 +232,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
-		String accessToken=getAccessToken();
+		String accessToken=keycloakClient.getSystemToken();
 
 		if(studySubject.getUserId()!=null) {
 			UserAccountBean userAccountBean = (UserAccountBean) udao.findByPK(studySubject.getUserId());
@@ -428,26 +431,5 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	public RuleSetDao getRuleSetDao() {
 		return ruleSetDao;
 	}
-
-
-
-
-
-	public String getAccessToken() {
-		logger.debug("Creating Auth0 Api Token");
-
-		try {
-			InputStream inputStream = new ClassPathResource("keycloak.json", this.getClass().getClassLoader()).getInputStream();
-			AuthzClient authzClient = AuthzClient.create(JsonSerialization.readValue(inputStream, Configuration.class));
-			AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
-			if (accessTokenResponse != null)
-				return accessTokenResponse.getToken();
-		} catch (IOException e) {
-			logger.error("Could not read keycloak.json", e);
-			return null;
-		}
-		return null;
-	}
-
 
 }

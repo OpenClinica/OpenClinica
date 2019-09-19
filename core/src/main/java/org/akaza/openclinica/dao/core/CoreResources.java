@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.core;
 
+import org.akaza.openclinica.bean.core.KeyCloakConfiguration;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -11,6 +12,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
@@ -30,10 +32,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
@@ -46,6 +45,7 @@ public class CoreResources implements ResourceLoaderAware {
     public static ThreadLocal<String> tenantSchema = new ThreadLocal<>();
     private static Properties DATAINFO;
     private static Properties EXTRACTINFO;
+    private static KeyCloakConfiguration KEYCLOAKCONFIG;
 
     private Properties dataInfo;
     private Properties dataInfoProp;
@@ -68,7 +68,6 @@ public class CoreResources implements ResourceLoaderAware {
     private static ArrayList<ExtractPropertyBean> extractProperties;
 
     public static String ODM_MAPPING_DIR;
-
     // TODO:Clean up all system outs
     // default no arg constructor
     public CoreResources() {
@@ -190,7 +189,7 @@ public class CoreResources implements ResourceLoaderAware {
                 copyImportRulesFiles();
                 // copyConfig();
             }
-
+            extractKeyCloakConfig(dataInfo);
             // tbh, following line to be removed
             // reportUrl();
 
@@ -204,7 +203,19 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
+    private void extractKeyCloakConfig(Properties dataInfo) {
+        KEYCLOAKCONFIG=new KeyCloakConfiguration();
+        KEYCLOAKCONFIG.setRealm(DATAINFO.getProperty("keycloak.realm"));
+        KEYCLOAKCONFIG.setAuthServerUrl(DATAINFO.getProperty("keycloak.auth-server-url"));
+        String secretKey="secret";
+        String secretValue=DATAINFO.getProperty("keycloak.credectials.secret");
+        Map<String,Object> credentials=new TreeMap<String,Object>(){{put(secretKey, secretValue);}};
+        KEYCLOAKCONFIG.setCredentials(credentials);
+    }
 
+    public static Configuration getKeyCloakConfig(){
+        return KEYCLOAKCONFIG;
+    }
     public void overwriteExternalPropOnInternalProp(Properties internalProp, Properties externalProp){
         if(externalProp!=null && !externalProp.isEmpty()){
             Set<String> externalKeys= externalProp.stringPropertyNames();
@@ -481,6 +492,7 @@ public class CoreResources implements ResourceLoaderAware {
             statement.close();
         }
     }
+
 
     public static String getRequestSchema() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

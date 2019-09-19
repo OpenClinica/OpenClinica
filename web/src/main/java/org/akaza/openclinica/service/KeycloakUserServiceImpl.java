@@ -33,7 +33,7 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
 
         if (response == null || response.getBody() == null)
             return false;
-        AuthzClient authzClient = AuthzClient.create();
+        AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
         try {
              authzClient.obtainAccessToken(username, password);
         } catch (HttpResponseException e) {

@@ -51,7 +51,7 @@ public class KeycloakController {
     private StudyDAO studyDAO;
 
     public String buildAuthorizeUrl(HttpServletRequest request) {
-        AuthzClient authzClient = AuthzClient.create();
+        AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
         String coreAuthUrl = authzClient.getConfiguration().getAuthServerUrl();
         int port = request.getServerPort();
         String portStr ="";
