@@ -19,6 +19,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.Component;
 import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
@@ -189,8 +190,17 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setItemFormMetadataDao(getItemFormMetadataDao());
         factory.setPermissionTagDao(getPermissionTagDao());
 
-        List<String> permissionTags= permissionService.getPermissionTagsList(request);
-        request.getSession().setAttribute("permissionTags", permissionTags);
+        List<Component> components = getViewStudySubjectService().getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
+        if (components != null) {
+            for (Component component : components) {
+                if (component.getColumns() != null) {
+                    List<String> permissionTags = permissionService.getPermissionTagsList(request);
+                    request.getSession().setAttribute("userPermissionTags", permissionTags);
+                    break;
+                }
+            }
+        }
+
         String findSubjectsHtml = factory.createTable(request, response).render();
 
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);

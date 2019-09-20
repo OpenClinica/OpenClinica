@@ -252,11 +252,6 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     private List<String> getPermissionTags(HttpServletRequest request) {
-        List<String> permissionTags = (List<String>) request.getSession().getAttribute("permissionTags");
-        if (permissionTags == null) {
-            permissionTags = getPermissionTagsList(request);
-            request.getSession().setAttribute("permissionTags", permissionTags);
-        }
-        return permissionTags;
+        return (List<String>) request.getSession().getAttribute("userPermissionTags");
     }
 }
