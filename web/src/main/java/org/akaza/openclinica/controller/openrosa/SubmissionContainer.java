@@ -54,7 +54,13 @@ public class SubmissionContainer {
         this.instanceId = instanceId;
     }
 
-    public CrfVersion getCrfVersion() {
+    /**
+     *  default constructor
+     */
+    public SubmissionContainer() {		
+	}
+
+	public CrfVersion getCrfVersion() {
         return crfVersion;
     }
 

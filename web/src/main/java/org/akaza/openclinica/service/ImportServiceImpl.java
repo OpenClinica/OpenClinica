@@ -986,11 +986,8 @@ public class ImportServiceImpl implements ImportService {
 
 
     private boolean isEventCrfCompleted(EventCrf eventCrf) {
-    	if(eventCrf.getStatusId() == EventCRFStatus.INITIAL_DATA_ENTRY_COMPLETE.getCode()) {
-    		return true;
-    	}else if(eventCrf.getStatusId() == EventCRFStatus.DOUBLE_DATA_ENTRY_COMPLETE.getCode()) {
-    		return true;
-    	}else if(eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
+		
+    	if(eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
     		return true;
     	}else {
     		return false;
@@ -1358,37 +1355,11 @@ public class ImportServiceImpl implements ImportService {
                 return new ErrorObj(NO_CHANGE, null);
 
             } else {
-            	if(isEventCrfCompleted(eventCrf)) {         		            		                
-                    
-					try {
-						QueryBean queryBean = new QueryBean();
-						queryBean.setType(QueryType.REASON.getName());
-						queryBean.setComment(this.DetailedNotes);
-						
-						QueryServiceHelperBean helperBean = new QueryServiceHelperBean();
-						helperBean.setItemData(itemData);
-						SubmissionContainer container = new SubmissionContainer(null, null, null, null, null, null, null, null);
-						container.setStudy(study);
-						container.setUser(userAccount);
-						container.setSubject(studySubject);
-						helperBean.setContainer(container);
-						
-						DiscrepancyNote parentDn = (DiscrepancyNote) queryService.createQuery(helperBean, queryBean, true);						
-						parentDn.setDescription(this.DiscrepancyNoteMessage);
-						
-						discrepancyNoteDao.saveOrUpdate(parentDn);
-						helperBean.setDn(parentDn);
-						queryService.saveQueryItemDatamap(helperBean);
-			            
-			            DiscrepancyNote childDN = queryService.createQuery(helperBean, queryBean,false);
-		                childDN.setParentDiscrepancyNote(parentDn);
-		                childDN = discrepancyNoteDao.saveOrUpdate(childDN);
-					} catch (Exception e) {
-						return new ErrorObj(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
-					}
-					
-                    
-                    
+            	if(isEventCrfCompleted(eventCrf)) {        		            		                                    
+            		ErrorObj eb = createQuery(userAccount, study, studySubject, itemData);	
+            		if(eb != null) {
+            			return eb;
+            		}
             	}
                 itemData = updateItemData(itemData, userAccount, itemDataBean.getValue());
                 itemCountInForm.setInsertedUpdatedItemCountInForm(itemCountInForm.getInsertedUpdatedItemCountInForm() + 1);
@@ -1402,6 +1373,46 @@ public class ImportServiceImpl implements ImportService {
             return new DataImportReport(null, null, null, null, null, null, null, null, INSERTED, sdf_logFile.format(new Date()), null);
         }
     }
+
+	/**
+	 * @param userAccount
+	 * @param study
+	 * @param studySubject
+	 * @param itemData
+	 */
+	private ErrorObj createQuery(UserAccount userAccount, Study study, StudySubject studySubject, ItemData itemData) {
+		
+		ErrorObj eb = null;
+		
+		try {
+			QueryBean queryBean = new QueryBean();
+			queryBean.setType(QueryType.REASON.getName());
+			queryBean.setComment(this.DetailedNotes);
+			
+			QueryServiceHelperBean helperBean = new QueryServiceHelperBean();
+			helperBean.setItemData(itemData);
+			SubmissionContainer container = new SubmissionContainer();
+			container.setStudy(study);
+			container.setUser(userAccount);
+			container.setSubject(studySubject);
+			helperBean.setContainer(container);
+			
+			DiscrepancyNote parentDn = (DiscrepancyNote) queryService.createQuery(helperBean, queryBean, true);						
+			parentDn.setDescription(this.DiscrepancyNoteMessage);
+			
+			parentDn = discrepancyNoteDao.saveOrUpdate(parentDn);
+			helperBean.setDn(parentDn);
+			queryService.saveQueryItemDatamap(helperBean);
+		    
+		    DiscrepancyNote childDN = queryService.createQuery(helperBean, queryBean,false);
+		    childDN.setParentDiscrepancyNote(parentDn);
+		    childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+		} catch (Exception e) {
+			eb = new ErrorObj(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
+		}
+		
+		return eb;
+	}
 
     private Object validateForm(FormDataBean formDataBean, Study tenantStudy, StudyEventDefinition studyEventDefinition) {
         if (formDataBean.getItemGroupData() == null)
