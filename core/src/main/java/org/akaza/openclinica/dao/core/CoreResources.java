@@ -167,6 +167,7 @@ public class CoreResources implements ResourceLoaderAware {
              * extractInfo = OC_dataExtractProperties;
              *
              */
+            dataInfoExternal=getExternalProperties("datainfo.properties");
             overwriteExternalPropOnInternalProp(dataInfo,dataInfoExternal);
             String dbName = dataInfo.getProperty("dbType");
 
@@ -174,7 +175,7 @@ public class CoreResources implements ResourceLoaderAware {
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
             // instance
             tenantSchema.set(DATAINFO.getProperty("schema"));
-
+            extractInfoExternal=getExternalProperties("extract.properties");
             overwriteExternalPropOnInternalProp(extractInfo,extractInfoExternal);
             EXTRACTINFO = extractInfo;
             DB_NAME = dbName;
@@ -202,6 +203,22 @@ public class CoreResources implements ResourceLoaderAware {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+
+    private Properties getExternalProperties(String propertyFileName){
+        Properties prop = new Properties();
+        InputStream input = null;
+
+        try {
+            logger.error("File location: "+System.getProperty("user.home")+"/runtime-config/"+propertyFileName);
+            input = new FileInputStream(System.getProperty("user.home")+"/runtime-config/"+propertyFileName);
+            prop.load(input);
+        }
+        catch(IOException ioe){
+            prop=null;
+        }
+        return prop;
     }
 
 
