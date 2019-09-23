@@ -20,8 +20,6 @@
     <util:properties id="dataInfo" location="classpath:datainfo.properties"/>
     <util:properties id="extractInfo" location="classpath:extract.properties"/>
     <util:properties id="enterpriseInfo" location="classpath:enterprise.properties"/>
-    <util:properties id="dataInfoExternal" location="file:${user.home}/runtime-config/datainfo.properties" ignore-resource-not-found="true"/>
-    <util:properties id="extractInfoExternal" location="file:${user.home}/runtime-config/extract.properties" ignore-resource-not-found="true"/>
     <!--
 
     <bean id="ocSessionContext" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
@@ -34,10 +32,6 @@
         <property name="dataInfo" ref="dataInfo"/>
 
         <property name="extractInfo" ref="extractInfo"/>
-
-        <property name="dataInfoExternal" ref="dataInfoExternal"/>
-
-        <property name="extractInfoExternal" ref="extractInfoExternal"/>
         <!--  <property name="messageSource" ref="messageSource"/> -->
     </bean>
 
