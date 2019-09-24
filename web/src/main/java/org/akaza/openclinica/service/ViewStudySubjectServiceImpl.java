@@ -37,6 +37,9 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
     private EventCrfDao eventCrfDao;
     private StudyEventDefinitionDao studyEventDefintionDao;
     private PageLayoutDao pageLayoutDao;
+    public static final String PAGE_NAME = "participant-matrix";
+    public static final String PARTICIPANT_MATRIX_TABLE = "participant-matrix-table";
+
 
     public ViewStudySubjectServiceImpl(StudyDao studyDao, UserAccountDao userAccountDao, StudySubjectDao studySubjectDao, CrfDao crfDao,
                                        EventDefinitionCrfDao eventDefinitionCrfDao, StudyEventDao studyEventDao, EventCrfDao eventCrfDao, StudyEventDefinitionDao studyEventDefintionDao,
@@ -292,4 +295,15 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
     }
 
 
+    public String[] getTableColumns() {
+        List<Component> components = getPageComponents(PAGE_NAME);
+        if (components != null) {
+            for (Component component : components) {
+                if (component.getName().equals(PARTICIPANT_MATRIX_TABLE)) {
+                    return component.getColumns();
+                }
+            }
+        }
+        return null;
+    }
 }

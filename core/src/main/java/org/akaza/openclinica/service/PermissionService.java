@@ -26,6 +26,6 @@ public interface PermissionService {
 
     String getAccessToken();
 
-    boolean isUserHasPermission(Component component,HttpServletRequest request,StudyBean studyBean);
+    boolean isUserHasPermission(String column,HttpServletRequest request,StudyBean studyBean);
 
     }

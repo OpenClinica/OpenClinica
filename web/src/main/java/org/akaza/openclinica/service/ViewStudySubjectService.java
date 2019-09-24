@@ -53,4 +53,6 @@ public interface ViewStudySubjectService {
 	public CommonEventContainerDTO addCommonForm(String studyEventDefinitionOid, String crfOid, String studySubjectOid,
 												 UserAccount userAccount,String studyOid);
 
-}
+     String[] getTableColumns();
+
+	}

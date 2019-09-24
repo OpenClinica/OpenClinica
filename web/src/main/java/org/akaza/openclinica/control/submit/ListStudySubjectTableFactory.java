@@ -73,7 +73,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private HttpServletRequest request;
     private ViewStudySubjectService viewStudySubjectService;
     private PermissionService permissionService;
-    public static final String PAGE_NAME = "view subject";
+    public static final String PAGE_NAME = "participant-matrix";
+    public static final String  PARTICIPANT_MATRIX_TABLE="participant-matrix-table";
     public static final String DOT = ".";
 
     private static final String CHECKBOX = "checkbox";
@@ -154,24 +155,24 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn(columnNames[index]), resword.getString("site_id"), null, null);
         ++index;
         EventDefinitionCrf eventDefCrf = null;
-        List<Component> components = getViewStudySubjectService().getPageComponents(PAGE_NAME);
-        if (components != null) {
-            for (Component component : components) {
-                if (component.getColumns() != null) {
-                    if (permissionService.isUserHasPermission(component, request, studyBean)) {
-                        List<String> itemOids = Arrays.asList(component.getColumns());
-                        for (String itemOid : itemOids) {
-                            Item item = itemDao.findByOcOID(itemOid);
-                            //         configureColumn(row.getColumn(columnNames[index]), component.getName()+DOT+itemOid, new ItemIdCellEditor(), null);
 
-                            configureColumn(row.getColumn(columnNames[index]), item != null ? item.getName() : null, new ItemIdCellEditor(), null);
-                            ++index;
-                        }
 
+        String[] tableColumns = getViewStudySubjectService().getTableColumns();
+        if (tableColumns != null) {
+            for (String column : tableColumns) {
+                if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                    String itemOid = column.split("\\.")[2];
+                    Item item = itemDao.findByOcOID(itemOid);
+                    if (item != null) {
+                        configureColumn(row.getColumn(columnNames[index]), item != null ? item.getName() : null, new ItemIdCellEditor(), null);
+                        ++index;
                     }
                 }
+                break;
             }
         }
+
+
 
 
         configureColumn(row.getColumn(columnNames[index]), resword.getString("status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
@@ -288,67 +289,67 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("studySubject.status", studySubjectBean.getStatus());
             theItem.put("enrolledAt", study.getIdentifier());
 
-            List<Component> components = getViewStudySubjectService().getPageComponents(PAGE_NAME);
-            if (components != null) {
-                for (Component component : components) {
-                    if (component.getColumns() != null) {
-                        if (permissionService.isUserHasPermission(component, request, studyBean)) {
-                            List<String> itemOids = Arrays.asList(component.getColumns());
-                            for (String itemOid : itemOids) {
-                                //Get Item Value from database
-                                StudyEventDefinition studyEventDefinition = null;
-                                StudyEvent studyEvent = null;
-                                ItemData itemData = null;
-                                Item item = null;
-                                List<EventCrf> eventCrfs = null;
-                                String sedOid = component.getName().split("\\.")[0];
-                                String formOid = component.getName().split("\\.")[1];
-                                String itemValue = null;
 
-                                if (!StringUtils.isEmpty(sedOid))
-                                    studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(sedOid, 1, studySubjectBean.getId());
-                                if (!StringUtils.isEmpty(itemOid))
-                                    item = itemDao.findByOcOID(itemOid);
-                                CrfBean crf = crfDao.findByOcOID(formOid);
-                                if (studyEvent != null) {
-                                    eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubjectBean.getId(), crf.getCrfId());
-                                    if (item != null && (eventCrfs != null && eventCrfs.size() != 0)) { // non-repeating group, group ordinal=1
-                                        itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrfs.get(0).getEventCrfId(), 1);
-                                    }
-                                    if (itemData != null && !StringUtils.isEmpty(itemData.getValue())) {
-                                        itemValue = itemData.getValue();
-                                        List<CrfVersion> crfVersions = crfVersionDao.findAllByCrfId(crf.getCrfId());
-                                        ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersions.get(0).getCrfVersionId());
-                                        ResponseSet responseSet = itemFormMetadata.getResponseSet();
-                                        String responseType = responseSet.getResponseType().getName();
 
-                                        if (responseType.equals(CHECKBOX) || responseType.equals(MULTI_SELECT) || responseType.equals(RADIO) || responseType.equals(SINGLE_SELECT)) {
-                                            List<String> itemValues = Arrays.asList(itemData.getValue().split("\\s*,\\s*"));
-                                            String[] optionValues = responseSet.getOptionsValues().split("\\s*,\\s*");
-                                            String[] optionTexts = responseSet.getOptionsText().split("\\s*,\\s*");
-                                            String output = null;
-                                            for (int i = 0; i < optionValues.length; i++) {
-                                                for (String value : itemValues) {
-                                                    if (optionValues[i].equals(value)) {
-                                                        if (output == null) {
-                                                            output = optionTexts[i];
-                                                        } else {
-                                                            output = output + "," + optionTexts[i];
+                        String [] tableColumns= getViewStudySubjectService().getTableColumns();
+                        if(tableColumns!=null){
+                            for (String column : tableColumns) {
+                            if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                                String sedOid = column.split("\\.")[0];
+                                String formOid = column.split("\\.")[1];
+                                String itemOid = column.split("\\.")[2];
+                                    //Get Item Value from database
+                                    StudyEventDefinition studyEventDefinition = null;
+                                    StudyEvent studyEvent = null;
+                                    ItemData itemData = null;
+                                    Item item = null;
+                                    List<EventCrf> eventCrfs = null;
+                                    String itemValue = null;
+
+                                    if (!StringUtils.isEmpty(sedOid))
+                                        studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(sedOid, 1, studySubjectBean.getId());
+                                    if (!StringUtils.isEmpty(itemOid))
+                                        item = itemDao.findByOcOID(itemOid);
+                                    CrfBean crf = crfDao.findByOcOID(formOid);
+                                    if (studyEvent != null) {
+                                        eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubjectBean.getId(), crf.getCrfId());
+                                        if (item != null && (eventCrfs != null && eventCrfs.size() != 0)) { // non-repeating group, group ordinal=1
+                                            itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrfs.get(0).getEventCrfId(), 1);
+                                        }
+                                        if (itemData != null && !StringUtils.isEmpty(itemData.getValue())) {
+                                            itemValue = itemData.getValue();
+                                            List<CrfVersion> crfVersions = crfVersionDao.findAllByCrfId(crf.getCrfId());
+                                            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersions.get(0).getCrfVersionId());
+                                            ResponseSet responseSet = itemFormMetadata.getResponseSet();
+                                            String responseType = responseSet.getResponseType().getName();
+
+                                            if (responseType.equals(CHECKBOX) || responseType.equals(MULTI_SELECT) || responseType.equals(RADIO) || responseType.equals(SINGLE_SELECT)) {
+                                                List<String> itemValues = Arrays.asList(itemData.getValue().split("\\s*,\\s*"));
+                                                String[] optionValues = responseSet.getOptionsValues().split("\\s*,\\s*");
+                                                String[] optionTexts = responseSet.getOptionsText().split("\\s*,\\s*");
+                                                String output = null;
+                                                for (int i = 0; i < optionValues.length; i++) {
+                                                    for (String value : itemValues) {
+                                                        if (optionValues[i].equals(value)) {
+                                                            if (output == null) {
+                                                                output = optionTexts[i];
+                                                            } else {
+                                                                output = output + "," + optionTexts[i];
+                                                            }
+                                                            break;
                                                         }
-                                                        break;
                                                     }
                                                 }
+                                                itemValue = output;
                                             }
-                                            itemValue = output;
                                         }
                                     }
-                                }
-                                theItem.put(component.getName() + DOT + itemOid, itemValue);
+                                    theItem.put(column, itemValue);
                             }
                         }
                     }
-                }
-            }
+
+
 
 
             theItem.put("studySubject.oid", studySubjectBean.getOid());
@@ -480,19 +481,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("studySubject.label");
         columnNamesList.add("enrolledAt");
 
-        List<Component> components = getViewStudySubjectService().getPageComponents(PAGE_NAME);
-        if (components != null) {
-            for (Component component : components) {
-                if (component.getColumns() != null) {
-                    if (permissionService.isUserHasPermission(component, request, studyBean)) {
-                        List<String> itemOids = Arrays.asList(component.getColumns());
-                        for (String itemOid : itemOids) {
-                            columnNamesList.add(component.getName() + DOT + itemOid);
+
+            String [] tableColumns= getViewStudySubjectService().getTableColumns();
+                    if(tableColumns!=null){
+                    for (String column : tableColumns) {
+                        if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                            columnNamesList.add(column);
                         }
                     }
                 }
-            }
-        }
+
+
 
         columnNamesList.add("studySubject.status");
         columnNamesList.add("studySubject.oid");

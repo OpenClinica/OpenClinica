@@ -126,22 +126,13 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
             int participantStatusColumn = 4;
             int itemsColumnCount=0;
 
-            List<Component> components = viewStudySubjectService.getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
-           if(components!=null) {
-               for (Component component : components) {
-                   if (component.getColumns() != null) {
-                       if (permissionService.isUserHasPermission(component, request, studyBean)) {
-                           List<String> itemOids = Arrays.asList(component.getColumns());
-                           for (String itemOid : itemOids) {
-                               itemsColumnCount++;
-                           }
-                       }
-
-                   }
-               }
-           }
-
-            if (components != null ) {
+            String[] tableColumns = viewStudySubjectService.getTableColumns();
+            if (tableColumns != null) {
+                for (String column : tableColumns) {
+                    if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                        itemsColumnCount++;
+                    }
+                }
                 statusColumn = itemsColumnCount + 2;
                 oidColumn = itemsColumnCount + 3;
                 participantStatusColumn = itemsColumnCount + 4;
