@@ -17,8 +17,6 @@
     <context:component-scan base-package="org.akaza.openclinica.service"/>
 
 
-    <util:properties id="dataInfo" location="classpath:datainfo.properties"/>
-    <util:properties id="extractInfo" location="classpath:extract.properties"/>
     <util:properties id="enterpriseInfo" location="classpath:enterprise.properties"/>
     <!--
 
@@ -27,15 +25,6 @@
          <property name="targetMethod"><value>getContext</value></property>
     </bean>
     -->
-    <bean id="coreResources" class="org.akaza.openclinica.dao.core.CoreResources">
-
-        <property name="dataInfo" ref="dataInfo"/>
-
-        <property name="extractInfo" ref="extractInfo"/>
-        <!--  <property name="messageSource" ref="messageSource"/> -->
-    </bean>
-
-
     <bean id="dataInfoProperties" factory-bean="coreResources" factory-method="getDataInfo"/>
 
     <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->

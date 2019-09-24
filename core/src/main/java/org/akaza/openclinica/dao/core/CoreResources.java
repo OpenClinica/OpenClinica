@@ -13,12 +13,24 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ResourceLoaderAware;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePropertySource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -30,29 +42,31 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
 
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
-
-public class CoreResources implements ResourceLoaderAware {
-
+@Configuration
+@PropertySources({
+        @PropertySource("classpath:datainfo.properties"),
+        @PropertySource(value = "file:${HOME}/runtime-config/datainfo.properties",ignoreResourceNotFound = true),
+        @PropertySource("classpath:extract.properties"),
+        @PropertySource(value = "file:${HOME}/runtime-config/extract.properties",ignoreResourceNotFound = true)
+})
+public class CoreResources implements EnvironmentAware {
+    @Autowired
+    Environment env;
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
     private static String DB_NAME;
     public static ThreadLocal<String> tenantSchema = new ThreadLocal<>();
     private static Properties DATAINFO;
     private static Properties EXTRACTINFO;
-
     private Properties dataInfo;
     private Properties dataInfoProp;
     private Properties extractInfo;
     private Properties extractProp;
-    private Properties dataInfoExternal;
-    private Properties extractInfoExternal;
 
     public static final Integer PDF_ID = 10;
     public static final Integer TAB_ID = 8;
@@ -61,6 +75,8 @@ public class CoreResources implements ResourceLoaderAware {
     public static final Integer CDISC_ODM_1_3_ID = 3;
     public static final Integer CDISC_ODM_1_3_EXTENSION_ID = 2;
     public static final Integer SPSS_ID = 9;
+    private static final String DATA_INFO_FILE_NAME="datainfo.properties";
+    private static final String EXTRACT_INFO_FILE_NAME="extract.properties";
 
     private static String webapp;
     protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.dao.core.CoreResources");
@@ -139,88 +155,6 @@ public class CoreResources implements ResourceLoaderAware {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-        try {
-            // setPROPERTIES_DIR(resourceLoader);
-            // @pgawade 18-April-2011 Fix for issue 8394
-            webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-            /*
-             * getPropertiesSource();
-             *
-             * String filePath = "$catalina.home/$WEBAPP.lower.config";
-             *
-             * filePath = replaceWebapp(filePath);
-             * filePath = replaceCatHome(filePath);
-             *
-             * String dataInfoPropFileName = filePath + "/datainfo.properties";
-             * String extractPropFileName = filePath + "/extract.properties";
-             *
-             * Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
-             * Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
-             *
-             * if (OC_dataDataInfoProperties != null)
-             * dataInfo = OC_dataDataInfoProperties;
-             * if (OC_dataExtractProperties != null)
-             * extractInfo = OC_dataExtractProperties;
-             *
-             */
-            dataInfoExternal=getExternalProperties("datainfo.properties");
-            overwriteExternalPropOnInternalProp(dataInfo,dataInfoExternal);
-            String dbName = dataInfo.getProperty("dbType");
-
-            DATAINFO = dataInfo;
-            dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
-            // instance
-            tenantSchema.set(DATAINFO.getProperty("schema"));
-            extractInfoExternal=getExternalProperties("extract.properties");
-            overwriteExternalPropOnInternalProp(extractInfo,extractInfoExternal);
-            EXTRACTINFO = extractInfo;
-            DB_NAME = dbName;
-            SQLFactory factory = SQLFactory.getInstance();
-            factory.run(dbName, resourceLoader);
-            setODM_MAPPING_DIR();
-            if (extractInfo != null) {
-                copyBaseToDest(resourceLoader);
-                // @pgawade 18-April-2011 Fix for issue 8394
-                copyODMMappingXMLtoResources(resourceLoader);
-                extractProperties = findExtractProperties();
-                // JN: this is in for junits to run without extract props
-                copyImportRulesFiles();
-                // copyConfig();
-            }
-
-            // tbh, following line to be removed
-            // reportUrl();
-
-        } catch (OpenClinicaSystemException e) {
-            logger.debug(e.getMessage());
-            logger.debug(e.toString());
-            throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-
-    private Properties getExternalProperties(String propertyFileName){
-        Properties prop = new Properties();
-        InputStream input = null;
-
-        try {
-            logger.error("File location: "+System.getProperty("user.home")+"/runtime-config/"+propertyFileName);
-            input = new FileInputStream(System.getProperty("user.home")+"/runtime-config/"+propertyFileName);
-            prop.load(input);
-        }
-        catch(IOException ioe){
-            prop=null;
-        }
-        return prop;
-    }
-
 
     public void overwriteExternalPropOnInternalProp(Properties internalProp, Properties externalProp){
         if(externalProp!=null && !externalProp.isEmpty()){
@@ -1239,7 +1173,6 @@ public class CoreResources implements ResourceLoaderAware {
         }
         return returnBean;
     }
-
     public Properties getDataInfo() {
         return DATAINFO;
     }
@@ -1247,12 +1180,6 @@ public class CoreResources implements ResourceLoaderAware {
         this.dataInfo = dataInfo;
     }
 
-    public void setDataInfoExternal(Properties dataInfoExternal) {
-        this.dataInfoExternal = dataInfoExternal;
-    }
-    public void setExtractInfoExternal(Properties extractInfoExternal) {
-        this.extractInfoExternal= extractInfoExternal;
-    }
     public Properties getExtractInfo() {
         return extractInfo;
     }
@@ -1273,6 +1200,88 @@ public class CoreResources implements ResourceLoaderAware {
 
     public Properties getDATAINFO() {
         return DATAINFO;
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.env=environment;
+        dataInfo=setPropertiesFromEnv(DATA_INFO_FILE_NAME);
+        extractInfo=setPropertiesFromEnv(EXTRACT_INFO_FILE_NAME);
+        this.resourceLoader =  new DefaultResourceLoader();;
+        try {
+            // setPROPERTIES_DIR(resourceLoader);
+            // @pgawade 18-April-2011 Fix for issue 8394
+            webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
+            /*
+             * getPropertiesSource();
+             *
+             * String filePath = "$catalina.home/$WEBAPP.lower.config";
+             *
+             * filePath = replaceWebapp(filePath);
+             * filePath = replaceCatHome(filePath);
+             *
+             * String dataInfoPropFileName = filePath + "/datainfo.properties";
+             * String extractPropFileName = filePath + "/extract.properties";
+             *
+             * Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
+             * Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
+             *
+             * if (OC_dataDataInfoProperties != null)
+             * dataInfo = OC_dataDataInfoProperties;
+             * if (OC_dataExtractProperties != null)
+             * extractInfo = OC_dataExtractProperties;
+             *
+             */
+
+            String dbName = dataInfo.getProperty("dbType");
+
+            DATAINFO = dataInfo;
+            dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
+            // instance
+            tenantSchema.set(DATAINFO.getProperty("schema"));
+            EXTRACTINFO = extractInfo;
+            DB_NAME = dbName;
+            SQLFactory factory = SQLFactory.getInstance();
+            factory.run(dbName, resourceLoader);
+            setODM_MAPPING_DIR();
+            if (extractInfo != null) {
+                copyBaseToDest(resourceLoader);
+                // @pgawade 18-April-2011 Fix for issue 8394
+                copyODMMappingXMLtoResources(resourceLoader);
+                extractProperties = findExtractProperties();
+                // JN: this is in for junits to run without extract props
+                copyImportRulesFiles();
+                // copyConfig();
+            }
+
+            // tbh, following line to be removed
+            // reportUrl();
+
+        } catch (OpenClinicaSystemException e) {
+            logger.debug(e.getMessage());
+            logger.debug(e.toString());
+            throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private Properties setPropertiesFromEnv(String propertyFileName) {
+
+        Properties properties=new Properties();
+
+        MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
+        StreamSupport.stream(propSrcs.spliterator(), false)
+                .filter(ps -> ps instanceof EnumerablePropertySource)
+                .filter(ps->ps instanceof ResourcePropertySource)
+                .filter(ps->ps.getName().contains(propertyFileName))
+                .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
+                .flatMap(Arrays::<String>stream)
+                .forEach(propName -> {
+                    ((AbstractEnvironment) env).setIgnoreUnresolvableNestedPlaceholders(true);
+                    properties.setProperty(propName, env.getProperty(propName));});
+        return properties;
     }
 
     // // TODO comment out system out after dev
