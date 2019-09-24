@@ -49,8 +49,7 @@ public class OdmImportController {
             throws Exception {
 
         ODM odm = publishDTO.getOdm();
-        List <Page> pages = new ArrayList<>();
-        pages.add(publishDTO.getPage());
+        List <Page> pages = publishDTO.getPages();
         Instant start = Instant.now();
         String accessToken = (String) request.getSession().getAttribute("accessToken");
 
@@ -81,8 +80,7 @@ public class OdmImportController {
         CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
 
             ODM odm = publishDTO.getOdm();
-            List <Page> pages = new ArrayList<>();
-            pages.add(publishDTO.getPage());
+            List <Page> pages = publishDTO.getPages();
             Map<String, Object> map = null;
             try {
                 CoreResources.tenantSchema.set("public");
