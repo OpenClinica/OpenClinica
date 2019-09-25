@@ -49,12 +49,12 @@ public class OdmImportController {
             throws Exception {
 
         ODM odm = publishDTO.getOdm();
-        Page page = publishDTO.getPage();
+        List <Page> pages = publishDTO.getPages();
         Instant start = Instant.now();
         String accessToken = (String) request.getSession().getAttribute("accessToken");
 
         try {
-            Map<String, Object> map = (Map<String, Object>) odmImportService.importOdm(odm, page, boardId, accessToken);
+            Map<String, Object> map = (Map<String, Object>) odmImportService.importOdm(odm, pages, boardId, accessToken);
             Study study = (Study) map.get("study");
             Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
             odmImportService.updatePublicStudyPublishedFlag(publicStudy);
@@ -80,11 +80,11 @@ public class OdmImportController {
         CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
 
             ODM odm = publishDTO.getOdm();
-            Page page = publishDTO.getPage();
+            List <Page> pages = publishDTO.getPages();
             Map<String, Object> map = null;
             try {
                 CoreResources.tenantSchema.set("public");
-                map = (Map<String, Object>) odmImportService.importOdm(odm, page, publishDTO.getBoardId(), accessToken);
+                map = (Map<String, Object>) odmImportService.importOdm(odm, pages, publishDTO.getBoardId(), accessToken);
             } catch (Exception e) {
                 throw new CompletionException(e);
             }

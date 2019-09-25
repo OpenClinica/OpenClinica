@@ -117,15 +117,15 @@ public class OdmImportServiceImpl implements OdmImportService {
 		}
 	}
 
-	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, String accessToken) throws Exception {
+	public Map<String, Object> importOdm(ODM odm, List <Page> pages, String boardId, String accessToken) throws Exception {
 		// since this is a new thread, add it to the ResourceBundle
         ResourceBundleProvider.updateLocale(Locale.US);
 		logger.info("Thread name in importOdm:" + Thread.currentThread());
-		Map<String, Object> map = importOdmToOC(odm, page, boardId, accessToken);
+		Map<String, Object> map = importOdmToOC(odm, pages, boardId, accessToken);
 		return map;
 	}
 
-	public Map<String, Object> importOdmToOC(ODM odm, Page page, String boardId, String accessToken) {
+	public Map<String, Object> importOdmToOC(ODM odm, List <Page> pages, String boardId, String accessToken) {
 		DataBinder dataBinder = new DataBinder(new Study());
 		errors = dataBinder.getBindingResult();
 		printOdm(odm);
@@ -133,7 +133,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 
 		UserAccount userAccount = getCurrentUser();
 
-		saveOrUpdatePageLayout(page, userAccount);
+		saveOrUpdatePageLayout(pages, userAccount);
 		// TODO add validation to all entities
 		ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
 		Study study = retrieveStudy(odm, userAccount, odmStudy);
@@ -771,20 +771,22 @@ public class OdmImportServiceImpl implements OdmImportService {
 		return factory;
 	}
 
-	public void saveOrUpdatePageLayout(Page page, UserAccount userAccount) {
-		PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(page.getName());
-		if (pageLayout == null) {
-			pageLayout = new PageLayout();
-			pageLayout.setName(page.getName());
-			pageLayout.setDateCreated(new Date());
-			pageLayout.setUserAccount(userAccount);
-		} else {
-			pageLayout.setDateUpdated(new Date());
-			pageLayout.setUpdateId(userAccount.getUserId());
+	public void saveOrUpdatePageLayout(List<Page> pages, UserAccount userAccount) {
+		for(Page page:pages) {
+			PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(page.getName());
+			if (pageLayout == null) {
+				pageLayout = new PageLayout();
+				pageLayout.setName(page.getName());
+				pageLayout.setDateCreated(new Date());
+				pageLayout.setUserAccount(userAccount);
+			} else {
+				pageLayout.setDateUpdated(new Date());
+				pageLayout.setUpdateId(userAccount.getUserId());
+			}
+			pageLayout.setDefinition(SerializationUtils.serialize((Serializable) page));
+			pageLayout = (PageLayout) pageLayoutDao.saveOrUpdate(pageLayout);
+			logger.info("Page with pageName {} object is being persisted", page.getName());
 		}
-		pageLayout.setDefinition(SerializationUtils.serialize((Serializable) page));
-		pageLayout = (PageLayout) pageLayoutDao.saveOrUpdate(pageLayout);
-		logger.info("Page with pageName {} object is being persisted", page.getName());
 	}
 
 	public void removeSiteDefinitions(Integer edcId, Integer updateId) {
