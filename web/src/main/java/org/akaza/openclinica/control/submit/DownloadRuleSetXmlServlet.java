@@ -143,7 +143,7 @@ public class DownloadRuleSetXmlServlet extends SecureController {
             op.flush();
             op.close();
         } catch (Exception ee) {
-            ee.printStackTrace();
+            logger.error("Unable to process the Input processRequest: ",ee);
         } finally {
             if (in != null) {
                 in.close();

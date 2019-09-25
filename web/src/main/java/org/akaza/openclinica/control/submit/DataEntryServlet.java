@@ -256,7 +256,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     SessionManager     sm = new SessionManager(SpringServletAccess.getApplicationContext(context));
         dataSource = sm.getDataSource();
         }catch(Exception ne){
-            ne.printStackTrace();
+            LOGGER.error("Servlet context is not working properly: ",ne);
         }
     }
 
@@ -294,7 +294,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     private void logMe(String message)
     {
-      // System.out.println(message);
         LOGGER.trace(message);
     }
 
@@ -2190,11 +2189,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     }
                     // }
                 } catch (InconsistentStateException ie) {
-                    ie.printStackTrace();
+                    LOGGER.error("permission is not sufficient: ",ie);
                     addPageMessage(ie.getOpenClinicaMessage(), request);
                     throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, ie.getOpenClinicaMessage(), "1");
                 } catch (NullPointerException ne) {
-                    ne.printStackTrace();
+                    LOGGER.error("crf not created correctly: ",ne);
                     addPageMessage(ne.getMessage(), request);
                     throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, ne.getMessage(), "1");
                 }
@@ -5156,7 +5155,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
                 try {
                     customValidation = Validator.processCRFValidationFunction(customValidationString);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("CRF validation is failed: ",e);
                 }
             } else if (customValidationString.startsWith("regexp:")) {
                 try {
@@ -5294,8 +5293,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
                 ruleSets = getRuleSetService(request).solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
                 // next line here ?
             } catch (NullPointerException npe) {
-                LOGGER.debug("found NPE " + npe.getMessage());
-                npe.printStackTrace();
+                LOGGER.debug("found NPE " , npe);
             }
             // above throws NPE?
             // return getRuleSetService().runRules(ruleSets, dryRun,

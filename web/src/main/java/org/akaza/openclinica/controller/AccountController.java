@@ -188,7 +188,7 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount1(@PathVariable("studyOid") String studyOid, @PathVariable("crcUserName") String crcUserName) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-		System.out.println("I'm in getAccount1");
+		logger.debug("I'm in getAccount1");
 
 		StudyBean parentStudy = getParentStudy(studyOid);
 		Integer pStudyId = parentStudy.getId();
@@ -216,7 +216,7 @@ public class AccountController {
 
 	public Boolean isCRCHasAccessToStudySubject(String studyOid, String crcUserName, String studySubjectId) {
 		uDTO = null;
-		System.out.println("I'm in getAccount4");
+		logger.debug("I'm in getAccount4");
 		StudyBean parentStudy = getParentStudy(studyOid);
 		Integer pStudyId = parentStudy.getId();
 		String oid = parentStudy.getOid();
@@ -259,7 +259,7 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount2(@PathVariable("studyOid") String studyOid, @PathVariable("accessCode") String accessCode) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-		System.out.println("I'm in getAccount2");
+		logger.debug("I'm in getAccount2");
 
 		accessCode = URLDecoder.decode(accessCode, "UTF-8");
 
@@ -334,7 +334,7 @@ public class AccountController {
 	public ResponseEntity<UserDTO> getAccount3(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectId") String studySubjectId) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		uDTO = null;
-		System.out.println("I'm in getAccount3");
+		logger.debug("I'm in getAccount3");
 
 		StudyBean parentStudy = getParentStudy(studyOid);
 		String oid = parentStudy.getOid();
@@ -450,7 +450,7 @@ public class AccountController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> createOrUpdateAccount(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
-		System.out.println("I'm in createOrUpdateAccount");
+		logger.debug("I'm in createOrUpdateAccount");
 
 		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
 		String oid = parentStudy.getOid();
@@ -464,7 +464,8 @@ public class AccountController {
 		String email = map.get("email");
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		System.out.println("******************     You are in the Rest Service   *****************");
+		logger.debug("************** You are in the Rest Service ***************");
+
 
 		UserAccountBean uBean = null;
 
@@ -510,7 +511,6 @@ public class AccountController {
 			updateUserAccount(uBean);
 			disableUserAccount(uBean);
 			logger.info("***New User Account is created***");
-			System.out.println("***New User Account is created***");
 			uDTO = buildUserDTO(uBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 
@@ -519,7 +519,6 @@ public class AccountController {
 			uBean.setUpdater(uBean.getOwner());
 			updateUserAccount(uBean);
 			logger.info("***User Account already exist in the system and data is been Updated ***");
-			System.out.println("***User Account already exist in the system and data is been Updated ***");
 			uDTO = buildUserDTO(uBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 		}
@@ -550,7 +549,7 @@ public class AccountController {
 	@RequestMapping(value = "/timezone", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> updateTimezone(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
-		System.out.println("I'm in update Timezone method");
+		logger.debug("I'm in update Timezone method");
 
 		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
 		String oid = parentStudy.getOid();
@@ -559,7 +558,7 @@ public class AccountController {
 		String timeZone = map.get("timeZone");
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		System.out.println("******************     You are in the Rest Service   *****************");
+		logger.debug("************** You are in the Rest Service ***************");
 
 		StudySubjectBean studySubjectBean = getStudySubjectByOidAndStudy(studySubjectId, parentStudy.getId());
 		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
@@ -712,7 +711,6 @@ public class AccountController {
 		StudyBean studyBean = getStudy(studyOid);
 		if (studyBean == null) {
 			logger.info("***Study  Does Not Exist ***");
-			System.out.println("***Study  Does Not Exist ***");
 			return true;
 		}
 		return false;
@@ -722,7 +720,6 @@ public class AccountController {
 		StudyBean studyBean = getStudy(studyOid);
 		if (studyBean.getParentStudyId() != 0) {
 			logger.info("***Study provided in the URL is a Site study***");
-			System.out.println("***Study provided in the URL is a Site study***");
 			return true;
 		}
 		return false;
@@ -731,7 +728,6 @@ public class AccountController {
 	private Boolean isStudySubjectDoesNotExist(StudySubjectBean studySubjectBean) {
 		if (studySubjectBean == null || !studySubjectBean.isActive()) {
 			logger.info("***Study Subject Does Not Exist OR the Study Subject is not associated with the Study_Oid in the URL   ***");
-			System.out.println("***Study Subject Does Not Exist OR the Study Subject is not associated with the Study_Oid in the URL    ***");
 			return true;
 		}
 		return false;
@@ -740,7 +736,6 @@ public class AccountController {
 	private Boolean isFistNameInValid(String fName) {
 		if (fName.length() < 1) {
 			logger.info("***     First Name length is less than 1 characters    ***");
-			System.out.println("***     First Name length is less than 1 characters    ***");
 			return true;
 		}
 		return false;
@@ -749,7 +744,6 @@ public class AccountController {
 	private Boolean isPhoneFieldIsNull(String mobile) {
 		if (mobile.length() == 0) {
 			logger.info("***     Phone # is a Required Field   ***");
-			System.out.println("***     Phone # is a Required Field   ***");
 			return true;
 		}
 		return false;
@@ -758,7 +752,6 @@ public class AccountController {
 	private Boolean isAccessCodeIsNull(String accessCode) {
 		if (accessCode.length() == 0) {
 			logger.info("***Access Code is a Required field and can't be null ***");
-			System.out.println("***Access Code is a Required field and can't be null ***");
 			return true;
 		}
 		return false;
@@ -768,7 +761,6 @@ public class AccountController {
 		UserAccountBean accessCodeAccountBean = getAccessCodeAccount(accessCode);
 		if (accessCodeAccountBean.isActive()) {
 			logger.info("***Access Code already Exist in the User Table ***");
-			System.out.println("***Access Code already Exist in the User Table ***");
 			return true;
 		}
 		return false;
@@ -778,7 +770,6 @@ public class AccountController {
 		UserAccountBean ownerUserAccount = getUserAccount(crcUserName);
 		if (!ownerUserAccount.isActive()) {
 			logger.info("***  CRC user acount does not Exist in the User Table ***");
-			System.out.println("***  CRC user acount does not Exist in the User Table ***");
 			return true;
 		}
 		return false;
@@ -787,7 +778,6 @@ public class AccountController {
 	private Boolean isEmailIsNull(String email) {
 		if (email.length() == 0) {
 			logger.info("***Email Address is a Required field and can't be null ***");
-			System.out.println("***Email Address is a Required field and can't be null ***");
 			return true;
 		}
 		return false;
@@ -801,7 +791,7 @@ public class AccountController {
 		Integer pStudyId = study.getId();
 
 		String pUserName = study.getOid() + "." + studySubjectOid;
-		System.out.println("participate Username: " + pUserName);
+		logger.info("participate Username: {}",pUserName);
 		map.put("pUserName", pUserName);
 		map.put("pStudyId", pStudyId.toString());
 		map.put("studySubjectOid", studySubjectOid);
@@ -814,22 +804,21 @@ public class AccountController {
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
 			StudyBean study = getParentStudy(studyUserRoleBean.getStudyId());
-			System.out.println("-------------");
-			System.out.println("Study Id to compare: " + studyUserRoleBean.getStudyId());
-			System.out.println("parent study Id to compare: " + study.getId());
-			System.out.println("Parent Study Id    " + pStudyId);
-			System.out.println("Role: " + studyUserRoleBean.getRoleName());
-			System.out.println("Status :" + studyUserRoleBean.getStatus().getId());
+			logger.info("---------------");
+			logger.info("Study Id to compare:{} ", studyUserRoleBean.getStudyId());
+			logger.info("parent study Id to compare: {}",study.getId());
+			logger.info("Parent Study Id   {}" ,pStudyId);
+			logger.info("Role: {}" , studyUserRoleBean.getRoleName());
+			logger.info("Status : {}" , studyUserRoleBean.getStatus().getId());
 
 			if ((study.getId() == pStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2")) && studyUserRoleBean.getStatus().isAvailable()) {
 				found = true;
-				System.out.println("if found :" + found);
+				logger.info("if found : {}",found);
 				break;
 			}
 		}
 		if (!found) {
 			logger.info("*** CRC Does not have access to the study/site OR CRC Does not have 'Data Entry Person' role ***");
-			System.out.println("*** CRC Does not have access to the study/site  OR CRC Does not have 'Data Entry Person' role  ***");
 			return true;
 		}
 		return false;
@@ -839,28 +828,26 @@ public class AccountController {
 		boolean found = false;
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
-			System.out.println("-------------");
-			System.out.println("StudySubject Study Id to compare to   " + subjectStudyId);
+			logger.info("StudySubject Study Id to compare to   {}" , subjectStudyId);
 
 			if (studyUserRoleBean.getStudyId() == getParentStudy(subjectStudyId).getId()) {
 				subjectStudyId = getParentStudy(subjectStudyId).getId();
-				System.out.println("StudySubject Parent Study Id to compare to Overwritten    " + subjectStudyId);
+				logger.info("StudySubject Parent Study Id to compare to Overwritten    " + subjectStudyId);
 			}
+			logger.info("CRC Study Id to compare to : {}" , studyUserRoleBean.getStudyId());
+			logger.info("Role: {}",studyUserRoleBean.getStudyId());
+			logger.info("Status: {}",studyUserRoleBean.getStatus().getId());
 
-			System.out.println("CRC Study Id to compare to : " + studyUserRoleBean.getStudyId());
-			System.out.println("Role: " + studyUserRoleBean.getRoleName());
-			System.out.println("Status :" + studyUserRoleBean.getStatus().getId());
 
 			if ((studyUserRoleBean.getStudyId() == subjectStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))
 					&& studyUserRoleBean.getStatus().isAvailable()) {
 				found = true;
-				System.out.println("if found :" + found);
+				logger.info("if found : {}",found);
 				break;
 			}
 		}
 		if (!found) {
 			logger.info("*** CRC Role does not match with StudySubject assignment ***");
-			System.out.println("*** CRC Role does not match with StudySubject assignment ***");
 			return true;
 		}
 		return false;
@@ -880,11 +867,10 @@ public class AccountController {
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
 		Integer studyIdFromStudySubjectId = studySubjectBean.getStudyId();
 
-		System.out.println("    ------------------     ");
-		System.out.println("studyIdFromStudyOid :  " + studyIdFromStudyOid);
-
-		System.out.println("studySubjectId:  " + studySubjectId);
-		System.out.println("studyIdFromStudySubjectId:  " + studyIdFromStudySubjectId);
+		logger.info(" ----------- ");
+		logger.info("studyIdFromStudyOid : {} " , studyIdFromStudyOid);
+		logger.info("studySubjectId:  {}" , studySubjectId);
+		logger.info("studyIdFromStudySubjectId:  {}" , studyIdFromStudySubjectId);
 
 		return doesStudySubjecAndCRCRolesMatch(crcUserName, studyIdFromStudySubjectId);
 
@@ -916,7 +902,6 @@ public class AccountController {
 		boolean accessPermission = false;
 		if (ssBean.isActive()) {
 			logger.info("  studySubjectStatus: " + ssBean.getStatus().getName());
-			System.out.println("  studySubjectStatus: " + ssBean.getStatus().getName());
 			if (mayProceed(studyOid) && ssBean.getStatus() == Status.AVAILABLE) {
 				accessPermission = true;
 			}
@@ -935,7 +920,6 @@ public class AccountController {
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
 		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
 		String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
-		System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
 		logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: " + siteStatus);
 		if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
 			accessPermission = true;
@@ -948,7 +932,7 @@ public class AccountController {
 	public ResponseEntity<ArrayList<UserDTO>> getAllParticipantPerStudy(@PathVariable("studyOid") String studyOid) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		ArrayList<UserDTO> uDTOs = null;
-		System.out.println("I'm in getAllParticipantPerStudy");
+		logger.debug("I'm in getAllParticipantPerStudy");
 
 		StudyBean parentStudy = getParentStudy(studyOid);
 		String oid = parentStudy.getOid();
@@ -990,7 +974,7 @@ public class AccountController {
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	public ResponseEntity<UserDTO> updateAccount(@RequestBody HashMap<String, String> map) throws Exception {
 		uDTO = null;
-		System.out.println("I'm in UpdateAccount");
+		logger.debug("I'm in UpdateAccount");
 
 		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
 		String oid = parentStudy.getOid();
@@ -1004,7 +988,7 @@ public class AccountController {
 		String email = map.get("email");
 
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		System.out.println("******************     You are in the Update Rest Service   *****************");
+		logger.debug("******************     You are in the Update Rest Service   *****************");
 
 		UserAccountBean uBean = null;
 
@@ -1026,7 +1010,6 @@ public class AccountController {
 			updateUserAccount(uBean);
 			disableUserAccount(uBean);
 			logger.info("***New User Account is created***");
-			System.out.println("***New User Account is created***");
 			uDTO = buildUserDTO(uBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 
@@ -1035,7 +1018,6 @@ public class AccountController {
 			uBean.setUpdater(uBean.getOwner());
 			updateUserAccount(uBean);
 			logger.info("***User Account already exist in the system and data is been Updated ***");
-			System.out.println("***User Account already exist in the system and data is been Updated ***");
 			uDTO = buildUserDTO(uBean);
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.OK);
 		}

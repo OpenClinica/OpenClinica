@@ -3338,8 +3338,6 @@ public class OdmExtractDAO extends DatasetDAO {
             }
         } catch (NullPointerException e) {
             // TODO Auto-generated catch block
-            // e.printStackTrace();
-            // System.out.println("caught NPE here");
             logger.debug("caught NPE here");
         }
 

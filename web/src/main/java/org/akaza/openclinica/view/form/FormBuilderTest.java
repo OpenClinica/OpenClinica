@@ -4,6 +4,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -15,6 +17,7 @@ import java.util.Map;
  */
 public class FormBuilderTest {
 
+    private static final Logger logger= LoggerFactory.getLogger(FormBuilderTest.class);
     public void setFormContents(Map contentsMap) {
 
     }
@@ -48,7 +51,8 @@ public class FormBuilderTest {
         try {
             outp.output(doc, writer);
         } catch (IOException e) {
-            e.printStackTrace(); // To change body of catch statement use
+            logger.error("Error while writing the XML: ",e);
+             // To change body of catch statement use
             // File | Settings | File Templates.
         }
         return writer.toString();

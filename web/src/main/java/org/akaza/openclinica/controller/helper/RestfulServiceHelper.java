@@ -641,7 +641,7 @@ public class RestfulServiceHelper {
 		        
 		       
 		    } catch (Exception e) {
-		        e.printStackTrace();
+		        log.error("Error while accessing the process the data: ",e);
 		    }
 		    
 			return fileList;
@@ -727,7 +727,7 @@ public class RestfulServiceHelper {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
 			String timeStamp = simpleDateFormat.format(now);
 			logFileName =originalFileName+"_"+ timeStamp+"_log.txt";
-			
+						
 			return logFileName;
 		}
 }

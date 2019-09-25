@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-
 import javax.servlet.AsyncContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -240,7 +239,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 					sendOneDataRowPerRequestByHttpClient(files, requestMock,hmIn );
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Error sending data row for request: ",e);
 				} ;
 	              }
 	          }).start();
@@ -251,8 +250,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 
               
             } catch (Exception e) {
-                logger.error("*** Found exception during file upload***");
-                //e.printStackTrace();
+                logger.error("*** Found exception during file upload***",e);
 
                 String message = "Please selected correct files to resubmit.";  	          
   	            this.addPageMessage(message);
@@ -265,14 +263,14 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
         } else if ("download".equalsIgnoreCase(action)) {
         	String studyID= request.getParameter("studyId");
         	String parentNm= request.getParameter("parentNm");
-            String fileName= request.getParameter("fileId");
+            String fileName= request.getParameter("fileId");          
             File file = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
             dowloadFile(file, "text/xml");
             
         } else if ("delete".equalsIgnoreCase(action)) {
         	String studyID= request.getParameter("studyId");
         	String parentNm= request.getParameter("parentNm");
-            String fileName= request.getParameter("fileId");
+            String fileName= request.getParameter("fileId");           
             File tempFile = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
            
         	if(tempFile!=null && tempFile.exists()) {
@@ -864,7 +862,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	        
 	       
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        logger.error("Error processing the data row by row: ",e);
+
 	    }
 	    
 		return fileList;
@@ -1060,8 +1059,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 			 try {
 				sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Session Manager is not initializing properly: ",e);
 			}	
 		}
 		

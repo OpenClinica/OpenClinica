@@ -36,7 +36,7 @@ public class SchedulerResources {
         }
         if (StringUtils.isEmpty(schema))
             schema = CoreResources.getField("schema");
-        System.out.println("SchedulerResources**********Using schema:" + schema);
+        logger.debug("SchedulerResources**********Using schema: {}", schema);
         properties.setProperty("schema", schema);
     }
     public Properties getSchemaInfo() {

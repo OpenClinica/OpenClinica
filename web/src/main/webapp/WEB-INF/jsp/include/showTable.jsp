@@ -145,7 +145,7 @@
 					</c:if>
 					<c:forEach var="link" items="${table.links}">
 						<c:if test="${!isFirstLink}">
-							<td class="table_tools">&nbsp;&nbsp;|&nbsp;&nbsp;</td>
+							<td class="table_tools">&nbsp;&nbsp;&nbsp;&nbsp;</td>
 						</c:if>
 						
 						<c:choose>

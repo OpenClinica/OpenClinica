@@ -33,7 +33,9 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -106,7 +108,21 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         // https://jira.openclinica.com/browse/OC-9952
-        tableFacade.setMaxRows(50);
+        try {
+            String maxrows = WebUtils.findParameterValue(request, "maxRows");
+            Integer.parseInt(maxrows);
+            Cookie cookie = new Cookie("maxrows", maxrows);
+            cookie.setMaxAge(7 * 24 * 60 * 60);
+            response.addCookie(cookie);
+        }
+        catch (Exception e) {
+        }
+        try {
+            tableFacade.setMaxRows(Integer.parseInt(WebUtils.getCookie(request, "maxrows").getValue()));            
+        }
+        catch (Exception e) {
+            tableFacade.setMaxRows(50);            
+        }
         setDataAndLimitVariables(tableFacade);
         configureTableFacade(response, tableFacade);
         if (!tableFacade.getLimit().isExported()) {
@@ -987,8 +1003,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                             url.append(viewParticipateBuilder(studySubjectBean));
                         }
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        logger.error("Error appending StudySubject into URL: ",e);
                     }
                 }
                 value = url.toString();
@@ -1050,7 +1065,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         StudyBean study = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
         StudyBean pStudy = getParentStudy(study.getOid());
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());
-        System.out.println("URL:  " + url);
+        logger.info("URL: {}",url);
 
         HtmlBuilder actionLink = new HtmlBuilder();
         // actionLink.a().href("url?id=" + studySubject.getId());

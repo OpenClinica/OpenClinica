@@ -1,5 +1,7 @@
 package org.akaza.openclinica.web.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -8,6 +10,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
+    Logger logger= LoggerFactory.getLogger(getClass().getName());
     public XSSRequestWrapper(HttpServletRequest servletRequest) {
         super(servletRequest);
     }
@@ -24,7 +27,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
         }
 
         for (Map.Entry<String, String[]> entry : originalParameterMap.entrySet()) {
-            System.out.println(entry.getKey() + ":" + entry.getValue());
+            logger.debug("{} : {}",entry.getKey(),entry.getValue());
             strippedParameterMap.put(entry.getKey(),getParameterValues(entry.getKey()));
         }
 

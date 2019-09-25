@@ -379,41 +379,47 @@ public class UserServiceImpl implements UserService {
       
         if(ss == null) {
         	
-        	throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_NOT_AVAILABLE);
+        	throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
         }
             
         try {          
         	ocuserDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,
 					ss);
         	
-        	spDTO.setSubjectOid(ss.getOcOid());
-        	spDTO.setSubjectKey(ss.getLabel());
-        	spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
-        	
-        	spDTO.setCreatedBy(ss.getUserAccount().getUserName());        	        	
-        	spDTO.setLastModifiedBy(userAccountDao.findById(ss.getUpdateId()).getUserName());        	        	
-        	
-        	if(ss.getDateCreated()!=null) {
-        		spDTO.setCreatedAt(ss.getDateCreated().toLocaleString());
+        	if (!ss.getStatus().equals(Status.DELETED)
+    		        && !ss.getStatus().equals(Status.AUTO_DELETED)) {
+        		spDTO.setSubjectOid(ss.getOcOid());
+            	spDTO.setSubjectKey(ss.getLabel());
+            	if(ss.getStudySubjectDetail() != null) {
+            		spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
+            	}
+           	        	
+            	spDTO.setCreatedBy(ss.getUserAccount().getUserName());        	        	
+            	spDTO.setLastModifiedBy(userAccountDao.findById(ss.getUpdateId()).getUserName());        	        	
+            	
+            	if(ss.getDateCreated()!=null) {
+            		spDTO.setCreatedAt(ss.getDateCreated().toLocaleString());
+            	}
+            	if(ss.getDateUpdated() !=null) {
+            		spDTO.setLastModified(ss.getDateUpdated().toLocaleString());
+            	}
+            	        	        	
+            	if(incRelatedInfo) {
+            		if(ss.getUserStatus() !=null) {
+            			spDTO.setStatus(ss.getUserStatus().getValue());
+            		}
+            		spDTO.setAccessCode(ocuserDTO.getAccessCode());
+            	}		        			        	
+            	
+            	if(ocuserDTO != null) {
+            		spDTO.setFirstName(ocuserDTO.getFirstName());
+            		spDTO.setLastName(ocuserDTO.getLastName());
+            		spDTO.setEmail(ocuserDTO.getEmail());
+            		spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());
+            		
+            	}			
         	}
-        	if(ss.getDateUpdated() !=null) {
-        		spDTO.setLastModified(ss.getDateUpdated().toLocaleString());
-        	}
-        	        	        	
-        	if(incRelatedInfo) {
-        		if(ss.getUserStatus() !=null) {
-        			spDTO.setStatus(ss.getUserStatus().getValue());
-        		}
-        		spDTO.setAccessCode(ocuserDTO.getAccessCode());
-        	}		        			        	
-        	
-        	if(ocuserDTO != null) {
-        		spDTO.setFirstName(ocuserDTO.getFirstName());
-        		spDTO.setLastName(ocuserDTO.getLastName());
-        		spDTO.setEmail(ocuserDTO.getEmail());
-        		spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());
-        		
-        	}			        			   
+        	        			   
 	        
            
         } catch (Exception e) {
@@ -793,7 +799,7 @@ public class UserServiceImpl implements UserService {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error while accessing file for writing: ",e);
         } finally {
             writer.print(writeToTextFile(userDTOs));
             closeFile(writer);

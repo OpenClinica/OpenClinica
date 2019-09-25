@@ -91,7 +91,7 @@ public class MessageLogger {
 	 			bw.close();						
 	 	       
 	 	    } catch (Exception e) {
-	 	        e.printStackTrace();
+	 	    	logger.error("Error while writing to the log: ",e);
 	 	    }finally {
 	 			try {
 	 				if (bw != null)
@@ -99,7 +99,7 @@ public class MessageLogger {
 	 				if (fw != null)
 	 					fw.close();
 	 			} catch (IOException ex) {
-	 				ex.printStackTrace();
+	 				logger.error("Error while writing to the log: ",ex);
 	 			}
 	 		}
 	    }

@@ -105,8 +105,7 @@ public class IdtViewController {
             page = 1;
         if (per_page == 0)
             per_page = 30; // default to 30 records / page
-
-        System.out.println("I'm in getPaginatedIdtViewData");
+        logger.debug("I'm in getPaginatedIdtViewData");
 
         StudyBean parentStudy = getParentStudy(studyOid);
         Integer pStudyId = parentStudy.getId();
