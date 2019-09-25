@@ -54,8 +54,7 @@ import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdent
         @PropertySource("classpath:extract.properties"),
         @PropertySource(value = "file:${HOME}/runtime-config/extract.properties",ignoreResourceNotFound = true)
 })
-public class CoreResources implements EnvironmentAware {
-    @Autowired
+public class CoreResources implements EnvironmentAware{
     Environment env;
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
@@ -1209,35 +1208,11 @@ public class CoreResources implements EnvironmentAware {
         extractInfo=setPropertiesFromEnv(EXTRACT_INFO_FILE_NAME);
         this.resourceLoader =  new DefaultResourceLoader();;
         try {
-            // setPROPERTIES_DIR(resourceLoader);
-            // @pgawade 18-April-2011 Fix for issue 8394
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-            /*
-             * getPropertiesSource();
-             *
-             * String filePath = "$catalina.home/$WEBAPP.lower.config";
-             *
-             * filePath = replaceWebapp(filePath);
-             * filePath = replaceCatHome(filePath);
-             *
-             * String dataInfoPropFileName = filePath + "/datainfo.properties";
-             * String extractPropFileName = filePath + "/extract.properties";
-             *
-             * Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
-             * Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
-             *
-             * if (OC_dataDataInfoProperties != null)
-             * dataInfo = OC_dataDataInfoProperties;
-             * if (OC_dataExtractProperties != null)
-             * extractInfo = OC_dataExtractProperties;
-             *
-             */
-
             String dbName = dataInfo.getProperty("dbType");
 
             DATAINFO = dataInfo;
-            dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
-            // instance
+            dataInfo = setDataInfoProperties();
             tenantSchema.set(DATAINFO.getProperty("schema"));
             EXTRACTINFO = extractInfo;
             DB_NAME = dbName;
@@ -1246,17 +1221,12 @@ public class CoreResources implements EnvironmentAware {
             setODM_MAPPING_DIR();
             if (extractInfo != null) {
                 copyBaseToDest(resourceLoader);
-                // @pgawade 18-April-2011 Fix for issue 8394
                 copyODMMappingXMLtoResources(resourceLoader);
                 extractProperties = findExtractProperties();
                 // JN: this is in for junits to run without extract props
                 copyImportRulesFiles();
                 // copyConfig();
             }
-
-            // tbh, following line to be removed
-            // reportUrl();
-
         } catch (OpenClinicaSystemException e) {
             logger.debug(e.getMessage());
             logger.debug(e.toString());
@@ -1281,13 +1251,12 @@ public class CoreResources implements EnvironmentAware {
                 .forEach(propName -> {
                     ((AbstractEnvironment) env).setIgnoreUnresolvableNestedPlaceholders(true);
                     properties.setProperty(propName, env.getProperty(propName));});
+        StreamSupport.stream(propSrcs.spliterator(), false)
+                .filter(ps -> ps instanceof EnumerablePropertySource)
+                .filter(ps->ps instanceof ResourcePropertySource)
+                .filter(ps->ps.getName().contains(propertyFileName))
+                .map(ps-> ps.getName())
+                .forEach(fileUri->logger.error("File URI's fetched: "+fileUri));
         return properties;
     }
-
-    // // TODO comment out system out after dev
-    // private static void logMe(String message) {
-    // System.out.println(message);
-    // logger.info(message);
-    // }
-
 }
