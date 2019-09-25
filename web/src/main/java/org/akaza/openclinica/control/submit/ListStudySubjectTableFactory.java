@@ -184,7 +184,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         ++index;
                     }
                 }
-                break;
             }
         }
 
