@@ -123,7 +123,7 @@ public class DicomServiceClient {
      */
     private static String getDicomServiceUrl() {
         return UriComponentsBuilder.fromUriString(SBS_URL)
-                .replacePath("/dicom-service/api")
+                .path("/dicom-service/api")
                 .build()
                 .toUriString();
 

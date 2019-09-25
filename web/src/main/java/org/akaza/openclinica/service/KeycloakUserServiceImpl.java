@@ -21,9 +21,8 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
         try {
             String SBSUrl = CoreResources.getField("SBSUrl");
             int index = SBSUrl.indexOf("//");
-            String protocol = SBSUrl.substring(0, index) + "//";
-            String subDomain = SBSUrl.substring(SBSUrl.indexOf("//")  + 2,  SBSUrl.indexOf("."));
-            String SBSDomainURL = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
+            String subDomain = SBSUrl.substring(index  + 2,  SBSUrl.indexOf("."));
+            String SBSDomainURL = SBSUrl + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
             response = Unirest.get(SBSDomainURL)
                     .header("content-type", "application/json")
                     .asString();
