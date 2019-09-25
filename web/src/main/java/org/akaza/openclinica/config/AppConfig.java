@@ -44,7 +44,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private String securedRoute = "/**";
-
     @Autowired
     private KeycloakClientImpl keycloakClient;
     @Autowired
