@@ -307,7 +307,7 @@ public class StudyParticipantController {
         responseSuccess.setSiteOID(siteOid);
         if (siteOid != null) {
           StudyBean site = this.getStudyDAO().findByOid(siteOid);
-          responseSuccess.setSiteID(site.getId());
+          responseSuccess.setSiteID(site.getIdentifier());
           responseSuccess.setSiteName(site.getName());
         }       	
 		 	  response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
