@@ -1163,7 +1163,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     public static String getSBSFieldFormservice(){
         String value = getField("SBSUrl");
-        return value.replaceFirst("user-service(.)*","form-service/api");
+        return value.concat("/form-service/api");
     }
 
     // TODO internationalize

@@ -101,7 +101,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (userContextMap == null)
             return null;
         String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("SBSUrl") + userUuid + "/roles";
+        String uri = CoreResources.getField("SBSUrl")+"/user-service/api/users/" + userUuid + "/roles";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));

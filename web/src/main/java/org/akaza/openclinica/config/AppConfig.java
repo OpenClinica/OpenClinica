@@ -44,7 +44,7 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private String securedRoute = "/**";
-
+    private static final String sbsUrl=CoreResources.getField("SBSUrl");
 
     @Autowired
     private KeycloakClientImpl keycloakClient;
@@ -155,13 +155,11 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
         corsConfigurationSource.setAlwaysUseFullPath(true);
 
-        URL studyManagerUrl = new URL(getSbsurl());
-        String studyManagerHost = studyManagerUrl.getProtocol() + "://" + studyManagerUrl.getAuthority();
 
-        // Set up CORS configuration for REST API endpoints
+                // Set up CORS configuration for REST API endpoints
         CorsConfiguration restApiCorsConfiguration = new CorsConfiguration();
         // Allow requests originated from Study Manager
-        restApiCorsConfiguration.addAllowedOrigin(studyManagerHost);
+        restApiCorsConfiguration.addAllowedOrigin(sbsUrl);
         // This code should be removed once participate calls are proxied through gateway.
         restApiCorsConfiguration.addAllowedOrigin("*");
         restApiCorsConfiguration.setAllowCredentials(true);
@@ -174,9 +172,5 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Bean
     public KeycloakConfigResolver keycloakConfigResolver() {
         return new CustomKeycloakConfigResolver();
-    }
-
-    public String getSbsurl(){
-        return CoreResources.getField("SBSUrl");
     }
 }
