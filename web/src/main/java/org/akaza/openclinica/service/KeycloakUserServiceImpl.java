@@ -19,7 +19,7 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
     public boolean authenticateKeycloakUser(String username, String password) {
         HttpResponse<String> response = null;
         try {
-            String SBSUrl = CoreResources.getField("SBSUrl");
+            String SBSUrl = CoreResources.getField("SBSBaseUrl");
             int index = SBSUrl.indexOf("//");
             String subDomain = SBSUrl.substring(index  + 2,  SBSUrl.indexOf("."));
             String SBSDomainURL = SBSUrl + "/customer-service/api/allowed-connections?subdomain=" + subDomain;

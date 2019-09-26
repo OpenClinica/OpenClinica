@@ -26,7 +26,7 @@ import java.nio.file.Path;
  */
 @Service
 public class DicomServiceClient {
-    private static final String SBS_URL = CoreResources.getField("SBSUrl");
+    private static final String SBS_URL = CoreResources.getField("SBSBaseUrl");
     private static final String DICOM_SERVICE_URL = getDicomServiceUrl();
     private static final String DICOM_PATH = "/dicom";
     private static final String DICOM_FILE_PARAM = "dicomFile";

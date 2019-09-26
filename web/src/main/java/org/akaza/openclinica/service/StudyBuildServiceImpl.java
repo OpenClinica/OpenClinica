@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class StudyBuildServiceImpl implements StudyBuildService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private static final String sbsUrl = CoreResources.getField("SBSUrl");
+    private static final String sbsUrl = CoreResources.getField("SBSBaseUrl");
     PermissionService permissionService;
     @Autowired
     private StudyDao studyDao;
