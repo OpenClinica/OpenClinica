@@ -45,7 +45,7 @@ public class NotificationService  {
     public static final String PARTICIPATE = "participate";
     private static final String ACCESS_CODE_ATTRIBUTE = "accessCode";
     String DB_CONNECTION_KEY = "dbConnection";
-    private String sbsUrl = CoreResources.getField("SBSUrl");
+    private String sbsUrl = CoreResources.getField("SBSBaseUrl");
     @Autowired
     private StudyDao studyDao;
     @Autowired

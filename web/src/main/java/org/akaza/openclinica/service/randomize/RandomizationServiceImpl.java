@@ -37,7 +37,7 @@ import java.util.stream.IntStream;
 @Service("randomizationService")
 public class RandomizationServiceImpl implements RandomizationService {
     private final Logger log = LoggerFactory.getLogger(RandomizationServiceImpl.class);
-    private static String sbsUrl = CoreResources.getField("SBSUrl");
+    private static String sbsUrl = CoreResources.getField("SBSBaseUrl");
 
     @Autowired
     private StudySubjectDao studySubjectDao;

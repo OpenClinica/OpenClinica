@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SBSController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String SBSUrl = CoreResources.getField("SBSUrl");
+    private static final String SBSUrl = CoreResources.getField("SBSBaseUrl");
     @RequestMapping(value = "/customer-service/api/allowed-connections", method = RequestMethod.GET)
     protected ResponseEntity<String[]> redirectToSBS(final HttpServletRequest req, HttpServletResponse res,
             @RequestParam("subdomain") String subDomain) {

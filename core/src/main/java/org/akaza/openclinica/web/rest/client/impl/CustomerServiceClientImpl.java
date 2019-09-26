@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class CustomerServiceClientImpl {
-    private String sbsUrl = CoreResources.getField("SBSUrl");
+    private String sbsUrl = CoreResources.getField("SBSBaseUrl");
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 

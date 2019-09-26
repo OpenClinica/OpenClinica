@@ -407,10 +407,6 @@ public class CoreResources implements EnvironmentAware{
 
     }
 
-    public static String getStudyManager() {
-        return DATAINFO.getProperty("smURL");
-    }
-
     private void setMailProps() {
 
         DATAINFO.setProperty("mail.host", DATAINFO.getProperty("mailHost"));
@@ -432,6 +428,9 @@ public class CoreResources implements EnvironmentAware{
         DATAINFO.setProperty("designer.url", DATAINFO.getProperty("designerURL"));
     }
 
+    public static String getStudyManager() {
+        return DATAINFO.getProperty("SBSBaseUrl")+"/#/account-study";
+    }
     public static void setSchema(Connection conn) throws SQLException {
         Statement statement = conn.createStatement();
         String schema = null;
@@ -1126,7 +1125,7 @@ public class CoreResources implements EnvironmentAware{
     }
 
     public static String getSBSFieldFormservice(){
-        String value = getField("SBSUrl");
+        String value = getField("SBSBaseUrl");
         return value.concat("/form-service/api");
     }
 
