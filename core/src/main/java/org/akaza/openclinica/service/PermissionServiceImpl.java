@@ -48,6 +48,10 @@ public class PermissionServiceImpl implements PermissionService {
     private EventCrfDao eventCrfDao;
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    private StudyEventDefinitionDao studyEventDefinitionDao;
+    @Autowired
+    private CrfDao crfDao;
 
     private static final String CREATE_TOKEN_API_PATH = "/oauth/token";
 
@@ -76,7 +80,7 @@ public class PermissionServiceImpl implements PermissionService {
             tmpUuid = study.getStudyEnvSiteUuid();
 
         final String uuId = tmpUuid;
-        if (StringUtils.isEmpty(uuId)){
+        if (StringUtils.isEmpty(uuId)) {
             logger.error("***********Uuid should not be empty:");
         }
         Optional<StudyEnvironmentRoleDTO> dto =
@@ -117,11 +121,12 @@ public class PermissionServiceImpl implements PermissionService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        ResponseEntity<List<StudyEnvironmentRoleDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<StudyEnvironmentRoleDTO>>() {});
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<StudyEnvironmentRoleDTO>>() {
+        });
         logger.debug("Response: getUserRoles:" + response);
         if (logger.isDebugEnabled()) {
-            for (StudyEnvironmentRoleDTO userRole: response.getBody()) {
-                logger.debug("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid() );
+            for (StudyEnvironmentRoleDTO userRole : response.getBody()) {
+                logger.debug("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid());
             }
         }
         return response;
@@ -203,18 +208,20 @@ public class PermissionServiceImpl implements PermissionService {
         return true;
     }
 
-    public List<String> getPermissionTagsList(StudyBean study,HttpServletRequest request) {
+    public List<String> getPermissionTagsList(StudyBean study, HttpServletRequest request) {
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
         return getTagList(roles, study);
     }
 
-    public String getPermissionTagsString(StudyBean study,HttpServletRequest request) {
-        List<String> tagsList = getPermissionTagsList(study ,request);
-        return getTagsString(tagsList);    }
+    public String getPermissionTagsString(StudyBean study, HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(study, request);
+        return getTagsString(tagsList);
+    }
 
-    public String[] getPermissionTagsStringArray(StudyBean study,HttpServletRequest request) {
-        List<String> tagsList = getPermissionTagsList(study,request);
-        return getStringArray(tagsList);    }
+    public String[] getPermissionTagsStringArray(StudyBean study, HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(study, request);
+        return getStringArray(tagsList);
+    }
 
     public String getAccessToken() {
         logger.debug("Creating Auth0 Api Token");
@@ -232,4 +239,27 @@ public class PermissionServiceImpl implements PermissionService {
         return null;
     }
 
+
+
+
+
+
+    public boolean isUserHasPermission(String column,HttpServletRequest request,StudyBean studyBean) {
+        String sedOid = column.split("\\.")[0];
+        String formOid = column.split("\\.")[1];
+        StudyEventDefinition sed = studyEventDefinitionDao.findByOcOID(sedOid);
+        CrfBean crf = crfDao.findByOcOID(formOid);
+        EventDefinitionCrf eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getStudyEventDefinitionId(), crf.getCrfId(), studyBean.getParentStudyId()!=0 ?studyBean.getParentStudyId():studyBean.getId());
+        List<String> tagsInEDC = permissionTagDao.findTagsForEDC(eventDefCrf);
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(tagsInEDC)) {
+            List<String> list = tagsInEDC.stream().filter(getPermissionTags(request)::contains).collect(Collectors.toList());
+            if (org.apache.commons.collections.CollectionUtils.isEmpty(list))
+                return false;
+        }
+        return true;
+    }
+
+    private List<String> getPermissionTags(HttpServletRequest request) {
+        return (List<String>) request.getSession().getAttribute("userPermissionTags");
+    }
 }

@@ -743,7 +743,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
 
             sql = sql + partialSql;
             if (partialSql.equals(""))
-                sql = sql + "  ORDER BY SS.label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+                sql = sql + "  ORDER BY label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
             else
                 sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
@@ -1020,11 +1020,11 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         boolean filterIsEmpty = false;
        
         if (filter.getFilters().isEmpty()){
-            sql = digester.getQuery("getCountofStudySubjects");
+            sql = digester.getQuery("getStudySubjects");
             filterIsEmpty = true;
         }
         else {
-            sql = digester.getQuery("getCountWithFilter");
+             sql = digester.getQuery("getWithFilterAndSort");
         }
 
         if(participateStatusSetFilter ==null) {
@@ -1045,6 +1045,9 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         sql += filter.execute("");
 
         ArrayList rows = this.select(sql, variables);
+        if(rows!=null)
+            return rows.size();
+
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {

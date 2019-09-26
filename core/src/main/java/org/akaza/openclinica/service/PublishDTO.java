@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.cdisc.ns.odm.v130.ODM;
+import java.util.List;
 
 /**
  * @author joekeremian
@@ -19,7 +20,7 @@ import org.cdisc.ns.odm.v130.ODM;
 public class PublishDTO {
 
 	@XmlElement
-	private Page page;
+	private List<Page> pages;
 	@XmlElement
 	private ODM odm;
 
@@ -34,12 +35,12 @@ public class PublishDTO {
 	@XmlElement
 	private String boardId;
 
-	public Page getPage() {
-		return page;
+	public List<Page> getPages() {
+		return pages;
 	}
 
-	public void setPage(Page page) {
-		this.page = page;
+	public void setPages(List<Page> pages) {
+		this.pages = pages;
 	}
 
 	public ODM getOdm() {

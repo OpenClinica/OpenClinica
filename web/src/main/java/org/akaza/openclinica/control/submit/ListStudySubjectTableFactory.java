@@ -6,21 +6,18 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.*;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.service.UserStatus;
+import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
@@ -59,7 +57,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private HttpSession session;
     private StudyBean studyBean;
-    private String[] columnNames = new String[] {};
+    private String[] columnNames = new String[]{};
     private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
     private ArrayList<StudyGroupClassBean> studyGroupClasses;
     private StudyUserRoleBean currentRole;
@@ -75,6 +73,30 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private UserService userService;
     private HttpServletRequest request;
+    private ViewStudySubjectService viewStudySubjectService;
+    private PermissionService permissionService;
+    public static final String PAGE_NAME = "participant-matrix";
+    public static final String  PARTICIPANT_MATRIX_TABLE="participant-matrix-table";
+    public static final String DOT = ".";
+
+    private static final String CHECKBOX = "checkbox";
+    private static final String MULTI_SELECT = "multi-select";
+    private static final String RADIO = "radio";
+    private static final String SINGLE_SELECT = "single-select";
+
+
+    private ItemDataDao itemDataDao;
+    private ItemDao itemDao;
+    private ItemFormMetadataDao itemFormMetadataDao;
+    private ResponseSetDao responseSetDao;
+    private EventCrfDao eventCrfDao;
+    private StudyEventDao studyEventDao;
+    private CrfDao crfDao;
+    private CrfVersionDao crfVersionDao;
+    private EventDefinitionCrfDao eventDefinitionCrfDao;
+    private EventDefinitionCrfPermissionTagDao permissionTagDao;
+    List<String> permissionTagsList = null;
+    private final String  PARTICIPATE_STATUS="participate.status";
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
@@ -145,28 +167,41 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         int index = 0;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("study_subject_ID"), new SubjectIdCellEditor(), null);
         ++index;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
-        ++index;
+
         configureColumn(row.getColumn(columnNames[index]), resword.getString("site_id"), null, null);
+        ++index;
+        EventDefinitionCrf eventDefCrf = null;
+
+
+        String[] tableColumns = getViewStudySubjectService().getTableColumns();
+        if (tableColumns != null) {
+            for (String column : tableColumns) {
+                if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                    String itemOid = column.split("\\.")[2];
+                    Item item = itemDao.findByOcOID(itemOid);
+                    if (item != null) {
+                        configureColumn(row.getColumn(columnNames[index]), item != null ? item.getName() : null, new ItemIdCellEditor(), null);
+                        ++index;
+                    }
+                }
+            }
+        }
+
+
+
+
+        configureColumn(row.getColumn(columnNames[index]), resword.getString("status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
         ++index;
-       if(getParticipateModuleStatus().equals(ENABLED)){
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("participate_status"), null, new ParticipateStatusDroplistFilterEditor());
-        ++index;}
-        // group class columns
-        for (int i = index; i < index + studyGroupClasses.size(); i++) {
-            StudyGroupClassBean studyGroupClass = studyGroupClasses.get(i - index);
-            // configureColumn(row.getColumn(columnNames[i]),
-            // studyGroupClass.getName(), new
-            // StudyGroupClassCellEditor(studyGroupClass), null, false, false);
-            configureColumn(row.getColumn(columnNames[i]), studyGroupClass.getName(), new StudyGroupClassCellEditor(studyGroupClass),
-                    new SubjectGroupClassDroplistFilterEditor(studyGroupClass), true, false);
+        if (getParticipateModuleStatus().equals(ENABLED)) {
+            configureColumn(row.getColumn(columnNames[index]), resword.getString("participate_status"), null, new ParticipateStatusDroplistFilterEditor());
+            ++index;
         }
         // study event definition columns
         this.studyEventDefinitions = getStudyEventDefinitions();
-        for (int i = index + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
-            StudyEventDefinitionBean studyEventDefinition = this.studyEventDefinitions.get(i - (index + studyGroupClasses.size()));
+        for (int i = index; i < columnNames.length - 1; i++) {
+            StudyEventDefinitionBean studyEventDefinition = this.studyEventDefinitions.get(i - index);
             configureColumn(row.getColumn(columnNames[i]), studyEventDefinition.getName(), new StudyEventDefinitionMapCellEditor(),
                     new SubjectEventStatusDroplistFilterEditor(), true, false);
         }
@@ -184,17 +219,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         getColumnNamesMap();
         tableFacade.addFilterMatcher(new MatcherKey(Character.class), new CharFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(Status.class), new StatusFilterMatcher());
-        // tableFacade.addFilterMatcher(new MatcherKey(Integer.class), new
-        // SubjectEventStatusFilterMatcher());
-        int colNumber = 4;
-        if(getParticipateModuleStatus().equals(ENABLED))
-            colNumber=5;
 
-        for (int i = colNumber; i < colNumber + studyGroupClasses.size(); i++) {
-            tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectGroupFilterMatcher());
-        }
-        for (int i = colNumber + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
-            tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectEventStatusFilterMatcher());
+        for (int i = 0; i < columnNames.length; i++) {
+            if (columnNames[i].startsWith("sed_"))
+                tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectEventStatusFilterMatcher());
         }
 
     }
@@ -203,14 +231,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         Role r = currentRole.getRole();
         boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR) && !isEnrollmentCapped();
-        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink,getParticipateModuleStatus()));
+        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink, getParticipateModuleStatus(), viewStudySubjectService, permissionService, studyBean, request));
     }
 
-    private boolean isEnrollmentCapEnforced(){
-        String enrollmentCapStatus=null;
-        if(studyBean.getParentStudyId()!=0){
+    private boolean isEnrollmentCapEnforced() {
+        String enrollmentCapStatus = null;
+        if (studyBean.getParentStudyId() != 0) {
             enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getParentStudyId(), "enforceEnrollmentCap").getValue();
-        }else {
+        } else {
             enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getId(), "enforceEnrollmentCap").getValue();
         }
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
@@ -218,18 +246,18 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
 
-    protected boolean isEnrollmentCapped(){
+    protected boolean isEnrollmentCapped() {
 
         boolean capIsOn = isEnrollmentCapEnforced();
         int numberOfSubjects = getStudySubjectDAO().getCountofActiveStudySubjects();
 
         StudyBean sb = null;
-        if(studyBean.getParentStudyId()!=0){
+        if (studyBean.getParentStudyId() != 0) {
             sb = (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId());
-        }else{
+        } else {
             sb = (StudyBean) studyDAO.findByPK(studyBean.getId());
         }
-        int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
+        int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
         if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
             return true;
@@ -251,7 +279,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         }
 
         if (!limit.isComplete()) {
-            int totalRows = getStudySubjectDAO().getCountWithFilter(subjectFilter, getStudyBean() ,participateStatusSetFilter);
+            int totalRows = getStudySubjectDAO().getCountWithFilter(subjectFilter, getStudyBean(), participateStatusSetFilter);
             tableFacade.setTotalRows(totalRows);
         }
 
@@ -259,7 +287,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
-        Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd,participateStatusSetFilter);
+        Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd, participateStatusSetFilter);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
@@ -270,14 +298,78 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("studySubject", studySubjectBean);
             HtmlBuilder subjectLink = new HtmlBuilder();
 
-            subjectLink.append("<a name=\"" + studySubjectBean.getLabel() + "\" class=\"pidVerification\" id=\"pid-" + studySubjectBean.getId() + "\" href=\"ViewStudySubject?id="+ studySubjectBean.getId());
+            subjectLink.append("<a name=\"" + studySubjectBean.getLabel() + "\" class=\"pidVerification\" id=\"pid-" + studySubjectBean.getId() + "\" href=\"ViewStudySubject?id=" + studySubjectBean.getId());
             subjectLink.append("\">" + studySubjectBean.getLabel() + "</a>");
             theItem.put("studySubject.label", subjectLink.toString());
             theItem.put("studySubject.status", studySubjectBean.getStatus());
             theItem.put("enrolledAt", study.getIdentifier());
+
+
+
+                        String [] tableColumns= getViewStudySubjectService().getTableColumns();
+                        if(tableColumns!=null){
+                            for (String column : tableColumns) {
+                            if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                                String sedOid = column.split("\\.")[0];
+                                String formOid = column.split("\\.")[1];
+                                String itemOid = column.split("\\.")[2];
+                                    //Get Item Value from database
+                                    StudyEventDefinition studyEventDefinition = null;
+                                    StudyEvent studyEvent = null;
+                                    ItemData itemData = null;
+                                    Item item = null;
+                                    List<EventCrf> eventCrfs = null;
+                                    String itemValue = null;
+
+                                    if (!StringUtils.isEmpty(sedOid))
+                                        studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(sedOid, 1, studySubjectBean.getId());
+                                    if (!StringUtils.isEmpty(itemOid))
+                                        item = itemDao.findByOcOID(itemOid);
+                                    CrfBean crf = crfDao.findByOcOID(formOid);
+                                    if (studyEvent != null) {
+                                        eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubjectBean.getId(), crf.getCrfId());
+                                        if (item != null && (eventCrfs != null && eventCrfs.size() != 0)) { // non-repeating group, group ordinal=1
+                                            itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrfs.get(0).getEventCrfId(), 1);
+                                        }
+                                        if (itemData != null && !StringUtils.isEmpty(itemData.getValue())) {
+                                            itemValue = itemData.getValue();
+                                            List<CrfVersion> crfVersions = crfVersionDao.findAllByCrfId(crf.getCrfId());
+                                            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersions.get(0).getCrfVersionId());
+                                            ResponseSet responseSet = itemFormMetadata.getResponseSet();
+                                            String responseType = responseSet.getResponseType().getName();
+
+                                            if (responseType.equals(CHECKBOX) || responseType.equals(MULTI_SELECT) || responseType.equals(RADIO) || responseType.equals(SINGLE_SELECT)) {
+                                                List<String> itemValues = Arrays.asList(itemData.getValue().split("\\s*,\\s*"));
+                                                String[] optionValues = responseSet.getOptionsValues().split("\\s*,\\s*");
+                                                String[] optionTexts = responseSet.getOptionsText().split("\\s*,\\s*");
+                                                String output = null;
+                                                for (int i = 0; i < optionValues.length; i++) {
+                                                    for (String value : itemValues) {
+                                                        if (optionValues[i].equals(value)) {
+                                                            if (output == null) {
+                                                                output = optionTexts[i];
+                                                            } else {
+                                                                output = output + "," + optionTexts[i];
+                                                            }
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                itemValue = output;
+                                            }
+                                        }
+                                    }
+                                    theItem.put(column, itemValue);
+                            }
+                        }
+                    }
+
+
+
+
             theItem.put("studySubject.oid", studySubjectBean.getOid());
-            if(getParticipateModuleStatus().equals(ENABLED))
-                theItem.put("participate.status", (studySubjectBean.getUserStatus()==null?"":studySubjectBean.getUserStatus().getValue()));
+            if (getParticipateModuleStatus().equals(ENABLED))
+                theItem.put("participate.status", (studySubjectBean.getUserStatus() == null ? "" : studySubjectBean.getUserStatus().getValue()));
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
@@ -387,8 +479,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("oid");
-        if(getParticipateModuleStatus().equals(ENABLED))
-             columnNamesList.add("participate.status");
+        if (getParticipateModuleStatus().equals(ENABLED))
+            columnNamesList.add("participate.status");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }
@@ -402,8 +494,21 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private void getColumnNamesMap() {
         ArrayList<String> columnNamesList = new ArrayList<String>();
         columnNamesList.add("studySubject.label");
-        columnNamesList.add("studySubject.status");
         columnNamesList.add("enrolledAt");
+
+
+            String [] tableColumns= getViewStudySubjectService().getTableColumns();
+                    if(tableColumns!=null){
+                    for (String column : tableColumns) {
+                        if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                            columnNamesList.add(column);
+                        }
+                    }
+                }
+
+
+
+        columnNamesList.add("studySubject.status");
         columnNamesList.add("studySubject.oid");
         if(getParticipateModuleStatus().equals(ENABLED))
             columnNamesList.add("participate.status");
@@ -429,6 +534,35 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             } else if (property.startsWith("sgc_")) {
                 int studyGroupClassId = property.endsWith("_") ? 0 : Integer.valueOf(property.split("_")[1]);
                 value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId() + "";
+            } else if (property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) {
+                String formOid = property.split("\\.")[1];
+                String itemOid = property.split("\\.")[2];
+
+                Item item = itemDao.findByOcOID(itemOid);
+                CrfBean crf = crfDao.findByOcOID(formOid);
+                List<CrfVersion> crfVersions = crfVersionDao.findAllByCrfId(crf.getCrfId());
+                ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersions.get(0).getCrfVersionId());
+                ResponseSet responseSet = itemFormMetadata.getResponseSet();
+                String responseType = responseSet.getResponseType().getName();
+                if (responseType.equals(CHECKBOX) || responseType.equals(MULTI_SELECT) || responseType.equals(RADIO) || responseType.equals(SINGLE_SELECT)) {
+                    List<String> itemTexts = Arrays.asList(filter.getValue().split("\\s*,\\s*"));
+                    String[] optionValues = responseSet.getOptionsValues().split("\\s*,\\s*");
+                    String[] optionTexts = responseSet.getOptionsText().split("\\s*,\\s*");
+                    String output = null;
+                    for (int i = 0; i < optionValues.length; i++) {
+                        for (String it : itemTexts) {
+                            if (optionTexts[i].equalsIgnoreCase(it.trim())) {
+                                if (output == null) {
+                                    output = optionValues[i];
+                                } else {
+                                    output = output + "," + optionValues[i];
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    value = output != null ? output : value;
+                }
             }
             auditUserLoginFilter.addFilter(property, value);
         }
@@ -440,18 +574,25 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
      * A very custom way to sort the items. The PresidentSort acts as a command for the Hibernate criteria object. There
      * are probably many ways to do this, but this is the most flexible way I have found. The point is you need to
      * somehow take the Limit information and sort the rows.
-     * 
-     * @param limit
-     *            The Limit to use.
+     *
+     * @param limit The Limit to use.
      */
     protected FindSubjectsSort getSubjectSort(Limit limit) {
         FindSubjectsSort auditUserLoginSort = new FindSubjectsSort();
         SortSet sortSet = limit.getSortSet();
         Collection<Sort> sorts = sortSet.getSorts();
+        List <Sort> disableSorts = new ArrayList<>();
         for (Sort sort : sorts) {
             String property = sort.getProperty();
-            String order = sort.getOrder().toParam();
-            auditUserLoginSort.addSort(property, order);
+            if (!(property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) && !property.equals(PARTICIPATE_STATUS)) {
+                String order = sort.getOrder().toParam();
+                auditUserLoginSort.addSort(property, order);
+            } else {
+                disableSorts.add(sort);
+            }
+        }
+        for (Sort disabledSort : disableSorts) {
+            sortSet.getSorts().remove(disabledSort);
         }
 
         return auditUserLoginSort;
@@ -476,7 +617,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return tempList;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     private ArrayList<StudyGroupClassBean> getStudyGroupClasses() {
         if (this.studyGroupClasses == null) {
             if (studyBean.getParentStudyId() > 0) {
@@ -665,6 +806,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         }
     }
 
+    private class ItemIdCellEditor implements CellEditor {
+        public Object getValue(Object item, String property, int rowcount) {
+            Object itemValue = ItemUtils.getItemValue(item, property);
+            return itemValue;
+        }
+    }
+
     private class StatusDroplistFilterEditor extends DroplistFilterEditor {
         @Override
         protected List<Option> getOptions() {
@@ -751,7 +899,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             this.studyEventDefinition = studyEventDefinition;
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         private void logic() {
             studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubjectBean, studyEventDefinition);
             if (studyEvents.size() < 1) {
@@ -793,7 +941,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             return studyEvents.size() < 2 ? "" : "&nbsp;&nbsp;&nbsp;x" + String.valueOf(studyEvents.size() + "");
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         public Object getValue(Object item, String property, int rowcount) {
 
             studyEvents = (List<StudyEventBean>) ((HashMap<Object, Object>) item).get(property + "_studyEvents");
@@ -814,7 +962,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private class ActionsCellEditor implements CellEditor {
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
             StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
@@ -833,7 +981,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     if (getStudyBean().getStatus() == Status.AVAILABLE
                             && (studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
                             && getCurrentRole().getRole() != Role.RESEARCHASSISTANT && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2) {
-                            url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
+                        url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
                     }
                     if (getStudyBean().getStatus() == Status.AVAILABLE && getCurrentRole().getRole() != Role.RESEARCHASSISTANT
                             && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2 && getCurrentRole().getRole() != Role.INVESTIGATOR
@@ -905,7 +1053,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.append("<a name=\"" + studySubject.getLabel() + "\" class=\"pidVerification\" id=\"pid-" + studySubject.getId() + "\" onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ViewStudySubject?id="
-                    + studySubject.getId());
+                + studySubject.getId());
         actionLink.append("\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
@@ -975,7 +1123,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private String eventDivBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed,
-            StudySubjectBean studySubject) {
+                                   StudySubjectBean studySubject) {
 
         String studySubjectLabel = studySubject.getLabel();
 
@@ -1017,7 +1165,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void repeatingEventDivBuilder(HtmlBuilder eventDiv, SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
+                                          StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
 
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
@@ -1141,7 +1289,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void linksDivBuilder(HtmlBuilder eventDiv, SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed,
-            StudySubjectBean studySubject, StudyEventBean currentEvent) {
+                                 StudySubjectBean studySubject, StudyEventBean currentEvent) {
 
         Status eventSysStatus = studySubject.getStatus();
         SubjectEventStatus eventStatus = currentEvent.getSubjectEventStatus();
@@ -1212,7 +1360,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void singleEventDivBuilder(HtmlBuilder eventDiv, SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
+                                       StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
 
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
@@ -1392,7 +1540,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void lockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed) {
+                                 StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
@@ -1411,7 +1559,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void repeatingLockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed) {
+                                          StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
         // String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount
@@ -1432,7 +1580,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void repeatingIconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed) {
+                                          StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
         // String href1 = "javascript:leftnavExpand('Menu_on_" +
@@ -1453,7 +1601,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void iconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed) {
+                                 StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1Repeating = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size()
                 + "); ";
@@ -1475,7 +1623,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private void divCloseRepeatinglinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed) {
+                                              StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
@@ -1531,7 +1679,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         if (subjectFilter.getFilters() != null && subjectFilter.getFilters().size() > 0) {
             for (FindSubjectsFilter.Filter filter : subjectFilter.getFilters()) {
                 if (filter.getProperty().equals("participate.status")) {
-                    String filteredValue=(String)filter.getValue();
+                    String filteredValue = (String) filter.getValue();
                     participateStatusSetFilter = UserStatus.valueOf(filteredValue.toUpperCase());
                     subjectFilter.removeFilter(filter);
                     break;
@@ -1548,4 +1696,62 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public void setRequest(HttpServletRequest request) {
         this.request = request;
     }
+
+    public ViewStudySubjectService getViewStudySubjectService() {
+        return viewStudySubjectService;
+    }
+
+    public void setViewStudySubjectService(ViewStudySubjectService viewStudySubjectService) {
+        this.viewStudySubjectService = viewStudySubjectService;
+    }
+
+    public void setItemDataDao(ItemDataDao itemDataDao) {
+        this.itemDataDao = itemDataDao;
+    }
+
+    public void setItemDao(ItemDao itemDao) {
+        this.itemDao = itemDao;
+    }
+
+    public void setItemFormMetadataDao(ItemFormMetadataDao itemFormMetadataDao) {
+        this.itemFormMetadataDao = itemFormMetadataDao;
+    }
+
+    public void setResponseSetDao(ResponseSetDao responseSetDao) {
+        this.responseSetDao = responseSetDao;
+    }
+
+    public void setEventCrfDao(EventCrfDao eventCrfDao) {
+        this.eventCrfDao = eventCrfDao;
+    }
+
+    public void setStudyEventDao(StudyEventDao studyEventDao) {
+        this.studyEventDao = studyEventDao;
+    }
+
+    public void setCrfDao(CrfDao crfDao) {
+        this.crfDao = crfDao;
+    }
+
+    public void setStudyEventDefinitionDAO(StudyEventDefinitionDAO studyEventDefinitionDAO) {
+        this.studyEventDefinitionDao = studyEventDefinitionDAO;
+    }
+
+    public void setCrfVersionDao(CrfVersionDao crfVersionDao) {
+        this.crfVersionDao = crfVersionDao;
+    }
+
+    public void setEventDefinitionCrfDao(EventDefinitionCrfDao eventDefinitionCrfDao) {
+        this.eventDefinitionCrfDao = eventDefinitionCrfDao;
+    }
+
+    public void setPermissionTagDao(EventDefinitionCrfPermissionTagDao permissionTagDao) {
+        this.permissionTagDao = permissionTagDao;
+    }
+
+    public void setPermissionService(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
+
 }
+
