@@ -448,7 +448,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         variables.put(new Integer(2), new Integer(siteOrStudyId));
         variables.put(new Integer(3), new Integer(siteOrStudyId));
 
-        String sql = digester.getQuery("findByLabelAndStudyForCreatingParticipant");
+        String sql = digester.getQuery("findByLabelAndStudyWithoutCaseSensitiveLabel");
 
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
@@ -458,6 +458,20 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         }
 
         return answer;
+    }
+
+    public List<StudySubjectBean> findAllSubjectsByLabelAndStudy(String label, StudyBean study) {
+        List<StudySubjectBean> answerList = new ArrayList<>();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), label);
+        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(new Integer(3), new Integer(study.getId()));
+
+        answerList=executeFindAllQuery("findByLabelAndStudyWithoutCaseSensitiveLabel",variables);
+
+        return answerList;
     }
     public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
         StudySubjectBean answer = new StudySubjectBean();
