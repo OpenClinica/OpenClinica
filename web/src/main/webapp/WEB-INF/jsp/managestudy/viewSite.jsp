@@ -479,7 +479,6 @@
 <br>
  <c:choose>
   <c:when test="${fromListSite=='yes'}">
-   <p><a href="#" onClick="history.go(-1)"><fmt:message key="go_back" bundle="${resword}"/></a></p>
   </c:when>
   <c:otherwise>
     <c:choose>
