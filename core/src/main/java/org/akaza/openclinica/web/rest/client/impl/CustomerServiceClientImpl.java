@@ -15,16 +15,13 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class CustomerServiceClientImpl {
-    private String sbsUrl = CoreResources.getField("SBSUrl");
+    private String sbsUrl = CoreResources.getField("SBSBaseUrl");
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 
     public CustomerDTO getCustomer(String accessToken,String customerUuid) {
-        int index = sbsUrl.indexOf("//");
-        String protocol = sbsUrl.substring(0, index) + "//";
-        String domainUrl=sbsUrl.substring(index + 2, sbsUrl.indexOf("/", index + 2));
         String subDomainUrl="/customer-service/api/customers/"+customerUuid;
-        String uri = protocol+domainUrl+subDomainUrl;
+        String uri =sbsUrl + subDomainUrl;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

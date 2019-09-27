@@ -542,7 +542,7 @@ public class UserServiceImpl implements UserService {
 
 
     public List<OCUserDTO> getAllParticipantAccountsFromUserService(String accessToken) {
-        String uri = sbsUrl.substring(0, sbsUrl.length() - 1) + PAGINATION;
+        String uri =sbsUrl + "/user-service/api/users" + PAGINATION;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

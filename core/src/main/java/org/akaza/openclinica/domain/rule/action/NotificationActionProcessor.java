@@ -81,9 +81,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	NotificationService notificationService;
 	String userUuid;
 
-	public static String sbsUrl = CoreResources.getField("SBSUrl");
-	public static String messageServiceUri = StringUtils.substringBefore(sbsUrl, "//")
-			+ "//" + StringUtils.substringBetween(sbsUrl, "//", "/") + "/message-service/api/messages/text";
+	public static String sbsUrl = CoreResources.getField("SBSBaseUrl");
+	public static String messageServiceUri = sbsUrl+ "/message-service/api/messages/text";
 	public static String subDomain = sbsUrl.substring(sbsUrl.indexOf("//")  + 2,  sbsUrl.indexOf("."));
 
 	@Autowired
