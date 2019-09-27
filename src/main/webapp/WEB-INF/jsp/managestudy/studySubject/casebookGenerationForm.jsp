@@ -20,6 +20,8 @@
                     <fmt:message key="viewStudySubject.casebookGenerationForm.format.json" bundle="${resword}"/><br>
                     <input type="radio" value="xml/view" id="casebookTypeXml" name="casebookType">
                     <fmt:message key="viewStudySubject.casebookGenerationForm.format.xml" bundle="${resword}"/><br>
+                    <input type="radio" value="pdf/print" id="casebookTypePdf" name="casebookType">
+                    <fmt:message key="viewStudySubject.casebookGenerationForm.format.pdf" bundle="${resword}"/><br>
                 </div>
 
                 <div style="margin-bottom:10px;" class="connect-widget">

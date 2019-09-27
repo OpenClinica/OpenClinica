@@ -70,6 +70,7 @@ public class EnketoAPI {
 
     // public static final String INSTANCE_100_PERCENT_READONLY = "/api/v2/instance/view/iframe";
     public static final String INSTANCE_100_PERCENT_READONLY = "/oc/api/v1/instance/view";
+    public static final String INSTANCE_FORM_PDF = "/api/v2/instance/view/pdf";
 
     // public static final String INSTANCE_READONLY_DN = "/api/v2/instance/fieldsubmission/note/iframe";
     public static final String INSTANCE_READONLY_DN = "/oc/api/v1/instance/note";
@@ -650,5 +651,104 @@ public class EnketoAPI {
         }
         EnketoFormResponse enketoFormResponse = new EnketoFormResponse(urlResponse, lockOn);
         return enketoFormResponse;
+    }
+    
+    public EnketoPDFResponse getPDFForm(ActionUrlObject actionUrlObject) throws Exception {
+        String ecid = actionUrlObject.ecid;
+        String crfOid = actionUrlObject.crfOid;
+        Study parentStudy = actionUrlObject.parentStudy;
+        Study site = actionUrlObject.site;
+        StudyEvent studyEvent = actionUrlObject.studyEvent;
+        boolean markComplete = actionUrlObject.markComplete;
+        EventDefinitionCrf edc = actionUrlObject.edc;
+        Role role = actionUrlObject.role;
+        String mode = actionUrlObject.mode;
+        String flavor = actionUrlObject.flavor;
+        List<FormLayoutMedia> mediaList = actionUrlObject.mediaList;
+        String instance = actionUrlObject.instance;
+        String redirect = actionUrlObject.redirect;
+        String goTo = actionUrlObject.goTo;
+        String studyOid = actionUrlObject.studyOid;
+        String loadWarning = actionUrlObject.loadWarning;
+        EventCrf eventCrf = actionUrlObject.eventCrf;
+        EnketoPDFResponse pdfResponse = null;
+        boolean lockOn = false;
+        boolean shouldLock = false;
+        if (enketoURL == null)
+            return null;
+
+        try {
+            // Build instanceId to cache populated instance at Enketo with
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            String hashString = ecid + "." + String.valueOf(cal.getTimeInMillis());
+            ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
+            String instanceId = encoder.encodePassword(hashString, null);
+            URL eURL = null;         
+            eURL = new URL(enketoURL + INSTANCE_FORM_PDF);           
+            String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
+
+            InstanceAttachment attachment = new InstanceAttachment();
+            String databaseIdEncryptionKey = CoreResources.getField(DATABASE_ID_ENCRYPTION_KEY_PROPERTY);
+
+            for (FormLayoutMedia media : mediaList) {
+                String fileName = media.getName();
+                String baseUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+                int formLayoutMediaId = media.getFormLayoutMediaId();
+                // Encrypt the form layout media id so we don't expose database ids to users
+                String encryptedFormLayoutMediaId = EncryptionUtil.encryptValue(Integer.toString(formLayoutMediaId), databaseIdEncryptionKey);
+                String downLoadUrl = baseUrl + "/downloadMediaEncrypted?formLayoutMediaId=" + encryptedFormLayoutMediaId;
+                attachment.setAdditionalProperty(fileName, downLoadUrl);
+            }
+
+            /**
+             * prepare header
+             */
+            HttpHeaders headers = new HttpHeaders();
+            //headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Basic " + userPasswdCombo);
+            headers.add("Accept-Charset", "UTF-8");
+
+            /**
+             *  prepare body
+             */
+            
+            EnketoPDFRequest body = new EnketoPDFRequest(ocURL, actionUrlObject.ecid,crfOid,instance, instanceId, redirect, 
+                    attachment, "A4", "0.5in", "false");
+            HttpEntity<EnketoPDFRequest> request = new HttpEntity<EnketoPDFRequest>(body, headers);
+            RestTemplate rest = new RestTemplate();
+            ResponseEntity<EnketoPDFResponse> response = rest.postForEntity(eURL.toString(), request, EnketoPDFResponse.class);
+            if (response != null)
+                pdfResponse = response.getBody();
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+            throw e;
+        }
+        
+        return pdfResponse;
+    }
+    
+    public EnketoPDFResponse registerAndGetFormPDF(ActionUrlObject actionUrlObject) {
+    	EnketoPDFResponse enketoPDFResponse = null;
+        try {            
+        	enketoPDFResponse = this.getPDFForm(actionUrlObject);
+        } catch (Exception e) {
+            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
+                savePformRegistration();
+                try {
+                	enketoPDFResponse = getPDFForm(actionUrlObject);
+                } catch (Exception e1) {
+                    logger.error(e.getMessage());
+                    logger.error(ExceptionUtils.getStackTrace(e));
+                }
+            } else {
+                logger.error(e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+            }
+        }
+        return enketoPDFResponse;
     }
 }

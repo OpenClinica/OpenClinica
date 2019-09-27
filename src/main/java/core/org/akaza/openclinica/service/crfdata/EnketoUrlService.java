@@ -603,5 +603,77 @@ public class EnketoUrlService {
         }
     }
 
+    public File getFormPdf(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
+            ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked , boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub) throws Exception {
+			
+    	    File pdfFile = null; 
+    	    Study study = enketoCredentials.getParentStudy(studyOid);
+			Study site = enketoCredentials.getSiteStudy(studyOid);
+			studyOid = study.getOc_oid();
+			int filePath = study.getFilePath();
+			
+			String editURL = null;
+			StudyEventDefinition eventDef = null;
+			StudySubject subject = null;
+							
+			// Lookup relevant data			
+			eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(subjectContext.getStudyEventDefinitionId()));
+			StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
+			subject = studyEvent.getStudySubject();
+			
+			if (formLayout == null) {
+				formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
+			}
+			EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
+			formLayout.getFormLayoutId());
+			
+			if(eventCrf==null){
+				UserAccount userAccount = userAccountDao.findByUserId(ub.getId());
+				eventCrf= createEventCrf(formLayout,studyEvent,subject,userAccount);
+			}
+			
+			CrfVersion crfVersion = eventCrf.getCrfVersion();
+			boolean markComplete = true;
+			if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
+				markComplete = false;
+			}
+			
+			// Load populated instance
+			String populatedInstance = "";
+			String crfFlavor = "";
+			String crfOid = "";
+		
+			populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds);
+			crfFlavor = flavor;
+	
+			crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
+			
+			// Call Enketo api to get edit url
+			EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
+			
+			// Build redirect url
+			String redirectUrl = CoreResources.getField("sysURL");
+			
+			EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventDef.getStudyEventDefinitionId(),
+			formLayout.getCrf().getCrfId(), eventDef.getStudy().getStudyId());
+			
+			// Return Enketo URL
+			List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
+			ActionUrlObject actionUrlObject = new ActionUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
+			mediaList, null, flavor, role, study, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked);
+			
+			// EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
+			// URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
+			// enketo.registerAndDeleteCache(eURL, crfOid);
+			
+			EnketoPDFResponse epr = enketo.registerAndGetFormPDF(actionUrlObject);
+			
+			if (epr.getPdfFile() != null) {
+				pdfFile = epr.getPdfFile();
+			}
+						
+			return pdfFile;
+		
+		}
     }
 
