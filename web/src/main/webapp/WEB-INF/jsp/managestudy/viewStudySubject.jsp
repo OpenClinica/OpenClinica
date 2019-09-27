@@ -1763,7 +1763,7 @@
         });
 
         jQuery('#connect-button').click(function () {
-            var phoneNumber = $('#phone-input').val();
+            var phoneNumber = $('#phone-input').val() || '';
             if (phoneNumber.trim())
                 phoneNumber = $('#country-code').text() + ' ' + phoneNumber;
 

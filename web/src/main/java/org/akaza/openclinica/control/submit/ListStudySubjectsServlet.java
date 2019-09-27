@@ -13,22 +13,25 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.Component;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -52,6 +55,19 @@ public class ListStudySubjectsServlet extends SecureController {
     private StudyGroupDAO studyGroupDAO;
     private StudyParameterValueDAO studyParameterValueDAO;
     private UserService userService;
+    private ViewStudySubjectService viewStudySubjectService;
+    private PermissionService permissionService;
+    private ItemDao itemDao;
+    private ItemDataDao itemDataDao;
+    private ItemFormMetadataDao itemFormMetadataDao;
+    private ResponseSetDao responseSetDao;
+    private EventCrfDao eventCrfDao;
+    private StudyEventDao studyEventDao;
+    private CrfDao crfDao;
+    private CrfVersionDao crfVersionDao;
+    private EventDefinitionCrfDao eventDefinitionCrfDao;
+    private EventDefinitionCrfPermissionTagDao permissionTagDao;
+
     Locale locale;
 
     /*
@@ -162,6 +178,29 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
         factory.setUserService(getUserService());
         factory.setRequest(request);
+        factory.setViewStudySubjectService(getViewStudySubjectService());
+        factory.setPermissionService(getPermissionService());
+        factory.setItemDao(getItemDao());
+        factory.setItemDataDao(getItemDataDao());
+        factory.setCrfDao(getCrfDao());
+        factory.setCrfVersionDao(getCrfVersionDao());
+        factory.setStudyEventDao(getStudyEventDao());
+        factory.setEventCrfDao(getEventCrfDao());
+        factory.setEventDefinitionCrfDao(getEventDefinitionCrfDao());
+        factory.setItemFormMetadataDao(getItemFormMetadataDao());
+        factory.setPermissionTagDao(getPermissionTagDao());
+
+        List<Component> components = getViewStudySubjectService().getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
+        if (components != null) {
+            for (Component component : components) {
+                if (component.getColumns() != null) {
+                    List<String> permissionTags = permissionService.getPermissionTagsList(request);
+                    request.getSession().setAttribute("userPermissionTags", permissionTags);
+                    break;
+                }
+            }
+        }
+
         String findSubjectsHtml = factory.createTable(request, response).render();
 
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);
@@ -244,4 +283,47 @@ public class ListStudySubjectsServlet extends SecureController {
         return userService= (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
     }
 
+    public ViewStudySubjectService getViewStudySubjectService() {
+        return viewStudySubjectService= (ViewStudySubjectService) SpringServletAccess.getApplicationContext(context).getBean("viewStudySubjectService");
+    }
+
+    public ItemDao getItemDao() {
+        return itemDao=(ItemDao) SpringServletAccess.getApplicationContext(context).getBean("itemDao");
+    }
+
+    public ItemDataDao getItemDataDao() {
+        return itemDataDao=(ItemDataDao) SpringServletAccess.getApplicationContext(context).getBean("itemDataDao");
+    }
+
+    public CrfDao getCrfDao() {
+        return crfDao=(CrfDao) SpringServletAccess.getApplicationContext(context).getBean("crfDao");
+    }
+
+    public CrfVersionDao getCrfVersionDao() {
+        return crfVersionDao=(CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
+    }
+
+    public StudyEventDao getStudyEventDao() {
+        return studyEventDao=(StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
+    }
+
+    public EventCrfDao getEventCrfDao() {
+        return eventCrfDao=(EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
+    }
+
+    public ItemFormMetadataDao getItemFormMetadataDao() {
+        return itemFormMetadataDao=(ItemFormMetadataDao) SpringServletAccess.getApplicationContext(context).getBean("itemFormMetadataDao");
+    }
+
+    public EventDefinitionCrfDao getEventDefinitionCrfDao() {
+        return eventDefinitionCrfDao=(EventDefinitionCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfDao");
+    }
+
+    public EventDefinitionCrfPermissionTagDao getPermissionTagDao() {
+        return permissionTagDao=(EventDefinitionCrfPermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfPermissionTagDao");
+    }
+
+    public PermissionService getPermissionService() {
+        return permissionService= (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+    }
 }
