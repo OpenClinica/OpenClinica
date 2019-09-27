@@ -31,7 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +43,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -503,4 +514,42 @@ public class StudyParticipantController {
 		});
 		return jobDetail.getUuid();
 	}
+	
+	@RequestMapping(value = "/pdf/print/{studyOID}/{studySubjectIdentifier}", method = RequestMethod.GET)
+	public ResponseEntity<InputStreamResource> getCaseBookInPDF(@PathVariable("studyOID") String studyOID,
+			 @PathVariable("studySubjectIdentifier") String studySubjectIdentifier, 
+             @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
+             @Context HttpServletRequest request, 
+             @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
+             @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
+             @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
+             @QueryParam("showArchived") String showArchived ,
+             @DefaultValue("n") @QueryParam("crossFormLogic") String crossFormLogic,
+             @DefaultValue("n") @QueryParam("links")String links) throws IOException {
+	 
+			 	  
+		 	  utilService.setSchemaFromStudyOid(studyOID);
+		 	  String fileName = null;
+		 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+		 	  String userAccountID = userAccountBean.getId() +"";
+		 	  File pdfFile = this.studyParticipantService.getCaseBookPDF(studyOID, studySubjectIdentifier, includeDns, includeAudits, request, userAccountID, clinicaldata, includeMetadata, clinicalData, showArchived, crossFormLogic, links);
+		 	  fileName = pdfFile.getName();
+		      ClassPathResource pdfFileForDownLoad = new ClassPathResource("downloads/" + fileName);
+		     
+			  HttpHeaders headers = new HttpHeaders();
+			  headers.setContentType(MediaType.parseMediaType("application/pdf"));
+			  headers.add("Access-Control-Allow-Origin", "*");
+			  headers.add("Access-Control-Allow-Methods", "GET, POST, PUT");
+			  headers.add("Access-Control-Allow-Headers", "Content-Type");
+			  headers.add("Content-Disposition", "filename=" + fileName);
+			  headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+			  headers.add("Pragma", "no-cache");
+			  headers.add("Expires", "0");
+			 
+			  headers.setContentLength(pdfFileForDownLoad.contentLength());
+			  ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(
+			    new InputStreamResource(pdfFileForDownLoad.getInputStream()), headers, HttpStatus.OK);
+			  return response;
+		 
+		 }
 }

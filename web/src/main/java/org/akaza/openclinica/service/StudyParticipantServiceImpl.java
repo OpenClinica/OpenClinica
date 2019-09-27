@@ -1,6 +1,8 @@
 package org.akaza.openclinica.service;
 
 import liquibase.util.StringUtils;
+
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -11,16 +13,24 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.SubjectDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobType;
+import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
+import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.akaza.openclinica.web.pform.OpenRosaServices;
+import org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -36,6 +46,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This Service class is used with Add Participant Rest Api
@@ -73,6 +85,15 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     UtilService utilService;
     @Autowired
     ValidateService validateService;
+    
+    @Autowired
+    FormLayoutDao formLayoutDao;
+    
+    @Autowired
+    EnketoUrlService urlService;
+    
+    @Autowired
+    OpenRosaServices openRosaServices;
 
     private StudyDAO studyDao;
     private StudySubjectDAO studySubjectDao;
@@ -376,5 +397,85 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         
     }
 
+    public File getCaseBookPDF(String studyOID,
+            String studySubjectIdentifier,
+            String includeDns, String includeAudits,
+            HttpServletRequest request, String userAccountID,
+            String clinicaldata,
+            String includeMetadata,
+            String clinicalData,
+            String showArchived ,
+            String crossFormLogic,
+            String links) {
+		
+    	    ArrayList<File> pdfFiles = new ArrayList<File>();
+		    File pdfFile = null;
+			/**
+			 *  need to check the number of study/events/forms for this subject
+			 *  each for need a rest service call to Enketo
+			 */
+		    String studyEventDefinitionID = null;
+		    String formLayoutOID = null;
+		    String studyEventID = null;
+		    String studySubjectOID = studySubjectIdentifier;
+		    String studyEventOrdinal = null;
+		    
+		    ArrayList<StudyEvent> subjectStudyEvents = studySubjectHibDao.fetchListSEs(studySubjectOID);
+		    for(StudyEvent studyEvent : subjectStudyEvents) {
+		    	List<EventCrf> eventCRFs = studyEvent.getEventCrfs();
+		    	
+		    	for(EventCrf eventCrf : eventCRFs) {
+		    		formLayoutOID = eventCrf.getFormLayout().getOcOid();
+		    		
+		    		PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
+		    		studyEventDefinitionID = studyEvent.getStudyEventDefinition().getStudyEventDefinitionId() + "";
+			        subjectContext.setStudyEventDefinitionId(studyEventDefinitionID);
+			        subjectContext.setFormLayoutOid(formLayoutOID);
+			        studyEventID = studyEvent.getStudyEventId()+"";
+			        subjectContext.setStudyEventId(studyEventID);
+
+			        subjectContext.setStudySubjectOid(studySubjectOID);
+			        studyEventOrdinal = studyEvent.getSampleOrdinal() +"";
+			        subjectContext.setOrdinal(studyEventOrdinal);
+			        subjectContext.setUserAccountId(userAccountID);
+			        UserAccountDAO udao = new UserAccountDAO(dataSource);
+			        UserAccountBean ub = (UserAccountBean) udao.findByPK(Integer.parseInt(userAccountID));
+
+			        FormLayout formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
+			        Role role = Role.RESEARCHASSISTANT;
+			        String mode = PFormCache.VIEW_MODE;
+
+			        
+					try {
+						List<Bind> binds = openRosaServices.getBinds(formLayout,EnketoAPI.QUERY_FLAVOR,studyOID);
+				        boolean formContainsContactData=false;
+				        if(openRosaServices.isFormContainsContactData(binds))
+				            formContainsContactData=true;
+
+				        String subjectContextKey;
+						subjectContextKey = this.createSubjectContextKey(studyOID, formLayout, studyEvent, studySubjectOID, userAccountID, request);
+						pdfFile = urlService.getFormPdf(subjectContextKey, subjectContext, studyOID, formLayout, EnketoAPI.QUERY_FLAVOR, null, role, mode, null, false,formContainsContactData,binds,ub);
+				        
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			        
+		    	}//for-loop-2
+		    	
+					
+		    }//for-loop-1
+		   
+			return pdfFile;
+		}
+    
+    private String createSubjectContextKey(String studyOID, FormLayout formLayout, StudyEvent studyEvent, String studySubjectOID, String userAccountID,HttpServletRequest request) throws Exception {
+        PFormCache cache = PFormCache.getInstance(request.getServletContext());
+        String subjectContextKey = cache.putSubjectContext(studySubjectOID, String.valueOf(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId()), String.valueOf(studyEvent.getSampleOrdinal()),
+                formLayout.getOcOid(),userAccountID ,String.valueOf(studyEvent.getStudyEventId()), studyOID, PFormCache.PARTICIPATE_MODE);
+      
+        return subjectContextKey;
+
+    }
 
 }
