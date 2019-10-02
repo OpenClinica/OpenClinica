@@ -19,11 +19,10 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
     public boolean authenticateKeycloakUser(String username, String password) {
         HttpResponse<String> response = null;
         try {
-            String SBSUrl = CoreResources.getField("SBSUrl");
+            String SBSUrl = CoreResources.getField("SBSBaseUrl");
             int index = SBSUrl.indexOf("//");
-            String protocol = SBSUrl.substring(0, index) + "//";
-            String subDomain = SBSUrl.substring(SBSUrl.indexOf("//")  + 2,  SBSUrl.indexOf("."));
-            String SBSDomainURL = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
+            String subDomain = SBSUrl.substring(index  + 2,  SBSUrl.indexOf("."));
+            String SBSDomainURL = SBSUrl + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
             response = Unirest.get(SBSDomainURL)
                     .header("content-type", "application/json")
                     .asString();
@@ -33,7 +32,7 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
 
         if (response == null || response.getBody() == null)
             return false;
-        AuthzClient authzClient = AuthzClient.create();
+        AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
         try {
              authzClient.obtainAccessToken(username, password);
         } catch (HttpResponseException e) {

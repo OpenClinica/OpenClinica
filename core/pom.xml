@@ -382,6 +382,11 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-jwt</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-core</artifactId>
+            <version>3.7.0</version>
+        </dependency>
     </dependencies>
     <!-- @pgawade 16-NOV-2010 unit tests through maven -->
 

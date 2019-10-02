@@ -56,7 +56,6 @@ public class PermissionServiceImpl implements PermissionService {
     private static final String CREATE_TOKEN_API_PATH = "/oauth/token";
 
 
-
     private boolean checkStudyUuid(String studyUuid, int parentStudyId) {
         if (parentStudyId == 0) return false;
         Study study = studyDao.findById(parentStudyId);
@@ -106,7 +105,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (userContextMap == null)
             return null;
         String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("SBSUrl") + userUuid + "/roles";
+        String uri = CoreResources.getField("SBSBaseUrl")+"/user-service/api/users/" + userUuid + "/roles";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -223,27 +222,6 @@ public class PermissionServiceImpl implements PermissionService {
         return getStringArray(tagsList);
     }
 
-    public String getAccessToken() {
-        logger.debug("Creating Auth0 Api Token");
-
-        try {
-            InputStream inputStream = new ClassPathResource("keycloak.json", this.getClass().getClassLoader()).getInputStream();
-            AuthzClient authzClient = AuthzClient.create(JsonSerialization.readValue(inputStream, Configuration.class));
-            AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
-            if (accessTokenResponse != null)
-                return accessTokenResponse.getToken();
-        } catch (IOException e) {
-            logger.error("Could not read keycloak.json", e);
-            return null;
-        }
-        return null;
-    }
-
-
-
-
-
-
     public boolean isUserHasPermission(String column,HttpServletRequest request,StudyBean studyBean) {
         String sedOid = column.split("\\.")[0];
         String formOid = column.split("\\.")[1];
@@ -262,4 +240,5 @@ public class PermissionServiceImpl implements PermissionService {
     private List<String> getPermissionTags(HttpServletRequest request) {
         return (List<String>) request.getSession().getAttribute("userPermissionTags");
     }
+
 }

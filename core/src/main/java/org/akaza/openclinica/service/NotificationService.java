@@ -45,7 +45,7 @@ public class NotificationService  {
     public static final String PARTICIPATE = "participate";
     private static final String ACCESS_CODE_ATTRIBUTE = "accessCode";
     String DB_CONNECTION_KEY = "dbConnection";
-    private String sbsUrl = CoreResources.getField("SBSUrl");
+    private String sbsUrl = CoreResources.getField("SBSBaseUrl");
     @Autowired
     private StudyDao studyDao;
     @Autowired
@@ -95,11 +95,8 @@ public class NotificationService  {
             studyBean.setStudyUuid(studyEnvironmentDTO.getStudyUuid());
         }
 
-        String SBSUrl = CoreResources.getField("SBSUrl");
-        int index = SBSUrl.indexOf("//");
-        String protocol = SBSUrl.substring(0, index) + "//";
         String appendUrl = "/study-service/api/studies/" + studyBean.getStudyUuid() + "/module-configs";
-        String uri = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + appendUrl;
+        String uri =sbsUrl+ appendUrl;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -124,12 +121,8 @@ public class NotificationService  {
 
     public StudyEnvironmentDTO getStudyUuidFromStudyService(String accessToken, StudyBean studyBean) {
 
-        String SBSUrl = CoreResources.getField("SBSUrl");
-        int index = SBSUrl.indexOf("//");
-        String protocol = SBSUrl.substring(0, index) + "//";
         String appendUrl = "/study-service/api/study-environments/" + studyBean.getStudyEnvUuid();
-
-        String uri = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + appendUrl;
+        String uri = sbsUrl + appendUrl;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -187,11 +180,9 @@ public class NotificationService  {
 
     public String getRealmName(String accessToken) {
         int index = sbsUrl.indexOf("//");
-        String protocol = sbsUrl.substring(0, index) + "//";
-        String domainUrl=sbsUrl.substring(index + 2, sbsUrl.indexOf("/", index + 2));
-        String subDomain= domainUrl.substring(0,domainUrl.indexOf(".build"));
+        String subDomain= sbsUrl.substring(index+2,sbsUrl.indexOf(".build"));
         String subDomainUrl="/customer-service/api/allowed-connections?subdomain="+subDomain;
-        String uri = protocol+domainUrl+subDomainUrl;
+        String uri =sbsUrl+subDomainUrl;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

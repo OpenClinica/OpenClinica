@@ -23,13 +23,9 @@ import javax.servlet.http.HttpServletResponse;
             return "error";
         if (!StringUtils.equals(debugCode, "0610443160820171"))
             return "error";
-        String smURL = CoreResources.getField("smURL");
-        if (StringUtils.isNotEmpty(smURL)) {
-
-            int index = smURL.indexOf("//");
-            String protocol = smURL.substring(0, index) + "//";
-            String subDomain = smURL.substring(smURL.indexOf("//")  + 2,  smURL.indexOf("/", protocol.length()));
-            String crossStorageURL = protocol + subDomain + "/hub/hub.html";
+        String SBSUrl = CoreResources.getField("SBSBaseUrl");
+        if (StringUtils.isNotEmpty(SBSUrl)) {
+            String crossStorageURL = SBSUrl + "/hub/hub.html";
             req.setAttribute("crossStorageURL", crossStorageURL);
             return "resetOCAppTimeout";
         } else
