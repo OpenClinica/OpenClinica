@@ -1225,7 +1225,6 @@ public class CoreResources implements EnvironmentAware{
         try {
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
             String dbName = dataInfo.getProperty("dbType");
-
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();
             tenantSchema.set(DATAINFO.getProperty("schema"));
@@ -1258,6 +1257,7 @@ public class CoreResources implements EnvironmentAware{
         Properties properties=new Properties();
 
         MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
+        logger.error("{} Properties:", propertyFileName);
         StreamSupport.stream(propSrcs.spliterator(), false)
                 .filter(ps -> ps instanceof EnumerablePropertySource)
                 .filter(ps->ps instanceof ResourcePropertySource)
@@ -1266,6 +1266,7 @@ public class CoreResources implements EnvironmentAware{
                 .flatMap(Arrays::<String>stream)
                 .forEach(propName -> {
                     ((AbstractEnvironment) env).setIgnoreUnresolvableNestedPlaceholders(true);
+                    logger.error(" {}: {}", propName, env.getProperty(propName));
                     properties.setProperty(propName, env.getProperty(propName));});
         StreamSupport.stream(propSrcs.spliterator(), false)
                 .filter(ps -> ps instanceof EnumerablePropertySource)
