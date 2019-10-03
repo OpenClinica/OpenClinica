@@ -852,6 +852,7 @@ public class CreateSubStudyServlet extends SecureController {
 
                 logger.debug("iter:           {} --db:    {}", eventDef.getId(), eventDef.getSubmissionUrl());
                 logger.debug("edcsInSession:  {} --session: {} ", sessionBean.getId(), sessionBean.getSubmissionUrl());
+
                 if (sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() == null) {
                     break;
                 } else {
