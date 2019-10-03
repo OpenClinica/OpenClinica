@@ -1162,9 +1162,9 @@ public class CoreResources implements InitializingBean {
     }
 
     public static void loadAllProperties() {
-//        if (DATAINFO == null)
+        if (DATAINFO == null)
             DATAINFO = loadProperties(DATA_INFO_FILE_NAME);
-//        if (EXTRACTINFO == null)
+        if (EXTRACTINFO == null)
             EXTRACTINFO = loadProperties(EXTRACT_INFO_FILE_NAME);
     }
 
@@ -1183,9 +1183,7 @@ public class CoreResources implements InitializingBean {
             externalInpStream.close();
             return internalProp;
         } catch (Exception e) {
-            if (externalProp == null) {
-                logger.info("External {} is not present", EXTERNAL_PROPERTY_DIRECTORY+fileProps);
-            }
+            logger.warn("Failing to load the properties {}", e.getMessage());
         }
         return internalProp;
     }
