@@ -1183,6 +1183,7 @@ public class CoreResources implements InitializingBean {
             externalInpStream.close();
             return internalProp;
         } catch (Exception e) {
+            logger.warn("Failing to load the properties {}", e.getMessage());
         }
         return internalProp;
     }
