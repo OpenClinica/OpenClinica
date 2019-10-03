@@ -65,7 +65,7 @@ public class LogoutController {
         } else {
             redirectUri += "/MainMenu";
         }
-        logger.info("Redirect URI:" + redirectUri);
+        logger.debug("Redirect URI:" + redirectUri);
         return redirectUri;
     }
 
@@ -85,7 +85,7 @@ public class LogoutController {
             if (callback) {
                 authUrl += "&client_id=bridge&response_type=code";
             }
-            logger.info("authUrl:" + authUrl);
+            logger.debug("authUrl:" + authUrl);
         } catch (UnsupportedEncodingException e) {
             logger.error("Encoding redirect URI:" + redirectUri, e);
         }
@@ -101,7 +101,7 @@ public class LogoutController {
         if (request.getParameter("studyEnvUuid") != null) {
             param = "?studyEnvUuid=" + request.getParameter("studyEnvUuid");
         }
-        logger.info("/logoutSuccess:" + returnURL + param);
+        logger.debug("/logoutSuccess:" + returnURL + param);
         return "redirect:" + returnURL + param;
     }
 

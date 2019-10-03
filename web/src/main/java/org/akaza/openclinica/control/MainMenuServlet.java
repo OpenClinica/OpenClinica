@@ -160,7 +160,7 @@ public class MainMenuServlet extends SecureController {
             request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
         }
 
-        logger.info("is ub a ldapuser??" + ub.isLdapUser());
+        logger.debug("is ub a ldapuser??" + ub.isLdapUser());
 
         if (currentStudy == null) {
             logger.error("CurrentStudy is null: forwarding to menu.jsp");
