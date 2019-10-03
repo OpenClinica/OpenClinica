@@ -147,7 +147,7 @@ public class ListStudySubjectsServlet extends SecureController {
         request.setAttribute("closeInfoShowIcons", true);
         if (fp.getString("navBar").equals("yes") && fp.getString("findSubjects_f_studySubject.label").trim().length() > 0) {
             List<StudySubjectBean> studySubjectList = getStudySubjectDAO().findAllSubjectsByLabelAndStudy(fp.getString("findSubjects_f_studySubject.label"), currentStudy);
-            if (studySubjectList.size() ==1 ) {
+            if (studySubjectList.size() == 1 ) {
                 request.setAttribute("id", new Integer(studySubjectList.get(0).getId()).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             } else {
