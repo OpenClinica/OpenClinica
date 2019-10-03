@@ -16,21 +16,11 @@ import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -45,18 +35,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.StreamSupport;
 
 import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
-@org.springframework.context.annotation.Configuration
-@PropertySources({
-        @PropertySource("classpath:datainfo.properties"),
-        @PropertySource(value = "file:${user.home}/runtime-config/datainfo.properties",ignoreResourceNotFound = true),
-        @PropertySource("classpath:extract.properties"),
-        @PropertySource(value = "file:${user.home}/runtime-config/extract.properties",ignoreResourceNotFound = true)
-})
-public class CoreResources implements EnvironmentAware{
-    Environment env;
+
+@Component
+public class CoreResources implements InitializingBean {
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
     private static String DB_NAME;
@@ -65,11 +48,6 @@ public class CoreResources implements EnvironmentAware{
     private static Properties EXTRACTINFO;
     private static KeyCloakConfiguration KEYCLOAKCONFIG;
 
-    private Properties dataInfo;
-    private Properties dataInfoProp;
-    private Properties extractInfo;
-    private Properties extractProp;
-
     public static final Integer PDF_ID = 10;
     public static final Integer TAB_ID = 8;
     public static final Integer CDISC_ODM_1_2_ID = 5;
@@ -77,8 +55,9 @@ public class CoreResources implements EnvironmentAware{
     public static final Integer CDISC_ODM_1_3_ID = 3;
     public static final Integer CDISC_ODM_1_3_EXTENSION_ID = 2;
     public static final Integer SPSS_ID = 9;
-    private static final String DATA_INFO_FILE_NAME="datainfo.properties";
-    private static final String EXTRACT_INFO_FILE_NAME="extract.properties";
+    private static final String DATA_INFO_FILE_NAME = "datainfo.properties";
+    private static final String EXTRACT_INFO_FILE_NAME = "extract.properties";
+    private static final String EXTERNAL_PROPERTY_DIRECTORY = System.getProperty("user.home") + "/runtime-config/";
 
     private static String webapp;
     protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.dao.core.CoreResources");
@@ -86,6 +65,7 @@ public class CoreResources implements EnvironmentAware{
     private static ArrayList<ExtractPropertyBean> extractProperties;
 
     public static String ODM_MAPPING_DIR;
+
     // TODO:Clean up all system outs
     // default no arg constructor
     public CoreResources() {
@@ -99,7 +79,7 @@ public class CoreResources implements EnvironmentAware{
      * @throws IOException
      */
     public CoreResources(Properties dataInfoProps) throws IOException {
-        this.dataInfo = dataInfoProps;
+        DATAINFO = dataInfoProps;
         if (resourceLoader == null)
             resourceLoader = new DefaultResourceLoader();
         webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
@@ -110,7 +90,7 @@ public class CoreResources implements EnvironmentAware{
         String contHome = System.getProperty("catalina.home");
         Properties pros = System.getProperties();
         Enumeration proEnum = pros.propertyNames();
-        for (; proEnum.hasMoreElements();) {
+        for (; proEnum.hasMoreElements(); ) {
             // Get property name
             String propName = (String) proEnum.nextElement();
 
@@ -119,63 +99,29 @@ public class CoreResources implements EnvironmentAware{
         }
     }
 
-    public Properties getPropValues(Properties prop, String propFileName) throws IOException {
-        // System.out.println(propFileName);
-
-        prop = new Properties();
-        File file = new File(propFileName);
-        if (!file.exists())
-            return null;
-
-        InputStream inputStream = new FileInputStream(propFileName);
-        prop.load(inputStream);
-
-        return prop;
-    }
-
-    public void getPropertiesSource() {
-        try {
-            String filePath = "$catalina.home/$WEBAPP.lower.config";
-
-            filePath = replaceWebapp(filePath);
-            filePath = replaceCatHome(filePath);
-
-            String dataInfoPropFileName = filePath + "/datainfo.properties";
-            String extractPropFileName = filePath + "/extract.properties";
-
-            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
-            Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
-
-            if (OC_dataDataInfoProperties != null)
-                dataInfo = OC_dataDataInfoProperties;
-            if (OC_dataExtractProperties != null)
-                extractInfo = OC_dataExtractProperties;
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    private void extractKeyCloakConfig(Properties dataInfo) {
-        KEYCLOAKCONFIG=new KeyCloakConfiguration();
+    private void extractKeyCloakConfig() {
+        KEYCLOAKCONFIG = new KeyCloakConfiguration();
         KEYCLOAKCONFIG.setRealm(DATAINFO.getProperty("keycloak.realm"));
         KEYCLOAKCONFIG.setAuthServerUrl(DATAINFO.getProperty("keycloak.auth-server-url"));
-        String secretKey="secret";
-        String secretValue=DATAINFO.getProperty("keycloak.credentials.secret");
-        Map<String,Object> credentials=new TreeMap<String,Object>(){{put(secretKey, secretValue);}};
+        String secretKey = "secret";
+        String secretValue = DATAINFO.getProperty("keycloak.credentials.secret");
+        Map<String, Object> credentials = new TreeMap<String, Object>() {{
+            put(secretKey, secretValue);
+        }};
         KEYCLOAKCONFIG.setCredentials(credentials);
     }
 
-    public static Configuration getKeyCloakConfig(){
+    public static Configuration getKeyCloakConfig() {
         return KEYCLOAKCONFIG;
     }
-    public void overwriteExternalPropOnInternalProp(Properties internalProp, Properties externalProp){
-        if(externalProp!=null && !externalProp.isEmpty()){
-            Set<String> externalKeys= externalProp.stringPropertyNames();
+
+    public static void overwriteExternalPropOnInternalProp(Properties internalProp, Properties externalProp) {
+        if (externalProp != null && !externalProp.isEmpty()) {
+            Set<String> externalKeys = externalProp.stringPropertyNames();
             externalKeys.forEach(key -> internalProp.setProperty(key, externalProp.getProperty(key)));
         }
     }
+
     public static UserAccountBean setRootUserAccountBean(HttpServletRequest request, DataSource dataSource) {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName("root");
@@ -207,9 +153,7 @@ public class CoreResources implements EnvironmentAware{
 
         if (value.contains("${WEBAPP}")) {
             value = value.replace("${WEBAPP}", webapp);
-        }
-
-        else if (value.contains("${WEBAPP.lower}")) {
+        } else if (value.contains("${WEBAPP.lower}")) {
             value = value.replace("${WEBAPP.lower}", webapp.toLowerCase());
         }
         if (value.contains("$WEBAPP.lower")) {
@@ -425,8 +369,9 @@ public class CoreResources implements EnvironmentAware{
     }
 
     public static String getStudyManager() {
-        return DATAINFO.getProperty("SBSBaseUrl")+"/#/account-study";
+        return DATAINFO.getProperty("SBSBaseUrl") + "/#/account-study";
     }
+
     public static void setSchema(Connection conn) throws SQLException {
         Statement statement = conn.createStatement();
         String schema = null;
@@ -620,7 +565,7 @@ public class CoreResources implements EnvironmentAware{
             url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db");
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQL94Dialect";
-            if (dbSSLsetting.equals("true")){
+            if (dbSSLsetting.equals("true")) {
                 url = url + "?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
             }
         } else if (database.equalsIgnoreCase("oracle")) {
@@ -679,7 +624,7 @@ public class CoreResources implements EnvironmentAware{
     private void copyImportRulesFiles() throws IOException {
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
-        String[] fileNames = { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
+        String[] fileNames = {"rules.xsd", "rules_template.xml", "rules_template_with_notes.xml"};
         Resource[] resources = null;
         Resource[] resourcesTemplate = null;
         Resource[] resourcesPipeDelimitedTemplate = null;
@@ -687,7 +632,7 @@ public class CoreResources implements EnvironmentAware{
 
         resources = resolver.getResources("classpath*:properties/rules_template*.xml");
         resourcesTemplate = resolver.getResources("classpath*:properties/import_template*.xml");
-        resourcesPipeDelimitedTemplate =resolver.getResources("classpath*:properties/template_pipe*.txt");
+        resourcesPipeDelimitedTemplate = resolver.getResources("classpath*:properties/template_pipe*.txt");
 
         File dest = new File(getField("filePath") + "rules");
         if (!dest.exists()) {
@@ -823,7 +768,7 @@ public class CoreResources implements EnvironmentAware{
 
     private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
-        String[] fileNames = { "cd_odm_mapping.xml" };
+        String[] fileNames = {"cd_odm_mapping.xml"};
         Resource[] resources;
         try {
             resources = resolver.getResources("classpath*:properties/cd_odm_mapping.xml");
@@ -1035,7 +980,7 @@ public class CoreResources implements EnvironmentAware{
     }
 
     /**
-     * @deprecated Use {@link #getFile(String,String)} instead
+     * @deprecated Use {@link #getFile(String, String)} instead
      */
     @Deprecated
     public File getFile(String fileName) {
@@ -1081,23 +1026,11 @@ public class CoreResources implements EnvironmentAware{
 
     /**
      * @pgawade 18-April-2011 - Fix for issue 8394 Method to set the absolute file path value to point to "odm_mapping"
-     *          in resources. cd_odm_mapping.xml file used by Castor API during CRF data import will be copied to this
-     *          location during application initialization
+     * in resources. cd_odm_mapping.xml file used by Castor API during CRF data import will be copied to this
+     * location during application initialization
      */
     public void setODM_MAPPING_DIR() {
-        String resource = "classpath:datainfo.properties";
-
-        Resource scr = resourceLoader.getResource(resource);
-        String absolutePath = null;
-        try {
-
-            absolutePath = scr.getFile().getAbsolutePath();
-
-            ODM_MAPPING_DIR = getField("filePath");
-            // System.out.println("ODM_MAPPING_DIR: " + ODM_MAPPING_DIR);
-        } catch (IOException e) {
-            throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
-        }
+        ODM_MAPPING_DIR = getField("filePath");
     }
 
     public static String getDBName() {
@@ -1114,7 +1047,7 @@ public class CoreResources implements EnvironmentAware{
         return value == null ? "" : value;
     }
 
-    public static String getSBSFieldFormservice(){
+    public static String getSBSFieldFormservice() {
         String value = getField("SBSBaseUrl");
         return value.concat("/form-service/api");
     }
@@ -1178,23 +1111,13 @@ public class CoreResources implements EnvironmentAware{
         }
         return returnBean;
     }
+
     public Properties getDataInfo() {
         return DATAINFO;
     }
-    public void setDataInfo(Properties dataInfo) {
-        this.dataInfo = dataInfo;
-    }
-
-    public Properties getExtractInfo() {
-        return extractInfo;
-    }
-
-    public void setExtractInfo(Properties extractInfo) {
-        this.extractInfo = extractInfo;
-    }
 
     // Pradnya G code added by Jamuna
-    public String getWebAppName(String servletCtxRealPath) {
+    public static String getWebAppName(String servletCtxRealPath) {
         String webAppName = null;
         if (null != servletCtxRealPath) {
             String[] tokens = servletCtxRealPath.split("/");
@@ -1202,29 +1125,24 @@ public class CoreResources implements EnvironmentAware{
         }
         return webAppName;
     }
-
-    public Properties getDATAINFO() {
+    public Properties getDATAINFO(){
         return DATAINFO;
     }
 
     @Override
-    public void setEnvironment(Environment environment) {
-        this.env=environment;
-        dataInfo=setPropertiesFromEnv(DATA_INFO_FILE_NAME);
-        extractInfo=setPropertiesFromEnv(EXTRACT_INFO_FILE_NAME);
-        this.resourceLoader =  new DefaultResourceLoader();;
+    public void afterPropertiesSet() {
         try {
+            this.resourceLoader = new DefaultResourceLoader();
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-            String dbName = dataInfo.getProperty("dbType");
-            DATAINFO = dataInfo;
-            dataInfo = setDataInfoProperties();
+            loadAllProperties();
+            String dbName = DATAINFO.getProperty("dbType");
+            setDataInfoProperties();
             tenantSchema.set(DATAINFO.getProperty("schema"));
-            EXTRACTINFO = extractInfo;
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
             setODM_MAPPING_DIR();
-            if (extractInfo != null) {
+            if (EXTRACTINFO != null) {
                 copyBaseToDest(resourceLoader);
                 copyODMMappingXMLtoResources(resourceLoader);
                 extractProperties = findExtractProperties();
@@ -1232,7 +1150,7 @@ public class CoreResources implements EnvironmentAware{
                 copyImportRulesFiles();
                 // copyConfig();
             }
-            extractKeyCloakConfig(dataInfo);
+            extractKeyCloakConfig();
         } catch (OpenClinicaSystemException e) {
             logger.debug(e.getMessage());
             logger.debug(e.toString());
@@ -1243,28 +1161,43 @@ public class CoreResources implements EnvironmentAware{
         }
     }
 
-    private Properties setPropertiesFromEnv(String propertyFileName) {
+    public static void loadAllProperties() {
+//        if (DATAINFO == null)
+            DATAINFO = loadProperties(DATA_INFO_FILE_NAME);
+//        if (EXTRACTINFO == null)
+            EXTRACTINFO = loadProperties(EXTRACT_INFO_FILE_NAME);
+    }
 
-        Properties properties=new Properties();
+    public static Properties loadProperties(String fileProps) {
 
-        MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
-        logger.error("{} Properties:", propertyFileName);
-        StreamSupport.stream(propSrcs.spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource)
-                .filter(ps->ps instanceof ResourcePropertySource)
-                .filter(ps->ps.getName().contains(propertyFileName))
-                .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
-                .flatMap(Arrays::<String>stream)
-                .forEach(propName -> {
-                    ((AbstractEnvironment) env).setIgnoreUnresolvableNestedPlaceholders(true);
-                    logger.error(" {}: {}", propName, env.getProperty(propName));
-                    properties.setProperty(propName, env.getProperty(propName));});
-        StreamSupport.stream(propSrcs.spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource)
-                .filter(ps->ps instanceof ResourcePropertySource)
-                .filter(ps->ps.getName().contains(propertyFileName))
-                .map(ps-> ps.getName())
-                .forEach(fileUri->logger.error("File URI's fetched: "+fileUri));
-        return properties;
+        Properties internalProp = null;
+        InputStream inpStream;
+        Properties externalProp = null;
+        try {
+            inpStream = CoreResources.class.getClassLoader().getResourceAsStream(fileProps);
+            internalProp = extractPropertiesFromFile(inpStream);
+            InputStream externalInpStream = new FileInputStream(EXTERNAL_PROPERTY_DIRECTORY + fileProps);
+            externalProp = extractPropertiesFromFile(externalInpStream);
+            overwriteExternalPropOnInternalProp(internalProp, externalProp);
+            inpStream.close();
+            externalInpStream.close();
+            return internalProp;
+        } catch (Exception e) {
+            if (externalProp == null) {
+                logger.info("External {} is not present", EXTERNAL_PROPERTY_DIRECTORY+fileProps);
+            }
+        }
+        return internalProp;
+    }
+
+    private static Properties extractPropertiesFromFile(InputStream input) {
+        Properties prop = new Properties();
+
+        try {
+            prop.load(input);
+        } catch (IOException ioe) {
+            prop = null;
+        }
+        return prop;
     }
 }
