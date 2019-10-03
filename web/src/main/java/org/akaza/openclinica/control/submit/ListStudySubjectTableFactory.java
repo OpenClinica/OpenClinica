@@ -1195,7 +1195,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.br();
         if (studyBean.getStatus() == Status.AVAILABLE) {
             eventDiv.span().styleClass("font-weight: normal;").close();
-            eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId(), add_another_occurrence);
+            eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId(), add_another_occurrence + "ANOTHER");
         }
         eventDiv.nbsp().nbsp().nbsp();
         for (int i = 1; i <= studyEventsSize; i++) {
@@ -1411,7 +1411,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             eventDiv.boldEnd().tdEnd().trEnd(0);
             if (studyBean.getStatus() == Status.AVAILABLE) {
                 eventDiv.tr(0).close().td(0).styleClass("table_cell_left").close();
-                eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId(), add_another_occurrence);
+                eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId(), add_another_occurrence + "OTHERANOTHER");
                 eventDiv.tdEnd().trEnd(0);
             }
 
@@ -1523,7 +1523,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "CreateNewStudyEvent?studySubjectId=" + studySubjectId + "&studyEventDefinition=" + sed.getId();
         builder.a().href(href1);
         builder.close();
-        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-clock2\"/>");
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-clock2\"/> <span>" + href1 + "</span>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(schedule).aEnd();
 
