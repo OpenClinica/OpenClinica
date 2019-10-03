@@ -850,8 +850,8 @@ public class CreateSubStudyServlet extends SecureController {
             for (EventDefinitionCRFBean eventDef : eventDefCrfList) {
                 sessionBean = edcsInSession.get(i);
 
-                logger.info("iter:           {} --db:    {}", eventDef.getId(), eventDef.getSubmissionUrl());
-                logger.info("edcsInSession:  {} --session: {} ", sessionBean.getId(), sessionBean.getSubmissionUrl());
+                logger.debug("iter:           {} --db:    {}", eventDef.getId(), eventDef.getSubmissionUrl());
+                logger.debug("edcsInSession:  {} --session: {} ", sessionBean.getId(), sessionBean.getSubmissionUrl());
                 if (sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() == null) {
                     break;
                 } else {

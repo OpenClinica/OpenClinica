@@ -104,11 +104,6 @@ public class SystemController {
 		map.put("User Directory", System.getProperty("user.dir"));
 		map.put("User Name", System.getProperty("user.name"));
 
-		Map<String, String> env = System.getenv();
-		for (String envName : env.keySet()) {
-			logger.info("{} = {}", envName, env.get(envName));
-		}
-
 		DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
 		try {
 			UserAccountDAO udao = new UserAccountDAO(dataSource);
