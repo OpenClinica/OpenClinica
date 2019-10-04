@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM study_group WHERE 
+		study_group_id = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM study_group</sql>
+	</query>
+	<query>
+		<name>findAllByStudy</name>
+		<sql>
+			SELECT sg.*
+			FROM study_group sg, study_group_class sgc, study st
+			WHERE sgc.study_id=st.study_id
+			    AND sg.study_group_class_id = sgc.study_group_class_id
+				AND (st.study_id=? or st.parent_study_id=?)
+		</sql>
+	</query>
+	<query>
+		<name>findAllByStudySubject</name>
+		<sql>
+			SELECT sg.*
+			FROM study_group sg, subject_group_map sgmap
+			WHERE sg.study_group_id=sgmap.study_group_id
+			    AND sgmap.study_subject_id = ?
+		</sql>
+	</query>
+	<query>
+        <name>getGroupByStudySubject</name>
+        <sql> SELECT sg.* from study_group sg, study_subject ss, subject_group_map sgm
+            where
+            sgm.study_group_id = sg.study_group_id and
+            sgm.study_subject_id  = ss.study_subject_id and
+            ss.study_subject_id = ? and
+            (ss.study_id = ? or study_id in (select study_id from study where parent_study_id = ?))</sql>
+    </query>
+	<query>
+		<name>findSubjectGroupMaps</name>
+		<sql>
+			SELECT sg.*, sgmap.study_subject_id
+			FROM study_group sg, study_group_class sgc, subject_group_map sgmap
+			WHERE sg.study_group_id=sgmap.study_group_id
+				AND sg.study_group_class_id = sgc.study_group_class_id
+				AND sgc.study_id = ?
+		</sql>
+	</query>
+	<query>
+		<name>findAllByGroupClass</name>
+		<sql>
+			SELECT sg.*
+			FROM study_group sg
+			WHERE sg.study_group_class_id=?
+			ORDER BY study_group_id
+		</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>
+		   INSERT INTO study_group 
+		   (name,description,study_group_class_id) 
+		   VALUES (?,?,?)
+		</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>
+		  UPDATE study_group SET study_group_class_id=?, name=?,
+		         description=?
+		  WHERE study_group_id=?
+	    </sql>
+	</query>
+	<query>
+		<name>findByPKAndStudy</name>
+		<sql>
+			SELECT sg.*
+			FROM study_group sg, study st
+			WHERE sg.study_group_id=?
+				AND sg.study_id=st.study_id
+				AND (st.study_id=? or st.parent_study_id=?)
+		</sql>
+	</query>
+	<query>
+		<name>findByNameAndGroupClassId</name>
+		<sql>
+			select sg.* from study_group sg
+			where sg.name = ? and sg.study_group_class_id = ?
+		</sql>
+	</query>
+</queries>

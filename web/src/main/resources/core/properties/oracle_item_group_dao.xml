@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<queries>
+  <query>
+    <name>findByPK</name>
+    <sql>SELECT * FROM ITEM_GROUP WHERE
+      ITEM_GROUP_ID = ?</sql>
+  </query>
+    <query>
+      <name>findGroupByOid</name>
+      <sql>SELECT * FROM ITEM_GROUP WHERE
+        OC_OID = ?</sql>
+  </query>
+  <query>
+      <name>findGroupByOidAndCrfId</name>
+      <sql>SELECT * FROM ITEM_GROUP WHERE
+        OC_OID = ? and crf_id=?</sql>
+  </query>
+  <query>
+    <name>findAll</name>
+    <sql>SELECT * FROM ITEM_GROUP</sql>
+  </query>
+   <query>
+    <name>create</name>
+    <sql>
+     INSERT INTO ITEM_GROUP (ITEM_GROUP_ID,name,crf_id,status_id,
+     date_created ,owner_id) VALUES (?,?,?,?,sysdate,?)
+    </sql>
+  </query>
+  <query>
+    <name>update</name>
+    <sql>UPDATE ITEM_GROUP SET name=?,crf_id =?,
+      status_id=?, date_updated = sysdate,update_id=?,
+      WHERE ITEM_GROUP_ID=?
+    </sql>
+  </query>
+  <query>
+    <name>findByName</name>
+    <sql>select * from item_group where name=? </sql>
+  </query>
+  <query>
+    <name>findGroupsByItemID</name>
+    <sql>
+      select fg.* from item_group fg, item_group_metadata fgm, item it 
+      where it.item_id = ? and it.item_id=fgm.item_id 
+      and fgm.item_group_id = fg.item_group_id
+    </sql>
+  </query>
+  <query>
+    <name>findGroupByCRFVersionID</name>
+    <sql>
+    select distinct ig.* from item_group ig, item_group_metadata igm 
+    where igm.crf_version_id=? 
+    and ig.item_group_id = igm.item_group_id    
+    </sql>
+  </query>
+  <query>
+    <name>findGroupBySectionId</name>
+    <sql>
+        select distinct ig.* from item_group ig, item_group_metadata igm,
+        section s, item_form_metadata ifm
+        where ifm.section_id=? and igm.crf_version_id=s.crf_version_id
+        and ig.item_group_id = igm.item_group_id
+        and s.section_id = ifm.section_id
+        and ifm.item_id = igm.item_id
+    </sql>
+  </query>
+  <query>
+    <name>findCurrentPKValue</name>
+    <sql>select item_group_id_seq.currval as key from dual</sql>
+  </query>
+  <query>
+    <name>getNextPK</name>
+    <sql>select item_group_id_seq.nextval as key from dual</sql>
+  </query>
+    <query>
+      <name>findOnlyGroupsByCRFVersionID</name>
+      <sql>
+      select distinct ig.* from item_group ig, item_group_metadata igm
+      where igm.crf_version_id=?
+      and ig.item_group_id = igm.item_group_id and ig.name != 'Ungrouped'
+      </sql>
+    </query>
+    <query>
+    <name>findLegitGroupBySectionId</name>
+    <sql>
+      select distinct ig.* from item_group ig, item_group_metadata igm,
+      section s, item_form_metadata ifm
+      where ifm.section_id=? and igm.crf_version_id=s.crf_version_id
+      and ig.item_group_id = igm.item_group_id
+      and s.section_id = ifm.section_id
+      and ifm.item_id = igm.item_id
+      and ig.name != 'Ungrouped'  
+      and igm.repeating_group = 1
+    </sql>
+  </query>
+    <query>
+        <name>isItemGroupRepeatingBasedOnAllCrfVersions</name>
+        <sql>
+           select count(igm.item_group_metadata_id) count from item_group ig,item_group_metadata igm where 
+				ig.item_group_id = igm.item_group_id AND
+				oc_oid=?
+				and (repeat_number > 1 or repeat_max > 1)
+        </sql>
+    </query>
+   <query>
+        <name>isItemGroupRepeatingBasedOnCrfVersion</name>
+        <sql>
+           select count(igm.item_group_metadata_id) count from item_group ig,item_group_metadata igm where 
+				ig.item_group_id = igm.item_group_id AND
+				oc_oid=? and crf_version_id = ?
+				and (repeat_number > 1 or repeat_max > 1)
+        </sql>
+    </query>
+  <query>
+  	<name>findTopOneGroupBySectionId</name>
+  	<sql> select distinct ig.* from item_group ig, item_group_metadata igm,
+      section s, item_form_metadata ifm
+      where ifm.section_id=? and igm.crf_version_id=s.crf_version_id
+      and ig.item_group_id = igm.item_group_id
+      and s.section_id = ifm.section_id
+      and ifm.item_id = igm.item_id
+      and ig.name != 'Ungrouped'
+      and igm.repeating_group = 1   
+  	  and rownum = 1
+  </sql>
+  </query>
+</queries>

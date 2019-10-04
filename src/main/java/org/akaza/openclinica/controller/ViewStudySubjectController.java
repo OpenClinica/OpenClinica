@@ -8,8 +8,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
-import org.akaza.openclinica.service.Page;
-import org.akaza.openclinica.service.ViewStudySubjectService;
+import core.org.akaza.openclinica.service.Page;
+import core.org.akaza.openclinica.service.ViewStudySubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package org.akaza.openclinica.service;
+package core.org.akaza.openclinica.service;
 
 import org.springframework.data.annotation.ReadOnlyProperty;
 

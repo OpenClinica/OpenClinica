@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByCrfPath</name>
+		<sql>
+			select * from event_definition_crf_tag where tag_id=? and path=? and
+			active=?
+		</sql>
+	</query>
+
+</queries>
+

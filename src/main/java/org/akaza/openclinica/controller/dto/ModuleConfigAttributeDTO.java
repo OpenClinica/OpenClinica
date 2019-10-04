@@ -2,7 +2,7 @@ package org.akaza.openclinica.controller.dto;
 
 
 
-import org.akaza.openclinica.service.AbstractAuditingDTO;
+import core.org.akaza.openclinica.service.AbstractAuditingDTO;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 

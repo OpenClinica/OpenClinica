@@ -17,14 +17,25 @@ import javax.servlet.http.HttpServletResponse;
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/submit/ListNotesTableFactory.java
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.PermissionService;
+=======
+import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/submit/ListNotesTableFactory.java
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.DropdownFilter;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/submit/ListNotesTableFactory.java
+=======
+import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/submit/ListNotesTableFactory.java
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -44,7 +55,10 @@ import core.org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesService;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/submit/ListNotesTableFactory.java
 import org.akaza.openclinica.service.ViewStudySubjectService;
+=======
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/submit/ListNotesTableFactory.java
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;

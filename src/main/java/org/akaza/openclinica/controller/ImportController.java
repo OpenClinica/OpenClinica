@@ -4,6 +4,10 @@ import core.org.akaza.openclinica.service.CustomParameterizedException;
 import core.org.akaza.openclinica.service.UtilService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/ImportController.java
+=======
+import core.org.akaza.openclinica.bean.core.ApplicationConstants;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/ImportController.java
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
@@ -17,11 +21,17 @@ import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/ImportController.java
 //import core.org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
+=======
+import core.org.akaza.openclinica.service.*;
+import core.org.akaza.openclinica.service.auth.TokenService;
+import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/ImportController.java
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 import org.exolab.castor.mapping.Mapping;

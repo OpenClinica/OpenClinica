@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM RULE_EXPRESSION WHERE
+		RULE_EXPRESSION_ID = ?</sql>
+	</query>
+	<query>
+		<name>getCurrentPK</name>
+		<sql> select rule_expression_id_seq.currval as key from dual</sql>
+	</query>
+	<query>
+		<name>delete</name>
+		<sql>delete FROM RULE_EXPRESSION where RULE_EXPRESSION_ID=?</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO RULE_EXPRESSION (context,value,owner_id,status_id,date_created) 
+		VALUES (?,?,?,?,sysdate)</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>
+			UPDATE RULE_EXPRESSION
+			SET CONTEXT=?,
+			    VALUE=?,
+				DATE_UPDATED=sysdate,
+			    UPDATE_ID=?
+			    WHERE RULE_EXPRESSION_ID=?
+		</sql>
+	</query>
+</queries>

@@ -6,7 +6,11 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.CustomRuntimeException;
 import core.org.akaza.openclinica.service.OdmImportService;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/OdmImportController.java
 import org.akaza.openclinica.service.Page;
+=======
+import core.org.akaza.openclinica.service.Page;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/OdmImportController.java
 import core.org.akaza.openclinica.service.PublishDTO;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.apache.commons.collections4.map.PassiveExpiringMap;

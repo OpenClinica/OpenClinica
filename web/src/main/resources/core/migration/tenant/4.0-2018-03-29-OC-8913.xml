@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="jkeremian" id="2018-03-29-OC-8913-01">
+		<createTable tableName="page_layout">
+			<column autoIncrement="true" name="page_layout_id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="pk_page_layout" />
+			</column>
+			<column name="name" type="varchar(255)" />
+			<column name="definition" type="BYTEA" />
+			<column name="owner_id" type="INT" />
+			<column name="update_id" type="INT" />
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE" />
+		</createTable>
+	</changeSet>
+
+
+
+
+</databaseChangeLog>
