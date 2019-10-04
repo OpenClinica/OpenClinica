@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/StudyParticipantController.java
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -25,6 +26,35 @@ import org.akaza.openclinica.service.PdfService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+=======
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import core.org.akaza.openclinica.bean.login.*;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
+import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.JobDetail;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.*;
+import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/StudyParticipantController.java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

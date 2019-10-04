@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM study_group_class WHERE 
+		study_group_class_id = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM study_group_class</sql>
+	</query>
+	<query>
+		<name>findAllByStudy</name>
+		<sql>
+			SELECT sg.*, st.name as study_name, gct.name as type_name 
+			FROM study_group_class sg, study st, group_class_types gct
+			WHERE sg.group_class_type_id=gct.group_class_type_id
+			AND sg.study_id=st.study_id
+			AND (st.study_id=? or st.parent_study_id=?)
+		    ORDER BY sg.name asc
+		</sql>
+	</query>
+	<query>
+		<name>findAllActiveByStudy</name>
+		<sql>
+			SELECT sg.*, st.name as study_name, gct.name as type_name 
+			FROM study_group_class sg, study st, group_class_types gct
+			WHERE sg.group_class_type_id=gct.group_class_type_id
+			AND sg.study_id=st.study_id
+				AND (st.study_id=? or st.parent_study_id=?)		
+			AND sg.status_id=1
+			ORDER BY sg.name asc
+		</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>
+		   INSERT INTO study_group_class 
+		   (STUDY_GROUP_CLASS_ID,NAME,STUDY_ID,OWNER_ID,DATE_CREATED, GROUP_CLASS_TYPE_ID,
+		    STATUS_ID,subject_assignment) 
+		   VALUES (?,?,?,?,NOW(),?,?,?)
+		</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>
+		  UPDATE study_group_class SET NAME=?,STUDY_ID=?, GROUP_CLASS_TYPE_ID=?,
+		  STATUS_ID=?, DATE_UPDATED=?,UPDATE_ID=?,subject_assignment=?
+		  WHERE STUDY_GROUP_CLASS_ID=?
+	    </sql>
+	</query>
+	<query>
+		<name>getCurrentPrimaryKey</name>
+		<sql>SELECT study_group_class_id as key from study_group_class order by oid desc</sql>
+	</query>
+	<query>
+		<name>getNextPK</name>
+		<sql>SELECT nextval('study_group_class_study_group_class_id_seq') AS key</sql>
+	</query>
+</queries>

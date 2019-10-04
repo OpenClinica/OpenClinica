@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="pgawade" id="2017-03-15-7878-1">
+        <createTable tableName="status">
+            <column autoIncrement="true" name="status_id" type="SERIAL">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(1000)"/>
+        </createTable>
+
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="1"/>
+            <column name="name" value="available"/>
+            <column name="description" value="this is the active status"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="2"/>
+            <column name="name" value="unavailable"/>
+            <column name="description" value="this is the inactive status"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="3"/>
+            <column name="name" value="private"/>
+            <column name="description"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="4"/>
+            <column name="name" value="pending"/>
+            <column name="description"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="5"/>
+            <column name="name" value="removed"/>
+            <column name="description" value="this indicates that a record is specifically removed by user"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="6"/>
+            <column name="name" value="locked"/>
+            <column name="description"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="7"/>
+            <column name="name" value="auto-removed"/>
+            <column name="description" value="this indicates that a record is removed due to the removal of its parent record"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="8"/>
+            <column name="name" value="signed"/>
+            <column name="description" value="this indicates all StudyEvents has been signed"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="9"/>
+            <column name="name" value="frozen"/>
+            <column name="description" value="frozen"/>
+        </insert>
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="10"/>
+            <column name="name" value="souce_data_verification"/>
+            <column name="description" value="indicates the element has undergone SDV"/>
+        </insert>
+
+        <insert tableName="status">
+            <column name="status_id" valueNumeric="11"/>
+            <column name="name" value="reset"/>
+            <column name="description" value="deleting event crf resets status"/>
+        </insert>
+    </changeSet>
+    <changeSet author="yogi" id="2017-03-15-7878-2">
+        <createTable tableName="user_account">
+            <column autoIncrement="true" name="user_id" type="SERIAL">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_name" type="VARCHAR(64)"/>
+            <column name="passwd" type="VARCHAR(255)"/>
+            <column name="first_name" type="VARCHAR(50)"/>
+            <column name="last_name" type="VARCHAR(50)"/>
+            <column name="email" type="VARCHAR(120)"/>
+            <column name="active_study" type="int"/>
+            <column name="institutional_affiliation" type="VARCHAR(255)"/>
+            <column name="status_id" type="int"/>
+            <column name="owner_id" type="int"/>
+            <column name="date_created" type="DATE"/>
+            <column name="date_updated" type="DATE"/>
+            <column name="date_lastvisit" type="timestamp"/>
+            <column name="passwd_timestamp" type="DATE"/>
+            <column name="passwd_challenge_question" type="VARCHAR(64)"/>
+            <column name="passwd_challenge_answer" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(64)"/>
+            <column name="user_type_id" type="int"/>
+            <column name="update_id" type="int"/>
+            <column name="enabled" defaultValueBoolean="true" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_non_locked" defaultValueBoolean="true" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lock_counter" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="run_webservices" defaultValueBoolean="false" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_code" type="VARCHAR(64)"/>
+            <column name="time_zone" type="VARCHAR(255)" defaultValue=""/>
+            <column name="enable_api_key" defaultValueBoolean="false" type="boolean"/>
+            <column name="api_key" type="VARCHAR(255)"/>
+            <column name="user_uuid" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pgawade" id="2017-03-15-7878-3">
+        <createTable tableName="user_type">
+            <column autoIncrement="true" name="user_type_id" type="SERIAL">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_type" type="VARCHAR(50)"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="user_account" constraintName="fk_user_acc_fk_user_f_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
+        <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="user_account" constraintName="fk_user_acc_status_re_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
+        <addForeignKeyConstraint baseColumnNames="user_type_id" baseTableName="user_account" constraintName="fk_user_acc_ref_user__user_typ" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_type_id" referencedTableName="user_type" referencedTableSchemaName="public" />
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-4">
+            <insert tableName="user_type">
+                <column name="user_type_id" valueNumeric="1"/>
+                <column name="user_type" value="admin"/>
+            </insert>
+            <insert tableName="user_type">
+                <column name="user_type_id" valueNumeric="2"/>
+                <column name="user_type" value="user"/>
+            </insert>
+        <insert tableName="user_type">
+            <column name="user_type_id" valueNumeric="3"/>
+            <column name="user_type" value="tech-admin"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade" id="2017-03-15-7878-5">
+        <createIndex indexName="i_user_account_user_name" tableName="user_account" unique="false">
+            <column name="user_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pgawade" id="2017-03-15-7878-6">
+        <insert tableName="user_account">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="user_name" value="root"/>
+            <column name="passwd" value="25d55ad283aa400af464c76d713c07ad"/>
+            <column name="first_name" value="Root"/>
+            <column name="last_name" value="User"/>
+            <column name="email" value="openclinica_admin@example.com"/>
+            <column name="institutional_affiliation" value="Akaza Research"/>
+            <column name="status_id" valueNumeric="1"/>
+            <column name="owner_id" valueNumeric="1"/>
+            <column name="date_created"/>
+            <column name="date_updated" valueDate="2006-10-23"/>
+            <column name="date_lastvisit" valueDate="2006-10-23"/>
+            <column name="passwd_timestamp" valueDate="2006-10-23"/>
+            <column name="passwd_challenge_question"/>
+            <column name="passwd_challenge_answer"/>
+            <column name="phone" value="617 621 8585"/>
+            <column name="user_type_id" valueNumeric="3"/>
+            <column name="update_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2017-03-15-7878-7">
+
+        <sql splitStatements="false">
+            SELECT nextval('user_account_user_id_seq')
+        </sql>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-8">
+        <createTable tableName="user_role">
+            <column autoIncrement="true" name="role_id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="pk_user_role"/>
+            </column>
+            <column name="role_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="INT"/>
+            <column name="role_desc" type="VARCHAR(2000)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-9">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="1"/>
+            <column name="role_name" value="admin"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-10">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="2"/>
+            <column name="role_name" value="coordinator"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-11">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="3"/>
+            <column name="role_name" value="director"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-12">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="4"/>
+            <column name="role_name" value="investigator"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-13">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="5"/>
+            <column name="role_name" value="ra"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-14">
+        <insert tableName="user_role">
+            <column name="role_id" valueNumeric="6"/>
+            <column name="role_name" value="monitor"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="role_desc"/>
+        </insert>
+    </changeSet>
+    <!-- Added Tables for Spring Security -->
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-15">
+        <createTable tableName="authorities">
+            <column autoIncrement="true" name="id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2017-03-15-7878-16" dbms="postgresql">
+        <sql splitStatements="false">
+            delete from authorities;
+            insert into authorities  select nextval('authorities_id_seq'), user_name,'ROLE_USER',1 from user_account;
+        </sql>
+        <rollback>
+            delete from authorities;
+            insert into authorities values (1, 'root','ROLE_USER',1);
+        </rollback>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-18">
+        <createTable tableName="study_user_role">
+            <column name="role_name" type="VARCHAR(40)"/>
+            <column name="study_id" type="int"/>
+            <column name="status_id" type="int"/>
+            <column name="owner_id" type="int"/>
+            <column name="date_created" type="DATE"/>
+            <column name="date_updated" type="DATE"/>
+            <column name="update_id" type="int"/>
+            <column name="user_name" type="VARCHAR(64)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-19">
+        <createIndex indexName="i_study_user_role_user_name" tableName="study_user_role" unique="false">
+            <column name="user_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-20">
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_user_role" constraintName="fk_study_us_study_use_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-21">
+        <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_user_role" constraintName="fk_study_us_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public"/>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="2017-03-15-7878-22">
+        <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_user_role" constraintName="fk_person_role_study_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
+    </changeSet>
+    <changeSet author="kkrumlian" id="2017-03-15-7878-22">
+        <comment>update study protocol_type</comment>
+        <update tableName="study_user_role">
+            <column name="role_name" value="Data Specialist"/>
+            <where>role_name='investigator'</where>
+        </update>
+        <rollback>
+            <update tableName="study_user_role">
+                <column name="role_name" value="investigator"/>
+                <where>role_name='Data Specialist'</where>
+            </update>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -41,8 +41,8 @@ public class RssReaderServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    	resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",req.getLocale());
-    	resformat = ResourceBundle.getBundle("org.akaza.openclinica.i18n.format",req.getLocale());
+    	resword = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",req.getLocale());
+    	resformat = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.format",req.getLocale());
     	PrintWriter pw = new PrintWriter(resp.getOutputStream());
         if (rssUrl == null || rssUrl.length() == 0) {
             about(pw);

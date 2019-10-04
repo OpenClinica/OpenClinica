@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM ARCHIVED_DATASET_FILE WHERE 
+		ARCHIVED_DATASET_FILE_ID = ?</sql>
+	</query>
+	<query>
+		<name>findByDatasetId</name>
+		<sql>SELECT * FROM ARCHIVED_DATASET_FILE WHERE 
+		DATASET_ID = ?</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>UPDATE ARCHIVED_DATASET_FILE SET NAME=?,DATASET_ID=?,
+		EXPORT_FORMAT_ID=?,FILE_REFERENCE=?,FILE_SIZE=?,RUN_TIME=?,
+		OWNER_ID=? WHERE 
+	    ARCHIVED_DATASET_FILE_ID=?</sql>
+	</query>
+    <query>
+        <name>deleteArchiveDataset</name>
+        <sql>Delete from ARCHIVED_DATASET_FILE where ARCHIVED_DATASET_FILE_ID=?
+        </sql>
+    </query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO ARCHIVED_DATASET_FILE (NAME, DATASET_ID, 
+		EXPORT_FORMAT_ID, FILE_REFERENCE, FILE_SIZE, RUN_TIME, 
+		OWNER_ID, DATE_CREATED) 
+		VALUES (?,?,?,?,?,?,?,sysdate)</sql>
+	</query>
+	<query>
+		<name>getCurrentPK</name>
+		<sql>SELECT archived_dataset_file_id_seq.currval AS key from dual</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM ARCHIVED_DATASET_FILE</sql>
+	</query>
+</queries>

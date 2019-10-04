@@ -14,7 +14,15 @@ import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/extract/DiscrepancyNoteOutputServlet.java
 import core.org.akaza.openclinica.bean.managestudy.*;
+=======
+import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/extract/DiscrepancyNoteOutputServlet.java
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
@@ -22,14 +30,21 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/extract/DiscrepancyNoteOutputServlet.java
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.service.PermissionService;
+=======
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/extract/DiscrepancyNoteOutputServlet.java
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.core.util.Pair;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/extract/DiscrepancyNoteOutputServlet.java
+=======
+import core.org.akaza.openclinica.dao.hibernate.ItemDataDao;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/extract/DiscrepancyNoteOutputServlet.java
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -51,8 +66,11 @@ import core.org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesService;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/extract/DiscrepancyNoteOutputServlet.java
 import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.service.ViewStudySubjectService;
+=======
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/extract/DiscrepancyNoteOutputServlet.java
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**

@@ -593,7 +593,7 @@ public class SDVController {
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles =
             { resourceBundle.getString("study_subject_ID"), resourceBundle.getString("person_ID"), resourceBundle.getString("secondary_ID"),

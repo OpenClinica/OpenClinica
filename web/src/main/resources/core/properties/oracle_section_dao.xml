@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM SECTION WHERE 
+		SECTION_ID = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM SECTION</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO SECTION (CRF_VERSION_ID, STATUS_ID, LABEL, TITLE,
+		INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL, ORDINAL, PARENT_ID,
+		OWNER_ID, DATE_CREATED) 
+		VALUES (?,?,?,?,?,?,?,?,?,?,sysdate)</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>UPDATE SECTION SET CRF_VERSION_ID=?,STATUS_ID=?,LABEL=?,
+		TITLE=?,INSTRUCTIONS=?,SUBTITLE=?,PAGE_NUMBER_LABEL=?,ORDINAL=?,
+		DATE_UPDATED=sysdate,UPDATE_ID=?,BORDERS=? WHERE 
+		SECTION_ID=?</sql>
+	</query>
+
+	<query>
+		<name>findByVersionId</name>
+		<sql>SELECT * FROM SECTION WHERE CRF_VERSION_ID=?
+		order by section_id ASC</sql>
+	</query>
+
+	<query>
+		<name>findAllByCRFVersion</name>
+		<sql>SELECT * FROM section WHERE crf_version_id=?
+		order by section_id ASC</sql>
+	</query>
+
+	<query>
+		<name>getNumItemsBySectionId</name>
+		<sql>
+			SELECT section_id, count(*) as num_items
+			FROM ITEM_FORM_METADATA M
+			GROUP BY section_id
+		</sql>
+	</query>
+	<!-- YW 10-11-2007, also count repeated items in section. Items with "remove" or "auto-remove" status will not be counted -->
+	<!-- And this depends on all repeated items will be put into ITEM_DATA table as current it is -->
+	<query>
+		<name>getNumItemsPlusRepeatBySectionId</name>
+		<sql>
+			SELECT M.section_id as section_id, count(*) AS num_items
+			FROM ITEM_DATA D, ITEM_FORM_METADATA M
+			WHERE D.item_id = M.item_id
+				AND (D.status_id != 5 AND D.status_id != 7)
+				AND D.event_crf_id = ?
+			GROUP BY M.section_id
+		</sql>
+	</query>
+	<query>
+		<name>getNumItemsCompletedBySectionId</name>
+		<sql>
+			SELECT M.section_id as section_id, count(*) AS num_items
+			FROM ITEM_DATA D, ITEM_FORM_METADATA M
+			WHERE D.item_id = M.item_id
+				AND D.status_id = 2
+				AND D.event_crf_id = ?
+			GROUP BY M.section_id
+		</sql>
+	</query>
+	<query>
+		<name>getNumItemsCompletedBySection</name>
+		<sql>
+			SELECT M.section_id as section_id, count(*) AS num_items
+			FROM ITEM_DATA D, ITEM_FORM_METADATA M
+			WHERE D.item_id = M.item_id
+				--AND D.status_id = 2
+				AND D.event_crf_id = ?
+			GROUP BY M.section_id
+		</sql>
+	</query>
+	<query>
+		<name>getNumItemsPendingBySectionId</name>
+		<sql>
+			SELECT M.section_id as section_id, count(*) AS num_items
+			FROM ITEM_DATA D, ITEM_FORM_METADATA M
+			WHERE D.item_id = M.item_id
+				AND D.status_id = 4
+				AND D.event_crf_id = ?
+			GROUP BY M.section_id
+		</sql>
+	</query>
+	<query>
+		<name>getNumItemsBlankBySectionId</name>
+		<sql>
+			SELECT M.section_id as section_id, count(*) AS num_items
+			FROM ITEM_DATA D, ITEM_FORM_METADATA M
+			WHERE D.item_id = M.item_id
+				AND D.status_id = 1
+				AND D.event_crf_id = ?
+			GROUP BY M.section_id
+		</sql>
+	</query>
+	<query>
+		<name>findNext</name>
+		<sql>
+			SELECT n.*
+			FROM section n, section c
+			WHERE n.crf_version_id = c.crf_version_id
+				AND n.ordinal = c.ordinal + 1
+				AND c.crf_version_id = ?
+				AND c.ordinal = ?
+		</sql>
+	</query>
+	<query>
+		<name>findPrevious</name>
+		<sql>
+			SELECT n.*
+			FROM section n, section c
+			WHERE n.crf_version_id = c.crf_version_id
+				AND n.ordinal = c.ordinal - 1
+				AND c.crf_version_id = ?
+				AND c.ordinal = ?
+		</sql>
+	</query>
+	<query>
+		<name>deleteTestSection</name>
+		<sql>
+			delete from section where label=?
+		</sql>
+	</query>
+	<query>
+		<name>countSCDItemBySectionId</name>
+		<sql>
+			select count(scd.id) as "COUNT" from scd_item_metadata scd
+			where scd.scd_item_form_metadata_id in (select ifm.item_form_metadata_id 
+			from item_form_metadata ifm where ifm.section_id = ?)
+		</sql>
+	</query>
+	<query>
+	<name>containNormalItem</name>
+	<sql>select ifm.item_id from item_form_metadata ifm where ifm.section_id = ? and ifm.crf_version_id = ?
+    and ifm.show_item = 1
+    and ifm.item_id not in  (select distinct igm.item_id from item_group_metadata igm where igm.crf_version_id = ? 
+		and igm.show_group = 0 
+		and igm.item_id in (select im.item_id from item_form_metadata im where im.section_id = ? and im.crf_version_id = ?)) 
+    	and rownum = 1
+	</sql>
+	</query>
+	<query>
+		<name>getSectionIdForTabId</name>
+		<sql>
+			select section_id from section where crf_version_id = ? and ordinal = ?
+		</sql>
+	
+	</query>
+</queries>

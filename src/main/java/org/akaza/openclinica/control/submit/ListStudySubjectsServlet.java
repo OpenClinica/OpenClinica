@@ -19,10 +19,17 @@ import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/submit/ListStudySubjectsServlet.java
 import org.akaza.openclinica.service.Component;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
+=======
+import core.org.akaza.openclinica.service.Component;
+import core.org.akaza.openclinica.service.PermissionService;
+import core.org.akaza.openclinica.service.UserService;
+import core.org.akaza.openclinica.service.ViewStudySubjectService;
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/submit/ListStudySubjectsServlet.java
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.web.context.WebApplicationContext;

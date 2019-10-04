@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<queries>
+        <query>
+                <name>findByPK</name>
+                <sql>SELECT * FROM DATASET WHERE
+                DATASET_ID = ?</sql>
+        </query>
+        <query>
+                <name>findByNameAndStudy</name>
+                <sql>SELECT * FROM DATASET WHERE
+                name = ? and study_id=?</sql>
+        </query>
+        <query>
+                <name>findAll</name>
+                <sql>SELECT * FROM DATASET</sql>
+        </query>
+        <query>
+                <name>findByOwnerId</name>
+                <sql>select ds.*
+                from dataset ds, study st
+                where ds.study_id=st.study_id
+                        AND (st.study_id=? or st.parent_study_id=?)
+                        AND ds.status_id=1
+                        AND DS.OWNER_ID=?</sql>
+        </query>
+        <query>
+                <name>getCurrentPK</name>
+                <sql>SELECT dataset_id_seq.currval AS key from dual</sql>
+        </query>
+        <query>
+                <name>getNextPK</name>
+                <sql>SELECT dataset_id_seq.nextval AS key from dual</sql>
+        </query>
+        <query>
+                <name>create</name>
+                <sql>
+                   INSERT INTO DATASET (STUDY_ID, STATUS_ID, NAME, DESCRIPTION,
+		  			SQL_STATEMENT, OWNER_ID, DATE_CREATED, DATE_LAST_RUN,
+		  			NUM_RUNS, DATE_START, DATE_END,
+		  			SHOW_EVENT_LOCATION,SHOW_EVENT_START,SHOW_EVENT_END,
+		  			SHOW_SUBJECT_DOB,SHOW_SUBJECT_GENDER,SHOW_EVENT_STATUS,
+		  			SHOW_SUBJECT_STATUS,SHOW_SUBJECT_UNIQUE_ID,SHOW_SUBJECT_AGE_AT_EVENT,
+		  			SHOW_CRF_STATUS,SHOW_CRF_VERSION,
+		  			SHOW_CRF_INT_NAME,SHOW_CRF_INT_DATE,
+		  			SHOW_GROUP_INFO,SHOW_DISC_INFO,
+		  			odm_metadataversion_name, odm_metadataversion_oid,
+		  			odm_prior_study_oid, odm_prior_metadataversion_oid, show_secondary_id,
+		  			dataset_item_status_id)
+		  			VALUES (?,?,?,?,?,?,sysdate,sysdate,?,sysdate,date'2005-11-15',
+		  			?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                </sql>
+        </query>
+        <query>
+                <name>createGroupMap</name>
+                <sql>
+                INSERT INTO DATASET_STUDY_GROUP_CLASS_MAP (DATASET_ID,
+                        STUDY_GROUP_CLASS_ID) VALUES (?,?)
+                </sql>
+        </query>
+        <query>
+                <name>removeGroupMap</name>
+                <sql>
+                DELETE FROM DATASET_STUDY_GROUP_CLASS_MAP WHERE DATASET_ID=?
+                        AND STUDY_GROUP_CLASS_ID=?
+                </sql>
+        </query>
+        <query>
+                <name>findAllGroups</name>
+                <sql>
+                SELECT DISTINCT * FROM DATASET_STUDY_GROUP_CLASS_MAP
+                        WHERE DATASET_ID=?
+                </sql>
+        </query>
+        <query>
+                <name>update</name>
+                <sql>UPDATE DATASET SET STUDY_ID=?,STATUS_ID=?,NAME=?,DESCRIPTION=?,
+                SQL_STATEMENT=?,DATE_LAST_RUN=?,NUM_RUNS=?,
+                DATE_UPDATED=sysdate,UPDATE_ID=?,APPROVER_ID=?,DATE_START=?,
+                DATE_END=? WHERE
+                DATASET_ID=?</sql>
+        </query>
+        <query>
+                <name>findTopFive</name>
+                <sql>select ds.* from dataset ds, study st
+                where ds.study_id=st.study_id
+                        AND (st.study_id=? or st.parent_study_id=?)
+                        AND ds.status_id=1
+            and rownum &lt;= 5
+                        order by ds.date_created desc</sql>
+        </query>
+
+        <query>
+          <name>findAllByStudyId</name>
+          <sql>
+                select ds.*
+                from dataset ds, study st
+                where ds.study_id=st.study_id
+                        AND (st.study_id=? or st.parent_study_id=?)
+          </sql>
+        </query>
+        <query>
+          <name>findAllByStudyIdAdmin</name>
+          <sql>
+                select ds.*
+                from dataset ds, study st
+                where ds.study_id=st.study_id
+                        AND (st.study_id=? or st.parent_study_id=?)
+          </sql>
+        </query>
+        <query>
+			<name>findAllOrderByStudyIdAndName</name>
+			<sql>select * from dataset where status_id = 1 order by study_id, name</sql>
+		</query>
+        <!-- YW, Feb. 2008, for editing dataset -->
+		<query>
+			<name>updateAll</name>
+			<sql>UPDATE DATASET SET STUDY_ID=?,STATUS_ID=?,NAME=?,DESCRIPTION=?,
+			SQL_STATEMENT=?,DATE_LAST_RUN=?,NUM_RUNS=?,
+			DATE_UPDATED=sysdate,UPDATE_ID=?,APPROVER_ID=?,DATE_START=?,
+			DATE_END=?,
+			SHOW_EVENT_LOCATION=?,SHOW_EVENT_START=?,SHOW_EVENT_END=?,
+			SHOW_SUBJECT_DOB=?,SHOW_SUBJECT_GENDER=?,SHOW_EVENT_STATUS=?,
+			SHOW_SUBJECT_STATUS=?,SHOW_SUBJECT_UNIQUE_ID=?,SHOW_SUBJECT_AGE_AT_EVENT=?,
+			SHOW_CRF_STATUS=?,SHOW_CRF_VERSION=?,
+			SHOW_CRF_INT_NAME=?,SHOW_CRF_INT_DATE=?,
+			SHOW_GROUP_INFO=?,SHOW_DISC_INFO=?,
+			odm_metadataversion_name=?, odm_metadataversion_oid=?,
+			odm_prior_study_oid=?, odm_prior_metadataversion_oid=?,
+			show_secondary_id=?, dataset_item_status_id=?
+			WHERE DATASET_ID=?</sql>
+		</query>
+</queries>

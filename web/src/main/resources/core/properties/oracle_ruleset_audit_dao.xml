@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM RULE_SET_AUDIT WHERE
+		RULE_SET_AUDIT_ID = ?</sql>
+	</query>
+	<query>
+        <name>findCurrentPKValue</name>
+        <sql> select rule_set_audit_id_seq.currval as key from dual</sql>
+    </query>
+	<query>
+		<name>findAllByRuleSet</name>
+		<sql>SELECT * FROM RULE_SET_AUDIT WHERE RULE_SET_ID=?</sql>
+	</query>
+	<query>
+		<name>delete</name>
+		<sql>delete FROM RULE_SET where RULE_SET_ID=?</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql> INSERT INTO RULE_SET_AUDIT (rule_set_id, status_id,updater_id,date_updated)
+		      VALUES (?,?,?,sysdate)</sql>
+	</query>
+</queries>

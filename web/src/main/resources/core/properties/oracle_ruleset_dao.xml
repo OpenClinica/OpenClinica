@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM RULE_SET WHERE
+		RULE_SET_ID = ?</sql>
+	</query>
+
+	<query>
+        <name>findByExpression</name>
+        <sql>SELECT RULE_SET.* FROM RULE_SET,RULE_EXPRESSION WHERE
+        RULE_SET.RULE_EXPRESSION_ID = RULE_EXPRESSION.RULE_EXPRESSION_ID AND
+        RULE_EXPRESSION.CONTEXT = ? AND
+        RULE_EXPRESSION.VALUE = ? </sql>
+    </query>
+    <query>
+        <name>findByCrfId</name>
+        <sql>SELECT RULE_SET.* FROM RULE_SET WHERE
+        RULE_SET.CRF_ID = ? AND RULE_SET.STUDY_ID=? </sql>
+    </query>
+    <query>
+        <name>findByCrfVersionStudyAndStudyEventDefinition</name>
+        <sql>SELECT RULE_SET.* FROM RULE_SET WHERE
+        RULE_SET.CRF_VERSION_ID = ? AND RULE_SET.STUDY_ID=? AND RULE_SET.STUDY_EVENT_DEFINITION_ID=? </sql>
+    </query>
+    <query>
+        <name>findByCrfVersionOrCrfStudyAndStudyEventDefinition</name>
+        <sql>SELECT RULE_SET.* FROM RULE_SET WHERE
+         RULE_SET.STUDY_ID=? AND RULE_SET.STUDY_EVENT_DEFINITION_ID=? AND (( RULE_SET.CRF_VERSION_ID = ? AND RULE_SET.CRF_ID = ? ) OR
+         (RULE_SET.CRF_VERSION_ID is null AND RULE_SET.CRF_ID = ?))</sql>
+    </query>
+    <query>
+        <name>findByCrfStudyAndStudyEventDefinition</name>
+        <sql>SELECT RULE_SET.* FROM RULE_SET WHERE
+        RULE_SET.CRF_ID = ? AND RULE_SET.STUDY_ID=? AND RULE_SET.STUDY_EVENT_DEFINITION_ID=?</sql>
+    </query>
+    <query>
+        <name>findAllByStudy</name>
+        <sql>SELECT RULE_SET.* FROM RULE_SET WHERE RULE_SET.STUDY_ID=?</sql>
+    </query>
+	<query>
+		<name>findByStudyEventDefinition</name>
+		<sql>SELECT * FROM RULE_SET WHERE
+		study_event_definition_id = ?</sql>
+	</query>
+	<query>
+		<name>getCurrentPK</name>
+		<sql>select rule_set_id_seq.currval as key from dual</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM RULE_SET</sql>
+	</query>
+	<query>
+		<name>delete</name>
+		<sql>delete FROM RULE_SET where RULE_SET_ID=?</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO RULE_SET (RULE_EXPRESSION_ID,STUDY_EVENT_DEFINITION_ID,CRF_ID,CRF_VERSION_ID,STUDY_ID,
+		 OWNER_ID,status_id,DATE_CREATED)
+		VALUES (?,?,?,?,?,?,?,sysdate)</sql>
+	</query>
+	<query>
+        <name>removeOrRestore</name>
+        <sql> UPDATE RULE_SET SET DATE_UPDATED=sysdate, UPDATE_ID=?, STATUS_ID=?  WHERE RULE_SET_ID=?</sql>
+    </query>
+	<query>
+		<name>update</name>
+		<sql>
+			UPDATE RULE_SET
+			SET   DATE_UPDATED=sysdate
+				, UPDATE_ID=?
+			WHERE RULE_SET_ID=?
+		</sql>
+	</query>
+</queries>

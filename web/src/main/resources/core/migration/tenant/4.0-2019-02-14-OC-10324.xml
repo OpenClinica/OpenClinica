@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="jkeremian" id="2019-02-14-10324-01">
+		<addColumn tableName="study_subject_detail">
+			<column name="identifier" type="VARCHAR(1000)"/>
+		</addColumn>
+	</changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="kkrumlian" id="2010-03-03-NA01-4">
+
+        <sql splitStatements="false">
+            CREATE TRIGGER didm_update
+            AFTER INSERT ON dn_item_data_map
+            FOR EACH ROW
+            EXECUTE PROCEDURE populate_ssid_in_didm_trigger();
+        </sql>
+    </changeSet>
+
+    <changeSet author="htaycher " id="2011-11-16-11950-5">
+        <sql splitStatements="false">
+            CREATE TRIGGER study_event_insert_update
+            AFTER UPDATE ON study_event
+            FOR EACH ROW
+            EXECUTE PROCEDURE study_event_trigger_new();
+        </sql>
+    </changeSet>
+
+    <changeSet author="ywang" id="2011-07-27-8874-2">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql"/>
+        </preConditions>
+        <comment>create trigger item_data_initial</comment>
+        <sql splitStatements="false">
+            CREATE TRIGGER item_data_initial
+            AFTER INSERT ON item_data
+            FOR EACH ROW
+            EXECUTE PROCEDURE item_data_initial_trigger()
+        </sql>
+    </changeSet>
+    <changeSet author="sshamim" id="2009-03-03-4768-2">
+
+        <sql splitStatements="false">
+            CREATE TRIGGER event_definition_crf_update
+            AFTER UPDATE ON event_definition_crf
+            FOR EACH ROW
+            EXECUTE PROCEDURE event_definition_crf_trigger();
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="pgawade (generated)" id="1235684743487-366">
+
+        <sql splitStatements="false">
+            CREATE TRIGGER global_subject_insert_update
+            AFTER INSERT OR UPDATE ON subject
+            FOR EACH ROW
+            EXECUTE PROCEDURE global_subject_trigger();
+        </sql>
+    </changeSet>
+
+    <changeSet author="pgawade (generated)" id="1235684743487-368">
+
+        <sql splitStatements="false">
+            CREATE TRIGGER study_subject_insert_updare
+            AFTER INSERT OR UPDATE ON study_subject
+            FOR EACH ROW
+            EXECUTE PROCEDURE study_subject_trigger();
+        </sql>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="1235684743487-370">
+
+        <sql splitStatements="false">
+            CREATE TRIGGER subject_group_map_insert_update
+            AFTER INSERT OR UPDATE ON subject_group_map
+            FOR EACH ROW
+            EXECUTE PROCEDURE subject_group_assignment_trigger();
+        </sql>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="1235684743487-371">
+
+        <sql splitStatements="false">
+            CREATE TRIGGER repeating_data_insert
+            AFTER INSERT
+            ON item_data
+            FOR EACH ROW
+            EXECUTE PROCEDURE repeating_item_data_trigger();
+        </sql>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2015-04-15-OC6413-6">
+
+        <sql splitStatements="false">
+            CREATE TRIGGER event_crf_initial
+            AFTER INSERT ON event_crf
+            FOR EACH ROW
+            EXECUTE PROCEDURE event_crf_initial_trigger();
+        </sql>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="1235684743487-365">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql"/>
+            <!--<runningAs username="clinica" />-->
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE TRIGGER event_crf_update
+            AFTER UPDATE ON event_crf
+            FOR EACH ROW
+            EXECUTE PROCEDURE event_crf_trigger();
+        </sql>
+    </changeSet>
+
+    <changeSet author="htaycher " id="2011-10-03-11376-2">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+            <!--<runningAs username="clinica" />-->
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE TRIGGER event_crf_update_1
+            AFTER UPDATE ON event_crf
+            FOR EACH ROW
+            EXECUTE PROCEDURE event_crf_version_change_trigger();
+        </sql>
+    </changeSet>
+</databaseChangeLog>

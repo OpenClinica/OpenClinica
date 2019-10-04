@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM QUERY WHERE 
+		QUERY_ID = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM QUERY</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO QUERY (STATUS_ID, NAME, DESCRIPTION, 
+		SQL_STATEMENT, OWNER_ID, DATE_CREATED, DATE_LAST_RUN, 
+		NUM_RUNS, RUN_TIME, SIB_REQUIREMENT, RESEARCH_PROPOSAL,
+		WHERE_CLAUSE) 
+		VALUES (?,?,?,?,?,NOW(),NOW(),?,?,?,?,?)</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>UPDATE QUERY SET STATUS_ID=?,NAME=?,DESCRIPTION=?,
+		SQL_STATEMENT=?,DATE_LAST_RUN=?,NUM_RUNS=?,RUN_TIME=?,
+		SIB_REQUIREMENT=?,RESEARCH_PROPOSAL=?,APPROVER_ID=?,
+		WHERE_CLAUSE=?,
+		DATE_UPDATED=NOW(),UPDATE_ID=? WHERE 
+		QUERY_ID=?</sql>
+	</query>
+</queries>

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM RULE_ACTION WHERE ACTION_ID = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM RULE_ACTION</sql>
+	</query>
+	findByRuleSetRule
+	<query>
+        <name>findByRuleSetRule</name>
+        <sql>SELECT * FROM RULE_ACTION where rule_set_rule_id= ?</sql>
+    </query>
+	<query>
+		<name>getCurrentPK</name>
+		<sql> select rule_action_id_seq.currval as key from dual</sql>
+	</query>
+	<query>
+		<name>delete</name>
+		<sql>delete FROM RULE_ACTION where ACTION_ID=?</sql>
+	</query>
+	<query>
+		<name>create_dn</name>
+		<sql>INSERT INTO RULE_ACTION (rule_set_rule_id,action_type,expression_evaluates_to,message
+		,OWNER_ID,status_id,DATE_CREATED)
+		VALUES (?,?,?,?,?,?,sysdate)</sql>
+	</query>
+	<query>
+        <name>create_email</name>
+        <sql>INSERT INTO RULE_ACTION (rule_set_rule_id,action_type,expression_evaluates_to,message,email_to
+        ,OWNER_ID,status_id,DATE_CREATED)
+        VALUES (?,?,?,?,?,?,?,sysdate)</sql>
+    </query>
+	<query>
+		<name>update</name>
+		<sql>
+			UPDATE ACTION
+			SET NAME=?
+				, DATE_UPDATED=sysdate
+				, UPDATE_ID=?
+			WHERE RULE_ID=?
+		</sql>
+	</query>
+</queries>

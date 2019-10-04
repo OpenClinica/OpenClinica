@@ -28,8 +28,11 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
+<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/StudyEventController.java
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
+=======
+>>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/StudyEventController.java
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
