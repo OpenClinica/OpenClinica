@@ -1,11 +1,11 @@
 package org.akaza.openclinica.controller;
 
 import net.sf.json.util.JSONUtils;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.service.CallbackService;
-import org.akaza.openclinica.service.CustomRuntimeException;
-import org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.service.CallbackService;
+import core.org.akaza.openclinica.service.CustomRuntimeException;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.keycloak.KeycloakSecurityContext;

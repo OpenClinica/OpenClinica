@@ -1,8 +1,8 @@
 package org.akaza.openclinica.config;
 
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.service.randomize.RandomizationService;
-import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.service.randomize.RandomizationService;
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 

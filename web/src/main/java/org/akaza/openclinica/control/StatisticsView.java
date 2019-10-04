@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.component.Column;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.GroupCellEditor;

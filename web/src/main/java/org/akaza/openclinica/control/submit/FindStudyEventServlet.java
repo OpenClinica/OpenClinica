@@ -7,15 +7,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,9 +143,9 @@ public class FindStudyEventServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
+        // resexception=ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",locale);
 
         String exceptionName = resexception.getString("no_permission_to_submit_data");
         String noAccessMessage = respage.getString("you_may_not_submit_data_for_this_study") + respage.getString("change_study_contact_sysadmin");

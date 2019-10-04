@@ -11,10 +11,10 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
+import core.org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import core.org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.HashMap;
 

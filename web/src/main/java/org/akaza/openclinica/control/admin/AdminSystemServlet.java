@@ -8,13 +8,13 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -93,9 +93,9 @@ public class AdminSystemServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
         // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
+        // resexception=ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions",locale);
 
         if (!ub.isSysAdmin()) {
             throw new InsufficientPermissionException(Page.MENU, "You may not perform administrative functions", "1");

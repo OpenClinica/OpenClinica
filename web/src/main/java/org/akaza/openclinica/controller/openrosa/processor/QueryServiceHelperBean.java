@@ -1,8 +1,8 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.w3c.dom.Node;
 
 /**

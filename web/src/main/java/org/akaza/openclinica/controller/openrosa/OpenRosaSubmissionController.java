@@ -1,19 +1,19 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.rule.FileProperties;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
-import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
-import org.akaza.openclinica.service.randomize.RandomizationService;
-import org.akaza.openclinica.web.pform.PFormCache;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.rule.FileProperties;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
+import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
+import core.org.akaza.openclinica.service.randomize.RandomizationService;
+import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -228,8 +228,8 @@ public class OpenRosaSubmissionController {
             createItemData(items.get(0), "", eventCrf, userAccount);
         }
 
-        if (!eventCrf.getStatusId().equals(org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode())) {
-            eventCrf.setStatusId(org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode());
+        if (!eventCrf.getStatusId().equals(core.org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode())) {
+            eventCrf.setStatusId(core.org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode());
             eventCrf.setUserAccount(userAccount);
             eventCrf.setUpdateId(userAccount.getUserId());
             eventCrf.setDateCompleted(new Date());
@@ -490,7 +490,7 @@ public class OpenRosaSubmissionController {
                 accessPermission = true;
         } else {
             logger.info("studyStatus: " + studyStatus + "  studySubjectStatus: " + ssBean.getStatus().getName());
-            if (study.getStatus() == Status.AVAILABLE && ssBean.getStatus() == org.akaza.openclinica.bean.core.Status.AVAILABLE)
+            if (study.getStatus() == Status.AVAILABLE && ssBean.getStatus() == core.org.akaza.openclinica.bean.core.Status.AVAILABLE)
                 accessPermission = true;
         }
         return accessPermission;
@@ -542,7 +542,7 @@ public class OpenRosaSubmissionController {
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
-        eventCrf.setStatusId(org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
+        eventCrf.setStatusId(core.org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
         eventCrf.setCompletionStatus(completionStatusDao.findByCompletionStatusId(1));// setCompletionStatusId(1);
         eventCrf.setStudySubject(studySubject);
         eventCrf.setStudyEvent(studyEvent);
@@ -564,7 +564,7 @@ public class OpenRosaSubmissionController {
         itemData.setEventCrf(eventCrf);
         itemData.setValue(itemValue);
         itemData.setDateCreated(new Date());
-        itemData.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+        itemData.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
         itemData.setOrdinal(1);
         itemData.setUserAccount(userAccount);
         itemData.setDeleted(false);
@@ -597,9 +597,9 @@ public class OpenRosaSubmissionController {
         if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SIGNED.getCode()) {
             int count = 0;
             for (EventCrf evCrf : eventCrfs) {
-                if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
-                        || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.DELETED.getCode()
-                        || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
+                if (evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
+                        || evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.DELETED.getCode()
+                        || evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
                     for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
                         if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
                             count++;

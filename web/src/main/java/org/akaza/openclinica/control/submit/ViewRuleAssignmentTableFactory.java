@@ -12,32 +12,32 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.OCTableFacadeImpl;
-import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
-import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentSort;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.action.ActionType;
-import org.akaza.openclinica.domain.rule.action.EventActionBean;
-import org.akaza.openclinica.domain.rule.action.HideActionBean;
-import org.akaza.openclinica.domain.rule.action.InsertActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
-import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
-import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import core.org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
+import core.org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentSort;
+import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.rule.RuleSetBean;
+import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import core.org.akaza.openclinica.domain.rule.action.ActionType;
+import core.org.akaza.openclinica.domain.rule.action.EventActionBean;
+import core.org.akaza.openclinica.domain.rule.action.HideActionBean;
+import core.org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import core.org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import core.org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
+import core.org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import core.org.akaza.openclinica.domain.technicaladmin.LoginStatus;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import core.org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -721,10 +721,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             }
         }
         private void appendDestProps(HtmlBuilder builder,
-                List<org.akaza.openclinica.domain.rule.action.PropertyBean> propertyBeans) {
+                List<core.org.akaza.openclinica.domain.rule.action.PropertyBean> propertyBeans) {
             if(propertyBeans!=null && propertyBeans.size()>0) {
                 String s = "";
-                for(org.akaza.openclinica.domain.rule.action.PropertyBean p : propertyBeans) {
+                for(core.org.akaza.openclinica.domain.rule.action.PropertyBean p : propertyBeans) {
                     if(p.getOid()!=null)
                     {
                         s += p.getOid().trim() + ", ";
@@ -748,10 +748,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
 
         private void appendStratificationFactors(HtmlBuilder builder,
-                List<org.akaza.openclinica.domain.rule.action.StratificationFactorBean> factorBeans) {
+                List<core.org.akaza.openclinica.domain.rule.action.StratificationFactorBean> factorBeans) {
             if(factorBeans!=null && factorBeans.size()>0) {
                 String s = "";
-                for(org.akaza.openclinica.domain.rule.action.StratificationFactorBean p : factorBeans) {
+                for(core.org.akaza.openclinica.domain.rule.action.StratificationFactorBean p : factorBeans) {
                    if(p.getStratificationFactor()!=null){
                         s +=p.getStratificationFactor().getValue()+", ";
                     }

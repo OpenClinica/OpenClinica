@@ -1,6 +1,6 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

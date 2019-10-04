@@ -1,7 +1,7 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.jdom.Element;
 
 import java.util.List;
@@ -66,7 +66,7 @@ public class FormBeanUtilDecorator {
             tempStr = displayBean.getMetadata().getResponseSet().getResponseType().getName();
             if (checkForTypes(tempStr)) {
                 responseSetBean = displayBean.getMetadata().getResponseSet();
-                responseSetBean.setResponseType(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX);
+                responseSetBean.setResponseType(core.org.akaza.openclinica.bean.core.ResponseType.CHECKBOX);
 
             }
         }

@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 
 /**
  * A bean that represents a study row in a view table.

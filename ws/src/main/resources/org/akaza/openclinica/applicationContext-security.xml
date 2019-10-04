@@ -57,12 +57,12 @@
     <bean id="shaPasswordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
     <bean id="md5PasswordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
 
-    <bean id="openClinicaPasswordEncoder" class="org.akaza.openclinica.core.OpenClinicaPasswordEncoder">
+    <bean id="openClinicaPasswordEncoder" class="core.org.akaza.openclinica.core.OpenClinicaPasswordEncoder">
         <property name="currentPasswordEncoder" ref="shaPasswordEncoder"/>
         <property name="oldPasswordEncoder" ref="md5PasswordEncoder"/>
     </bean>
 
-    <bean id="securityManager" class="org.akaza.openclinica.core.SecurityManager">
+    <bean id="securityManager" class="core.org.akaza.openclinica.core.SecurityManager">
         <property name="encoder" ref="openClinicaPasswordEncoder"/>
         <property name="providers">
             <list>
@@ -74,12 +74,12 @@
             </list>
         </property>
     </bean>
-    <bean id="ocUserDetailsService" class="org.akaza.openclinica.web.filter.OpenClinicaJdbcService"
+    <bean id="ocUserDetailsService" class="core.org.akaza.openclinica.web.filter.OpenClinicaJdbcService"
           p:dataSource-ref="dataSource"
           p:usersByUsernameQuery="SELECT user_name,passwd,enabled,account_non_locked FROM user_account WHERE user_name = ?">
         <property name="enableAuthorities" value="true"/>
     </bean>
-    <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaUsernamePasswordAuthenticationFilter">
+    <bean id="myFilter" class="core.org.akaza.openclinica.web.filter.OpenClinicaUsernamePasswordAuthenticationFilter">
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="authenticationFailureHandler" ref="failureHandler" />
         <property name="authenticationSuccessHandler" ref="successHandler" />
@@ -117,7 +117,7 @@
         </property>
     </bean>
      
-     <bean id="sessionRegistry" class="org.akaza.openclinica.web.filter.OpenClinicaSessionRegistryImpl">
+     <bean id="sessionRegistry" class="core.org.akaza.openclinica.web.filter.OpenClinicaSessionRegistryImpl">
         <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
         <property name="dataSource" ref="dataSource"/>
      </bean>
@@ -128,7 +128,7 @@
     </bean>
 
     
-    <bean id="openClinicaLogoutHandler" class="org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
+    <bean id="openClinicaLogoutHandler" class="core.org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
         <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>

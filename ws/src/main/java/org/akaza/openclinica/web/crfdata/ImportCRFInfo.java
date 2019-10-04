@@ -1,6 +1,6 @@
-package org.akaza.openclinica.web.crfdata;
+package core.org.akaza.openclinica.web.crfdata;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
 
 public class ImportCRFInfo {
     private String studyOID;

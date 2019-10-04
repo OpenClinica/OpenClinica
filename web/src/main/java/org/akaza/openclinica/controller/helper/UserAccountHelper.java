@@ -1,6 +1,6 @@
 package org.akaza.openclinica.controller.helper;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 
 /**
  * Created by yogi on 7/25/17.

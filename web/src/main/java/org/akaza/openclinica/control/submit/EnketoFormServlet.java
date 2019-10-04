@@ -1,31 +1,27 @@
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.core.LockInfo;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.xform.XformParser;
-import org.akaza.openclinica.domain.xform.dto.*;
-import org.akaza.openclinica.service.crfdata.EnketoUrlService;
-import org.akaza.openclinica.service.crfdata.FormUrlObject;
-import org.akaza.openclinica.service.crfdata.XformMetaDataService;
-import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
-import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import core.org.akaza.openclinica.core.LockInfo;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.xform.XformParser;
+import core.org.akaza.openclinica.domain.xform.dto.*;
+import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
+import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.pform.OpenRosaServices;
-import org.akaza.openclinica.web.pform.PFormCache;
-import org.apache.commons.collections4.CollectionUtils;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.pform.OpenRosaServices;
+import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 public class EnketoFormServlet extends SecureController {
 

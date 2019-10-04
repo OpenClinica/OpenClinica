@@ -30,7 +30,7 @@
    </filter-mapping>
     <filter>
         <filter-name>multiTenantFilter</filter-name>
-        <filter-class>org.akaza.openclinica.dao.hibernate.multitenant.MultiTenantFilter</filter-class>
+        <filter-class>core.org.akaza.openclinica.dao.hibernate.multitenant.MultiTenantFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>multiTenantFilter</filter-name>

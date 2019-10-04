@@ -1,11 +1,8 @@
 package org.akaza.openclinica.controller.dto;
 
-import org.akaza.openclinica.domain.datamap.AuditLogEventType;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.service.AbstractAuditingDTO;
+import core.org.akaza.openclinica.service.AbstractAuditingDTO;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by krikorkrumlian on 9/18/17.

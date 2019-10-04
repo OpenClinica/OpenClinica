@@ -6,17 +6,17 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.FormLayoutBean;
-import org.akaza.openclinica.core.OpenClinicaMailSender;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.core.OpenClinicaMailSender;
+import core.org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import core.org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 

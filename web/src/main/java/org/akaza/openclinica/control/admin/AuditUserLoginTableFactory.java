@@ -2,12 +2,12 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginFilter;
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginSort;
-import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
-import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
+import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginFilter;
+import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginSort;
+import core.org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
+import core.org.akaza.openclinica.domain.technicaladmin.LoginStatus;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;

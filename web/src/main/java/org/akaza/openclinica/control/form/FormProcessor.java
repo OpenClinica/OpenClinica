@@ -16,13 +16,13 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.dao.core.EntityDAO;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.I18nFormatUtil;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
+import core.org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.dao.core.EntityDAO;
+import core.org.akaza.openclinica.exception.OpenClinicaException;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -535,8 +535,8 @@ public class FormProcessor {
         return answer;
     }
 
-    public org.akaza.openclinica.web.domain.EntityBeanTable getWebEntityBeanTable() {
-        org.akaza.openclinica.web.domain.EntityBeanTable answer = new org.akaza.openclinica.web.domain.EntityBeanTable();
+    public core.org.akaza.openclinica.web.domain.EntityBeanTable getWebEntityBeanTable() {
+        core.org.akaza.openclinica.web.domain.EntityBeanTable answer = new core.org.akaza.openclinica.web.domain.EntityBeanTable();
 
         String sortingColumn = request.getParameter(EBL_SORT_COLUMN);
         if (sortingColumn != null && !"".equals(sortingColumn)) {

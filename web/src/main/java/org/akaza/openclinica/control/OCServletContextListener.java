@@ -6,11 +6,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO;
-import org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
-import org.akaza.openclinica.domain.OpenClinicaVersionBean;
-import org.akaza.openclinica.service.usageStats.LogUsageStatsService;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO;
+import core.org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO;
+import core.org.akaza.openclinica.domain.OpenClinicaVersionBean;
+import core.org.akaza.openclinica.service.usageStats.LogUsageStatsService;
 
 /**
  * ServletContextListener used as a controller for throwing an error when

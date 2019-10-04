@@ -7,9 +7,9 @@
 package org.akaza.openclinica.control.techadmin;
 
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.Locale;
 
@@ -50,7 +50,7 @@ public class ViewSchedulerServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
+        // resexception=ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions",locale);
 
         if (!ub.isTechAdmin()) {
             throw new InsufficientPermissionException(Page.MENU, "You may not perform technical administrative functions", "1");

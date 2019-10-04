@@ -8,7 +8,7 @@
 
 package org.akaza.openclinica.control.form.spreadsheet;
 
-import org.akaza.openclinica.domain.crfdata.InstantOnChangeType;
+import core.org.akaza.openclinica.domain.crfdata.InstantOnChangeType;
 
 import java.util.ArrayList;
 import java.util.List;

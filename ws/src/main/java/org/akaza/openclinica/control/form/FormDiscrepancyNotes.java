@@ -7,7 +7,7 @@
  */
 package org.akaza.openclinica.control.form;
 
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 
 import java.util.ArrayList;
 import java.util.HashMap;

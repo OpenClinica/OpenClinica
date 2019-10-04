@@ -1,18 +1,18 @@
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.job.ImportSpringJob;
-import org.akaza.openclinica.web.job.TriggerService;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.job.ImportSpringJob;
+import core.org.akaza.openclinica.web.job.TriggerService;
 import org.quartz.*;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -145,7 +145,7 @@ public class UpdateJobImportServlet extends SecureController {
                 JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
                 JobDetailFactoryBean.setGroup(TRIGGER_IMPORT_GROUP);
                 JobDetailFactoryBean.setName(trigger.getKey().getName());
-                JobDetailFactoryBean.setJobClass(org.akaza.openclinica.web.job.ImportStatefulJob.class);
+                JobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.web.job.ImportStatefulJob.class);
                 JobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
                 JobDetailFactoryBean.setDurability(true); // need durability?
 

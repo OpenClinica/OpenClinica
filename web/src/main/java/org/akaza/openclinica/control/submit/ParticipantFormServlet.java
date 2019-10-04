@@ -5,12 +5,12 @@ import java.util.Map;
 
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
-import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
+import core.org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import core.org.akaza.openclinica.domain.datamap.FormLayout;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 public class ParticipantFormServlet extends SecureController {
 

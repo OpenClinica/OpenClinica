@@ -7,8 +7,8 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.web.domain.EntityBeanRow;
+import core.org.akaza.openclinica.domain.rule.RuleSetBean;
+import core.org.akaza.openclinica.web.domain.EntityBeanRow;
 
 import java.util.ArrayList;
 
@@ -32,7 +32,7 @@ public class ViewRuleAssignmentRow extends EntityBeanRow {
     /*
      * (non-Javadoc)
      *
-     * @see org.akaza.openclinica.core.EntityBeanRow#compareColumn(java.lang.Object,
+     * @see core.org.akaza.openclinica.core.EntityBeanRow#compareColumn(java.lang.Object,
      *      int)
      */
     @Override
@@ -70,7 +70,7 @@ public class ViewRuleAssignmentRow extends EntityBeanRow {
     /*
      * (non-Javadoc)
      *
-     * @see org.akaza.openclinica.core.EntityBeanRow#generatRowsFromBeans(java.util.ArrayList)
+     * @see core.org.akaza.openclinica.core.EntityBeanRow#generatRowsFromBeans(java.util.ArrayList)
      */
     @Override
     public ArrayList generatRowsFromBeans(ArrayList beans) {

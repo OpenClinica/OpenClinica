@@ -2,7 +2,7 @@ package org.akaza.openclinica.control;
 
 import java.io.IOException;
 
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -16,7 +16,7 @@ public class SpringServletAccess {
     }
     
     public static String getPropertiesDir(ServletContext servletContext) {
-    	String resource = "properties/placeholder.properties";
+    	String resource = "core/properties/placeholder.properties";
     	ServletContextResource scr = (ServletContextResource)getApplicationContext(servletContext).getResource(resource);
     	String absolutePath = null;
 		try {

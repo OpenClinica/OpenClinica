@@ -4,12 +4,10 @@
 package org.akaza.openclinica.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.akaza.openclinica.domain.enumsupport.JobStatus;
-import org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
 
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * @author joekeremian

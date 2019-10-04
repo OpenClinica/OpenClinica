@@ -1,9 +1,9 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.service.DicomServiceClient;
-import org.akaza.openclinica.service.UtilService;
-import org.akaza.openclinica.web.util.ErrorConstants;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.service.DicomServiceClient;
+import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.web.util.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

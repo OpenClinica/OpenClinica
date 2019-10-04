@@ -14,25 +14,25 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import core.org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDAO;
+import core.org.akaza.openclinica.domain.rule.RuleSetBean;
+import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import core.org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.view.component.Column;
 import org.jmesa.view.component.Row;
@@ -186,7 +186,7 @@ public class ViewCRFServlet extends SecureController {
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         // i18n caption; TODO: convert to Spring messages
         /*
-         * ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",
+         * ResourceBundle resourceBundle = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",
          * LocaleResolver.getLocale(request));
          * String captionText = resourceBundle.getString("studies_using_crf");
          * if (captionText == null || "".equalsIgnoreCase(captionText)) {

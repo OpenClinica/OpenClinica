@@ -31,43 +31,43 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.akaza.openclinica.bean.admin.AuditBean;
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.core.NullValue;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
-import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
-import org.akaza.openclinica.bean.submit.DisplaySectionBean;
-import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.bean.submit.SCDItemDisplayInfo;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.bean.admin.AuditBean;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.core.ItemDataType;
+import core.org.akaza.openclinica.bean.core.NullValue;
+import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import core.org.akaza.openclinica.bean.core.ResolutionStatus;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
+import core.org.akaza.openclinica.bean.core.Utils;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
+import core.org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import core.org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import core.org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import core.org.akaza.openclinica.bean.submit.ResponseSetBean;
+import core.org.akaza.openclinica.bean.submit.SCDItemDisplayInfo;
+import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -78,53 +78,50 @@ import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
-import org.akaza.openclinica.core.SecurityManager;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.AuditDAO;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
-import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
-import org.akaza.openclinica.logic.score.ScoreCalculator;
-import org.akaza.openclinica.service.DiscrepancyNoteThread;
-import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
-import org.akaza.openclinica.service.crfdata.InstantOnChangeService;
-import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
-import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
-import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import core.org.akaza.openclinica.core.SecurityManager;
+import core.org.akaza.openclinica.core.SessionManager;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.admin.AuditDAO;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import core.org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import core.org.akaza.openclinica.dao.submit.SectionDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
+import core.org.akaza.openclinica.domain.rule.RuleSetBean;
+import core.org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import core.org.akaza.openclinica.exception.OpenClinicaException;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
+import core.org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
+import core.org.akaza.openclinica.logic.score.ScoreCalculator;
+import core.org.akaza.openclinica.service.DiscrepancyNoteThread;
+import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import core.org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+import core.org.akaza.openclinica.service.crfdata.InstantOnChangeService;
+import core.org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
+import core.org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
+import core.org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
+import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.DataEntryInputGenerator;
 import org.akaza.openclinica.view.form.FormBeanUtil;
-import org.akaza.openclinica.web.InconsistentStateException;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InconsistentStateException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -272,8 +269,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException;
 
     /*
-     * locale = LocaleResolver.getLocale(request); //< resmessage = ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages" ,locale); //< restext =
-     * ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale); //< resexception =ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions"
+     * locale = LocaleResolver.getLocale(request); //< resmessage = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages" ,locale); //< restext =
+     * ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale); //< resexception =ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions"
      * ,locale);
      */
 
@@ -2283,13 +2280,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
     private EventCRFBean createEventCRF(HttpServletRequest request, FormProcessor fp) throws InconsistentStateException {
         locale = LocaleResolver.getLocale(request);
         // < resmessage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",
         // locale);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
         // <
         // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
+        // "core.org.akaza.openclinica.i18n.exceptions",locale);
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
         EventCRFBean ecb;
@@ -2437,14 +2434,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected DisplayItemBean loadFormValue(DisplayItemBean dib, HttpServletRequest request) {
         String inputName = getInputName(dib);
         FormProcessor fp = new FormProcessor(request);
-        org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
+        core.org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
 
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)
-                || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
+        if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)
+                || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib.loadFormValue(fp.getStringArray(inputName));
             // YW, 2-4-2008 << calculation result has been written in dib-data
-        } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
-            || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
+        } else if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
+            || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
             dib.loadFormValue(dib.getData().getValue());
             ResponseOptionBean rob = (ResponseOptionBean) dib.getMetadata().getResponseSet().getOptions().get(0);
             LOGGER.trace("test print of options for coding: " + rob.getValue());
@@ -3277,8 +3274,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         String itemDataValue = idb.getValue();
         String dbValue = dib.getDbData().getValue();
         ResponseSetBean rsb = dib.getMetadata().getResponseSet();
-        org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE) && itemDataValue.length() > 0) {
+        core.org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
+        if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.FILE) && itemDataValue.length() > 0) {
             File file = new File(itemDataValue);
             fileName = file.getName();
             if (itemDataValue.length() > fileName.length()) {
@@ -3998,13 +3995,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
         EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",
         // locale);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
         // <
         // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
+        // "core.org.akaza.openclinica.i18n.exceptions",locale);
         getEventCRFBean(request);
         getEventDefinitionCRFBean(request);
         DataEntryStage stage = ecb.getStage();
@@ -4771,8 +4768,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         for (int j = 0; j < dibs.size(); j++) {
             DisplayItemBean displayItem = dibs.get(j);
             String inputName = "";
-            org.akaza.openclinica.bean.core.ResponseType rt = displayItem.getMetadata().getResponseSet().getResponseType();
-            if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
+            core.org.akaza.openclinica.bean.core.ResponseType rt = displayItem.getMetadata().getResponseSet().getResponseType();
+            if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
 
                 if (isAuto) {
                     inputName = getGroupItemInputName(digb, i, displayItem);
@@ -4797,7 +4794,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 // although this code is very
                 // confusing and murky, ; refactoring of form handling is
                 // necessary here
-                if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
+                if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
                     ensureSelectedOption(displayItem);
                 }
                 // BWP>>
@@ -4988,9 +4985,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // value = attachedFilePath + value;
         // }
         //isChanged should not be run for calc/group-calc type, only for fields that they depend upon
-        org.akaza.openclinica.bean.core.ResponseType rt =dib.getMetadata().getResponseSet().getResponseType();
-        if ( rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION )||
-        		rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION )){
+        core.org.akaza.openclinica.bean.core.ResponseType rt =dib.getMetadata().getResponseSet().getResponseType();
+        if ( rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.CALCULATION )||
+        		rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION )){
         	return false;
         }
 String tempKey = idb.getItemId()+","+idb.getOrdinal();

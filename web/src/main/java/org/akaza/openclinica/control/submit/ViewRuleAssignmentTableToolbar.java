@@ -1,7 +1,7 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.control.DefaultToolbar;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;

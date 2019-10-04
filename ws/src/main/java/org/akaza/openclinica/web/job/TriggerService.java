@@ -1,11 +1,11 @@
-package org.akaza.openclinica.web.job;
+package core.org.akaza.openclinica.web.job;
 
-import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;

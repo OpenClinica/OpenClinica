@@ -7,21 +7,21 @@
  */
 package org.akaza.openclinica.control.login;
 
-import org.akaza.openclinica.bean.login.PwdChallengeQuestion;
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.login.PwdChallengeQuestion;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.core.SecurityManager;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.core.EmailEngine;
+import core.org.akaza.openclinica.core.SecurityManager;
+import core.org.akaza.openclinica.core.SessionManager;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
 
 import java.util.Calendar;
 import java.util.Date;

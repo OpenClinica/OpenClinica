@@ -7,7 +7,7 @@
  */
 package org.akaza.openclinica.control.form.spreadsheet;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;

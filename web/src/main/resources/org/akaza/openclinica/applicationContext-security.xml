@@ -58,7 +58,7 @@
         <property name="forceHttps" value="false"/>
     </bean>
 
-    <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaUsernamePasswordAuthenticationFilter">
+    <bean id="myFilter" class="core.org.akaza.openclinica.web.filter.OpenClinicaUsernamePasswordAuthenticationFilter">
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="authenticationFailureHandler" ref="failureHandler" />
         <property name="authenticationSuccessHandler" ref="successHandler" />
@@ -92,7 +92,7 @@
         </property>
     </bean>
 
-    <bean id="sessionRegistry" class="org.akaza.openclinica.web.filter.OpenClinicaSessionRegistryImpl">
+    <bean id="sessionRegistry" class="core.org.akaza.openclinica.web.filter.OpenClinicaSessionRegistryImpl">
         <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
@@ -105,7 +105,7 @@
     </bean>
 
 
-    <bean id="openClinicaLogoutHandler" class="org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
+    <bean id="openClinicaLogoutHandler" class="core.org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
         <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
@@ -145,24 +145,24 @@
     </oauth:authorization-server>
     -->
 
-    <bean id="metadataCollectorResource" class="org.akaza.openclinica.web.restful.MetadataCollectorResource" name="metadataCollectorResource">
+    <bean id="metadataCollectorResource" class="core.org.akaza.openclinica.web.restful.MetadataCollectorResource" name="metadataCollectorResource">
         <property name="dataSource" ref="dataSource"></property>
         <property name="ruleSetRuleDao" ref="ruleSetRuleDao"/>
         <property name="coreResources" ref="coreResources"/>
         <property name = "studyDaoHib" ref = "studyDaoDomain"/>
     </bean>
-    <bean id="odmMetadataRestResource" class="org.akaza.openclinica.web.restful.ODMMetadataRestResource">
+    <bean id="odmMetadataRestResource" class="core.org.akaza.openclinica.web.restful.ODMMetadataRestResource">
         <property name="metadataCollectorResource" ref="metadataCollectorResource"/>
     </bean>
-    <bean id="clinicalDataCollectorResource" class="org.akaza.openclinica.web.restful.ClinicalDataCollectorResource">
+    <bean id="clinicalDataCollectorResource" class="core.org.akaza.openclinica.web.restful.ClinicalDataCollectorResource">
         <property name = "generateClinicalDataService" ref = "generateClinicalDataService"></property>
     </bean>
-    <bean id="odmClinicalDataRestResource" class="org.akaza.openclinica.web.restful.ODMClinicaDataResource">
+    <bean id="odmClinicalDataRestResource" class="core.org.akaza.openclinica.web.restful.ODMClinicaDataResource">
         <property name="clinicalDataCollectorResource" ref="clinicalDataCollectorResource"/>
         <property name="metadataCollectorResource" ref="metadataCollectorResource"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
-    <bean id="openRosaServices" class="org.akaza.openclinica.web.pform.OpenRosaServices">
+    <bean id="openRosaServices" class="core.org.akaza.openclinica.web.pform.OpenRosaServices">
         <property name="dataSource" ref="dataSource"></property>
         <property name="coreResources" ref="coreResources"/>
         <property name="ruleActionPropertyDao" ref="ruleActionPropertyDao"/>
@@ -173,7 +173,7 @@
 
     <bean id="openRosaSubmissionController" class="org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController" autowire="byName">
     </bean>
-    <bean id="xformParserHelper" class="org.akaza.openclinica.domain.xform.XformParserHelper"/>
+    <bean id="xformParserHelper" class="core.org.akaza.openclinica.domain.xform.XformParserHelper"/>
 
 
 </beans>
