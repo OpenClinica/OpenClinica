@@ -1,17 +1,17 @@
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
-import org.akaza.openclinica.bean.submit.DisplaySectionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.bean.core.ItemDataType;
+import core.org.akaza.openclinica.bean.core.ResponseType;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import core.org.akaza.openclinica.bean.submit.ResponseSetBean;
+import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.core.form.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +73,7 @@ public class BeanFactory {
      *            spreadsheet.
      * @param crfName
      *            The name of the CRF, a String.
-     * @see org.akaza.openclinica.bean.submit.ItemGroupBean
+     * @see core.org.akaza.openclinica.bean.submit.ItemGroupBean
      * @return A List of DisplayItemGroupBeans
      */
     public List<DisplayItemGroupBean> createGroupBeans(Map<Integer, Map<String, String>> itemsMap, Map<Integer, Map<String, String>> groupsMap,

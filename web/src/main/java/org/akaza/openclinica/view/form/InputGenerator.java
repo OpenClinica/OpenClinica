@@ -1,6 +1,6 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import core.org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.jdom.Element;
 
 import java.util.List;

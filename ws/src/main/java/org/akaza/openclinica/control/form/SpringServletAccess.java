@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control.form;
 
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.ServletContextResource;
 import org.springframework.web.context.support.WebApplicationContextUtils;

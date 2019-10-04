@@ -1,17 +1,17 @@
 package org.akaza.openclinica.controller;
 
 import net.sf.json.util.JSONUtils;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.service.CallbackService;
-import org.akaza.openclinica.service.KeycloakUser;
-import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.randomize.ModuleProcessor;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.service.CallbackService;
+import core.org.akaza.openclinica.service.KeycloakUser;
+import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.keycloak.KeycloakPrincipal;
@@ -116,7 +116,7 @@ public class KeycloakController {
         KeycloakUser user = new KeycloakUser(token);
 
         String userType = (String) user.getUserContext().get("userType");
-        if (userType.equals(org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
+        if (userType.equals(core.org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
             ocUserUuid = (String) user.getUserContext().get("username");
         } else {
             ocUserUuid = (String) user.getUserContext().get("userUuid");

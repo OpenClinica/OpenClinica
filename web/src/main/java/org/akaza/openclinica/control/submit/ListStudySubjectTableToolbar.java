@@ -1,14 +1,12 @@
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.DefaultToolbar;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.Component;
-import org.akaza.openclinica.service.Page;
-import org.akaza.openclinica.service.PermissionService;
-import org.akaza.openclinica.service.ViewStudySubjectService;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.PermissionService;
+import core.org.akaza.openclinica.service.ViewStudySubjectService;
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;
@@ -20,8 +18,6 @@ import org.jmesa.view.html.toolbar.ToolbarItemType;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class ListStudySubjectTableToolbar extends DefaultToolbar {

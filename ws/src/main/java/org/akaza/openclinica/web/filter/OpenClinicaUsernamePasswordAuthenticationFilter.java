@@ -1,4 +1,4 @@
-package org.akaza.openclinica.web.filter;
+package core.org.akaza.openclinica.web.filter;
 
 /* Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
  *
@@ -15,14 +15,14 @@ package org.akaza.openclinica.web.filter;
  * limitations under the License.
  */
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
-import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
+import core.org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
+import core.org.akaza.openclinica.domain.technicaladmin.LoginStatus;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;

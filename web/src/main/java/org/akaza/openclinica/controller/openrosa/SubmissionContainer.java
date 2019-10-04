@@ -1,8 +1,8 @@
 package org.akaza.openclinica.controller.openrosa;
 
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.springframework.validation.Errors;
 
 import java.util.ArrayList;

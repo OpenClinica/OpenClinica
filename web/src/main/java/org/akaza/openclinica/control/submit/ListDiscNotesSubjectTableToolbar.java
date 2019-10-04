@@ -3,7 +3,7 @@ package org.akaza.openclinica.control.submit;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.DefaultToolbar;
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;

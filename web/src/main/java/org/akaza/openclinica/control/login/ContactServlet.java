@@ -10,11 +10,11 @@ package org.akaza.openclinica.control.login;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.core.EmailEngine;
+import core.org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 /**
  * @author jxu

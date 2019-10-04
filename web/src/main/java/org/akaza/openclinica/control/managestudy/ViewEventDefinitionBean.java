@@ -7,8 +7,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
 import java.util.ArrayList;
 import java.util.Date;

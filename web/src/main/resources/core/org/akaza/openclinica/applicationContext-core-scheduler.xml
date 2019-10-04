@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd http://www.springframework.org/schema/task
+http://www.springframework.org/schema/task/spring-task-4.3.xsd"
+    >
+
+    <bean id="schedulerFactoryBean" class="core.org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean"
+             destroy-method="destroy">
+        <property name="schedulerName" value="public"/>
+        <property name="autoStartup" value="true"/>
+        <property name="jobFactory">
+            <bean  class="core.org.akaza.openclinica.job.AutowiringSpringBeanJobFactory" />
+        </property>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="quartzProperties">
+        	<props>
+        		<prop key="org.quartz.jobStore.misfireThreshold">s[org.quartz.jobStore.misfireThreshold]</prop>
+				<prop key="org.quartz.jobStore.class">s[org.quartz.jobStore.class]</prop>
+				<prop key="org.quartz.jobStore.driverDelegateClass">s[org.quartz.jobStore.driverDelegateClass]</prop>
+				<prop key="org.quartz.jobStore.useProperties">s[org.quartz.jobStore.useProperties]</prop>
+        		<prop key="org.quartz.jobStore.tablePrefix">s[org.quartz.jobStore.tablePrefix]</prop>
+        		<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<prop key="org.quartz.threadPool.threadCount">s[org.quartz.threadPool.threadCount]</prop>
+				<prop key="org.quartz.threadPool.threadPriority">s[org.quartz.threadPool.threadPriority]</prop>
+
+        	</props>
+        </property>
+        
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        
+        <property name="globalJobListeners">
+            <list>
+                <bean class="core.org.akaza.openclinica.job.JobExecutionExceptionListener"/>
+            </list>
+        </property>
+        <property name="globalTriggerListeners">
+            <list>
+                <bean class="core.org.akaza.openclinica.job.JobTriggerListener"/>
+            </list>
+        </property>
+    </bean>
+
+    <task:annotation-driven scheduler="taskScheduler"/>
+     <task:scheduler id="taskScheduler" pool-size="42"/>
+        <bean id="jobTriggerService" class="core.org.akaza.openclinica.service.JobTriggerService" autowire="byName">
+                <constructor-arg ref="dataSource"/>
+                <constructor-arg ref="ruleSetDao"/>
+                <constructor-arg ref="ruleSetService"/>        
+    </bean>
+    
+</beans>

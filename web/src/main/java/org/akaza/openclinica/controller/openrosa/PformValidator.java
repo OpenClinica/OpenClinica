@@ -1,6 +1,6 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
+import core.org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;

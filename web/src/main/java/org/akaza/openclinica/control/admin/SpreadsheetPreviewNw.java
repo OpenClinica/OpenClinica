@@ -1,7 +1,7 @@
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.ApplicationConstants;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.bean.core.ApplicationConstants;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;

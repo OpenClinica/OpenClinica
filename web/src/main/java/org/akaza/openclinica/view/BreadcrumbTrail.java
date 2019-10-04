@@ -7,10 +7,10 @@
  */
 package org.akaza.openclinica.view;
 
-import org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

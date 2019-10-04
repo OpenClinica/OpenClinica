@@ -1,7 +1,7 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.managestudy.BeanFactory;
 import org.jdom.Document;
 import org.jdom.Element;

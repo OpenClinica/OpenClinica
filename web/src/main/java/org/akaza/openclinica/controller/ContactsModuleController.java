@@ -1,11 +1,10 @@
 package org.akaza.openclinica.controller;
 
-import io.swagger.annotations.ApiOperation;
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.dto.ContactsModuleDTO;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.service.*;
+import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.service.*;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -5,17 +5,17 @@ import java.util.HashMap;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.submit.FormLayoutBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.dao.submit.ItemDAO;
+import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import core.org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import core.org.akaza.openclinica.dao.submit.SectionDAO;
 
 /**
  * Utility class with method for retrieving the metadata for a CRFVersion.

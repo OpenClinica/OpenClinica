@@ -1,21 +1,18 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateTemplate;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
+import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
 /**
  * Created by yogi on 1/31/17.

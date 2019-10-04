@@ -14,13 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.akaza.openclinica.bean.core.ApplicationConstants;
-import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.core.util.CrfTemplateColumnNameEnum;
-import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
-import org.akaza.openclinica.dao.submit.ItemDAO;
+import core.org.akaza.openclinica.bean.core.ApplicationConstants;
+import core.org.akaza.openclinica.bean.core.ResponseType;
+import core.org.akaza.openclinica.bean.core.Utils;
+import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.core.util.CrfTemplateColumnNameEnum;
+import core.org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
+import core.org.akaza.openclinica.dao.submit.ItemDAO;
 
 public class SpreadSheetItemUtil {
 	

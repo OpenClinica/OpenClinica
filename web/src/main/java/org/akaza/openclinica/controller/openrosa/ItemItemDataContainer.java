@@ -1,7 +1,7 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
+import core.org.akaza.openclinica.domain.datamap.Item;
+import core.org.akaza.openclinica.domain.datamap.ItemData;
 
 public class ItemItemDataContainer {
     private Item item;

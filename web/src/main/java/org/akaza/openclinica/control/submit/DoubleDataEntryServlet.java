@@ -18,30 +18,30 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import core.org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.dao.submit.SectionDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,15 +86,15 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
 
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",
         // locale);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
         // <
         // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
+        // "core.org.akaza.openclinica.i18n.exceptions",locale);
         // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
 
         getInputBeans(request);
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
@@ -214,7 +214,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     @Override
     protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, HttpServletRequest request) {
 
-        org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
+        core.org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
         HttpSession session = request.getSession();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
 
@@ -269,7 +269,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         LOGGER.debug("--- show original: " + showOriginalItem + " show duplicate: " + showDuplicateItem + " and just show item: " + showItem);
         LOGGER.debug("VALIDATION COUNT " + validationCount);
         if (showOriginalItem && showDuplicateItem || showItem) {
-            if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
+            if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
                 dib = validateDisplayItemBeanText(v, dib, inputName, request);
                 if (validationCount == null || validationCount.intValue() == 0) {
                     v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
@@ -277,7 +277,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                         + respage.getString("from_initial_data_entry"));
                 }
 
-            } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
+            } else if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.FILE)) {
             	dib = validateDisplayItemBeanText(v, dib, inputName, request);
             	if (validationCount == null || validationCount.intValue() == 0) {
             		// we want to check if the current uploaded file matched the initial data file, quick way to do it is by using the hash
@@ -299,7 +299,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             			+ respage.getString("from_initial_data_entry"));
             	}
 
-            } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
+            } else if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
                 dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
                 // ItemFormMetadataBean ifmdb = dib.getMetadata();
                 // ResponseSetBean rsBean = ifmdb.getResponseSet();
@@ -321,7 +321,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                     }
                     v.setErrorMessage(respage.getString("value_you_specified") + " " + errorValue + " " + respage.getString("from_initial_data_entry"));
                 }
-            } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
+            } else if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
                 dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
 
                 if (validationCount == null || validationCount.intValue() == 0) {
@@ -423,7 +423,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     @Override
     protected DisplayItemBean validateCalcTypeDisplayItemBean(ScoreItemValidator sv, DisplayItemBean dib, String inputName, HttpServletRequest request) {
 
-        org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
+        core.org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
         ItemDataDAO iddao = new ItemDataDAO(getDataSource());
         boolean isSingleItem = false;
         HttpSession session = request.getSession();
@@ -448,7 +448,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         } else {
             valueToCompare = dib.getDbData();
         }
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
+        if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
             boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);
             boolean showItem = dib.getMetadata().isShowItem();
             boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());
@@ -589,7 +589,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, RuleValidator rv,
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation, ArrayList<String> messages, HttpServletRequest request) {
 
-        org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
+        core.org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
 
         boolean isSingleItem = false;

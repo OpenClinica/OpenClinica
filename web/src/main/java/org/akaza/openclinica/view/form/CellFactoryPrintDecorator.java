@@ -1,7 +1,7 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
 import org.jdom.Element;
 
 /**

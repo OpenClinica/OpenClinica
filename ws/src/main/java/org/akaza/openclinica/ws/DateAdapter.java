@@ -1,7 +1,7 @@
 package org.akaza.openclinica.ws;
 
 
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.text.SimpleDateFormat;

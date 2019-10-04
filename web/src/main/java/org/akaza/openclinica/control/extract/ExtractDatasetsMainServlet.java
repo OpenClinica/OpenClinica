@@ -7,14 +7,14 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.extract.DatasetDAO;
+import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.bean.DatasetRow;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.bean.DatasetRow;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
 import java.util.ArrayList;
 import java.util.Arrays;

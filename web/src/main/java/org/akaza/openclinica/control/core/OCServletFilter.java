@@ -13,8 +13,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.log.LoggingConstants;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.log.LoggingConstants;
 import org.slf4j.MDC;
 
 /**

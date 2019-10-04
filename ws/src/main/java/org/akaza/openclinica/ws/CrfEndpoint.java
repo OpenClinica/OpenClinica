@@ -7,9 +7,9 @@
  */
 package org.akaza.openclinica.ws;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.service.subject.SubjectServiceInterface;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.openclinica.ws.crf.v1.CreateCrfResponse;
 import org.openclinica.ws.crf.v1.CrfType;
 import org.openclinica.ws.crf.v1.ObjectFactory;

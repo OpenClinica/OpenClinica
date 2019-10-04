@@ -3,7 +3,7 @@ package org.akaza.openclinica.dto.randomize;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.akaza.openclinica.service.AbstractAuditingDTO;
+import core.org.akaza.openclinica.service.AbstractAuditingDTO;
 
 import java.io.Serializable;
 import java.util.Map;

@@ -7,11 +7,11 @@
  */
 package org.akaza.openclinica.view;
 
-import org.akaza.openclinica.bean.core.EntityAction;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.core.EntityAction;
+import core.org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.admin.DeleteStudyUserRoleServlet;
 import org.akaza.openclinica.control.admin.DeleteUserServlet;
 import org.akaza.openclinica.control.admin.EditStudyUserRoleServlet;

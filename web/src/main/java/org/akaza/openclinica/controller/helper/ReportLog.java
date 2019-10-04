@@ -1,10 +1,6 @@
 package org.akaza.openclinica.controller.helper;
 
 import java.util.ArrayList;
-import java.util.Locale;
-
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.apache.commons.lang.StringUtils;
 
 public class ReportLog {
 

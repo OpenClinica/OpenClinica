@@ -1,9 +1,9 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.core.SessionManager;
+import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import org.akaza.openclinica.control.admin.SpreadsheetPreviewNw;
 import org.akaza.openclinica.control.managestudy.BeanFactory;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;

@@ -1,8 +1,8 @@
 package org.akaza.openclinica.controller.dto;
 
 
-import org.akaza.openclinica.domain.enumsupport.StudyEnvironmentStatus;
-import org.akaza.openclinica.service.AbstractAuditingDTO;
+import core.org.akaza.openclinica.domain.enumsupport.StudyEnvironmentStatus;
+import core.org.akaza.openclinica.service.AbstractAuditingDTO;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

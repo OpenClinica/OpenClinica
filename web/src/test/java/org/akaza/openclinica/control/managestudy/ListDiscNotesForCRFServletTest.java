@@ -2,11 +2,10 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.Locale;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.managestudy.ListDiscNotesForCRFServlet;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import static org.mockito.Mockito.*;
 import junit.framework.TestCase;

@@ -7,21 +7,21 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
+import core.org.akaza.openclinica.bean.extract.DatasetBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
-import org.akaza.openclinica.dao.extract.DatasetDAO;
-import org.akaza.openclinica.dao.hibernate.ArchivedDatasetFilePermissionTagDao;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTag;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
+import core.org.akaza.openclinica.dao.extract.DatasetDAO;
+import core.org.akaza.openclinica.dao.hibernate.ArchivedDatasetFilePermissionTagDao;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTag;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.List;
 import java.util.Locale;
@@ -136,11 +136,11 @@ if( dsBean.getStudyId() != currentStudy.getId())		{
 
         locale = LocaleResolver.getLocale(request);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",locale);
         // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
+        // resexception=ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions",locale);
 
         if (ub.isSysAdmin()) {
             return;

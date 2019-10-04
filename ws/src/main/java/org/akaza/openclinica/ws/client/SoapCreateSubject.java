@@ -1,10 +1,10 @@
 package org.akaza.openclinica.ws.client;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.service.subject.SubjectServiceInterface;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.springframework.util.xml.DomUtils;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import org.w3c.dom.Document;

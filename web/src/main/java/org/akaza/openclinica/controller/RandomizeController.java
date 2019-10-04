@@ -1,9 +1,9 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.service.UserType;
-import org.akaza.openclinica.service.UtilService;
-import org.akaza.openclinica.service.auth.TokenService;
-import org.akaza.openclinica.service.randomize.RandomizationService;
+import core.org.akaza.openclinica.service.UserType;
+import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.service.auth.TokenService;
+import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

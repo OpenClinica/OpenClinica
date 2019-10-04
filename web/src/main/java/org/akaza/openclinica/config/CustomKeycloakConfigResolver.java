@@ -1,19 +1,18 @@
 package org.akaza.openclinica.config;
 
-import org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.http.client.HttpClient;
 import org.keycloak.adapters.HttpClientBuilder;
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.KeycloakDeployment;
 import org.keycloak.adapters.KeycloakDeploymentBuilder;
 import org.keycloak.adapters.spi.HttpFacade;
-import org.keycloak.representations.adapters.config.AdapterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.akaza.openclinica.web.rest.client.auth.impl.KeycloakConfig.CONNECTION_TTL;
+import static core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakConfig.CONNECTION_TTL;
 
 /**
  * KeycloakConfigResolver that still reads the configuration from keycloak.json in the classpath but allows you to customize the
