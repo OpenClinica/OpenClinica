@@ -1,4 +1,4 @@
-package org.akaza.openclinica.web.job;
+package core.org.akaza.openclinica.web.job;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.AbstractHtmlView;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.HtmlSnippets;

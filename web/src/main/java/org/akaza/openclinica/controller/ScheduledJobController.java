@@ -14,13 +14,13 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.extract.XsltTriggerService;
-import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
-import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.extract.XsltTriggerService;
+import core.org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
+import core.org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
+import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.jmesa.facade.TableFacade;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
@@ -237,7 +237,7 @@ public class ScheduledJobController {
             JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
             JobDetailFactoryBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
             JobDetailFactoryBean.setName(newTrigger.getKey().getName());
-            JobDetailFactoryBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
+            JobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
             JobDetailFactoryBean.setJobDataMap(newTrigger.getJobDataMap());
             JobDetailFactoryBean.setDurability(true); // need durability?
             JobDetailFactoryBean.afterPropertiesSet();

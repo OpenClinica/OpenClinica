@@ -1,11 +1,11 @@
 package org.akaza.openclinica.controller.openrosa;
 
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.CrfVersion;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

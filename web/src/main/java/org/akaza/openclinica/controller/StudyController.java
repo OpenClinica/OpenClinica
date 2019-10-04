@@ -16,50 +16,50 @@ import javax.sql.DataSource;
 
 import freemarker.template.TemplateException;
 import io.swagger.annotations.Api;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.EventDefinitionDTO;
-import org.akaza.openclinica.bean.login.FacilityInfo;
-import org.akaza.openclinica.bean.login.ResponseSuccessEventDefDTO;
-import org.akaza.openclinica.bean.login.ResponseSuccessSiteDTO;
-import org.akaza.openclinica.bean.login.ResponseSuccessStudyDTO;
-import org.akaza.openclinica.bean.login.SiteDTO;
-import org.akaza.openclinica.bean.login.StudyDTO;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.login.UserRole;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.UserType;
+import core.org.akaza.openclinica.bean.login.EventDefinitionDTO;
+import core.org.akaza.openclinica.bean.login.FacilityInfo;
+import core.org.akaza.openclinica.bean.login.ResponseSuccessEventDefDTO;
+import core.org.akaza.openclinica.bean.login.ResponseSuccessSiteDTO;
+import core.org.akaza.openclinica.bean.login.ResponseSuccessStudyDTO;
+import core.org.akaza.openclinica.bean.login.SiteDTO;
+import core.org.akaza.openclinica.bean.login.StudyDTO;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.login.UserRole;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.dto.ParticipantIdModel;
 import org.akaza.openclinica.controller.dto.ParticipantIdVariable;
 import org.akaza.openclinica.controller.dto.SiteStatusDTO;
 import org.akaza.openclinica.controller.dto.StudyEnvStatusDTO;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
-import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
+import core.org.akaza.openclinica.service.OCUserDTO;
+import core.org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyParameterDao;
-import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
-import org.akaza.openclinica.domain.datamap.StudyParameter;
-import org.akaza.openclinica.domain.datamap.StudyParameterValue;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.LiquibaseOnDemandService;
-import org.akaza.openclinica.service.SchemaCleanupService;
-import org.akaza.openclinica.service.SiteBuildService;
-import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.crfdata.ErrorObj;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyParameterDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyEnvEnum;
+import core.org.akaza.openclinica.domain.datamap.StudyParameter;
+import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.LiquibaseOnDemandService;
+import core.org.akaza.openclinica.service.SchemaCleanupService;
+import core.org.akaza.openclinica.service.SiteBuildService;
+import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -382,7 +382,7 @@ public class StudyController {
         Date startDate;
         Date endDate;
         StudyParameterConfig studyParameterConfig;
-        org.akaza.openclinica.domain.Status status;
+        core.org.akaza.openclinica.domain.Status status;
         String templateID;
         Boolean enrollmentCap;
         String studyUuid;
@@ -409,14 +409,14 @@ public class StudyController {
             studyUuid = (String) map.get("uuid");
         }
 
-        org.akaza.openclinica.domain.Status setStatus(String myStatus) {
+        core.org.akaza.openclinica.domain.Status setStatus(String myStatus) {
 
             // set status object if no status pass default it to "PENDING"
-            org.akaza.openclinica.domain.Status statusObj = org.akaza.openclinica.domain.Status.PENDING;
+            core.org.akaza.openclinica.domain.Status statusObj = core.org.akaza.openclinica.domain.Status.PENDING;
 
             if (myStatus != null) {
                 myStatus = myStatus.equals("DESIGN") ? "PENDING" : myStatus;
-                statusObj = org.akaza.openclinica.domain.Status.getByName(myStatus);
+                statusObj = core.org.akaza.openclinica.domain.Status.getByName(myStatus);
             }
             return statusObj;
         }
@@ -496,10 +496,10 @@ public class StudyController {
             if (status == null ) {
                 ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "status");
                 errorObjects.add(errorObject);
-            } else if (!status.equals(org.akaza.openclinica.domain.Status.PENDING)
-                    && !status.equals(org.akaza.openclinica.domain.Status.AVAILABLE)
-                    && !status.equals(org.akaza.openclinica.domain.Status.FROZEN)
-                    && !status.equals(org.akaza.openclinica.domain.Status.LOCKED) ){
+            } else if (!status.equals(core.org.akaza.openclinica.domain.Status.PENDING)
+                    && !status.equals(core.org.akaza.openclinica.domain.Status.AVAILABLE)
+                    && !status.equals(core.org.akaza.openclinica.domain.Status.FROZEN)
+                    && !status.equals(core.org.akaza.openclinica.domain.Status.LOCKED) ){
                 ErrorObj errorObject = createErrorObject("Study Object", "Invalid status", "status");
                 errorObjects.add(errorObject);
             }
@@ -1690,7 +1690,7 @@ public class StudyController {
     }
 
     public Boolean verifyStudyTypeExist(String studyType) {
-        ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
+        ResourceBundle resadmin = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
         if (!studyType.equalsIgnoreCase(resadmin.getString("interventional"))
                 && !studyType.equalsIgnoreCase(resadmin.getString("observational"))
                 && !studyType.equalsIgnoreCase(resadmin.getString("other"))) {
@@ -1727,7 +1727,7 @@ public class StudyController {
 
     public StudyBean buildSiteBean(SiteParameters parameters) {
         StudyBean study = new StudyBean();
-        ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
+        ResourceBundle resadmin = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
         study.setOid(parameters.ocOid);
         study.setIdentifier(parameters.uniqueIdentifier);
         study.setParentStudyId(parameters.parentStudy.getId());
@@ -1972,13 +1972,13 @@ public class StudyController {
                                     int expectedTotalEnrollment, String studyType, String status, Date startDate, UserAccountBean owner) {
 
         StudyBean study = new StudyBean();
-        ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
+        ResourceBundle resadmin = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
         if (studyType.equals(resadmin.getString("interventional"))) {
             study.setProtocolType("interventional");
         } else if (studyType.equals(resadmin.getString("observational"))) {
             study.setProtocolType("observational");
         }
-        ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
+        ResourceBundle resword = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
         if (resword.getString("available").equalsIgnoreCase(status))
             study.setStatus(Status.AVAILABLE);
         else if (resword.getString("design").equalsIgnoreCase(status) || status.equals(""))
@@ -2000,9 +2000,9 @@ public class StudyController {
     public StudyBean buildNewStudyBean(String uniqueStudyId, String name, UserAccountBean accountBean) {
 
         StudyBean study = new StudyBean();
-        ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
+        ResourceBundle resadmin = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
 
-        ResourceBundle resword = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
+        ResourceBundle resword = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
         study.setStatus(Status.PENDING);
 
         study.setIdentifier(uniqueStudyId);

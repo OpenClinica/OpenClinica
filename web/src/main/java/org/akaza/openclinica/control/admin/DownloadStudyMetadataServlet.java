@@ -8,20 +8,17 @@ package org.akaza.openclinica.control.admin;
 
 import java.util.ArrayList;
 
-import org.akaza.openclinica.bean.extract.odm.FullReportBean;
-import org.akaza.openclinica.bean.odmbeans.ODMBean;
+import core.org.akaza.openclinica.bean.extract.odm.FullReportBean;
+import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
-import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
-import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
-import org.akaza.openclinica.service.PermissionService;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import core.org.akaza.openclinica.logic.odmExport.AdminDataCollector;
+import core.org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 public class DownloadStudyMetadataServlet extends SecureController {
     public static String STUDY_ID = "studyId";

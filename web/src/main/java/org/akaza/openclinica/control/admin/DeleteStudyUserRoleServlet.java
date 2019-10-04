@@ -7,15 +7,15 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.EntityAction;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.core.EntityAction;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 // allows both deletion and restoration of a study user role
 

@@ -16,23 +16,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.akaza.openclinica.web.bean.StudyEventRow;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import core.org.akaza.openclinica.web.bean.StudyEventRow;
 
 /**
  * @author jxu
@@ -67,7 +67,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
 
         if (ub.isSysAdmin()) {
             return;

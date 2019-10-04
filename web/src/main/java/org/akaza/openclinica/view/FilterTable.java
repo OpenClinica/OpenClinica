@@ -7,9 +7,9 @@
  */
 package org.akaza.openclinica.view;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.extract.FilterBean;
+import core.org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.extract.FilterBean;
 import org.akaza.openclinica.control.extract.ApplyFilterServlet;
 import org.akaza.openclinica.control.extract.EditFilterServlet;
 import org.akaza.openclinica.control.extract.RemoveFilterServlet;

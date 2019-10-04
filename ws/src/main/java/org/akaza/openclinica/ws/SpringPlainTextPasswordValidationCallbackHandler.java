@@ -1,9 +1,9 @@
 package org.akaza.openclinica.ws;
 
 import com.sun.xml.wss.impl.callback.PasswordValidationCallback;
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.bean.core.UserType;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

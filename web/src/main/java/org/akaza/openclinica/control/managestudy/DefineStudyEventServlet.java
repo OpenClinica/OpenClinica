@@ -16,31 +16,31 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.NullValue;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.core.NullValue;
+import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.domain.SourceDataVerification;
+import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.bean.CRFRow;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.bean.CRFRow;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -132,8 +132,8 @@ public class DefineStudyEventServlet extends SecureController {
                             response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
                             // forwardPage(Page.MANAGE_STUDY_MODULE);
                             // request.getRequestDispatcher("/pages/studymodule").forward(request, response);
-                            // org.akaza.openclinica.service.sdv.SDVUtil sdvUtil = new
-                            // org.akaza.openclinica.service.sdv.SDVUtil();
+                            // core.org.akaza.openclinica.service.sdv.SDVUtil sdvUtil = new
+                            // core.org.akaza.openclinica.service.sdv.SDVUtil();
                             // sdvUtil.forwardRequestFromController(request,response,"http://localhost:8080/OpenClinica-SNAPSHOT/pages/studymodule");
 
                             // This last part is necessary because the compiler will complain about the return;

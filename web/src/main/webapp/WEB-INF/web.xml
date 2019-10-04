@@ -32,7 +32,7 @@
     </context-param>
 
     <listener>
-        <listener-class>org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
+        <listener-class>core.org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
     </listener>
     <listener>
         <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
@@ -46,7 +46,7 @@
 
     <filter>
         <filter-name>xssFilter</filter-name>
-        <filter-class>org.akaza.openclinica.web.filter.XSSFilter</filter-class>
+        <filter-class>core.org.akaza.openclinica.web.filter.XSSFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>xssFilter</filter-name>
@@ -72,7 +72,7 @@
 
     <filter>
         <filter-name>localeFilter</filter-name>
-        <filter-class>org.akaza.openclinica.web.filter.LocaleFilter</filter-class>
+        <filter-class>core.org.akaza.openclinica.web.filter.LocaleFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>localeFilter</filter-name>
@@ -129,7 +129,7 @@
     </filter-mapping>
     <filter>
         <filter-name>multiTenantFilter</filter-name>
-        <filter-class>org.akaza.openclinica.dao.hibernate.multitenant.MultiTenantFilter</filter-class>
+        <filter-class>core.org.akaza.openclinica.dao.hibernate.multitenant.MultiTenantFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>multiTenantFilter</filter-name>
@@ -216,7 +216,7 @@
         <display-name>SQLInitServlet</display-name>
         <!-- we've decided not to deal this warning at this point -->
         <servlet-name>SQLInitServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.web.SQLInitServlet</servlet-class>
+        <servlet-class>core.org.akaza.openclinica.web.SQLInitServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
@@ -2286,7 +2286,7 @@
         <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.akaza.openclinica.web.pform</param-value>
+            <param-value>core.org.akaza.openclinica.web.pform</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -2301,11 +2301,11 @@
         <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.akaza.openclinica.web.restful</param-value>
+            <param-value>core.org.akaza.openclinica.web.restful</param-value>
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-            <param-value>org.akaza.openclinica.web.filter.rest.RestODMFilter</param-value>
+            <param-value>core.org.akaza.openclinica.web.filter.rest.RestODMFilter</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

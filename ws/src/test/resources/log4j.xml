@@ -39,7 +39,7 @@
     <logger name="org.apache.jasper">          <level value="info"/></logger>
     <logger name="org.dbunit">                 <level value="error"/></logger>
     
-    <logger name="org.akaza.openclinica.domain.enumsupport">          <level value="debug"/></logger>
+    <logger name="core.org.akaza.openclinica.domain.enumsupport">          <level value="debug"/></logger>
 
     <root>
         <priority value="debug"/>

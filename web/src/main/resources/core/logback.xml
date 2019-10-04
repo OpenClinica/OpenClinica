@@ -1,0 +1,22 @@
+<configuration>
+    <contextListener class="core.org.akaza.openclinica.log.LoggerStartupListener"/>
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.dir}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<!-- daily rollover -->
+		<fileNamePattern>${log.dir}-%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="org.hibernate.SQL" level="${hibernateSQLLogLevel}" />
+	<logger name="org.hibernate.type" level="${hibernateTypeLogLevel}" />
+	<logger name="org.springframework.security" level="ERROR" />
+	<logger name="org.springframework.web" level="ERROR" />
+	<logger name="liquibase" level="ERROR" />
+	<root level="${logLevel}">
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>

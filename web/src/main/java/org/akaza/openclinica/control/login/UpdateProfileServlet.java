@@ -15,20 +15,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
-import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import core.org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 /**
  * @author jxu
@@ -97,8 +97,8 @@ public class UpdateProfileServlet extends SecureController {
                 .getApplicationContext(context)
                 .getBean(ConfigurationDao.class);
 
-        org.akaza.openclinica.core.SecurityManager sm =
-                (org.akaza.openclinica.core.SecurityManager) SpringServletAccess
+        core.org.akaza.openclinica.core.SecurityManager sm =
+                (core.org.akaza.openclinica.core.SecurityManager) SpringServletAccess
                 .getApplicationContext(context)
                 .getBean("securityManager");
 

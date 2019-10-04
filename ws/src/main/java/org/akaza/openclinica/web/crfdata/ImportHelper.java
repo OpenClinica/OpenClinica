@@ -1,15 +1,15 @@
-package org.akaza.openclinica.web.crfdata;
+package core.org.akaza.openclinica.web.crfdata;
 
-import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.bean.core.ItemDataType;
+import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.core.form.StringUtil;
 
 /*
  * Helper methods will be placed in this class - DRY

@@ -2,15 +2,12 @@ package org.akaza.openclinica.controller.dto;
 
 
 
-import org.akaza.openclinica.service.AbstractAuditingDTO;
+import core.org.akaza.openclinica.service.AbstractAuditingDTO;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Objects;
 
 /**
  * A DTO for the ModuleConfigAttribute entity.

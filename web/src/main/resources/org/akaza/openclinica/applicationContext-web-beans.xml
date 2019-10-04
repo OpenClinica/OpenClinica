@@ -10,7 +10,7 @@
           and Hibernate DAO injection via autowiring -->
 
     
-    <bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"  name="sdvUtil">
+    <bean id="sdvUtil" class="core.org.akaza.openclinica.web.table.sdv.SDVUtil" name="sdvUtil">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 

@@ -1,6 +1,6 @@
 package org.akaza.openclinica.controller.helper;
 
-import org.akaza.openclinica.bean.login.ErrorObject;
+import core.org.akaza.openclinica.bean.login.ErrorObject;
 
 import java.time.LocalTime;
 import java.util.ArrayList;

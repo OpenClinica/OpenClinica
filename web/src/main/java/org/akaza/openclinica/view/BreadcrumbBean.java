@@ -7,8 +7,8 @@
  */
 package org.akaza.openclinica.view;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.core.Status;
 
 /**
  * <P>

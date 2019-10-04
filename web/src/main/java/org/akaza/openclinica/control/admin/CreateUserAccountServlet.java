@@ -16,29 +16,29 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.TermType;
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.TermType;
+import core.org.akaza.openclinica.bean.core.UserType;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.SecurityManager;
-import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.user.AuthoritiesBean;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.domain.user.LdapUser;
-import org.akaza.openclinica.service.user.LdapUserService;
+import core.org.akaza.openclinica.core.SecurityManager;
+import core.org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.domain.user.AuthoritiesBean;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.domain.user.LdapUser;
+import core.org.akaza.openclinica.service.user.LdapUserService;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
 
 /**
  * Servlet for creating a user account.
@@ -72,7 +72,7 @@ public class CreateUserAccountServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
 
         if (!ub.isSysAdmin()) {
             throw new InsufficientPermissionException(Page.MENU, resexception.getString("you_may_not_perform_administrative_functions"), "1");
@@ -122,7 +122,7 @@ public class CreateUserAccountServlet extends SecureController {
         if (changeRoles) {
             StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
             roleMap = new LinkedHashMap();
-            ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
+            ResourceBundle resterm = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 
             if (study.getParentStudyId() > 0) {
                 for (Iterator it = getRoles().iterator(); it.hasNext();) {

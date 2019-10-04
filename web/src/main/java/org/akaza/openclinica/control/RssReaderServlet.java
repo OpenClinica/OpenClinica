@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jmesa.view.html.HtmlBuilder;
 
@@ -20,7 +20,6 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
@@ -42,8 +41,8 @@ public class RssReaderServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    	resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",req.getLocale());
-    	resformat = ResourceBundle.getBundle("org.akaza.openclinica.i18n.format",req.getLocale());
+    	resword = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",req.getLocale());
+    	resformat = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.format",req.getLocale());
     	PrintWriter pw = new PrintWriter(resp.getOutputStream());
         if (rssUrl == null || rssUrl.length() == 0) {
             about(pw);

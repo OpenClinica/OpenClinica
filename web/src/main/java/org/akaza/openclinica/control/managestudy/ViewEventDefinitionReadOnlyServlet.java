@@ -7,19 +7,19 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.view.Page;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.jmesa.core.CoreContext;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;

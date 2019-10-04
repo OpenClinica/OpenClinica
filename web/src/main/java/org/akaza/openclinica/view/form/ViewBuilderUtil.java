@@ -1,10 +1,10 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jdom.Element;
 
 import java.util.ArrayList;

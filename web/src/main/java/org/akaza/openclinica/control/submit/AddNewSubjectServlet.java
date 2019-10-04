@@ -7,31 +7,31 @@
  */
 package org.akaza.openclinica.control.submit;
 
-// import org.akaza.openclinica.bean.core.Role;
+// import core.org.akaza.openclinica.bean.core.Role;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.akaza.openclinica.bean.core.*;
-import org.akaza.openclinica.bean.managestudy.*;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.bean.core.*;
+import core.org.akaza.openclinica.bean.managestudy.*;
+import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.bean.submit.DisplaySubjectBean;
+import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.service.rule.RuleSetService;
+import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import core.org.akaza.openclinica.dao.managestudy.*;
+import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.rule.RuleSetBean;
+import core.org.akaza.openclinica.exception.OpenClinicaException;
+import core.org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

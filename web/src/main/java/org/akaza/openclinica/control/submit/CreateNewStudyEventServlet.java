@@ -18,31 +18,31 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.service.rule.RuleSetService;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.domain.rule.RuleSetBean;
+import core.org.akaza.openclinica.exception.OpenClinicaException;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 // TODO: support YYYY-MM-DD HH:MM time formats
 
@@ -638,13 +638,13 @@ public class CreateNewStudyEventServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",
         // locale);
         // <
         // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
+        // "core.org.akaza.openclinica.i18n.exceptions",locale);
 
         String exceptionName = resexception.getString("no_permission_to_add_new_study_event");
         String noAccessMessage = respage.getString("not_create_new_event") + " " + respage.getString("change_study_contact_sysadmin");

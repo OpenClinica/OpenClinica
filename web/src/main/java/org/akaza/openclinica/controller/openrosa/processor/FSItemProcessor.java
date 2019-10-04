@@ -1,21 +1,21 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.xform.XformParserHelper;
-import org.akaza.openclinica.service.randomize.RandomizationService;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.xform.XformParserHelper;
+import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
+import static core.org.akaza.openclinica.service.crfdata.EnketoUrlService.ENKETO_ORDINAL;
 
 @Component
 @Order(value = 7)

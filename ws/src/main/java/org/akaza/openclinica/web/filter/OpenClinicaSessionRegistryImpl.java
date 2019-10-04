@@ -1,11 +1,11 @@
-package org.akaza.openclinica.web.filter;
+package core.org.akaza.openclinica.web.filter;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
-import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
+import core.org.akaza.openclinica.domain.technicaladmin.LoginStatus;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.User;

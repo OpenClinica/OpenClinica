@@ -3,9 +3,9 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.dao.admin.AuditDAO;
+import core.org.akaza.openclinica.dao.admin.AuditDAO;
 import java.util.ArrayList;
 
 public class ViewItemAuditLogServlet extends SecureController {

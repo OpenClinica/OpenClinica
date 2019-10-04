@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import core.org.akaza.openclinica.domain.rule.action.RuleActionBean;
 
 import java.util.List;
 

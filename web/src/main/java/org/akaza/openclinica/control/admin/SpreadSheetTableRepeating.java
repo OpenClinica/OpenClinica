@@ -7,19 +7,19 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.admin.NewCRFBean;
-import org.akaza.openclinica.bean.core.ItemDataType;
-import org.akaza.openclinica.bean.core.ResponseType;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.admin.NewCRFBean;
+import core.org.akaza.openclinica.bean.core.ItemDataType;
+import core.org.akaza.openclinica.bean.core.ResponseType;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import core.org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidationCell;
 import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidationType;
@@ -27,18 +27,17 @@ import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidator;
 import org.akaza.openclinica.control.form.spreadsheet.SheetCell;
 import org.akaza.openclinica.control.form.spreadsheet.SheetValidationContainer;
 import org.akaza.openclinica.control.form.spreadsheet.SheetValidationType;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.core.util.CrfTemplateColumnNameEnum;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.exception.CRFReadingException;
-import org.akaza.openclinica.logic.score.ScoreValidator;
-import org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.core.util.CrfTemplateColumnNameEnum;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDAO;
+import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import core.org.akaza.openclinica.exception.CRFReadingException;
+import core.org.akaza.openclinica.logic.score.ScoreValidator;
+import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -1756,7 +1755,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         cell = sheet.getRow(gk).getCell((short) ++cellNo);
                         String groupHeader = getValue(cell);
                         // replace any apostrophes in groupHeader: issue 3277
-                        groupHeader = org.akaza.openclinica.core.form.StringUtil.escapeSingleQuote(groupHeader);
+                        groupHeader = core.org.akaza.openclinica.core.form.StringUtil.escapeSingleQuote(groupHeader);
                         if (groupHeader != null && groupHeader.length() > 255) {
                             errors.add(resPageMsg.getString("group_header_length_error"));
                         }

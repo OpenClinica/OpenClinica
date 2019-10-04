@@ -7,12 +7,12 @@
  */
 package org.akaza.openclinica.control.login;
 
-import org.akaza.openclinica.bean.core.CustomRole;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.bean.core.CustomRole;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
@@ -23,21 +23,21 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.service.StudyConfigService;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
-import org.akaza.openclinica.service.randomize.ModuleProcessor;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.*;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
+import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
+import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -79,7 +79,7 @@ public class ChangeStudyServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
 
     }
 

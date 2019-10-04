@@ -1,20 +1,20 @@
-package org.akaza.openclinica.web.crfdata;
+package core.org.akaza.openclinica.web.crfdata;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.crfdata.*;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.crfdata.*;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

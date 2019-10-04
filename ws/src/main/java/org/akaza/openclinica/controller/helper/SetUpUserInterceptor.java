@@ -1,8 +1,8 @@
 package org.akaza.openclinica.controller.helper;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;

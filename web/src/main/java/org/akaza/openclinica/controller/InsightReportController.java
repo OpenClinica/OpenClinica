@@ -1,16 +1,16 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import org.akaza.openclinica.domain.datamap.JobDetail;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.enumsupport.JobType;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.service.InsightReportService;
-import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import core.org.akaza.openclinica.domain.datamap.JobDetail;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.service.InsightReportService;
+import core.org.akaza.openclinica.service.UserService;
+import core.org.akaza.openclinica.service.UtilService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

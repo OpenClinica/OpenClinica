@@ -1,8 +1,8 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.jdom.Element;
 
 import java.util.ArrayList;

@@ -11,15 +11,15 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import core.org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system

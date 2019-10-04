@@ -16,25 +16,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,9 +168,9 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
         // <
         // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
+        // "core.org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",
         // locale);
 
         getInputBeans(request);
@@ -263,14 +263,14 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#validateDisplayItemBean
-     * (org.akaza.openclinica.core.form.Validator,
-     * org.akaza.openclinica.bean.submit.DisplayItemBean)
+     * (core.org.akaza.openclinica.core.form.Validator,
+     * core.org.akaza.openclinica.bean.submit.DisplayItemBean)
      */
     @Override
     protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, HttpServletRequest request) {
 
         ItemBean ib = dib.getItem();
-        org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
+        core.org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
 
         // note that this step sets us up both for
         // displaying the data on the form again, in the event of an error
@@ -281,12 +281,12 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         }
 
         // types TEL and ED are not supported yet
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) ||
-                rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
+        if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) ||
+                rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.FILE)) {
             dib = validateDisplayItemBeanText(v, dib, inputName, request);
-        } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
+        } else if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
-        } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
+        } else if (rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(core.org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
             dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
         }
 

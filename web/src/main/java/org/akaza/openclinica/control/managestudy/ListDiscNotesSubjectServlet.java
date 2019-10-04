@@ -7,26 +7,26 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.ListDiscNotesSubjectTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -125,7 +125,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         request.setAttribute("mapKeys", mapKeys);
 
         // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
 
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
@@ -177,9 +177,9 @@ public class ListDiscNotesSubjectServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
+        // resexception=ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",locale);
 
         if (ub.isSysAdmin()) {
             return;

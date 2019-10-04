@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
 
 public class ImportCRFInfo {
     private String studyOID;

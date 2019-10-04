@@ -5,18 +5,18 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.submit.DisplaySectionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.view.form.ViewPersistanceHandler;
 

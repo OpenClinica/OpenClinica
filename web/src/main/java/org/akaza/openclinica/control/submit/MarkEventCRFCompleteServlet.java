@@ -12,28 +12,28 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.dao.submit.SectionDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InconsistentStateException;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InconsistentStateException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 /**
  * @author ssachs
@@ -273,12 +273,12 @@ public class MarkEventCRFCompleteServlet extends SecureController {
         locale = LocaleResolver.getLocale(request);
         // <
         // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
+        // "core.org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",
         // locale);
         // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
 
         fp = new FormProcessor(request);
 

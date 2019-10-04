@@ -9,8 +9,8 @@ package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.core.SecurityManager;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.core.SecurityManager;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
 /**
  * Checks user's password with the one int the session

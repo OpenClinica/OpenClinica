@@ -9,18 +9,18 @@ package org.akaza.openclinica.control.admin;
 
 import java.util.Locale;
 
-import org.akaza.openclinica.bean.core.EntityAction;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.core.EntityAction;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.core.SecurityManager;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.core.SecurityManager;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
 
 // allows both deletion and restoration of a study user role
 
@@ -44,7 +44,7 @@ public class UnLockUserServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
 
         if (!ub.isSysAdmin()) {
             throw new InsufficientPermissionException(Page.MENU, resexception.getString("you_may_not_perform_administrative_functions"), "1");

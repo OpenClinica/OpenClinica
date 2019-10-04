@@ -1,7 +1,5 @@
 package org.akaza.openclinica.controller.dto;
 
-import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
-
 public class StudyEventUpdateRequestDTO {
 
 	private String subjectKey;

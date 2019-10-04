@@ -12,11 +12,11 @@ import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
-import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
+import core.org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.component.HtmlColumn;
@@ -48,7 +48,7 @@ public class AuditDatabaseServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
 
         if (!ub.isSysAdmin()) {
             throw new InsufficientPermissionException(Page.MENU, resexception.getString("you_may_not_perform_administrative_functions"), "1");

@@ -1,9 +1,9 @@
 package org.akaza.openclinica.ws.validator;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 
 import javax.sql.DataSource;
 

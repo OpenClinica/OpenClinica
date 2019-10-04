@@ -7,7 +7,7 @@
  */
 package org.akaza.openclinica.view;
 
-import org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.control.form.FormProcessor;
 
 import java.util.ArrayList;

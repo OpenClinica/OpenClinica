@@ -14,19 +14,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.akaza.openclinica.web.bean.ListCRFRow;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import core.org.akaza.openclinica.web.bean.ListCRFRow;
 
 /**
  * Lists all the CRF and their CRF versions
@@ -45,15 +45,15 @@ public class ListCRFServlet extends SecureController {
 
         locale = LocaleResolver.getLocale(request);
         // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
         // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
         // < resworkflow =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.workflow",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.workflow",locale);
         // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
+        // resexception=ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
+        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",locale);
 
         if (ub.isSysAdmin() || ub.isTechAdmin()) {
             return;

@@ -9,16 +9,16 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBean;
-import org.akaza.openclinica.bean.submit.DisplaySectionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.dao.submit.ItemDAO;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
+import core.org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
 package org.akaza.openclinica.view.tags;
 
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.view.form.HorizontalFormBuilder;
 
 import java.io.IOException;

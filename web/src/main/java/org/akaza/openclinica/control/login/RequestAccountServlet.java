@@ -7,21 +7,21 @@
  */
 package org.akaza.openclinica.control.login;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.TermType;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.TermType;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.core.EmailEngine;
+import core.org.akaza.openclinica.core.SessionManager;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
 
 import java.util.ArrayList;
 import java.util.Date;

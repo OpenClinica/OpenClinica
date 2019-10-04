@@ -1,14 +1,14 @@
 package org.akaza.openclinica.controller;
 
 import io.swagger.annotations.Api;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.service.LiquibaseOnDemandService;
-import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.SiteBuildService;
-import org.akaza.openclinica.service.archival.ArchivedStudyService;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.service.LiquibaseOnDemandService;
+import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.SiteBuildService;
+import core.org.akaza.openclinica.service.archival.ArchivedStudyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,12 +3,11 @@ package org.akaza.openclinica.controller.dto;
 
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.akaza.openclinica.domain.enumsupport.ModuleStatus;
-import org.akaza.openclinica.service.AbstractAuditingDTO;
+import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
+import core.org.akaza.openclinica.service.AbstractAuditingDTO;
 
 /**
  * A DTO for the ModuleConfig entity.

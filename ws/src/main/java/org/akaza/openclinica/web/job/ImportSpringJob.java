@@ -1,6 +1,6 @@
-package org.akaza.openclinica.web.job;
+package core.org.akaza.openclinica.web.job;
 
-import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
+import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;

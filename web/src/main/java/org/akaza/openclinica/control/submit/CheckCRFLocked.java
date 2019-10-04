@@ -1,10 +1,10 @@
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.core.LockInfo;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.core.LockInfo;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 
 /**

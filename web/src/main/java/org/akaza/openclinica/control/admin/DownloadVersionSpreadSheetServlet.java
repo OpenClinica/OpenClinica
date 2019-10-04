@@ -6,16 +6,16 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
 
 import java.io.DataInputStream;
 import java.io.File;

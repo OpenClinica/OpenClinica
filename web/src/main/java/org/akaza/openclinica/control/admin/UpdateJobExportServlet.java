@@ -13,25 +13,25 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.extract.DatasetBean;
+import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.extract.DatasetDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.service.extract.ExtractUtils;
-import org.akaza.openclinica.service.extract.XsltTriggerService;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.extract.DatasetDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.service.extract.ExtractUtils;
+import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.job.ExampleSpringJob;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -243,7 +243,7 @@ public class UpdateJobExportServlet extends SecureController {
                 JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
                 JobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
                 JobDetailFactoryBean.setName(trigger.getKey().getName());
-                JobDetailFactoryBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
+                JobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
                 JobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
                 JobDetailFactoryBean.setDurability(true); // need durability?
                 JobDetailFactoryBean.afterPropertiesSet();

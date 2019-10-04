@@ -1,7 +1,7 @@
 package org.akaza.openclinica.view.form;
 
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jdom.Element;
 
 import java.util.List;

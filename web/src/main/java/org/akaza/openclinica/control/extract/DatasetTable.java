@@ -7,9 +7,9 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.extract.DatasetBean;
+import core.org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.view.Table;
 
 /**
