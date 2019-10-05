@@ -11,11 +11,6 @@
 		</encoder>
 	</appender>
 
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%msg%n</pattern>
-		</encoder>
-	</appender>
 	<logger name="org.hibernate.SQL" level="${hibernateSQLLogLevel}" />
 	<logger name="org.hibernate.type" level="${hibernateTypeLogLevel}" />
 	<logger name="org.springframework.security" level="ERROR" />

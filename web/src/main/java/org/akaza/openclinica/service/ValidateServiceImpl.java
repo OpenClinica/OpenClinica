@@ -39,7 +39,6 @@ public class ValidateServiceImpl implements ValidateService {
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "enabled";
 
-    private static String sbsUrl = CoreResources.getField("SBSUrl");
     private static final String ADVANCE_SEARCH = "contactsModule";
 
     @Autowired

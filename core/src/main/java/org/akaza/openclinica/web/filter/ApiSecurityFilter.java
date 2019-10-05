@@ -187,7 +187,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         if (userContextMap == null)
             return null;
         String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("SBSUrl") + userUuid;
+        String uri = CoreResources.getField("SBSBaseUrl") + "/user-service/api/users/" + userUuid;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));

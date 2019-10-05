@@ -45,6 +45,7 @@ import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -554,7 +555,7 @@ public class UpdateStudyEventServlet extends SecureController {
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             StudyEventBean seb = (StudyEventBean) session.getAttribute("eventSigned");
             boolean isAuthenticated = false;
-            AuthzClient authzClient = AuthzClient.create();
+            AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
             try {
                 authzClient.obtainAccessToken(username, password);
                 isAuthenticated = true;
