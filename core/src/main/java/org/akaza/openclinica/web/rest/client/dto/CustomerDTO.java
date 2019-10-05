@@ -1,4 +1,4 @@
-package org.akaza.openclinica.web.rest.client.cs.dto;
+package org.akaza.openclinica.web.rest.client.dto;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

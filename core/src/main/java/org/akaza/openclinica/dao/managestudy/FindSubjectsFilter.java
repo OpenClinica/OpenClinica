@@ -42,10 +42,15 @@ public class FindSubjectsFilter implements CriteriaCommand {
         value = StringEscapeUtils.escapeSql(value.toString());
         if (value != null) {
             if (property.equals("studySubject.status")) {
-                criteria = criteria + " and ";
+                criteria+= " INTERSECT " +
+                        " select ss.* from study_subject ss  ";
+                criteria = criteria + " where ";
                 criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
             } else if (property.startsWith("sed_")) {
                 value = SubjectEventStatus.getSubjectEventStatusIdByName(value.toString()) + "";
+                criteria+= " INTERSECT " +
+                        " select ss.* from study_subject ss JOIN study_event se  ON  se.study_subject_id=ss.study_subject_id ";
+
                 if (!value.equals("2")) {
                     criteria += " and ";
                     criteria += " ( se.study_event_definition_id = " + property.substring(4);
@@ -68,11 +73,33 @@ public class FindSubjectsFilter implements CriteriaCommand {
                         + " AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)" + " AND sgm.study_group_class_id = sgc.study_group_class_id"
                         + " ) ";
 
+            }else if(property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")){
+                String sedOid = property.split("\\.")[0];
+                String formOid = property.split("\\.")[1];
+                String itemOid = property.split("\\.")[2];
+
+                criteria+= " INTERSECT " +
+                        " select ss.* from item_data id JOIN event_crf ec ON id.event_crf_id=ec.event_crf_id\n" +
+                        "                                          JOIN study_event se ON se.study_event_id=ec.study_event_id\n" +
+                        "                                          JOIN crf_version cv ON cv.crf_version_id=ec.crf_version_id\n" +
+                        "                                          JOIN crf c ON c.crf_id=cv.crf_id\n" +
+                        "                                          JOIN item i ON i.item_id=id.item_id\n" +
+                        "                                          JOIN study_event_definition sed ON sed.study_event_definition_id=se.study_event_definition_id\n" +
+                        "                                          JOIN study_subject ss ON ss.study_subject_id=se.study_subject_id\n"+
+                        "                                          where\n" +
+                        "                                          sed.oc_oid=\'"+sedOid+"\' AND\n" +
+                        "                                          c.oc_oid=\'"+formOid+"\' AND\n" +
+                        "                                          i.oc_oid=\'"+itemOid+"\' AND\n" +
+                        "                                          UPPER(id.value)like  \'%"+((String) value).toUpperCase()+"%\'";
+
+
             }
 
             else {
-                criteria = criteria + " and ";
-                criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
+                criteria+= " INTERSECT " +
+                        " select ss.* from study_subject ss JOIN study st ON st.study_id=ss.study_id\n";
+                criteria = criteria + " where ";
+                criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like ('%" + ((String) value).toUpperCase() + "%')" + " ";
             }
         }
         return criteria;

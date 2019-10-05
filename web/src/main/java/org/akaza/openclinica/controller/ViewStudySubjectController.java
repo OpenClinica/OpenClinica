@@ -60,7 +60,7 @@ public class ViewStudySubjectController {
 	@RequestMapping(value = "/api/studies/{studyoid}/pages/{name}", method = RequestMethod.GET)
 	public ResponseEntity<Page> getPageLayout(HttpServletRequest request, @PathVariable("studyoid") String studyOid, @PathVariable("name") String name) {
 
-		Page page = viewStudySubjectService.getPage(request, studyOid, name);
+		Page page = viewStudySubjectService.getPage( name);
 		if (page == null) {
 			page = new Page();
 			//return new ResponseEntity<Page>(page, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);

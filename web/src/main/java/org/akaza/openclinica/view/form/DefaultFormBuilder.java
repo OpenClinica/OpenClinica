@@ -122,6 +122,5 @@ public class DefaultFormBuilder implements FormBuilder {
 
     public static void main(String[] args) {
         DefaultFormBuilder dfb = new DefaultFormBuilder();
-        System.out.println(dfb.createMarkup());
     }
 }

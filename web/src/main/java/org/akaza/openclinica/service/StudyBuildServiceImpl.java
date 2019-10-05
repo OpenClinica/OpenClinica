@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class StudyBuildServiceImpl implements StudyBuildService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
+    private static final String sbsUrl = CoreResources.getField("SBSBaseUrl");
     PermissionService permissionService;
     @Autowired
     private StudyDao studyDao;
@@ -318,7 +318,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             }
             if (StringUtils.isNotEmpty(altStudyEnvUuid)) {
                 if (uuidToFind.equals(altStudyEnvUuid)) {
-                    logger.info("Commented out setting altCustomUserRole - does it have any adverse effects ??");
+                    logger.debug("Commented out setting altCustomUserRole - does it have any adverse effects ??");
                     //request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
                 }
             }
@@ -423,7 +423,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (userContextMap == null)
             return null;
         String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("SBSUrl") + userUuid;
+        String uri = sbsUrl + "/user-service/api/users/" + userUuid;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -536,11 +536,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             studyDao.saveOrUpdate(study);
         }
 
-        String SBSUrl = CoreResources.getField("SBSUrl");
-        int index = SBSUrl.indexOf("//");
-        String protocol = SBSUrl.substring(0, index) + "//";
         String appendUrl = "/study-service/api/studies/" + study.getStudyUuid() + "/module-configs";
-        String uri = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + appendUrl;
+        String uri = sbsUrl + appendUrl;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -565,12 +562,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     public StudyEnvironmentDTO getStudyUuidFromStudyService(String accessToken, Study study) {
 
-        String SBSUrl = CoreResources.getField("SBSUrl");
-        int index = SBSUrl.indexOf("//");
-        String protocol = SBSUrl.substring(0, index) + "//";
         String appendUrl = "/study-service/api/study-environments/" + study.getStudyEnvUuid();
-
-        String uri = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + appendUrl;
+        String uri =sbsUrl + appendUrl;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
