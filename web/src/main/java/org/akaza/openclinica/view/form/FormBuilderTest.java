@@ -60,6 +60,5 @@ public class FormBuilderTest {
 
     public static void main(String[] args) {
         FormBuilderTest builder = new FormBuilderTest();
-        System.out.println(builder.createTable());
     }
 }

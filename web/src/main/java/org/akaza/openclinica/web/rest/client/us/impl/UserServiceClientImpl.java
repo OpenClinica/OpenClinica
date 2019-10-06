@@ -31,7 +31,7 @@ import java.util.List;
 
 @Service
 public class UserServiceClientImpl {
-    private String sbsUrl = CoreResources.getField("SBSUrl");
+    private String sbsUrl = CoreResources.getField("SBSBaseUrl");
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 }

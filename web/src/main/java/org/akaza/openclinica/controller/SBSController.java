@@ -19,15 +19,12 @@ import javax.servlet.http.HttpServletResponse;
 public class SBSController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private static final String SBSUrl = CoreResources.getField("SBSBaseUrl");
     @RequestMapping(value = "/customer-service/api/allowed-connections", method = RequestMethod.GET)
     protected ResponseEntity<String[]> redirectToSBS(final HttpServletRequest req, HttpServletResponse res,
             @RequestParam("subdomain") String subDomain) {
         logger.debug("Performing login");
-        String SBSUrl = CoreResources.getField("SBSUrl");
-        int index = SBSUrl.indexOf("//");
-        String protocol = SBSUrl.substring(0, index) + "//";
-        String SBSDomainURl = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
+        String SBSDomainURl = SBSUrl + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
         RestTemplate restTemplate = new RestTemplate();
         String[] responseStr = restTemplate.getForObject(SBSDomainURl, String[].class);
         HttpHeaders headers = new HttpHeaders();

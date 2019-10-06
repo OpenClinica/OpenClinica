@@ -1,10 +1,11 @@
 package org.akaza.openclinica.web.rest.client.auth.impl;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.CustomParameterizedException;
 import org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.service.UserType;
-import org.akaza.openclinica.web.rest.client.cs.dto.CustomerDTO;
-import org.akaza.openclinica.web.rest.client.cs.impl.CustomerServiceClientImpl;
+import org.akaza.openclinica.web.rest.client.dto.CustomerDTO;
+import org.akaza.openclinica.web.rest.client.impl.CustomerServiceClientImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.javers.common.collections.Lists;
@@ -15,6 +16,7 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
@@ -52,7 +54,6 @@ public class KeycloakClientImpl {
     private static final MessageFormat USERS_PATH = new MessageFormat("/realms/{0}/oc-rest/users");
     private static final String ACCESS_CODE = "access_code";
     public static final String RANDOMIZE_CLIENT = "randomize";
-
     @Autowired
     CustomerServiceClientImpl customerServiceClient;
 
@@ -171,7 +172,7 @@ public class KeycloakClientImpl {
 
         String realm = getRealmName(accessToken, customerUuid);
 
-        AuthzClient authzClient = AuthzClient.create();
+        AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
         String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
 
         String usersUrlPath = USERS_PATH.format(new String[]{realm});
@@ -209,7 +210,7 @@ public class KeycloakClientImpl {
         logger.debug("Create OC-API System Token");
 
         try {
-            AuthzClient authzClient = AuthzClient.create();
+            AuthzClient authzClient=AuthzClient.create(CoreResources.getKeyCloakConfig());
             String realm = authzClient.getConfiguration().getRealm();
             logger.debug("Getting access token for realm: {} and client: {}", realm, OC_API_CLIENT_ID);
             ClientsResource clientsResource = keycloak
@@ -243,7 +244,7 @@ public class KeycloakClientImpl {
             logger.debug("Keycloak Access Token: {}", accessToken);
             return accessToken;
         } catch (Exception e) {
-            logger.error("Could not read keycloak.json", e);
+            logger.error("Error reading keycloak properties from DataInfo.properties", e);
             return null;
         }
     }

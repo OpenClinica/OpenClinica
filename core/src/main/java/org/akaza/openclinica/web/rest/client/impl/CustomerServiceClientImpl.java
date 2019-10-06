@@ -1,11 +1,11 @@
-package org.akaza.openclinica.web.rest.client.cs.impl;
+package org.akaza.openclinica.web.rest.client.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.web.rest.client.cs.dto.CustomerDTO;
+import org.akaza.openclinica.web.rest.client.dto.CustomerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -13,20 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
-
 @Service
 public class CustomerServiceClientImpl {
-    private String sbsUrl = CoreResources.getField("SBSUrl");
+    private String sbsUrl = CoreResources.getField("SBSBaseUrl");
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 
     public CustomerDTO getCustomer(String accessToken,String customerUuid) {
-        int index = sbsUrl.indexOf("//");
-        String protocol = sbsUrl.substring(0, index) + "//";
-        String domainUrl=sbsUrl.substring(index + 2, sbsUrl.indexOf("/", index + 2));
         String subDomainUrl="/customer-service/api/customers/"+customerUuid;
-        String uri = protocol+domainUrl+subDomainUrl;
+        String uri =sbsUrl + subDomainUrl;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

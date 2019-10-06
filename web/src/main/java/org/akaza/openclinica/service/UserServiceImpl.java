@@ -12,7 +12,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
-import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
@@ -543,7 +542,7 @@ public class UserServiceImpl implements UserService {
 
 
     public List<OCUserDTO> getAllParticipantAccountsFromUserService(String accessToken) {
-        String uri = sbsUrl.substring(0, sbsUrl.length() - 1) + PAGINATION;
+        String uri =sbsUrl + "/user-service/api/users" + PAGINATION;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
