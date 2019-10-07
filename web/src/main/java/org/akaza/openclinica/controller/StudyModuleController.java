@@ -372,7 +372,7 @@ public class StudyModuleController {
             sms.setUsers(StudyModuleStatus.IN_PROGRESS);
         }
 
-        map.addObject(sms);
+        map.addAttribute(sms);
         map.addAttribute("crfCount", totalCrf);
         map.addAttribute("eventDefinitionCount", eventDefinitionCount);
         map.addAttribute("subjectGroupCount", subjectGroupCount);

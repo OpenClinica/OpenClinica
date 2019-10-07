@@ -36,6 +36,7 @@
         var checkboxObject;
     </script>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
     <script type="text/javascript"  language="JavaScript" src=
@@ -52,9 +53,10 @@
 	    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
 	    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
     <!-- End -->
-
+    
+	
 </head>
-<body class="aka_bodywidth" onload=" document.getElementById('here').style.display='none'; document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
+<body class="aka_bodywidth" onload="<c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if> document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
 
 <c:import url="../submit/showItemInputToolTipsJS.jsp"></c:import>
 
@@ -385,7 +387,10 @@ function initmb(){
 
 }
 
-window.onload = initmb;
+// this is neccessary since body.onload is overwritten 
+// by window.onload
+oldOnload = document.body.onload;
+window.onload = function(){oldOnload(); initmb();};
 
 //-->
 </script>
@@ -737,11 +742,12 @@ but the custom tag uses that, not this jstl code--%>
 
 <c:forEach var="bodyItemGroup" items="${displayItem.itemGroups}"  varStatus="status">
 <c:set var="columnNum"  value="1"/>
+<c:set var="editFlag" value="${bodyItemGroup.editFlag}"/>
 <!-- hasError is set to true when validation error happens-->
 
 <!-- JN: So, the cross button should not be displayed for the items which are present in the  -->
 <!--  not the last row -->
-<tr repeat="0" />
+<tr repeat="${uniqueId}" />
 <c:set var="columnNum"  value="1"/>
 	<c:set var="isButtonRemShow" value="true"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
@@ -798,6 +804,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
+			 <c:param name="editFlag" value="${editFlag}"/>
                     </c:import>
                 </td>
             </c:forEach>
@@ -825,6 +832,7 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="tabNum" value="${itemNum}"/>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                     <c:param name="originJSP" value="initialDataEntry"/>
+		     <c:param name="editFlag" value="${editFlag}"/>
                 </c:import>
                 <c:import url="../submit/generateGroupItemTxt.jsp">
                     <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -931,7 +939,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="initialDataEntry"/>
-
+			     <c:param name="editFlag" value="${editFlag}"/>
                         </c:import>
                     </td>
                 </c:forEach>
@@ -960,6 +968,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
+			 <c:param name="editFlag" value="${editFlag}"/>
                     </c:import>
                     <c:import url="../submit/generateGroupItemTxt.jsp">
                         <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -983,7 +992,7 @@ but the custom tag uses that, not this jstl code--%>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
     
                 <td class="aka_padding_norm aka_cellBorders">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
+                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
 
                 <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove" style="display:block;"></button>
                </td>

@@ -3,9 +3,11 @@ package org.akaza.openclinica.dao.hibernate;
 import org.akaza.openclinica.bean.rule.expression.Context;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.type.IntegerType;
 import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.ParameterizedType;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.internal.util.ReflectHelper;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -36,7 +38,7 @@ public class IntegerEnumUserType implements EnhancedUserType, ParameterizedType 
     }
 
     public int[] sqlTypes() {
-        return new int[] { Hibernate.INTEGER.sqlType() };
+        return new int[] { IntegerType.INSTANCE.sqlType() };
     }
 
     public boolean isMutable() {
@@ -67,6 +69,16 @@ public class IntegerEnumUserType implements EnhancedUserType, ParameterizedType 
         return x.hashCode();
     }
 
+    @Override
+    public Object nullSafeGet(ResultSet resultSet, String[] strings, SharedSessionContractImplementor sharedSessionContractImplementor, Object o) throws HibernateException, SQLException {
+        return null;
+    }
+
+    @Override
+    public void nullSafeSet(PreparedStatement preparedStatement, Object o, int i, SharedSessionContractImplementor sharedSessionContractImplementor) throws HibernateException, SQLException {
+
+    }
+
     public Object fromXMLString(String xmlValue) {
         return Enum.valueOf(enumClass, xmlValue);
     }
@@ -87,7 +99,7 @@ public class IntegerEnumUserType implements EnhancedUserType, ParameterizedType 
 
     public void nullSafeSet(PreparedStatement st, Object value, int index) throws SQLException {
         if (value == null) {
-            st.setNull(index, Hibernate.INTEGER.sqlType());
+            st.setNull(index, IntegerType.INSTANCE.sqlType());
         } else {
             // st.setString(index, ((Enum) value).name());
             st.setInt(index, ((Context) value).getCode());

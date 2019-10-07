@@ -20,7 +20,7 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "rule_action_stratification_factor")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_action_stratification_factor_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_action_stratification_factor_id_seq") })
 public class StratificationFactorBean extends AbstractMutableDomainObject {
     
     private ExpressionBean stratificationFactor;

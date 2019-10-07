@@ -148,7 +148,7 @@ public class UpdateProfileServlet extends SecureController {
             session.setAttribute("userBean1", userBean1);
             String oldPass = fp.getString("oldPasswd").trim();
 
-            if (!userBean1.isLdapUser() && !sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {
+            if (!userBean1.isLdapUser() && !sm.verifyPassword(oldPass, getUserDetails())) {
                 Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
                 request.setAttribute("formMessages", errors);
                 // addPageMessage("Wrong old password. Please try again.");

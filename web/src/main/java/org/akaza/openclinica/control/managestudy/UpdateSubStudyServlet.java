@@ -442,42 +442,14 @@ public class UpdateSubStudyServlet extends SecureController {
                         // saved for the site
                         int defaultId = defaultVersionId > 0 ? defaultVersionId : edcBean.getDefaultVersionId();
                         int dbDefaultVersionId = edcBean.getDefaultVersionId();
-                        if (defaultId == dbDefaultVersionId) {
-                            if (isRequired == edcBean.isRequiredCRF()) {
-                                if (isDouble == edcBean.isDoubleEntry()) {
-                                    if (hasPassword == edcBean.isElectronicSignature()) {
-                                        if (isHide == edcBean.isHideCrf()) {
-                                             if (submissionUrl.equals("")) {
-
-                                            if (selectedVersionIdListSize > 0) {
-                                                if (selectedVersionIdListSize == edcBean.getVersions().size()) {
-                                                    if (sdvId > 0) {
-                                                        if (sdvId != edcBean.getSourceDataVerification().getCode()) {
-                                                            changed = true;
-                                                        }
-                                                    }
-                                                } else {
-                                                    changed = true;
-                                                }
-                                            }
-                                    } else {
-                                        changed = true;
-                                  }
-                                        } else {
-                                            changed = true;
-                                        }
-                                    } else {
-                                        changed = true;
-                                    }
-                                } else {
-                                    changed = true;
-                                }
-                            } else {
-                                changed = true;
-                            }
-                        } else {
-                            changed = true;
-                        }
+                        changed = changed || (defaultId != dbDefaultVersionId);
+                        changed = changed || (isRequired != edcBean.isRequiredCRF());
+                        changed = changed || (isDouble != edcBean.isDoubleEntry());
+                        changed = changed || (hasPassword != edcBean.isElectronicSignature());
+                        changed = changed || (isHide != edcBean.isHideCrf());
+                        changed = changed || (!submissionUrl.equals(""));                        
+                        changed = changed || (selectedVersionIdListSize > 0 && selectedVersionIdListSize != edcBean.getVersions().size());
+                        changed = changed || (sdvId > 0 && sdvId != edcBean.getSourceDataVerification().getCode());
 
                         if (changed) {
                             CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(defaultId);

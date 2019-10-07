@@ -28,6 +28,7 @@
 
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
    <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
     <script type="text/javascript"  language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>
@@ -573,7 +574,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <c:forEach var="bodyItemGroup" items="${displayItem.itemGroups}"  varStatus="status">
 <c:set var="columnNum"  value="1"/>
 
-<tr repeat="0">
+<c:set var="editFlag" value="${bodyItemGroup.editFlag}"/>
+<tr repeat="${uniqueId}">
 <c:set var="columnNum"  value="1"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 <c:choose>
@@ -604,6 +606,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
                         <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                        <c:param name="editFlag" value="§{editFlag}"/>
                     </c:import>
                 </td>
             </c:forEach>
@@ -631,6 +634,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                     <c:param name="originJSP" value="administrativeEditing"/>
                     <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                    <c:param name="editFlag" value="§{editFlag}"/>
                 </c:import>
 				<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -704,6 +708,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="administrativeEditing"/>
                             <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                            <c:param name="editFlag" value="§{editFlag}"/>
                         </c:import>
                     </td>
                 </c:forEach>
@@ -732,6 +737,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
                         <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                        <c:param name="editFlag" value="§{editFlag}"/>
                     </c:import>
 					<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -754,7 +760,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
     
                 <td class="aka_padding_norm aka_cellBorders">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
+                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
                     <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
                 </td>
         
@@ -934,6 +940,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                     <c:param name="respLayout" value="${displayItem.singleItem.metadata.responseLayout}"/>
                                     <c:param name="originJSP" value="administrativeEditing"/>
                                     <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                                    <c:param name="editFlag" value="§{editFlag}"/>
                                 </c:import>
 
                             </td>
@@ -1045,6 +1052,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                         <c:param name="respLayout" value="${childItem.metadata.responseLayout}"/>
                                         <c:param name="originJSP" value="administrativeEditing"/>
                                         <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                                        <c:param name="editFlag" value="§{editFlag}"/>
                                     </c:import>
                                         <%--	<br />--%><%--<c:import url="../showMessage.jsp"><c:param name="key" value="input${childItem.item.id}" /></c:import>--%>
                                 </td>

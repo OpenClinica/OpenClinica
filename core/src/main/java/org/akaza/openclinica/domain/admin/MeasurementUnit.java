@@ -22,7 +22,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "measurement_unit")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "measurement_unit_measurement_unit_id") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "measurement_unit_measurement_unit_id") })
 public class MeasurementUnit extends AbstractMutableDomainObject {
     private String name;
     private String description;

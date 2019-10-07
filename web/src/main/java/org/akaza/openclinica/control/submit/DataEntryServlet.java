@@ -2249,7 +2249,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         int tabId = fp.getInt("tab", true);
         if (tabId <= 0) {
-            tabId = 1;
+            if(sb != null && sb.getOrdinal() > 0) {
+            	tabId = sb.getOrdinal();
+            } else {
+            	tabId = 1;
+            }
         }
         request.setAttribute(INPUT_TAB, new Integer(tabId));
         request.setAttribute(SECTION_BEAN, sb);
@@ -2523,6 +2527,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
             formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
 
             ItemGroupBean igb = digb.getItemGroupBean();
+            
+        	// check whether this loop should be executed or skipped
+            boolean firstLoopSkip = !fp.getStartsWith(igb.getOid() + "_manual" + i + "input");
+            firstLoopSkip = firstLoopSkip && StringUtil.isBlank(fp.getString(igb.getOid() + "_manual" + i + ".newRow"));
+            
+            if(firstLoopSkip) {
+            	firstLoopBreak++;
+                if (firstLoopBreak > 14) {
+                    LOGGER.debug("break first loop");
+                    break;
+                }            	
+            	continue;
+            }
 
             // want to do deep copy here, so always get a fresh copy for items,
             // may use other better way to do, like clone
@@ -2562,12 +2579,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 formGroup.setItems(dibs);
                 formGroups.add(formGroup);
 
-            } else {
-                firstLoopBreak++;
-            }
-            if (firstLoopBreak > 14) {
-                LOGGER.debug("break first loop");
-                break;
             }
         }// end of for (int i = 0; i < repeatMax; i++)
         // >>TBH remove the above eventually, repeat some work here?
@@ -2586,6 +2597,21 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         // had the call to form bean utils here, tbh
         for (int i = 0; i < repeatMax; i++) {
+			ItemGroupBean igb = digb.getItemGroupBean();
+
+			// check whether this loop should be executed or skipped
+			boolean secondLoopSkip = !fp.getStartsWith(igb.getOid() + "_" + i + "input");
+			secondLoopSkip = secondLoopSkip && StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"));
+
+			if (secondLoopSkip) {
+				secondLoopBreak++;
+				if (secondLoopBreak > 14) {
+					LOGGER.debug("break second loop");
+					break;
+				}
+				continue;
+			}
+
             DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
             formGroup.setItemGroupBean(digb.getItemGroupBean());
 
@@ -2603,7 +2629,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
             //                logger.debug("throws an OCE for " + digb.getGroupMetaBean().getId());
             //            }
             formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
-            ItemGroupBean igb = digb.getItemGroupBean();
             // adding this code from below, since we want to pass a null values
             // list
             // in all cases of getDisplayBeansFromItems().

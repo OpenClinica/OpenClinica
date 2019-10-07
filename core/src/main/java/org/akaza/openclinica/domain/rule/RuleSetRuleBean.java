@@ -43,8 +43,7 @@ import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "rule_set_rule")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_set_rule_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_set_rule_id_seq") })
 public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject implements Serializable {
 
     RuleSetBean ruleSetBean;

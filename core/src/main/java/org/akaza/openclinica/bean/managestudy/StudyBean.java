@@ -7,16 +7,18 @@
  */
 package org.akaza.openclinica.bean.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.StringTokenizer;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.StringTokenizer;
 
 /**
  * @author thickerson
@@ -72,7 +74,31 @@ public class StudyBean extends AuditableEntityBean {
     private String collaborators = "";
     private String medlineIdentifier = "";
     private boolean resultsReference = false;
-    
+    private String schemaName = "";
+    private StudyEnvEnum envType;
+    private String studyEnvSiteUuid;
+    private String studyEnvUuid;
+    private boolean published;
+    public int filePath;
+    private int subjectCount;
+    private String studyUuid;
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public String getStudyEnvUuid() {
+        return studyEnvUuid;
+    }
+
+    public void setStudyEnvUuid(String studyEnvUuid) {
+        this.studyEnvUuid = studyEnvUuid;
+    }
+
     // private boolean usingDOB = false;
     // private boolean discrepancyManagement = false;
     private String oid;
@@ -252,6 +278,34 @@ public class StudyBean extends AuditableEntityBean {
      */
     public String getCollaborators() {
         return collaborators;
+    }
+
+    /**
+     * @param collaborators
+     *            The collaborators to set.
+     */
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public StudyEnvEnum getEnvType() {
+        return this.envType;
+    }
+
+    public void setEnvType(StudyEnvEnum envType) {
+        this.envType = envType;
+    }
+
+    public String getStudyEnvSiteUuid() {
+        return this.studyEnvSiteUuid;
+    }
+
+    public void setStudyEnvSiteUuid(String studyEnvSiteUuid) {
+        this.studyEnvSiteUuid = studyEnvSiteUuid;
     }
 
     /**
@@ -1089,4 +1143,27 @@ public class StudyBean extends AuditableEntityBean {
         return parentStudyId > 0 ? true : false;
     }
 
+    public int getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(int filePath) {
+        this.filePath = filePath;
+    }
+
+    public int getSubjectCount() {
+        return subjectCount;
+    }
+
+    public void setSubjectCount(int subjectCount) {
+        this.subjectCount = subjectCount;
+    }
+
+    public String getStudyUuid() {
+        return studyUuid;
+    }
+
+    public void setStudyUuid(String studyUuid) {
+        this.studyUuid = studyUuid;
+    }
 }

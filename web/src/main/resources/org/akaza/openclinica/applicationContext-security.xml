@@ -6,61 +6,56 @@
     xmlns:security="http://www.springframework.org/schema/security"
     xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/util
-                           http://www.springframework.org/schema/util/spring-util-3.0.xsd
+                           http://www.springframework.org/schema/util/spring-util.xsd
                            http://www.springframework.org/schema/security
-                           http://www.springframework.org/schema/security/spring-security-3.0.xsd
+                           http://www.springframework.org/schema/security/spring-security.xsd
                            http://www.springframework.org/schema/security/oauth2 
                            http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
 
 
-  <security:http access-denied-page="/accounts/denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
+  <security:http entry-point-ref="authenticationProcessingFilterEntryPoint" use-expressions="true">
     
     <security:anonymous />
-    <security:intercept-url pattern="/pages/login/login" filters="none"/>
-    <security:intercept-url pattern="/SystemStatus" filters="none"/>
-    <security:intercept-url pattern="/RssReader" filters="none"/>
-    <security:intercept-url pattern="/RequestPassword" filters="none"/>
-    <security:intercept-url pattern="/RequestAccount" filters="none"/>
-    <security:intercept-url pattern="/includes/**" filters="none"/>
-    <security:intercept-url pattern="/images/**" filters="none"/>
-    <security:intercept-url pattern="/help/**" filters="none"/>
-    <security:intercept-url pattern="/ws/**" filters="none"/>
-    <security:intercept-url pattern="/Contact" filters="none"/>
-    <security:intercept-url pattern="/rest2/openrosa/**" filters="none"/>
-    <security:intercept-url pattern="/pages/odmk/**" filters="none"/>
-    <security:intercept-url pattern="/pages/openrosa/**" filters="none"/>
-    <security:intercept-url pattern="/pages/accounts/**" filters="none"/>
-    <security:intercept-url pattern="/pages/itemdata/**" filters="none"/>
-    <security:intercept-url pattern="/pages/auth/api/v1/studies/**" filters="none"/>
-    <security:intercept-url pattern="/pages/odmss/**" filters="none"/>
-    <security:intercept-url pattern="/pages/healthcheck/**" filters="none"/>
-    <security:intercept-url pattern="/pages/api/v1/anonymousform/**" filters="none"/>
-    <security:intercept-url pattern="/pages/api/v2/anonymousform/**" filters="none"/>
-    <security:intercept-url pattern="/pages/api/v1/editform/**" filters="none"/>
-    <security:intercept-url pattern="/pages/auth/api/v1/discrepancynote/**" filters="none"/>
-    <security:intercept-url pattern="/pages/auth/api/v1/forms/migrate/**" filters="none"/>
-    <security:intercept-url pattern="/pages/api/v1/forms/migrate/**" filters="none"/>
-    <security:intercept-url pattern="/pages/auth/api/**" filters="none"/>
-    <security:intercept-url pattern="/pages/auth/api/v1/system/**" filters="none"/>
-    <!--
-    <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
-      default-target-url='/MainMenu' always-use-default-target='true' />
-     -->
-    <security:intercept-url pattern="/**" access="ROLE_USER" />
+    <security:intercept-url pattern="/pages/login/login" access="permitAll"/>
+    <security:intercept-url pattern="/SystemStatus" access="permitAll"/>
+    <security:intercept-url pattern="/RequestPassword" access="permitAll"/>
+    <security:intercept-url pattern="/RequestAccount" access="permitAll"/>
+    <security:intercept-url pattern="/includes/**" access="permitAll"/>
+    <security:intercept-url pattern="/images/**" access="permitAll"/>
+    <security:intercept-url pattern="/help/**" access="permitAll"/>
+    <security:intercept-url pattern="/ws/**" access="permitAll"/>
+    <security:intercept-url pattern="/Contact" access="permitAll"/>
+    <security:intercept-url pattern="/rest2/openrosa/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/odmk/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/openrosa/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/accounts/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/itemdata/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/auth/api/v1/studies/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/odmss/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/healthcheck/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/api/v1/anonymousform/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/api/v2/anonymousform/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/api/v1/editform/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/auth/api/v1/discrepancynote/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/auth/api/v1/forms/migrate/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/api/v1/forms/migrate/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/auth/api/**" access="permitAll"/>
+    <security:intercept-url pattern="/pages/auth/api/v1/system/**" access="permitAll"/>
+    <security:intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="myFilter" />
-    <!--  <security:custom-filter position="LOGOUT_FILTER" ref="logoutFilter" /> -->
     <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
     <security:session-management session-authentication-strategy-ref="sas"/>
-    <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
+    <security:logout success-handler-ref="openClinicaLogoutHandler" logout-url="/j_spring_security_logout"/>
+    <security:csrf disabled="true"/>
     
   </security:http>  
  
 
     <bean id="authenticationProcessingFilterEntryPoint"
           class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-        <property name="loginFormUrl" value="/pages/login/login"/>
+        <constructor-arg name="loginFormUrl" value="/pages/login/login"/>
         <property name="forceHttps" value="false"/>
     </bean>
     
@@ -94,8 +89,8 @@
     </bean>
     
      <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
-        <property name="sessionRegistry" ref="sessionRegistry" />
-        <property name="expiredUrl" value="/MainMenu" />
+     	<constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+        <constructor-arg name="expiredUrl" value="/MainMenu" />
         <property name="logoutHandlers">
             <list>
                <ref bean="openClinicaLogoutHandler"/>
@@ -111,7 +106,7 @@
     
     
    
-    <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
+    <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
         <constructor-arg name="sessionRegistry" ref="sessionRegistry" />
         <property name="maximumSessions" value="1" />
     </bean>
@@ -122,27 +117,37 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
     
-   
-    
-    <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.InMemoryOAuth2ProviderTokenServices">
-        <property name="supportRefreshToken" value="true"/>
-    </bean>
-    <bean id="tokenServicesJdbc" class="org.springframework.security.oauth2.provider.token.JdbcOAuth2ProviderTokenServices">
-        <constructor-arg>
-               <ref bean="dataSource"/>
-        </constructor-arg> 
-        <property name="supportRefreshToken" value="true"/>
+    <bean id="inMemoryTokenStore" class="org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore">
+        <property name="flushInterval" value="30"/>
     </bean>
 
-    <oauth:provider client-details-service-ref="clientDetails" token-services-ref="tokenServices" >
-        <oauth:verification-code user-approval-page="/oauth/confirm_access"/>
-    </oauth:provider>
+    <bean id="jdbcTokenStore" class="org.springframework.security.oauth2.provider.token.store.JdbcTokenStore">
+        <constructor-arg>
+            <ref bean="dataSource"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="tokenServices"
+          class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+        <property name="tokenStore" ref="inMemoryTokenStore" />
+        <property name="supportRefreshToken" value="true" />
+        <property name="clientDetailsService" ref="clientDetails" />
+    </bean>
 
     <oauth:client-details-service id="clientDetails">
-        <oauth:client clientId="my-trusted-client" authorizedGrantTypes="password,authorization_code,refresh_token"/>
-        <oauth:client clientId="my-less-trusted-client" authorizedGrantTypes="authorization_code"/>
-        <oauth:client clientId="designer" authorizedGrantTypes="authorization_code,refresh_token"/>
+        <oauth:client client-id="test" authorized-grant-types="password,authorization_code,refresh-token"/>
+        <oauth:client client-id="my-trusted-client" authorized-grant-types="password,authorization_code,refresh_token"/>
+        <oauth:client client-id="my-less-trusted-client" authorized-grant-types="authorization_code"/>
+        <oauth:client client-id="designer" authorized-grant-types="authorization_code,refresh_token"/>
     </oauth:client-details-service>
+
+    <oauth:authorization-server
+            client-details-service-ref="clientDetails" token-services-ref="tokenServices">
+        <oauth:authorization-code />
+        <oauth:implicit />
+        <oauth:refresh-token />
+        <oauth:client-credentials />
+    </oauth:authorization-server>
     
     
     	<bean id="metadataCollectorResource" class="org.akaza.openclinica.web.restful.MetadataCollectorResource" name="metadataCollectorResource">

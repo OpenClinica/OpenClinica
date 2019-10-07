@@ -12,11 +12,10 @@ import java.util.Random;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.SaltSource;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  *
@@ -26,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class SecurityManager {
 
     private PasswordEncoder encoder;
-    private SaltSource saltSource;
 
     private AuthenticationProvider providers[];
 
@@ -59,30 +57,7 @@ public class SecurityManager {
     }
 
     public String encrytPassword(String password, UserDetails userDetails) throws NoSuchAlgorithmException {
-        Object salt = null;
-
-        if (this.saltSource != null) {
-            salt = this.saltSource.getSalt(userDetails);
-        }
-        return encoder.encodePassword(password, salt);
-    }
-
-    /**
-     * @deprecated Use {@link #verifyPassword(String, UserDetails)} instead.
-     * @param encPass
-     * @param rawPass
-     * @param userDetails
-     * @return
-     */
-    @Deprecated
-    public boolean isPasswordValid(String encPass, String rawPass, UserDetails userDetails) {
-        Object salt = null;
-
-        if (this.saltSource != null) {
-            salt = this.saltSource.getSalt(userDetails);
-        }
-
-        return encoder.isPasswordValid(encPass, rawPass, salt);
+        return encoder.encode(password);
     }
 
     public boolean verifyPassword(String clearTextPassword, UserDetails userDetails) {
@@ -109,14 +84,6 @@ public class SecurityManager {
 
     public void setEncoder(PasswordEncoder encoder) {
         this.encoder = encoder;
-    }
-
-    public SaltSource getSaltSource() {
-        return saltSource;
-    }
-
-    public void setSaltSource(SaltSource saltSource) {
-        this.saltSource = saltSource;
     }
 
     public AuthenticationProvider[] getProviders() {

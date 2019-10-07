@@ -10,7 +10,6 @@
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope="request" id="responseOptionBean" class="org.akaza.openclinica.bean.submit.ResponseOptionBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
-<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
 
 <script lang="Javascript">
 function genToolTips(itemId){
@@ -244,6 +243,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="numOfDate" value="${param.key}" />
 <c:set var="isLast" value="${param.isLast}" />
+<c:set var="editFlag" value="${param.editFlag}" />
 <c:set var="isNewItem" value="${param.isNewItem}" />
 
 <c:set var="isFirst" value="${param.isFirst}" />
@@ -271,6 +271,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:if test="${isLast == false && rowCount >0}">
   <c:set var="inputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
   <c:set var="parsedInputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
+</c:if>
+<c:if test="${isLast == true}">
+  <c:set var="inputName" value="${repeatParentId}_manual[${repeatParentId}]input${itemId}" />
+  <c:set var="parsedInputName" value="${repeatParentId}_manual[${repeatParentId}]input${itemId}" />
 </c:if>
 <c:set var="item_data_id"  value="${displayItem.data.id}" />
 <c:if test="${item_data_id == 0}">
@@ -796,7 +800,7 @@ include the default value first in the select list --%>
     </c:otherwise>
   </c:choose>
   <c:choose>
-    <c:when test="${displayItem.numDiscrepancyNotes > 0  and isNewItem != true}">
+    <c:when test="${displayItem.numDiscrepancyNotes > 0  and isNewItem != true and isLast == false}">
 
     <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip();" onClick=
@@ -820,7 +824,7 @@ include the default value first in the select list --%>
 		
        <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip();" onClick=
-    "openDNWindow('CreateDiscrepancyNote?rowCount=${param.rowCount}&eventCRFId=${eventCRFId}&isGroup=1&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    "openDNWindow('CreateDiscrepancyNote?rowCount=${param.rowCount}&eventCRFId=${eventCRFId}&isGroup=1&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${isLast ? -1 : item_data_id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&monitor=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
     ></a>

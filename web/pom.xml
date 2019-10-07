@@ -1,17 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>OpenClinica-web</artifactId>
+	<artifactId>LibreClinica-web</artifactId>
 	<packaging>war</packaging>
-	<name>OpenClinica Web Application</name>
+	<name>LibreClinica Web Application</name>
 	<parent>
-		<groupId>org.akaza.openclinica</groupId>
-		<artifactId>OpenClinica</artifactId>
-		  <version>3.14</version>
+		<groupId>org.libreclinica</groupId>
+		<artifactId>LibreClinica</artifactId>
+		  <version>0.3.0</version>
 	</parent>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>OpenClinica-core</artifactId>
+			<artifactId>LibreClinica-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -23,33 +23,6 @@
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon-dom</artifactId>
 			<version>8.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>rome</groupId>
-			<artifactId>rome-fetcher</artifactId>
-			<version>1.0</version>
-			<scope>compile</scope>
-			<exclusions>
-				<!-- We are using jdom 1.1 lib below -->
-				<exclusion>
-					<groupId>jdom</groupId>
-					<artifactId>jdom</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>rome</groupId>
-			<artifactId>rome</artifactId>
-			<version>1.0</version>
-			<scope>compile</scope>
-			<exclusions>
-				<!-- We are using jdom 1.1 lib below -->
-				<exclusion>
-					<groupId>jdom</groupId>
-					<artifactId>jdom</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -181,13 +154,11 @@
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-			<version>1.2.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -284,17 +255,17 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.17.1</version>
+            <version>1.19.3</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>1.17.1</version>
+            <version>1.19.3</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>
-            <version>1.13</version>
+            <version>1.19.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -316,6 +287,14 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-context</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-asm</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -335,18 +314,14 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-core-lgpl</artifactId>
-    <version>1.8.1</version>
-</dependency>
-
-<dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-mapper-lgpl</artifactId>
-    <version>1.8.1</version>
-</dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
