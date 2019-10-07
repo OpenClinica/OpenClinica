@@ -20,7 +20,7 @@ public class LiquibaseConfig {
     public OCCreatePostgresAppServer createPostgresAppServer() {
         OCCreatePostgresAppServer appServer = new OCCreatePostgresAppServer();
         appServer.setDataSource(dataSource);
-        appServer.setChangeLog("classpath:migration/initDB/release.xml");
+        appServer.setChangeLog("classpath:core/migration/initDB/release.xml");
         return appServer;
     }
 
@@ -31,7 +31,7 @@ public class LiquibaseConfig {
         OCCommonTablesSpringLiquibase liquibase = new OCCommonTablesSpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setDefaultSchema("public");
-        liquibase.setChangeLog("classpath:migration/dualPurposeStudyTable/release.xml");
+        liquibase.setChangeLog("classpath:core/migration/dualPurposeStudyTable/release.xml");
         return liquibase;
     }
     
@@ -41,7 +41,7 @@ public class LiquibaseConfig {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setDefaultSchema("public");
-        liquibase.setChangeLog("classpath:migration/publicSchemaOnly/release.xml");
+        liquibase.setChangeLog("classpath:core/migration/publicSchemaOnly/release.xml");
         return liquibase;
     }
 
@@ -52,7 +52,7 @@ public class LiquibaseConfig {
     public OCSpringLiquibase liquibaseForeignTables() {
         OCSpringLiquibase liquibase = new OCSpringLiquibase();
         liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:migration/tenantForeignTables/release.xml");
+        liquibase.setChangeLog("classpath:core/migration/tenantForeignTables/release.xml");
         return liquibase;
     }
 
@@ -61,7 +61,7 @@ public class LiquibaseConfig {
     public OCMultiTenantSpringLiquibase liquibase() {
         OCMultiTenantSpringLiquibase liquibase = new OCMultiTenantSpringLiquibase();
         liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:migration/master.xml");
+        liquibase.setChangeLog("classpath:core/migration/master.xml");
         return liquibase;
     }
 }

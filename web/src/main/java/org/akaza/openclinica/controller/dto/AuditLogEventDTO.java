@@ -1,6 +1,6 @@
 package org.akaza.openclinica.controller.dto;
 
-import core.org.akaza.openclinica.service.AbstractAuditingDTO;
+import org.akaza.openclinica.service.AbstractAuditingDTO;
 
 import java.io.Serializable;
 
