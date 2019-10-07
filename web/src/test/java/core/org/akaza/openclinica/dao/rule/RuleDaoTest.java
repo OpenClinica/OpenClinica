@@ -5,23 +5,22 @@ import core.org.akaza.openclinica.dao.hibernate.RuleDao;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.expression.Context;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import core.templates.HibernateOcDbTestCase;
 import org.junit.Ignore;
 
 @Ignore
-public class RuleDaoTest extends HibernateOcDbTestCase {
+public class RuleDaoTest extends core.org.akaza.openclinica.templates.HibernateOcDbTestCase {
     private static RuleDao ruleDao;
 
     public RuleDaoTest() {
         super();
-       
+
     }
 
     @Override
     public void setUp() throws Exception{
         super.setUp();
         ruleDao = (RuleDao) getContext().getBean("ruleDao");
-        
+
     }
     public void testFindByOidString() {
       //  RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");

@@ -2,7 +2,7 @@ package core.org.akaza.openclinica.dao;
 
 import core.org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import core.org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Ignore;
 
 @Ignore

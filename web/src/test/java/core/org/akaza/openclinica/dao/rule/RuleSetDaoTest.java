@@ -11,7 +11,7 @@ import core.org.akaza.openclinica.domain.rule.action.ActionType;
 import core.org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
 import core.org.akaza.openclinica.domain.rule.expression.Context;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionBean;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Ignore;
 
 import java.util.List;

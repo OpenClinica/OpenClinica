@@ -4,7 +4,7 @@ import core.org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import core.org.akaza.openclinica.domain.rule.RuleSetAuditBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
 import org.junit.Ignore;
 
