@@ -3,7 +3,7 @@ package core.org.akaza.openclinica.dao;
 import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import core.org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import core.org.akaza.openclinica.domain.technicaladmin.LoginStatus;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Ignore;
 
 import java.util.Date;

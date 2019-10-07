@@ -2,7 +2,7 @@ package core.org.akaza.openclinica.dao;
 
 import core.org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import core.org.akaza.openclinica.domain.user.AuthoritiesBean;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
 import org.junit.Ignore;
 

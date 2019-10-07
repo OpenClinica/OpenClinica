@@ -16,8 +16,8 @@
 
     <context:component-scan base-package="core.org.akaza.openclinica.service"/>
 
-
-    <util:properties id="enterpriseInfo" location="classpath:enterprise.properties"/>
+    <bean id="coreResources" class="core.org.akaza.openclinica.dao.core.CoreResources"/>
+    <util:properties id="enterpriseInfo" location="classpath:core/enterprise.properties"/>
     <!--
 
     <bean id="ocSessionContext" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
