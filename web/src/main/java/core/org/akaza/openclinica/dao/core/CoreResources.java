@@ -16,6 +16,7 @@ import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -38,7 +39,7 @@ import java.util.regex.Pattern;
 
 import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
-@Component
+@Component("coreResources")
 public class CoreResources implements InitializingBean {
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
@@ -590,7 +591,7 @@ public class CoreResources implements InitializingBean {
              * http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources
              * .html#resources-classpath-wildcards
              */
-            resources = resolver.getResources("classpath*:properties/xslt/*.xsl");
+            resources = resolver.getResources("classpath*:core/properties/xslt/*.xsl");
 
         } catch (IOException ioe) {
             logger.debug(ioe.getMessage(), ioe);
@@ -629,9 +630,9 @@ public class CoreResources implements InitializingBean {
         Resource[] resourcesPipeDelimitedTemplate = null;
         FileOutputStream out = null;
 
-        resources = resolver.getResources("classpath*:properties/rules_template*.xml");
-        resourcesTemplate = resolver.getResources("classpath*:properties/import_template*.xml");
-        resourcesPipeDelimitedTemplate = resolver.getResources("classpath*:properties/template_pipe*.txt");
+        resources = resolver.getResources("classpath*:core/properties/rules_template*.xml");
+        resourcesTemplate = resolver.getResources("classpath*:core/properties/import_template*.xml");
+        resourcesPipeDelimitedTemplate = resolver.getResources("classpath*:core/properties/template_pipe*.txt");
 
         File dest = new File(getField("filePath") + "rules");
         if (!dest.exists()) {
@@ -664,7 +665,7 @@ public class CoreResources implements InitializingBean {
             out.close();
 
         }
-        Resource[] r1 = resolver.getResources("classpath*:properties/" + fileNames[0]);
+        Resource[] r1 = resolver.getResources("classpath*:core/properties/" + fileNames[0]);
         File f1 = new File(dest, r1[0].getFilename());
         out = new FileOutputStream(f1);
         IOUtils.copy(r1[0].getInputStream(), out);
@@ -770,7 +771,7 @@ public class CoreResources implements InitializingBean {
         String[] fileNames = {"cd_odm_mapping.xml"};
         Resource[] resources;
         try {
-            resources = resolver.getResources("classpath*:properties/cd_odm_mapping.xml");
+            resources = resolver.getResources("classpath*:core/properties/cd_odm_mapping.xml");
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
             oe.initCause(ioe);
@@ -971,11 +972,11 @@ public class CoreResources implements InitializingBean {
     }
 
     public InputStream getInputStream(String fileName) throws IOException {
-        return resourceLoader.getResource("classpath:properties/" + fileName).getInputStream();
+        return resourceLoader.getResource("classpath:core/properties/" + fileName).getInputStream();
     }
 
     public URL getURL(String fileName) throws IOException {
-        return resourceLoader.getResource("classpath:properties/" + fileName).getURL();
+        return resourceLoader.getResource("classpath:core/properties/" + fileName).getURL();
     }
 
     /**
@@ -1006,7 +1007,7 @@ public class CoreResources implements InitializingBean {
     }
 
     public void setPROPERTIES_DIR() {
-        String resource = "classpath:properties/placeholder.properties";
+        String resource = "classpath:core/properties/placeholder.properties";
         // System.out.println("Resource " + resource);
         Resource scr = resourceLoader.getResource(resource);
         String absolutePath = null;

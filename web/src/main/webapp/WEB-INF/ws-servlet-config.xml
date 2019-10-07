@@ -104,7 +104,7 @@
     <!-- Security -->
     <bean id="wsSecurityInterceptor" class="org.springframework.ws.soap.security.xwss.XwsSecurityInterceptor">
         <property name="secureResponse" value="false"/>
-        <property name="policyConfiguration" value="classpath:securityPolicy.xml"/>
+        <property name="policyConfiguration" value="classpath:core/securityPolicy.xml"/>
         <property name="callbackHandlers" ref="springSecurityHandler"/>
     </bean>
     

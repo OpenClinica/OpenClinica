@@ -1,4 +1,4 @@
-package core.org.akaza.openclinica.web.filter;
+package org.akaza.openclinica.web.filter;
 
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.MappingSqlQuery;

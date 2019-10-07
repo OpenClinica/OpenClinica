@@ -59,7 +59,7 @@
     <bean class="org.akaza.openclinica.config.SwaggerConfig"/>
 
     <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller" >
-        <property name="mappingLocation" value="classpath:properties/mappingMarshaller.xml" />
+        <property name="mappingLocation" value="classpath:core/properties/mappingMarshaller.xml" />
     </bean>
     
     <oxm:jaxb2-marshaller id="jaxbMarshaller" context-path="org.cdisc.ns.odm.v130:org.openclinica.ns.odm_ext_v130.v31:org.openclinica.ns.rules.v31:org.openclinica.ns.response.v31:org.openclinica.ns.rules_test.v31"/>

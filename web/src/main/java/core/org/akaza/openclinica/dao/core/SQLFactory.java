@@ -141,7 +141,7 @@ public class SQLFactory {
 
         try {
             if (resourceLoader != null && cacheManager != null)
-                cacheManager = cacheManager.create(resourceLoader.getResource("classpath:/ehcache.xml").getInputStream());
+                cacheManager = cacheManager.create(resourceLoader.getResource("classpath:/core/ehcache.xml").getInputStream());
         } catch (CacheException e) {
 
             e.printStackTrace();
@@ -255,7 +255,7 @@ public class SQLFactory {
                     newDaoDigester.setInputStream(new FileInputStream(path + DAOFileName));
                 } else {
                     String path = CoreResources.PROPERTIES_DIR;
-                    newDaoDigester.setInputStream(resourceLoader.getResource("classpath:properties/" + DAOFileName).getInputStream());
+                    newDaoDigester.setInputStream(resourceLoader.getResource("classpath:core/properties/" + DAOFileName).getInputStream());
                     // newDaoDigester.setInputStream(new FileInputStream(path + DAOFileName));
                 }
                 try {

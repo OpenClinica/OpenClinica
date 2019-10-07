@@ -6,6 +6,7 @@ package core.org.akaza.openclinica.service;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.akaza.openclinica.service.AbstractAuditingDTO;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
