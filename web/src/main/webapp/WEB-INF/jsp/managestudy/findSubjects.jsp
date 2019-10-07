@@ -151,3 +151,15 @@
 
 <br>
 <jsp:include page="../include/footer.jsp"/>
+
+<div id="cons"></div>
+<script>
+    $(document).on('click', function(e) {
+        var entry = $('<div/>').text($(e.originalEvent.target)[0].outerHTML);
+        $('#cons').append('<br>');
+        $('#cons').append(entry);
+        console.log(e);
+    });
+</script>
+
+
