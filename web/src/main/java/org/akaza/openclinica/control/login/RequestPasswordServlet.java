@@ -21,7 +21,7 @@ import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
-import core.org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
+import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
 
 import java.util.Calendar;
 import java.util.Date;

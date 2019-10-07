@@ -53,12 +53,12 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
        
        context =
            new ClassPathXmlApplicationContext(
-                   new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
-                       "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
-                       "classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
-                       "classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
-                      " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
-                       "classpath*:org/akaza/openclinica/applicationContext-security.xml" });
+                   new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:core/org/akaza/openclinica/applicationContext-core-db.xml",
+                       "classpath*:core/org/akaza/openclinica/applicationContext-core-email.xml",
+                       "classpath*:core/org/akaza/openclinica/applicationContext-core-hibernate.xml",
+                       "classpath*:core/org/akaza/openclinica/applicationContext-core-service.xml",
+                      " classpath*:core/org/akaza/openclinica/applicationContext-core-timer.xml",
+                       "classpath*:core/org/akaza/openclinica/applicationContext-security.xml" });
      transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
      transactionManager.getTransaction(new DefaultTransactionDefinition());
        

@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
-import core.org.akaza.openclinica.service.AbstractAuditingDTO;
+import org.akaza.openclinica.service.AbstractAuditingDTO;
 
 /**
  * A DTO for the ModuleConfig entity.

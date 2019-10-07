@@ -3,7 +3,7 @@ package core.org.akaza.openclinica.service.rule.expression;
 import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Ignore;
 
 @Ignore

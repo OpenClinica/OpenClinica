@@ -5,7 +5,7 @@ import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.CacheMode;
 import org.hibernate.HibernateException;
 import org.junit.Ignore;
@@ -14,6 +14,7 @@ import java.util.List;
 
 @Ignore
 public class RuleSetRuleAuditDaoTest extends HibernateOcDbTestCase {
+
 private static RuleSetDao ruleSetDao;
 private static  RuleSetRuleAuditDao ruleSetRuleAuditDao;
 private static RuleSetRuleDao ruleSetRuleDao;

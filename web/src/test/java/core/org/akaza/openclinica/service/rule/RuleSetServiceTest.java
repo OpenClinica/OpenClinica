@@ -7,7 +7,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Ignore;
 
 import java.util.List;

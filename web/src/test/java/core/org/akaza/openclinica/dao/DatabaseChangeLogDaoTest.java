@@ -2,7 +2,7 @@ package core.org.akaza.openclinica.dao;
 
 import core.org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
 import core.org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
-import core.templates.HibernateOcDbTestCase;
+import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Ignore;
 
 @Ignore

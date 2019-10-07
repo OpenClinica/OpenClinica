@@ -42,14 +42,14 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
         String dbFolder = resolveDbFolder();
         PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver(resourceLoader);
         try {
-            Resource resources[] = resourceResolver.getResources("classpath:queries/" + dbFolder + "/**/*.properties");
+            Resource resources[] = resourceResolver.getResources("classpath:core/queries/" + dbFolder + "/**/*.properties");
             for (Resource r : resources) {
                 Properties p = new Properties();
                 p.load(r.getInputStream());
                 fileByName.put(StringUtils.substringBeforeLast(r.getFilename(), "."), p);
             }
         } catch (IOException e) {
-            throw new BeanInitializationException("Unable to read files from directory 'classpath:queries/" + dbFolder
+            throw new BeanInitializationException("Unable to read files from directory 'classpath:core/queries/" + dbFolder
                     + "'", e);
         }
     }

@@ -49,7 +49,7 @@ public abstract class OcDbTestCase extends DataSourceBasedDBTestCase {
         // use different settings.
         context =
             new ClassPathXmlApplicationContext(
-                    new String[] { "classpath*:applicationContext*.xml", "classpath*:org/akaza/openclinica/applicationContext*.xml", });
+                    new String[] { "classpath*:applicationContext*.xml", "classpath*:core/org/akaza/openclinica/applicationContext*.xml", });
     }
 
     @Override
