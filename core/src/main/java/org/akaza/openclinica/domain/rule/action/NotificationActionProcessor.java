@@ -85,9 +85,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	public static String messageServiceUri = sbsUrl+ "/message-service/api/messages/text";
 	public static String subDomain = sbsUrl.substring(sbsUrl.indexOf("//")  + 2,  sbsUrl.indexOf("."));
 
-	@Autowired
-	private KeycloakClientImpl keycloakClient;
-
 	public NotificationActionProcessor() {
 	}
 
@@ -186,7 +183,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		return null;
 	}
 
-	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, int eventOrdinal,NotificationService notificationService) {
+	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, int eventOrdinal,NotificationService notificationService, KeycloakClientImpl keycloakClientImpl) {
 		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
 		String message = ((NotificationActionBean) ruleActionBean).getMessage();
 		String emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
@@ -231,7 +228,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
-		String accessToken=keycloakClient.getSystemToken();
+		String accessToken = keycloakClientImpl.getSystemToken();
 
 		if(studySubject.getUserId()!=null) {
 			UserAccountBean userAccountBean = (UserAccountBean) udao.findByPK(studySubject.getUserId());

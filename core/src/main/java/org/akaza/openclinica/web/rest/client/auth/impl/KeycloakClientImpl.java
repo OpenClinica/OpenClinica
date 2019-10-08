@@ -38,7 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+
+@Service("keycloakClientImpl")
 public class KeycloakClientImpl {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private static final String USER_UUID_ATTRIBUTE = "ocUserUuid";

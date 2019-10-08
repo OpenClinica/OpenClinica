@@ -82,8 +82,10 @@ import org.akaza.openclinica.service.NotificationService;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -126,6 +128,9 @@ public class RuleSetService implements RuleSetServiceInterface {
     private StudyEventDao studyEventDomainDao;
     private StudyEventDefinitionDao studyEventDefDomainDao;
     private NotificationService notificationService;
+
+    @Autowired
+    private KeycloakClientImpl keycloakClientImpl;
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#saveRuleSet(org.akaza.openclinica.domain.rule.RuleSetBean)
@@ -1096,7 +1101,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 				e.printStackTrace();
 			}
 
-    		ruleRunner.runRules(ruleSets,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender,notificationService);
+    		ruleRunner.runRules(ruleSets,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender,notificationService, keycloakClientImpl);
 }
 
     public void runIndividualRulesInBeanProperty(List<RuleSetBean> ruleSets,Integer userId,StudyEventChangeDetails changeDetails , Integer studyEventOrdinal) {	
@@ -1109,7 +1114,7 @@ public class RuleSetService implements RuleSetServiceInterface {
           }
     	}    	
 	    BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
- 		ruleRunner.runRules(ruleSetBeans,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender,notificationService);
+ 		ruleRunner.runRules(ruleSetBeans,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender,notificationService, keycloakClientImpl);
 }
 
     
@@ -1188,4 +1193,10 @@ public class RuleSetService implements RuleSetServiceInterface {
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
+
+/*    public KeycloakClientImpl getKeyCloakClientImpl(){ return keycloakClientImpl; }
+
+    public void setKeyCloakClientImpl(KeycloakClientImpl keycloakClientImpl){
+         this.keycloakClientImpl = keycloakClientImpl;
+    }*/
 }
