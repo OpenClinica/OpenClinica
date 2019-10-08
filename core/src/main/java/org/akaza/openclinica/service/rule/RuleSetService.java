@@ -1194,9 +1194,4 @@ public class RuleSetService implements RuleSetServiceInterface {
         this.notificationService = notificationService;
     }
 
-/*    public KeycloakClientImpl getKeyCloakClientImpl(){ return keycloakClientImpl; }
-
-    public void setKeyCloakClientImpl(KeycloakClientImpl keycloakClientImpl){
-         this.keycloakClientImpl = keycloakClientImpl;
-    }*/
 }
