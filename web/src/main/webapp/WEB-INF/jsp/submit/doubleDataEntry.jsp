@@ -242,7 +242,7 @@ function DisplaySectionTabs()
 
     {
         sectionId = TabSectionId[TabID-1];
-        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=" +${fn:escapeXml(exitTo)};
+        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=" +"${fn:escapeXml(exitTo)}";
         currTabID = <c:out value="${tabId}"/>;
         if (TabID<=TabsShown)
         {
