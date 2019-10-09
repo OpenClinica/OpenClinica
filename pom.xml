@@ -8,6 +8,13 @@
     <name>OpenClinica</name>
     <description>OpenClinica</description>
 
+<<<<<<< HEAD
+=======
+    <modules>
+        <module>web</module>
+    </modules>
+
+>>>>>>> OC-11521: ws module is removed
     <properties>
         <!-- Default configuration activation -->
         <config.id>default</config.id>
