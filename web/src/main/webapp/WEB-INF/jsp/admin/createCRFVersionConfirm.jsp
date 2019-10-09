@@ -48,10 +48,10 @@
 
 <jsp:include page="../include/sideInfo_prev.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='excelErrors' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='htmlTable' class='java.lang.String'/>
-<jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='session' id='version' class='core.org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <jsp:useBean scope='session' id='crfName' class='java.lang.String'/>
 
 

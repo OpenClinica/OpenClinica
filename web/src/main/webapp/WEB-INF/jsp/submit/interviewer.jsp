@@ -7,8 +7,8 @@
 <link rel="shortcut icon" type="image/x-icon" href="${pageContext.request.contextPath}/images/favicon.png">
 
 
-<jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
+<jsp:useBean scope="request" id="section" class="core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+<jsp:useBean scope="request" id="displayItem" class="core.org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 <jsp:useBean scope='request' id='exitTo' class='java.lang.String'/>
 <jsp:useBean scope='request' id='nameNotes' class='java.util.ArrayList'/>

@@ -40,7 +40,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 
 
 <h1><span class="title_manage"><c:out value="${study.name}"/>: <fmt:message key="create_dataset" bundle="${resword}"/> <a href="javascript:openDocWindow('help/4_2_createDataset_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>

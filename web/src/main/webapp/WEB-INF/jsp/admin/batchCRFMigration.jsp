@@ -42,17 +42,17 @@
 
 <jsp:include page="../include/sideInfo.jsp" />
 <jsp:useBean scope="request" id="displayStudy"
-	class="org.akaza.openclinica.bean.admin.DisplayStudyBean" />
+	class="core.org.akaza.openclinica.bean.admin.DisplayStudyBean" />
 <jsp:useBean scope="session" id="study"
-	class="org.akaza.openclinica.bean.managestudy.StudyBean" />
+	class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
 <jsp:useBean scope="request" id="subject"
-	class="org.akaza.openclinica.bean.submit.SubjectBean" />
+	class="core.org.akaza.openclinica.bean.submit.SubjectBean" />
 <jsp:useBean scope="request" id="studySub"
-	class="org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
+	class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
 <jsp:useBean scope='session' id='userBean'
-	class='org.akaza.openclinica.bean.login.UserAccountBean' />
+	class='core.org.akaza.openclinica.bean.login.UserAccountBean' />
 <jsp:useBean scope='request' id='crf'
-	class='org.akaza.openclinica.bean.admin.CRFBean' />
+	class='core.org.akaza.openclinica.bean.admin.CRFBean' />
 <jsp:useBean scope='request' id='siteList' class='java.util.ArrayList' />
 <jsp:useBean scope='request' id='eventList' class='java.util.ArrayList' />
 

@@ -38,8 +38,8 @@
 
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope="request" id="dataset" class="org.akaza.openclinica.bean.extract.DatasetBean"/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope="request" id="dataset" class="core.org.akaza.openclinica.bean.extract.DatasetBean"/>
 <jsp:useBean scope="request" id="filelist" class="java.util.ArrayList"/>
 <h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_format" bundle="${resword}"/></span></h1>
 

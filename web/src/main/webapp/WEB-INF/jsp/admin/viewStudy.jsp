@@ -55,7 +55,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <h1><div class="title_manage"><fmt:message key="view_study_metadata" bundle="${resword}"/>
 </div></h1></br>
 

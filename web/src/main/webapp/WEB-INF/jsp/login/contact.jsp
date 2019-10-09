@@ -6,7 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 
-<jsp:useBean scope="session" id="newUserBean" class="org.akaza.openclinica.bean.login.UserAccountBean"/>
+<jsp:useBean scope="session" id="newUserBean" class="core.org.akaza.openclinica.bean.login.UserAccountBean"/>
 <jsp:useBean scope="session" id="passwordExpired" class="java.lang.String"/>
 <c:choose>
 <c:when test="${userBean != null && userRole != null && !userRole.invalid && passwordExpired == 'no'}">

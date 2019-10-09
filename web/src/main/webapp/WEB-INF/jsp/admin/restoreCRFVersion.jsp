@@ -42,7 +42,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='request' id='eventCRFs' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='versionToRestore' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='request' id='versionToRestore' class='core.org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 
 <h1><span class="title_manage"><fmt:message key="confirm_restore_of_CRF_version" bundle="${resword}"/></span></h1>
 

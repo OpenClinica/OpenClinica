@@ -26,16 +26,16 @@ public class ResourceBundleProvider {
         localeMap.put(Thread.currentThread(), l);
         if (!resBundleSetMap.containsKey(l)) {
             HashMap<String, ResourceBundle> resBundleSet = new HashMap<String, ResourceBundle>();
-            resBundleSet.put("core.org.akaza.openclinica.i18n.admin", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.admin", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.audit_events", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.audit_events", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.exceptions", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.format", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.format", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.page_messages", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.notes", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.terms", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.terms", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.words", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.workflow", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.workflow", l));
-            resBundleSet.put("core.org.akaza.openclinica.i18n.licensing", ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.licensing", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.admin", ResourceBundle.getBundle("org.akaza.openclinica.i18n.admin", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.audit_events", ResourceBundle.getBundle("org.akaza.openclinica.i18n.audit_events", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.exceptions", ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.format", ResourceBundle.getBundle("org.akaza.openclinica.i18n.format", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.page_messages", ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.notes", ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.terms", ResourceBundle.getBundle("org.akaza.openclinica.i18n.terms", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.words", ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.workflow", ResourceBundle.getBundle("org.akaza.openclinica.i18n.workflow", l));
+            resBundleSet.put("org.akaza.openclinica.i18n.licensing", ResourceBundle.getBundle("org.akaza.openclinica.i18n.licensing", l));
 
             resBundleSetMap.put(l, resBundleSet);
         }
@@ -46,79 +46,79 @@ public class ResourceBundleProvider {
     }
 
     public static ResourceBundle getAdminBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.admin");
+        return getResBundle("org.akaza.openclinica.i18n.admin");
     }
 
     public static ResourceBundle getAdminBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.admin", locale);
+        return getResBundle("org.akaza.openclinica.i18n.admin", locale);
     }
 
     public static ResourceBundle getAuditEventsBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.audit_events");
+        return getResBundle("org.akaza.openclinica.i18n.audit_events");
     }
 
     public static ResourceBundle getAuditEventsBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.audit_events", locale);
+        return getResBundle("org.akaza.openclinica.i18n.audit_events", locale);
     }
 
     public static ResourceBundle getExceptionsBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.exceptions");
+        return getResBundle("org.akaza.openclinica.i18n.exceptions");
     }
 
     public static ResourceBundle getExceptionsBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.exceptions", locale);
+        return getResBundle("org.akaza.openclinica.i18n.exceptions", locale);
     }
 
     public static ResourceBundle getFormatBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.format");
+        return getResBundle("org.akaza.openclinica.i18n.format");
     }
 
     public static ResourceBundle getFormatBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.format", locale);
+        return getResBundle("org.akaza.openclinica.i18n.format", locale);
     }
 
     public static ResourceBundle getPageMessagesBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.page_messages");
+        return getResBundle("org.akaza.openclinica.i18n.page_messages");
     }
 
     public static ResourceBundle getPageMessagesBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.page_messages", locale);
+        return getResBundle("org.akaza.openclinica.i18n.page_messages", locale);
     }
 
     public static ResourceBundle getTermsBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.terms");
+        return getResBundle("org.akaza.openclinica.i18n.terms");
     }
 
     public static ResourceBundle getTermsBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.terms", locale);
+        return getResBundle("org.akaza.openclinica.i18n.terms", locale);
     }
 
     public static ResourceBundle getWordsBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.words");
+        return getResBundle("org.akaza.openclinica.i18n.words");
     }
 
     public static ResourceBundle getWordsBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.words", locale);
+        return getResBundle("org.akaza.openclinica.i18n.words", locale);
     }
 
     public static ResourceBundle getTextsBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.notes", locale);
+        return getResBundle("org.akaza.openclinica.i18n.notes", locale);
     }
 
     public static ResourceBundle getTextsBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.notes");
+        return getResBundle("org.akaza.openclinica.i18n.notes");
     }
 
     public static ResourceBundle getWorkflowBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.workflow", locale);
+        return getResBundle("org.akaza.openclinica.i18n.workflow", locale);
     }
 
     public static ResourceBundle getLicensingBundle() {
-        return getResBundle("core.org.akaza.openclinica.i18n.licensing");
+        return getResBundle("org.akaza.openclinica.i18n.licensing");
     }
 
     public static ResourceBundle getLicensingBundle(Locale locale) {
-        return getResBundle("core.org.akaza.openclinica.i18n.licensing", locale);
+        return getResBundle("org.akaza.openclinica.i18n.licensing", locale);
     }
 
     /**
@@ -181,7 +181,7 @@ public class ResourceBundleProvider {
     public static String getResTerm(String key) {
         String value;
         try {
-            value = getResBundle("core.org.akaza.openclinica.i18n.terms").getString(key);
+            value = getResBundle("org.akaza.openclinica.i18n.terms").getString(key);
         } catch (MissingResourceException mre) {
             value = key;
         }
@@ -191,7 +191,7 @@ public class ResourceBundleProvider {
     public static String getResWord(String key) {
         String value;
         try {
-            value = getResBundle("core.org.akaza.openclinica.i18n.words").getString(key);
+            value = getResBundle("org.akaza.openclinica.i18n.words").getString(key);
         } catch (MissingResourceException mre) {
             value = key;
         }

@@ -3,8 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.AuditEventStudyRow" />
+<jsp:useBean scope='session' id='userRole' class='core.org.akaza.openclinica.bean.login.StudyUserRoleBean' />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.AuditEventStudyRow" />
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 

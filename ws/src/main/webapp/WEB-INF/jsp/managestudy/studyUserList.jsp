@@ -38,7 +38,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
+<jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope="request" id="roles" class="java.util.ArrayList"/>
 <script type="text/JavaScript" language="JavaScript">
   <!--

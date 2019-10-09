@@ -73,8 +73,8 @@
     </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-<jsp:useBean scope='request' id='parentStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='parentStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 
 

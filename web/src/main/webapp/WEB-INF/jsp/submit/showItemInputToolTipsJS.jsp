@@ -12,7 +12,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
-<jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+<jsp:useBean scope="request" id="section" class="core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <script lang="Javascript">
 <!--
 function genToolTips_ItemInput(itemId){

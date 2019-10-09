@@ -6,10 +6,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
 
-<jsp:useBean scope="request" id="table" class="org.akaza.openclinica.web.domain.EntityBeanTable" />
+<jsp:useBean scope="request" id="table" class="core.org.akaza.openclinica.web.domain.EntityBeanTable" />
 <c:set var="rowURL" value="${param.rowURL}" />
 <c:set var="outerFormName" value="${param.outerFormName}" />
 <c:set var="searchFormOnClickJS" value="${param.searchFormOnClickJS}" />

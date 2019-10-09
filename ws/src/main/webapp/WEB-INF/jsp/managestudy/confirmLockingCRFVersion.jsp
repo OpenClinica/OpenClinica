@@ -39,8 +39,8 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='crfVersionToLock' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='request' id='crfVersionToLock' class='core.org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <script type="text/JavaScript" language="JavaScript">
   <!--
  function myCancel() {

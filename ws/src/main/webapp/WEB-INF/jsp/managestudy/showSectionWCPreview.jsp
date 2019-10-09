@@ -5,7 +5,7 @@
 
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
 <jsp:useBean scope="request" id="section" class=
-  "org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+  "core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="annotations" class="java.lang.String" />
 
 <c:set var="currPage" value="" />

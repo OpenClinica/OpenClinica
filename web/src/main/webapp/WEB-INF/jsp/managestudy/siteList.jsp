@@ -36,7 +36,7 @@
 </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
+<jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
 
 <h1><span class="title_manage">
 <fmt:message key="manage_all_sites_in_study" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1>

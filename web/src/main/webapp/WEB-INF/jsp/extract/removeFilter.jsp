@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -11,8 +11,8 @@
 
 
 <jsp:include page="../include/sidebar.jsp"/>
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope="request" id="filter" class="org.akaza.openclinica.bean.extract.FilterBean"/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope="request" id="filter" class="core.org.akaza.openclinica.bean.extract.FilterBean"/>
 
 <h1><span class="title_manage"><fmt:message key="remove_filter" bundle="${resword}"/>: <c:out value="${filter.name}"/></span></h1>
 

@@ -22,7 +22,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;import core.
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
-import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

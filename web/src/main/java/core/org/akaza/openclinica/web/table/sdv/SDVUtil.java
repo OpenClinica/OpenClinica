@@ -688,7 +688,7 @@ public class SDVUtil {
         // Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         // i18n caption; TODO: convert to Spring messages
-        ResourceBundle resword = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles = { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"),
                 resword.getString("event_name"), resword.getString("event_date"),
@@ -766,7 +766,7 @@ public class SDVUtil {
         // Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         // i18n caption; TODO: convert to Spring messages
-        ResourceBundle resword = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles = { resword.getString("study_subject_ID"), resword.getString("site_id"),
                 resword.getString("event_name"), resword.getString("event_date"),
@@ -1251,7 +1251,7 @@ public class SDVUtil {
         // Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         // i18n caption; TODO: convert to Spring messages
-        ResourceBundle resword = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles = { resword.getString("study_subject_ID"), resword.getString("study_subject_status"), resword.getString("num_CRFs_SDV"),
                 resword.getString("porc_CRFs_SDV"), resword.getString("group") };

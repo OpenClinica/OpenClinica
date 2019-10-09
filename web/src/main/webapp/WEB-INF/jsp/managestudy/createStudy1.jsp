@@ -39,7 +39,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
 <script type="text/JavaScript" language="JavaScript">
   <!--

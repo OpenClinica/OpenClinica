@@ -6,7 +6,7 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <c:set var="eblRowCount" value="${param.eblRowCount}" />
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DiscrepancyNoteRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.DiscrepancyNoteRow" />
 <%--
     remember the ordering here: 
 	public static final int COL_SUBJECT = 0; 

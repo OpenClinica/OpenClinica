@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/managestudy-header.jsp"/>
 
 
@@ -34,7 +34,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <script type="text/JavaScript" language="JavaScript">
   <!--
  function myCancel() {

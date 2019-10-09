@@ -49,7 +49,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="session" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
 <body class="aka_bodywidth" onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};

@@ -37,7 +37,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='subject' class='org.akaza.openclinica.bean.submit.SubjectBean'/>
+<jsp:useBean scope='request' id='subject' class='core.org.akaza.openclinica.bean.submit.SubjectBean'/>
 <jsp:useBean scope='request' id='studySubs' class='java.util.ArrayList'/>
 <h1><span class="title_manage">
 <fmt:message key="view_subject_details" bundle="${resword}"/>

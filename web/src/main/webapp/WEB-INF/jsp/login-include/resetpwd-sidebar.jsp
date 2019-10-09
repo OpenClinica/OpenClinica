@@ -1,10 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@page import="org.akaza.openclinica.web.SQLInitServlet"%>
+<%@page import="core.org.akaza.openclinica.web.SQLInitServlet"%>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
 <script language="JavaScript">
 function reportBug(versionNumber) {

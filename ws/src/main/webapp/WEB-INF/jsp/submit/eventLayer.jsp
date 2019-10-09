@@ -2,17 +2,17 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<jsp:directive.page import="org.akaza.openclinica.bean.core.SubjectEventStatus"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<jsp:directive.page import="core.org.akaza.openclinica.bean.core.SubjectEventStatus"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<jsp:useBean scope="request" id="currEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
+<jsp:useBean scope="request" id="currEvent" class="core.org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 
 <%--
-<jsp:useBean scope="request" id="eventStatus" class="org.akaza.openclinica.bean.core.SubjectEventStatus" />
+<jsp:useBean scope="request" id="eventStatus" class="core.org.akaza.openclinica.bean.core.SubjectEventStatus" />
 --%>
 
 <c:set var="eblRowCount" value="${param.rowCount}" />

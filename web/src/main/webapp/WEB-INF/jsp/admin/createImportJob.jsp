@@ -41,7 +41,7 @@
 
 <c:set var="activeStudyId" value="${0}" />
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='filePath' class='java.lang.String'/>
 <jsp:useBean scope='request' id='hours' class='java.lang.String'/>
 <jsp:useBean scope='request' id='minutes' class='java.lang.String'/>

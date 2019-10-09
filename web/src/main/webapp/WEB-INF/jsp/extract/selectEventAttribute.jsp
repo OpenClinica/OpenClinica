@@ -39,7 +39,7 @@
 
 <jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="subjectAgeAtEvent" class="java.lang.String"/>
 

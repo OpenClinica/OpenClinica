@@ -9,7 +9,7 @@
 <jsp:include page="../include/sidebar.jsp"/>
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 
 <h1><span class="title_manage">
 <fmt:message key="view_scheduled_task" bundle="${resword}"/>

@@ -10,7 +10,7 @@
 
 <jsp:include page="../include/sidebar.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 
 
 <h1><span class="title_manage"><fmt:message key="create_datasets" bundle="${resword}"/>: <fmt:message key="dataset_filters_applied" bundle="${resword}"/></span></h1>

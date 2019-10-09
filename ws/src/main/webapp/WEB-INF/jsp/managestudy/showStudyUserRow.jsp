@@ -8,7 +8,7 @@
 <c:set var="count" value="${param.eblRowCount}" />
 <!-- row number: <c:out value="${count}"/> -->
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.UserAccountRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.UserAccountRow" />
  <c:choose>
    <c:when test="${currRow.bean.status.id ==1}">
    <tr valign="top">  

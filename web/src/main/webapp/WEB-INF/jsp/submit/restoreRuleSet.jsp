@@ -41,8 +41,8 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='ruleSet' class='org.akaza.openclinica.domain.rule.RuleSetBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='request' id='ruleSet' class='core.org.akaza.openclinica.domain.rule.RuleSetBean'/>
 
 <h1><c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">

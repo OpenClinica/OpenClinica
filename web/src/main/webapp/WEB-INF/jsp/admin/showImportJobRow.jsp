@@ -5,7 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.TriggerRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.TriggerRow" />
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
 <tr valign="top" bgcolor="#F5F5F5">

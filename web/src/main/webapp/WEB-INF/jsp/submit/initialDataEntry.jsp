@@ -39,7 +39,7 @@
 <jsp:include page="../include/submitSideInfo-inactive.jsp"/>
 
 <jsp:useBean scope="request" id="section" class=
-  "org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+  "core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 
 <%-- set button text depending on whether or not the user is confirming values --%>
 <c:choose>

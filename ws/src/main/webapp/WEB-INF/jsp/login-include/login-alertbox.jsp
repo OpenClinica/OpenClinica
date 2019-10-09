@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!-- Alert Box -->
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 <% 
     String action = request.getParameter("action");

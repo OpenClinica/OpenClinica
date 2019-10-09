@@ -1,9 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <html>
 <head>
@@ -11,9 +11,9 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 </head>
 
-<jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
-<jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
+<jsp:useBean scope="request" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="eventCRFAudits" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="allDeletedEventCRFs" class="java.util.ArrayList"/>

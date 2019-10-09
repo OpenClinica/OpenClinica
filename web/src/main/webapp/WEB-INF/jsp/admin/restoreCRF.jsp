@@ -43,7 +43,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='request' id='eventCRFs' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='crfToRestore' class='org.akaza.openclinica.bean.admin.CRFBean'/>
+<jsp:useBean scope='request' id='crfToRestore' class='core.org.akaza.openclinica.bean.admin.CRFBean'/>
 
 <h1><span class="title_manage"><fmt:message key="confirm_restore_of_CRF" bundle="${resword}"/></span></h1>
 

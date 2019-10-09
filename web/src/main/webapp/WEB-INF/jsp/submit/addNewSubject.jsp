@@ -39,7 +39,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean" />
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
 <jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
