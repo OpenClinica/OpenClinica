@@ -2,8 +2,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
  
+<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/include/workflow.jsp
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+=======
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
+>>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/include/workflow.jsp
 
  <c:set var="imagePathPrefix" value="${imagePathPrefix}" />
  <c:set var="module" value="${param.module}"/>

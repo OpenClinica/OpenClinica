@@ -8,10 +8,16 @@
 <jsp:useBean scope='request' id='inputName' class='java.lang.String'/>
 <jsp:useBean scope='request' id='attachedFilePath' class='java.lang.String'/>
 <jsp:useBean scope='request' id='uploadFileStatus' class='java.lang.String'/>
+<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/submit/uploadFile.jsp
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
+=======
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+>>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/submit/uploadFile.jsp
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
 
 <html>

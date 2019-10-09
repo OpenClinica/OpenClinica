@@ -6,8 +6,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/include/showTableNewDomain.jsp
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+=======
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+>>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/include/showTableNewDomain.jsp
 
 <jsp:useBean scope="request" id="table" class="core.org.akaza.openclinica.web.domain.EntityBeanTable" />
 <c:set var="rowURL" value="${param.rowURL}" />
