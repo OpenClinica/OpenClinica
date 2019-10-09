@@ -11,7 +11,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<jsp:useBean scope='request' id='siteToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='siteToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope="request" id="parentName" class="java.lang.String"/>
 <jsp:useBean scope='session' id='fromListSite' class="java.lang.String"/>
 <jsp:useBean scope='request' id='definitions' class='java.util.ArrayList'/>

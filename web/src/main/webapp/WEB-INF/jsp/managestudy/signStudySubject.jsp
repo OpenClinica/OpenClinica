@@ -76,11 +76,11 @@
 </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="parentStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
-<jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
+<jsp:useBean scope="request" id="parentStudy" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="children" class="java.util.ArrayList"/>
-<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
+<jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope="request" id="groups" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="from" class="java.lang.String"/>
 

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ page import="org.akaza.openclinica.logic.importdata.*" %>
+<%@ page import="core.org.akaza.openclinica.logic.importdata.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.slf4j.Logger" %>
@@ -52,8 +52,8 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='version' class='core.org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='crfName' class='java.lang.String'/>
 
  <c:out value="${crfName}"/>

@@ -4,7 +4,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
-<jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+<jsp:useBean scope="request" id="section" class="core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="annotations" class="java.lang.String" />
 
 <div style="width: 100%">

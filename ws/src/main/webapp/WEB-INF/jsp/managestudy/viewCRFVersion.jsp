@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
@@ -44,7 +44,7 @@
 
 <jsp:useBean scope='request' id='sections' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='crfname' class='java.lang.String'/>
-<jsp:useBean scope='request' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='request' id='version' class='core.org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
 <h1><span class="title_manage"><fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/>  </span></h1>

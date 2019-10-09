@@ -37,7 +37,7 @@
 		</td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-<jsp:useBean scope="session" id="currentRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean" />
+<jsp:useBean scope="session" id="currentRole" class="core.org.akaza.openclinica.bean.login.StudyUserRoleBean" />
 <jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="formMessages" class="java.util.HashMap" />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />

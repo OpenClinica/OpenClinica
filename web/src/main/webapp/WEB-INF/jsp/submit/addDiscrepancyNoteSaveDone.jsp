@@ -5,8 +5,8 @@
 <jsp:useBean scope='request' id='writeToDB' class='java.lang.String' />
 <jsp:useBean scope='request' id='submitClose' class='java.lang.String' />
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>    
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <html>
 <head>

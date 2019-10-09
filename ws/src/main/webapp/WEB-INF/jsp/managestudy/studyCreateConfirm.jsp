@@ -38,7 +38,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='interventions' class='java.util.ArrayList'/>
 <h1><span class="title_manage">
 <fmt:message key="confirm_study" bundle="${resword}"/>

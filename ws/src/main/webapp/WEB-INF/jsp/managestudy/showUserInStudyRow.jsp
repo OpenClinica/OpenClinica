@@ -2,10 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyUserRoleRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.StudyUserRoleRow" />
 
 <tr valign="top">   
       <td class="table_cell_left"><c:out value="${currRow.bean.userName}"/></td>

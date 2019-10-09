@@ -39,7 +39,7 @@ public class ScoreValidator {
 
     public ScoreValidator(Locale locale) {
         this.locale = locale;
-        this.resexception = ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions", locale);
+        this.resexception = ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions", locale);
     }
 
     public void setLocale(Locale l) {

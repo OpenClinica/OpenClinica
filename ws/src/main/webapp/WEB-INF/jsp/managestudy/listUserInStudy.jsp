@@ -39,7 +39,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 
 <h1><span class="title_manage"><fmt:message key="manage_all_users_in" bundle="${restext}"/> <c:out value="${study.name}"/> <a href="javascript:openDocWindow('help/5_3_users_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 

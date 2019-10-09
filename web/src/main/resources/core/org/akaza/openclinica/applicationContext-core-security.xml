@@ -12,7 +12,7 @@
 		                   http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
     <context:annotation-config />
-    <context:component-scan base-package="org.akaza.openclinica" />
+    <context:component-scan base-package="**.org.akaza.openclinica" />
 
     <!--
     <security:authentication-manager alias="authenticationManager">

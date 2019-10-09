@@ -1,11 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="org.akaza.openclinica.web.SQLInitServlet" %>
+<%@ page import="core.org.akaza.openclinica.web.SQLInitServlet" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
-<jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean' />
+<jsp:useBean scope='session' id='userRole' class='core.org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope="session" id="passwordExpired" class="java.lang.String"/>
 
 <c:choose>

@@ -10,7 +10,7 @@
 <c:set var="eblRowCount" value="${param.eblRowCount}" />
 <c:set var="isFirstLink" value="${param.isFirstLink}" />
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyEventDefinitionRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.StudyEventDefinitionRow" />
 
 <c:set var="last" value="${defSize-1}" />
  <c:choose>

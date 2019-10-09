@@ -2,10 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
-<jsp:useBean scope="request" id="dataset" class="org.akaza.openclinica.bean.extract.DatasetBean"/>
-<jsp:useBean scope="request" id="file" class="org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean"/>
+<jsp:useBean scope="request" id="dataset" class="core.org.akaza.openclinica.bean.extract.DatasetBean"/>
+<jsp:useBean scope="request" id="file" class="core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean"/>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>

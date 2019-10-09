@@ -39,10 +39,10 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="request" id="displayEventCRF" class="org.akaza.openclinica.bean.submit.DisplayEventCRFBean"/>
-<jsp:useBean scope="request" id="event" class="org.akaza.openclinica.bean.managestudy.StudyEventBean"/>
+<jsp:useBean scope="request" id="displayEventCRF" class="core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean"/>
+<jsp:useBean scope="request" id="event" class="core.org.akaza.openclinica.bean.managestudy.StudyEventBean"/>
 <jsp:useBean scope="request" id="items" class="java.util.ArrayList"/>
-<jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
 <h1><span class="title_manage">
 <fmt:message key="restore_CRF_to_event"  bundle="${resword}"/>

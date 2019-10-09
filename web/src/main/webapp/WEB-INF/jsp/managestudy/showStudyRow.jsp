@@ -7,7 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DisplayStudyRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.DisplayStudyRow" />
 <c:set var="available"><fmt:message key="available" bundle="${resterm}"/></c:set>
 <c:set var="removed"><fmt:message key="removed" bundle="${resterm}"/></c:set>
 <c:choose>

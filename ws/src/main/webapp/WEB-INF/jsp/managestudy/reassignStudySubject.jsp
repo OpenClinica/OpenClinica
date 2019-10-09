@@ -3,9 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>    
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
@@ -42,10 +42,10 @@
 
 <!-- org.akaza.openclinica.bean.core.AuditableEntityBean -->
 
-<jsp:useBean scope="request" id="displayStudy" class="org.akaza.openclinica.bean.admin.DisplayStudyBean"/>
-<jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
-<jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="request" id="displayStudy" class="core.org.akaza.openclinica.bean.admin.DisplayStudyBean"/>
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
+<jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <h1><span class="title_manage">
 <fmt:message key="reassign_study_subject" bundle="${resworkflow}"/> 
 </span></h1>

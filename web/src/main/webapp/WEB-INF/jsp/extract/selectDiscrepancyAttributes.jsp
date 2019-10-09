@@ -7,7 +7,7 @@
 
 <jsp:include page="../include/sidebar.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 
 <h1><span class="title_manage">Create Dataset: Select Discrepancy Attributes</span></h1>

@@ -52,7 +52,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="request" id="toc" class="org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean" />
+<jsp:useBean scope="request" id="toc" class="core.org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean" />
 
 <c:choose>
 <c:when test="${userBean.sysAdmin}">

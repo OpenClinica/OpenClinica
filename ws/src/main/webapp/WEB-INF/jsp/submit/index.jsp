@@ -42,7 +42,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <!-- the object inside the array is StudySubjectBean-->
-<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
+<jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
 
 
 

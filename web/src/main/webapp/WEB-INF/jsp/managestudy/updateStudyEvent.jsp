@@ -6,8 +6,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
-<jsp:useBean scope="request" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
-<jsp:useBean scope="request" id="studySubject" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
+<jsp:useBean scope="request" id="studyEvent" class="core.org.akaza.openclinica.bean.managestudy.StudyEventBean" />
+<jsp:useBean scope="request" id="studySubject" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
 
 <link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 

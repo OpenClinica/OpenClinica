@@ -44,8 +44,8 @@
 
 <jsp:useBean scope='session' id='itemsHaveData' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='eventsForVersion' class='java.util.ArrayList'/>
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='version' class='core.org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 <h1><span class="title_manage"><fmt:message key="create_a_new_CRF_version" bundle="${resword}"/> - <fmt:message key="remove_previous_same_version_error" bundle="${resword}"/>
 </span></h1>
 

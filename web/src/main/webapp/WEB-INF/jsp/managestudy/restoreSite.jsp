@@ -44,7 +44,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='siteToRestore' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='siteToRestore' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='userRolesToRestore' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToRestore' class='java.util.ArrayList'/>
 

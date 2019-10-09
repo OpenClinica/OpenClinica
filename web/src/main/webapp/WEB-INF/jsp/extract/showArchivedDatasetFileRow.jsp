@@ -7,7 +7,7 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.ArchivedDatasetFileRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.ArchivedDatasetFileRow" />
 <tr>
 	<td class="table_cell"><c:out value="${currRow.bean.format}" /></td>
 	<td class="table_cell_left"><c:out value="${currRow.bean.name}" /></td>

@@ -79,9 +79,9 @@
 </script>
 
 <jsp:useBean scope='session' id='userBean'
-    class='org.akaza.openclinica.bean.login.UserAccountBean' />
+    class='core.org.akaza.openclinica.bean.login.UserAccountBean' />
 <jsp:useBean scope='request' id='ruleSet'
-    class='org.akaza.openclinica.domain.rule.RuleSetBean' />
+    class='core.org.akaza.openclinica.domain.rule.RuleSetBean' />
 
 
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />

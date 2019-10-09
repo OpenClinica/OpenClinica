@@ -36,9 +36,9 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 
-<jsp:useBean scope="request" id="triggerBean" class="org.akaza.openclinica.bean.admin.TriggerBean" />
+<jsp:useBean scope="request" id="triggerBean" class="core.org.akaza.openclinica.bean.admin.TriggerBean" />
 
 <jsp:useBean scope="request" id="groupName" class="java.lang.String" />
 

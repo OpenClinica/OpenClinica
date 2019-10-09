@@ -17,9 +17,9 @@
   <link rel="stylesheet" href="includes/styles.css" type="text/css">
   <link rel="stylesheet" href="includes/print_crf.css" type="text/css">
 </head>
-<jsp:useBean scope="request" id="crfVersionBean" class="org.akaza.openclinica.bean.submit.CRFVersionBean" />
-<jsp:useBean scope="request" id="crfBean" class="org.akaza.openclinica.bean.admin.CRFBean" />
-<jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
+<jsp:useBean scope="request" id="crfVersionBean" class="core.org.akaza.openclinica.bean.submit.CRFVersionBean" />
+<jsp:useBean scope="request" id="crfBean" class="core.org.akaza.openclinica.bean.admin.CRFBean" />
+<jsp:useBean scope="session" id="studyEvent" class="core.org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 <%-- dataInvolved is a request attribute set in PrintCRFServlet and PrintDataEntryServlet --%>
 <c:set var="dataIsInvolved" value="${dataInvolved}" />
 <body>

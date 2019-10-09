@@ -46,9 +46,9 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
-<jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="subjectStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="session" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
+<jsp:useBean scope="request" id="subjectStudy" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
 <h1><span class="title_manage">
 <fmt:message key="remove_subject_from_Study"  bundle="${resword}"/>

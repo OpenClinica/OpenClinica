@@ -9,8 +9,8 @@
 <head>
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
 </head>
-<jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
+<jsp:useBean scope="request" id="section" class="core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+<jsp:useBean scope="session" id="studyEvent" class="core.org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 
 <body>
 <h1><span class="title_manage">

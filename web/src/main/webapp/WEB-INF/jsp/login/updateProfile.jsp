@@ -4,7 +4,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<%@ page import="org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
+<%@ page import="core.org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
 <c:import url="../include/home-header.jsp">
     <c:param name="profilePage" value="yes"/>
 </c:import>
@@ -40,8 +40,8 @@
 
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="mustChangePass" class="java.lang.String"/>
-<jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
-<jsp:useBean scope="session" id="userBean1" class="org.akaza.openclinica.bean.login.UserAccountBean"/>
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="session" id="userBean1" class="core.org.akaza.openclinica.bean.login.UserAccountBean"/>
 
 
 <h1><span class="title_manage">

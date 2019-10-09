@@ -37,8 +37,8 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
 <h1><span class="title_manage"><fmt:message key="scheduled_export_data_jobs" bundle="${resword}"/><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/brief-overview/jobs#content-title-4363')"><span class="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>

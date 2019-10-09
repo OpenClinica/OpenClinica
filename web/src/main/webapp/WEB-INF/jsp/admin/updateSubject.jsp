@@ -48,7 +48,7 @@
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" name="id" value="<c:out value="${id}"/>">
 <input type="hidden" name="studySubId" value="<c:out value="${studySubId}"/>">
-<jsp:useBean scope="request" id="subjectToUpdate" class="org.akaza.openclinica.bean.submit.SubjectBean" />
+<jsp:useBean scope="request" id="subjectToUpdate" class="core.org.akaza.openclinica.bean.submit.SubjectBean" />
 
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">

@@ -42,7 +42,7 @@
 
 <jsp:useBean scope='request' id='studySubs' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='events' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='subjectToRestore' class='org.akaza.openclinica.bean.submit.SubjectBean'/>
+<jsp:useBean scope='request' id='subjectToRestore' class='core.org.akaza.openclinica.bean.submit.SubjectBean'/>
 
 <h1><span class="title_manage"><fmt:message key="confirm_restore_of_subject" bundle="${restext}"/></span></h1>
 
