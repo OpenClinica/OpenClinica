@@ -1,7 +1,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/submit/generateLeftItemTxt.jsp
 <%@ page import="core.org.akaza.openclinica.logic.score.*, java.util.HashMap, java.util.ArrayList, core.org.akaza.openclinica.bean.submit.ResponseOptionBean, core.org.akaza.openclinica.bean.submit.ItemBean" %>
+=======
+<%@ page import="core.org.akaza.openclinica.logic.score.*, java.util.HashMap, java.util.ArrayList, org.akaza.openclinica.bean.submit.ResponseOptionBean, org.akaza.openclinica.bean.submit.ItemBean" %>
+>>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/submit/generateLeftItemTxt.jsp
 
 <c:set var="inputType" value="${param.inputType}" />
 <c:set var="itemId" value="${param.itemId}" />

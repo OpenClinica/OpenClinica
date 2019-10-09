@@ -45,7 +45,10 @@
 
 <jsp:useBean scope="request" id="newStudy" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
+<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/managestudy/reassignStudySubjectConfirm.jsp
 <jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+=======
+>>>>>>> OC-11521: Merged core to web working:web/src/main/webapp/WEB-INF/jsp/managestudy/reassignStudySubjectConfirm.jsp
 
 <h1><span class="title_manage">
 <fmt:message key="confirm_reassign_study_subject" bundle="${restext}"/> <c:out value="${studySub.label}"/>
