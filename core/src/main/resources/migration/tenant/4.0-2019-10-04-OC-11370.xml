@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="jkeremian" id="2019-10-04-OC-11370-01" dbms="postgresql" runOnChange="true">
+		<comment>Drop all Views cause are not needed</comment>
+		<sql>
+			DROP VIEW IF EXISTS dn_age_days;
+			DROP VIEW IF EXISTS	view_site_hidden_event_definition_crf;
+			DROP VIEW IF EXISTS	view_study_hidden_event_definition_crf;
+			DROP VIEW IF EXISTS	view_discrepancy_note;
+			DROP VIEW IF EXISTS view_dn_item_data;
+			DROP VIEW IF EXISTS	view_dn_event_crf;
+			DROP VIEW IF EXISTS view_dn_study_event;
+			DROP VIEW IF EXISTS	view_dn_study_subject;
+			DROP VIEW IF EXISTS view_dn_subject;
+			DROP VIEW IF EXISTS	view_dn_stats;
+			DROP VIEW IF EXISTS view_item_data_toolkit_filtered;
+			DROP VIEW IF EXISTS view_item_data_toolkit;
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>

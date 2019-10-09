@@ -12,6 +12,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.managestudy.CustomColumn;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
@@ -203,6 +204,13 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(",");
             writer.append("Study/Site OID");
             writer.append(",");
+
+     if(discNoteBean.getCustomColumns()!=null) {
+     for(CustomColumn customColumn:discNoteBean.getCustomColumns()) {
+         writer.append(customColumn.getDescription());
+         writer.append(",");
+     }
+     }
             //we're adding a thread number row
             writer.append("Thread ID");
             writer.append(",");
@@ -275,6 +283,15 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         writer.append(escapeQuotesInCSV(discNoteBean.getStudy().getOid()));
         writer.append(",");
+
+
+        if(discNoteBean.getCustomColumns()!=null) {
+            for(CustomColumn customColumn:discNoteBean.getCustomColumns()) {
+                writer.append(escapeQuotesInCSV(customColumn.getValue()));
+                writer.append(",");
+            }
+        }
+
 
         writer.append(escapeQuotesInCSV(threadNumber+""));
         writer.append(",");
@@ -467,7 +484,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 //Just the parent of the thread?  discNoteThread.getLinkedNoteList()
                for(DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()){
                     //DiscrepancyNoteBean discNoteBean = discNoteThread.getLinkedNoteList().getFirst();
-                   if(discNoteBean.getParentDnId()>0) {
+                   if(discNoteBean.getParentDnId()==0) {
                        pdfDoc.add(this.createTableFromBean(discNoteBean));
                        pdfDoc.add(new Paragraph("\n"));
                    }
@@ -549,9 +566,11 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 for(DiscrepancyNoteBean discNoteBean : dnThread.getLinkedNoteList()){
                    //DiscrepancyNoteBean discNoteBean = dnThread.getLinkedNoteList().getFirst();
                     ++counter;
+                    if(discNoteBean.getParentDnId()==0) {
 
-                    singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter) : serializeToString(discNoteBean, false, threadCounter);
-                    allContent.append(singleBeanContent);
+                        singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter) : serializeToString(discNoteBean, false, threadCounter);
+                        allContent.append(singleBeanContent);
+                    }
                }
             }
         }
@@ -787,10 +806,15 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         table.addCell(cell);
         cell = new Cell("Date updated: "+discBean.getUpdatedDateString());
         table.addCell(cell);
-        cell = new Cell("Study ID: "+discBean.getStudyId());
+        cell = new Cell("Study ID: "+discBean.getStudy().getIdentifier());
         table.addCell(cell);
 
-
+        if (discBean.getCustomColumns() != null) {
+            for (CustomColumn customColumn : discBean.getCustomColumns()) {
+                cell = new Cell(customColumn.getDescription() + " : " + (customColumn.getValue() != null ? customColumn.getValue():""));
+                table.addCell(cell);
+            }
+        }
 
         return table;
 

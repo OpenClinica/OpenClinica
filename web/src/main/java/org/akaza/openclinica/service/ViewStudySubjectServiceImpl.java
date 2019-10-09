@@ -1,6 +1,10 @@
 package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.CustomColumn;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import org.akaza.openclinica.dao.hibernate.*;
@@ -8,12 +12,15 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -37,8 +44,16 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
     private EventCrfDao eventCrfDao;
     private StudyEventDefinitionDao studyEventDefintionDao;
     private PageLayoutDao pageLayoutDao;
-    public static final String PAGE_NAME = "participant-matrix";
-    public static final String PARTICIPANT_MATRIX_TABLE = "participant-matrix-table";
+    private static final String CHECKBOX = "checkbox";
+    private static final String MULTI_SELECT = "multi-select";
+    private static final String RADIO = "radio";
+    private static final String SINGLE_SELECT = "single-select";
+
+    private ItemDataDao itemDataDao;
+    private ItemDao itemDao;
+    private ItemFormMetadataDao itemFormMetadataDao;
+    private CrfVersionDao crfVersionDao;
+
 
 
     public ViewStudySubjectServiceImpl(StudyDao studyDao, UserAccountDao userAccountDao, StudySubjectDao studySubjectDao, CrfDao crfDao,
@@ -295,15 +310,17 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
     }
 
 
-    public String[] getTableColumns() {
-        List<Component> components = getPageComponents(PAGE_NAME);
+    public String[] getTableColumns(String pageName,String componentName) {
+        List<Component> components = getPageComponents(pageName);
         if (components != null) {
             for (Component component : components) {
-                if (component.getName().equals(PARTICIPANT_MATRIX_TABLE)) {
+                if (component.getName().equals(componentName)) {
                     return component.getColumns();
                 }
             }
         }
         return null;
     }
+
+
 }
