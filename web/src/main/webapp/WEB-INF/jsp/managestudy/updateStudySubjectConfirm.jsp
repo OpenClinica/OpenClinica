@@ -45,7 +45,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="session" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
 <h1><span class="title_manage">
 <fmt:message key="confirm_study_subject_updates" bundle="${resword}"/>

@@ -2,14 +2,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <c:set var="count" value="${param.eblRowCount}" />
 <c:set var="eblRowCount" value="${param.eblRowCount}" />
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyEventDefinitionRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.StudyEventDefinitionRow" />
 <jsp:useBean scope="request" id="defSize" type="java.lang.Integer" />
 <c:set var="last" value="${defSize-1}" />
  <c:choose>

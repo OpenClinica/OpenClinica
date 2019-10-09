@@ -44,11 +44,11 @@
 
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope="request" id="dataset" class="org.akaza.openclinica.bean.extract.DatasetBean"/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope="request" id="dataset" class="core.org.akaza.openclinica.bean.extract.DatasetBean"/>
 
 <%--
-<jsp:useBean scope="request" id="extractBean" class="org.akaza.openclinica.bean.extract.ExtractBean"/>
+<jsp:useBean scope="request" id="extractBean" class="core.org.akaza.openclinica.bean.extract.ExtractBean"/>
 --%>
 
 <h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"> <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>

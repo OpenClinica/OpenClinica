@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 
-<%@ page import="org.akaza.openclinica.bean.core.DataEntryStage"%>
-<%@ page import="org.akaza.openclinica.bean.core.SubjectEventStatus"%>
+<%@ page import="core.org.akaza.openclinica.bean.core.DataEntryStage"%>
+<%@ page import="core.org.akaza.openclinica.bean.core.SubjectEventStatus"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -14,7 +14,7 @@
 <!-- row number: <c:out value="${eblRowCount}"/> -->
 <c:set var="eventCRFNum" value="${param.eventDefCRFNum}" />
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DisplayStudySubjectEventsRow" />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.DisplayStudySubjectEventsRow" />
 <c:set var="eventCount" value="0"/>
 <c:forEach var="event" items="${currRow.bean.studyEvents}">
     <c:set var="eventCount" value="${eventCount+1}"/>

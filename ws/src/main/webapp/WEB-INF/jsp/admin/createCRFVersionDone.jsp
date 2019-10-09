@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
@@ -44,10 +44,10 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="queries" class="java.util.ArrayList"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 <h1><span class="title_manage"><fmt:message key="create_a_new_CRF_version" bundle="${resword}"/> - <fmt:message key="data_committed_successfully" bundle="${resword}"/></span></h1>
 <br/>
 <fmt:message key="the_new_CRF_version_was_committed_into" bundle="${restext}"/>

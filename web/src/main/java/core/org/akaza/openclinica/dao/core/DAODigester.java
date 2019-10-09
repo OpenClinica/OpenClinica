@@ -43,9 +43,9 @@ public class DAODigester {
          * </query> </queries>
          *
          */
-        digester.addCallMethod("core/queries/query", "setQuery", 2);
-        digester.addCallParam("core/queries/query/name", 0);
-        digester.addCallParam("core/queries/query/sql", 1);
+        digester.addCallMethod("queries/query", "setQuery", 2);
+        digester.addCallParam("queries/query/name", 0);
+        digester.addCallParam("queries/query/sql", 1);
         digester.parse(fis);
     }
 

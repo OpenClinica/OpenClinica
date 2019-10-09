@@ -34,8 +34,8 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
 <h1><span class="title_manage"><fmt:message key="administer_users" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/overview-user-types-and-roles')"><span class=""></span></a></span></h1><br/>

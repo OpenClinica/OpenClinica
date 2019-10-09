@@ -37,7 +37,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<jsp:useBean scope='request' id='studyToRemove' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToRemove' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='sitesToRemove' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='userRolesToRemove' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToRemove' class='java.util.ArrayList'/>

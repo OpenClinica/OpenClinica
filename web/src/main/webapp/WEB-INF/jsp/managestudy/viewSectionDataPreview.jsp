@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<jsp:useBean scope="request" id="sec" class="org.akaza.openclinica.bean.submit.SectionBean" />
+<jsp:useBean scope="request" id="section" class="core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+<jsp:useBean scope="request" id="sec" class="core.org.akaza.openclinica.bean.submit.SectionBean" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 

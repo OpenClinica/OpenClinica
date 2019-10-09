@@ -40,9 +40,9 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="request" id="displayEvent" class="org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean"/>
-<jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
-<jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="displayEvent" class="core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean"/>
+<jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="request" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
 
 <h1><span class="title_manage"><fmt:message key="remove_event_from_study" bundle="${resword}"/></span></h1>
 

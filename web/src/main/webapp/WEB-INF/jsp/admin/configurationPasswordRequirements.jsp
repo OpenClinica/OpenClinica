@@ -36,7 +36,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='presetValues' class='java.util.HashMap' />
 
 <h1><span class="title_manage"><fmt:message key="configure_password_requirements" bundle="${resword}"/></span></h1><br/>

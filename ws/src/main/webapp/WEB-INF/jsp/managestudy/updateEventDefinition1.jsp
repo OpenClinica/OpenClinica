@@ -39,8 +39,8 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='definition' class='core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
 <jsp:useBean scope='session' id='eventDefinitionCRFs' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='sdvOptions' class='java.util.ArrayList'/>
 <script type="text/JavaScript" language="JavaScript">

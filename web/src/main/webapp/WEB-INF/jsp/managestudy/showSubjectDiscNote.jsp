@@ -18,7 +18,7 @@
 <!-- row number: <c:out value="${eblRowCount}"/> -->
 
 <jsp:useBean scope="request" id="currRow" class=
-  "org.akaza.openclinica.web.bean.DisplayStudySubjectRow" />
+  "core.org.akaza.openclinica.web.bean.DisplayStudySubjectRow" />
 <c:set var="groups" value="3"/>
 <c:forEach var="group" items="${currRow.bean.studyGroups}">
     <c:set var="groups" value="${groups+1}"/>

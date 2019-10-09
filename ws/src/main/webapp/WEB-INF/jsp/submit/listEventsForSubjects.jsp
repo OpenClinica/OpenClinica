@@ -22,8 +22,8 @@
     }
 </script>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
 
 
 <jsp:include page="../include/submit-header.jsp"/>
@@ -58,8 +58,8 @@
 </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='request' id='crf' class='core.org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
 <h1><span class="title_manage">

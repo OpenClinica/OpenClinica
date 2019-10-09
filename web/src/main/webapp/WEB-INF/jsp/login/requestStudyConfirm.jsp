@@ -35,7 +35,7 @@
 		</td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-<jsp:useBean scope="session" id="newRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
+<jsp:useBean scope="session" id="newRole" class="core.org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
 <h1><span class="title_manage"><fmt:message key="confirm_your_study_acces_request" bundle="${resword}"/></span></h1>
 
 <form action="RequestStudy?action=submit" method="post">

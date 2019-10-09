@@ -2,9 +2,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="pagemessage"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.page_messages" var="pagemessage"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 

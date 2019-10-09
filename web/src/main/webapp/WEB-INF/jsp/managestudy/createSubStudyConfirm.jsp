@@ -56,8 +56,8 @@
       }
  </script>
 
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='session' id='definitions' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
 <h1><span class="title_manage">

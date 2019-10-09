@@ -36,7 +36,7 @@
 
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='presetValues' class='java.util.HashMap' />
 <jsp:useBean scope='request' id='userTypes' class='java.util.ArrayList' />
 

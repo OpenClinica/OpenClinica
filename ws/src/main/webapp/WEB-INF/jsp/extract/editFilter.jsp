@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
 <jsp:include page="../include/extract-header.jsp"/>
@@ -10,8 +10,8 @@
 
 <jsp:include page="../include/sidebar.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='filter' class='org.akaza.openclinica.bean.extract.FilterBean' />
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='request' id='filter' class='core.org.akaza.openclinica.bean.extract.FilterBean' />
 <jsp:useBean scope='request' id='statuses' class='java.util.ArrayList' />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 

@@ -1,7 +1,7 @@
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/jsp/taglibs.jsp" %>
 <!-- For Mantis Issue 6099 -->
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
     <c:if test="${userBean.name!=''}">
     <c:redirect url="/MainMenu"/>
     </c:if>

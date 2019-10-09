@@ -7,8 +7,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
+<jsp:useBean scope="request" id="section" class="core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+<jsp:useBean scope="request" id="displayItem" class="core.org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 <script lang="Javascript">
 function genToolTips(itemId){

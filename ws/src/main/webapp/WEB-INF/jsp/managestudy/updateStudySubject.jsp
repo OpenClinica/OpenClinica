@@ -4,9 +4,9 @@
 
 
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
 <c:choose>
 <c:when test="${userBean.sysAdmin || userBean.techAdmin || userRole.manageStudy}">
@@ -47,7 +47,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="session" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="session" id="enrollDateStr" class="java.lang.String"/>
 
 <body class="aka_bodywidth" onload=

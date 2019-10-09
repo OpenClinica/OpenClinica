@@ -2,9 +2,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/extract-header.jsp"/>
@@ -44,11 +44,11 @@
 
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope="request" id="dataset" class="org.akaza.openclinica.bean.extract.DatasetBean"/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope="request" id="dataset" class="core.org.akaza.openclinica.bean.extract.DatasetBean"/>
 
 <%--
-<jsp:useBean scope="request" id="extractBean" class="org.akaza.openclinica.bean.extract.ExtractBean"/>
+<jsp:useBean scope="request" id="extractBean" class="core.org.akaza.openclinica.bean.extract.ExtractBean"/>
 --%>
 
 <h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/> <a href="javascript:openDocWindow('help/4_3_exportDatasets_Help.html')"> <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>

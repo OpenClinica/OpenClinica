@@ -6,7 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
-<jsp:useBean scope="request" id="toc" class="org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean" />
+<jsp:useBean scope="request" id="toc" class="core.org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean" />
 
 <jsp:include page="../include/submit-header.jsp"/>
 

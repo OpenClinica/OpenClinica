@@ -37,8 +37,8 @@
 
 <jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='newDataset' class='org.akaza.openclinica.bean.extract.DatasetBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='newDataset' class='core.org.akaza.openclinica.bean.extract.DatasetBean'/>
 
 <c:choose>
 <c:when test="${newDataset.id>0}">

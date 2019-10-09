@@ -45,8 +45,8 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='request' id='definitions' class='java.util.ArrayList'/>
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='version' class='core.org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 
 <h1><span class="title_manage"><fmt:message key="create_a_new_CRF_version" bundle="${resword}"/> - <fmt:message key="version_already_exits" bundle="${resword}"/> </span></h1>
 

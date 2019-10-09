@@ -2,15 +2,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>  
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 
 
 
 <c:set var="eblRowCount" value="${param.eblRowCount}" />
 <!--row number: <c:out value="${eblRowCount}"/> -->
 
-<jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DisplayStudySubjectRow" />
-<jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
+<jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.DisplayStudySubjectRow" />
+<jsp:useBean scope='session' id='userRole' class='core.org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <c:set var="groups" value="5"/>
 	<c:forEach var="group" items="${currRow.bean.studyGroups}">
 	<c:set var="groups" value="${groups+1}"/> 

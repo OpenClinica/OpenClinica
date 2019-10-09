@@ -1,8 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/admin-header.jsp"/>
 
 
@@ -36,7 +36,7 @@
 
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='presetValues' class='java.util.HashMap' />
 <jsp:useBean scope='request' id='userTypes' class='java.util.ArrayList' />
 

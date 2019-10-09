@@ -6,9 +6,9 @@
 <jsp:useBean scope='request' id='writeToDB' class='java.lang.String' />
 <jsp:useBean scope='request' id='unlock' class='java.lang.String' />
 <jsp:useBean scope='request' id='autoView' class='java.lang.String' />
-<jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean' />
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <html>

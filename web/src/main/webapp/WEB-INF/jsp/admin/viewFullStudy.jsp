@@ -45,7 +45,7 @@
     </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-<jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='userRolesToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToView' class='java.util.ArrayList'/>

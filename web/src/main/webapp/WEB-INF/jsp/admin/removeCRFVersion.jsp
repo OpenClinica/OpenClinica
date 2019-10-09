@@ -45,7 +45,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='request' id='eventCRFs' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='versionToRemove' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
+<jsp:useBean scope='request' id='versionToRemove' class='core.org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 
 <h1><span class="title_manage"><fmt:message key="confirm_removal_of_CRF_version" bundle="${resword}"/></span></h1>
 

@@ -3,8 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 
 <jsp:include page="../include/submit-header.jsp"/>
 
@@ -37,7 +37,7 @@
   </tr>
 <jsp:include page="../include/submitSideInfo.jsp"/>
 
-<jsp:useBean scope="request" id="toc" class="org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean" />
+<jsp:useBean scope="request" id="toc" class="core.org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean" />
 
 <c:set var="interviewer" value="" />
 <c:set var="interviewDate" value="" />

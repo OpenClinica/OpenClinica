@@ -8,7 +8,7 @@
 <c:set var="suppressAddSubject"  value="${param.suppressAddSubject}"/>
 <c:set var="discNoteType"  value="${param.discNoteType}"/>
 
-<jsp:useBean scope="request" id="table" class="org.akaza.openclinica.web.bean.EntityBeanTable" />
+<jsp:useBean scope="request" id="table" class="core.org.akaza.openclinica.web.bean.EntityBeanTable" />
 <c:set var="rowURL" value="${param.rowURL}" />
 <c:set var="groupCount" value="${param.groupNum}" />
 

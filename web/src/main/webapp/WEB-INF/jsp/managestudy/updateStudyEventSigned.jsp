@@ -115,8 +115,8 @@
 <jsp:useBean scope='request' id='eventId' class='java.lang.String'/>
 <c:set var="eventId" value="${eventId}"/>
 
-<jsp:useBean scope="request" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
-<jsp:useBean scope="request" id="studySubject" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
+<jsp:useBean scope="request" id="studyEvent" class="core.org.akaza.openclinica.bean.managestudy.StudyEventBean" />
+<jsp:useBean scope="request" id="studySubject" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
 <jsp:useBean scope="request" id="uncompletedEventDefinitionCRFs" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="displayEventCRFs" class="java.util.ArrayList" />
 

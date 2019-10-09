@@ -42,7 +42,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 <jsp:useBean scope='request' id='eventCRFs' class='java.util.ArrayList'/>
-<jsp:useBean scope='request' id='crfToRemove' class='org.akaza.openclinica.bean.admin.CRFBean'/>
+<jsp:useBean scope='request' id='crfToRemove' class='core.org.akaza.openclinica.bean.admin.CRFBean'/>
 
 <h1><span class="title_manage"><fmt:message key="confirm_removal_of_CRF" bundle="${resword}"/></span></h1>
 

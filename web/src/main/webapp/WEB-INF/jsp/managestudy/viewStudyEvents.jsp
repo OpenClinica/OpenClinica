@@ -8,7 +8,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<jsp:useBean scope="request" id="table" class="org.akaza.openclinica.web.bean.EntityBeanTable" />
+<jsp:useBean scope="request" id="table" class="core.org.akaza.openclinica.web.bean.EntityBeanTable" />
   <c:choose>
    <c:when test="${userRole.manageStudy}">
     <c:import url="../include/managestudy-header.jsp"/>

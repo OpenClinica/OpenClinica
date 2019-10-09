@@ -4,8 +4,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
 <head><title>OpenClinica interview</title>
    <%-- <fmt:message key="view_data_entry" bundle="${resword}"/>--%>
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
@@ -34,8 +34,8 @@
 <div id="centralContainer" style=
   "padding-left:3em; margin-top:1em; background-color: white; color:black;">
 
-<jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
+<jsp:useBean scope="request" id="section" class="core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+<jsp:useBean scope="request" id="displayItem" class="core.org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>

@@ -1,8 +1,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
 <!-- Main Content Area -->
 <div align="justify" style="width: 630px; height: 330px;; background:#FFFFFF; padding:5px 8px 0px 8px">
 <h1><fmt:message key="request_password_form" bundle="${resword}"/></h1>

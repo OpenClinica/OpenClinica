@@ -15,7 +15,7 @@ public class SpringServletAccess {
     }
     
     public static String getPropertiesDir(ServletContext servletContext) {
-    	String resource = "properties/placeholder.properties";
+    	String resource = "core/properties/placeholder.properties";
     	ServletContextResource scr = (ServletContextResource)getApplicationContext(servletContext).getResource(resource);
     	String absolutePath = null;
 		try {

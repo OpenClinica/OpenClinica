@@ -35,8 +35,8 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='studyUserRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='request' id='studyUserRole' class='core.org.akaza.openclinica.bean.login.StudyUserRoleBean'/>
 <jsp:useBean scope='request' id='userName' class='java.lang.String'/>
 <jsp:useBean scope='request' id='chosenRoleId' type='java.lang.Integer' />
 <jsp:useBean scope="request" id="roles" class="java.util.LinkedHashMap"/>

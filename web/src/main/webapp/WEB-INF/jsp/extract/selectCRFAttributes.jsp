@@ -36,7 +36,7 @@
 
 <jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 
 <h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_CRF_attributes" bundle="${resword}"/></span></h1>

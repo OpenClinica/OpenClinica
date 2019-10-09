@@ -45,7 +45,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='siteToRemove' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='siteToRemove' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='userRolesToRemove' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToRemove' class='java.util.ArrayList'/>
 

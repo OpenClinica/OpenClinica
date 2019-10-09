@@ -10,7 +10,7 @@
 
 <jsp:include page="../include/sidebar.jsp"/>
 
-<jsp:useBean scope="request" id="entityWithStudyEvents" class="org.akaza.openclinica.bean.core.EntityBean" />
+<jsp:useBean scope="request" id="entityWithStudyEvents" class="core.org.akaza.openclinica.bean.core.EntityBean" />
 <jsp:useBean scope="request" id="displayEntities" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="browseBy" class="java.lang.String" />
 

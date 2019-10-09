@@ -1,4 +1,4 @@
-<%@page import="org.akaza.openclinica.service.user.LdapUserService"%>
+<%@page import="core.org.akaza.openclinica.service.user.LdapUserService"%>
 <%@page import="org.springframework.context.ApplicationContext"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>

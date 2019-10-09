@@ -35,7 +35,7 @@
 		</td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-<jsp:useBean scope="session" id="userBean11" class="org.akaza.openclinica.bean.login.UserAccountBean"/>
+<jsp:useBean scope="session" id="userBean11" class="core.org.akaza.openclinica.bean.login.UserAccountBean"/>
 <h1><span class="title_manage"><fmt:message key="confirm_user_profile_updates" bundle="${resword}"/></span></h1>
 
 <form action="UpdateProfile?action=submit" method="post">

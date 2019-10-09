@@ -41,9 +41,9 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="request" id="user" class="org.akaza.openclinica.bean.login.UserAccountBean"/>
-<jsp:useBean scope="request" id="uRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
-<jsp:useBean scope="request" id="uStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="user" class="core.org.akaza.openclinica.bean.login.UserAccountBean"/>
+<jsp:useBean scope="request" id="uRole" class="core.org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
+<jsp:useBean scope="request" id="uStudy" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
 
 <h1><span class="title_manage"><fmt:message key="view_user_account" bundle="${resword}"/></span></h1>
 <div style="width: 600px">

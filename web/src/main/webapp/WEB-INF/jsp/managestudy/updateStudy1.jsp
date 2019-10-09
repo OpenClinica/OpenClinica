@@ -36,8 +36,8 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="statuses" class="java.util.ArrayList"/>
 <script type="text/JavaScript" language="JavaScript">

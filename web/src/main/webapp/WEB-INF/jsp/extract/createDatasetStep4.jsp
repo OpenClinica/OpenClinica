@@ -45,7 +45,7 @@
 
 <jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='statuses' class='java.util.ArrayList' />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
