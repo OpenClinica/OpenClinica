@@ -1,10 +1,18 @@
 package core.org.akaza.openclinica.service.crfdata.xform;
 
+import java.io.File;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
+
 
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -16,7 +24,11 @@ import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
+import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -25,12 +37,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -70,7 +91,7 @@ public class EnketoAPI {
 
     // public static final String INSTANCE_100_PERCENT_READONLY = "/api/v2/instance/view/iframe";
     public static final String INSTANCE_100_PERCENT_READONLY = "/oc/api/v1/instance/view";
-    public static final String INSTANCE_FORM_PDF = "/api/v2/instance/view/pdf";
+    public static final String INSTANCE_FORM_PDF = "/oc/api/v1/instance/view/pdf";
 
     // public static final String INSTANCE_READONLY_DN = "/api/v2/instance/fieldsubmission/note/iframe";
     public static final String INSTANCE_READONLY_DN = "/oc/api/v1/instance/note";
@@ -653,27 +674,23 @@ public class EnketoAPI {
         return enketoFormResponse;
     }
     
-    public EnketoPDFResponse getPDFForm(ActionUrlObject actionUrlObject) throws Exception {
+    /**
+     * 
+     * @param actionUrlObject
+     * @return
+     * @throws Exception
+     */
+    public EnketoPDFResponse getPDFForm(PdfActionUrlObject actionUrlObject) throws Exception {
         String ecid = actionUrlObject.ecid;
         String crfOid = actionUrlObject.crfOid;
-        Study parentStudy = actionUrlObject.parentStudy;
-        Study site = actionUrlObject.site;
-        StudyEvent studyEvent = actionUrlObject.studyEvent;
-        boolean markComplete = actionUrlObject.markComplete;
-        EventDefinitionCrf edc = actionUrlObject.edc;
-        Role role = actionUrlObject.role;
-        String mode = actionUrlObject.mode;
-        String flavor = actionUrlObject.flavor;
         List<FormLayoutMedia> mediaList = actionUrlObject.mediaList;
         String instance = actionUrlObject.instance;
         String redirect = actionUrlObject.redirect;
-        String goTo = actionUrlObject.goTo;
         String studyOid = actionUrlObject.studyOid;
-        String loadWarning = actionUrlObject.loadWarning;
-        EventCrf eventCrf = actionUrlObject.eventCrf;
+        String studySubjectOID = actionUrlObject.getStudySubjectOID();
         EnketoPDFResponse pdfResponse = null;
-        boolean lockOn = false;
-        boolean shouldLock = false;
+        URI finalUrl = null;
+        
         if (enketoURL == null)
             return null;
 
@@ -685,7 +702,8 @@ public class EnketoAPI {
             ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
             String instanceId = encoder.encodePassword(hashString, null);
             URL eURL = null;         
-            eURL = new URL(enketoURL + INSTANCE_FORM_PDF);           
+            eURL = new URL(enketoURL + INSTANCE_FORM_PDF);
+            String eurlStr = eURL.toString();          
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
 
             InstanceAttachment attachment = new InstanceAttachment();
@@ -702,53 +720,136 @@ public class EnketoAPI {
             }
 
             /**
-             * prepare header
+             * prepare request header
              */
             HttpHeaders headers = new HttpHeaders();
-            //headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);           
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
-
+         
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(eurlStr);
+            finalUrl = builder.build().toUri();
             /**
              *  prepare body
-             */
+             */                      
+            LinkedMultiValueMap<String, String>  body = new LinkedMultiValueMap<>();
+            body.add("server_url", ocURL);
+            body.add("ecid", actionUrlObject.ecid);
+            body.add("form_id", crfOid);
+            body.add("instance", instance);
+            body.add("instance_id", instanceId);
+            body.add("return_url", redirect);
+            String format = actionUrlObject.getFormat();
+            if(format == null || format.trim().length() == 0) {
+            	format = "A4";
+            }
+            body.add("format", format);
             
-            EnketoPDFRequest body = new EnketoPDFRequest(ocURL, actionUrlObject.ecid,crfOid,instance, instanceId, redirect, 
-                    attachment, "A4", "0.5in", "false");
-            HttpEntity<EnketoPDFRequest> request = new HttpEntity<EnketoPDFRequest>(body, headers);
-            RestTemplate rest = new RestTemplate();
-            ResponseEntity<EnketoPDFResponse> response = rest.postForEntity(eURL.toString(), request, EnketoPDFResponse.class);
-            if (response != null)
-                pdfResponse = response.getBody();
-
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-            throw e;
+            String margin =actionUrlObject.getMargin();
+            if(margin == null || margin.trim().length()==0 ) {
+            	margin =  "0.5in";
+            }
+            body.add("margin", margin);
+            
+            String landscape = actionUrlObject.getLandscape();
+            if(landscape != null && landscape.equalsIgnoreCase("true")) {
+            	landscape = "true";
+            }else {
+            	landscape = "false";
+            }            
+            body.add("landscape", landscape);
+            
+			HttpEntity<LinkedMultiValueMap> request = new HttpEntity<LinkedMultiValueMap>(body, headers);
+			            
+            RestTemplate rest = new RestTemplate();		            
+            ResponseEntity<byte[]> response = rest.postForEntity(eURL.toString(), request, byte[].class);
+		
+             if (response != null) {
+            	 pdfResponse = new EnketoPDFResponse();
+            	 
+            	 SimpleDateFormat sdf_pdfFile = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");            
+            	 String fileName = crfOid + "_" + sdf_pdfFile.format(new Date()) + ".pdf"; 
+            	 String filePath = getCaseBookFilePath(studyOid, studySubjectOID) + File.separator +  fileName; 
+            	 Path pdfFile = Files.write(Paths.get(filePath), response.getBody());
+            	 pdfResponse.setPdfFile(pdfFile.toFile());	
+            	 pdfResponse.setStatusCode(response.getStatusCodeValue()+"");
+             }                
+             
+        } catch(HttpClientErrorException ec) {
+        	String bodyStr =ec.getResponseBodyAsString();
+        	String msg = "ClientError:"+ec.getMessage();
+        	String finalUrlStr = finalUrl.toString();
+        	throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_CLIENT,msg+ ":" + bodyStr + ":" + finalUrlStr); 
+        	
+        } catch(HttpServerErrorException es) {
+        	String bodyStr =es.getResponseBodyAsString();
+        	String msg = "ServerError:" + es.getMessage();
+        	String finalUrlStr = finalUrl.toString();
+        	
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_SERVER,msg+ ":" + bodyStr + ":" + finalUrlStr);
+         } catch (Exception e) {           
+        	 throw e;
         }
         
         return pdfResponse;
     }
     
-    public EnketoPDFResponse registerAndGetFormPDF(ActionUrlObject actionUrlObject) {
+    /**
+     * 
+     * @param pdfActionUrlObject
+     * @return
+     * @throws Exception 
+     */
+    public EnketoPDFResponse registerAndGetFormPDF(PdfActionUrlObject pdfActionUrlObject) throws Exception {
     	EnketoPDFResponse enketoPDFResponse = null;
         try {            
-        	enketoPDFResponse = this.getPDFForm(actionUrlObject);
+        	enketoPDFResponse = this.getPDFForm(pdfActionUrlObject);
         } catch (Exception e) {
             if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                	enketoPDFResponse = getPDFForm(actionUrlObject);
+                	enketoPDFResponse = getPDFForm(pdfActionUrlObject);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
                 }
             } else {
                 logger.error(e.getMessage());
-                logger.error(ExceptionUtils.getStackTrace(e));
+                logger.error(ExceptionUtils.getStackTrace(e));                
             }
+            
+            throw e;
+            
+           
         }
         return enketoPDFResponse;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public static String getCaseBookFileRootPath() {
+        String dirPath = CoreResources.getField("filePath") + "bulk_jobs" + File.separator + JobType.PARTICIPANT_PDF_CASEBOOK;
+        File directory = new File(dirPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        return dirPath;
+    }
+    
+    /**
+     * 
+     * @param studyOid
+     * @param studySubjectOID
+     * @return
+     */
+    public static String getCaseBookFilePath(String studyOid,String studySubjectOID) {
+        String dirPath = CoreResources.getField("filePath") + "bulk_jobs" + File.separator + JobType.PARTICIPANT_PDF_CASEBOOK + File.separator+ studyOid + File.separator + studySubjectOID;
+        File directory = new File(dirPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        return dirPath;
     }
 }
