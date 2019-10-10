@@ -5,6 +5,9 @@ package org.akaza.openclinica.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.akaza.openclinica.bean.managestudy.CustomColumn;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -53,6 +56,6 @@ public interface ViewStudySubjectService {
 	public CommonEventContainerDTO addCommonForm(String studyEventDefinitionOid, String crfOid, String studySubjectOid,
 												 UserAccount userAccount,String studyOid);
 
-     String[] getTableColumns();
+     String[] getTableColumns(String pageName,String componentName);
 
 	}

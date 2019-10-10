@@ -5,8 +5,11 @@ import static java.util.Arrays.sort;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.DefaultToolbar;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.jmesa.core.CoreContext;
 import org.jmesa.limit.Filter;
 import org.jmesa.limit.FilterSet;
@@ -20,6 +23,8 @@ import org.jmesa.view.html.toolbar.ToolbarItem;
 import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class ListNotesTableToolbar extends DefaultToolbar {
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
     private String module;
@@ -28,9 +33,18 @@ public class ListNotesTableToolbar extends DefaultToolbar {
     private boolean studyHasDiscNotes;
     private ResourceBundle resword;
 
-    public ListNotesTableToolbar(boolean showMoreLink) {
+    private ViewStudySubjectService viewStudySubjectService;
+    private PermissionService permissionService;
+    private StudyBean studyBean;
+    private HttpServletRequest request;
+    public ListNotesTableToolbar(boolean showMoreLink,ViewStudySubjectService viewStudySubjectService,PermissionService permissionService,StudyBean studyBean,HttpServletRequest request) {
         super();
         this.showMoreLink = showMoreLink;
+
+        this.viewStudySubjectService=viewStudySubjectService;
+        this.permissionService=permissionService;
+        this.studyBean=studyBean;
+        this.request=request;
     }
 
     private FilterSet filterSet;
@@ -139,7 +153,21 @@ public class ListNotesTableToolbar extends DefaultToolbar {
          *      java.util.Locale)
          */
         String getIndexes() {
-            String result = "5, 6, 10, 12, 15, 17";
+
+            int itemsColumnCount=0;
+
+            String[] tableColumns = viewStudySubjectService.getTableColumns(ListNotesTableFactory.PAGE_NAME,ListNotesTableFactory.COMPONENT_NAME);
+            if (tableColumns != null) {
+                for (String column : tableColumns) {
+                    if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                        itemsColumnCount++;
+                    }
+                }
+
+            }
+
+        String result = String.valueOf(5+itemsColumnCount) + "," + String.valueOf(6+itemsColumnCount)+ "," + String.valueOf(10+itemsColumnCount)+ "," +String.valueOf(12+itemsColumnCount) + "," + String.valueOf(15+itemsColumnCount)+ "," + String.valueOf(17+itemsColumnCount);
+
             return result;
         }
 
