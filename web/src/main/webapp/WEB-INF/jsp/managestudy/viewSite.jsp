@@ -103,7 +103,6 @@
 
 <strong><fmt:message key="download_oid_in_odm_format_by_click" bundle="${restext}"/>
  <a href="DownloadStudyMetadata?studyId=<c:out value="${siteToView.id}"/>"> <fmt:message key="here" bundle="${restext}"/></a>.</strong>
-<fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
 <br><br>
 
 <div class="table_title_Manage"><a href="javascript:leftnavExpand('siteProperties');">
@@ -477,35 +476,6 @@
 </div><br>
 </c:forEach>
 </div>
-<br><br>
-    <c:choose>
-        <c:when test="${userBean.sysAdmin}">
-            <input type="button" onclick="confirmExit('ListSite');"  name="cancel" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
-        </c:when>
-        <c:otherwise>
-            <input type="button" onclick="goBack();" name="cancel" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
-        </c:otherwise>
-    </c:choose>
-
-
-
 <br>
- <c:choose>
-  <c:when test="${fromListSite=='yes'}">
-   <p><a href="#" onClick="history.go(-1)"><fmt:message key="go_back_to_site_list" bundle="${resword}"/></a></p>
-  </c:when>
-  <c:otherwise>
-    <c:choose>
-      <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin}">
-       <p><a href="ListStudy"><fmt:message key="go_back_to_study_list" bundle="${resword}"/></a></p>
-      </c:when>
-      <c:otherwise>
-         <p><a href="MainMenu"><fmt:message key="go_back_home" bundle="${resword}"/></a></p>
-      </c:otherwise>
-    </c:choose>
-  </c:otherwise>
- </c:choose>
-
- <br><br>
 
 <jsp:include page="../include/footer.jsp"/>

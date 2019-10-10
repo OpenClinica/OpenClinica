@@ -52,6 +52,7 @@
 
     jQuery(document).ready(function() {
         jQuery('#addSubject').click(function() {
+            $('#sidebar_Alerts_open .alert').empty();
             jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
         });
 

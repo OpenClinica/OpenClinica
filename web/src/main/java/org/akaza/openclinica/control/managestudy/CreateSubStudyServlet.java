@@ -850,9 +850,9 @@ public class CreateSubStudyServlet extends SecureController {
             for (EventDefinitionCRFBean eventDef : eventDefCrfList) {
                 sessionBean = edcsInSession.get(i);
 
-                System.out.println("iter:           " + eventDef.getId() + "--db:    " + eventDef.getSubmissionUrl());
-                System.out.println("edcsInSession:  " + sessionBean.getId() + "--session:" + sessionBean.getSubmissionUrl());
-                System.out.println();
+                logger.debug("iter:           {} --db:    {}", eventDef.getId(), eventDef.getSubmissionUrl());
+                logger.debug("edcsInSession:  {} --session: {} ", sessionBean.getId(), sessionBean.getSubmissionUrl());
+
                 if (sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() == null) {
                     break;
                 } else {
@@ -860,12 +860,12 @@ public class CreateSubStudyServlet extends SecureController {
                             && (eventDef.getId() != sessionBean.getId())) {
                         v.addValidation("submissionUrl" + order, Validator.SUBMISSION_URL_NOT_UNIQUE);
                         sed.setPopulated(true);
-                        System.out.println("Duplicate ****************************");
+                        logger.debug("Duplicate ***************************");
                         isExist = true;
                         break;
                     } else if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim())
                             && (eventDef.getId() == sessionBean.getId())) {
-                        System.out.println("Not Duplicate  ***********");
+                        logger.debug("Not Duplicate  ***********");
                         isExist = true;
                         break;
                     }

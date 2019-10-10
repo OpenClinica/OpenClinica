@@ -3,9 +3,11 @@ package org.akaza.openclinica.controller;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.config.AppConfig;
 import org.akaza.openclinica.core.EventCRFLocker;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.LogoutService;
 import org.akaza.openclinica.view.Page;
 import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,12 +65,12 @@ public class LogoutController {
         } else {
             redirectUri += "/MainMenu";
         }
-        logger.info("Redirect URI:" + redirectUri);
+        logger.debug("Redirect URI:" + redirectUri);
         return redirectUri;
     }
 
     private String getLogoutUri(HttpServletRequest req, boolean callback) {
-        AuthzClient authzClient = AuthzClient.create();
+        AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
         String coreAuthUrl = authzClient.getConfiguration().getAuthServerUrl();
         String redirectUri = getRedirectUri(req, callback);
         String authUrl = null;
@@ -83,7 +85,7 @@ public class LogoutController {
             if (callback) {
                 authUrl += "&client_id=bridge&response_type=code";
             }
-            logger.info("authUrl:" + authUrl);
+            logger.debug("authUrl:" + authUrl);
         } catch (UnsupportedEncodingException e) {
             logger.error("Encoding redirect URI:" + redirectUri, e);
         }
@@ -99,7 +101,7 @@ public class LogoutController {
         if (request.getParameter("studyEnvUuid") != null) {
             param = "?studyEnvUuid=" + request.getParameter("studyEnvUuid");
         }
-        logger.info("/logoutSuccess:" + returnURL + param);
+        logger.debug("/logoutSuccess:" + returnURL + param);
         return "redirect:" + returnURL + param;
     }
 

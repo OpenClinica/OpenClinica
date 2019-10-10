@@ -448,7 +448,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         variables.put(new Integer(2), new Integer(siteOrStudyId));
         variables.put(new Integer(3), new Integer(siteOrStudyId));
 
-        String sql = digester.getQuery("findByLabelAndStudyForCreatingParticipant");
+        String sql = digester.getQuery("findByLabelAndStudyWithoutCaseSensitiveLabel");
 
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
@@ -458,6 +458,20 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         }
 
         return answer;
+    }
+
+    public List<StudySubjectBean> findAllSubjectsByLabelAndStudy(String label, StudyBean study) {
+        List<StudySubjectBean> answerList = new ArrayList<>();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), label);
+        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(new Integer(3), new Integer(study.getId()));
+
+        answerList=executeFindAllQuery("findByLabelAndStudyWithoutCaseSensitiveLabel",variables);
+
+        return answerList;
     }
     public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
         StudySubjectBean answer = new StudySubjectBean();
@@ -743,7 +757,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
 
             sql = sql + partialSql;
             if (partialSql.equals(""))
-                sql = sql + "  ORDER BY SS.label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+                sql = sql + "  ORDER BY label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
             else
                 sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
@@ -1020,11 +1034,11 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         boolean filterIsEmpty = false;
        
         if (filter.getFilters().isEmpty()){
-            sql = digester.getQuery("getCountofStudySubjects");
+            sql = digester.getQuery("getStudySubjects");
             filterIsEmpty = true;
         }
         else {
-            sql = digester.getQuery("getCountWithFilter");
+             sql = digester.getQuery("getWithFilterAndSort");
         }
 
         if(participateStatusSetFilter ==null) {
@@ -1045,6 +1059,9 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         sql += filter.execute("");
 
         ArrayList rows = this.select(sql, variables);
+        if(rows!=null)
+            return rows.size();
+
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {
