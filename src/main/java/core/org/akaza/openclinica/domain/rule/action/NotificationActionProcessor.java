@@ -31,6 +31,7 @@ import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -67,15 +68,18 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	String url;
 	String emailSubject;
 	String participateStatus;
-	StudySubject studySubject;
-	String accessToken;
-	PermissionService permissionService;
+    StudySubject studySubject;
+    String accessToken;
+    PermissionService permissionService;
 	NotificationService notificationService;
 	String userUuid;
 
 	public static String sbsUrl = CoreResources.getField("SBSBaseUrl");
 	public static String messageServiceUri = sbsUrl+ "/message-service/api/messages/text";
 	public static String subDomain = sbsUrl.substring(sbsUrl.indexOf("//")  + 2,  sbsUrl.indexOf("."));
+
+	@Autowired
+	private KeycloakClientImpl keycloakClient;
 
 	public NotificationActionProcessor() {
 	}
@@ -91,7 +95,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	}
 
 	public NotificationActionProcessor(String[] listOfEmails, StudySubject studySubject, StudyBean studyBean, String message, String emailSubject,
-									   JavaMailSenderImpl mailSender , String participateStatus,String accessToken,NotificationService notificationService,String userUuid) {
+			JavaMailSenderImpl mailSender , String participateStatus,String accessToken,NotificationService notificationService,String userUuid) {
 		this.listOfEmails = listOfEmails;
 		this.message = message;
 		this.emailSubject = emailSubject;
@@ -111,7 +115,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		this.ruleSetRule = ruleSetRule;
 		ssdao = new StudySubjectDAO(ds);
 		udao = new UserAccountDAO(ds);
-		spvdao = new StudyParameterValueDAO(ds);
+  	   spvdao = new StudyParameterValueDAO(ds);
 
 
 
@@ -119,32 +123,32 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	public RuleActionBean execute(ExecutionMode executionMode, RuleActionBean ruleActionBean, ParticipantDTO pDTO , String email  ) {
 		switch (executionMode) {
-			case DRY_RUN: {
-				return ruleActionBean;
-			}
+		case DRY_RUN: {
+			return ruleActionBean;
+		}
 
-			case SAVE: {
-				createMimeMessagePreparator(pDTO, email);
-				return null;
-			}
-			default:
-				return null;
+		case SAVE: {
+			createMimeMessagePreparator(pDTO, email);
+			return null;
+		}
+		default:
+			return null;
 		}
 	}
 
 
 	private void createMimeMessagePreparator(final ParticipantDTO pDTO, final String email){
-		MimeMessagePreparator preparator = new MimeMessagePreparator() {
-			public void prepare(MimeMessage mimeMessage) throws Exception {
-				MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
-				message.setFrom(EmailEngine.getAdminEmail());
-				message.setTo(email);
-				message.setSubject(pDTO.getEmailSubject());
-				message.setText(pDTO.getMessage());
-			}
-		};
-		BulkEmailSenderService.addMimeMessage(preparator);
-	}
+        MimeMessagePreparator preparator = new MimeMessagePreparator() {
+            public void prepare(MimeMessage mimeMessage) throws Exception {
+                MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
+                message.setFrom(EmailEngine.getAdminEmail());
+                message.setTo(email);
+                message.setSubject(pDTO.getEmailSubject());
+                message.setText(pDTO.getMessage());
+            }
+        };
+        BulkEmailSenderService.addMimeMessage(preparator);
+    }
 
 	private void sendEmail(RuleActionBean ruleAction, ParticipantDTO pDTO) throws OpenClinicaSystemException {
 
@@ -170,12 +174,12 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	@Override
 	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
-								  UserAccountBean ub, Object... arguments) {
+			UserAccountBean ub, Object... arguments) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, int eventOrdinal,NotificationService notificationService, KeycloakClientImpl keycloakClientImpl) {
+	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, int eventOrdinal,NotificationService notificationService) {
 		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
 		String message = ((NotificationActionBean) ruleActionBean).getMessage();
 		String emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
@@ -196,7 +200,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		}
 
 		if (message==null) message="";
-		if (emailSubject==null) emailSubject="";
+        if (emailSubject==null) emailSubject="";
 		message = message.replaceAll("\\$\\{event.name}", eventName);
 
 		message = message.replaceAll("\\$\\{study.name}",studyBean.getName());
@@ -216,15 +220,15 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		ParticipantDTO pDTO = null;
 		String[] listOfEmails = emailList.split(",");
 		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
-		OCUserDTO userDTO=null;
+        OCUserDTO userDTO=null;
 
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
-		String accessToken = keycloakClientImpl.getSystemToken();
+		String accessToken=keycloakClient.getSystemToken();
 
 		if(studySubject.getUserId()!=null) {
 			UserAccountBean userAccountBean = (UserAccountBean) udao.findByPK(studySubject.getUserId());
-			userUuid = userAccountBean.getUserUuid();
+			 userUuid = userAccountBean.getUserUuid();
 		}
 
 
@@ -246,12 +250,12 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			String eSubject = null;
 
 			String pDTOaccessCode=(pDTO.getAccessCode()!=null)?pDTO.getAccessCode():"";
-			String pDTOurl=(pDTO.getUrl()!=null)?pDTO.getUrl():"";
-			String pDTOloginUrl=(pDTO.getLoginUrl()!=null)?pDTO.getLoginUrl():"";
-			String pDTOfName=(pDTO.getfName()!=null)?pDTO.getfName():"";
+            String pDTOurl=(pDTO.getUrl()!=null)?pDTO.getUrl():"";
+            String pDTOloginUrl=(pDTO.getLoginUrl()!=null)?pDTO.getLoginUrl():"";
+            String pDTOfName=(pDTO.getfName()!=null)?pDTO.getfName():"";
 			String pDTOId=(pDTO.getParticipantId()!=null)?pDTO.getParticipantId():"";
 
-			msg = message.replaceAll("\\$\\{participant.accessCode}", pDTOaccessCode);
+            msg = message.replaceAll("\\$\\{participant.accessCode}", pDTOaccessCode);
 			msg = msg.replaceAll("\\$\\{participant.firstname}", pDTOfName);
 			msg = msg.replaceAll("\\$\\{participant.url}", pDTOurl);
 			msg = msg.replaceAll("\\$\\{participant.loginurl}", pDTOloginUrl);
@@ -276,10 +280,10 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		} else {
 			pDTO = buildNewPDTO();
-			message = message.replaceAll("\\\\n", "\n");
-			emailSubject = emailSubject.replaceAll("\\\\n", "\n");
-			pDTO.setOrigMessage(message);
-			pDTO.setOrigEmailSubject(emailSubject);
+            message = message.replaceAll("\\\\n", "\n");
+            emailSubject = emailSubject.replaceAll("\\\\n", "\n");
+            pDTO.setOrigMessage(message);
+            pDTO.setOrigEmailSubject(emailSubject);
 		}
 		String smsPhone = null;
 
@@ -360,12 +364,12 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 				pDTO.setIdentifier(studySubject.getStudySubjectDetail().getIdentifier());
 				ParticipantAccessDTO participantAccessDTO =notificationService.getAccessInfo(accessToken,studyBean,studySubject,userUuid) ;
 
-				if (participantAccessDTO != null) {
-					pDTO.setAccessCode(participantAccessDTO.getAccessCode());
-					pDTO.setLoginUrl(participantAccessDTO.getAccessLink());
-					pDTO.setUrl(participantAccessDTO.getHost());
-				}
-			}
+                if (participantAccessDTO != null) {
+                    pDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                    pDTO.setLoginUrl(participantAccessDTO.getAccessLink());
+                    pDTO.setUrl(participantAccessDTO.getHost());
+                }
+            }
 		} else {
 			return null;
 		}

@@ -7,6 +7,13 @@ release.properties
 .classpath
 .project
 .settings/
+<<<<<<< HEAD
+=======
+src/main/resources/sso.properties
+src/main/resources/datainfo.properties
+src/main/resources/sso.properties
+src/main/webapp/WEB-INF/keycloak.json
+>>>>>>> OC-11521: Web moved to the parent branch and working
 .DS_Store
 catalina.home_IS_UNDEFINED/
 

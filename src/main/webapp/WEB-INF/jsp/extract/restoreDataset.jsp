@@ -2,15 +2,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/extract/restoreDataset.jsp
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-=======
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
->>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/extract/restoreDataset.jsp
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/extract-header.jsp"/>

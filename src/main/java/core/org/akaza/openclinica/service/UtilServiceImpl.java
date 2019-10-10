@@ -12,7 +12,7 @@ import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.dbcp2.BasicDataSource;

@@ -6,7 +6,6 @@ public class XformItem {
     String itemPath = null;
     String itemName = null;
     String itemDescription = null;
-    String itemBriefDescription = null;
     String itemGroup = null;
     String itemResponseType = null;
     String itemDataType = null;
@@ -167,11 +166,4 @@ public class XformItem {
         this.mediaType = mediaType;
     }
 
-    public String getItemBriefDescription() {
-        return itemBriefDescription;
-    }
-
-    public void setItemBriefDescription(String itemBriefDescription) {
-        this.itemBriefDescription = itemBriefDescription;
-    }
 }

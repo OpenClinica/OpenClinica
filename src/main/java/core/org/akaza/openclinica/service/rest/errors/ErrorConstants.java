@@ -79,8 +79,6 @@ public class ErrorConstants {
     public static final String ERR_ITEM_OID ="errorCode.ItemOIDValidationFailed";
     public static final String ERR_ITEM_GROUP_OID ="errorCode.ItemGroupOIDValidationFailed";
 
-    public static final String ERR_ENKETO_CLIENT = "errorCode.enketoClient";
-    public static final String ERR_ENKETO_SERVER = "errorCode.enketoServer";
 
 
 

@@ -16,7 +16,6 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.authorization.client.AuthzClient;
-import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
@@ -38,8 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-@Service("keycloakClientImpl")
+@Service
 public class KeycloakClientImpl {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private static final String USER_UUID_ATTRIBUTE = "ocUserUuid";
@@ -173,7 +171,7 @@ public class KeycloakClientImpl {
 
         String realm = getRealmName(accessToken, customerUuid);
 
-        AuthzClient authzClient = AuthzClient.create(core.org.akaza.openclinica.dao.core.CoreResources.getKeyCloakConfig());
+        AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
         String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
 
         String usersUrlPath = USERS_PATH.format(new String[]{realm});

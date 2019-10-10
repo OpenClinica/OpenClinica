@@ -12,12 +12,12 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-        "queries",
+        "core/queries",
     "logs"
 })
 public class QueriesBean {
 
-    @JsonProperty("queries")
+    @JsonProperty("core/queries")
     private List<QueryBean> queries = new ArrayList<QueryBean>();
     @JsonProperty("logs")
     private List<LogBean> logs = new ArrayList<LogBean>();
@@ -29,7 +29,7 @@ public class QueriesBean {
      * @return
      *     The queries
      */
-    @JsonProperty("queries")
+    @JsonProperty("core/queries")
     public List<QueryBean> getQueries() {
         return queries;
     }
@@ -39,7 +39,7 @@ public class QueriesBean {
      * @param queries
      *     The queries
      */
-    @JsonProperty("queries")
+    @JsonProperty("core/queries")
     public void setQueries(List<QueryBean> queries) {
         this.queries = queries;
     }

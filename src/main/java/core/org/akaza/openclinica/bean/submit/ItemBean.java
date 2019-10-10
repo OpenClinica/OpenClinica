@@ -22,7 +22,6 @@ import java.util.ArrayList;
  */
 public class ItemBean extends AuditableEntityBean implements Comparable {
     private String description = "";
-    private String briefDescription = "";
 
     private String units = "";
 
@@ -417,13 +416,5 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 
     public void setDefId(int defId) {
         this.defId = defId;
-    }
-
-    public String getBriefDescription() {
-        return briefDescription;
-    }
-
-    public void setBriefDescription(String briefDescription) {
-        this.briefDescription = briefDescription;
     }
 }

@@ -25,9 +25,7 @@ import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.ValidateService;
-import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.akaza.openclinica.service.UserService;
+import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +44,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-import static org.akaza.openclinica.service.UserService.BULK_JOBS;
-import static org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
+import static core.org.akaza.openclinica.service.UserService.BULK_JOBS;
+import static core.org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
 
 @Service("ParticipantService")
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
@@ -221,7 +219,8 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
             if (study == null) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier", "The study identifier you provided is not valid.");
             }
-                       
+            checkStudyOrSiteStatus(study);
+            
             StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
             if (studyLevelRole == null) {
                 throw new OpenClinicaSystemException("errorCode.noRoleSetUp",
@@ -238,12 +237,14 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier",
                         "The study identifier you provided is not valid.");
             }
-                      
+            checkStudyOrSiteStatus(study);
+            
             if (site == null || site.getParentStudyId() != study.getId()) {
                 throw new OpenClinicaSystemException("errorCode.invalidSiteIdentifier",
                         "The site identifier you provided is not valid.");
             }
-                      
+            checkStudyOrSiteStatus(site);
+            
             /**
              * check study level
              */
@@ -269,6 +270,52 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         return study;
         
     }
+
+	/**
+	  * OC-11162
+	  * AC1: When bulk add participant API is called for a study OID which is either in Design, Frozen or Locked status then 
+	  * instead of starting the process, system should return an errorcode.studyNotAvailable.
+	  * AC2: When bulk add participant API is called for a site OID which is either in Design, Frozen or Locked status then 
+	  * instead of starting the process, system should return an errorcode.siteNotAvailable.
+	 * @param study
+	 * @throws OpenClinicaSystemException
+	 */
+	private void checkStudyOrSiteStatus(StudyBean study) throws OpenClinicaSystemException {
+		
+		int parentStudyId = study.getParentStudyId();
+		String errorCode=null;
+		String msg = null;
+		boolean isNotAvailableStatus = false;
+		
+		// site
+		if(parentStudyId > 0) {
+			errorCode = "errorCode.siteNotAvailable"; 
+			msg = "The site is not available,";
+		}else {
+			errorCode = "errorCode.studyNotAvailable"; 
+			msg = "The study is not available,";
+		}
+		
+		String studyStatus = study.getStatus().getName().toString().toLowerCase();
+		if(studyStatus != null ) {
+			if(studyStatus.equals("design")) {
+				isNotAvailableStatus = true;				
+				msg = msg + "it is in design status.";
+			}else if(studyStatus.equals("locked")) {
+				isNotAvailableStatus = true;				
+				msg = msg + "it is in locked status.";
+			}else if(studyStatus.equals("frozen")) {
+				isNotAvailableStatus = true;				
+				msg = msg + "it is in frozen status.";
+			}
+			if(isNotAvailableStatus) {
+				throw new OpenClinicaSystemException(errorCode, msg);
+			}
+			
+		}
+	}
+    
+           
 
     
     /**

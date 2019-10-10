@@ -2,11 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/extract/generateMetadataCore.jsp
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-=======
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
->>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/extract/generateMetadataCore.jsp
 
 <jsp:useBean scope="request" id="dataset" class="core.org.akaza.openclinica.bean.extract.DatasetBean"/>
 <jsp:useBean scope="request" id="file" class="core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean"/>

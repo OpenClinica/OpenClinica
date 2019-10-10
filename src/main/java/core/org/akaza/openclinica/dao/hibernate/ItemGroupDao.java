@@ -35,14 +35,6 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
         return (ItemGroup) q.uniqueResult();
     }
 
-    public ItemGroup findByOcOIDCrfId(String OCOID, CrfBean crf) {
-        getSessionFactory().getStatistics().logSummary();
-        String query = "from " + getDomainClassName() + " do  where do.ocOid = :OCOID and do.crf = :crf";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setString("OCOID", OCOID);
-        q.setEntity("crf", crf);
-        return (ItemGroup) q.uniqueResult();
-    }
     public ItemGroup findByCrfAndGroupLayout(CrfBean crf, String layout) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.crf = :crf and do.layoutGroupPath = :layout ";
