@@ -14,12 +14,14 @@ import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -38,9 +40,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import javax.ws.rs.DefaultValue;
@@ -86,6 +90,8 @@ public class StudyParticipantController {
 
 	@Autowired
 	private StudyDao studyDao;
+	@Autowired
+	private StudySubjectDao studySubjectDao;
 
 	private StudyDAO studyDAO;
 	private StudySubjectDAO ssDao;
@@ -93,6 +99,9 @@ public class StudyParticipantController {
 
 	@Autowired
 	private StudyParticipantService studyParticipantService;
+		 
+    @Autowired
+    PermissionService permissionService;
 
 	private RestfulServiceHelper serviceHelper;
 	private String dateFormat;
@@ -515,41 +524,83 @@ public class StudyParticipantController {
 		return jobDetail.getUuid();
 	}
 	
-	@RequestMapping(value = "/pdf/print/{studyOID}/{studySubjectIdentifier}", method = RequestMethod.GET)
-	public ResponseEntity<InputStreamResource> getCaseBookInPDF(@PathVariable("studyOID") String studyOID,
-			 @PathVariable("studySubjectIdentifier") String studySubjectIdentifier, 
-             @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-             @Context HttpServletRequest request, 
-             @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
-             @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
-             @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
-             @QueryParam("showArchived") String showArchived ,
-             @DefaultValue("n") @QueryParam("crossFormLogic") String crossFormLogic,
-             @DefaultValue("n") @QueryParam("links")String links) throws IOException {
-	 
-			 	  
-		 	  utilService.setSchemaFromStudyOid(studyOID);
-		 	  String fileName = null;
-		 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-		 	  String userAccountID = userAccountBean.getId() +"";
-		 	  File pdfFile = this.studyParticipantService.getCaseBookPDF(studyOID, studySubjectIdentifier, includeDns, includeAudits, request, userAccountID, clinicaldata, includeMetadata, clinicalData, showArchived, crossFormLogic, links);
-		 	  fileName = pdfFile.getName();
-		      ClassPathResource pdfFileForDownLoad = new ClassPathResource("downloads/" + fileName);
-		     
-			  HttpHeaders headers = new HttpHeaders();
-			  headers.setContentType(MediaType.parseMediaType("application/pdf"));
-			  headers.add("Access-Control-Allow-Origin", "*");
-			  headers.add("Access-Control-Allow-Methods", "GET, POST, PUT");
-			  headers.add("Access-Control-Allow-Headers", "Content-Type");
-			  headers.add("Content-Disposition", "filename=" + fileName);
-			  headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-			  headers.add("Pragma", "no-cache");
-			  headers.add("Expires", "0");
-			 
-			  headers.setContentLength(pdfFileForDownLoad.contentLength());
-			  ResponseEntity<InputStreamResource> response = new ResponseEntity<InputStreamResource>(
-			    new InputStreamResource(pdfFileForDownLoad.getInputStream()), headers, HttpStatus.OK);
-			  return response;
-		 
+	@ApiOperation(value = "To get PDF version casebook for one specific participant",  notes = "only work for authorized users with the right acecss permission ")
+	@RequestMapping(value = "/pdf/print/{studyOid}/{studySubjectIdentifier}", method = RequestMethod.POST)
+	public ResponseEntity<Object> getCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
+												   @PathVariable("studySubjectIdentifier") String studySubjectIdentifier, 
+												   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
+										           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
+										           @ApiParam( value = "optional parameter landscape whether paper orientation is landscape. Valid values are true, false. Default is false.", required = false ) @RequestParam(value="landscape",defaultValue = "false",required = false) String landscape,
+										           @Context HttpServletRequest request
+										          ) throws IOException {
+											 
+		
+		  utilService.setSchemaFromStudyOid(studyOid);		 	  
+	 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+	 	  String siteOid = null;
+	 	  
+		  try {				 
+			  validateService.validateStudyAndRoles(studyOid,userAccountBean);			 	 			 	 		 	 
+		 	  String uuid = startBulkCaseBookPDFJob(studyOid,siteOid, studySubjectIdentifier, request, userAccountBean, format, margin, landscape);
+
+			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
+			  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+		  
+			  } catch (OpenClinicaSystemException e) {
+					return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+			}
+		 	 
 		 }
+
+	@Transactional
+	private String startBulkCaseBookPDFJob(String studyOid,
+											String siteOid, 
+											String studySubjectIdentifier, 											 
+											HttpServletRequest request,
+											UserAccountBean userAccountBean, 
+											String format, 
+											String margin, 
+											String landscape) {
+									 	 
+
+		    Study site = null;
+		    Study study = null;
+		    if(siteOid !=null) {
+		    	site = studyDao.findByOcOID(siteOid);
+		    }
+			if(studyOid != null) {
+				study = studyDao.findByOcOID(studyOid);
+			}
+			
+			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
+			//currently studySubjectIdentifier is OID
+			StudySubject ss = studySubjectDao.findByOcOID(studySubjectIdentifier);
+			String participantId = ss.getLabel();
+			//Setting the destination file
+	        String fullFinalFilePathName = this.studyParticipantService.getMergedPDFcasebookFileName(studyOid, participantId);
+	        int index= fullFinalFilePathName.lastIndexOf("\\");
+	    	String fileName = fullFinalFilePathName.substring(index + 1);
+	    	
+			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.PARTICIPANT_PDF_CASEBOOK, fileName);
+			jobDetail.setLogPath(fileName);
+			ServletContext servletContext = request.getServletContext();
+			String accessToken = (String) request.getSession().getAttribute("accessToken");
+			servletContext.setAttribute("accessToken", accessToken);
+			servletContext.setAttribute("studyID", study.getStudyId()+"");
+			List<String> permissionTagsString =permissionService.getPermissionTagsList((StudyBean)request.getSession().getAttribute("study"),request);
+			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+				try {
+					 String userAccountID = userAccountBean.getId() +"";
+					 File pdfFile = this.studyParticipantService.startCaseBookPDFJob(jobDetail,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+				 	
+					} catch (Exception e) {
+						logger.error("Exception is thrown while processing CaseBook PDF: " + e);
+						return e.getMessage();
+					}
+				return null;
+
+			});
+			return jobDetail.getUuid();
+	
+	}
 }
