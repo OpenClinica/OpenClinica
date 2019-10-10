@@ -166,7 +166,7 @@ public class QueryServiceImpl implements QueryService {
         }
     }
 
-    private DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) throws Exception {
+    public DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) throws Exception {
         DiscrepancyNote dn = new DiscrepancyNote();
         dn.setStudy(helperBean.getContainer().getStudy());
         dn.setEntityType("itemData");
@@ -297,7 +297,7 @@ public class QueryServiceImpl implements QueryService {
         return childDiscrepancyNotes;
     }
 
-    private void saveQueryItemDatamap(QueryServiceHelperBean helperBean) {
+    public void saveQueryItemDatamap(QueryServiceHelperBean helperBean) {
         // Create Mapping for new Discrepancy Note
         DnItemDataMapId dnItemDataMapId = new DnItemDataMapId();
         dnItemDataMapId.setDiscrepancyNoteId(helperBean.getDn().getDiscrepancyNoteId());

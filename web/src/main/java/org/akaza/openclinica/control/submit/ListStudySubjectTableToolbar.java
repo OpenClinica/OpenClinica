@@ -120,27 +120,21 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
          *      java.util.Locale)
          */
         String getIndexes() {
-            int siteIdColumn = 1;
-            int statusColumn = 2;
-            int oidColumn = 3;
-            int participantStatusColumn = 4;
+
             int itemsColumnCount=0;
 
-            String[] tableColumns = viewStudySubjectService.getTableColumns();
+            String[] tableColumns = viewStudySubjectService.getTableColumns(ListStudySubjectTableFactory.PAGE_NAME,ListStudySubjectTableFactory.COMPONENT_NAME);
             if (tableColumns != null) {
                 for (String column : tableColumns) {
                     if (permissionService.isUserHasPermission(column, request, studyBean)) {
                         itemsColumnCount++;
                     }
                 }
-                statusColumn = itemsColumnCount + 2;
-                oidColumn = itemsColumnCount + 3;
-                participantStatusColumn = itemsColumnCount + 4;
             }
 
-            String result = String.valueOf(siteIdColumn) + "," + String.valueOf(statusColumn)+ "," + String.valueOf(oidColumn);
+            String result = String.valueOf(1) + "," + String.valueOf(itemsColumnCount+2)+ "," + String.valueOf(itemsColumnCount+3);
             if (participateModuleStatus.equals(ENABLED))
-                result = result + "," + String.valueOf(participantStatusColumn);
+                result = result + "," + String.valueOf(itemsColumnCount+4);
 
             return result;
         }

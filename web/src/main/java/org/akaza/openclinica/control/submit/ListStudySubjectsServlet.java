@@ -66,6 +66,7 @@ public class ListStudySubjectsServlet extends SecureController {
     private CrfDao crfDao;
     private CrfVersionDao crfVersionDao;
     private EventDefinitionCrfDao eventDefinitionCrfDao;
+    private StudyEventDefinitionDao studyEventDefinitionHibDao;
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
 
     Locale locale;
@@ -189,6 +190,7 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setEventDefinitionCrfDao(getEventDefinitionCrfDao());
         factory.setItemFormMetadataDao(getItemFormMetadataDao());
         factory.setPermissionTagDao(getPermissionTagDao());
+        factory.setStudyEventDefinitionHibDao(getStudyEventDefinitionHibDao());
 
         List<Component> components = getViewStudySubjectService().getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
         if (components != null) {
@@ -325,5 +327,10 @@ public class ListStudySubjectsServlet extends SecureController {
 
     public PermissionService getPermissionService() {
         return permissionService= (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+    }
+
+    public StudyEventDefinitionDao getStudyEventDefinitionHibDao() {
+        return studyEventDefinitionHibDao= (StudyEventDefinitionDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefDaoDomain");
+
     }
 }

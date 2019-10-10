@@ -4,13 +4,8 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,11 +14,7 @@ import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -34,10 +25,11 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.core.util.Pair;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -55,10 +47,13 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -75,6 +70,17 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     public static String CONTENT_DISPOSITION_VALUE = "attachment; filename=";
     private Map<String, String> discrepancyNoteTypesDecoder = makeDiscrepancyNoteTypesDecoder();
     private Map<String, String> resolutionStatusDecoder = makeResolutionStatusDecoder();
+    private ViewStudySubjectService viewStudySubjectService;
+    private PermissionService  permissionService;
+    private ItemDataDao itemDataDao;
+    private ItemDao itemDao;
+    private ItemFormMetadataDao itemFormMetadataDao;
+    private StudyEventDao studyEventDao;
+    private CrfDao crfDao;
+    private CrfVersionDao crfVersionDao;
+    private EventDefinitionCrfDao eventDefinitionCrfDao;
+    private EventDefinitionCrfPermissionTagDao permissionTagDao;
+    private StudyEventDefinitionDao studyEventDefinitionDao;
 
     /* Handle the HTTP Get or Post request. */
     @Override
@@ -137,6 +143,39 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(getFilters(request), getDateFormat(), discrepancyNoteTypesDecoder,
                 resolutionStatusDecoder);
         List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(currentStudy, filter, ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)), getPermissionTagsList());
+
+
+        ListNotesTableFactory factory = new ListNotesTableFactory(true, getPermissionTagsList());
+        factory.setPermissionService(getPermissionService());
+        factory.setViewStudySubjectService(getViewStudySubjectService());
+        factory.setItemDao(getItemDao());
+        factory.setItemDataDao(getItemDataDao());
+        factory.setCrfDao(getCrfDao());
+        factory.setCrfVersionDao(getCrfVersionDao());
+        factory.setStudyEventDao(getStudyEventDao());
+        factory.setItemFormMetadataDao(getItemFormMetadataDao());
+        factory.setEventDefinitionCrfDao(getEventDefinitionCrfDao());
+        factory.setPermissionTagDao(getPermissionTagDao());
+        factory.setStudyEventDefinitionHibDao(getStudyEventDefinitionDao());
+
+        int columnCount = factory.getNetCountCustomColumns(currentStudy, request);
+        for (DiscrepancyNoteBean note : notes) {
+            if (note.getEntityType().equals(ListNotesTableFactory.ITEM_DATA)) {
+                note.setCustomColumns(factory.getCustomColumns(note, currentStudy, request));
+            } else if (note.getEntityType().equals(ListNotesTableFactory.STUDY_EVENT)) {
+                List<CustomColumn> customColumns = new ArrayList<>();
+                for (int i = 0; i < columnCount; i++) {
+                    CustomColumn customColumn = new CustomColumn();
+                    customColumns.add(customColumn);
+                }
+                note.setCustomColumns(customColumns);
+            }
+
+        }
+
+
+
+
         ArrayList<DiscrepancyNoteBean> allDiscNotes = notes instanceof ArrayList ? (ArrayList<DiscrepancyNoteBean>) notes
                 : new ArrayList<DiscrepancyNoteBean>(notes);
 
@@ -503,6 +542,48 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
-
     }
+
+
+
+    public ViewStudySubjectService getViewStudySubjectService() {
+        return viewStudySubjectService= (ViewStudySubjectService) SpringServletAccess.getApplicationContext(context).getBean("viewStudySubjectService");
+    }
+    public PermissionService getPermissionService() {
+        return permissionService= (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+    }
+    public ItemDataDao getItemDataDao() {
+        return itemDataDao=(ItemDataDao) SpringServletAccess.getApplicationContext(context).getBean("itemDataDao");
+    }
+
+    public CrfDao getCrfDao() {
+        return crfDao=(CrfDao) SpringServletAccess.getApplicationContext(context).getBean("crfDao");
+    }
+
+    public CrfVersionDao getCrfVersionDao() {
+        return crfVersionDao=(CrfVersionDao) SpringServletAccess.getApplicationContext(context).getBean("crfVersionDao");
+    }
+
+    public StudyEventDao getStudyEventDao() {
+        return studyEventDao=(StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
+    }
+
+    public ItemFormMetadataDao getItemFormMetadataDao() {
+        return itemFormMetadataDao=(ItemFormMetadataDao) SpringServletAccess.getApplicationContext(context).getBean("itemFormMetadataDao");
+    }
+
+    public EventDefinitionCrfDao getEventDefinitionCrfDao() {
+        return eventDefinitionCrfDao=(EventDefinitionCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfDao");
+    }
+    public EventDefinitionCrfPermissionTagDao getPermissionTagDao() {
+        return permissionTagDao=(EventDefinitionCrfPermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfPermissionTagDao");
+    }
+
+    public ItemDao getItemDao() {
+        return itemDao=(ItemDao) SpringServletAccess.getApplicationContext(context).getBean("itemDao");
+    }
+    public StudyEventDefinitionDao getStudyEventDefinitionDao() {
+        return studyEventDefinitionDao= (StudyEventDefinitionDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefDaoDomain");
+    }
+
 }

@@ -179,5 +179,6 @@ public class ErrorConstants {
     public static final String ERR_MULTIPLE_LAST_NAME_HEADERS = "errorCode.multipleLastNameHeaders";
     public static final String ERR_MULTIPLE_EMAIL_ADDRESS_HEADERS = "errorCode.multipleEmailAddressHeaders";
     public static final String ERR_MULTIPLE_MOBILE_PHONE_HEADERS = "errorCode.multipleMobilePhoneHeaders";
+	public static final String ERR_IMPORT_XML_QUERY_CREAT_FAILED = "errorCode.importXMLcreateQueryFailed";
 
 }

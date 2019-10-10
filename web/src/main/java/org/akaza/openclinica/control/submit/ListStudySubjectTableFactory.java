@@ -76,7 +76,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ViewStudySubjectService viewStudySubjectService;
     private PermissionService permissionService;
     public static final String PAGE_NAME = "participant-matrix";
-    public static final String  PARTICIPANT_MATRIX_TABLE="participant-matrix-table";
+    public static final String  COMPONENT_NAME="participant-matrix-table";
     public static final String DOT = ".";
 
     private static final String CHECKBOX = "checkbox";
@@ -95,6 +95,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private CrfVersionDao crfVersionDao;
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
+    private StudyEventDefinitionDao studyEventDefinitionHibDao;
     List<String> permissionTagsList = null;
     private final String  PARTICIPATE_STATUS="participate.status";
 
@@ -105,6 +106,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
         locale = LocaleResolver.getLocale(request);
         session = request.getSession();
+        this.request=request;
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         // https://jira.openclinica.com/browse/OC-9952
@@ -173,7 +175,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         EventDefinitionCrf eventDefCrf = null;
 
 
-        String[] tableColumns = getViewStudySubjectService().getTableColumns();
+        String[] tableColumns = getViewStudySubjectService().getTableColumns(ListStudySubjectTableFactory.PAGE_NAME,ListStudySubjectTableFactory.COMPONENT_NAME);
         if (tableColumns != null) {
             for (String column : tableColumns) {
                 if (permissionService.isUserHasPermission(column, request, studyBean)) {
@@ -306,65 +308,93 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 
 
-                        String [] tableColumns= getViewStudySubjectService().getTableColumns();
-                        if(tableColumns!=null){
-                            for (String column : tableColumns) {
-                            if (permissionService.isUserHasPermission(column, request, studyBean)) {
-                                String sedOid = column.split("\\.")[0];
-                                String formOid = column.split("\\.")[1];
-                                String itemOid = column.split("\\.")[2];
-                                    //Get Item Value from database
-                                    StudyEventDefinition studyEventDefinition = null;
-                                    StudyEvent studyEvent = null;
-                                    ItemData itemData = null;
-                                    Item item = null;
-                                    List<EventCrf> eventCrfs = null;
-                                    String itemValue = null;
+                        String [] tableColumns= getViewStudySubjectService().getTableColumns(PAGE_NAME,COMPONENT_NAME);
+            if (tableColumns != null) {
+                for (String column : tableColumns) {
+                    String itemValue = null;
+                    if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                        String sedOid = column.split("\\.")[0];
+                        String formOid = column.split("\\.")[1];
+                        String itemOid = column.split("\\.")[2];
+                        //Get Item Value from database
+                        StudyEventDefinition studyEventDefinition = null;
+                        List<StudyEvent> studyEvents = null;
+                        StudyEvent studyEvent = null;
+                        List<EventCrf> eventCrfs = null;
+                        EventCrf eventCrf = null;
+                        List<ItemData> itemDatas = null;
+                        ItemData itemData = null;
+                        Item item = null;
 
-                                    if (!StringUtils.isEmpty(sedOid))
-                                        studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(sedOid, 1, studySubjectBean.getId());
-                                    if (!StringUtils.isEmpty(itemOid))
-                                        item = itemDao.findByOcOID(itemOid);
-                                    CrfBean crf = crfDao.findByOcOID(formOid);
-                                    if (studyEvent != null) {
-                                        eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubjectBean.getId(), crf.getCrfId());
-                                        if (item != null && (eventCrfs != null && eventCrfs.size() != 0)) { // non-repeating group, group ordinal=1
-                                            itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrfs.get(0).getEventCrfId(), 1);
-                                        }
-                                        if (itemData != null && !StringUtils.isEmpty(itemData.getValue())) {
-                                            itemValue = itemData.getValue();
-                                            List<CrfVersion> crfVersions = crfVersionDao.findAllByCrfId(crf.getCrfId());
-                                            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersions.get(0).getCrfVersionId());
-                                            ResponseSet responseSet = itemFormMetadata.getResponseSet();
-                                            String responseType = responseSet.getResponseType().getName();
+                        if (!StringUtils.isEmpty(sedOid)) {
+                            studyEventDefinition = studyEventDefinitionHibDao.findByOcOID(sedOid);
+                            if (studyEventDefinition != null && !studyEventDefinition.getRepeating()) {
+                                studyEvents = studyEventDao.fetchListByStudyEventDefOID(sedOid, studySubjectBean.getId());
 
-                                            if (responseType.equals(CHECKBOX) || responseType.equals(MULTI_SELECT) || responseType.equals(RADIO) || responseType.equals(SINGLE_SELECT)) {
-                                                List<String> itemValues = Arrays.asList(itemData.getValue().split("\\s*,\\s*"));
-                                                String[] optionValues = responseSet.getOptionsValues().split("\\s*,\\s*");
-                                                String[] optionTexts = responseSet.getOptionsText().split("\\s*,\\s*");
-                                                String output = null;
-                                                for (int i = 0; i < optionValues.length; i++) {
-                                                    for (String value : itemValues) {
-                                                        if (optionValues[i].equals(value)) {
-                                                            if (output == null) {
-                                                                output = optionTexts[i];
-                                                            } else {
-                                                                output = output + "," + optionTexts[i];
-                                                            }
+                                if (studyEvents != null) {
+                                    for (StudyEvent se : studyEvents) {
+                                        eventCrfs = se.getEventCrfs();
+                                        if (eventCrfs != null) {
+                                            CrfBean crf = crfDao.findByOcOID(formOid);
+                                            for (EventCrf ec : eventCrfs) {
+                                                if (ec.getCrfVersion().getCrf().getCrfId() == crf.getCrfId()) {
+                                                    eventCrf = ec;
+                                                    break;
+                                                }
+                                            }
+
+
+                                            if (eventCrf != null) {
+                                                itemDatas = eventCrf.getItemDatas();
+                                                if (!StringUtils.isEmpty(itemOid))
+                                                    item = itemDao.findByOcOID(itemOid);
+                                                if (itemDatas != null) {
+                                                    for (ItemData id : itemDatas) {
+                                                        if (id.getItem().getItemId() == item.getItemId()
+                                                                && id.getOrdinal() == 1) {
+                                                            itemData = id;
                                                             break;
                                                         }
                                                     }
+
+                                                    if (itemData != null && !StringUtils.isEmpty(itemData.getValue())) {
+                                                        itemValue = itemData.getValue();
+                                                        List<CrfVersion> crfVersions = crfVersionDao.findAllByCrfId(crf.getCrfId());
+                                                        ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersions.get(0).getCrfVersionId());
+                                                        ResponseSet responseSet = itemFormMetadata.getResponseSet();
+                                                        String responseType = responseSet.getResponseType().getName();
+
+                                                        if (responseType.equals(CHECKBOX) || responseType.equals(MULTI_SELECT) || responseType.equals(RADIO) || responseType.equals(SINGLE_SELECT)) {
+                                                            List<String> itemValues = Arrays.asList(itemData.getValue().split("\\s*,\\s*"));
+                                                            String[] optionValues = responseSet.getOptionsValues().split("\\s*,\\s*");
+                                                            String[] optionTexts = responseSet.getOptionsText().split("\\s*,\\s*");
+                                                            String output = null;
+                                                            for (int i = 0; i < optionValues.length; i++) {
+                                                                for (String value : itemValues) {
+                                                                    if (optionValues[i].equals(value)) {
+                                                                        if (output == null) {
+                                                                            output = optionTexts[i];
+                                                                        } else {
+                                                                            output = output + "," + optionTexts[i];
+                                                                        }
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }
+                                                            itemValue = output;
+                                                        }
+                                                    }
                                                 }
-                                                itemValue = output;
                                             }
                                         }
                                     }
-                                    theItem.put(column, itemValue);
+                                }
                             }
                         }
                     }
-
-
+                    theItem.put(column, itemValue);
+                }
+            }
 
 
             theItem.put("studySubject.oid", studySubjectBean.getOid());
@@ -497,7 +527,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("enrolledAt");
 
 
-            String [] tableColumns= getViewStudySubjectService().getTableColumns();
+            String [] tableColumns= getViewStudySubjectService().getTableColumns(PAGE_NAME,COMPONENT_NAME);
                     if(tableColumns!=null){
                     for (String column : tableColumns) {
                         if (permissionService.isUserHasPermission(column, request, studyBean)) {
@@ -1733,9 +1763,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         this.crfDao = crfDao;
     }
 
-    public void setStudyEventDefinitionDAO(StudyEventDefinitionDAO studyEventDefinitionDAO) {
-        this.studyEventDefinitionDao = studyEventDefinitionDAO;
-    }
 
     public void setCrfVersionDao(CrfVersionDao crfVersionDao) {
         this.crfVersionDao = crfVersionDao;
@@ -1743,6 +1770,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     public void setEventDefinitionCrfDao(EventDefinitionCrfDao eventDefinitionCrfDao) {
         this.eventDefinitionCrfDao = eventDefinitionCrfDao;
+    }
+
+    public void setStudyEventDefinitionHibDao(StudyEventDefinitionDao studyEventDefinitionHibDao) {
+        this.studyEventDefinitionHibDao = studyEventDefinitionHibDao;
     }
 
     public void setPermissionTagDao(EventDefinitionCrfPermissionTagDao permissionTagDao) {
