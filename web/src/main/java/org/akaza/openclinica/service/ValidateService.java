@@ -11,6 +11,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,7 @@ public interface ValidateService {
 
     boolean isUserHasAccessToSite(List<StudyUserRoleBean> userRoles, String siteOid);
 
+    boolean isUserSystemUser(HttpServletRequest request);
 
     boolean isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(List<StudyUserRoleBean> userRoles, String siteOid);
 

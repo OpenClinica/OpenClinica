@@ -127,8 +127,8 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
             String js =
                 "var selectedValue = document.getElementById('sedDropDown').options[document.getElementById('sedDropDown').selectedIndex].value;"
                     + " var maxrows = $('select[name=maxRows]').val();"
-                    + " if (selectedValue != null && selectedValue != 0 ) {window.location='ListEventsForSubjects?module=submit&defId=' + selectedValue + '&findSubjects_mr_=' + maxrows + '&maxrows=' + maxrows;}"
-                    + " if (selectedValue != null && selectedValue == 0 ) {window.location='ListStudySubjects?listEventsForSubject_mr_=' + maxrows + '&maxrows=' + maxrows;}";
+                    + " if (selectedValue != null && selectedValue != 0 ) {window.location='ListEventsForSubjects?module=submit&defId=' + selectedValue + '&listEventsForSubject_mr_=' + maxrows + '&maxrows=' + maxrows;}"
+                    + " if (selectedValue != null && selectedValue == 0 ) {window.location='ListStudySubjects?findSubjects_mr_=' + maxrows + '&maxrows=' + maxrows;}";
             HtmlBuilder html = new HtmlBuilder();
             html.append(resword.getString("events")+": ");
             html.select().id("sedDropDown").onchange(js).close();

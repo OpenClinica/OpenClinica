@@ -29,6 +29,7 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.NotificationService;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
@@ -48,7 +49,8 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 
 	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,
 						 BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib,
-						 StudyEventChangeDetails changeDetails, Integer userId , JavaMailSenderImpl mailSender, NotificationService notificationService)
+						 StudyEventChangeDetails changeDetails, Integer userId , JavaMailSenderImpl mailSender, NotificationService notificationService,
+						 KeycloakClientImpl keycloakClientImpl)
 	{
         for (RuleSetBean ruleSet : ruleSets)
         {
@@ -95,7 +97,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                        		beanPropertyService.runAction(ruleActionBean,eow,userId,changeDetails.getRunningInTransaction());
 	                        	}else if (ruleActionBean instanceof NotificationActionBean){
 									notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule);
-                                    notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(),eventOrdinal,notificationService);
+                                    notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(),eventOrdinal,notificationService, keycloakClientImpl);
 	                        	}                	
 	                        }
 	                    }catch (OpenClinicaSystemException osa) {
