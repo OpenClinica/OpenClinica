@@ -230,7 +230,7 @@ public class CoreResources implements InitializingBean {
         setDataInfoVals();
         if (DATAINFO.getProperty("filePath") == null || DATAINFO.getProperty("filePath").length() <= 0)
             DATAINFO.setProperty("filePath", filePath);
-        DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
+        DATAINFO.setProperty("changeLogFile", "migration/master.xml");
         // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);
