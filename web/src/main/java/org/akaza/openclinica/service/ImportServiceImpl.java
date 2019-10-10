@@ -113,11 +113,7 @@ public class ImportServiceImpl implements ImportService {
 
     @Autowired
     OpenRosaSubmissionController openRosaSubmissionController;
-    
-    @Autowired
-    @Qualifier( "dataSource" )
-    private BasicDataSource dataSource;
-
+       
     @Autowired
     QueryService queryService;
     
