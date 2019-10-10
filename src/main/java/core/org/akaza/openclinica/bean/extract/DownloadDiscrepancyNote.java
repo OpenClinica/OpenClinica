@@ -12,7 +12,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import core.org.akaza.openclinica.bean.core.EntityBean;
-import core.org.akaza.openclinica.bean.managestudy.CustomColumn;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.service.DiscrepancyNoteThread;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
@@ -29,7 +28,6 @@ import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Table;
 import com.lowagie.text.pdf.PdfWriter;
-
 
 /**
  *  This class converts or serializes DiscrepancyNoteBeans to Strings or iText-related
@@ -56,7 +54,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     private final boolean firstColumnHeaderLine;
     //A list of DiscrepancyNoteBeans to be downloaded together
     private final List<DiscrepancyNoteBean> discrepancyBeanList =
-            new ArrayList<DiscrepancyNoteBean>();
+      new ArrayList<DiscrepancyNoteBean>();
 
     public DownloadDiscrepancyNote() {
         this.firstColumnHeaderLine = false;
@@ -70,9 +68,9 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                          String format,
                          OutputStream stream) {
         if(bean == null || stream == null ||
-                !( bean instanceof DiscrepancyNoteBean)){
+          !( bean instanceof core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean)){
             throw new IllegalStateException(
-                    "An invalid parameter was passed to the DownloadDiscrepancyNote.downLoad method.");
+              "An invalid parameter was passed to the DownloadDiscrepancyNote.downLoad method.");
         }
         DiscrepancyNoteBean discNBean = (DiscrepancyNoteBean) bean;
         //This must be a ServletOutputStream for our purposes
@@ -169,7 +167,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         int count = 0;
         int threadCount = 1;
         for(DiscrepancyNoteThread discrepancyNoteThread : threadBeans)  {
-            for(DiscrepancyNoteBean discNoteBean : discrepancyNoteThread.getLinkedNoteList()) {
+           for(DiscrepancyNoteBean discNoteBean : discrepancyNoteThread.getLinkedNoteList()) {
                 //DiscrepancyNoteBean discNoteBean = discrepancyNoteThread.getLinkedNoteList().getFirst();
                 ++count;
                 //Only count the byte length of a CSV header row for the first DNote; we're only
@@ -205,13 +203,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(",");
             writer.append("Study/Site OID");
             writer.append(",");
-
-            if(discNoteBean.getCustomColumns()!=null) {
-                for(CustomColumn customColumn:discNoteBean.getCustomColumns()) {
-                    writer.append(customColumn.getDescription());
-                    writer.append(",");
-                }
-            }
             //we're adding a thread number row
             writer.append("Thread ID");
             writer.append(",");
@@ -284,15 +275,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         writer.append(escapeQuotesInCSV(discNoteBean.getStudy().getOid()));
         writer.append(",");
-
-
-        if(discNoteBean.getCustomColumns()!=null) {
-            for(CustomColumn customColumn:discNoteBean.getCustomColumns()) {
-                writer.append(escapeQuotesInCSV(customColumn.getValue()));
-                writer.append(",");
-            }
-        }
-
 
         writer.append(escapeQuotesInCSV(threadNumber+""));
         writer.append(",");
@@ -396,7 +378,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         try {
             PdfWriter.getInstance(pdfDoc,
-                    servletStream);
+              servletStream);
             pdfDoc.open();
             pdfDoc.add(new Paragraph(writer.toString()));
         } catch (DocumentException e) {
@@ -414,7 +396,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         try {
             PdfWriter.getInstance(pdfDoc,
-                    servletStream);
+              servletStream);
             pdfDoc.open();
             pdfDoc.add(new Paragraph(content));
         } catch (DocumentException e) {
@@ -433,15 +415,15 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         try {
             PdfWriter.getInstance(pdfDoc,
-                    servletStream);
+              servletStream);
             pdfDoc.open();
             //Create header for the study identifier or name
             if(studyIdentifier != null)  {
                 HeaderFooter header = new HeaderFooter(
-                        new Phrase("Study Identifier: "+studyIdentifier+" pg."),true);
+                  new Phrase("Study Identifier: "+studyIdentifier+" pg."),true);
                 header.setAlignment(Element.ALIGN_CENTER);
                 Paragraph para = new Paragraph("Study Identifier: "+studyIdentifier,
-                        new Font(Font.HELVETICA, 18, Font.BOLD, new Color(0, 0, 0)));
+                  new Font(Font.HELVETICA, 18, Font.BOLD, new Color(0, 0, 0)));
                 para.setAlignment(Element.ALIGN_CENTER);
                 pdfDoc.setHeader(header);
                 pdfDoc.add(para);
@@ -467,15 +449,15 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         try {
             PdfWriter.getInstance(pdfDoc,
-                    servletStream);
+              servletStream);
             pdfDoc.open();
             //Create header for the study identifier or name
             if(studyIdentifier != null)  {
                 HeaderFooter header = new HeaderFooter(
-                        new Phrase("Study Identifier: "+studyIdentifier+" pg."),true);
+                  new Phrase("Study Identifier: "+studyIdentifier+" pg."),true);
                 header.setAlignment(Element.ALIGN_CENTER);
                 Paragraph para = new Paragraph("Study Identifier: "+studyIdentifier,
-                        new Font(Font.HELVETICA, 18, Font.BOLD, new Color(0, 0, 0)));
+                  new Font(Font.HELVETICA, 18, Font.BOLD, new Color(0, 0, 0)));
                 para.setAlignment(Element.ALIGN_CENTER);
                 pdfDoc.setHeader(header);
                 pdfDoc.add(para);
@@ -483,13 +465,13 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             for(DiscrepancyNoteThread discNoteThread : listOfThreads){
                 pdfDoc.add(this.createTableThreadHeader(discNoteThread));
                 //Just the parent of the thread?  discNoteThread.getLinkedNoteList()
-                for(DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()){
+               for(DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()){
                     //DiscrepancyNoteBean discNoteBean = discNoteThread.getLinkedNoteList().getFirst();
-                    if(discNoteBean.getParentDnId()==0) {
-                        pdfDoc.add(this.createTableFromBean(discNoteBean));
-                        pdfDoc.add(new Paragraph("\n"));
-                    }
-                }
+                   if(discNoteBean.getParentDnId()>0) {
+                       pdfDoc.add(this.createTableFromBean(discNoteBean));
+                       pdfDoc.add(new Paragraph("\n"));
+                   }
+               }
             }
             //pdfDoc.add(new Paragraph(content));
         } catch (DocumentException e) {
@@ -565,14 +547,12 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             for(DiscrepancyNoteThread dnThread : listOfThreadedBeans ) {
                 threadCounter++;
                 for(DiscrepancyNoteBean discNoteBean : dnThread.getLinkedNoteList()){
-                    //DiscrepancyNoteBean discNoteBean = dnThread.getLinkedNoteList().getFirst();
+                   //DiscrepancyNoteBean discNoteBean = dnThread.getLinkedNoteList().getFirst();
                     ++counter;
-                    if(discNoteBean.getParentDnId()==0) {
 
-                        singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter) : serializeToString(discNoteBean, false, threadCounter);
-                        allContent.append(singleBeanContent);
-                    }
-                }
+                    singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter) : serializeToString(discNoteBean, false, threadCounter);
+                    allContent.append(singleBeanContent);
+               }
             }
         }
 
@@ -640,7 +620,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     }
 
     private Table createTableThreadHeader(DiscrepancyNoteThread discNoteThread)
-            throws BadElementException {
+      throws BadElementException {
         Table table = new Table(2);
         table.setTableFitsPage(true);
         table.setCellsFitPage(true);
@@ -671,7 +651,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
             }
             Paragraph para = new Paragraph(content.toString(),
-                    new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0)));
+              new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0)));
             Cell cell = new Cell(para);
             cell.setHeader(true);
             cell.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -685,7 +665,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             table.addCell(cell);
 
             cell = createCell("Study Event",dnBean.getEventName());
-            table.addCell(cell);
+             table.addCell(cell);
 
             //row 2
             cell = createCell("Study Event Date",dnBean.getEventStart()+"");
@@ -704,12 +684,12 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
             //row 3
             cell = createCell("Type",discUtil.getResolutionStatusTypeName(
-                    dnBean.getDiscrepancyNoteTypeId()));
+              dnBean.getDiscrepancyNoteTypeId()));
 
             table.addCell(cell);
 
             cell = createCell("Resolution Status",
-                    latestResolutionStatus);
+              latestResolutionStatus);
 
             table.addCell(cell);
 
@@ -733,7 +713,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             cell = createCell("Query ID", tn);
             cell.setColspan(2);
             table.addCell(cell);
-
+            
         }
 
         return table;
@@ -744,7 +724,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         StringBuilder content = new StringBuilder(propertyName+": ");
         content.append(propertyValue);
         Paragraph para = new Paragraph(content.toString(),
-                new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0)));
+          new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0)));
         return new Cell(para);
     }
 
@@ -755,19 +735,19 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         for(DiscrepancyNoteBean discBean : discNoteThread.getLinkedNoteList()){
             ++counter;
             content += discBean.getEntityName()+"; "+
-                    RESOLUTION_STATUS_MAP.get(discBean.getResolutionStatusId());
+              RESOLUTION_STATUS_MAP.get(discBean.getResolutionStatusId());
             if(size > 1 && counter != size) {
                 content +=" --->";
             }
 
         }
         Paragraph para = new Paragraph(content,
-                new Font(Font.HELVETICA, 16, Font.BOLD, new Color(0, 0, 0)));
+          new Font(Font.HELVETICA, 16, Font.BOLD, new Color(0, 0, 0)));
         return para;
     }
 
     private Table createTableFromBean(DiscrepancyNoteBean discBean) throws
-            BadElementException {
+      BadElementException {
 
         Table table = new Table(2);
         table.setTableFitsPage(true);
@@ -797,7 +777,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         cell = new Cell("Parent note ID: "+(discBean.getParentDnId()>0? discBean.getParentDnId():""));
         table.addCell(cell);
         cell = new Cell("Resolution status: "+
-                new DiscrepancyNoteUtil().getResolutionStatusName(discBean.getResolutionStatusId()));
+          new DiscrepancyNoteUtil().getResolutionStatusName(discBean.getResolutionStatusId()));
         table.addCell(cell);
         cell = new Cell("Detailed notes: "+discBean.getDetailedNotes());
         table.addCell(cell);
@@ -807,15 +787,10 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         table.addCell(cell);
         cell = new Cell("Date updated: "+discBean.getUpdatedDateString());
         table.addCell(cell);
-        cell = new Cell("Study ID: "+discBean.getStudy().getIdentifier());
+        cell = new Cell("Study ID: "+discBean.getStudyId());
         table.addCell(cell);
 
-        if (discBean.getCustomColumns() != null) {
-            for (CustomColumn customColumn : discBean.getCustomColumns()) {
-                cell = new Cell(customColumn.getDescription() + " : " + (customColumn.getValue() != null ? customColumn.getValue():""));
-                table.addCell(cell);
-            }
-        }
+
 
         return table;
 

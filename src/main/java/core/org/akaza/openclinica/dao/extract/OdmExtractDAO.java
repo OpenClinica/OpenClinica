@@ -32,12 +32,10 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 
-import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.job.JobTerminationMonitor;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
-import core.org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 
@@ -206,10 +204,9 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(23, TypeNames.STRING);// item_group_header
         this.setTypeExpected(24, TypeNames.BOOL);// is Repeating?
         this.setTypeExpected(25, TypeNames.STRING);// item_description
-        this.setTypeExpected(26, TypeNames.STRING);// item_brief_description
-        this.setTypeExpected(27, TypeNames.INT);// section_id
-        this.setTypeExpected(28, TypeNames.STRING); // question_number_label
-        this.setTypeExpected(29, TypeNames.STRING);// mu_oid
+        this.setTypeExpected(26, TypeNames.INT);// section_id
+        this.setTypeExpected(27, TypeNames.STRING); // question_number_label
+        this.setTypeExpected(28, TypeNames.STRING);// mu_oid
     }
 
     public void setItemGroupAndItemMetaOC1_3TypesExpected() {
@@ -1102,7 +1099,6 @@ public class OdmExtractDAO extends DatasetDAO {
             String igHeader = (String) row.get("item_group_header");
             Boolean isRepeating = (Boolean) row.get("repeating_group");
             String itDesc = (String) row.get("item_description");
-            String itBriefDesc = (String) row.get("item_brief_description");
             String itQuesNum = (String) row.get("question_number_label");
             String muOid = (String) row.get("mu_oid");
             if (cvprev != cvId) {
@@ -1217,7 +1213,6 @@ public class OdmExtractDAO extends DatasetDAO {
                 idef.setOid(itOID);
                 idef.setName(itName);
                 idef.setComment(itDesc);
-                idef.setBriefDescription(itBriefDesc);
                 if (muOid != null && muOid.length() > 0) {
                     ElementRefBean measurementUnitRef = new ElementRefBean();
                     measurementUnitRef.setElementDefOID(muOid);
@@ -1857,7 +1852,6 @@ public class OdmExtractDAO extends DatasetDAO {
 
             Boolean isRepeating = (Boolean) row.get("repeating_group");
             String itDesc = (String) row.get("item_description");
-            String itBriefDesc = (String) row.get("item_brief_description");
             String itQuesNum = (String) row.get("question_number_label");
             String muOid = (String) row.get("mu_oid");
             if (cvprev != cvId) {
@@ -1971,7 +1965,6 @@ public class OdmExtractDAO extends DatasetDAO {
                 idef.setOid(itOID);
                 idef.setName(itName);
                 idef.setComment(itDesc);
-                idef.setBriefDescription(itBriefDesc);
                 if (muOid != null && muOid.length() > 0) {
                     ElementRefBean measurementUnitRef = new ElementRefBean();
                     measurementUnitRef.setElementDefOID(muOid);
@@ -3437,7 +3430,7 @@ public class OdmExtractDAO extends DatasetDAO {
         permissionTags =(permissionTags.length() != 0 ? permissionTags : "null");
         return " where sed.study_id = " + parentStudyId + " " + showArchived[0] + " and "
                 + this.getEventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite) + " " + showArchived[1] + " and edc.crf_id = crf.crf_id "
-                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3]
+                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3] + " and (pt.permission_tag_id is null or pt.permission_tag_id in (" + permissionTags + ")) "
                 + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 
@@ -3456,7 +3449,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 + " ig.name as item_group_name, item.name as item_name, item.item_data_type_id, ifm.item_header, ifm.left_item_text,"
                 + " ifm.right_item_text, ifm.required as item_required, ifm.regexp, ifm.regexp_error_msg, ifm.width_decimal,"
                 + " rs.response_type_id, rs.options_text, rs.options_values, rs.label as response_label,"
-                + " igm.item_group_header, igm.repeating_group,item.description as item_description,item.brief_description as item_brief_description, ifm.section_id, ifm.question_number_label from crf_version cv,"
+                + " igm.item_group_header, igm.repeating_group,item.description as item_description, ifm.section_id, ifm.question_number_label from crf_version cv,"
                 + " (select crf_version_id, item_id, response_set_id, header as item_header, left_item_text, right_item_text, required, regexp,"
                 + " regexp_error_msg, width_decimal, section_id, question_number_label from item_form_metadata where crf_version_id in (" + crfVersionIds
                 + "))ifm, item, response_set rs,"

@@ -3,7 +3,6 @@ package core.org.akaza.openclinica.service;
 import org.akaza.openclinica.controller.dto.ContactsModuleDTO;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.service.ValidateService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

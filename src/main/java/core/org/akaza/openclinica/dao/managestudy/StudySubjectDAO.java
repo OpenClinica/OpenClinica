@@ -19,7 +19,6 @@ import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import core.org.akaza.openclinica.dao.StudySubjectSDVSort;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -718,43 +717,52 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
     }
 
     public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter, FindSubjectsSort sort, int rowStart,
-            int rowEnd) {
+            int rowEnd ,UserStatus participateStatusSetFilter) {
         ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
-        unsetTypeExpected();
-        int variableIndex=0;
-        int ind=1;
-         ind= setStudySubjectTypeExpected(ind);
-
+        setTypesExpected();
         String partialSql;
         HashMap variables = new HashMap();
 
         String sql;
+        if (filter.getFilters().isEmpty()){
+            sql = digester.getQuery("getFromStudy");
+        }
+        else {
             sql = digester.getQuery("getWithFilterAndSort");
-            variables.put(new Integer(++variableIndex), currentStudy.getId());
-            variables.put(new Integer(++variableIndex), currentStudy.getId());
-
-        sql = sql + filter.execute("");
-
-        if(sort!=null) {
-            partialSql = sort.execute("");
-
-            if (!StringUtils.isEmpty(partialSql)) {
-                int filterCountInPartialSql = StringUtils.countMatches(partialSql, "FILTERED_SQL");
-                    filterCountInPartialSql = filterCountInPartialSql * 2 - 2;
-
-                if (filterCountInPartialSql > 0)
-                    this.setTypeExpected(ind + 1, TypeNames.STRING);
-
-                for (int i = 0; i < filterCountInPartialSql; i++) {
-                    variables.put(new Integer(++variableIndex), currentStudy.getId());
-                }
-                sql = partialSql.replaceAll("FILTERED_SQL", sql);
-            } else {
-                sql = sql + " order by label asc ";
-            }
-            sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
 
+        if(participateStatusSetFilter ==null) {
+            variables.put(new Integer(1), currentStudy.getId());
+            variables.put(new Integer(2), currentStudy.getId());
+        }else{
+            sql = sql + " AND ss.user_status_id = ?";
+            variables.put(new Integer(1), currentStudy.getId());
+            variables.put(new Integer(2), currentStudy.getId());
+            variables.put(new Integer(3), participateStatusSetFilter.getCode());
+        }
+
+
+        sql = sql + filter.execute("");
+        // Order by Clause for the defect id 0005480
+
+        partialSql = sort.execute("");
+        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+            if (partialSql.equals(""))
+                sql += " ORDER BY SS.label )x)where r between " + (rowStart + 1) + " and " + rowEnd;
+            else
+                sql += ")x)where r between " + (rowStart + 1) + " and " + rowEnd;
+
+            sql = sql + partialSql;
+        } else {
+
+            sql = sql + partialSql;
+            if (partialSql.equals(""))
+                sql = sql + "  ORDER BY label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+            else
+                sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+        }
+
+        // System.out.println("SQL: "+sql);
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 

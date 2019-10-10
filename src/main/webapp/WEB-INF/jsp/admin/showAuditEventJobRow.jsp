@@ -1,9 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.audit_events" var="resaudit"/>
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.audit_events" var="resaudit"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <jsp:useBean scope='session' id='userRole' class='core.org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope="request" id="currRow" class="core.org.akaza.openclinica.web.bean.AuditEventRow" />

@@ -119,10 +119,6 @@
         <field name="EventCRFStatus" type="java.lang.String">
             <bind-xml name="OpenClinica:Status" node="attribute"/>
         </field>
-        
-        <field name="ReasonForChangeForCompleteForms" type="java.lang.String">
-            <bind-xml name="OpenClinica:ReasonForChangeForCompleteForms" node="attribute"/>
-        </field>
        
         <field name="ItemGroupData"
        		type="core.org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean"

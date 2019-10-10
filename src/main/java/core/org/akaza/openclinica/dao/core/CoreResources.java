@@ -16,6 +16,7 @@ import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -38,7 +39,7 @@ import java.util.regex.Pattern;
 
 import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
-@Component
+@Component("coreResources")
 public class CoreResources implements InitializingBean {
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
@@ -229,7 +230,7 @@ public class CoreResources implements InitializingBean {
         setDataInfoVals();
         if (DATAINFO.getProperty("filePath") == null || DATAINFO.getProperty("filePath").length() <= 0)
             DATAINFO.setProperty("filePath", filePath);
-        DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
+        DATAINFO.setProperty("changeLogFile", "migration/master.xml");
         // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);
@@ -303,6 +304,11 @@ public class CoreResources implements InitializingBean {
         if (supportURL == null || supportURL.isEmpty())
             supportURL = "https://www.openclinica.com/support";
         DATAINFO.setProperty("supportURL", supportURL);
+
+        String walkmeURL = DATAINFO.getProperty("walkme.url");
+        if (walkmeURL == null || walkmeURL.isEmpty())
+            walkmeURL = "https://ineedawalkme.url";
+        DATAINFO.setProperty("walkmeURL", walkmeURL);
 
         String piwikURL = DATAINFO.getProperty("piwik.url");
         if (piwikURL == null || piwikURL.isEmpty())

@@ -3,11 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
 
-<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/submit/showFixedSection.jsp
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-=======
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
->>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/submit/showFixedSection.jsp
 <jsp:useBean scope="request" id="section" class="core.org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="annotations" class="java.lang.String" />
 

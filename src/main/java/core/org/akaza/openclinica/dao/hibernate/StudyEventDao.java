@@ -207,7 +207,6 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         this.changeDetails = changeDetails;
     }
 
-    @Transactional
     public StudyEvent saveOrUpdate(StudyEvent studyEvent){
         StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
         changeDetails.setStartDateChanged(true);
