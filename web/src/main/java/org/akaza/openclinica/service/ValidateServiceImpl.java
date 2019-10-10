@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service;
 
 import liquibase.util.StringUtils;
+import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -13,6 +14,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -24,9 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -40,7 +41,6 @@ public class ValidateServiceImpl implements ValidateService {
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "enabled";
 
-    private static String sbsUrl = CoreResources.getField("SBSUrl");
     private static final String ADVANCE_SEARCH = "contactsModule";
 
     @Autowired
@@ -57,6 +57,9 @@ public class ValidateServiceImpl implements ValidateService {
     EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
     
    
+
+    @Autowired
+    private TokenService tokenService;
 
 
     public boolean isStudyOidValid(String studyOid) {
@@ -217,6 +220,34 @@ public class ValidateServiceImpl implements ValidateService {
             }
         }
         return false;
+    }
+
+    public boolean isUserSystemUser(HttpServletRequest request){
+        boolean skipRoleCheck = false;
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && !authHeader.isEmpty()) {
+            StringTokenizer st = new StringTokenizer(authHeader);
+            if (st.hasMoreTokens()) {
+                String basic = st.nextToken();
+                if (basic.equalsIgnoreCase("Bearer")) {
+                    String accessToken = st.nextToken();
+                    final Map<String, Object> decodedToken = tokenService.decodeAndVerify(accessToken);
+                    if (accessToken != null && !accessToken.isEmpty()) {
+                        LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
+                        String userType = (String) userContextMap.get("userType");
+                        if (userType.equals(org.akaza.openclinica.service.UserType.SYSTEM.getName())){
+                            String clientId = decodedToken.get("clientId").toString();
+                            if (org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
+                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)){
+                                skipRoleCheck = true;
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+        return skipRoleCheck;
     }
 
     public void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean) {

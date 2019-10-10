@@ -27,10 +27,6 @@
         </param-value>
     </context-param>
     <context-param>
-        <param-name>jmesaMessagesLocation</param-name>
-        <param-value>org/akaza/openclinica/jmesaResourceBundle</param-value>
-    </context-param>
-    <context-param>
         <param-name>SQLInitServlet</param-name>
         <param-value>org/</param-value>
     </context-param>

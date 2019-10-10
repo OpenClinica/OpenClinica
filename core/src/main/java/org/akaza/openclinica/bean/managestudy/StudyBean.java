@@ -1143,12 +1143,12 @@ public class StudyBean extends AuditableEntityBean {
         return parentStudyId > 0 ? true : false;
     }
 
-    public String getManager() {
-        return CoreResources.getStudyManager();
-    }
-
     public int getFilePath() {
         return filePath;
+    }
+
+    public String getManager() {
+        return CoreResources.getStudyManager();
     }
 
     public void setFilePath(int filePath) {

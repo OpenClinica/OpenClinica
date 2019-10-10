@@ -412,13 +412,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // YW 10-03-2007 <<
             // Since we are managing the session on our own, disable Tomcat session timeout
             session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
-            String smURL = CoreResources.getField("smURL");
-            if (StringUtils.isNotEmpty(smURL)) {
+            String sbsUrl = CoreResources.getField("SBSBaseUrl");
+            if (StringUtils.isNotEmpty(sbsUrl)) {
 
-                int index = smURL.indexOf("//");
-                String protocol = smURL.substring(0, index) + "//";
-                String subDomain = smURL.substring(smURL.indexOf("//") + 2, smURL.indexOf("/", protocol.length()));
-                String crossStorageURL = protocol + subDomain + "/hub/hub.html";
+                String crossStorageURL = sbsUrl + "/hub/hub.html";
                 session.setAttribute("crossStorageURL", crossStorageURL);
             }
             // YW >>

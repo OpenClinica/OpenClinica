@@ -477,22 +477,5 @@
 </c:forEach>
 </div>
 <br>
- <c:choose>
-  <c:when test="${fromListSite=='yes'}">
-   <p><a href="#" onClick="history.go(-1)"><fmt:message key="go_back" bundle="${resword}"/></a></p>
-  </c:when>
-  <c:otherwise>
-    <c:choose>
-      <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin}">
-       <p><a href="ListStudy"><fmt:message key="go_back_to_study_list" bundle="${resword}"/></a></p>
-      </c:when>
-      <c:otherwise>
-         <p><a href="MainMenu"><fmt:message key="go_back_home" bundle="${resword}"/></a></p>
-      </c:otherwise>
-    </c:choose>
-  </c:otherwise>
- </c:choose>
-
- <br><br>
 
 <jsp:include page="../include/footer.jsp"/>

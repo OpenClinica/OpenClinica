@@ -37,7 +37,7 @@ import java.util.stream.IntStream;
 @Service("randomizationService")
 public class RandomizationServiceImpl implements RandomizationService {
     private final Logger log = LoggerFactory.getLogger(RandomizationServiceImpl.class);
-    private static String sbsUrl = CoreResources.getField("SBSUrl");
+    private static String sbsUrl = CoreResources.getField("SBSBaseUrl");
 
     @Autowired
     private StudySubjectDao studySubjectDao;
@@ -54,11 +54,8 @@ public class RandomizationServiceImpl implements RandomizationService {
     private static final String SUCCESS_STR = "SUCCESS";
 
     private static String initServiceUrl() {
-        int index = sbsUrl.indexOf("//");
-        String protocol = sbsUrl.substring(0, index) + "//";
-        String domainUrl=sbsUrl.substring(index + 2, sbsUrl.indexOf("/", index + 2));
         String subDomainUrl = "/randomizeservice/api/";
-        return protocol + domainUrl + subDomainUrl;
+        return sbsUrl+ subDomainUrl;
     };
     static String randomizeUrl = initServiceUrl();
 

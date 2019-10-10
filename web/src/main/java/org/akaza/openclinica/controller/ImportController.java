@@ -67,9 +67,6 @@ public class ImportController {
     private UtilService utilService;
 
     @Autowired
-    private TokenService tokenService;
-
-    @Autowired
     private StudyDao studyDao;
     @Autowired
     UserAccountDao userAccountDao;
@@ -179,7 +176,7 @@ public class ImportController {
         }
 
         // If the import is performed by a system user, then we can skip the roles check.
-        boolean isSystemUserImport = isSystemUserImport(request);
+        boolean isSystemUserImport = validateService.isUserSystemUser(request);
         if (!isSystemUserImport){
             if (siteOid != null) {
                 if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
@@ -209,33 +206,7 @@ public class ImportController {
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
     }
 
-    private boolean isSystemUserImport(HttpServletRequest request){
-        boolean skipRoleCheck = false;
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && !authHeader.isEmpty()) {
-            StringTokenizer st = new StringTokenizer(authHeader);
-            if (st.hasMoreTokens()) {
-                String basic = st.nextToken();
-                if (basic.equalsIgnoreCase("Bearer")) {
-                        String accessToken = st.nextToken();
-                        final Map<String, Object> decodedToken = tokenService.decodeAndVerify(accessToken);
-                        if (accessToken != null && !accessToken.isEmpty()) {
-                            LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
-                            String userType = (String) userContextMap.get("userType");
-                            if (userType.equals(UserType.SYSTEM.getName())){
-                                String clientId = decodedToken.get("clientId").toString();
-                                if (StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
-                                        || StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)){
-                                    skipRoleCheck = true;
-                                }
 
-                            }
-                        }
-                }
-            }
-        }
-        return skipRoleCheck;
-    }
 
 
     private Study getTenantStudy(String studyOid) {

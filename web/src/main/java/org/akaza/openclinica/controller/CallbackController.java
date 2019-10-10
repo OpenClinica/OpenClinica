@@ -65,9 +65,8 @@ public class CallbackController {
         String error = req.getParameter("error");
         if (error != null && error.equals("unauthorized")) {
             logger.info("CallbackController In unauthorized:%%%%%%%%");
-            String smURL = CoreResources.getField("smURL");
-            int lastIndex = smURL.lastIndexOf('/');
-            String unauthURl = smURL.substring(0, lastIndex) + "/error-user-deactivated";
+            String sbsUrl = CoreResources.getField("SBSBaseUrl");
+            String unauthURl = sbsUrl + "/#/error-user-deactivated";
             res.sendRedirect(unauthURl);
             return;
         }
