@@ -14,11 +14,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/helper/MessageLogger.java
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-=======
-import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/helper/MessageLogger.java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

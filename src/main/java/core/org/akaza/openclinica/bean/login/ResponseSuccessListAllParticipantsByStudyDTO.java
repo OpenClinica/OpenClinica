@@ -4,17 +4,17 @@ import java.util.List;
 
 public class ResponseSuccessListAllParticipantsByStudyDTO {
 
-	
+
 	protected List<StudyParticipantDTO> studyParticipants;
 	protected String SiteOID;
-	protected int SiteID;
+	protected String SiteID;
 	protected String SiteName;
 
-	public int getSiteID() {
+	public String getSiteID() {
 		return SiteID;
 	}
 
-	public void setSiteID(int siteID) {
+	public void setSiteID(String siteID) {
 		SiteID = siteID;
 	}
 
@@ -41,7 +41,7 @@ public class ResponseSuccessListAllParticipantsByStudyDTO {
 	public void setStudyParticipants(List<StudyParticipantDTO> studyParticipants) {
 		this.studyParticipants = studyParticipants;
 	}
-	
-	
-	
+
+
+
 }

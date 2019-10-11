@@ -42,11 +42,8 @@ import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/core/SecureController.java
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
-=======
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/core/SecureController.java
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;

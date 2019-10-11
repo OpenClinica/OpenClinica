@@ -6,11 +6,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.DefaultToolbar;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.PermissionService;
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/submit/ListStudySubjectTableToolbar.java
 import org.akaza.openclinica.service.ViewStudySubjectService;
-=======
-import core.org.akaza.openclinica.service.ViewStudySubjectService;
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/submit/ListStudySubjectTableToolbar.java
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;

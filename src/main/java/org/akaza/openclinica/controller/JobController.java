@@ -14,15 +14,9 @@ import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.JobService;
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/JobController.java
 import org.akaza.openclinica.service.UserService;
 import core.org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.ValidateService;
-=======
-import core.org.akaza.openclinica.service.UserService;
-import core.org.akaza.openclinica.service.UtilService;
-import core.org.akaza.openclinica.service.ValidateService;
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/JobController.java
 import core.org.akaza.openclinica.web.util.ErrorConstants;
 import core.org.akaza.openclinica.web.util.HeaderUtil;
 import org.apache.commons.dbcp2.BasicDataSource;
