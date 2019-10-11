@@ -12,7 +12,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
-import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;

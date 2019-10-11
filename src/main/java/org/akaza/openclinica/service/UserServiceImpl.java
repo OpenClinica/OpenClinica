@@ -2,29 +2,30 @@ package org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import core.org.akaza.openclinica.service.*;
 import org.akaza.openclinica.ParticipateInviteEnum;
 import org.akaza.openclinica.ParticipateInviteStatusEnum;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.ParticipantDTO;
-import org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.login.ParticipantDTO;
+import core.org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
-import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.enumsupport.JobStatus;
-import org.akaza.openclinica.domain.enumsupport.JobType;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.service.randomize.ModuleProcessor;
-import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+import core.org.akaza.openclinica.core.EmailEngine;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.RandomStringUtils;
@@ -54,8 +55,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.messageServiceUri;
-import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.sbsUrl;
+import static core.org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.messageServiceUri;
+import static core.org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.sbsUrl;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -310,13 +311,13 @@ public class UserServiceImpl implements UserService {
             studySubject.setStudySubjectDetail(studySubjectDetail);
         }
         if (participantDTO.getFirstName() != null)
-        studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() != null ? participantDTO.getFirstName() : "");
+            studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() != null ? participantDTO.getFirstName() : "");
 
         if (validateService.isParticipateActive(tenantStudy)) {
             if (participantDTO.getEmail() != null)
                 studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() != null ? participantDTO.getEmail() : "");
             if (participantDTO.getPhoneNumber() != null)
-            studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() != null ? participantDTO.getPhoneNumber() : "");
+                studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() != null ? participantDTO.getPhoneNumber() : "");
         }
 
         if (validateService.isAdvanceSearchEnabled(tenantStudy)) {
@@ -347,12 +348,12 @@ public class UserServiceImpl implements UserService {
         String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
 
         try {
-        	 OCUserDTO userDTO = null;
+            OCUserDTO userDTO = null;
             for (StudySubject studySubject : studySubjects) {
-            	userDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,studySubject);                        
-                userDTOS.add(userDTO);                    		               
+                userDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,studySubject);
+                userDTOS.add(userDTO);
             }
-            
+
             // add a new method to write this object into text file
             writeToFile(userDTOS, studyOid, fileName);
         } catch (Exception e) {
@@ -361,12 +362,12 @@ public class UserServiceImpl implements UserService {
         }
         persistJobCompleted(jobDetail, fileName);
     }
-    
+
     @Transactional
     public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
     {
 
-        
+
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
 
@@ -375,99 +376,99 @@ public class UserServiceImpl implements UserService {
         StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantID, study);
         OCUserDTO ocuserDTO = null;
         StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
-      
-        if(ss == null) {        	
-        	throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+
+        if(ss == null) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
         }
-        
+
         if (ss.getStatus().equals(Status.DELETED)
-		        || ss.getStatus().equals(Status.AUTO_DELETED)) {
-        	throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
+                || ss.getStatus().equals(Status.AUTO_DELETED)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
         }
-        
-        try {          
-        	ocuserDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,
-					ss);
 
-       	        	
-    		spDTO.setSubjectOid(ss.getOcOid());
-        	spDTO.setSubjectKey(ss.getLabel());
-        	if(ss.getStudySubjectDetail() != null) {
-        		spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
-        	}
-       	        	
-        	spDTO.setCreatedBy(ss.getUserAccount().getUserName());        	        	
-        	spDTO.setLastModifiedBy(userAccountDao.findById(ss.getUpdateId()).getUserName());        	        	
-        	
-        	if(ss.getDateCreated()!=null) {
-        		spDTO.setCreatedAt(ss.getDateCreated().toLocaleString());
-        	}
-        	if(ss.getDateUpdated() !=null) {
-        		spDTO.setLastModified(ss.getDateUpdated().toLocaleString());
-        	}
-        	        	        	
-        	if(incRelatedInfo) {
-        		if(ss.getUserStatus() !=null) {
-        			spDTO.setStatus(ss.getUserStatus().getValue());
-        		}
-        		spDTO.setAccessCode(ocuserDTO.getAccessCode());
-        	}		        			        	
-        	
-        	if(ocuserDTO != null) {
-        		spDTO.setFirstName(ocuserDTO.getFirstName());
-        		spDTO.setLastName(ocuserDTO.getLastName());
-        		spDTO.setEmail(ocuserDTO.getEmail());
-        		spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());        		
-        	}			        			   	        
+        try {
+            ocuserDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,
+                    ss);
 
-           
+
+            spDTO.setSubjectOid(ss.getOcOid());
+            spDTO.setSubjectKey(ss.getLabel());
+            if(ss.getStudySubjectDetail() != null) {
+                spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
+            }
+
+            spDTO.setCreatedBy(ss.getUserAccount().getUserName());
+            spDTO.setLastModifiedBy(userAccountDao.findById(ss.getUpdateId()).getUserName());
+
+            if(ss.getDateCreated()!=null) {
+                spDTO.setCreatedAt(ss.getDateCreated().toLocaleString());
+            }
+            if(ss.getDateUpdated() !=null) {
+                spDTO.setLastModified(ss.getDateUpdated().toLocaleString());
+            }
+
+            if(incRelatedInfo) {
+                if(ss.getUserStatus() !=null) {
+                    spDTO.setStatus(ss.getUserStatus().getValue());
+                }
+                spDTO.setAccessCode(ocuserDTO.getAccessCode());
+            }
+
+            if(ocuserDTO != null) {
+                spDTO.setFirstName(ocuserDTO.getFirstName());
+                spDTO.setLastName(ocuserDTO.getLastName());
+                spDTO.setEmail(ocuserDTO.getEmail());
+                spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());
+            }
+
+
         } catch (Exception e) {
-           
+
             logger.error(" get access code Failed :", e);
         }
-		return spDTO;
-        
+        return spDTO;
+
     }
 
-	/**
-	 * @param siteOid
-	 * @param accessToken
-	 * @param customerUuid
-	 * @param userAccountBean
-	 * @param incRelatedInfo
-	 * @param studySubject
-	 * @param ocuserDTO
-	 * @return
-	 */
-	private OCUserDTO getOCUserDTO(String siteOid, String accessToken, String customerUuid,
-			UserAccountBean userAccountBean, boolean incRelatedInfo, StudySubject studySubject) {
-		
-		OCUserDTO ocuserDTO = null;
-		if (!studySubject.getStatus().equals(Status.DELETED)
-		        && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
+    /**
+     * @param siteOid
+     * @param accessToken
+     * @param customerUuid
+     * @param userAccountBean
+     * @param incRelatedInfo
+     * @param studySubject
+     * @param ocuserDTO
+     * @return
+     */
+    private OCUserDTO getOCUserDTO(String siteOid, String accessToken, String customerUuid,
+                                   UserAccountBean userAccountBean, boolean incRelatedInfo, StudySubject studySubject) {
 
-			 /**
-		     * OC-10640
-		     * AC4: Participant contact information and their Participate related information should only be returned
-		     *  for participants that are in available or signed status.
-		     */
-		    if (studySubject.getStatus().equals(Status.AVAILABLE)
-		            || studySubject.getStatus().equals(Status.SIGNED)) {
+        OCUserDTO ocuserDTO = null;
+        if (!studySubject.getStatus().equals(Status.DELETED)
+                && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
 
-		        
-		        //Get accessToken from Keycloak                      
-		    	ocuserDTO = buildOcUserDTO(studySubject,incRelatedInfo);
-		        ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo,incRelatedInfo);
-		        
-		        
-		        if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
-		        	ocuserDTO.setAccessCode(participantAccessDTO.getAccessCode());
-		        }                                             
-		    }
-		    
-		}
-		return ocuserDTO;
-	}
+            /**
+             * OC-10640
+             * AC4: Participant contact information and their Participate related information should only be returned
+             *  for participants that are in available or signed status.
+             */
+            if (studySubject.getStatus().equals(Status.AVAILABLE)
+                    || studySubject.getStatus().equals(Status.SIGNED)) {
+
+
+                //Get accessToken from Keycloak
+                ocuserDTO = buildOcUserDTO(studySubject,incRelatedInfo);
+                ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo,incRelatedInfo);
+
+
+                if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
+                    ocuserDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                }
+            }
+
+        }
+        return ocuserDTO;
+    }
 
     public OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken) {
 
@@ -519,7 +520,7 @@ public class UserServiceImpl implements UserService {
         if (participantDTO == null)
             return null;
         UserAccount userAccount = new UserAccount();
-        userAccount.setUserType(new org.akaza.openclinica.domain.user.UserType(4));
+        userAccount.setUserType(new core.org.akaza.openclinica.domain.user.UserType(4));
         userAccount.setUserName(username);
         userAccount.setActiveStudy(publicStudy);
         userAccount.setStatus(Status.AVAILABLE);
@@ -577,9 +578,9 @@ public class UserServiceImpl implements UserService {
 
         StringBuffer buffer = new StringBuffer("Hi ").append(participantDTO.getFirstName())
                 .append(", Thanks for participating in ").append(studyName).append("! ")
-        .append("Please follow the link below to get started. ").append(System.lineSeparator())
-        .append("For future reference, your access code is ").append(accessDTO.getAccessCode())
-        .append(System.lineSeparator()).append(accessDTO.getAccessLink());
+                .append("Please follow the link below to get started. ").append(System.lineSeparator())
+                .append("For future reference, your access code is ").append(accessDTO.getAccessCode())
+                .append(System.lineSeparator()).append(accessDTO.getAccessLink());
 
 
         RestTemplate restTemplate = new RestTemplate();
@@ -682,9 +683,9 @@ public class UserServiceImpl implements UserService {
 
 
     public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
-    	return getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,auditAccessCodeViewing,true);
+        return getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,auditAccessCodeViewing,true);
     }
-    
+
     public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing,boolean includeAccessCode) {
         Study tenantStudy = getStudy(studyOid);
         if (!validateService.isParticipateActive(tenantStudy)) {
@@ -702,16 +703,16 @@ public class UserServiceImpl implements UserService {
             logger.error("Participant account not found");
             return null;
         }
-        
+
         String accessCode = null;
         if(includeAccessCode) {
-        	 accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
-        	 if (accessCode == null) {
-                 logger.error(" Access code from Keycloack returned null ");
-                 return null;
-             }
+            accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
+            if (accessCode == null) {
+                logger.error(" Access code from Keycloack returned null ");
+                return null;
+            }
         }
-       
+
         if (tenantStudy.getStudy() != null)
             tenantStudy = tenantStudy.getStudy();
 
@@ -723,9 +724,9 @@ public class UserServiceImpl implements UserService {
                 if (moduleConfigAttributeDTO != null) {
                     logger.info("Participant Access Link is :{}", moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
                     ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();
-                    
-                    
-                    participantAccessDTO.setAccessCode(accessCode);                                       
+
+
+                    participantAccessDTO.setAccessCode(accessCode);
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
@@ -760,9 +761,9 @@ public class UserServiceImpl implements UserService {
             ocUserDTO.setPhoneNumber(studySubjectDetail.getPhone() != null ? studySubjectDetail.getPhone() : "");
             ocUserDTO.setLastName(studySubjectDetail.getLastName() != null ? studySubjectDetail.getLastName() : "");
             ocUserDTO.setIdentifier(studySubjectDetail.getIdentifier() != null ? studySubjectDetail.getIdentifier() : "");
-            
+
             if(incRelatedInfo) {
-            	ocUserDTO.setStatus(studySubject.getUserStatus());
+                ocUserDTO.setStatus(studySubject.getUserStatus());
             }
         } else {
             ocUserDTO.setFirstName("");
@@ -782,7 +783,7 @@ public class UserServiceImpl implements UserService {
         StudyUserRole studyUserRole = new StudyUserRole();
         studyUserRole.setId(userRoleId);
         studyUserRole.setRoleName(Role.PARTICIPATE.getName());
-        studyUserRole.setStatusId(org.akaza.openclinica.bean.core.Status.AVAILABLE.getId());
+        studyUserRole.setStatusId(core.org.akaza.openclinica.bean.core.Status.AVAILABLE.getId());
         studyUserRole.setDateCreated(new Date());
         studyUserRole.setOwnerId(ownerId);
         return studyUserRole;
@@ -814,8 +815,8 @@ public class UserServiceImpl implements UserService {
 
 
     public String getFilePath(JobType jobType) {
-      String dirPath= CoreResources.getField("filePath") + BULK_JOBS+ File.separator+ jobType.toString().toLowerCase();
-      File directory = new File(dirPath);
+        String dirPath= CoreResources.getField("filePath") + BULK_JOBS+ File.separator+ jobType.toString().toLowerCase();
+        File directory = new File(dirPath);
         if (!directory.exists()) {
             directory.mkdirs();
         }

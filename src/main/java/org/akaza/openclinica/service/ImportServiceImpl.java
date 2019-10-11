@@ -1,10 +1,18 @@
-package core.org.akaza.openclinica.service;
+package org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
+import core.org.akaza.openclinica.service.JobService;
+import core.org.akaza.openclinica.service.UtilService;
+import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
+import org.akaza.openclinica.controller.openrosa.QueryService;
+import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
+import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
+import core.org.akaza.openclinica.core.form.xform.QueryBean;
+import core.org.akaza.openclinica.core.form.xform.QueryType;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.Status;
@@ -12,7 +20,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
-import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +111,12 @@ public class ImportServiceImpl implements ImportService {
     @Autowired
     OpenRosaSubmissionController openRosaSubmissionController;
 
+    @Autowired
+    QueryService queryService;
+
+    @Autowired
+    private DiscrepancyNoteDao discrepancyNoteDao;
+
     public static final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
     public static final String SEPERATOR = ",";
@@ -118,6 +132,9 @@ public class ImportServiceImpl implements ImportService {
     public static final String INSERTED = "Inserted";
     public static final String UPDATED = "Updated";
     public static final String NO_CHANGE = "No Change";
+    public static final String DiscrepancyNoteMessage = "import XML";
+    public static final String DetailedNotes = "Update via Import";
+
     List<DataImportReport> dataImportReports = null;
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -295,7 +312,7 @@ public class ImportServiceImpl implements ImportService {
                                 Item item = null;
                                 Object itemObject = null;
 
-                                itemObject = validateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm);
+                                itemObject = validateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm,tenantStudy,studySubject);
                                 if (itemObject instanceof ErrorObj) {
                                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), ((ErrorObj) itemObject).getCode(), null, ((ErrorObj) itemObject).getMessage());
                                     dataImportReports.add(dataImportReport);
@@ -323,16 +340,30 @@ public class ImportServiceImpl implements ImportService {
                         } //itemGroupDataBean for loop
 
 
-                        if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) && itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {                         // update eventcrf status into Complete
-                            // Update Event Crf Status into Complete
-                            eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE,new Date());
-                            openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
+                        if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) ) {
+                            // update eventcrf status into Complete
+                            if(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
 
-                            logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
+                                eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE,new Date());
+                                openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
+
+                                logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
+                            }else {
+                                // even in COMPLETE, but during import process may still get some item updated
+                                ;
+                            }
+
 
                         } else if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {                         // update eventcrf status into data entry status
-                            // Update Event Crf Status into Initial Data Entry
-                            eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE,null);
+
+                            //AC3: Complete forms with data imported into them must stay in Complete status at the conclusion of the import.
+                            if(this.isEventCrfCompleted(eventCrf)) {
+                                ;
+                            }else {
+                                // Update Event Crf Status into Initial Data Entry
+                                eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE,null);
+                            }
+
                         }
                         // check if all Forms within this Event is Complete
                     } // formDataBean for loop
@@ -841,7 +872,8 @@ public class ImportServiceImpl implements ImportService {
                         List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
                         if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
                         // Event Crf has status complete or unavailable
-                        if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()))
+                        // in complete status will not throw out error any more at this stage
+                        if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
                             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
                         if (eventCrf == null) {
@@ -862,7 +894,8 @@ public class ImportServiceImpl implements ImportService {
                 if (eventCrfObject instanceof ErrorObj) return eventCrfObject;
                 EventCrf eventCrf = (EventCrf) eventCrfObject;
                 // Event Crf has status complete or invalid
-                if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()))
+                // in complete status will not throw out error any more at this stage
+                if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
                     return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
                 if (eventCrf != null) {     // form exist
@@ -944,6 +977,16 @@ public class ImportServiceImpl implements ImportService {
         }
     }
 
+
+    private boolean isEventCrfCompleted(EventCrf eventCrf) {
+
+        if(eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
+            return true;
+        }else {
+            return false;
+        }
+
+    }
 
     public ErrorObj validateStartAndEndDateAndOrder(StudyEventDataBean studyEventDataBean) {
         if (studyEventDataBean.getStartDate() == null)
@@ -1194,7 +1237,8 @@ public class ImportServiceImpl implements ImportService {
         EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());
 
         // Event Crf has status complete or invalid
-        if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()))
+        // in complete status will not throw out error any more at this stage
+        if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
 
@@ -1210,15 +1254,15 @@ public class ImportServiceImpl implements ImportService {
         if (eventCrf == null) {
 
             String selectedVersionIds=edc.getSelectedVersionIds();
-           if(!StringUtils.isEmpty(selectedVersionIds)) {
-               String[] ids = selectedVersionIds.split(",");
-               ArrayList<Integer> idList = new ArrayList<Integer>();
-               for (String id : ids) {
-                   idList.add(Integer.valueOf(id));
-               }
-               if (!idList.contains(formLayout.getFormLayoutId()))
-                   return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
-           }
+            if(!StringUtils.isEmpty(selectedVersionIds)) {
+                String[] ids = selectedVersionIds.split(",");
+                ArrayList<Integer> idList = new ArrayList<Integer>();
+                for (String id : ids) {
+                    idList.add(Integer.valueOf(id));
+                }
+                if (!idList.contains(formLayout.getFormLayoutId()))
+                    return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
+            }
 
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
@@ -1256,7 +1300,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private Object validateItem(ImportItemDataBean itemDataBean, CrfBean crf, EventCrf eventCrf, ImportItemGroupDataBean itemGroupDataBean, UserAccount userAccount, ItemCountInForm itemCountInForm) {
+    private Object validateItem(ImportItemDataBean itemDataBean, CrfBean crf, EventCrf eventCrf, ImportItemGroupDataBean itemGroupDataBean, UserAccount userAccount, ItemCountInForm itemCountInForm,Study study,StudySubject studySubject) {
         ErrorObj errorObj = null;
         if (itemDataBean.getItemOID() == null) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
@@ -1304,6 +1348,12 @@ public class ImportServiceImpl implements ImportService {
                 return new ErrorObj(NO_CHANGE, null);
 
             } else {
+                if(isEventCrfCompleted(eventCrf)) {
+                    ErrorObj eb = createQuery(userAccount, study, studySubject, itemData);
+                    if(eb != null) {
+                        return eb;
+                    }
+                }
                 itemData = updateItemData(itemData, userAccount, itemDataBean.getValue());
                 itemCountInForm.setInsertedUpdatedItemCountInForm(itemCountInForm.getInsertedUpdatedItemCountInForm() + 1);
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
@@ -1315,6 +1365,46 @@ public class ImportServiceImpl implements ImportService {
             itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
             return new DataImportReport(null, null, null, null, null, null, null, null, INSERTED, sdf_logFile.format(new Date()), null);
         }
+    }
+
+    /**
+     * @param userAccount
+     * @param study
+     * @param studySubject
+     * @param itemData
+     */
+    private ErrorObj createQuery(UserAccount userAccount, Study study, StudySubject studySubject, ItemData itemData) {
+
+        ErrorObj eb = null;
+
+        try {
+            QueryBean queryBean = new QueryBean();
+            queryBean.setType(QueryType.REASON.getName());
+            queryBean.setComment(this.DetailedNotes);
+
+            QueryServiceHelperBean helperBean = new QueryServiceHelperBean();
+            helperBean.setItemData(itemData);
+            SubmissionContainer container = new SubmissionContainer();
+            container.setStudy(study);
+            container.setUser(userAccount);
+            container.setSubject(studySubject);
+            helperBean.setContainer(container);
+
+            DiscrepancyNote parentDn = (DiscrepancyNote) queryService.createQuery(helperBean, queryBean, true);
+            parentDn.setDescription(this.DiscrepancyNoteMessage);
+
+            parentDn = discrepancyNoteDao.saveOrUpdate(parentDn);
+            helperBean.setDn(parentDn);
+            queryService.saveQueryItemDatamap(helperBean);
+
+            DiscrepancyNote childDN = queryService.createQuery(helperBean, queryBean,false);
+            childDN.setParentDiscrepancyNote(parentDn);
+            childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+        } catch (Exception e) {
+            eb = new ErrorObj(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
+        }
+
+        return eb;
     }
 
     private Object validateForm(FormDataBean formDataBean, Study tenantStudy, StudyEventDefinition studyEventDefinition) {
@@ -1386,6 +1476,5 @@ public class ImportServiceImpl implements ImportService {
 
         return formLayout;
     }
-
 
 }

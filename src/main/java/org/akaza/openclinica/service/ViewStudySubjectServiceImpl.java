@@ -1,16 +1,18 @@
 package org.akaza.openclinica.service;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.CustomColumn;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.CustomColumn;
+import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.service.Component;
+import core.org.akaza.openclinica.service.Page;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
-import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -213,7 +215,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         return commonEventContainerDTO;
     }
 
-    public Page getPage( String name) {
+    public Page getPage(String name) {
         Page page = null;
         PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(name);
         if (pageLayout != null) {

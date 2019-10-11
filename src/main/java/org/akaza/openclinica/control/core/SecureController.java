@@ -42,6 +42,8 @@ import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;

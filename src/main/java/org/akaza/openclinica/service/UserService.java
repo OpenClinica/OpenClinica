@@ -1,7 +1,7 @@
 /**
  *
  */
-package core.org.akaza.openclinica.service;
+package org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -9,6 +9,9 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.OCParticipantDTO;
+import core.org.akaza.openclinica.service.OCUserDTO;
+import core.org.akaza.openclinica.service.ParticipantAccessDTO;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -29,7 +32,7 @@ public interface UserService {
 
     List<OCUserDTO> getAllParticipantAccountsFromUserService(String accessToken);
 
-    ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing);
+    ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean, boolean auditAccessCodeViewing);
     
     ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing,boolean includeAccessCode);
 

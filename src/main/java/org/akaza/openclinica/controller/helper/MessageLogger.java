@@ -14,7 +14,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
-import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

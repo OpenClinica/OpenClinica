@@ -19,6 +19,8 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;

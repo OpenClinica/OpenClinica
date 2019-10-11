@@ -1,20 +1,20 @@
 package org.akaza.openclinica.service;
 
 import liquibase.util.StringUtils;
-import org.akaza.openclinica.bean.core.ApplicationConstants;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.service.auth.TokenService;
-import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import core.org.akaza.openclinica.bean.core.ApplicationConstants;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.UserType;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.auth.TokenService;
+import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -229,7 +229,7 @@ public class ValidateServiceImpl implements ValidateService {
                     if (accessToken != null && !accessToken.isEmpty()) {
                         LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
                         String userType = (String) userContextMap.get("userType");
-                        if (userType.equals(org.akaza.openclinica.service.UserType.SYSTEM.getName())){
+                        if (userType.equals(core.org.akaza.openclinica.service.UserType.SYSTEM.getName())){
                             String clientId = decodedToken.get("clientId").toString();
                             if (org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
                                     || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)){

@@ -6,7 +6,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.DefaultToolbar;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.PermissionService;
-import core.org.akaza.openclinica.service.ViewStudySubjectService;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;

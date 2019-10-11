@@ -1,12 +1,18 @@
 /**
  * 
  */
-package core.org.akaza.openclinica.service;
+package org.akaza.openclinica.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import core.org.akaza.openclinica.bean.managestudy.CustomColumn;
+import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.service.Component;
+import core.org.akaza.openclinica.service.Page;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 
 import java.util.List;
@@ -37,7 +43,7 @@ public interface ViewStudySubjectService {
 	 * @param name
 	 * @return
 	 */
-	Page getPage(  String name);
+	Page getPage(String name);
 
 	 List<Component> getPageComponents(String name);
 
@@ -52,6 +58,6 @@ public interface ViewStudySubjectService {
 	public CommonEventContainerDTO addCommonForm(String studyEventDefinitionOid, String crfOid, String studySubjectOid,
 												 UserAccount userAccount,String studyOid);
 
-     String[] getTableColumns();
+     String[] getTableColumns(String pageName,String componentName);
 
 	}
