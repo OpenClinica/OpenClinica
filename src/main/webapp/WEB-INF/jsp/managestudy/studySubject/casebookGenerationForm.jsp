@@ -87,6 +87,12 @@
 
     $('#casebookPdfBtn').click(function () {
         $('#getPdfMessage').slideDown();
+        jQuery.ajax({
+            'type': 'POST',
+            'url': '${pageContext.request.contextPath}/auth/api/clinicaldata/pdf/print/${study.oid}/${studySub.oid}?format=A4&landscape=false&margin=0.5in',
+            'contentType': 'application/json',
+            'dataType': 'json'
+        });
     });
 
 </script>
