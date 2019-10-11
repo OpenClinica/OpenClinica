@@ -12,11 +12,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/helper/RestfulServiceHelper.java
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-=======
-import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/helper/RestfulServiceHelper.java
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;

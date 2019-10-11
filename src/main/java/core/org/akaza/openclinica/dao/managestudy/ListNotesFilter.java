@@ -9,7 +9,7 @@ public class ListNotesFilter implements CriteriaCommand {
 
     List<Filter> filters = new ArrayList<Filter>();
     HashMap<String, String> columnMapping = new HashMap<String, String>();
-    
+
     public static final String filterDnTypeQueryAndFailedValidationCheck = "31";
     public static final String filterResStatusNewAndUpdated = "21";
     public static final String filterResStatusClosedAndClosedModified = "64";
@@ -25,6 +25,7 @@ public class ListNotesFilter implements CriteriaCommand {
         columnMapping.put("discrepancyNoteBean.disType", "dn.discrepancy_note_type_id");
         columnMapping.put("discrepancyNoteBean.entityType", "dn.entity_type");
         columnMapping.put("discrepancyNoteBean.resolutionStatus", "dn.resolution_status_id");
+        columnMapping.put("discrepancyNoteBean.threadNumber", "dn.thread_number");
         columnMapping.put("age", "age");
         columnMapping.put("days", "days");
     }
@@ -60,12 +61,15 @@ public class ListNotesFilter implements CriteriaCommand {
         if (property.equals("studySubject.labelExact")) {
             criteria = criteria + " and ";
             criteria = criteria + " UPPER(" + columnMapping.get(property) + ") = UPPER('" + inputValue + "')" + " ";
-        } else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description") || property.equals("discrepancyNoteBean.user")) {
+        } else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description") ) {
             criteria = criteria + " and ";
             criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + inputValue + "%')" + " ";
+        } else if (property.equals("discrepancyNoteBean.user") ) {
+            criteria = criteria + " and ";
+            criteria = criteria + " (LOWER(ua.user_name) like LOWER('%" + inputValue + "%') or LOWER(ua.first_name) like LOWER('%" + inputValue + "%') or LOWER(ua.last_name) like LOWER('%" + inputValue + "%'))";
         } else if (property.equals("siteId")) {
             criteria = criteria + " and ";
-            criteria = criteria + "ss.study_id in ( SELECT study_id FROM study WHERE unique_identifier like '%" + inputValue + "%')";
+            criteria = criteria + "ss.study_id in ( SELECT study_id FROM study WHERE LOWER(unique_identifier) like LOWER('%" + inputValue + "%'))";
         } else if (property.equals("age")) {
             if (inputValue.startsWith(">") || inputValue.startsWith("<")
                     || inputValue.startsWith("=")) {
@@ -129,5 +133,5 @@ public class ListNotesFilter implements CriteriaCommand {
     public List<Filter> getFilters() {
         return filters;
     }
-    
+
 }

@@ -9,6 +9,7 @@ package core.org.akaza.openclinica.bean.managestudy;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -90,6 +91,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private String itemGroupName;
     private String threadUuid;
     private Integer threadNumber;
+    private List <CustomColumn> customColumns;
 
     private StudyBean study = new StudyBean();
 
@@ -647,5 +649,13 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
     public void setThreadNumber(Integer threadNumber) {
         this.threadNumber = threadNumber;
+    }
+
+    public List<CustomColumn> getCustomColumns() {
+        return customColumns;
+    }
+
+    public void setCustomColumns(List<CustomColumn> customColumns) {
+        this.customColumns = customColumns;
     }
 }

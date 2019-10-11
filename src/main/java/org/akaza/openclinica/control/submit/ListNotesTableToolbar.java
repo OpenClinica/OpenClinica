@@ -1,4 +1,3 @@
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/submit/ListNotesTableToolbar.java
         package org.akaza.openclinica.control.submit;
 
         import static java.util.Arrays.sort;
@@ -25,29 +24,6 @@
         import org.jmesa.view.html.toolbar.ToolbarItemType;
 
         import javax.servlet.http.HttpServletRequest;
-=======
-package org.akaza.openclinica.control.submit;
-
-import static java.util.Arrays.sort;
-
-import java.util.Comparator;
-import java.util.ResourceBundle;
-
-import org.akaza.openclinica.control.DefaultToolbar;
-import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.jmesa.core.CoreContext;
-import org.jmesa.limit.Filter;
-import org.jmesa.limit.FilterSet;
-import org.jmesa.limit.Sort;
-import org.jmesa.limit.SortSet;
-import org.jmesa.view.html.HtmlBuilder;
-import org.jmesa.view.html.toolbar.AbstractItem;
-import org.jmesa.view.html.toolbar.AbstractItemRenderer;
-import org.jmesa.view.html.toolbar.ClearItemRenderer;
-import org.jmesa.view.html.toolbar.ToolbarItem;
-import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
-import org.jmesa.view.html.toolbar.ToolbarItemType;
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/submit/ListNotesTableToolbar.java
 
 public class ListNotesTableToolbar extends DefaultToolbar {
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
@@ -57,9 +33,18 @@ public class ListNotesTableToolbar extends DefaultToolbar {
     private boolean studyHasDiscNotes;
     private ResourceBundle resword;
 
-    public ListNotesTableToolbar(boolean showMoreLink) {
+    private ViewStudySubjectService viewStudySubjectService;
+    private PermissionService permissionService;
+    private StudyBean studyBean;
+    private HttpServletRequest request;
+    public ListNotesTableToolbar(boolean showMoreLink,ViewStudySubjectService viewStudySubjectService,PermissionService permissionService,StudyBean studyBean,HttpServletRequest request) {
         super();
         this.showMoreLink = showMoreLink;
+
+        this.viewStudySubjectService=viewStudySubjectService;
+        this.permissionService=permissionService;
+        this.studyBean=studyBean;
+        this.request=request;
     }
 
     private FilterSet filterSet;
@@ -168,7 +153,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
          *      java.util.Locale)
          */
         String getIndexes() {
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/submit/ListNotesTableToolbar.java
 
             int itemsColumnCount=0;
 
@@ -184,9 +168,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 
             String result = String.valueOf(5+itemsColumnCount) + "," + String.valueOf(6+itemsColumnCount)+ "," + String.valueOf(10+itemsColumnCount)+ "," +String.valueOf(12+itemsColumnCount) + "," + String.valueOf(15+itemsColumnCount)+ "," + String.valueOf(17+itemsColumnCount);
 
-=======
-            String result = "5, 6, 10, 12, 15, 17";
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/submit/ListNotesTableToolbar.java
             return result;
         }
 
