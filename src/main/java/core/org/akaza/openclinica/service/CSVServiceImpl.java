@@ -5,7 +5,7 @@ import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
 import org.akaza.openclinica.controller.helper.PIIEnum;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
-import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.csv.CSVFormat;

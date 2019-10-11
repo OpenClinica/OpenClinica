@@ -961,11 +961,6 @@
 
     <repositories>
         <repository>
-            <id>sonatype-release-repository</id>
-            <name>Sonatype release repository</name>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-        </repository>
-        <repository>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>

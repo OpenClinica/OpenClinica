@@ -17,6 +17,8 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.ValidateService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

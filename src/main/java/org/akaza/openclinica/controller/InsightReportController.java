@@ -9,7 +9,7 @@ import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.InsightReportService;
-import core.org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.UserService;
 import core.org.akaza.openclinica.service.UtilService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

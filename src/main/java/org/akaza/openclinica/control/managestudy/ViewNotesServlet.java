@@ -1,12 +1,3 @@
-/*
- * OpenClinica is distributed under the
- * GNU Lesser General Public License (GNU LGPL).
-
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
- *
- * Created on Sep 23, 2005
- */
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
@@ -18,8 +9,15 @@ import java.util.Set;
 
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
+import core.org.akaza.openclinica.bean.managestudy.CustomColumn;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.service.Component;
+import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import core.org.akaza.openclinica.service.DiscrepancyNotesSummary;
+import core.org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListNotesTableFactory;
@@ -38,14 +36,12 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
-import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import core.org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesService;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.jmesa.facade.TableFacade;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.akaza.openclinica.service.Component;
 
 /**
  *
@@ -63,6 +59,7 @@ public class ViewNotesServlet extends SecureController {
     public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
     private boolean showMoreLink;
     private ViewNotesService viewNotesService;
+
 
     private ViewStudySubjectService viewStudySubjectService;
     private PermissionService permissionService;

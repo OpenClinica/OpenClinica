@@ -25,7 +25,9 @@ import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +46,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-import static core.org.akaza.openclinica.service.UserService.BULK_JOBS;
-import static core.org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
+import static org.akaza.openclinica.service.UserService.BULK_JOBS;
+import static org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
 
 @Service("ParticipantService")
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)

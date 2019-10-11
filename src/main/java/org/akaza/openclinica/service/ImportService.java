@@ -1,7 +1,7 @@
 /**
  *
  */
-package core.org.akaza.openclinica.service;
+package org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;

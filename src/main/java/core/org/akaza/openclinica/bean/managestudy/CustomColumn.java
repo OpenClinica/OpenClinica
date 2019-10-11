@@ -1,4 +1,4 @@
-package org.akaza.openclinica.bean.managestudy;
+package core.org.akaza.openclinica.bean.managestudy;
 
 public class CustomColumn {
     private String name;

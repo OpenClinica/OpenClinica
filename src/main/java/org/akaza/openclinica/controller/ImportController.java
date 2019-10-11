@@ -1,8 +1,9 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.service.CustomParameterizedException;
+import core.org.akaza.openclinica.service.UtilService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import core.org.akaza.openclinica.bean.core.ApplicationConstants;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
@@ -16,12 +17,13 @@ import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.service.*;
-import core.org.akaza.openclinica.service.auth.TokenService;
-import core.org.akaza.openclinica.web.restful.errors.ErrorConstants;
+//import core.org.akaza.openclinica.service.*;
+import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.service.ImportService;
+import org.akaza.openclinica.service.UserService;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.lang.StringUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.slf4j.Logger;
@@ -40,9 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
 /**

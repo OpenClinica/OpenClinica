@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import core.org.akaza.openclinica.core.form.xform.QueryBean;
+import core.org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,6 @@ public interface QueryService {
         return null;
     }
     
-    DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean,boolean parentDn) throws Exception;
+    DiscrepancyNote createQuery(QueryServiceHelperBean helperBean, QueryBean queryBean, boolean parentDn) throws Exception;
     void saveQueryItemDatamap(QueryServiceHelperBean helperBean);
 }

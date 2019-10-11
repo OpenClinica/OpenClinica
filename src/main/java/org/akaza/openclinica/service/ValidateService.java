@@ -1,7 +1,7 @@
 /**
  *
  */
-package core.org.akaza.openclinica.service;
+package org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -9,7 +9,10 @@ import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,6 +45,7 @@ public interface ValidateService {
 
     boolean isUserHasAccessToSite(List<StudyUserRoleBean> userRoles, String siteOid);
 
+    boolean isUserSystemUser(HttpServletRequest request);
 
     boolean isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(List<StudyUserRoleBean> userRoles, String siteOid);
 

@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import core.org.akaza.openclinica.service.Page;
-import core.org.akaza.openclinica.service.ViewStudySubjectService;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
