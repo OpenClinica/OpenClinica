@@ -32,7 +32,7 @@
                 <fmt:message key="viewStudySubject.casebookGenerationForm.option.includeArchived" bundle="${resword}"/>
             </div>
 
-            <div id="getPdfMessage" class="connect-widget hide">
+            <div style="margin-bottom:10px;" id="getPdfMessage" class="connect-widget hide">
                 <table border="0" cellpadding="0" align="center" style="cursor:default;">
                     <tr>
                         <td>
