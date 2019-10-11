@@ -81,12 +81,12 @@
         else {
             $('#casebookOptions').slideDown();
             $('#casebookLinkBtn, #casebookOpenBtn').removeAttr('disabled');
+            $('#casebookPdfBtn').attr('disabled', 'disabled');
         }
     });
 
     $('#casebookPdfBtn').click(function () {
         $('#getPdfMessage').slideDown();
-        $('#casebookPdfBtn').attr('disabled', 'disabled');
     });
 
 </script>
