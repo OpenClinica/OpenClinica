@@ -32,6 +32,22 @@
                 <fmt:message key="viewStudySubject.casebookGenerationForm.option.includeArchived" bundle="${resword}"/>
             </div>
 
+            <div id="getPdfMessage" class="connect-widget hide">
+                <table border="0" cellpadding="0" align="center" style="cursor:default;">
+                    <tr>
+                        <td>
+                            <fmt:message key="viewStudySubject.casebookGenerationForm.getPdf.message" bundle="${resword}"/>
+                            <a href="Jobs">
+                                <em><strong>
+                                    <fmt:message key="jobs" bundle="${resword}"/>
+                                </strong></em>
+                            </a>
+                            <br>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
             <div style="margin-bottom:10px;" class="connect-widget">
 
                 <div id="casebookButtons">
@@ -49,21 +65,6 @@
                     <fmt:message key="viewStudySubject.casebookGenerationForm.button.getLink.description"
                                  bundle="${resword}"/><br>
                     <input type="text" id="casebookLinkText" size="100"></div>
-            </div>
-            <div id="getPdfMessage" class="connect-widget hide">
-                <table border="0" cellpadding="0" align="center" style="cursor:default;">
-                    <tr>
-                        <td>
-                            <fmt:message key="viewStudySubject.casebookGenerationForm.getPdf.message" bundle="${resword}"/>
-                            <a href="Jobs">
-                                <em><strong>
-                                    <fmt:message key="jobs" bundle="${resword}"/>
-                                </strong></em>
-                            </a>
-                            <br>
-                        </td>
-                    </tr>
-                </table>
             </div>
         </div>
     </div>
