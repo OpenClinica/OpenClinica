@@ -81,7 +81,6 @@
         else {
             $('#casebookOptions').slideDown();
             $('#casebookLinkBtn, #casebookOpenBtn').removeAttr('disabled');
-            $('#casebookPdfBtn').attr('disabled', 'disabled');
         }
     });
 
