@@ -15,6 +15,7 @@ import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
@@ -98,7 +99,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private StudyEventDefinitionDao studyEventDefinitionHibDao;
     List<String> permissionTagsList = null;
     private final String  PARTICIPATE_STATUS="participate.status";
-
+    private ResponseSet responseSet;
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
     @Override
@@ -120,10 +121,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         catch (Exception e) {
         }
         try {
-            tableFacade.setMaxRows(Integer.parseInt(WebUtils.getCookie(request, "maxrows").getValue()));            
+            tableFacade.setMaxRows(Integer.parseInt(WebUtils.getCookie(request, "maxrows").getValue()));
         }
         catch (Exception e) {
-            tableFacade.setMaxRows(50);            
+            tableFacade.setMaxRows(50);
         }
         setDataAndLimitVariables(tableFacade);
         configureTableFacade(response, tableFacade);
@@ -179,11 +180,24 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         if (tableColumns != null) {
             for (String column : tableColumns) {
                 if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                    String formOid = column.split("\\.")[1];
                     String itemOid = column.split("\\.")[2];
                     Item item = itemDao.findByOcOID(itemOid);
+                    CrfBean crf = crfDao.findByOcOID(formOid);
+                    ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crf.getCrfVersions().get(0).getCrfVersionId());
+                    responseSet = itemFormMetadata.getResponseSet();
+                    ResponseType responseType = responseSet.getResponseType();
                     if (item != null) {
-                        configureColumn(row.getColumn(columnNames[index]), item != null ? item.getName() : null, new ItemIdCellEditor(), null);
-                        ++index;
+                        if (responseType.getName().equals(CHECKBOX)
+                                || responseType.getName().equals(MULTI_SELECT)
+                                || responseType.getName().equals(RADIO)
+                                || responseType.getName().equals(SINGLE_SELECT)) {
+                            configureColumn(row.getColumn(columnNames[index]), item != null ? item.getName() : null, new ItemIdCellEditor(), new CustomColumnDroplistFilterEditor());
+                            ++index;
+                        } else {
+                            configureColumn(row.getColumn(columnNames[index]), item != null ? item.getName() : null, new ItemIdCellEditor(), null);
+                            ++index;
+                        }
                     }
                 }
             }
@@ -308,7 +322,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
 
 
-                        String [] tableColumns= getViewStudySubjectService().getTableColumns(PAGE_NAME,COMPONENT_NAME);
+            String [] tableColumns= getViewStudySubjectService().getTableColumns(PAGE_NAME,COMPONENT_NAME);
             if (tableColumns != null) {
                 for (String column : tableColumns) {
                     String itemValue = null;
@@ -527,14 +541,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("enrolledAt");
 
 
-            String [] tableColumns= getViewStudySubjectService().getTableColumns(PAGE_NAME,COMPONENT_NAME);
-                    if(tableColumns!=null){
-                    for (String column : tableColumns) {
-                        if (permissionService.isUserHasPermission(column, request, studyBean)) {
-                            columnNamesList.add(column);
-                        }
-                    }
+        String [] tableColumns= getViewStudySubjectService().getTableColumns(PAGE_NAME,COMPONENT_NAME);
+        if(tableColumns!=null){
+            for (String column : tableColumns) {
+                if (permissionService.isUserHasPermission(column, request, studyBean)) {
+                    columnNamesList.add(column);
                 }
+            }
+        }
 
 
 
@@ -850,6 +864,18 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             for (Object status : Status.toDropDownArrayList()) {
                 ((Status) status).getName();
                 options.add(new Option(((Status) status).getName(), ((Status) status).getName()));
+            }
+            return options;
+        }
+    }
+
+    private class CustomColumnDroplistFilterEditor extends DroplistFilterEditor {
+        List<String> optionsText = Arrays.asList(responseSet.getOptionsText().split("\\s*,\\s*"));
+        @Override
+        protected List<Option> getOptions() {
+            List<Option> options = new ArrayList<Option>();
+            for (String optionText : optionsText) {
+                options.add(new Option( optionText, optionText));
             }
             return options;
         }
