@@ -192,10 +192,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                                 || responseType.getName().equals(MULTI_SELECT)
                                 || responseType.getName().equals(RADIO)
                                 || responseType.getName().equals(SINGLE_SELECT)) {
-                            configureColumn(row.getColumn(columnNames[index]), item != null ? item.getName() : null, new ItemIdCellEditor(), new CustomColumnDroplistFilterEditor());
+                            configureColumn(row.getColumn(columnNames[index]), item != null && item.getBriefDescription()!=null? item.getBriefDescription() :itemFormMetadata.getLeftItemText(), new ItemIdCellEditor(), new CustomColumnDroplistFilterEditor());
                             ++index;
                         } else {
-                            configureColumn(row.getColumn(columnNames[index]), item != null ? item.getName() : null, new ItemIdCellEditor(), null);
+                            configureColumn(row.getColumn(columnNames[index]), item != null && item.getBriefDescription()!=null? item.getBriefDescription() :itemFormMetadata.getLeftItemText() , new ItemIdCellEditor(), null);
                             ++index;
                         }
                     }
