@@ -7,10 +7,6 @@ release.properties
 .classpath
 .project
 .settings/
-src/main/resources/sso.properties
-src/main/resources/datainfo.properties
-src/main/resources/sso.properties
-src/main/webapp/WEB-INF/keycloak.json
 .DS_Store
 
 # intellij idea
