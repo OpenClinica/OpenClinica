@@ -353,6 +353,7 @@ public class XformMetaDataService {
             item = new Item();
             item.setName(xformItem.getItemName());
             item.setDescription(xformItem.getItemDescription());
+            item.setBriefDescription(xformItem.getItemBriefDescription());
             item.setUnits("");
             item.setPhiStatus(false);
             item.setItemDataType(newDataType);
@@ -363,6 +364,7 @@ public class XformMetaDataService {
             usedItemOids.add(item.getOcOid());
         } else {
             item.setDescription(xformItem.getItemDescription());
+            item.setBriefDescription(xformItem.getItemBriefDescription());
         }
         item = itemDao.saveOrUpdate(item);
 

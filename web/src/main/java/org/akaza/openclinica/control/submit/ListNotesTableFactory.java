@@ -162,9 +162,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                                 || responseType.getName().equals(MULTI_SELECT)
                                 || responseType.getName().equals(RADIO)
                                 || responseType.getName().equals(SINGLE_SELECT)) {
-                            configureColumn(row.getColumn(column), item != null ? item.getName() : null, new ItemIdCellEditor(), new CustomColumnDroplistFilterEditor(),true,true);
+                            configureColumn(row.getColumn(column), item.getBriefDescription()!=null? item.getBriefDescription() :itemFormMetadata.getLeftItemText(), new ItemIdCellEditor(), new CustomColumnDroplistFilterEditor(),true,true);
                         } else {
-                            configureColumn(row.getColumn(column), item != null ? item.getName() : null, new ItemIdCellEditor(), null,true,true);
+                            configureColumn(row.getColumn(column), item.getBriefDescription()!=null? item.getBriefDescription() :itemFormMetadata.getLeftItemText(), new ItemIdCellEditor(), null,true,true);
                         }
                     }
 
