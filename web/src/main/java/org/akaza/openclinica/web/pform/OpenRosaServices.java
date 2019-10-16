@@ -444,9 +444,9 @@ public class OpenRosaServices {
             userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers?ecid=" + ecid);
             manifest.add(userList);
         }
-        MediaFile odmPayload = new MediaFile();
-        request.getSession().setAttribute("onlyMetaNoData", "onlyMetaNoData");
-        String odm = getODMMetadata(request, studyOID, ecid, context, formID);
+        
+        MediaFile odmPayload = new MediaFile();        
+        String odm = getODMMetadata(request, studyOID, ecid, context, formID,"false");
         odmPayload.setHash((DigestUtils.md5Hex(odm)));
         odmPayload.setFilename("clinicaldata.xml");
         odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + ecid + "/" + formID);
@@ -1081,7 +1081,7 @@ public class OpenRosaServices {
     @Path("/{studyOID}/{ecid}/{formID}")
     @Produces(MediaType.TEXT_XML)
     public String getODMMetadata(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID, @PathParam("ecid") String ecid,
-            @Context ServletContext context, @PathParam("formID") String formID) throws Exception {
+            @Context ServletContext context, @PathParam("formID") String formID,@QueryParam("includeClinicalData") String includeClinicalData) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
         HashMap<String, String> subjectContext = null;
@@ -1114,12 +1114,10 @@ public class OpenRosaServices {
         String phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";
         String userAccountID = subjectContext.get("userAccountID");
         
-        String result = null;
-        String onlyMetaNoData = (String) request.getSession().getAttribute("onlyMetaNoData");
+        String result = null;        
         // first time call
-        if(onlyMetaNoData != null && onlyMetaNoData.equalsIgnoreCase("onlyMetaNoData")) {
-        	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "no","no", "no","no","yes", "yes");        	
-        	request.getSession().removeAttribute("onlyMetaNoData");
+        if(includeClinicalData != null && includeClinicalData.equalsIgnoreCase("false")) {
+        	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "no","no", "no","no","yes", "yes");        	        
         }else {
         	// 2nd time call
         	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "yes");        	
