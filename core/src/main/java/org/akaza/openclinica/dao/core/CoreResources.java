@@ -304,11 +304,6 @@ public class CoreResources implements InitializingBean {
             supportURL = "https://www.openclinica.com/support";
         DATAINFO.setProperty("supportURL", supportURL);
 
-        String walkmeURL = DATAINFO.getProperty("walkme.url");
-        if (walkmeURL == null || walkmeURL.isEmpty())
-            walkmeURL = "https://ineedawalkme.url";
-        DATAINFO.setProperty("walkmeURL", walkmeURL);
-
         String piwikURL = DATAINFO.getProperty("piwik.url");
         if (piwikURL == null || piwikURL.isEmpty())
             piwikURL = "https://ineedapiwik.url";

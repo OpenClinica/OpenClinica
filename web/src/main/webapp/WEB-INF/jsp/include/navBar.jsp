@@ -163,19 +163,6 @@
     })();
 
 
-    // Walkme snippet
-    (function () {
-        var walkme = document.createElement('script');
-        walkme.type = 'text/javascript';
-        walkme.async = true;
-        walkme.src = '<c:out value="${sessionScope.walkmeURL}" />';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(walkme, s);
-        window._walkmeConfig = {
-            smartLoad: true
-        };
-    })();
-
     function confirmCancel(pageName) {
         var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
         if (confirm1) {
