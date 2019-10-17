@@ -20,7 +20,6 @@
 
         <skipTests>false</skipTests>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <walkme.url>https://cdn.walkme.com/users/3a0ed96eac494dacb4de0640679973c0/walkme_3a0ed96eac494dacb4de0640679973c0_https.js</walkme.url>
 
         <!-- Project's source control URL -->
         <git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
@@ -33,12 +32,6 @@
         <version.keycloak>7.0.0</version.keycloak>
     </properties>
     <profiles>
-        <profile>
-            <id>walkme-design</id>
-            <properties>
-                <walkme.url>https://cdn.walkme.com/users/3a0ed96eac494dacb4de0640679973c0/test/walkme_3a0ed96eac494dacb4de0640679973c0_https.js</walkme.url>
-            </properties>
-        </profile>
         <profile>
             <id>codeship</id>
             <properties>
