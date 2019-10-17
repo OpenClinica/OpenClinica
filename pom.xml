@@ -30,6 +30,7 @@
         <spring-ws.version>2.4.0.RELEASE</spring-ws.version>
         <db.test>localhost</db.test>
         <version.keycloak>7.0.0</version.keycloak>
+        <fasterxml.jackson.version>2.10.0</fasterxml.jackson.version>
     </properties>
     <profiles>
         <profile>
@@ -378,7 +379,12 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.9.9.2</version>
+                <version>${fasterxml.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${fasterxml.jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -722,7 +728,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
-                <version>2.8.9</version>
+                <version>${fasterxml.jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>
