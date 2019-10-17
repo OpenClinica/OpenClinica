@@ -83,6 +83,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
         this.setTypeExpected(11, TypeNames.DATE);// updated
         this.setTypeExpected(12, TypeNames.INT);// update id
         this.setTypeExpected(13, TypeNames.STRING);// oc_oid
+        this.setTypeExpected(14, TypeNames.STRING);// brief_description
     }
 
     public EntityBean update(EntityBean eb) {
@@ -178,6 +179,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
         eb.setName((String) hm.get("name"));
         eb.setId(((Integer) hm.get("item_id")).intValue());
         eb.setDescription((String) hm.get("description"));
+        eb.setBriefDescription((String) hm.get("brief_description"));
         eb.setUnits((String) hm.get("units"));
         eb.setPhiStatus(((Boolean) hm.get("phi_status")).booleanValue());
         eb.setItemDataTypeId(((Integer) hm.get("item_data_type_id")).intValue());
@@ -376,8 +378,8 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
     public ArrayList findAllActiveByCRF(CRFBean crf) {
         HashMap variables = new HashMap();
         this.setTypesExpected();
-        this.setTypeExpected(14, TypeNames.INT);// crf_version_id
-        this.setTypeExpected(15, TypeNames.STRING);// version name
+        this.setTypeExpected(15, TypeNames.INT);// crf_version_id
+        this.setTypeExpected(16, TypeNames.STRING);// version name
         variables.put(new Integer(1), new Integer(crf.getId()));
         String sql = digester.getQuery("findAllActiveByCRF");
         ArrayList alist = this.select(sql, variables);
