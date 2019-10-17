@@ -446,7 +446,7 @@ public class OpenRosaServices {
         }
         
         MediaFile odmPayload = new MediaFile();        
-        String odm = getODMMetadata(request, studyOID, ecid, context, formID,"false");
+        String odm = getODMMetadata(request, studyOID, ecid, context, formID,false);
         odmPayload.setHash((DigestUtils.md5Hex(odm)));
         odmPayload.setFilename("clinicaldata.xml");
         odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + ecid + "/" + formID);
@@ -1081,7 +1081,7 @@ public class OpenRosaServices {
     @Path("/{studyOID}/{ecid}/{formID}")
     @Produces(MediaType.TEXT_XML)
     public String getODMMetadata(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID, @PathParam("ecid") String ecid,
-            @Context ServletContext context, @PathParam("formID") String formID,@QueryParam("includeClinicalData") String includeClinicalData) throws Exception {
+            @Context ServletContext context, @PathParam("formID") String formID,@DefaultValue("true") @QueryParam(value="includeClinicalData") boolean includeClinicalData) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
         HashMap<String, String> subjectContext = null;
@@ -1116,7 +1116,7 @@ public class OpenRosaServices {
         
         String result = null;        
         // first time call
-        if(includeClinicalData != null && includeClinicalData.equalsIgnoreCase("false")) {
+        if(!includeClinicalData) {
         	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "no","no", "no","no","yes", "yes");        	        
         }else {
         	// 2nd time call
