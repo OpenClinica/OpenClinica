@@ -1292,7 +1292,7 @@ public class ImportServiceImpl implements ImportService {
         }
         //Item Group invalid Oid in Form
         ItemGroup itmGroup = itemGroupDao.findByNameCrfId(itemGroup.getName(), crf);
-        if (itmGroup == null) {
+        if (itmGroup == null || itmGroup.getItemGroupId()!=itemGroup.getItemGroupId()) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
         }
 
@@ -1318,7 +1318,7 @@ public class ImportServiceImpl implements ImportService {
         }
         Item itm = itemDao.findByNameCrfId(item.getName(), crf.getCrfId());
         // ItemOID is not valid
-        if (itm == null) {
+        if (itm == null || itm.getItemId()!=item.getItemId()) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
