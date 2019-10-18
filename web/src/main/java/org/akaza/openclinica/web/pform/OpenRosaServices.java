@@ -1117,7 +1117,8 @@ public class OpenRosaServices {
             phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\"";
         }else{
             phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";
-        }        String userAccountID = subjectContext.get("userAccountID");
+        }
+        String userAccountID = subjectContext.get("userAccountID");
         
         String result = null;        
         // first time call
