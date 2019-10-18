@@ -446,8 +446,7 @@ public class OpenRosaServices {
         }
         
         MediaFile odmPayload = new MediaFile();        
-        String odm = getODMMetadata(request, studyOID, ecid, context, formID,false);
-        odmPayload.setHash((DigestUtils.md5Hex(odm)));
+		
         odmPayload.setFilename("clinicaldata.xml");
         odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + ecid + "/" + formID);
         manifest.add(odmPayload);
@@ -1120,7 +1119,7 @@ public class OpenRosaServices {
         	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "no","no", "no","no","yes", "yes");        	        
         }else {
         	// 2nd time call
-        	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "yes");        	
+        	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "n");        	
         }
         
         result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "");
