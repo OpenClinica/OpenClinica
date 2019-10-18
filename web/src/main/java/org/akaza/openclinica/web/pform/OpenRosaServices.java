@@ -1119,7 +1119,7 @@ public class OpenRosaServices {
         	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "no","no", "no","no","yes", "yes");        	        
         }else {
         	// 2nd time call
-        	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "yes");        	
+        	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "n");        	
 
         }
         
