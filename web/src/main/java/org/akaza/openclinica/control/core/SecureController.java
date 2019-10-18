@@ -215,9 +215,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     // Use this variable as the key for the support url
     public static final String SUPPORT_URL = "supportURL";
 
-    // Use this variable as the key for the walkme url
-    public static final String WALKME_URL = "walkmeURL";
-
     // Use this variable as the key for the piwik url
     public static final String PIWIK_URL = "piwikURL";
 
@@ -428,11 +425,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         // If the session already has a value with key SUPPORT_URL don't reset
         if (session.getAttribute(SUPPORT_URL) == null) {
             session.setAttribute(SUPPORT_URL, SQLInitServlet.getSupportURL());
-        }
-
-        // If the session already has a value with key WALKME_URL don't reset
-        if (session.getAttribute(WALKME_URL) == null) {
-            session.setAttribute(WALKME_URL, CoreResources.getField("walkme.url"));
         }
 
         // If the session already has a value with key PIWIK_URL don't reset

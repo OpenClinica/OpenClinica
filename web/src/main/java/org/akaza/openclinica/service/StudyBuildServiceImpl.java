@@ -318,7 +318,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             }
             if (StringUtils.isNotEmpty(altStudyEnvUuid)) {
                 if (uuidToFind.equals(altStudyEnvUuid)) {
-                    logger.info("Commented out setting altCustomUserRole - does it have any adverse effects ??");
+                    logger.debug("Commented out setting altCustomUserRole - does it have any adverse effects ??");
                     //request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
                 }
             }

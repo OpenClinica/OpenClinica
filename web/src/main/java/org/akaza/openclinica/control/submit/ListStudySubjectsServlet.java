@@ -66,6 +66,7 @@ public class ListStudySubjectsServlet extends SecureController {
     private CrfDao crfDao;
     private CrfVersionDao crfVersionDao;
     private EventDefinitionCrfDao eventDefinitionCrfDao;
+    private StudyEventDefinitionDao studyEventDefinitionHibDao;
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
 
     Locale locale;
@@ -146,9 +147,9 @@ public class ListStudySubjectsServlet extends SecureController {
 
         request.setAttribute("closeInfoShowIcons", true);
         if (fp.getString("navBar").equals("yes") && fp.getString("findSubjects_f_studySubject.label").trim().length() > 0) {
-            StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(fp.getString("findSubjects_f_studySubject.label"), currentStudy);
-            if (studySubject.getId() > 0) {
-                request.setAttribute("id", new Integer(studySubject.getId()).toString());
+            List<StudySubjectBean> studySubjectList = getStudySubjectDAO().findAllSubjectsByLabelAndStudy(fp.getString("findSubjects_f_studySubject.label"), currentStudy);
+            if (studySubjectList.size() == 1 ) {
+                request.setAttribute("id", new Integer(studySubjectList.get(0).getId()).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             } else {
                 createTable(showMoreLink);
@@ -189,6 +190,7 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setEventDefinitionCrfDao(getEventDefinitionCrfDao());
         factory.setItemFormMetadataDao(getItemFormMetadataDao());
         factory.setPermissionTagDao(getPermissionTagDao());
+        factory.setStudyEventDefinitionHibDao(getStudyEventDefinitionHibDao());
 
         List<Component> components = getViewStudySubjectService().getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
         if (components != null) {
@@ -325,5 +327,10 @@ public class ListStudySubjectsServlet extends SecureController {
 
     public PermissionService getPermissionService() {
         return permissionService= (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+    }
+
+    public StudyEventDefinitionDao getStudyEventDefinitionHibDao() {
+        return studyEventDefinitionHibDao= (StudyEventDefinitionDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefDaoDomain");
+
     }
 }

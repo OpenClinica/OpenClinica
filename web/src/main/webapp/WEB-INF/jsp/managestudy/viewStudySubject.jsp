@@ -359,7 +359,7 @@
           </td>
           <td>
             <c:if test="${
-              studySub.status.name!='removed' &&
+              studySub.status.name!='Removed' &&
               (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
             }">
               <c:if test="${participateStatus=='enabled'}">
@@ -465,7 +465,7 @@
                           <div class="box_BR">
                             <div class="tablebox_center">
                               <c:if test="${
-                                studySub.status.name!='removed' &&
+                                studySub.status.name!='Removed' &&
                                 (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
                               }">
                                 <c:if test="${participateStatus=='enabled'}">

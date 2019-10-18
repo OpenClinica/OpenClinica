@@ -33,6 +33,11 @@
     <td class="table_header_row"><fmt:message key="query_id" bundle="${resword}"/></td>
     <td class="table_header_row_left"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="site_id" bundle="${resword}"/></td>
+
+   <c:forEach var="customColumn" items="${allNotes[0].customColumns}">
+       <td class="table_header_row"><c:out value="${customColumn.description}" /></td>
+   </c:forEach>
+
     <td class="table_header_row"><fmt:message key="type" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="resolution_status" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
@@ -64,6 +69,11 @@
     </td>
     <td class="table_cell_left"><c:out value="${note.studySub.label}" /></td>
     <td class="table_cell"><c:out value="${note.siteId}" /></td>
+
+   <c:forEach var="customColumn" items="${note.customColumns}">
+       <td class="table_cell"><c:out value="${customColumn.value}" /></td>
+   </c:forEach>
+
     <td class="table_cell"><c:out value="${note.disType.name}" /></td>
     <td class="table_cell"><c:out value="${note.resStatus.name}" /></td>
     <td class="table_cell"><fmt:formatDate value="${note.createdDate}" pattern="${dteFormat}"/></td>
