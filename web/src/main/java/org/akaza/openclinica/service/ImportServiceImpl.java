@@ -1285,14 +1285,8 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
         }
 
-        //Item Group invalid Oid
-        ItemGroup itemGroup = itemGroupDao.findByOcOID(itemGroupDataBean.getItemGroupOID());
-        if (itemGroup == null || (itemGroup != null && !itemGroup.getStatus().equals(Status.AVAILABLE))) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
-        }
-        //Item Group invalid Oid in Form
-        ItemGroup itmGroup = itemGroupDao.findByNameCrfId(itemGroup.getName(), crf);
-        if (itmGroup == null || itmGroup.getItemGroupId()!=itemGroup.getItemGroupId()) {
+        ItemGroup itemGroup = itemGroupDao.findByOcOIDCrfId( itemGroupDataBean.getItemGroupOID(), crf);
+        if (itemGroup == null ) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
         }
 
@@ -1309,16 +1303,9 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
-        Item item = itemDao.findByOcOID(itemDataBean.getItemOID());
-
+        Item item = itemDao.findByOcOIDCrfId(itemDataBean.getItemOID(), crf.getCrfId());
         // ItemOID is not valid
-        if (item == null || (item != null && !item.getStatus().equals(Status.AVAILABLE))) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
-
-        }
-        Item itm = itemDao.findByNameCrfId(item.getName(), crf.getCrfId());
-        // ItemOID is not valid
-        if (itm == null || itm.getItemId()!=item.getItemId()) {
+        if (item == null ||  (item != null && !item.getStatus().equals(Status.AVAILABLE))) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
