@@ -1286,7 +1286,7 @@ public class ImportServiceImpl implements ImportService {
         }
 
         ItemGroup itemGroup = itemGroupDao.findByOcOIDCrfId( itemGroupDataBean.getItemGroupOID(), crf);
-        if (itemGroup == null ) {
+        if (itemGroup == null || (itemGroup != null && !itemGroup.getStatus().equals(Status.AVAILABLE))) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
         }
 
