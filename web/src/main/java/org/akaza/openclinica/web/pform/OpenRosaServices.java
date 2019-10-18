@@ -123,6 +123,7 @@ public class OpenRosaServices {
     public static final String SVG = ".svg";
     public static final String DASH = "-";
     public static final String CONTACTDATA = "contactdata";
+    public static final String UNSCHECDULED = "unscheduled";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -1111,8 +1112,12 @@ public class OpenRosaServices {
         String studyEventDefinitionID = subjectContext.get("studyEventDefinitionID");
         String studyEventRepeat = subjectContext.get("studyEventOrdinal");
         StudyEventDefinition sed = studyEventDefinitionDao.findById(Integer.valueOf(studyEventDefinitionID));
-        String phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";
-        String userAccountID = subjectContext.get("userAccountID");
+        String phraseToLookForInOdm ="";
+        if(sed.getType().equals(UNSCHECDULED) && !sed.getRepeating()) {
+            phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\"";
+        }else{
+            phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";
+        }        String userAccountID = subjectContext.get("userAccountID");
         
         String result = null;        
         // first time call
