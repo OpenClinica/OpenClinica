@@ -949,7 +949,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 
         } catch (Exception e) {
             userService.persistJobFailed(jobDetail, fileName);
-            logger.error("Error " + e.getMessage());
+            logger.error("Error in scheduling the event: " , e);
         }
 
 
