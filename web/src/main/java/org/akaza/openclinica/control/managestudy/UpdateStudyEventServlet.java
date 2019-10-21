@@ -263,6 +263,7 @@ public class UpdateStudyEventServlet extends SecureController {
             statuses.remove(SubjectEventStatus.SKIPPED);
         }
         if ((studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
+        		|| studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)
                 || studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)) && currentRole.isInvestigator()) {
             statuses.remove(SubjectEventStatus.SIGNED);
         }
