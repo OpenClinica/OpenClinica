@@ -863,6 +863,11 @@ public class ImportServiceImpl implements ImportService {
                     if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
                         return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
 
+                    if (studyEvent != null && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
+                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
+                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
+                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    
                     if (studyEvent == null) {
                         eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
                         if (eventObject instanceof ErrorObj) return eventObject;
@@ -907,6 +912,11 @@ public class ImportServiceImpl implements ImportService {
                     if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
                         return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
 
+                    if (studyEvent != null && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
+                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
+                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
+                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(studyEvent.getSampleOrdinal()));
                     return studyEvent;
                 } else {
@@ -929,6 +939,12 @@ public class ImportServiceImpl implements ImportService {
                     if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
                         return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
 
+                    if (studyEvent != null && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
+                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
+                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
+                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    
+                    
                     if (studyEvent == null) {
                         //validate repeat key too large
                         eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
@@ -950,6 +966,11 @@ public class ImportServiceImpl implements ImportService {
                     if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
                         return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
 
+                    if (studyEvent != null && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
+                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
+                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
+                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    
                     if (studyEvent == null) {
                         // validate start , end date
                         eventObject = validateStartAndEndDateAndOrder(studyEventDataBean);
