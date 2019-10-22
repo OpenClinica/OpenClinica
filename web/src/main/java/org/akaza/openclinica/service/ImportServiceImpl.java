@@ -860,13 +860,10 @@ public class ImportServiceImpl implements ImportService {
                     eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                     if (eventObject instanceof ErrorObj) return eventObject;
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
-                    if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
-
-                    if (studyEvent != null && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
-                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
-                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
+                    }
                     
                     if (studyEvent == null) {
                         eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
@@ -908,14 +905,10 @@ public class ImportServiceImpl implements ImportService {
 
                 if (eventCrf != null) {     // form exist
                     studyEvent = eventCrf.getStudyEvent();
-                    // event is not available
-                    if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
-
-                    if (studyEvent != null && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
-                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
-                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
+                    }
                     
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(studyEvent.getSampleOrdinal()));
                     return studyEvent;
@@ -935,14 +928,10 @@ public class ImportServiceImpl implements ImportService {
                     if (eventObject instanceof ErrorObj) return eventObject;
                     // Lookup for event if exists
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
-                    //event not available
-                    if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
-
-                    if (studyEvent != null && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
-                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
-                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
+                    }
                     
                     
                     if (studyEvent == null) {
@@ -962,14 +951,10 @@ public class ImportServiceImpl implements ImportService {
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
                     //lookup for event if exits
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
-                    //event not available
-                    if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
-
-                    if (studyEvent != null && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
-                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
-                    		studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
+                    }
                     
                     if (studyEvent == null) {
                         // validate start , end date
@@ -1000,6 +985,21 @@ public class ImportServiceImpl implements ImportService {
             }
         }
     }
+
+	/**
+	 * @param studyEvent
+	 */
+	private ErrorObj checkEventAvailable(StudyEvent studyEvent) {
+		ErrorObj errorObj = null;	
+
+		if (studyEvent != null && (studyEvent.getStatusId() != Status.AVAILABLE.getCode() ||
+				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
+				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
+				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
+			errorObj = new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);		
+		
+		return errorObj;
+	}
 
 
     private boolean isEventCrfCompleted(EventCrf eventCrf) {
