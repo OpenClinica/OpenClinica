@@ -123,6 +123,7 @@ public class OpenRosaServices {
     public static final String SVG = ".svg";
     public static final String DASH = "-";
     public static final String CONTACTDATA = "contactdata";
+    public static final String UNSCHECDULED = "unscheduled";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -446,8 +447,7 @@ public class OpenRosaServices {
         }
         
         MediaFile odmPayload = new MediaFile();        
-        String odm = getODMMetadata(request, studyOID, ecid, context, formID,false);
-        odmPayload.setHash((DigestUtils.md5Hex(odm)));
+
         odmPayload.setFilename("clinicaldata.xml");
         odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + ecid + "/" + formID);
         manifest.add(odmPayload);
@@ -1111,7 +1111,12 @@ public class OpenRosaServices {
         String studyEventDefinitionID = subjectContext.get("studyEventDefinitionID");
         String studyEventRepeat = subjectContext.get("studyEventOrdinal");
         StudyEventDefinition sed = studyEventDefinitionDao.findById(Integer.valueOf(studyEventDefinitionID));
-        String phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";
+        String phraseToLookForInOdm ="";
+        if(sed.getType().equals(UNSCHECDULED) && !sed.getRepeating()) {
+            phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\"";
+        }else{
+            phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";
+        }
         String userAccountID = subjectContext.get("userAccountID");
         
         String result = null;        
@@ -1120,7 +1125,8 @@ public class OpenRosaServices {
         	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "no","no", "no","no","yes", "yes");        	        
         }else {
         	// 2nd time call
-        	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "yes");        	
+        	result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "n");        	
+
         }
         
         result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "");

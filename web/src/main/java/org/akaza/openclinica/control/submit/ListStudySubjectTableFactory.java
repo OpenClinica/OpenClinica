@@ -1649,9 +1649,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String onClick1 = "layersShowOrHide('visible','Lock_all'); ";
         String onClick2 = "LockObject('Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
         builder.a().href(href1 + href2);
-        builder.onmouseover(onmouseover);
-        builder.onmouseout(onmouseout);
-        builder.onclick(onClick1 + onClick2);
+        // builder.onmouseover(onmouseover);
+        // builder.onmouseout(onmouseout);
+        builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
     }
@@ -1671,9 +1671,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String onClick2 = "LockObject('Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
         String href = studyEvents.size() > 1 ? href1Repeating + href2 : href1 + href2;
         builder.a().href(href);
-        builder.onmouseover(onmouseover);
-        builder.onmouseout(onmouseout);
-        builder.onclick(onClick1 + onClick2);
+        // builder.onmouseover(onmouseover);
+        // builder.onmouseout(onmouseout);
+        builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
     }

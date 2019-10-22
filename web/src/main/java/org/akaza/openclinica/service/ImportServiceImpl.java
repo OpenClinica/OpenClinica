@@ -872,14 +872,16 @@ public class ImportServiceImpl implements ImportService {
                     eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                     if (eventObject instanceof ErrorObj) return eventObject;
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
-                    if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode())) {
-                    	if(!isStudyEventSigned(studyEvent)) {
-	                   		 return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
-	                   	}  else {
-	                   		return studyEvent;
-	                   	}
+
+                	if(studyEvent != null && isStudyEventSigned(studyEvent)) {
+                   		return studyEvent;
+                   	}
+  
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
                     }
-                    	                    
+                    
 
                     if (studyEvent == null) {
                         eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
@@ -926,10 +928,11 @@ public class ImportServiceImpl implements ImportService {
 
                 if (eventCrf != null) {     // form exist
                     studyEvent = eventCrf.getStudyEvent();
-                    // event is not available
-                    if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
-
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
+                    }
+                    
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(studyEvent.getSampleOrdinal()));
                     return studyEvent;
                 } else {
@@ -948,15 +951,18 @@ public class ImportServiceImpl implements ImportService {
                     if (eventObject instanceof ErrorObj) return eventObject;
                     // Lookup for event if exists
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
+
                     
                     // signed event
                     if(studyEvent !=null && isStudyEventSigned(studyEvent)) {
                     	return studyEvent;
                     }
-                    //event not available
-                    if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
-
+                    //event not available                
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
+                    }
+ 
                     if (studyEvent == null) {
                         //validate repeat key too large
                         eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
@@ -980,8 +986,10 @@ public class ImportServiceImpl implements ImportService {
                     	return studyEvent;
                     }
                     //event not available
-                    if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
-                        return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
+                    }
 
                     if (studyEvent == null) {
                         // validate start , end date
@@ -1016,6 +1024,21 @@ public class ImportServiceImpl implements ImportService {
             }
         }
     }
+
+	/**
+	 * @param studyEvent
+	 */
+	private ErrorObj checkEventAvailable(StudyEvent studyEvent) {
+		ErrorObj errorObj = null;	
+
+		if (studyEvent != null && (studyEvent.getStatusId() != Status.AVAILABLE.getCode() ||
+				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
+				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
+				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
+			errorObj = new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);		
+		
+		return errorObj;
+	}
 
 
     private boolean isEventCrfCompleted(EventCrf eventCrf) {
@@ -1336,14 +1359,8 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
         }
 
-        //Item Group invalid Oid
-        ItemGroup itemGroup = itemGroupDao.findByOcOID(itemGroupDataBean.getItemGroupOID());
+        ItemGroup itemGroup = itemGroupDao.findByOcOIDCrfId( itemGroupDataBean.getItemGroupOID(), crf);
         if (itemGroup == null || (itemGroup != null && !itemGroup.getStatus().equals(Status.AVAILABLE))) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
-        }
-        //Item Group invalid Oid in Form
-        ItemGroup itmGroup = itemGroupDao.findByNameCrfId(itemGroup.getName(), crf);
-        if (itmGroup == null) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
         }
 
@@ -1360,16 +1377,9 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
-        Item item = itemDao.findByOcOID(itemDataBean.getItemOID());
-
+        Item item = itemDao.findByOcOIDCrfId(itemDataBean.getItemOID(), crf.getCrfId());
         // ItemOID is not valid
-        if (item == null || (item != null && !item.getStatus().equals(Status.AVAILABLE))) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
-
-        }
-        Item itm = itemDao.findByNameCrfId(item.getName(), crf.getCrfId());
-        // ItemOID is not valid
-        if (itm == null) {
+        if (item == null ||  (item != null && !item.getStatus().equals(Status.AVAILABLE))) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
