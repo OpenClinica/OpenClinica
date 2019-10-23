@@ -342,34 +342,54 @@ public class ImportServiceImpl implements ImportService {
 
                         } //itemGroupDataBean for loop
 
+                        /* OC-11606 for signed event---  has specific logic to handle event status 
+                         *  After data is successfully imported, and at lease one item/field is updated/imported, then
+                         *  the form will still be Complete,
+                         *  and the event will be changed back to data entry started.
+                         *  
+                         *  if no data get updated/imported, even have successful process, still need to keep the event as signed,
+                         *  so this need to skip the existing set event status logic
+                         */
+                    	if(this.isStudyEventSigned(studyEvent) ) { 
+                    		if(itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
+                    			 studyEvent.setStatusId(Status.AVAILABLE.getCode());
+                             	 studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                             	 studyEventDao.saveOrUpdate(studyEvent);
+                    		}
+                    		 
+                    	}else {
+                    		 if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) ) {
+                            	 
+                                 if(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
+                              		// update eventcrf status into Complete\
+                                      eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE,new Date());
+                                      openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
 
-                        if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) ) {
-                        	// update eventcrf status into Complete
-                        	if(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
-                        		
-                                eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE,new Date());
-                                openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
+                                      logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
+                              	}else {
+                              		// event in COMPLETE, but during import process may still get some item updated
+                              		;
+                              	}
+                                  
 
-                                logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
-                        	}else {
-                        		// even in COMPLETE, but during import process may still get some item updated
-                        		;
-                        	}
-                            
-
-                        } else if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {                         // update eventcrf status into data entry status
-                           
-                        	//AC3: Complete forms with data imported into them must stay in Complete status at the conclusion of the import.
-                        	if(this.isEventCrfCompleted(eventCrf)) {
-                        		;
-                        	}else {
-                        		// Update Event Crf Status into Initial Data Entry
-                        		 eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE,null);
-                        	}
-                           
-                        }
+                              } else if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {                         // update eventcrf status into data entry status
+                                 
+                              	//AC3: Complete forms with data imported into them must stay in Complete status at the conclusion of the import.
+                              	if(this.isEventCrfCompleted(eventCrf)) {
+                              		;
+                              	}else {
+                              		// Update Event Crf Status into Initial Data Entry
+                              		 eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE,null);
+                              	}
+                                 
+                              }
+                    	}
+                    	
                         // check if all Forms within this Event is Complete
                     } // formDataBean for loop
+                    
+                    
+                    
                 } // StudyEventDataBean for loop
             } // StudySubjectDataBean for loop
         } else { // subjectDataBean ==null
@@ -860,11 +880,12 @@ public class ImportServiceImpl implements ImportService {
                     eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                     if (eventObject instanceof ErrorObj) return eventObject;
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
+                  
                     ErrorObj errorObj = checkEventAvailable(studyEvent);
                     if(errorObj != null) {
                     	return errorObj;
-                    }
-                    
+                    }                    
+
                     if (studyEvent == null) {
                         eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
                         if (eventObject instanceof ErrorObj) return eventObject;
@@ -898,6 +919,7 @@ public class ImportServiceImpl implements ImportService {
                 eventCrfObject = commonNonRepeatingEventCrfLookUp(studyEventDataBean, studyEventDefinition, studySubject);
                 if (eventCrfObject instanceof ErrorObj) return eventCrfObject;
                 EventCrf eventCrf = (EventCrf) eventCrfObject;
+                               
                 // Event Crf has status complete or invalid
                 // in complete status will not throw out error any more at this stage
                 if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
@@ -928,12 +950,13 @@ public class ImportServiceImpl implements ImportService {
                     if (eventObject instanceof ErrorObj) return eventObject;
                     // Lookup for event if exists
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
+                   
+                    //event not available                
                     ErrorObj errorObj = checkEventAvailable(studyEvent);
                     if(errorObj != null) {
                     	return errorObj;
                     }
-                    
-                    
+ 
                     if (studyEvent == null) {
                         //validate repeat key too large
                         eventObject = validateEventRepeatKeyTooLarge(studyEventDataBean.getStudyEventRepeatKey(), eventOrdinal);
@@ -951,11 +974,13 @@ public class ImportServiceImpl implements ImportService {
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
                     //lookup for event if exits
                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
+                  
+                    //event not available
                     ErrorObj errorObj = checkEventAvailable(studyEvent);
                     if(errorObj != null) {
                     	return errorObj;
                     }
-                    
+
                     if (studyEvent == null) {
                         // validate start , end date
                         eventObject = validateStartAndEndDateAndOrder(studyEventDataBean);
@@ -971,15 +996,19 @@ public class ImportServiceImpl implements ImportService {
                 studyEventDataBean.setStudyEventRepeatKey(String.valueOf('1'));
                 //lookup for event if exists
                 studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
-                //event not available
-                if (studyEvent != null && studyEvent.getStatusId() != (Status.AVAILABLE.getCode()))
-                    return new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+                
                 if (studyEvent == null) {
                     // validate start , end date
                     eventObject = validateStartAndEndDateAndOrder(studyEventDataBean);
                     if (eventObject instanceof ErrorObj) return eventObject;
                     // schedule event
                     studyEvent = scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
+                }else {
+
+                    ErrorObj errorObj = checkEventAvailable(studyEvent);
+                    if(errorObj != null) {
+                    	return errorObj;
+                    }
                 }
                 return studyEvent;
             }
@@ -995,8 +1024,11 @@ public class ImportServiceImpl implements ImportService {
 		if (studyEvent != null && (studyEvent.getStatusId() != Status.AVAILABLE.getCode() ||
 				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
 				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
-				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode()))
-			errorObj = new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);		
+				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())) {
+       		
+       		errorObj = new ErrorObj(FAILED, ErrorConstants.ERR_EVENT_NOT_AVAILABLE);
+       	}
+				
 		
 		return errorObj;
 	}
@@ -1011,6 +1043,20 @@ public class ImportServiceImpl implements ImportService {
     	}
 		
 	}
+    
+    /**
+     * 
+     * @param studyEvent
+     * @return
+     */
+    private boolean isStudyEventSigned(StudyEvent studyEvent) {
+    	
+    	if(studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SIGNED.getCode()) {
+    		return true;
+    	}else {
+    		return false;
+    	}
+    }
 
 	public ErrorObj validateStartAndEndDateAndOrder(StudyEventDataBean studyEventDataBean) {
         if (studyEventDataBean.getStartDate() == null)
