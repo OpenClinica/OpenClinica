@@ -342,47 +342,53 @@ public class ImportServiceImpl implements ImportService {
 
                         } //itemGroupDataBean for loop
 
+                        /* OC-11606 for signed event---  has specific logic to handle event status 
+                         *  After data is successfully imported, and at lease one item/field is updated/imported, then
+                         *  the form will still be Complete,
+                         *  and the event will be changed back to data entry started.
+                         *  
+                         *  if no data get updated/imported, even have successful process, still need to keep the event as signed,
+                         *  so this need to skip the existing set event status logic
+                         */
+                    	if(this.isStudyEventSigned(studyEvent) ) { 
+                    		if(itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
+                    			 studyEvent.setStatusId(Status.AVAILABLE.getCode());
+                             	 studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                             	 studyEventDao.saveOrUpdate(studyEvent);
+                    		}
+                    		 
+                    	}else {
+                    		 if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) ) {
+                            	 
+                                 if(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
+                              		// update eventcrf status into Complete\
+                                      eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE,new Date());
+                                      openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
 
-                        if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) ) {
-                        	// signed event will have specific logic to update event status
-                        	if(this.isStudyEventSigned(studyEvent)) {
-                        		 eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE,new Date());
-                        	}else if(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
-                        		// update eventcrf status into Complete\
-                                eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE,new Date());
-                                openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
+                                      logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
+                              	}else {
+                              		// event in COMPLETE, but during import process may still get some item updated
+                              		;
+                              	}
+                                  
 
-                                logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
-                        	}else {
-                        		// event in COMPLETE, but during import process may still get some item updated
-                        		;
-                        	}
-                            
-
-                        } else if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {                         // update eventcrf status into data entry status
-                           
-                        	//AC3: Complete forms with data imported into them must stay in Complete status at the conclusion of the import.
-                        	if(this.isEventCrfCompleted(eventCrf)) {
-                        		;
-                        	}else {
-                        		// Update Event Crf Status into Initial Data Entry
-                        		 eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE,null);
-                        	}
-                           
-                        }
+                              } else if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {                         // update eventcrf status into data entry status
+                                 
+                              	//AC3: Complete forms with data imported into them must stay in Complete status at the conclusion of the import.
+                              	if(this.isEventCrfCompleted(eventCrf)) {
+                              		;
+                              	}else {
+                              		// Update Event Crf Status into Initial Data Entry
+                              		 eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE,null);
+                              	}
+                                 
+                              }
+                    	}
+                    	
                         // check if all Forms within this Event is Complete
                     } // formDataBean for loop
                     
-                    /**
-                     * OC-11606
-                     * After data is successfully imported, the form will still be Complete
-                     *  and the event will be changed back to data entry started.
-                     */
-                    if(this.isStudyEventSigned(studyEvent)) {
-                    	studyEvent.setStatusId(Status.AVAILABLE.getCode());
-                    	studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
-                    	studyEventDao.saveOrUpdate(studyEvent);
-                    }
+                    
                     
                 } // StudyEventDataBean for loop
             } // StudySubjectDataBean for loop
