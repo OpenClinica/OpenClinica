@@ -13,7 +13,6 @@ import javax.servlet.http.HttpSession;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
 import core.org.akaza.openclinica.bean.extract.odm.FullReportBean;
-import core.org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyBean;

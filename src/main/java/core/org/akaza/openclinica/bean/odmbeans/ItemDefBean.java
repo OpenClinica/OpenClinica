@@ -33,6 +33,7 @@ public class ItemDefBean extends ElementOIDBean {
     //openclinica extension: which crf-versions this item belong to
     private String formOIDs;
     private ItemDetailsBean itemDetails;
+    private String briefDescription;
     
 
     public ItemDefBean() {
@@ -144,5 +145,13 @@ public class ItemDefBean extends ElementOIDBean {
 
     public void setItemDetails(ItemDetailsBean itemDetails) {
         this.itemDetails = itemDetails;
+    }
+
+    public String getBriefDescription() {
+        return briefDescription;
+    }
+
+    public void setBriefDescription(String briefDescription) {
+        this.briefDescription = briefDescription;
     }
 }

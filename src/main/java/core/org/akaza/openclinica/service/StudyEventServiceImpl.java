@@ -38,9 +38,9 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
-import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -951,7 +951,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 
         } catch (Exception e) {
             userService.persistJobFailed(jobDetail, fileName);
-            logger.error("Error " + e.getMessage());
+            logger.error("Error in scheduling the event: " , e);
         }
 
 
