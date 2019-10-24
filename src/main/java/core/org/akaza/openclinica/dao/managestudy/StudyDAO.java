@@ -356,7 +356,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         return oid;
 
     }
-
+    // findByOcOID(oid);
     public StudyBean findByOid(String oid) {
         StudyBean sb = null;
         this.unsetTypeExpected();
@@ -375,7 +375,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         }
 
     }
-
+    //findPublicStudy(oid);
     public StudyBean findByPublicOid(String oid) {
         StudyBean sb = null;
         this.unsetTypeExpected();
@@ -395,6 +395,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
 
     }
 
+    //findPublicStudyById(id);
     public StudyBean findByPublicPK(int id) {
         StudyBean sb = null;
         this.unsetTypeExpected();
@@ -414,6 +415,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
 
     }
 
+    //findByUniqueId(uniqueId)
     public StudyBean findByUniqueIdentifier(String oid) {
         StudyBean sb = null;
         this.unsetTypeExpected();
@@ -699,6 +701,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         return eb;
     }
 
+    //Check this and continue rom next method
     public Collection findAllByUser(String username) {
         this.unsetTypeExpected();
         this.setTypesExpected();
