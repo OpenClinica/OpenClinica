@@ -1418,6 +1418,12 @@ public class ImportServiceImpl implements ImportService {
             }
         } else {
             itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
+            if(isEventCrfCompleted(eventCrf)) {
+                ErrorObj eb = createQuery(userAccount, study, studySubject, itemData);
+                if(eb != null) {
+                    return eb;
+                }
+            }
             itemCountInForm.setInsertedUpdatedItemCountInForm(itemCountInForm.getInsertedUpdatedItemCountInForm() + 1);
             itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
             return new DataImportReport(null, null, null, null, null, null, null, null, INSERTED, sdf_logFile.format(new Date()), null);
