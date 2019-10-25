@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                        http://www.springframework.org/schema/util
+                        http://www.springframework.org/schema/util/spring-util-4.3.xsd
+
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <context:component-scan base-package="core.org.akaza.openclinica.service"/>
+
+    <util:properties id="enterpriseInfo" location="classpath:core/enterprise.properties"/>
+    <!--
+
+    <bean id="ocSessionContext" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+       <property name="targetClass"><value>org.akaza.openclinica.control.ApplicationContextHelper</value></property>
+         <property name="targetMethod"><value>getContext</value></property>
+    </bean>
+    -->
+    <bean id="dataInfoProperties" factory-bean="coreResources" factory-method="getDataInfo"/>
+
+    <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
+    <bean id="messageSource"
+          class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>org.akaza.openclinica.i18n.admin</value>
+                <value>org.akaza.openclinica.i18n.audit_events</value>
+                <value>org.akaza.openclinica.i18n.exceptions</value>
+                <value>org.akaza.openclinica.i18n.format</value>
+                <value>org.akaza.openclinica.i18n.notes</value>
+                <value>org.akaza.openclinica.i18n.page_messages</value>
+                <value>org.akaza.openclinica.i18n.terms</value>
+                <value>org.akaza.openclinica.i18n.words</value>
+                <value>org.akaza.openclinica.i18n.workflow</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+          p:placeholderPrefix="s["
+          p:placeholderSuffix="]"
+    >
+        <property name="properties">
+            <ref bean="dataInfoProperties"/>
+        </property>
+
+    </bean>
+
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
+</beans>
