@@ -1,5 +1,7 @@
 package core.org.akaza.openclinica.dao.hibernate;
 
+import core.org.akaza.openclinica.bean.core.EntityBean;
+import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.oid.OidGenerator;
 import core.org.akaza.openclinica.bean.oid.StudyOidGenerator;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -17,8 +19,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 public class StudyDao extends AbstractDomainDao<Study> {
@@ -172,11 +176,11 @@ public class StudyDao extends AbstractDomainDao<Study> {
     }
 
     public Study findSiteByOid(String parentOid, String siteOid) {
-        String query="Select site.* from "+ getDomainClassName() +" site, "+getDomainClassName()+" study where site.study.studyId = study.studyId and" +
+        String query = "Select site.* from "+ getDomainClassName() +" site, "+getDomainClassName()+" study where site.study.studyId = study.studyId and" +
                 " study.oc_oid = :parentOid and site.oc_oid = :siteOid";
-        Query q=getCurrentSession().createQuery(query);
-        q.setParameter("parentOid",parentOid);
-        q.setParameter("siteOid",siteOid);
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("parentOid", parentOid);
+        q.setParameter("siteOid", siteOid);
         return (Study) q.uniqueResult();
     }
 
@@ -185,16 +189,122 @@ public class StudyDao extends AbstractDomainDao<Study> {
         CriteriaQuery<Study> cq = cb.createQuery(Study.class);
         Root<Study> study =  cq.from(Study.class);
         Predicate predicate = cb.and(study.get("study.studyId").isNull(),
-                                cb.equal(study.get("oc_oid"),studyOid));
+                                cb.equal(study.get("oc_oid"), studyOid));
         cq.select(study).where(predicate);
         return (Study) getCurrentSession().createQuery(cq).uniqueResult();
     }
 
     public Collection findAllByUser(String username) {
+        Query q = getCurrentSession().createNativeQuery(digester.getQuery("findAllByUser"));
+        q.setParameter("userName", username);
+        return (List<Study>) q.getResultList();
+    }
 
-        Query q=getCurrentSession().createNativeQuery(digester.getQuery("findAllByUser")).setResultTransformer(Transformers.aliasToBean(Study.class));
-        q.setParameter("userName",username);
-        return q.list();
+
+    public List<Integer> getStudyIdsByCRF(int crfId) {
+        String query = "select distinct eventDefCrf.study.studyId from EventDefinitionCrf eventDefCrf where crf.crfId=:crfId";
+        Query q = getCurrentSession().createNativeQuery(query);
+        q.setParameter("crfId", crfId);
+        return (List<Integer>) q.getResultList();
+    }
+    public Collection findAllByUserNotRemoved(String username) {
+        String query = "SELECT s.* FROM Study s, StudyUserRole sur WHERE sur.StudyUserRoleId.userName = :userName"+
+        " AND s.studyId=sur.StudyUserRoleId.studyId AND sur.statusId != 5 AND sur.statusId != 7";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("userName", username);
+        return (List<Study>) q.getResultList();
+    }
+
+    public List findAllByStatus(Status status) {
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
+        CriteriaQuery<Study> cq = cb.createQuery(Study.class);
+        Root<Study> study =  cq.from(Study.class);
+        cq.select(study).where(cb.equal(study.get("status"), status));
+        return (List<Study>) getCurrentSession().createQuery(cq).getResultList();
+    }
+
+    public Collection findAllByLimit(boolean isLimited) {
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
+        CriteriaQuery<Study> cq = cb.createQuery(Study.class);
+        Root<Study> study = cq.from(Study.class);
+        cq.orderBy(cb.asc(study.get("name")));
+        List<Study> studyList = null;
+        if(isLimited)
+             studyList = (List<Study>) getCurrentSession().createQuery(cq).setMaxResults(5).getResultList();
+        else
+            studyList = (List<Study>) getCurrentSession().createQuery(cq).getResultList();
+        return studyList;
+    }
+
+    public ArrayList<Study> findAll() {
+        return (ArrayList<Study>) findAllByLimit(false);
+    }
+
+
+    public Collection findAllParents() {
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
+        CriteriaQuery<Study> cq = cb.createQuery(Study.class);
+        Root<Study> study = cq.from(Study.class);
+        cq.where(study.get("study").isNull()).orderBy(cb.asc(study.get("name")));
+        return (List<Study>) getCurrentSession().createQuery(cq).getResultList();
+    }
+
+    /**
+     * isAParent(), finds out whether or not a study is a parent.
+     *
+     * @return a boolean
+     */
+    public boolean isAParent(int studyId) {
+        boolean ret = false;
+        Collection col = findAllByParent(studyId);
+        if (col != null && col.size() > 0) {
+            ret = true;
+        }
+        return ret;
+    }
+
+    public Collection findAllByParent(int parentStudyId) {
+        return findAllByParentAndLimit(parentStudyId, false);
+    }
+
+    public Collection findAllByParentAndLimit(int parentStudyId, boolean isLimited) {
+
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
+        CriteriaQuery<Study> cq = cb.createQuery(Study.class);
+        Root<Study> study = cq.from(Study.class);
+        cq.where(cb.equal(study.get("study.studyId"), parentStudyId));
+        if(isLimited)
+            return (List<Study>) getCurrentSession().createQuery(cq).setMaxResults(5).getResultList();
+        return (List<Study>) getCurrentSession().createQuery(cq).getResultList();
+    }
+
+    public Collection findAll(int studyId) {
+       CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
+       CriteriaQuery<Study> cq = cb.createQuery(Study.class);
+       Root<Study> study = cq.from(Study.class);
+       Predicate predicate = cb.and(cb.or(cb.equal(study.get("studyId"), studyId),cb.equal(study.get("study.studyId"), studyId)),
+               study.get("study").isNotNull());
+       cq.where(predicate).orderBy(cb.asc(study.get("name")));
+       return (List<Study>) getCurrentSession().createQuery(cq).getResultList();
+    }
+
+    public Study findByPK(int ID) {
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
+        CriteriaQuery<Study> cq = cb.createQuery(Study.class);
+        Root<Study> study = cq.from(Study.class);
+        cq.where(cb.equal(study.get("studyId"), ID));
+        return (Study) getCurrentSession().createQuery(cq).uniqueResult();
+    }
+
+    public Study findByName(String name){
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
+        CriteriaQuery<Study> cq = cb.createQuery(Study.class);
+        Root<Study> study = cq.from(Study.class);
+        cq.where(cb.equal(study.get("name"),name));
+        List<Study> list=getCurrentSession().createQuery(cq).getResultList();
+        if(list != null && list.size() > 0)
+            return list.get(0);
+        return null;
     }
 
     public Study updatePublicStudy(Study study) {
