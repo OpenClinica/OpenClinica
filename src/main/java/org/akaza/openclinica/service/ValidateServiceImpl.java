@@ -246,7 +246,8 @@ public class ValidateServiceImpl implements ValidateService {
                         if (userType.equals(core.org.akaza.openclinica.service.UserType.SYSTEM.getName())){
                             String clientId = decodedToken.get("clientId").toString();
                             if (org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
-                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)){
+                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)
+                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RULES_ENGINE_CLIENT)){
                                 skipRoleCheck = true;
                             }
 
@@ -289,10 +290,13 @@ public class ValidateServiceImpl implements ValidateService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
         }
 
-        if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-        } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        if (!userAccountBean.getEmail().equals("openclinica-developers@openclinica.com")) {
+            logger.debug("User is a system user. Role checks can be bypassed");
+            if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+            } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+            }
         }
 
     }
@@ -348,7 +352,7 @@ public class ValidateServiceImpl implements ValidateService {
      * @param studyOid
      * @param siteOid
      * @param userAccountBean
-     * @param includeAccessCode
+     * @param includePII
      */
     public void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includePII) {
 

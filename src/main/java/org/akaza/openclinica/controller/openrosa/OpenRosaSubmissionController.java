@@ -14,12 +14,14 @@ import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.PFormCache;
+import com.openclinica.kafka.KafkaService;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +102,11 @@ public class OpenRosaSubmissionController {
 
     @Autowired
     private StudyBuildService studyBuildService;
+    @Autowired
+    private KafkaService kafkaService;
+
+    @Autowired
+    private NewTopic formStatusChange;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
@@ -238,7 +245,8 @@ public class OpenRosaSubmissionController {
             eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
             eventCrfDao.saveOrUpdate(eventCrf);
-            checkRandomization(subjectContext, studyOID, studySubjectOID);
+            kafkaService.sendFormCompleteMessage(eventCrf);
+//            checkRandomization(subjectContext, studyOID, studySubjectOID);
         }
 
         updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount);
