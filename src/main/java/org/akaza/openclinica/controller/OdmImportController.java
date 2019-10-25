@@ -6,7 +6,7 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.CustomRuntimeException;
 import core.org.akaza.openclinica.service.OdmImportService;
-import core.org.akaza.openclinica.service.Page;
+import org.akaza.openclinica.service.Page;
 import core.org.akaza.openclinica.service.PublishDTO;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.apache.commons.collections4.map.PassiveExpiringMap;

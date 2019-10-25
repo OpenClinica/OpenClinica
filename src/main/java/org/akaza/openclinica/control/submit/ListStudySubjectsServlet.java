@@ -19,7 +19,7 @@ import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import core.org.akaza.openclinica.service.Component;
+import org.akaza.openclinica.service.Component;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;

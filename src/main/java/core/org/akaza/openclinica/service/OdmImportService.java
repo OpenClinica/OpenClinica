@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.service.Page;
 import org.cdisc.ns.odm.v130.ODM;
 
 public interface OdmImportService {

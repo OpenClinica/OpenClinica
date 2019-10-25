@@ -1,7 +1,7 @@
 /**
  * 
  */
-package core.org.akaza.openclinica.service;
+package org.akaza.openclinica.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;

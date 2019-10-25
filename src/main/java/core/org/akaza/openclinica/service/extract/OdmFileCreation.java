@@ -21,6 +21,7 @@ import core.org.akaza.openclinica.bean.extract.ExportFormatBean;
 import core.org.akaza.openclinica.bean.extract.ExtractBean;
 import core.org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
 import core.org.akaza.openclinica.bean.extract.odm.FullReportBean;
+import core.org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;

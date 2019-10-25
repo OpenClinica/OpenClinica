@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import core.org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import core.org.akaza.openclinica.service.dto.Bucket;
 import core.org.akaza.openclinica.service.dto.Form;
+import org.akaza.openclinica.service.Page;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.cdisc.ns.odm.v130.*;
