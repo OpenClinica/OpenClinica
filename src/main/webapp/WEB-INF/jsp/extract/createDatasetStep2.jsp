@@ -1,0 +1,306 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+
+<jsp:include page="../include/extract-header.jsp"/>
+
+<script language="JavaScript">
+<!--
+
+function selectAll() {
+    if (document.cl.all.checked) {
+      for (var i=0; i <document.cl.elements.length; i++) {
+        if (document.cl.elements[i].name.indexOf('itemSelected') != -1) {
+            document.cl.elements[i].checked = true;
+        }
+      }
+    } else {
+      for (var i=0; i <document.cl.elements.length; i++) {
+        if (document.cl.elements[i].name.indexOf('itemSelected') != -1) {
+            document.cl.elements[i].checked = false;
+        }
+      }
+    }
+}
+function notSelectAll() {
+    if (!this.checked){
+        document.cl.all.checked = false;
+    }
+
+}
+//-->
+</script>
+
+<%--<jsp:include page="../include/sidebar.jsp"/>--%>
+<!-- move the alert message to the sidebar-->
+<jsp:include page="../include/sideAlert.jsp"/>
+<!-- then instructions-->
+<tr id="sidebar_Instructions_open" style="display: none">
+    <td class="sidebar_tab">
+
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
+
+    <fmt:message key="instructions" bundle="${resword}"/>
+
+    <div class="sidebar_tab_content">
+
+    </div>
+
+    </td>
+
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
+
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
+
+    <fmt:message key="instructions" bundle="${resword}"/>
+
+    </td>
+  </tr>
+
+<jsp:include page="../include/createDatasetSideInfo.jsp"/>
+
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
+
+<c:choose>
+<c:when test="${newDataset.id>0}">
+<h1>
+ <span class="title_manage">
+   <fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="select_items" bundle="${resword}"/>
+   <c:choose>
+   <c:when test="${newDataset.id<=0}">
+   <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')">
+   <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+   </c:when>
+   <c:otherwise>
+   <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/edit-dataset')">
+   <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+   </c:otherwise>
+   </c:choose>
+   : <c:out value="${newDataset.name}"/>
+ </span>
+</h1>
+</c:when>
+<c:otherwise>
+<h1>
+  <span class="title_manage">
+     <fmt:message key="create_dataset" bundle="${resword}"/>
+  </span>
+</h1>
+</c:otherwise>
+</c:choose>
+
+<%--
+<jsp:include page="createDatasetBoxes.jsp" flush="true">
+<jsp:param name="selectStudyEvents" value="1"/>
+</jsp:include>
+--%>
+
+
+<p><fmt:message key="Select_a_CRF_to_choose_individual" bundle="${resword}"/> </p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><img src="images/arrow_left.gif" alt="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>" title="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>"></td>
+    <td>
+      <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+    <div class="textbox_center" align="center">
+      <span class="title_extract">
+         <b><fmt:message key="use_task_pane_to_select_CRF" bundle="${restext}"/></b>
+      </span>
+    </div>
+
+  </div></div></div></div></div></div></div></div>
+
+    </td>
+  </tr>
+</table>
+
+<c:if test="${crf != null && crf.id>0}">
+
+<div style="width: 600px">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="textbox_center" align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr valign="top" ><td class="table_header_column"><fmt:message key="event_name" bundle="${resword}"/>:</td><td class="table_cell">
+  <c:out value="${definition.name}"/>
+   </td></tr>
+ <tr valign="top" ><td class="table_header_column"><fmt:message key="CRF_name" bundle="${resword}"/>:</td><td class="table_cell">
+  <c:out value="${crf.name}"/>
+   </td></tr>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_cell">
+  <c:out value="${crf.description}"/>
+  </td></tr>
+ </table>
+</div>
+
+</div></div></div></div></div></div></div></div>
+</div>
+
+</c:if>
+<br>
+<c:if test="${!empty allItems}">
+<form action="CreateDataset" method="post" name="cl">
+<input type="hidden" name="action" value="beginsubmit"/>
+<input type="hidden" name="crfId" value="<c:out value="${crf.id}"/>">
+<input type="hidden" name="defId" value="<c:out value="${definition.id}"/>">
+
+<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="all"/></jsp:include>
+<table border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+  <td><input type="checkbox" name="all" value="1"
+  onClick="javascript:selectAll();"> <fmt:message key="select_all_items" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
+   <td><input type="submit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="submit" name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+  </tr>
+</table>
+<br/>
+<P><B><fmt:message key="show_items_this_dataset" bundle="${restext}"/></b></p>
+<!--javascript to select all-->
+<div style="width: 100%">
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="textbox_center" align="center">
+<%-- TODO: i18n --%>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+    <td class="table_header_column_top">&nbsp;</td>
+    <td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="version2" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="group_s" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="data_type" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="response_type" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="response_label" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="required" bundle="${resword}"/>?</td>
+
+  </tr>
+<c:set var="count" value="0"/>
+<c:forEach var='item' items='${allItems}'>
+  <tr>
+   <td class="table_cell">
+   <c:choose>
+    <c:when test="${item.selected}">
+      <input type="checkbox" name="itemSelected<c:out value="${count}"/>" checked value="yes" onclick="javascript:notSelectAll();">
+    </c:when>
+    <c:otherwise>
+      <input type="checkbox" name="itemSelected<c:out value="${count}"/>" value="yes" onclick="javascript:notSelectAll();">
+    </c:otherwise>
+   </c:choose>
+   </td>
+   <td class="table_cell"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${item.name}"/></a></td>
+   <td class="table_cell">
+      <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
+        <c:choose>
+          <c:when test="${status.last}">
+           <c:out value="${meta.crfVersionName}"/>
+          </c:when>
+          <c:otherwise>
+           <c:out value="${meta.crfVersionName}"/>,<br>
+          </c:otherwise>
+        </c:choose>
+      </c:forEach>
+      &nbsp;
+    </td>
+
+   <%-- GROUP --%>
+
+   <%--
+   <td class="table_cell"><c:out value="${item.itemMeta.groupLabel}"/>&nbsp;</td>
+   --%>
+
+   <td class="table_cell">
+      <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
+        <c:choose>
+          <c:when test="${meta.groupLabel==null || meta.groupLabel==''}"></c:when>
+          <c:when test="${status.last}">
+           <c:out value="${meta.groupLabel}" default="Ungrouped"/>
+          </c:when>
+          <c:otherwise>
+            <c:out value="${meta.groupLabel}" default="Ungrouped"/>,<br>
+          </c:otherwise>
+        </c:choose>
+      </c:forEach>
+    &nbsp;</td>
+
+   <%-- DATA TYPE --%>
+
+   <td class="table_cell"><c:out value="${item.dataType.name}"/>&nbsp;</td>
+
+   <%-- RESPONSE TYPE --%>
+
+   <%-- <td class="table_cell"><c:out value="${item.itemMeta.responseSet.responseType.name}"/>&nbsp;</td>--%>
+
+    <td class="table_cell">
+      <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
+        <c:choose>
+          <c:when test="${status.last}">
+           <c:out value="${meta.responseSet.responseType.name}"/>
+          </c:when>
+          <c:otherwise>
+            <c:out value="${meta.responseSet.responseType.name}"/>,<br>
+          </c:otherwise>
+        </c:choose>
+      </c:forEach>
+      &nbsp;
+    </td>
+
+   <%-- response set label --%>
+
+    <td class="table_cell">
+      <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
+        <c:choose>
+          <c:when test="${status.last}">
+           <c:out value="${meta.responseSet.label}"/>
+          </c:when>
+          <c:otherwise>
+            <c:out value="${meta.responseSet.label}"/>,<br>
+          </c:otherwise>
+        </c:choose>
+      </c:forEach>
+      &nbsp;
+    </td>
+
+   <%-- REQUIRED --%>
+
+   <td class="table_cell">
+    <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
+     <c:choose>
+
+        <c:when test="${!status.last}"></c:when>
+        <c:when test="${meta.required}">
+          Yes
+        </c:when>
+        <c:otherwise>
+          No
+        </c:otherwise>
+
+    </c:choose>
+
+    </c:forEach>
+   &nbsp;</td>
+
+  </tr>
+  <c:set var="count" value="${count+1}"/>
+</c:forEach>
+</table>
+</div>
+
+</div></div></div></div></div></div></div></div>
+</div>
+<table border="0" cellpadding="0" cellspacing="0" >
+  <tr>
+   <td><input type="submit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="submit" name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
+  </tr>
+</table>
+</form>
+</c:if>
+
+
+<jsp:include page="../include/footer.jsp"/>
