@@ -28,7 +28,7 @@ public interface StudyParticipantService {
 
     void startBulkAddParticipantJob(MultipartFile file, Study study, Study site,UserAccountBean userAccountBean,  JobDetail jobDetail, String schema,String customerUuid, ResourceBundle textsBundle,String accessToken, String register);
   
-    File startCaseBookPDFJob(JobDetail jobDetail,
+    void startCaseBookPDFJob(JobDetail jobDetail,
     		String studyOID,  
             String studySubjectIdentifier,            
             ServletContext servletContext,
@@ -39,5 +39,5 @@ public interface StudyParticipantService {
             String landscape,
             List<String> permissionTagsString) throws Exception;
     
-    String getMergedPDFcasebookFileName(String studyOID, String studySubjectIdentifier);
+   
 }
