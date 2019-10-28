@@ -234,7 +234,7 @@ public class ValidateServiceImpl implements ValidateService {
                     if (accessToken != null && !accessToken.isEmpty()) {
                         LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
                         String userType = (String) userContextMap.get("userType");
-                        if (userType.equals(org.akaza.openclinica.service.UserType.SYSTEM.getName())){
+                        if (userType.equals(core.org.akaza.openclinica.service.UserType.SYSTEM.getName())){
                             String clientId = decodedToken.get("clientId").toString();
                             if (org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
                                     || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)){

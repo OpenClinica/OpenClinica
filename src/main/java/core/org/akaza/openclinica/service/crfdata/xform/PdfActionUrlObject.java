@@ -1,17 +1,18 @@
-package org.akaza.openclinica.service.crfdata.xform;
+package core.org.akaza.openclinica.service.crfdata.xform;
 
 import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.JobDetail;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.domain.datamap.EventCrf;
+import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import core.org.akaza.openclinica.domain.datamap.FormLayout;
+import core.org.akaza.openclinica.domain.datamap.FormLayoutMedia;
+import core.org.akaza.openclinica.domain.datamap.JobDetail;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.service.crfdata.xform.ActionUrlObject;
 
 public class PdfActionUrlObject extends ActionUrlObject {
 	

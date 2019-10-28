@@ -1,4 +1,4 @@
-package org.akaza.openclinica.service.crfdata.xform;
+package core.org.akaza.openclinica.service.crfdata.xform;
 
 import java.io.File;
 

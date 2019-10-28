@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.text.MessageFormat;
 
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
