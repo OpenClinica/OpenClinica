@@ -89,7 +89,7 @@
         $('#getPdfMessage').slideDown();
         jQuery.ajax({
             'type': 'POST',
-            'url': '${pageContext.request.contextPath}/auth/api/clinicaldata/pdf/print/${study.oid}/${studySub.oid}?format=A4&landscape=false&margin=0.5in',
+            'url': '${pageContext.request.contextPath}/studies/${study.oid}/participants/${studySub.oid}/casebook',
             'contentType': 'application/json',
             'dataType': 'json'
         });
