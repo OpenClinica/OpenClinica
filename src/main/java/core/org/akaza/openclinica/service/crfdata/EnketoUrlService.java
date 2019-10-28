@@ -10,27 +10,28 @@ import java.util.*;
 
 import javax.servlet.ServletContext;
 
-import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
-import core.org.akaza.openclinica.bean.core.Utils;
-import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.submit.ItemDataBean;
-import core.org.akaza.openclinica.core.form.xform.LogBean;
-import core.org.akaza.openclinica.core.form.xform.QueriesBean;
-import core.org.akaza.openclinica.core.form.xform.QueryBean;
-import core.org.akaza.openclinica.core.form.xform.QueryType;
-import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.*;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
-import core.org.akaza.openclinica.domain.Status;
-import core.org.akaza.openclinica.domain.datamap.*;
-import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.domain.xform.XformParserHelper;
-import core.org.akaza.openclinica.domain.xform.dto.Bind;
-import core.org.akaza.openclinica.service.crfdata.xform.*;
-import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.core.form.xform.LogBean;
+import org.akaza.openclinica.core.form.xform.QueriesBean;
+import org.akaza.openclinica.core.form.xform.QueryBean;
+import org.akaza.openclinica.core.form.xform.QueryType;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.domain.xform.dto.Bind;
+import org.akaza.openclinica.service.crfdata.xform.*;
+import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -569,7 +570,7 @@ public class EnketoUrlService {
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
-        eventCrf.setStatusId(core.org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
+        eventCrf.setStatusId(org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
         eventCrf.setCompletionStatus(completionStatusDao.findByCompletionStatusId(1));// setCompletionStatusId(1);
         eventCrf.setStudySubject(studySubject);
         eventCrf.setStudyEvent(studyEvent);
@@ -603,5 +604,74 @@ public class EnketoUrlService {
         }
     }
 
+    public File getFormPdf(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String studySubjectOID,FormLayout formLayout, String flavor,
+            ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked , boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub,String format, String margin,String landscape) throws Exception {
+			
+    	    File pdfFile = null; 
+    	    Study study = enketoCredentials.getParentStudy(studyOid);
+			Study site = enketoCredentials.getSiteStudy(studyOid);
+			studyOid = study.getOc_oid();
+			int filePath = study.getFilePath();
+			
+			String editURL = null;
+			StudyEventDefinition eventDef = null;
+			StudySubject subject = null;
+							
+			// Lookup relevant data			
+			eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(subjectContext.getStudyEventDefinitionId()));
+			StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
+			subject = studyEvent.getStudySubject();
+			
+			if (formLayout == null) {
+				formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
+			}
+			EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), subject.getStudySubjectId(),
+			formLayout.getFormLayoutId());
+			
+			if(eventCrf==null){
+				UserAccount userAccount = userAccountDao.findByUserId(ub.getId());
+				eventCrf= createEventCrf(formLayout,studyEvent,subject,userAccount);
+			}
+			
+			CrfVersion crfVersion = eventCrf.getCrfVersion();
+			boolean markComplete = true;
+			if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
+				markComplete = false;
+			}
+			
+			// Load populated instance
+			String populatedInstance = "";
+			String crfFlavor = "";
+			String crfOid = "";
+		
+			populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds);
+			crfFlavor = flavor;
+	
+			crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
+			
+			// Call Enketo api to get url
+			EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
+			
+			// Build redirect url
+			String redirectUrl = CoreResources.getField("sysURL");
+			
+			EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventDef.getStudyEventDefinitionId(),
+			formLayout.getCrf().getCrfId(), eventDef.getStudy().getStudyId());
+			
+			// Return Enketo URL
+			List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
+			PdfActionUrlObject pdfActionUrlObject = new PdfActionUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
+			mediaList, null, flavor, role, study, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked,
+			studySubjectOID,format,	margin, landscape);
+					
+			EnketoPDFResponse epr = enketo.registerAndGetFormPDF(pdfActionUrlObject);
+			
+			if (epr.getPdfFile() != null) {
+				pdfFile = epr.getPdfFile();
+			}
+						
+			return pdfFile;
+		
+		}
     }
 

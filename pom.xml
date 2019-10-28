@@ -777,6 +777,11 @@
             <artifactId>guava</artifactId>
             <version>28.0-jre</version>
         </dependency>
+        <dependency> 
+	       <groupId>org.apache.pdfbox</groupId> 
+	       <artifactId>pdfbox</artifactId> 
+	       <version>2.0.17</version> 
+	    </dependency>   
     </dependencies>
 
     <!-- These dependencies are used by _all_ child projects -->

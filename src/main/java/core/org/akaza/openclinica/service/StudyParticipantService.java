@@ -23,5 +23,16 @@ public interface StudyParticipantService {
 
     void startBulkAddParticipantJob(MultipartFile file, Study study, Study site,UserAccountBean userAccountBean,  JobDetail jobDetail, String schema,String customerUuid, ResourceBundle textsBundle,String accessToken, String register);
   
-
+    void startCaseBookPDFJob(JobDetail jobDetail,
+    		String studyOID,  
+            String studySubjectIdentifier,            
+            ServletContext servletContext,
+            String userAccountID,                    
+            String fullFinalFilePathName,
+            String format, 
+            String margin, 
+            String landscape,
+            List<String> permissionTagsString) throws Exception;
+    
+   
 }
