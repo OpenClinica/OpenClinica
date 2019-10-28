@@ -34,8 +34,7 @@ import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.apache.pdfbox.pdmodel.PDDocument;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +102,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     
     @Autowired
     OpenRosaServices openRosaServices;
+    
+    @Autowired
+    PdfService pdfService;
     
     @Autowired
     EventDefinitionCrfDao eventDefinitionCrfDao;
@@ -411,7 +413,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     }
   
     @Transactional
-    public File startCaseBookPDFJob(JobDetail jobDetail,
+    public void startCaseBookPDFJob(JobDetail jobDetail,
 						    		String studyOID,  
 						            String studySubjectIdentifier,            
 						            ServletContext servletContext,
@@ -485,7 +487,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    	}//for-loop-2	    						
 			    }//for-loop-1		   
 			    
-				mergedPdfFile = this.mergePDF(pdfFiles, studyOID, studySubjectIdentifier,fullFinalFilePathName);
+				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName);
+				String footerMsg = "OpenClinica CaseBook ";
+				pdfService.addFooter(fullFinalFilePathName, footerMsg);
 				mergedPdfFileNm = mergedPdfFile.getName();
 				userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
 			} catch (Exception e) {
@@ -494,7 +498,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 	            throw e;
 	        }
 		    
-			return mergedPdfFile;
+			
 		}
   
     /**
@@ -519,67 +523,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         }
 
     }
-    /**
-     * AC5: The PDF Casebook will be called "Participant <Participant ID> Casebook <current timestamp>.pdf".
-     * @param files
-     * @param studyOID
-     * @param studySubjectIdentifier
-     * @return
-     * @throws IOException
-     */
-    public File mergePDF(ArrayList<File> files,
-				    	 String studyOID,
-				         String studySubjectIdentifier,
-				         String fullFinalFilePathName) throws IOException {
-
-    	  //Instantiating PDFMergerUtility class
-        PDFMergerUtility PDFmerger = new PDFMergerUtility();
-        
-        File finalFile = new File(fullFinalFilePathName);
-        PDFmerger.setDestinationFileName(fullFinalFilePathName);
-        
-        //Loading an existing PDF document   
-        ArrayList<PDDocument>  pDDocuments = new ArrayList<>();
-        for(File file: files) {
-        	 PDDocument doc = PDDocument.load(file);
-        	 // track doc and  keep it open
-        	 pDDocuments.add(doc);
-        	
-        	//adding the source files
-        	 PDFmerger.addSource(file);
-        }
-        
-        //Merging all PDFs
-        PDFmerger.mergeDocuments(null);
-     
-        //after merge, to close the documents
-        for(PDDocument doc:pDDocuments) {
-        	doc.close();
-        }
-        //after merge, to remove the sub temp files
-        for(File file: files) {
-        	file.delete();
-        }
-        //return the new file
-        return finalFile;
-     }
-
-
-	/**
-	 * @param studyOID
-	 * @param studySubjectIdentifier
-	 * @return
-	 */
-	public String getMergedPDFcasebookFileName(String studyOID, String participantId) {
-		Date now = new Date();	
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
-		String timeStamp = simpleDateFormat.format(now);
-        String pathStr = EnketoAPI.getCaseBookFileRootPath();
-    	String fileName = "Participant_"+participantId+"_Casebook_"+timeStamp+".pdf";
-    	String fullFinalFilePathName = pathStr + File.separator + fileName;
-		return fullFinalFilePathName;
-	}
-    
+   
+	    
 	/**
 	 * 
 	 * @param studyOID

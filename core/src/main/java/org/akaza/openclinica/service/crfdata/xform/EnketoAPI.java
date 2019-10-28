@@ -109,6 +109,7 @@ public class EnketoAPI {
     public static final String SURVEY_WRITABLE_PARTICIPATE = "/oc/api/v1/survey/collect/participant";
     public static final String INSTANCE_WRITABLE_PARTICIPATE = "/oc/api/v1/instance/edit/participant";
     public static final String DATABASE_ID_ENCRYPTION_KEY_PROPERTY = "databaseIdEncryptionKey";
+    public static final String PDF_CASEBOOK_DIRECTORY = "pdf_casebook";
 
     private String userPasswdCombo;
 
@@ -766,8 +767,9 @@ public class EnketoAPI {
             	 pdfResponse = new EnketoPDFResponse();
             	 
             	 SimpleDateFormat sdf_pdfFile = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");            
-            	 String fileName = crfOid + "_" + sdf_pdfFile.format(new Date()) + ".pdf"; 
-            	 String filePath = getCaseBookFilePath(studyOid, studySubjectOID) + File.separator +  fileName; 
+            	 String fileName = studySubjectOID+"_"+crfOid + "_" + sdf_pdfFile.format(new Date()) + ".pdf";          	            	
+            	 String filePath = getCaseBookFileTempPath() + File.separator +  fileName;
+            	 
             	 Path pdfFile = Files.write(Paths.get(filePath), response.getBody());
             	 pdfResponse.setPdfFile(pdfFile.toFile());	
             	 pdfResponse.setStatusCode(response.getStatusCodeValue()+"");
@@ -827,8 +829,10 @@ public class EnketoAPI {
      * 
      * @return
      */
-    public static String getCaseBookFileRootPath() {
-        String dirPath = CoreResources.getField("filePath") + "bulk_jobs" + File.separator + JobType.PARTICIPANT_PDF_CASEBOOK;
+    public static String getCaseBookFileTempPath() {
+    	String tempDir = System.getProperty( "java.io.tmpdir");
+    	String dirPath = tempDir+ File.separator+ PDF_CASEBOOK_DIRECTORY;
+       
         File directory = new File(dirPath);
         if (!directory.exists()) {
             directory.mkdirs();
@@ -836,18 +840,5 @@ public class EnketoAPI {
         return dirPath;
     }
     
-    /**
-     * 
-     * @param studyOid
-     * @param studySubjectOID
-     * @return
-     */
-    public static String getCaseBookFilePath(String studyOid,String studySubjectOID) {
-        String dirPath = CoreResources.getField("filePath") + "bulk_jobs" + File.separator + JobType.PARTICIPANT_PDF_CASEBOOK + File.separator+ studyOid + File.separator + studySubjectOID;
-        File directory = new File(dirPath);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-        return dirPath;
-    }
+    
 }

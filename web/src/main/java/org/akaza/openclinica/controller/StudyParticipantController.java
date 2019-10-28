@@ -27,6 +27,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
+import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
@@ -55,6 +56,7 @@ import javax.ws.rs.core.Context;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -84,6 +86,9 @@ public class StudyParticipantController {
 
 	@Autowired
 	private CSVService csvService;
+	
+	@Autowired
+    PdfService pdfService;
 
 	@Autowired
 	private UserAccountDao uAccountDao;
@@ -525,9 +530,9 @@ public class StudyParticipantController {
 	}
 	
 	@ApiOperation(value = "To get PDF version casebook for one specific participant",  notes = "only work for authorized users with the right acecss permission ")
-	@RequestMapping(value = "/pdf/print/{studyOid}/{studySubjectIdentifier}", method = RequestMethod.POST)
+	@RequestMapping(value = "/studies/{studyOid}/participants/{participantId}/casebook", method = RequestMethod.POST)
 	public ResponseEntity<Object> getCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
-												   @PathVariable("studySubjectIdentifier") String studySubjectIdentifier, 
+												   @PathVariable("participantId") String participantId, 
 												   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
 										           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
 										           @ApiParam( value = "optional parameter landscape whether paper orientation is landscape. Valid values are true, false. Default is false.", required = false ) @RequestParam(value="landscape",defaultValue = "false",required = false) String landscape,
@@ -541,7 +546,7 @@ public class StudyParticipantController {
 	 	  
 		  try {				 
 			  validateService.validateStudyAndRoles(studyOid,userAccountBean);			 	 			 	 		 	 
-		 	  String uuid = startBulkCaseBookPDFJob(studyOid,siteOid, studySubjectIdentifier, request, userAccountBean, format, margin, landscape);
+		 	  String uuid = startBulkCaseBookPDFJob(studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
 
 			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
 			  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -552,10 +557,10 @@ public class StudyParticipantController {
 		 	 
 		 }
 
-	@Transactional
+	
 	private String startBulkCaseBookPDFJob(String studyOid,
 											String siteOid, 
-											String studySubjectIdentifier, 											 
+											String participantId, 											 
 											HttpServletRequest request,
 											UserAccountBean userAccountBean, 
 											String format, 
@@ -574,10 +579,11 @@ public class StudyParticipantController {
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 			//currently studySubjectIdentifier is OID
-			StudySubject ss = studySubjectDao.findByOcOID(studySubjectIdentifier);
-			String participantId = ss.getLabel();
+			StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantId, study);
+			String studySubjectIdentifier = ss.getOcOid();
+			
 			//Setting the destination file
-	        String fullFinalFilePathName = this.studyParticipantService.getMergedPDFcasebookFileName(studyOid, participantId);
+	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
 	        int index= fullFinalFilePathName.lastIndexOf("\\");
 	    	String fileName = fullFinalFilePathName.substring(index + 1);
 	    	
@@ -591,7 +597,7 @@ public class StudyParticipantController {
 			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 				try {
 					 String userAccountID = userAccountBean.getId() +"";
-					 File pdfFile = this.studyParticipantService.startCaseBookPDFJob(jobDetail,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
 				 	
 					} catch (Exception e) {
 						logger.error("Exception is thrown while processing CaseBook PDF: " + e);
@@ -603,4 +609,22 @@ public class StudyParticipantController {
 			return jobDetail.getUuid();
 	
 	}
+	
+	
+	/**
+	 * @param studyOID
+	 * @param studySubjectIdentifier
+	 * @return
+	 */
+	public String getMergedPDFcasebookFileName(String studyOID, String participantId) {
+		Date now = new Date();	
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
+		String timeStamp = simpleDateFormat.format(now);
+        String pathStr = pdfService.getCaseBookFileRootPath();
+    	String fileName = "Participant_"+participantId+"_Casebook_"+timeStamp+".pdf";
+    	String fullFinalFilePathName = pathStr + File.separator + fileName;
+		return fullFinalFilePathName;
+	}
+	
+	
 }
