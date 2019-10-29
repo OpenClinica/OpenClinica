@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
@@ -59,6 +60,7 @@ import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.CSVService;
 import core.org.akaza.openclinica.service.ParticipantService;
@@ -605,9 +607,11 @@ public class StudyParticipantController {
 			String accessToken = (String) request.getSession().getAttribute("accessToken");
 			servletContext.setAttribute("accessToken", accessToken);
 			servletContext.setAttribute("studyID", study.getStudyId()+"");
+			Locale local = LocaleResolver.resolveLocale(request);
 			List<String> permissionTagsString =permissionService.getPermissionTagsList((StudyBean)request.getSession().getAttribute("study"),request);
 			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 				try {
+					 ResourceBundleProvider.updateLocale(local);
 					 String userAccountID = userAccountBean.getId() +"";
 					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
 				 	

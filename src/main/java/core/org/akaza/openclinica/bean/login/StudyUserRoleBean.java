@@ -132,9 +132,7 @@ public class StudyUserRoleBean extends AuditableEntityBean {
         Role role = Role.getByName(roleName);
         if(role == null || role.getId()==0) {
             ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
-            if(resterm == null) {
-            	resterm = ResourceBundleProvider.getTermsBundle(new Locale("en"));
-            }
+          
             if(resterm.getString("site_investigator").equals(roleName)) {
                 role = Role.INVESTIGATOR;
             } else if("Data Specialist".equals(roleName)) {
