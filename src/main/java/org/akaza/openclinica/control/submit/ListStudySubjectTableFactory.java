@@ -1000,7 +1000,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         @SuppressWarnings( "unchecked" )
         public Object getValue(Object item, String property, int rowcount) {
-
             studyEvents = (List<StudyEventBean>) ((HashMap<Object, Object>) item).get(property + "_studyEvents");
             studyEventDefinition = (StudyEventDefinitionBean) ((HashMap<Object, Object>) item).get(property + "_object");
             subjectEventStatus = SubjectEventStatus.get((Integer) ((HashMap<Object, Object>) item).get(property));
@@ -1411,12 +1410,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.td(0).styleClass("table_cell_left");
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
                 eventDiv.tdEnd().trEnd(0);
+                eventDiv.tr(0).valign("top").close();
+                eventDiv.td(0).styleClass("table_cell_left").close();
+                updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
+                eventDiv.tdEnd().trEnd(0);
                 if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == Status.AVAILABLE
                         && currentRole.getRole() != Role.MONITOR) {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
-                    eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell_left").close();
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
@@ -1453,7 +1452,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
         String remove = resword.getString("remove");
-        String delete = resword.getString("reassign");
+        String delete = resword.getString("delete");
         String reassign = resword.getString("reassign");
         String occurrence_x_of = resword.getString("ocurrence");
         String subjectText = resword.getString("subject");
