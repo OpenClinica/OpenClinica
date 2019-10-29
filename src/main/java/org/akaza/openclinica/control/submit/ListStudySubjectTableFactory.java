@@ -1571,12 +1571,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.td(0).styleClass("table_cell_left");
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
                 eventDiv.tdEnd().trEnd(0);
+                eventDiv.tr(0).valign("top").close();
+                eventDiv.td(0).styleClass("table_cell_left").close();
+                updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
+                eventDiv.tdEnd().trEnd(0);
                 if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == Status.AVAILABLE
                         && currentRole.getRole() != Role.MONITOR) {
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
-                    eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell_left").close();
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
