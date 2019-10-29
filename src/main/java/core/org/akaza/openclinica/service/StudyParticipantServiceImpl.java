@@ -18,6 +18,7 @@ import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.service.ImportService;
+import org.akaza.openclinica.service.PdfService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
