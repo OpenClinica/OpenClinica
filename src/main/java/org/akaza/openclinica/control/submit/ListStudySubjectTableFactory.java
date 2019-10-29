@@ -1661,7 +1661,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "EnterDataForStudyEvent?eventId=" + studyEventId;
         builder.a().href(href1);
         builder.close();
-        builder.a().href(href1).append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>").aEnd();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>").aEnd();
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(view).aEnd();
 
