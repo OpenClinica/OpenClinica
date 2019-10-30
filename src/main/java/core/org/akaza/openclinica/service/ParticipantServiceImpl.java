@@ -297,15 +297,14 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
 			errorCode = "errorCode.studyNotAvailable"; 
 			msg = "The study is not available,";
 		}
-		
+		/**
+		 *  OC-11590: Allow GET Participant API on Locked Studies
+		 */
 		String studyStatus = study.getStatus().getName().toString().toLowerCase();
 		if(studyStatus != null ) {
 			if(studyStatus.equals("design")) {
 				isNotAvailableStatus = true;				
 				msg = msg + "it is in design status.";
-			}else if(studyStatus.equals("locked")) {
-				isNotAvailableStatus = true;				
-				msg = msg + "it is in locked status.";
 			}else if(studyStatus.equals("frozen")) {
 				isNotAvailableStatus = true;				
 				msg = msg + "it is in frozen status.";
