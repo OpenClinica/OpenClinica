@@ -1568,7 +1568,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 }
             } else {
                 eventDiv.tr(0).valign("top").close();
-                eventDiv.td(0).styleClass("table_cell_left");
+                eventDiv.td(0).styleClass("table_cell_left").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
                 eventDiv.tdEnd().trEnd(0);
                 eventDiv.tr(0).valign("top").close();
@@ -1576,7 +1576,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
                 eventDiv.tdEnd().trEnd(0);
                 if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == Status.AVAILABLE
-                        && currentRole.getRole() != Role.MONITOR) {
+                        && currentRole.getRole() != Role.MONITOR && eventStatus != SubjectEventStatus.SCHEDULED) {
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell_left").close();
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
@@ -1661,7 +1661,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "EnterDataForStudyEvent?eventId=" + studyEventId;
         builder.a().href(href1);
         builder.close();
-        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>").aEnd();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(view).aEnd();
 
