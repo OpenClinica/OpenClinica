@@ -1,34 +1,30 @@
 package org.akaza.openclinica.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import core.org.akaza.openclinica.bean.login.*;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.core.Context;
+
 import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
-import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.domain.datamap.JobDetail;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.domain.enumsupport.JobType;
-import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
-import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.service.*;
-import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.service.PdfService;
+import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.akaza.openclinica.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +32,47 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.text.ParseException;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import core.org.akaza.openclinica.bean.login.ErrorObject;
+import core.org.akaza.openclinica.bean.login.ResponseSuccessListAllParticipantsByStudyDTO;
+import core.org.akaza.openclinica.bean.login.StudyParticipantDTO;
+import core.org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.JobDetail;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.CSVService;
+import core.org.akaza.openclinica.service.ParticipantService;
+import core.org.akaza.openclinica.service.PermissionService;
+import core.org.akaza.openclinica.service.StudyParticipantService;
+import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
@@ -71,12 +100,17 @@ public class StudyParticipantController {
 
 	@Autowired
 	private CSVService csvService;
+	
+	@Autowired
+    PdfService pdfService;
 
 	@Autowired
 	private UserAccountDao uAccountDao;
 
 	@Autowired
 	private StudyDao studyDao;
+	@Autowired
+	private StudySubjectDao studySubjectDao;
 
 	private StudyDAO studyDAO;
 	private StudySubjectDAO ssDao;
@@ -84,6 +118,9 @@ public class StudyParticipantController {
 
 	@Autowired
 	private StudyParticipantService studyParticipantService;
+		 
+    @Autowired
+    PermissionService permissionService;
 
 	private RestfulServiceHelper serviceHelper;
 	private String dateFormat;
@@ -505,4 +542,105 @@ public class StudyParticipantController {
 		});
 		return jobDetail.getUuid();
 	}
+	
+	@ApiOperation(value = "To get PDF version casebook for one specific participant",  notes = "only work for authorized users with the right acecss permission ")
+	@RequestMapping(value = "/studies/{studyOid}/participants/{participantId}/casebook", method = RequestMethod.POST)
+	public ResponseEntity<Object> getCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
+												   @PathVariable("participantId") String participantId, 
+												   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
+										           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
+										           @ApiParam( value = "optional parameter landscape whether paper orientation is landscape. Valid values are true, false. Default is false.", required = false ) @RequestParam(value="landscape",defaultValue = "false",required = false) String landscape,
+										           @Context HttpServletRequest request
+										          ) throws IOException {
+											 
+		
+		  utilService.setSchemaFromStudyOid(studyOid);		 	  
+	 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+	 	  String siteOid = null;
+	 	  
+		  try {				 
+			  validateService.validateStudyAndRoles(studyOid,userAccountBean);			 	 			 	 		 	 
+		 	  String uuid = startBulkCaseBookPDFJob(studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
+
+			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
+			  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+		  
+			  } catch (OpenClinicaSystemException e) {
+					return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+			}
+		 	 
+		 }
+
+	
+	private String startBulkCaseBookPDFJob(String studyOid,
+											String siteOid, 
+											String participantId, 											 
+											HttpServletRequest request,
+											UserAccountBean userAccountBean, 
+											String format, 
+											String margin, 
+											String landscape) {
+									 	 
+
+		    Study site = null;
+		    Study study = null;
+		    if(siteOid !=null) {
+		    	site = studyDao.findByOcOID(siteOid);
+		    }
+			if(studyOid != null) {
+				study = studyDao.findByOcOID(studyOid);
+			}
+			
+			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
+			//currently studySubjectIdentifier is OID
+			StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantId, study);
+			String studySubjectIdentifier = ss.getOcOid();
+			
+			//Setting the destination file
+	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
+	        int index= fullFinalFilePathName.lastIndexOf("\\");
+	    	String fileName = fullFinalFilePathName.substring(index + 1);
+	    	
+			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.PARTICIPANT_PDF_CASEBOOK, fileName);
+			jobDetail.setLogPath(fileName);
+			ServletContext servletContext = request.getServletContext();
+			String accessToken = (String) request.getSession().getAttribute("accessToken");
+			servletContext.setAttribute("accessToken", accessToken);
+			servletContext.setAttribute("studyID", study.getStudyId()+"");
+			Locale local = LocaleResolver.resolveLocale(request);
+			List<String> permissionTagsString =permissionService.getPermissionTagsList((StudyBean)request.getSession().getAttribute("study"),request);
+			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+				try {
+					 ResourceBundleProvider.updateLocale(local);
+					 String userAccountID = userAccountBean.getId() +"";
+					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+				 	
+					} catch (Exception e) {
+						logger.error("Exception is thrown while processing CaseBook PDF: " + e);
+						return e.getMessage();
+					}
+				return null;
+
+			});
+			return jobDetail.getUuid();
+	
+	}
+	
+	
+	/**
+	 * @param studyOID
+	 * @param studySubjectIdentifier
+	 * @return
+	 */
+	public String getMergedPDFcasebookFileName(String studyOID, String participantId) {
+		Date now = new Date();	
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
+		String timeStamp = simpleDateFormat.format(now);
+        String pathStr = pdfService.getCaseBookFileRootPath();
+    	String fileName = "Participant_"+participantId+"_Casebook_"+timeStamp+".pdf";
+    	String fullFinalFilePathName = pathStr + File.separator + fileName;
+		return fullFinalFilePathName;
+	}
+	
+	
 }
