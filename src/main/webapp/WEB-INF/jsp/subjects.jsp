@@ -296,7 +296,7 @@ $(function() {
                 return;
 
             if (form.studyEvent['@Repeating'] === 'No')
-                form.disabled = 'disabled="disabled"';
+                form.disabled = 'style="display:none;"';
 
             var submission = {
                 status: studyEvent['@OpenClinica:Status'],

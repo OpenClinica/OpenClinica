@@ -165,13 +165,9 @@
                 <h3 class="form-name">
                     {{form.[@Name]}}
                 </h3>
-                <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
-                    {{#if form.addNew}}
-                        data-url="{{form.addNew}}"
-                    {{else}}
-                        disabled="disabled"
-                    {{/if}}
-                >
+                {{#if form.addNew}}
+                    <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>' data-url="{{form.addNew}}">
+                {{/if}}                
             </div>
             <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
             <thead>
