@@ -454,17 +454,19 @@ $(function() {
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
         function datatablefy($tables) {
-            $tables.each(function(i) {
+            $tables.each(function() {
                 var table = $(this);
+                var subsection = table.closest('.subsection');
+                var id = subsection.attr('id');
                 var datatable = table.DataTable({
                     stateSave: true,
                     stateSaveCallback: function(settings, state) {
                         store(function(data) {
-                            data.datatables[i] = state;
+                            data.datatables[id] = state;
                         });
                     },
                     stateLoadCallback: function(settings, callback) {
-                        var data = store.data.datatables[i];
+                        var data = store.data.datatables[id];
                         callback(data);
                         if (!data)
                             this.fnSortNeutral();
@@ -499,7 +501,7 @@ $(function() {
                     }
                 });
                 var tableWidth = table.width();
-                table.closest('.subsection').css('max-width', tableWidth < 500 ? 500 : tableWidth);
+                subsection.css('max-width', tableWidth < 500 ? 500 : tableWidth);
             })
             .prev('.dataTables_filter').each(function(i) {
                 var searchbox = $(this);
