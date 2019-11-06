@@ -221,7 +221,11 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
             if (study == null) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier", "The study identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(study);
+            /**
+             *  OC-11590:Please allow endpoints to retrieve data (not modify data) for studies 
+             *  in Available, Locked, Frozen, or Design status.
+             */
+           // checkStudyOrSiteStatus(study);
             
             StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
             if (studyLevelRole == null) {
@@ -239,13 +243,13 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier",
                         "The study identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(study);
+          //  checkStudyOrSiteStatus(study);
             
             if (site == null || site.getParentStudyId() != study.getId()) {
                 throw new OpenClinicaSystemException("errorCode.invalidSiteIdentifier",
                         "The site identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(site);
+           // checkStudyOrSiteStatus(site);
             
             /**
              * check study level
