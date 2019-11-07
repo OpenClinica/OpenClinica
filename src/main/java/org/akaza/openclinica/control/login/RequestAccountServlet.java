@@ -50,7 +50,7 @@ public class RequestAccountServlet extends SecureController {
 
         String action = request.getParameter("action");
 
-        ArrayList studies = (ArrayList) studyDao.findAll();
+        ArrayList studies = (ArrayList) getStudyDao().findAll();
         ArrayList roles = Role.toArrayList();
         roles.remove(Role.ADMIN); // admin is not a user role, only used for
         // tomcat
@@ -114,7 +114,7 @@ public class RequestAccountServlet extends SecureController {
             UserAccountBean ubDB = sm.getUserBean();
 
             if (StringUtil.isBlank(ubDB.getName())) {
-                Study study = (Study) studyDao.findByPK(ubForm.getActiveStudyId());
+                Study study = (Study) getStudyDao().findByPK(ubForm.getActiveStudyId());
                 String studyName = study.getName();
                 request.setAttribute("studyName", studyName);
                 forwardPage(Page.REQUEST_ACCOUNT_CONFIRM);

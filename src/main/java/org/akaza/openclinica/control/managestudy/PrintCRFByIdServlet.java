@@ -46,7 +46,7 @@ public class PrintCRFByIdServlet extends PrintCRFServlet {
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
         Study currentStudy =    (Study) request.getSession().getAttribute("study");
-        currentStudy = (Study) studyDao.findByPK(1);
+        currentStudy = (Study) getStudyDao().findByPK(1);
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(getDataSource());
         if (request.getParameter("id") == null) {
             forwardPage(Page.LOGIN, request, response);

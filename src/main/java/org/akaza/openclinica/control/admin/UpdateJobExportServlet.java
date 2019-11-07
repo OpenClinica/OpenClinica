@@ -157,7 +157,7 @@ public class UpdateJobExportServlet extends SecureController {
                 forwardPage(Page.UPDATE_JOB_EXPORT);
             } else {
                 // change trigger, update in database
-                Study study = (Study) studyDao.findByPK(sm.getUserBean().getActiveStudyId());
+                Study study = (Study) getStudyDao().findByPK(sm.getUserBean().getActiveStudyId());
                 DatasetDAO datasetDao = new DatasetDAO(sm.getDataSource());
                 CoreResources cr =  new CoreResources();
                 UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");

@@ -21,6 +21,7 @@ import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -52,6 +53,8 @@ import java.util.List;
 @Transactional
 public class OdmImportServiceImpl implements OdmImportService {
 
+	@Autowired
+	private StudyBuildService studyBuildService;
 	private UserAccountDao userDaoDomain;
 	private StudyUserRoleDao studyUserRoleDao;
 	private StudyEventDefinitionDao studyEventDefDao;
@@ -125,7 +128,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		DataBinder dataBinder = new DataBinder(new Study());
 		errors = dataBinder.getBindingResult();
 		printOdm(odm);
-		CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(), dataSource);
+		studyBuildService.setRequestSchemaByStudy(odm.getStudy().get(0).getOID());
 
 		UserAccount userAccount = getCurrentUser();
 

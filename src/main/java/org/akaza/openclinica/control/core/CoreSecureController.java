@@ -8,6 +8,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.SessionManager;
@@ -64,10 +65,13 @@ import java.util.*;
  *
  * @author jnyayapathi
  */
-public abstract class CoreSecureController extends HttpServlet {
+public abstract class CoreSecureController extends SecureController {
 
     @Autowired
     private StudyDao studyDao;
+
+    @Autowired
+    private StudyBuildService studyBuildService;
 
     public static final String PAGE_MESSAGE = "pageMessages";// for showing
     public static final String INPUT_MESSAGES = "formMessages"; // for showing
@@ -324,7 +328,7 @@ public abstract class CoreSecureController extends HttpServlet {
             if (currentStudy == null || currentStudy.getStudyId() <= 0) {
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
-                    currentStudy = (Study) studyDao.findByPK(ub.getActiveStudyId());
+                    currentStudy = (Study) getStudyDao().findByPK(ub.getActiveStudyId());
 
                     ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
 
@@ -336,7 +340,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
                     } else {
                         // YW <<
-                        currentStudy.getStudy().setName(((Study) studyDao.findByPK(currentStudy.getStudy().getStudyId())).getName());
+                        currentStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId())).getName());
                         // YW >>
                         scs.setParametersForSite(currentStudy);
                     }
@@ -360,14 +364,14 @@ public abstract class CoreSecureController extends HttpServlet {
                 session.setAttribute("publicStudy",
                         currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
                 request.setAttribute("requestSchema", currentStudy.getSchemaName());
-                Study currentTenantStudy = (Study) studyDao.findByUniqueId(currentStudy.getUniqueIdentifier());
+                Study currentTenantStudy = (Study) getStudyDao().findByUniqueId(currentStudy.getUniqueIdentifier());
                 request.setAttribute("requestSchema", "public");
                 session.setAttribute("study", currentTenantStudy);
             } else if (currentStudy.getStudyId() > 0) {
                 // YW 06-20-2007<< set site's parentstudy name when site is
                 // restored
                 if (currentStudy.isSite()) {
-                    currentStudy.getStudy().setName(((Study) studyDao.findByPK(currentStudy.getStudy().getStudyId())).getName());
+                    currentStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId())).getName());
                 }
                 // YW >>
             }
@@ -400,7 +404,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 currentRole.setStatus(Status.DELETED);
                 session.setAttribute("userRole", currentRole);
             }
-            Study userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), dataSource);
+            Study userRoleStudy = getStudyBuildService().getPublicStudy(currentRole.getStudyId());
 
             if (userRoleStudy.isSite()) {
                 /*
@@ -720,14 +724,14 @@ public abstract class CoreSecureController extends HttpServlet {
         if (session == null)
             return false;
         Study publicStudy = (Study) session.getAttribute("publicStudy");
-        Study schemaStudy = studyDao.findByOcOID(publicStudy.getOc_oid());
+        Study schemaStudy = getStudyDao().findByOcOID(publicStudy.getOc_oid());
         if (adao.findByPKAndStudy(entityId, schemaStudy).getId() > 0) {
             return true;
         }
         // Here follow the current logic - study subjects at sites level are
         // visible to parent studies.
         if (!schemaStudy.isSite()) {
-            ArrayList<Study> sites = (ArrayList<Study>) studyDao.findAllByParent(schemaStudy.getStudyId());
+            ArrayList<Study> sites = (ArrayList<Study>) getStudyDao().findAllByParent(schemaStudy.getStudyId());
             if (sites.size() > 0) {
                 for (int j = 0; j < sites.size(); ++j) {
                     if (adao.findByPKAndStudy(entityId, sites.get(j)).getId() > 0) {
@@ -811,7 +815,7 @@ public abstract class CoreSecureController extends HttpServlet {
         ArrayList allDefs = new ArrayList();
         if (currentStudy.isSite()) {
             parentStudyId = currentStudy.getStudy().getStudyId();
-            Study parentStudy = (Study) studyDao.findByPK(parentStudyId);
+            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(parentStudy);
         } else {
             parentStudyId = currentStudy.getStudyId();
@@ -828,7 +832,7 @@ public abstract class CoreSecureController extends HttpServlet {
         ArrayList studyGroupClasses = new ArrayList();
         if (currentStudy.isSite()) {
             parentStudyId = currentStudy.getStudy().getStudyId();
-            Study parentStudy = (Study) studyDao.findByPK(parentStudyId);
+            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
             studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(parentStudy);
         } else {
             parentStudyId = currentStudy.getStudyId();

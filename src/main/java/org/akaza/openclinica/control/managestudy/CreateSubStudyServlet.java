@@ -285,7 +285,7 @@ public class CreateSubStudyServlet extends SecureController {
          */
 
         Study newSite = this.createStudyBean();
-        Study parentStudy = (Study) studyDao.findByPK(newSite.checkAndGetParentStudyId());
+        Study parentStudy = (Study) getStudyDao().findByPK(newSite.checkAndGetParentStudyId());
         session.setAttribute("newStudy", newSite);
         session.setAttribute("definitions", this.createSiteEventDefinitions(parentStudy, v));
 
@@ -421,12 +421,12 @@ public class CreateSubStudyServlet extends SecureController {
 
         study.setUserAccount(ub.toUserAccount());
         study.setDateCreated(new Date());
-        Study parent = (Study) studyDao.findByPK(study.checkAndGetParentStudyId());
+        Study parent = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
         // YW 10-10-2007, enable setting site status
         study.setStatus(study.getStatus());
         // YW >>
 
-        study = (Study) studyDao.create(study);
+        study = (Study) getStudyDao().create(study);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         for (int i = 0; i < parameters.size(); i++) {
@@ -474,14 +474,14 @@ public class CreateSubStudyServlet extends SecureController {
         if (!site.isSite()) {
             parentStudyBean = site;
         } else {
-            parentStudyBean = (Study) studyDao.findByPK(site.getStudy().getStudyId());
+            parentStudyBean = (Study) getStudyDao().findByPK(site.getStudy().getStudyId());
         }
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         ArrayList<EventDefinitionCRFBean> eventDefCrfList = (ArrayList<EventDefinitionCRFBean>) edcdao
                 .findAllActiveSitesAndStudiesPerParentStudy(parentStudyBean.getStudyId());
 
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-        Study parentStudy = (Study) studyDao.findByPK(site.getStudy().getStudyId());
+        Study parentStudy = (Study) getStudyDao().findByPK(site.getStudy().getStudyId());
         seds = (ArrayList<StudyEventDefinitionBean>) session.getAttribute("definitions");
         if (seds == null || seds.size() <= 0) {
             StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
@@ -651,7 +651,7 @@ public class CreateSubStudyServlet extends SecureController {
 
         }
         errors = v.validate();
-        ArrayList<Study> allStudies = (ArrayList<Study>) studyDao.findAll();
+        ArrayList<Study> allStudies = (ArrayList<Study>) getStudyDao().findAll();
         for (Study thisBean : allStudies) {
             if (fp.getString("uniqueProId").trim().equals(thisBean.getUniqueIdentifier())) {
                 v.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
@@ -762,7 +762,7 @@ public class CreateSubStudyServlet extends SecureController {
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        Study parentStudy = (Study) studyDao.findByPK(site.checkAndGetParentStudyId());
+        Study parentStudy = (Study) getStudyDao().findByPK(site.checkAndGetParentStudyId());
         seds = sedDao.findAllByStudy(parentStudy);
         int start = 0;
         for (StudyEventDefinitionBean sed : seds) {

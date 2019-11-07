@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
@@ -93,7 +94,8 @@ public class BatchCRFMigrationController implements Runnable {
     private StudyDao studyDao;
     @Autowired
     private SessionFactory sessionFactory;
-
+    @Autowired
+    private StudyBuildService studyBuildService;
     private HelperObject helperObject;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -386,7 +388,7 @@ public class BatchCRFMigrationController implements Runnable {
         }
         // Get public study when you want to get the roles
         StudyUserRoleBean suRole = uadao().findRoleByUserNameAndStudyId(userAccountBean.getName(),
-                CoreResources.getPublicStudy(stBean.getOc_oid(),dataSource).getStudyId());
+                studyBuildService.getPublicStudy(stBean.getOc_oid()).getStudyId());
 
         Role r = suRole.getRole();
         if (suRole == null || !(r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR))) {

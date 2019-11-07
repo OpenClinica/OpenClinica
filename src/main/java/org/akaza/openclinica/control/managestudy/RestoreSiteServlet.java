@@ -75,7 +75,7 @@ public class RestoreSiteServlet extends SecureController {
         logger.info("site id:" + idString);
 
         int siteId = Integer.valueOf(idString.trim()).intValue();
-        Study study = (Study) studyDao.findByPK(siteId);
+        Study study = (Study) getStudyDao().findByPK(siteId);
 
         // find all user and roles
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
@@ -97,7 +97,7 @@ public class RestoreSiteServlet extends SecureController {
             if ("confirm".equalsIgnoreCase(action)) {
                 // site can be restored when its parent study is not "removed"
                 // -- YW -6-21-2007
-                Study parentstudy = (Study) studyDao.findByPK(study.checkAndGetParentStudyId());
+                Study parentstudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
                 if (!"removed".equals(parentstudy.getStatus().getName())) {
                     request.setAttribute("siteToRestore", study);
 
@@ -121,7 +121,7 @@ public class RestoreSiteServlet extends SecureController {
                 study.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(study.getOldStatusId()));
                 study.setUpdater(ub);
                 study.setDateUpdated(new Date());
-                studyDao.update(study);
+                getStudyDao().update(study);
 
                 // restore all users and roles
                 for (int i = 0; i < userRoles.size(); i++) {

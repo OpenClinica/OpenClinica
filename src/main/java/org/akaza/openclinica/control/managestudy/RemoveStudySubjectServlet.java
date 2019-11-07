@@ -84,7 +84,7 @@ public class RemoveStudySubjectServlet extends SecureController {
 
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
-            Study study = (Study) studyDao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
             checkRoleByUserAndStudy(ub, study);
 

@@ -275,7 +275,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                             + "ResolveDiscrepancy?flavor=-query&noteId=" + dn.getEntityId()
                             + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
                     message.append(respage.getString("you_received_this_from"));
-                    Study study = (Study) studyDao.findByPK(dn.getStudyId());
+                    Study study = (Study) getStudyDao().findByPK(dn.getStudyId());
 
                     if ("itemData".equalsIgnoreCase(entityType)) {
                         itemData = (ItemDataBean) iddao.findByPK(dn.getEntityId());

@@ -11,6 +11,7 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.fileupload.FileItem;
@@ -96,6 +97,9 @@ public class OpenRosaSubmissionController {
 
     @Autowired
     private RandomizationService randomizationService;
+
+    @Autowired
+    private StudyBuildService studyBuildService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
@@ -248,7 +252,7 @@ public class OpenRosaSubmissionController {
 
 
     private void checkRandomization(Map<String, String> subjectContext, String studyOid, String subjectOid) throws Exception {
-        Study parentPublicStudy = CoreResources.getParentPublicStudy(studyOid, dataSource);
+        Study parentPublicStudy = studyBuildService.getParentPublicStudy(studyOid);
         String accessToken = subjectContext.get("accessToken");
         randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
     }

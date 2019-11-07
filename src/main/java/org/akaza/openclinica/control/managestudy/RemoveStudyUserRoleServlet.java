@@ -70,7 +70,7 @@ public class RemoveStudyUserRoleServlet extends SecureController {
                 StudyUserRoleBean uRole = udao.findRoleByUserNameAndStudyId(name, studyId);
                 request.setAttribute("uRole", uRole);
 
-                Study study = (Study) studyDao.findByPK(studyId);
+                Study study = (Study) getStudyDao().findByPK(studyId);
                 request.setAttribute("uStudy", study);
                 forwardPage(Page.REMOVE_USER_ROLE_IN_STUDY);
             } else {
@@ -105,7 +105,7 @@ public class RemoveStudyUserRoleServlet extends SecureController {
      */
     private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
 
-        Study study = (Study) studyDao.findByPK(sub.getStudyId());
+        Study study = (Study) getStudyDao().findByPK(sub.getStudyId());
         logger.info("Sending email...");
         String body =
             u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": " + u.getName() + ") "

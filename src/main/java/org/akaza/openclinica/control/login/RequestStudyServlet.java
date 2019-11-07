@@ -44,7 +44,7 @@ public class RequestStudyServlet extends SecureController {
     public void processRequest() throws Exception {
 
         String action = request.getParameter("action");
-        ArrayList studies = (ArrayList) studyDao.findAllByStatus(Status.AVAILABLE);
+        ArrayList studies = (ArrayList) getStudyDao().findAllByStatus(Status.AVAILABLE);
         ArrayList roles = Role.toArrayList();
         roles.remove(Role.ADMIN); // admin is not a user role, only used for
         // tomcat
@@ -85,7 +85,7 @@ public class RequestStudyServlet extends SecureController {
             newRole.setRole(Role.get(fp.getInt("studyRoleId")));
         }
         newRole.setStudyId(fp.getInt("studyId"));
-        Study studyRequested = (Study) studyDao.findByPK(newRole.getStudyId());
+        Study studyRequested = (Study) getStudyDao().findByPK(newRole.getStudyId());
         newRole.setStudyName(studyRequested.getName());
         session.setAttribute("newRole", newRole);
         if (!errors.isEmpty()) {

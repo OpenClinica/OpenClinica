@@ -269,7 +269,7 @@ public class AssignUserToStudyServlet extends SecureController {
 
                 } else {
                     // find all the sites for this top study
-                    ArrayList sites = (ArrayList) studyDao.findAllByParent(currentStudy.getStudyId());
+                    ArrayList sites = (ArrayList) getStudyDao().findAllByParent(currentStudy.getStudyId());
                     String notes = "";
                     for (int j = 0; j < sites.size(); j++) {
                         Study site = (Study) sites.get(j);

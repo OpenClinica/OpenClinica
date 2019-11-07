@@ -70,9 +70,9 @@ public class RestoreStudyServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyId = fp.getInt("id");
 
-        Study study = (Study) studyDao.findByPK(studyId);
+        Study study = (Study) getStudyDao().findByPK(studyId);
         // find all sites
-        ArrayList sites = (ArrayList) studyDao.findAllByParent(studyId);
+        ArrayList sites = (ArrayList) getStudyDao().findAllByParent(studyId);
 
         // find all user and roles in the study, include ones in sites
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
@@ -108,7 +108,7 @@ public class RestoreStudyServlet extends SecureController {
                 study.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(study.getOldStatusId()));
                 study.setUpdater(ub);
                 study.setDateUpdated(new Date());
-                studyDao.update(study);
+                getStudyDao().update(study);
 
                 // YW 09-27-2007 << restore auto-removed sites
                 for (int i = 0; i < sites.size(); i++) {
@@ -117,7 +117,7 @@ public class RestoreStudyServlet extends SecureController {
                         site.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(site.getOldStatusId()));
                         site.setUpdater(ub);
                         site.setDateUpdated(new Date());
-                        studyDao.update(site);
+                        getStudyDao().update(site);
                     }
                 }
 

@@ -69,7 +69,7 @@ public class ViewStudyUserServlet extends SecureController {
             StudyUserRoleBean uRole = udao.findRoleByUserNameAndStudyId(name, studyId);
             request.setAttribute("uRole", uRole);
 
-            Study study = (Study) studyDao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
             request.setAttribute("uStudy", study);
             request.setAttribute("siteRoleMap", Role.siteRoleMap);
             // BWP 12/7/07 >>To provide the view with the correct date format

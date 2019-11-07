@@ -97,7 +97,7 @@ public class BatchCRFMigrationServlet extends SecureController {
             // crf.setVersions(crfVersionList);
             crf.setFormLayouts(formLayoutList);
 
-            ArrayList<Study> listOfSites = (ArrayList<Study>) studyDao.findAllByParent(currentStudy.getStudyId());
+            ArrayList<Study> listOfSites = (ArrayList<Study>) getStudyDao().findAllByParent(currentStudy.getStudyId());
             siteList = new ArrayList<Study>();
             Study studyBean = new Study();
             studyBean.setOc_oid(currentStudy.getOc_oid());

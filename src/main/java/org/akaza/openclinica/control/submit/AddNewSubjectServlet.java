@@ -155,7 +155,7 @@ public class AddNewSubjectServlet extends SecureController {
             parentStudyId = currentStudy.getStudyId();
             classes = sgcdao.findAllActiveByStudy(currentStudy);
         } else {
-            Study parentStudy = (Study) studyDao.findByPK(parentStudyId);
+            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
             classes = sgcdao.findAllActiveByStudy(parentStudy);
         }
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
@@ -282,7 +282,7 @@ public class AddNewSubjectServlet extends SecureController {
                 int subjectCount = getSubjectCount(currentStudy);
 
                 currentStudy.setSubjectCount(subjectCount + 1);
-                studyDao.update(currentStudy);
+                getStudyDao().update(currentStudy);
 
                 // no errors
                 SubjectBean subject = new SubjectBean();

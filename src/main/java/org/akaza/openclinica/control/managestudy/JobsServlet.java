@@ -29,7 +29,7 @@ public class JobsServlet extends SecureController {
         int parentStudyId = currentStudy.checkAndGetParentStudyId();
         if (parentStudyId > 0) {
             request.setAttribute("atSiteLevel", true);
-            Study parentStudy = (Study) studyDao.findByPK(parentStudyId);
+            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
             request.setAttribute("theStudy", parentStudy);
             request.setAttribute("theSite", currentStudy);
         } else {

@@ -95,7 +95,7 @@ public class ViewJobServlet extends SecureController {
                 DatasetBean dataset = (DatasetBean) datasetDAO.findByPK(dsId);
                 triggerBean.setDataset(dataset);
                 triggerBean.setDatasetName(dataset.getName());
-                Study study = (Study) studyDao.findByPK(dataset.getStudyId());
+                Study study = (Study) getStudyDao().findByPK(dataset.getStudyId());
                 triggerBean.setStudyName(study.getName());
             }
             logger.debug("Trigger Priority: " + trigger.getKey().getName() + " " + trigger.getPriority());

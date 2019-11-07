@@ -82,15 +82,15 @@ public class ReassignStudySubjectServlet extends SecureController {
             if (StringUtil.isBlank(action)) {
                 ArrayList studies = null;
                 DisplayStudyBean displayStudy = new DisplayStudyBean();
-                Study study = (Study) studyDao.findByPK(studySub.getStudyId());
+                Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
                 if (study.isSite()) {// current in site
-                    studies = (ArrayList) studyDao.findAllByParent(study.getStudy().getStudyId());
-                    Study parent = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+                    studies = (ArrayList) getStudyDao().findAllByParent(study.getStudy().getStudyId());
+                    Study parent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                     displayStudy.setParent(parent);
                     // studies.add(parent);
                     displayStudy.setChildren(studies);
                 } else {
-                    studies = (ArrayList) studyDao.findAllByParent(study.getStudyId());
+                    studies = (ArrayList) getStudyDao().findAllByParent(study.getStudyId());
                     displayStudy.setParent(study);
                     displayStudy.setChildren(studies);
                     // studies.add(study);
@@ -105,7 +105,7 @@ public class ReassignStudySubjectServlet extends SecureController {
                     forwardPage(Page.REASSIGN_STUDY_SUBJECT);
                     return;
                 }
-                Study st = (Study) studyDao.findByPK(studyId);
+                Study st = (Study) getStudyDao().findByPK(studyId);
                 if ("confirm".equalsIgnoreCase(action)) {
                     StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(studySub.getLabel(), studyId, studySub.getId());
                     if (sub1.getId() > 0) {
@@ -129,7 +129,7 @@ public class ReassignStudySubjectServlet extends SecureController {
                     int subjectCount = getSubjectCount(st);
 
                     st.setSubjectCount(subjectCount+1);
-                    studyDao.update(st);
+                    getStudyDao().update(st);
 
                     logger.info("submit to reassign the subject");
                     studySub.setUpdatedDate(new Date());

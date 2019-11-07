@@ -156,7 +156,7 @@ public class ViewDatasetsServlet extends SecureController {
                 int datasetId = fp.getInt("datasetId");
 
                 DatasetBean db = initializeAttributes(datasetId);
-                Study study = (Study)studyDao.findByPK(db.getStudyId());
+                Study study = (Study)getStudyDao().findByPK(db.getStudyId());
 
                 if (study != null && study.getStudyId() != currentStudy.getStudyId() && study.checkAndGetParentStudyId() != currentStudy.getStudyId()) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study")
@@ -217,7 +217,7 @@ public class ViewDatasetsServlet extends SecureController {
         session.setAttribute("allItems", db.getItemDefCrf().clone());
         session.setAttribute("allSelectedItems", db.getItemDefCrf().clone());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-        Study theStudy = (Study) studyDao.findByPK(sm.getUserBean().getActiveStudyId());
+        Study theStudy = (Study) getStudyDao().findByPK(sm.getUserBean().getActiveStudyId());
         ArrayList<StudyGroupClassBean> allSelectedGroups = sgcdao.findAllActiveByStudy(theStudy);
         ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
         if (selectedSubjectGroupIds != null && allSelectedGroups != null) {

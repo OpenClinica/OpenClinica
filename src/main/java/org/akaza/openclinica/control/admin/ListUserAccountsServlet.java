@@ -96,7 +96,7 @@ public class ListUserAccountsServlet extends SecureController {
      *            UserAccountBean.
      */
     private void setStudyNamesInStudyUserRoles(ArrayList users) {
-        ArrayList allStudies = (ArrayList) studyDao.findAll();
+        ArrayList allStudies = (ArrayList) getStudyDao().findAll();
         HashMap studiesById = new HashMap();
 
         int i;

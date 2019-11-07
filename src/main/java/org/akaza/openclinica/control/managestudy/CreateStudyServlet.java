@@ -382,7 +382,7 @@ public class CreateStudyServlet extends SecureController {
 
         errors = v.validate();
         // check to see if name and uniqueProId are unique, tbh
-        ArrayList<Study> allStudies = (ArrayList<Study>) studyDao.findAll();
+        ArrayList<Study> allStudies = (ArrayList<Study>) getStudyDao().findAll();
         for (Study thisBean : allStudies) {
             if (fp.getString("name").trim().equals(thisBean.getName())) {
                 MessageFormat mf = new MessageFormat("");
@@ -425,8 +425,8 @@ public class CreateStudyServlet extends SecureController {
                 studyBean.setUserAccount(ub.toUserAccount());
                 studyBean.setDateCreated(new Date());
                 studyBean.setStatus(core.org.akaza.openclinica.domain.Status.PENDING);
-                studyBean = (Study) studyDao.create(studyBean);
-                Study newstudyBean = (Study) studyDao.findByName(studyBean.getName());
+                studyBean = (Study) getStudyDao().create(studyBean);
+                Study newstudyBean = (Study) getStudyDao().findByName(studyBean.getName());
 
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                 String selectedUserIdStr = fp.getString("selectedUser");
@@ -803,7 +803,7 @@ public class CreateStudyServlet extends SecureController {
         newStudy.setUserAccount(ub.toUserAccount());
         newStudy.setDateCreated(new Date());
         // newStudy.setStatus(Status.AVAILABLE);
-        Study finalStudy = (Study) studyDao.create(newStudy);
+        Study finalStudy = (Study) getStudyDao().create(newStudy);
 
         logger.info("new study created");
         StudyParameterValueBean spv = new StudyParameterValueBean();

@@ -304,4 +304,14 @@ public class PrintCRFServlet extends DataEntryServlet {
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
     	return false;
     }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
 }

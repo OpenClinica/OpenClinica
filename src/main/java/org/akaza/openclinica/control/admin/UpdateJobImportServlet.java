@@ -84,13 +84,13 @@ public class UpdateJobImportServlet extends SecureController {
         // ArrayList studies = udao.findStudyByUser(ub.getName(), (ArrayList)
         // sdao.findAll());
         // request.setAttribute("studies", studies);
-        ArrayList<Study> all = (ArrayList<Study>) studyDao.findAll();
+        ArrayList<Study> all = (ArrayList<Study>) getStudyDao().findAll();
         ArrayList<Study> finalList = new ArrayList<Study>();
         for (Study sb : all) {
             if (!sb.isSite()) {
                 finalList.add(sb);
                 // System.out.println("found study name: " + sb.getName());
-                finalList.addAll(studyDao.findAllByParent(sb.getStudyId()));
+                finalList.addAll(getStudyDao().findAllByParent(sb.getStudyId()));
             }
         }
         // System.out.println("found list of studies: " + finalList.toString());
@@ -138,7 +138,7 @@ public class UpdateJobImportServlet extends SecureController {
                 forwardPage(Page.UPDATE_JOB_IMPORT);
             } else {
                 int studyId = fp.getInt(CreateJobImportServlet.STUDY_ID);
-                Study study = (Study) studyDao.findByPK(studyId);
+                Study study = (Study) getStudyDao().findByPK(studyId);
                 // in the place of a users' current study, tbh
                 Date startDate = trigger.getStartTime();
                 trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), study, startDate, LocaleResolver.getLocale(request).getLanguage());

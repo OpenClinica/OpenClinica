@@ -50,7 +50,7 @@ public class EditDatasetServlet extends SecureController {
         int dsId = fp.getInt("dsId");
         DatasetBean dataset = initializeAttributes(dsId);
 
-        Study study = (Study)studyDao.findByPK(dataset.getStudyId());
+        Study study = (Study)getStudyDao().findByPK(dataset.getStudyId());
         // Checking if user has permission to access the current study/site
         checkRoleByUserAndStudy(ub, study);
 
@@ -168,7 +168,7 @@ public class EditDatasetServlet extends SecureController {
         session.setAttribute("allItems", db.getItemDefCrf().clone());
         session.setAttribute("allSelectedItems", db.getItemDefCrf().clone());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-        Study theStudy = (Study) studyDao.findByPK(sm.getUserBean().getActiveStudyId());
+        Study theStudy = (Study) getStudyDao().findByPK(sm.getUserBean().getActiveStudyId());
         ArrayList<StudyGroupClassBean> allSelectedGroups = sgcdao.findAllActiveByStudy(theStudy);
         ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
         if (selectedSubjectGroupIds != null && allSelectedGroups != null) {

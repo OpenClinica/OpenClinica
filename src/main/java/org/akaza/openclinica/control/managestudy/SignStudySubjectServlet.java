@@ -138,7 +138,7 @@ public class SignStudySubjectServlet extends SecureController {
         StudyEventDAO sedao = new StudyEventDAO(ds);
         EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-        Study studyBean = (Study) new SignStudySubjectServlet().studyDao.findByPK(studySub.getStudyId());
+        Study studyBean = (Study) new SignStudySubjectServlet().getStudyDao().findByPK(studySub.getStudyId());
         // DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(ds);
         ArrayList studyEvents = sedao.findAllByStudySubject(studySub);
         for (int l = 0; l < studyEvents.size(); l++) {
@@ -258,7 +258,7 @@ public class SignStudySubjectServlet extends SecureController {
             } else {
 
                 int studyId = studySub.getStudyId();
-                Study study = (Study) studyDao.findByPK(studyId);
+                Study study = (Study) getStudyDao().findByPK(studyId);
 
                 StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
                 StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
@@ -311,14 +311,14 @@ public class SignStudySubjectServlet extends SecureController {
 
         request.setAttribute("subject", subject);
 
-        Study study = (Study) studyDao.findByPK(studyId);
+        Study study = (Study) getStudyDao().findByPK(studyId);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
         // request.setAttribute("study", study);
 
         if (study.isSite()) {// this is a site,find parent
-            Study parentStudy = (Study) studyDao.findByPK(study.checkAndGetParentStudyId());
+            Study parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
             request.setAttribute("parentStudy", parentStudy);
         } else {
             request.setAttribute("parentStudy", new Study());

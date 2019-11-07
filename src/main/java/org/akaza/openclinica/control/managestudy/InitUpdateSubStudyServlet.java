@@ -75,14 +75,14 @@ public class InitUpdateSubStudyServlet extends SecureController {
             forwardPage(Page.ERROR);
         } else {
             int studyId = Integer.valueOf(idString.trim()).intValue();
-            Study study = (Study) studyDao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
             checkRoleByUserAndStudy(ub, study);
 
             String parentStudyName = "";
             Study parent = new Study();
             if (study.isSite()) {
-                parent = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+                parent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                 parentStudyName = parent.getName();
                 // at this time, this feature is only available for site
                 createEventDefinitions(parent);

@@ -1003,4 +1003,30 @@ public class Study extends DataMapDomainObject {
     public String getManager() {
         return CoreResources.getStudyManager();
     }
+
+    @Transient
+    public String getAbbreviatedParentStudyName() {
+        String parentStudyName = getStudy().getName();
+        if (parentStudyName.length() > 30) {
+            parentStudyName = parentStudyName.substring(0, 27) + "...";
+        }
+        return parentStudyName;
+    }
+
+    @Transient
+    public String getAbbreviatedIdentifier() {
+        String identifier = getUniqueIdentifier();
+        if (identifier.length() > 25) {
+            identifier = identifier.substring(0, 22) + "...";
+        }
+        return identifier;
+    }
+    @Transient
+    public String getAbbreviatedName() {
+        String name = getName();
+        if (name.length() > 30) {
+            name = name.substring(0, 27) + "...";
+        }
+        return name;
+    }
 }

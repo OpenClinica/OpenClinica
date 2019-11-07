@@ -439,7 +439,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             // ssdao.findByPK(noteSubId);
 
             StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(subjectId);
-            Study studyBeanSub = (Study) studyDao.findByPK(notessub.getStudyId());
+            Study studyBeanSub = (Study) getStudyDao().findByPK(notessub.getStudyId());
             if (null != studyBeanSub) {
                 parentStudyForNoteSub = studyBeanSub.checkAndGetParentStudyId();
             }
@@ -644,7 +644,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         String currentSchema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, "public");
 
-        Study subjectStudy = studyDao.findByStudySubjectId(subjectId);
+        Study subjectStudy = getStudyDao().findByStudySubjectId(subjectId);
         int studyId = ub.getActiveStudyId();
         ArrayList<UserAccountBean> userAccounts = new ArrayList();
         if (currentStudy.isSite()) {

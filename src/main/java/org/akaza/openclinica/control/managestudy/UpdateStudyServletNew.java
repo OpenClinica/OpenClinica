@@ -69,7 +69,7 @@ public class UpdateStudyServletNew extends SecureController {
         String action = fp.getString("action");
         boolean isInterventional = false;
 
-        study = (Study) studyDao.findByPK(studyId);
+        study = (Study) getStudyDao().findByPK(studyId);
         if (study.getStudyId() != currentStudy.getStudyId()) {
             addPageMessage(respage.getString("not_current_study") + respage.getString("change_study_contact_sysadmin"));
             forwardPage(Page.MENU_SERVLET);
@@ -94,7 +94,7 @@ public class UpdateStudyServletNew extends SecureController {
 
         // A. Hamid. 5001
         if (study.isSite()) {
-            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+            Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
             request.setAttribute("parentStudy", parentStudy);
         }
 
@@ -492,11 +492,11 @@ public class UpdateStudyServletNew extends SecureController {
         logger.info("study bean to be updated:" + study1.getName());
         study1.setDateUpdated(new Date());
         study1.setUpdater((UserAccountBean) session.getAttribute("userBean"));
-        studyDao.update(study1);
+        getStudyDao().update(study1);
 
-        ArrayList siteList = (ArrayList) studyDao.findAllByParent(newStudy.getStudyId());
+        ArrayList siteList = (ArrayList) getStudyDao().findAllByParent(newStudy.getStudyId());
         if (siteList.size() > 0) {
-            studyDao.updateSitesStatus(study1);
+            getStudyDao().updateSitesStatus(study1);
         }
 
         StudyParameterValueBean spv = new StudyParameterValueBean();
@@ -533,7 +533,7 @@ public class UpdateStudyServletNew extends SecureController {
         // BWP 1/12/2009 3169 Update interviewerNameEditable and
         // interviewDateEditable parameters for all sites>>
         List<Study> sites = new ArrayList<Study>();
-        sites = (ArrayList) studyDao.findAllByParent(newStudy.getStudyId());
+        sites = (ArrayList) getStudyDao().findAllByParent(newStudy.getStudyId());
         if (sites != null && !sites.isEmpty()) {
             updateInterviewerForSites(newStudy, sites, spvdao, "interviewerNameEditable");
         }
@@ -588,12 +588,12 @@ public class UpdateStudyServletNew extends SecureController {
             session.setAttribute("study", study1);
         }
         // update manage_pedigrees for all sites
-        ArrayList children = (ArrayList) studyDao.findAllByParent(study1.getStudyId());
+        ArrayList children = (ArrayList) getStudyDao().findAllByParent(study1.getStudyId());
         for (int i = 0; i < children.size(); i++) {
             Study child = (Study) children.get(i);
             child.setDateUpdated(new Date());
             child.setUpdater(ub);
-            studyDao.update(child);
+            getStudyDao().update(child);
             // YW << update "collectDob" and "genderRequired" for sites
             StudyParameterValueBean childspv = new StudyParameterValueBean();
             childspv.setStudyId(child.getStudyId());

@@ -365,4 +365,13 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         return false; //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
 }

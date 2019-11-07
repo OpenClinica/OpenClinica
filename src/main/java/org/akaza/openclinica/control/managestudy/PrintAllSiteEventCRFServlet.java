@@ -84,7 +84,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
         ArrayList<SectionBean> allSectionBeans;
-        Study site = (Study) studyDao.findByPK(siteId);
+        Study site = (Study) getStudyDao().findByPK(siteId);
 
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         seds = sedao.findAllByStudy(site);
@@ -225,7 +225,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
                 sedCrfBeans.put(sedBean, list);
             }
         }
-        Study parentStudy = (Study) studyDao.findByPK(site.checkAndGetParentStudyId());
+        Study parentStudy = (Study) getStudyDao().findByPK(site.checkAndGetParentStudyId());
         String studyName = parentStudy.getName();
         String siteName = site.getName();
         request.setAttribute("sedCrfBeans", sedCrfBeans);
@@ -375,4 +375,13 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
         return false; //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
 }

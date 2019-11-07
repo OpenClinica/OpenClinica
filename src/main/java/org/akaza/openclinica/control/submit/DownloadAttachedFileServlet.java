@@ -83,14 +83,14 @@ public class DownloadAttachedFileServlet extends SecureController {
                 logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
             } else {
                 if (currentStudy.isSite()) {
-                    testName = testPath + ((Study) studyDao.findByPK(parentStudyId)).getOc_oid() + tail;
+                    testName = testPath + ((Study) getStudyDao().findByPK(parentStudyId)).getOc_oid() + tail;
                     temp = new File(testName);
                     if (temp.exists()) {
                         filePathName = testName;
                         logger.info("parent existing filePathName=" + filePathName);
                     }
                 } else {
-                    ArrayList<Study> sites = (ArrayList<Study>) studyDao.findAllByParent(currentStudy.getStudyId());
+                    ArrayList<Study> sites = (ArrayList<Study>) getStudyDao().findAllByParent(currentStudy.getStudyId());
                     for (Study s : sites) {
                         testPath = Utils.getAttachedFilePath(s);
                         testName = testPath + tail;//+ s.getIdentifier() + tail;

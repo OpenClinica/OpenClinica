@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.domain.EventCRFStatus;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     private final String COMMON = "common";
     private String[] permissionTagsStringArray;
     private ODMFilterDTO odmFilter;
+
+    @Autowired
+    private StudyBuildService studyBuildService;
 
     public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean , ODMFilterDTO odmFilter, String[] permissionTagsStringArray) {
         super();
@@ -87,14 +91,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         Role role = null; // OpenClinica:
         StudyUserRoleBean userRole = null;
-        Study publicStudyBean = CoreResources.getPublicStudy(userBean.getActiveStudyId(), dataSource);
+        Study publicStudyBean = studyBuildService.getPublicStudy(userBean.getActiveStudyId());
              userRole = userBean.getRoleByStudy(publicStudyBean.getStudyId());
             if (userRole == null || !userRole.isActive())
                 userRole = userBean.getRoleByStudy(publicStudyBean.getStudy().getStudyId());
 
             role = userRole.getRole();
 
-        Study userRoleStudy = CoreResources.getPublicStudy(userRole.getStudyId(), dataSource);
+        Study userRoleStudy = studyBuildService.getPublicStudy(userRole.getStudyId());
         setRoleDescription(role, userRoleStudy);
 
         if (odmFilter.isCrossForm()) {

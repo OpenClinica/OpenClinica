@@ -137,7 +137,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
         int studyId = studySubjectBean.getStudyId();
 
-        Study study = (Study) studyDao.findByPK(studyId);
+        Study study = (Study) getStudyDao().findByPK(studyId);
         // If the study subject derives from a site, and is being viewed from a
         // parent study,
         // then the study IDs will be different. However, since each note is

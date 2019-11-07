@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +48,13 @@ public interface StudyBuildService {
 
     String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module);
 
+    Study getPublicStudy(String ocId);
 
+    Study getParentPublicStudy(String ocId);
 
-    }
+    Study getPublicStudy(int id);
+
+    Boolean isPublicStudySameAsTenantStudy(Study tenantStudy, String publicStudyOID);
+
+    public void setRequestSchemaByStudy(String ocId);
+}

@@ -77,7 +77,7 @@ public class SelectItemsServlet extends SecureController {
         ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
         if (sgclasses == null || sgclasses.size() == 0) {
             StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-            Study theStudy = (Study) studyDao.findByPK(sm.getUserBean().getActiveStudyId());
+            Study theStudy = (Study) getStudyDao().findByPK(sm.getUserBean().getActiveStudyId());
             sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
 
             StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());

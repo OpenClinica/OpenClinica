@@ -525,7 +525,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                 }
             }
 
-            dnb.setStudy((Study) studyDao.findByPK(dnb.getStudyId()));
+            dnb.setStudy((Study) getStudyDao().findByPK(dnb.getStudyId()));
             if (dnb.getParentDnId() == 0 && dnb.getChildren().size() > 0) {
                 ArrayList<DiscrepancyNoteBean> children = dnb.getChildren();
                 int childrenSize = children.size();

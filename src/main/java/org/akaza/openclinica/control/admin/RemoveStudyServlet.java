@@ -70,9 +70,9 @@ public class RemoveStudyServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyId = fp.getInt("id");
 
-        Study study = (Study) studyDao.findByPK(studyId);
+        Study study = (Study) getStudyDao().findByPK(studyId);
         // find all sites
-        ArrayList sites = (ArrayList) studyDao.findAllByParent(studyId);
+        ArrayList sites = (ArrayList) getStudyDao().findAllByParent(studyId);
 
         // find all user and roles in the study, include ones in sites
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
@@ -109,7 +109,7 @@ public class RemoveStudyServlet extends SecureController {
                 study.setStatus(core.org.akaza.openclinica.domain.Status.DELETED);
                 study.setUpdater(ub);
                 study.setDateUpdated(new Date());
-                studyDao.update(study);
+                getStudyDao().update(study);
 
                 // remove all sites
                 for (int i = 0; i < sites.size(); i++) {
@@ -119,7 +119,7 @@ public class RemoveStudyServlet extends SecureController {
                         site.setStatus(core.org.akaza.openclinica.domain.Status.AUTO_DELETED);
                         site.setUpdater(ub);
                         site.setDateUpdated(new Date());
-                        studyDao.update(site);
+                        getStudyDao().update(site);
                     }
                 }
 

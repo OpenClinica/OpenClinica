@@ -74,7 +74,7 @@ public class ListSiteServlet extends SecureController {
             forwardPage(Page.MENU_SERVLET);
         } else {
 
-            ArrayList studies = (ArrayList) studyDao.findAllByParent(currentStudy.getStudyId());
+            ArrayList studies = (ArrayList) getStudyDao().findAllByParent(currentStudy.getStudyId());
 
             EntityBeanTable table = fp.getEntityBeanTable();
             ArrayList allStudyRows = StudyRow.generateRowsFromBeans(studies);

@@ -364,7 +364,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
             ecb.setCRFVersionId(sb.getCRFVersionId());
             if (currentStudy.isSite()) {
                 // this is a site,find parent
-                Study parentStudy = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
+                Study parentStudy = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
                 request.setAttribute("studyTitle", parentStudy.getName());
                 request.setAttribute("siteTitle", currentStudy.getName());
             } else {
@@ -399,11 +399,11 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
                 age = Utils.getInstacne().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
             }
             // Get the study then the parent study
-            Study study = (Study) studyDao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
             if (study.isSite()) {
                 // this is a site,find parent
-                Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+                Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                 request.setAttribute("studyTitle", parentStudy.getName());
                 request.setAttribute("siteTitle", study.getName());
             } else {
@@ -729,5 +729,15 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
     @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
         return false;
+    }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
     }
 }

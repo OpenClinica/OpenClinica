@@ -90,12 +90,12 @@ public class CreateUserAccountServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
 
         // YW 11-28-2007 << list sites under their studies
-        ArrayList<Study> all = (ArrayList<Study>) studyDao.findAll();
+        ArrayList<Study> all = (ArrayList<Study>) getStudyDao().findAll();
         ArrayList<Study> finalList = new ArrayList<Study>();
         for (Study sb : all) {
             if (!sb.isSite()) {
                 finalList.add(sb);
-                finalList.addAll(studyDao.findAllByParent(sb.getStudyId()));
+                finalList.addAll(getStudyDao().findAllByParent(sb.getStudyId()));
             }
         }
         addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM);
@@ -122,7 +122,7 @@ public class CreateUserAccountServlet extends SecureController {
         Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request.getParameter("changeRoles"));
         int activeStudy = fp.getInt(INPUT_STUDY);
         if (changeRoles) {
-            Study study = (Study) studyDao.findByPK(activeStudy);
+            Study study = (Study) getStudyDao().findByPK(activeStudy);
             roleMap = new LinkedHashMap();
             ResourceBundle resterm = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 

@@ -70,7 +70,7 @@ public class ViewEventDefinitionServlet extends SecureController {
         } else {
             // definition id
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
-            Study study = (Study) studyDao.findByPK(sed.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(sed.getStudyId());
 
             if (currentStudy.getStudyId() != sed.getStudyId()) {
                 addPageMessage(respage.getString("no_have_correct_privilege_current_study")

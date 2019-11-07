@@ -126,7 +126,7 @@ public class ViewStudySubjectServlet extends SecureController {
             event.setStudyEventDefinition(sed);
 
             // find all active crfs in the definition
-            Study study = (Study) new ViewStudySubjectServlet().studyDao.findByPK(studySubject.getStudyId());
+            Study study = (Study) new ViewStudySubjectServlet().getStudyDao().findByPK(studySubject.getStudyId());
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
             ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
@@ -197,7 +197,7 @@ public class ViewStudySubjectServlet extends SecureController {
             int studyId = studySub.getStudyId();
             int subjectId = studySub.getSubjectId();
 
-            Study study = (Study) studyDao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
             // Check if this StudySubject would be accessed from the Current Study
             if (studySub.getStudyId() != currentStudy.getStudyId()) {
                 if (currentStudy.isSite()) {
@@ -206,7 +206,7 @@ public class ViewStudySubjectServlet extends SecureController {
                     return;
                 } else {
                     // The SubjectStudy is not belong to currentstudy and current study is not a site.
-                    Collection sites = studyDao.findOlnySiteIdsByStudy(currentStudy);
+                    Collection sites = getStudyDao().findOlnySiteIdsByStudy(currentStudy);
                     if (!sites.contains(study.getStudyId())) {
                         addPageMessage(
                                 respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
@@ -234,7 +234,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(study, studySubId));
             } else {
                 if (!isParentStudy) {
-                    Study stParent = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+                    Study stParent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                     allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, study, subjectId);
                     allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent, study, studySubId));
                 } else {
@@ -278,7 +278,7 @@ public class ViewStudySubjectServlet extends SecureController {
             request.setAttribute("subjectStudy", study);
 
             if (study.isSite()) {// this is a site,find parent
-                Study parentStudy2 = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+                Study parentStudy2 = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                 request.setAttribute("parentStudy", parentStudy2);
             } else {
                 request.setAttribute("parentStudy", new Study());
@@ -310,7 +310,7 @@ public class ViewStudySubjectServlet extends SecureController {
             if(!StringUtils.isEmpty(visitBasedEventItempath)) {
                  itemPathList = Arrays.asList(visitBasedEventItempath.split("\\s*,\\s*"));
             }
-            Study parentStudyBean = (Study) studyDao.findByPK(parentStudyId);
+            Study parentStudyBean = (Study) getStudyDao().findByPK(parentStudyId);
 
                 for (int i = 0; i < displayEvents.size(); i++) {
                     DisplayStudyEventBean decb = displayEvents.get(i);
@@ -724,7 +724,7 @@ public class ViewStudySubjectServlet extends SecureController {
         if (discBeans == null || discBeans.isEmpty() || discrepancyNoteDAO == null) {
             return;
         }
-        ArrayList<Study> childStudies = (ArrayList) studyDao.findAllByParent(parentStudyId);
+        ArrayList<Study> childStudies = (ArrayList) getStudyDao().findAllByParent(parentStudyId);
 
         for (Study studyBean : childStudies) {
             discBeans.addAll(discrepancyNoteDAO.findAllSubjectByStudyAndId(studyBean, subjectId));

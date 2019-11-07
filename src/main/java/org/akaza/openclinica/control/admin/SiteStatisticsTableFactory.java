@@ -66,7 +66,7 @@ public class SiteStatisticsTableFactory extends AbstractTableFactory {
     public void setDataAndLimitVariables(TableFacade tableFacade) {
 
         Limit limit = tableFacade.getLimit();
-        List<Study> studies = (List<Study>) studyDao.findAll(currentStudy.getStudyId());
+        List<Study> studies = (List<Study>) getStudyDao().findAll(currentStudy.getStudyId());
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
         /*

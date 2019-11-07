@@ -137,7 +137,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             forwardPage(Page.LIST_STUDY_SUBJECTS);
         } else {
             studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
-            Study study = (Study) studyDao.findByPK(studySubject.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySubject.getStudyId());
             // Check if this StudySubject would be accessed from the Current Study
             if (studySubject.getStudyId() != currentStudy.getStudyId()) {
                 if (currentStudy.isSite()) {
@@ -146,7 +146,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                     return;
                 } else {
                     // The SubjectStudy is not belong to currentstudy and current study is not a site.
-                    Collection sites = studyDao.findOlnySiteIdsByStudy(currentStudy);
+                    Collection sites = getStudyDao().findOlnySiteIdsByStudy(currentStudy);
                     if (!sites.contains(study.getStudyId())) {
                         addPageMessage(
                                 respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
