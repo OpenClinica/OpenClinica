@@ -72,7 +72,7 @@
        <c:forEach var="studyRole" items="${studies}">
            <c:set var="statusId" value="${studyRole.status.id}"/>
         <c:choose>
-         <c:when test="${publicStudy.id == studyRole.studyId}">
+         <c:when test="${publicStudy.studyId == studyRole.studyId}">
 
            <c:choose>
             <c:when test="${studyRole.parentStudyId > 0}">
