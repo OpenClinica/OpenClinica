@@ -11,7 +11,7 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 </head>
 <jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="study" class="core.org.akaza.openclinica.domain.datamap.Study"/>
 <jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="collectdob" class="java.lang.String"/>

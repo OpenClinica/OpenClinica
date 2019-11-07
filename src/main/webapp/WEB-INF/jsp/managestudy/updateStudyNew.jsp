@@ -70,8 +70,8 @@
     </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-<jsp:useBean scope='request' id='parentStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='parentStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
+<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 
 
@@ -98,7 +98,7 @@
            }
        
            function registerPManage(event){
-               var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${studyToView.oid}";
+               var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${studyToView.oc_oid}";
                jQuery.ajax({
                  type:'GET',
                  url: regURL,
@@ -149,7 +149,7 @@
         <table border="0" cellpadding="0" cellspacing="0" width="450">
           <tr valign="top">
               <td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</a></td><td><div class="formfieldXL_BG">
-          <input type="text" name="uniqueProId" value="<c:out value="${studyToView.identifier}"/>" class="formfieldXL"></div>
+          <input type="text" name="uniqueProId" value="<c:out value="${studyToView.uniqueIdentifier}"/>" class="formfieldXL"></div>
           <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td>
               <td width="10%" >*</td></tr>
 
@@ -165,7 +165,7 @@
           </tr>
 
           <c:choose>
-           <c:when test="${studyToView.parentStudyId == 0}">
+           <c:when test="${studyToView.study == null || studyToView.study.studyId == 0}">
               <c:set var="key" value="study_system_status"/>
            </c:when>
            <c:otherwise>
@@ -176,7 +176,7 @@
               <td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td>
               <td><div class="formfieldXL_BG">
            <c:set var="dis" value="${parentStudy.name!='' && !parentStudy.status.available}"/>
-           <c:set var="status1" value="${studyToView.status.id}"/>
+           <c:set var="status1" value="${studyToView.status.code}"/>
           <select class="formfieldXL" name="statusId" disabled="true">
             <c:forEach var="status" items="${statuses}">
              <c:choose>
@@ -274,7 +274,7 @@
            <tr valign="top"><td class="formlabel"><fmt:message key="protocol_type" bundle="${resword}"/>:</td><td>
            <c:set var="type1" value="observational"/>
            <c:choose>
-            <c:when test="${studyToView.protocolTypeKey == type1}">
+            <c:when test="${studyToView.protocolType == type1}">
              <input type="radio" checked name="protocolType" value="observational" disabled><fmt:message key="observational" bundle="${resword}"/>
             </c:when>
             <c:otherwise>

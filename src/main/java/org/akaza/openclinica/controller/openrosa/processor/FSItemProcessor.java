@@ -2,7 +2,6 @@ package org.akaza.openclinica.controller.openrosa.processor;
 
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
@@ -305,7 +304,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     }
 
     private void checkRandomization(ItemData thisItemData, SubmissionContainer container) throws Exception {
-        StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(thisItemData.getEventCrf().getStudySubject().getStudy().getOc_oid(), dataSource);
+        Study parentPublicStudy = CoreResources.getParentPublicStudy(thisItemData.getEventCrf().getStudySubject().getStudy().getOc_oid(), dataSource);
         Map<String, String> subjectContext =  container.getSubjectContext();
         String accessToken = subjectContext.get("accessToken");
         String studySubjectOID = container.getSubject().getOcOid();

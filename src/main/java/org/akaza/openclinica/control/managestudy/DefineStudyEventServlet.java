@@ -58,7 +58,7 @@ public class DefineStudyEventServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"));
 
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
             addPageMessage(respage.getString("SED_may_only_added_top_level") + respage.getString("please_contact_sysadmin_questions"));
             throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST, resexception.getString("not_top_study"), "1");
         }

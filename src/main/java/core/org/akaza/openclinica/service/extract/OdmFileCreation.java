@@ -23,13 +23,13 @@ import core.org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
 import core.org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import core.org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.job.JobTerminationMonitor;
 import core.org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
@@ -55,7 +55,7 @@ public class OdmFileCreation {
     private static File files[] = null;
     private static List<File> oldFiles = new LinkedList<File>();
 
-    public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, StudyBean currentStudy,
+    public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, Study currentStudy,
                                                   String generalFileDirCopy, ExtractBean eb, Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped,
                                                   boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean, ODMFilterDTO odmFilter, String permissionTagsString, String[] permissionTagsStringArray, Set<Integer> edcSet) {
 
@@ -170,7 +170,7 @@ public class OdmFileCreation {
             JobTerminationMonitor.check();
 
             OdmStudyBase u = it.next();
-            ArrayList newRows = dsdao.selectStudySubjects(u.getStudy().getId(), 0, st_sed_in, st_itemid_in, dsdao.genDatabaseDateConstraint(eb),
+            ArrayList newRows = dsdao.selectStudySubjects(u.getStudy().getStudyId(), 0, st_sed_in, st_itemid_in, dsdao.genDatabaseDateConstraint(eb),
                     ecStatusConstraint, itStatusConstraint);
 
             ///////////////

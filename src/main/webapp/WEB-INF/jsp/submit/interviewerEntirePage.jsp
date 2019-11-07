@@ -174,11 +174,11 @@
     </td>
     <td class="table_cell_noborder" style="color: #789EC5">
         <c:choose>
-        <c:when test="${study.parentStudyId>0}">
-        <a href="ViewSite?id=<c:out value="${study.id}"/>">
+        <c:when test="${study.study != null && study.study.studyId > 0}">
+        <a href="ViewSite?id=<c:out value="${study.studyId}"/>">
             </c:when>
             <c:otherwise>
-            <a href="ViewStudy?id=<c:out value="${study.id}"/>&viewFull=yes">
+            <a href="ViewStudy?id=<c:out value="${study.studyId}"/>&viewFull=yes">
                 </c:otherwise>
                 </c:choose> <c:out value="${studyTitle}" /></a><br>
     </td>

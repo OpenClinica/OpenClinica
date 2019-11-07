@@ -37,8 +37,8 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definitions' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
@@ -151,7 +151,7 @@ function updateThis(multiSelEle, count) {
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td> *</td></tr>
   
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td><div class="formfieldXL_BG">
-  <input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>" class="formfieldXL"></div>
+  <input type="text" name="uniqueProId" value="<c:out value="${newStudy.uniqueIdentifier}"/>" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td> *</td></tr>
   
   <tr valign="top"><td class="formlabel"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b><br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>):</td><td>
@@ -261,7 +261,7 @@ function updateThis(multiSelEle, count) {
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConEmail"/></jsp:include></td></tr>  
   
    <c:choose>
-    <c:when test="${newStudy.parentStudyId == 0}">
+    <c:when test="${newStudy.study != null && newStudy.study.studyId == 0}">
        <c:set var="key" value="study_system_status"/>
     </c:when>
     <c:otherwise>
@@ -271,7 +271,7 @@ function updateThis(multiSelEle, count) {
 
    <tr valign="top"><td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
    <%--
-   <c:set var="status1" value="${newStudy.status.id}"/>   
+   <c:set var="status1" value="${newStudy.status.code}"/>
    <select name="statusId" class="formfieldXL">
       <c:forEach var="status" items="${statuses}">    
        <c:choose>
@@ -285,7 +285,7 @@ function updateThis(multiSelEle, count) {
     </c:forEach>
    </select></div> --%>
    <input type="text" name="statusName" value="<c:out value="${study.status.name}"/>" class="formfieldL" disabled>
-   <input type="hidden" name="statusId" value="${study.status.id}">
+   <input type="hidden" name="statusId" value="${study.status.code}">
 
    </div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td> *</td></tr>      

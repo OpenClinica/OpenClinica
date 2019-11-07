@@ -1,13 +1,13 @@
 package org.akaza.openclinica.control.submit;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.domain.datamap.ResponseType;
+import core.org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
@@ -36,6 +36,7 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
@@ -47,6 +48,8 @@ import java.util.*;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
+    @Autowired
+    private StudyDao studyDAO;
     private StudyEventDefinitionDAO studyEventDefinitionDao;
     private StudySubjectDAO studySubjectDAO;
     private SubjectDAO subjectDAO;
@@ -54,11 +57,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
     private StudyGroupDAO studyGroupDAO;
-    private StudyDAO studyDAO;
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private HttpSession session;
-    private StudyBean studyBean;
+    private Study studyBean;
     private String[] columnNames = new String[]{};
     private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
     private ArrayList<StudyGroupClassBean> studyGroupClasses;
@@ -248,16 +250,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         Role r = currentRole.getRole();
-        boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR) && !isEnrollmentCapped();
+        boolean addSubjectLinkShow = studyBean.getStatus() == Status.AVAILABLE && !r.equals(Role.MONITOR) && !isEnrollmentCapped();
         tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink, getParticipateModuleStatus(), viewStudySubjectService, permissionService, studyBean, request));
     }
 
     private boolean isEnrollmentCapEnforced() {
         String enrollmentCapStatus = null;
-        if (studyBean.getParentStudyId() != 0) {
-            enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getParentStudyId(), "enforceEnrollmentCap").getValue();
+        if (studyBean.getStudy() != null && studyBean.getStudy().getStudyId() != 0) {
+            enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getStudy().getStudyId(), "enforceEnrollmentCap").getValue();
         } else {
-            enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getId(), "enforceEnrollmentCap").getValue();
+            enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getStudyId(), "enforceEnrollmentCap").getValue();
         }
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         return capEnforced;
@@ -269,11 +271,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         boolean capIsOn = isEnrollmentCapEnforced();
         int numberOfSubjects = getStudySubjectDAO().getCountofActiveStudySubjects();
 
-        StudyBean sb = null;
-        if (studyBean.getParentStudyId() != 0) {
-            sb = (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId());
+        Study sb = null;
+        if (studyBean.getStudy() != null && studyBean.getStudy().getStudyId() != 0) {
+            sb = (Study) studyDAO.findByPK(studyBean.getStudy().getStudyId());
         } else {
-            sb = (StudyBean) studyDAO.findByPK(studyBean.getId());
+            sb = (Study) studyDAO.findByPK(studyBean.getStudyId());
         }
         int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
@@ -307,7 +309,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
         for (StudySubjectBean studySubjectBean : items) {
-            StudyBean study = (StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId());
+            Study study = (Study) studyDAO.findByPK(studySubjectBean.getStudyId());
 
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("studySubject", studySubjectBean);
@@ -317,7 +319,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             subjectLink.append("\">" + studySubjectBean.getLabel() + "</a>");
             theItem.put("studySubject.label", subjectLink.toString());
             theItem.put("studySubject.status", studySubjectBean.getStatus());
-            theItem.put("enrolledAt", study.getIdentifier());
+            theItem.put("enrolledAt", study.getUniqueIdentifier());
 
 
 
@@ -572,7 +574,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             String property = filter.getProperty();
             String value = filter.getValue();
             if ("studySubject.status".equalsIgnoreCase(property)) {
-                value = Status.getByName(value).getId() + "";
+                value = Status.getByName(value).getCode() + "";
             } else if ("participate.status".equalsIgnoreCase(property)) {
                UserStatus userStatus= UserStatus.valueOf(value.toUpperCase());
                 value=userStatus.getCode()+"";
@@ -640,10 +642,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         ArrayList<StudyEventDefinitionBean> tempList = new ArrayList<>();
 
         if (this.studyEventDefinitions == null) {
-            if (studyBean.getParentStudyId() > 0) {
-                this.studyEventDefinitions = getStudyEventDefinitionDao().findAllActiveByParentStudyId(studyBean.getParentStudyId());
+            if (studyBean.isSite()) {
+                this.studyEventDefinitions = getStudyEventDefinitionDao().findAllActiveByParentStudyId(studyBean.getStudy().getStudyId());
             } else {
-                this.studyEventDefinitions = getStudyEventDefinitionDao().findAllActiveByParentStudyId(studyBean.getId());
+                this.studyEventDefinitions = getStudyEventDefinitionDao().findAllActiveByParentStudyId(studyBean.getStudyId());
             }
         }
         for (StudyEventDefinitionBean studyEventDefinition : this.studyEventDefinitions) {
@@ -658,8 +660,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     @SuppressWarnings( "unchecked" )
     private ArrayList<StudyGroupClassBean> getStudyGroupClasses() {
         if (this.studyGroupClasses == null) {
-            if (studyBean.getParentStudyId() > 0) {
-                StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId());
+            if (studyBean.isSite()) {
+                Study parentStudy = (Study) studyDAO.findByPK(studyBean.getStudy().getStudyId());
                 studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(parentStudy);
             } else {
                 studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(studyBean);
@@ -684,11 +686,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         this.studyEventDefinitionDao = studyEventDefinitionDao;
     }
 
-    public StudyBean getStudyBean() {
+    public Study getStudyBean() {
         return studyBean;
     }
 
-    public void setStudyBean(StudyBean studyBean) {
+    public void setStudyBean(Study studyBean) {
         this.studyBean = studyBean;
     }
 
@@ -730,14 +732,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     public void setSubjectGroupMapDAO(SubjectGroupMapDAO subjectGroupMapDAO) {
         this.subjectGroupMapDAO = subjectGroupMapDAO;
-    }
-
-    public StudyDAO getStudyDAO() {
-        return studyDAO;
-    }
-
-    public void setStudyDAO(StudyDAO studyDAO) {
-        this.studyDAO = studyDAO;
     }
 
     public StudyUserRoleBean getCurrentRole() {
@@ -1023,30 +1017,30 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 url.append(viewStudySubjectLinkBuilder(studySubjectBean));
                 if (getCurrentRole().getRole() != Role.MONITOR) {
                     if (getStudyBean().getStatus() == Status.AVAILABLE
-                            && !(studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
+                            && !(studySubjectBean.getStatus() == core.org.akaza.openclinica.bean.core.Status.DELETED || studySubjectBean.getStatus() == core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED)
                             && getCurrentRole().getRole() != Role.RESEARCHASSISTANT && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2) {
                         url.append(removeStudySubjectLinkBuilder(studySubjectBean));
                     }
                     if (getStudyBean().getStatus() == Status.AVAILABLE
-                            && (studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
+                            && (studySubjectBean.getStatus() == core.org.akaza.openclinica.bean.core.Status.DELETED || studySubjectBean.getStatus() == core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED)
                             && getCurrentRole().getRole() != Role.RESEARCHASSISTANT && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2) {
                         url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
                     }
                     if (getStudyBean().getStatus() == Status.AVAILABLE && getCurrentRole().getRole() != Role.RESEARCHASSISTANT
                             && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2 && getCurrentRole().getRole() != Role.INVESTIGATOR
-                            && studySubjectBean.getStatus() == Status.AVAILABLE) {
+                            && studySubjectBean.getStatus() == core.org.akaza.openclinica.bean.core.Status.AVAILABLE) {
                         url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
                     }
 
                     if (getCurrentRole().getRole() == Role.INVESTIGATOR && getStudyBean().getStatus() == Status.AVAILABLE
-                            && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
+                            && studySubjectBean.getStatus() != core.org.akaza.openclinica.bean.core.Status.DELETED && isSignable) {
                         url.append(signStudySubjectLinkBuilder(studySubjectBean));
                     }
 
                     try {
                         if (getStudyBean().getStatus() == Status.AVAILABLE
                                 && (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
-                                && studySubjectBean.getStatus() == Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE")
+                                && studySubjectBean.getStatus() == core.org.akaza.openclinica.bean.core.Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE")
                                 && participateStatus(studySubjectBean).equalsIgnoreCase(ENABLED)) {
                             url.append(viewParticipateBuilder(studySubjectBean));
                         }
@@ -1063,39 +1057,39 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private String participateStatus(StudySubjectBean studySubjectBean) {
-        StudyBean study = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
-        StudyBean pStudy = getParentStudy(study.getOid());
-        String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
+        Study study = (Study) studyDAO.findByPK(studySubjectBean.getStudyId());
+        Study pStudy = getParentStudy(study.getOc_oid());
+        String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getStudyId(), "participantPortal").getValue();
         return participateFormStatus;
     }
 
     private String getParticipateModuleStatus() {
-        StudyBean pStudy = getParentStudy(studyBean.getOid());
-        String participatModuleStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
+        Study pStudy = getParentStudy(studyBean.getOc_oid());
+        String participatModuleStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getStudyId(), "participantPortal").getValue();
         return participatModuleStatus;
     }
 
 
     private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception {
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        StudyBean study = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
-        StudyBean pStudy = getParentStudy(study.getOid());
-        String pManageStatus = participantPortalRegistrar.getCachedRegistrationStatus(pStudy.getOid(), session).toString(); // ACTIVE
+        Study study = (Study) studyDAO.findByPK(studySubjectBean.getStudyId());
+        Study pStudy = getParentStudy(study.getOc_oid());
+        String pManageStatus = participantPortalRegistrar.getCachedRegistrationStatus(pStudy.getOc_oid(), session).toString(); // ACTIVE
         return pManageStatus;
     }
 
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(String studyOid) {
+        Study study = getStudy(studyOid);
+        if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) studyDAO.findByPK(study.getParentStudyId());
+            Study parentStudy = (Study) studyDAO.findByPK(study.getStudy().getStudyId());
             return parentStudy;
         }
     }
 
-    private StudyBean getStudy(String oid) {
-        StudyBean studyBean = (StudyBean) studyDAO.findByOid(oid);
+    private Study getStudy(String oid) {
+        Study studyBean = (Study) studyDAO.findByOcOID(oid);
         return studyBean;
     }
 
@@ -1110,9 +1104,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        StudyBean study = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
-        StudyBean pStudy = getParentStudy(study.getOid());
-        String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());
+        Study study = (Study) studyDAO.findByPK(studySubject.getStudyId());
+        Study pStudy = getParentStudy(study.getOc_oid());
+        String url = participantPortalRegistrar.getStudyHost(pStudy.getOc_oid());
         logger.info("URL: {}",url);
 
         HtmlBuilder actionLink = new HtmlBuilder();
@@ -1231,7 +1225,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         StudyEventBean defaultEvent = studyEvents.get(0);
         String studySubjectLabel = studySubject.getLabel();
-        Status eventSysStatus = studySubject.getStatus();
+        core.org.akaza.openclinica.bean.core.Status eventSysStatus = studySubject.getStatus();
         Integer studyEventsSize = studyEvents.size();
 
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).colspan("2").close();
@@ -1340,7 +1334,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private void linksDivBuilder(HtmlBuilder eventDiv, SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed,
                                  StudySubjectBean studySubject, StudyEventBean currentEvent) {
 
-        Status eventSysStatus = studySubject.getStatus();
+        core.org.akaza.openclinica.bean.core.Status eventSysStatus = studySubject.getStatus();
         SubjectEventStatus eventStatus = currentEvent.getSubjectEventStatus();
         String studyEventId = String.valueOf(currentEvent.getId());
 
@@ -1350,7 +1344,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String delete = resword.getString("delete");
         String reassign = resword.getString("reassign");
 
-        if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
+        if (eventSysStatus.getId() == core.org.akaza.openclinica.bean.core.Status.AVAILABLE.getId() || eventSysStatus == core.org.akaza.openclinica.bean.core.Status.SIGNED) {
 
             if (eventStatus == SubjectEventStatus.COMPLETED) {
                 eventDiv.tr(0).valign("top").close();
@@ -1425,7 +1419,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             }
         }
 
-        if (eventSysStatus == Status.DELETED || eventSysStatus == Status.AUTO_DELETED) {
+        if (eventSysStatus == core.org.akaza.openclinica.bean.core.Status.DELETED || eventSysStatus == core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED) {
             eventDiv.tr(0).valign("top").close();
             eventDiv.td(0).styleClass("table_cell").close();
             enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -1455,7 +1449,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         SubjectEventStatus eventStatus = studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED : studyEvents.get(0).getSubjectEventStatus();
         String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
         String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
-        Status eventSysStatus = studySubject.getStatus();
+        core.org.akaza.openclinica.bean.core.Status eventSysStatus = studySubject.getStatus();
         String studySubjectLabel = studySubject.getLabel();
 
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).close();
@@ -1502,7 +1496,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.td(0).colspan("2").close();
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
-        if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
+        if (eventSysStatus.getId() == core.org.akaza.openclinica.bean.core.Status.AVAILABLE.getId() || eventSysStatus == core.org.akaza.openclinica.bean.core.Status.SIGNED) {
 
             if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen()) {
                 eventDiv.tr(0).valign("top").close();
@@ -1586,7 +1580,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             }
         }
 
-        if (eventSysStatus == Status.DELETED || eventSysStatus == Status.AUTO_DELETED) {
+        if (eventSysStatus == core.org.akaza.openclinica.bean.core.Status.DELETED || eventSysStatus == core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED) {
             eventDiv.tr(0).valign("top").close();
             eventDiv.td(0).styleClass("table_cell_left").close();
             enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);

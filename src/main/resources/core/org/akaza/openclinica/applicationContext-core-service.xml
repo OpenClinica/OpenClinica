@@ -132,7 +132,8 @@
     </bean>
 
     <bean id = "enketoCredentials" class="core.org.akaza.openclinica.service.crfdata.xform.EnketoCredentials">
-        <property name="studyDao" ref="studyDaoDomain"/>
+<!--        <property name="studyDao" ref="studyDaoDomain"/>-->
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
     <bean id="xformParserHelper" class="core.org.akaza.openclinica.domain.xform.XformParserHelper"/>

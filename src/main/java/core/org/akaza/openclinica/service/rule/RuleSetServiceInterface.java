@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -22,6 +21,7 @@ import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import core.org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
 import core.org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentSort;
 import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
@@ -64,14 +64,14 @@ public interface RuleSetServiceInterface {
     public abstract RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean);
 
     public abstract HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String crfId,
-            ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub);
+                                                                                                                        ExecutionMode executionMode, Study currentStudy, UserAccountBean ub);
 
     public abstract HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String ruleSetRuleId,
-            String crfVersionId, ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub);
+            String crfVersionId, ExecutionMode executionMode, Study currentStudy, UserAccountBean ub);
 
-    public abstract List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub, boolean jobTrigger);
+    public abstract List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun, Study currentStudy, UserAccountBean ub, boolean jobTrigger);
 
-    public abstract MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub,
+    public abstract MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, Study currentStudy, UserAccountBean ub,
             HashMap<String, String> variableAndValue, Phase phase,EventCRFBean ecb, HttpServletRequest request);
 
     /**
@@ -81,28 +81,28 @@ public interface RuleSetServiceInterface {
      * @param executionMode
      * @return RuleActionBean summary with key as groupOrdinalPLusItemOid.
      */
-    public abstract HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub, ExecutionMode executionMode);
+    public abstract HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers, Study study, UserAccountBean ub, ExecutionMode executionMode);
 
-    public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion);
+    public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(Study study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion);
 
     /*
      * Used to Manage RuleSets ,Hence will return all RuleSets whether removed or not
      */
-    public abstract List<RuleSetBean> getRuleSetsByStudy(StudyBean study);
+    public abstract List<RuleSetBean> getRuleSetsByStudy(Study study);
 
     public int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter);
 
-    public int getCountByStudy(StudyBean study);
+    public int getCountByStudy(Study study);
 
     public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter, ViewRuleAssignmentSort viewRuleAssignmentSort,
             int rowStart, int rowEnd);
 
     // . TODO: why are we including study but not using it in query
-    public abstract RuleSetBean getRuleSetById(StudyBean study, String id);
+    public abstract RuleSetBean getRuleSetById(Study study, String id);
 
-    public abstract List<RuleSetRuleBean> getRuleSetById(StudyBean study, String id, RuleBean ruleBean);
+    public abstract List<RuleSetRuleBean> getRuleSetById(Study study, String id, RuleBean ruleBean);
 
-    public abstract List<RuleSetBean> getRuleSetsByCrfAndStudy(CRFBean crfBean, StudyBean study);
+    public abstract List<RuleSetBean> getRuleSetsByCrfAndStudy(CRFBean crfBean, Study study);
 
     public abstract List<RuleSetBean> filterByStatusEqualsAvailableOnlyRuleSetRules(List<RuleSetBean> ruleSets);
 

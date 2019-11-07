@@ -13,7 +13,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <jsp:useBean scope="request" id="label" class="java.lang.String"/>
 
-<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.domain.datamap.Study" />
 <jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 

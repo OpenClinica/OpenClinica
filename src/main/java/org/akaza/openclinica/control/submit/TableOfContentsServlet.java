@@ -24,7 +24,6 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -35,6 +34,8 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -45,7 +46,6 @@ import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -60,6 +60,7 @@ import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author ssachs
@@ -118,6 +119,9 @@ public class TableOfContentsServlet extends SecureController {
     private EventCRFBean ecb;
 
     private String action;
+    
+    @Autowired
+    private StudyDao studyDao;
 
     private void getEventCRFAndAction() {
         ecdao = new EventCRFDAO(sm.getDataSource());
@@ -202,7 +206,7 @@ public class TableOfContentsServlet extends SecureController {
         int subjectId = fp.getInt(INPUT_SUBJECT_ID);
         int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID);
 
-        logger.info("Creating event CRF within Table of Contents.  Study id: " + currentStudy.getId() + "; CRF Version id: " + crfVersionId
+        logger.info("Creating event CRF within Table of Contents.  Study id: " + currentStudy.getStudyId() + "; CRF Version id: " + crfVersionId
                 + "; Study Event id: " + studyEventId + "; Event Definition CRF id: " + eventDefinitionCRFId + "; Subject: " + subjectId);
 
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
@@ -233,10 +237,10 @@ public class TableOfContentsServlet extends SecureController {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
 
-        StudyBean studyWithSED = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithSED = new StudyBean();
-            studyWithSED.setId(currentStudy.getParentStudyId());
+        Study studyWithSED = currentStudy;
+        if (currentStudy.isSite()) {
+            studyWithSED = new Study();
+            studyWithSED.setId(currentStudy.getStudy().getStudyId());
         }
 
         AuditableEntityBean aeb = sedao.findByPKAndStudy(studyEventId, studyWithSED);
@@ -636,7 +640,7 @@ public class TableOfContentsServlet extends SecureController {
         return sections;
     }
 
-    public static DisplayTableOfContentsBean getDisplayBean(EventCRFBean ecb, DataSource ds, StudyBean currentStudy) {
+    public static DisplayTableOfContentsBean getDisplayBean(EventCRFBean ecb, DataSource ds, Study currentStudy) {
         DisplayTableOfContentsBean answer = new DisplayTableOfContentsBean();
 
         answer.setEventCRF(ecb);
@@ -667,7 +671,7 @@ public class TableOfContentsServlet extends SecureController {
         CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
         answer.setCrf(cb);
 
-        StudyBean studyForStudySubject = new StudyDAO(ds).findByStudySubjectId(ssb.getId());
+        Study studyForStudySubject = new TableOfContentsServlet().studyDao.findByStudySubjectId(ssb.getId());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
         EventDefinitionCRFBean edcb = edcdao.findByStudyEventDefinitionIdAndCRFId(studyForStudySubject, sedb.getId(), cb.getId());
         answer.setEventDefinitionCRF(edcb);

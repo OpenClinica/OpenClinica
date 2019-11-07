@@ -1,20 +1,23 @@
 package core.org.akaza.openclinica.service.rule;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.junit.Ignore;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @Ignore
 public class RuleSetServiceTest extends HibernateOcDbTestCase {
 
+    @Autowired
+    private StudyDao studyDao;
     public RuleSetServiceTest() {
         super();
     }
@@ -79,8 +82,7 @@ public class RuleSetServiceTest extends HibernateOcDbTestCase {
     // }
 
     private List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition() {
-        StudyDAO studyDao = new StudyDAO(getDataSource());
-        StudyBean study = (StudyBean) studyDao.findByPK(1);
+        Study study = (Study) studyDao.findByPK(1);
         assertNotNull(study);
 
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(getDataSource());

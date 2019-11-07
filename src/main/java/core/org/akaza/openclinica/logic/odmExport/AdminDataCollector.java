@@ -15,8 +15,8 @@ import java.util.LinkedHashMap;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.job.JobTerminationMonitor;
 
 /**
@@ -33,7 +33,7 @@ import core.org.akaza.openclinica.job.JobTerminationMonitor;
 public class AdminDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap;
 
-    public AdminDataCollector(DataSource ds, StudyBean currentStudy) {
+    public AdminDataCollector(DataSource ds, Study currentStudy) {
         super(ds, currentStudy);
         this.odmAdminDataMap = new LinkedHashMap<String, OdmAdminDataBean>();
     }
@@ -43,7 +43,7 @@ public class AdminDataCollector extends OdmDataCollector {
      * @param ds
      * @param dataset
      */
-    public AdminDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy) {
+    public AdminDataCollector(DataSource ds, DatasetBean dataset, Study currentStudy) {
         super(ds, dataset, currentStudy);
         this.odmAdminDataMap = new LinkedHashMap<String, OdmAdminDataBean>();
     }
@@ -61,7 +61,7 @@ public class AdminDataCollector extends OdmDataCollector {
             AdminDataUnit adata = new AdminDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
             adata.setCategory(this.getCategory());
             adata.collectOdmAdminData();
-            odmAdminDataMap.put(u.getStudy().getOid(), adata.getOdmAdminData());
+            odmAdminDataMap.put(u.getStudy().getOc_oid(), adata.getOdmAdminData());
         }
     }
 

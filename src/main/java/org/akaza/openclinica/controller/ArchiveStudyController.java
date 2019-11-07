@@ -3,7 +3,6 @@ package org.akaza.openclinica.controller;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.service.LiquibaseOnDemandService;
 import core.org.akaza.openclinica.service.StudyBuildService;
@@ -45,7 +44,6 @@ public class ArchiveStudyController {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	UserAccountDAO udao;
-	StudyDAO sdao;
 	StudyEventDefinitionDAO seddao;
 
 

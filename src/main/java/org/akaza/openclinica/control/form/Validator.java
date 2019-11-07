@@ -34,14 +34,17 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.TermType;
 import core.org.akaza.openclinica.bean.core.UserType;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import core.org.akaza.openclinica.bean.submit.ResponseSetBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.EntityDAO;
+import core.org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.domain.DomainObject;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -458,7 +461,7 @@ public class Validator {
     
     public static final int NO_LEADING_OR_TRAILING_SPACES = 46;
     public static final int DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS = 47;
-
+    public static final int HIBERNATE_ENTITY_EXISTS = 48; // for checking if a primary key
     /**
      * The last field for which an addValidation method was invoked. This is
      * used by setErrorMessage(String).
@@ -568,7 +571,7 @@ public class Validator {
     /*
      * use for: ENTITY_EXISTS_IN_STUDY
      */
-    public void addValidation(String fieldName, int type, AuditableEntityDAO dao, StudyBean study) {
+    public void addValidation(String fieldName, int type, AuditableEntityDAO dao, Study study) {
         // for entity exists validation
         Validation v = new Validation(type);
         v.addArgument(dao);
@@ -588,6 +591,12 @@ public class Validator {
         addValidation(fieldName, v);
     }
 
+    public void addValidation(String fieldName, int type, AbstractDomainDao abstractDomainDao) {
+        Validation v = new Validation(type);
+        v.addArgument(abstractDomainDao);
+
+        addValidation(fieldName, v);
+    }
     // TODO: add is_of_file_type addValidation method
 
     /*
@@ -746,6 +755,7 @@ public class Validator {
                 errorMessage =
                     resexception.getString("input_not_valid_phone") + getPhoneRegEx().getDescription() + " " + resexception.getString("format4") + ".";
                 break;
+            case HIBERNATE_ENTITY_EXISTS:
             case ENTITY_EXISTS:
                 errorMessage = resexception.getString("not_select_valid_entity");
                 break;
@@ -967,9 +977,15 @@ public class Validator {
                 addError(fieldName, v);
             }
             break;
+        case HIBERNATE_ENTITY_EXISTS:
+            AbstractDomainDao abstractDomainDao =(AbstractDomainDao) v.getArg(0);
+            if(!entityExists(fieldName,abstractDomainDao)){
+                addError(fieldName, v);
+            }
+
         case ENTITY_EXISTS_IN_STUDY:
             AuditableEntityDAO dao = (AuditableEntityDAO) v.getArg(0);
-            StudyBean study = (StudyBean) v.getArg(1);
+            Study study = (Study) v.getArg(1);
 
             if (!entityExistsInStudy(fieldName, dao, study)) {
                 addError(fieldName, v);
@@ -1628,7 +1644,27 @@ break;
         return true;
     }
 
-    protected boolean entityExistsInStudy(String fieldName, AuditableEntityDAO dao, StudyBean study) {
+    protected boolean entityExists(String fieldName, AbstractDomainDao edao) {
+        String fieldValue = getFieldValue(fieldName);
+
+        if (fieldValue == null) {
+            return false;
+        }
+
+        try {
+            int id = Integer.parseInt(fieldValue);
+            DomainObject e = edao.findByPK(id);
+
+            if (e == null) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+    protected boolean entityExistsInStudy(String fieldName, AuditableEntityDAO dao, Study study) {
 
         String fieldValue = getFieldValue(fieldName);
 
@@ -2183,4 +2219,6 @@ break;
         }
         return message;
     }
+
+
 }

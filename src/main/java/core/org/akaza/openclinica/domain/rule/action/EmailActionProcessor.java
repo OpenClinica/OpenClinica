@@ -1,10 +1,10 @@
 package core.org.akaza.openclinica.domain.rule.action;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.rulerunner.ExecutionMode;
@@ -42,7 +42,7 @@ public class EmailActionProcessor implements ActionProcessor {
     }
 
     public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean,
-            String itemData, StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
+                                  String itemData, Study currentStudy, UserAccountBean ub, Object... arguments) {
         switch (executionMode) {
         case DRY_RUN: {
             return ruleAction;

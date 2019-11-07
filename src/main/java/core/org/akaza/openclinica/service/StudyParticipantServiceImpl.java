@@ -3,7 +3,6 @@ package core.org.akaza.openclinica.service;
 import liquibase.util.StringUtils;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.controller.dto.*;
@@ -11,7 +10,6 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.dao.hibernate.SubjectDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -94,7 +92,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     EventDefinitionCrfDao eventDefinitionCrfDao;
 
 
-    private StudyDAO studyDao;
+    @Autowired
+    private StudyDao studyDao;
     private StudySubjectDAO studySubjectDao;
     private SubjectDAO subjectDao;  
 
@@ -114,8 +113,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         boolean createNewParticipant=false;
         Study tenantStudy = studyHibDao.findByOcOID(studyOid);
         Study tenantSite = studyHibDao.findByOcOID(siteOid);
-        StudyBean tenantStudyBean = getStudyDao().findByOid(studyOid);
-        StudyBean tenantSiteBean = getStudyDao().findByOid(siteOid);
+        Study tenantStudyBean = studyDao.findByOcOID(studyOid);
+        Study tenantSiteBean = studyDao.findByOcOID(siteOid);
        
         if (isEnrollmentCapped(tenantStudyBean,tenantSiteBean))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
@@ -161,11 +160,11 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
         Subject subject = null;
         StudySubject studySubject = null;
-        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getId());
+        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getStudyId());
 
         StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
-        if (tenantStudyBean.getParentStudyId() > 0) {
-            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getParentStudyId());// <
+        if (tenantStudyBean.isSite()) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getStudy().getStudyId());// <
         }
         if (studySubjectBean == null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             createNewParticipant=true;
@@ -178,9 +177,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
             studySubjectBean.setSubjectId(subjectBean.getId());
             if (tenantSiteBean != null) {
-                studySubjectBean.setStudyId(tenantSiteBean.getId());
+                studySubjectBean.setStudyId(tenantSiteBean.getStudyId());
             } else {
-                studySubjectBean.setStudyId(tenantStudyBean.getId());
+                studySubjectBean.setStudyId(tenantStudyBean.getStudyId());
             }
 
             studySubjectBean.setLabel(addParticipantRequestDTO.getSubjectKey());
@@ -272,11 +271,6 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         return studySubjectDao;
     }
 
-    public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-    }
-
     public SubjectDAO getSubjectDao() {
         subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
         return subjectDao;
@@ -320,16 +314,15 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
     }
 
-    public int getSubjectCount(StudyBean currentStudy) {
+    public int getSubjectCount(Study currentStudy) {
         int subjectCount = 0;
-        StudyDAO sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByPK(currentStudy.getId());
+        Study studyBean = (Study) studyDao.findByPK(currentStudy.getStudyId());
         if (studyBean != null)
             subjectCount = studyBean.getSubjectCount();
 
         if (subjectCount == 0) {
             StudySubjectDAO ssdao = this.getStudySubjectDao();
-            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
+            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getStudyId());
             if (ss != null) {
                 subjectCount = ss.size();
             }
@@ -339,26 +332,25 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
 
 
-    private void updateStudySubjectSize(Study study, StudyBean currentStudy) {
+    private void updateStudySubjectSize(Study study, Study currentStudy) {
         int subjectCount = getSubjectCount(currentStudy);
         study.setSubjectCount(subjectCount+1);
         studyHibDao.saveOrUpdate(study);
     }
 
 
-    private boolean isEnrollmentCapped(StudyBean currentStudy,StudyBean siteStudy){
+    private boolean isEnrollmentCapped(Study currentStudy,Study siteStudy){
 
         boolean capIsOn = isEnrollmentCapEnforced(currentStudy,siteStudy);
 
         StudySubjectDAO studySubjectDAO = this.getStudySubjectDao();
         int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
 
-        StudyDAO studyDAO = this.getStudyDao();
-        StudyBean sb = null;
-        if(currentStudy.getParentStudyId()!=0){
-            sb = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
+        Study sb = null;
+        if(currentStudy.isSite()){
+            sb = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
         }else{
-             sb = (StudyBean) studyDAO.findByPK(currentStudy.getId());
+             sb = (Study) studyDao.findByPK(currentStudy.getStudyId());
         }
         int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
@@ -372,18 +364,18 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
      * if it's site level, then also need to check study 
      * @return
      */
-    private boolean isEnrollmentCapEnforced(StudyBean currentStudy,StudyBean siteStudy){
+    private boolean isEnrollmentCapEnforced(Study currentStudy,Study siteStudy){
         StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(this.dataSource);
        
         boolean capEnforcedSite = false;
         String  enrollmentCapStatusSite = null;
         
-        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
+        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudyId(), "enforceEnrollmentCap").getValue();
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         
         // check at the site level
         if(siteStudy != null) {
-        	int siteId = siteStudy.getId();
+        	int siteId = siteStudy.getStudyId();
         	enrollmentCapStatusSite = studyParameterValueDAO.findByHandleAndStudy(siteId, "enforceEnrollmentCap").getValue();
         	capEnforcedSite = Boolean.valueOf(enrollmentCapStatusSite);        	
         }

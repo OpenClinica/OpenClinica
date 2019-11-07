@@ -13,18 +13,19 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.InterventionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -44,6 +45,8 @@ import java.util.Locale;
  *
  */
 public class CreateStudyServlet extends SecureController {
+    @Autowired
+    private StudyDao studyDao;
     public static final String INPUT_START_DATE = "startDate";
 
     public static final String INPUT_END_DATE = "endDate";
@@ -276,7 +279,7 @@ public class CreateStudyServlet extends SecureController {
         panel.setManageSubject(false);
 
         if (StringUtil.isBlank(action)) {
-            session.setAttribute("newStudy", new StudyBean());
+            session.setAttribute("newStudy", new Study());
 
             // request.setAttribute("facRecruitStatusMap", facRecruitStatusMap);
             // request.setAttribute("statuses", Status.toActiveArrayList());
@@ -305,13 +308,13 @@ public class CreateStudyServlet extends SecureController {
 
                 session.setAttribute("study", session.getAttribute("newStudy"));
                 session.removeAttribute("newStudy");
-                currentStudy = (StudyBean) session.getAttribute("study");
+                currentStudy = (Study) session.getAttribute("study");
 
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 
                 StudyUserRoleBean sub = new StudyUserRoleBean();
                 sub.setRole(Role.COORDINATOR);
-                sub.setStudyId(currentStudy.getId());
+                sub.setStudyId(currentStudy.getStudyId());
                 sub.setStatus(Status.AVAILABLE);
                 sub.setOwner(ub);
                 udao.createStudyUserRole(ub, sub);
@@ -343,7 +346,7 @@ public class CreateStudyServlet extends SecureController {
                     }
                 } else {
                     if (session.getAttribute("newStudy") == null) {
-                        session.setAttribute("newStudy", new StudyBean());
+                        session.setAttribute("newStudy", new Study());
                     }
 
                     UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
@@ -379,9 +382,8 @@ public class CreateStudyServlet extends SecureController {
 
         errors = v.validate();
         // check to see if name and uniqueProId are unique, tbh
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-        ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
-        for (StudyBean thisBean : allStudies) {
+        ArrayList<Study> allStudies = (ArrayList<Study>) studyDao.findAll();
+        for (Study thisBean : allStudies) {
             if (fp.getString("name").trim().equals(thisBean.getName())) {
                 MessageFormat mf = new MessageFormat("");
                 mf.applyPattern(respage.getString("brief_title_existed"));
@@ -389,7 +391,7 @@ public class CreateStudyServlet extends SecureController {
 
                 Validator.addError(errors, "name", mf.format(arguments));
             }
-            if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier())) {
+            if (fp.getString("uniqueProId").trim().equals(thisBean.getUniqueIdentifier())) {
                 Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
             }
         }
@@ -412,7 +414,7 @@ public class CreateStudyServlet extends SecureController {
             Validator.addError(errors, "officialTitle", resexception.getString("maximum_lenght_official_title_255"));
         }
 
-        StudyBean studyBean = createStudyBean();
+        Study studyBean = createStudyBean();
 
         if (errors.isEmpty()) {
             logger.info("no errors in the first section");
@@ -420,12 +422,11 @@ public class CreateStudyServlet extends SecureController {
             request.setAttribute("statuses", Status.toActiveArrayList());
             logger.info("setting arrays to request, size of list: " + Status.toArrayList().size());
             if (request.getParameter("Save") != null && request.getParameter("Save").length() > 0) {
-                StudyDAO sdao = new StudyDAO(sm.getDataSource());
-                studyBean.setOwner(ub);
-                studyBean.setCreatedDate(new Date());
-                studyBean.setStatus(Status.PENDING);
-                studyBean = (StudyBean) sdao.create(studyBean);
-                StudyBean newstudyBean = (StudyBean) sdao.findByName(studyBean.getName());
+                studyBean.setUserAccount(ub.toUserAccount());
+                studyBean.setDateCreated(new Date());
+                studyBean.setStatus(core.org.akaza.openclinica.domain.Status.PENDING);
+                studyBean = (Study) studyDao.create(studyBean);
+                Study newstudyBean = (Study) studyDao.findByName(studyBean.getName());
 
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                 String selectedUserIdStr = fp.getString("selectedUser");
@@ -437,14 +438,14 @@ public class CreateStudyServlet extends SecureController {
                     UserAccountBean user = (UserAccountBean) udao.findByPK(selectedUserId);
                     StudyUserRoleBean sub = new StudyUserRoleBean();
                     sub.setRole(Role.COORDINATOR);
-                    sub.setStudyId(newstudyBean.getId());
+                    sub.setStudyId(newstudyBean.getStudyId());
                     sub.setStatus(Status.AVAILABLE);
                     sub.setOwner(ub);
                     udao.createStudyUserRole(user, sub);
                     if (ub.getId() != selectedUserId) {
                         sub = new StudyUserRoleBean();
                         sub.setRole(Role.COORDINATOR);
-                        sub.setStudyId(newstudyBean.getId());
+                        sub.setStudyId(newstudyBean.getStudyId());
                         sub.setStatus(Status.AVAILABLE);
                         sub.setOwner(ub);
                         udao.createStudyUserRole(ub, sub);
@@ -452,7 +453,7 @@ public class CreateStudyServlet extends SecureController {
                 } else {
                     StudyUserRoleBean sub = new StudyUserRoleBean();
                     sub.setRole(Role.COORDINATOR);
-                    sub.setStudyId(newstudyBean.getId());
+                    sub.setStudyId(newstudyBean.getStudyId());
                     sub.setStatus(Status.AVAILABLE);
                     sub.setOwner(ub);
                     udao.createStudyUserRole(ub, sub);
@@ -620,7 +621,7 @@ public class CreateStudyServlet extends SecureController {
             Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
         }
 
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.setConditions(fp.getString("conditions"));
         newStudy.setKeywords(fp.getString("keywords"));
         newStudy.setEligibility(fp.getString("eligibility"));
@@ -677,7 +678,7 @@ public class CreateStudyServlet extends SecureController {
         v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         errors = v.validate();
 
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
 
         newStudy.setFacilityCity(fp.getString("facCity"));
         newStudy.setFacilityContactDegree(fp.getString("facConDrgree"));
@@ -717,7 +718,7 @@ public class CreateStudyServlet extends SecureController {
 
         errors = v.validate();
 
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.setMedlineIdentifier(fp.getString("medlineIdentifier"));
         newStudy.setResultsReference(fp.getBoolean("resultsReference"));
         newStudy.setUrl(fp.getString("url"));
@@ -751,7 +752,7 @@ public class CreateStudyServlet extends SecureController {
         Validator v = new Validator(request);
         errors = v.validate();
 
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.getStudyParameterConfig().setCollectDob(fp.getString("collectDob"));
         newStudy.getStudyParameterConfig().setDiscrepancyManagement(fp.getString("discrepancyManagement"));
         newStudy.getStudyParameterConfig().setGenderRequired(fp.getString("genderRequired"));
@@ -794,20 +795,19 @@ public class CreateStudyServlet extends SecureController {
      *
      */
     private void submitStudy() {
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
 
         logger.info("study bean to be created:" + newStudy.getName() + newStudy.getProtocolDateVerification());
         // newStudy.setType(StudyType.NONGENETIC);//need to refine in the future
-        newStudy.setOwner(ub);
-        newStudy.setCreatedDate(new Date());
+        newStudy.setUserAccount(ub.toUserAccount());
+        newStudy.setDateCreated(new Date());
         // newStudy.setStatus(Status.AVAILABLE);
-        StudyBean finalStudy = (StudyBean) sdao.create(newStudy);
+        Study finalStudy = (Study) studyDao.create(newStudy);
 
         logger.info("new study created");
         StudyParameterValueBean spv = new StudyParameterValueBean();
-        spv.setStudyId(finalStudy.getId());
+        spv.setStudyId(finalStudy.getStudyId());
         spv.setParameter("collectDob");
         spv.setValue(newStudy.getStudyParameterConfig().getCollectDob());
         spvdao.create(spv);
@@ -878,12 +878,12 @@ public class CreateStudyServlet extends SecureController {
      * @param request
      * @return
      */
-    private StudyBean createStudyBean() {
+    private Study createStudyBean() {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean newStudy = new StudyBean();
+        Study newStudy = new Study();
         newStudy.setName(fp.getString("name"));
         newStudy.setOfficialTitle(fp.getString("officialTitle"));
-        newStudy.setIdentifier(fp.getString("uniqueProId"));
+        newStudy.setUniqueIdentifier(fp.getString("uniqueProId"));
         newStudy.setSecondaryIdentifier(fp.getString("secondProId"));
         newStudy.setPrincipalInvestigator(fp.getString("prinInvestigator"));
         newStudy.setProtocolType(fp.getString("protocolType"));
@@ -906,13 +906,13 @@ public class CreateStudyServlet extends SecureController {
      */
     private boolean updateStudy2() {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.setProtocolType(fp.getString("protocolType"));// protocolType
 
         // this is not fully supported yet, because the system will not handle
         // studies which are pending
         // or private...
-        newStudy.setStatus(Status.get(fp.getInt("statusId")));
+        newStudy.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(fp.getInt("statusId")));
 
         if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
             newStudy.setProtocolDateVerification(null);
@@ -929,11 +929,6 @@ public class CreateStudyServlet extends SecureController {
         }
 
         newStudy.setPhase(fp.getString("phase"));
-        if (fp.getInt("genetic") == 1) {
-            newStudy.setGenetic(true);
-        } else {
-            newStudy.setGenetic(false);
-        }
 
         session.setAttribute("newStudy", newStudy);
 
@@ -950,7 +945,7 @@ public class CreateStudyServlet extends SecureController {
      */
     private void updateStudy3(boolean isInterventional) {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.setPurpose(fp.getString("purpose"));
         if (isInterventional) {
             newStudy.setAllocation(fp.getString("allocation"));

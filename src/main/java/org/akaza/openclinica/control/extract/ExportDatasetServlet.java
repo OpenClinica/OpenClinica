@@ -24,7 +24,8 @@ import core.org.akaza.openclinica.bean.extract.ExportFormatBean;
 import core.org.akaza.openclinica.bean.extract.ExtractBean;
 import core.org.akaza.openclinica.bean.extract.SPSSReportBean;
 import core.org.akaza.openclinica.bean.extract.TabReportBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -34,7 +35,6 @@ import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.hibernate.ArchivedDatasetFilePermissionTagDao;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTag;
 import core.org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.view.Page;
@@ -46,6 +46,7 @@ import core.org.akaza.openclinica.web.job.XalanTriggerService;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 /**
@@ -84,11 +85,12 @@ public class ExportDatasetServlet extends SecureController {
     public String CSVFilePath;
     public ArrayList fileList;
 
-    public StudyBean getPublicStudy(String uniqueId) {
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+    @Autowired
+    private StudyDao studyDao;
+    public Study getPublicStudy(String uniqueId) {
         String studySchema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");
-        StudyBean study = studyDAO.findByUniqueIdentifier(uniqueId);
+        Study study = studyDao.findByUniqueId(uniqueId);
         CoreResources.setRequestSchema(studySchema);
         return study;
     }
@@ -115,12 +117,11 @@ public class ExportDatasetServlet extends SecureController {
             }
         }
         DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean study = (StudyBean)sdao.findByPK(db.getStudyId());
-        checkRoleByUserAndStudy(ub, study, sdao);
+        Study study = (Study)studyDao.findByPK(db.getStudyId());
+        checkRoleByUserAndStudy(ub, study);
 
         //Checks if the study is current study or child of current study
-        if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
+        if (study != null && currentStudy != null && study.getStudyId() != currentStudy.getStudyId() && study.checkAndGetParentStudyId() != currentStudy.getStudyId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));
             forwardPage(Page.MENU_SERVLET);
@@ -132,15 +133,15 @@ public class ExportDatasetServlet extends SecureController {
          *      parentstudy = currentStudy.getParentStudyId(); if (parentstudy >
          *      0) { // is OK } else { // same parentstudy = currentstudyid; } //
          */
-        int currentstudyid = currentStudy.getId();
+        int currentstudyid = currentStudy.getStudyId();
         // YW 11-09-2008 << modified logic here.
         int parentstudy = currentstudyid;
         // YW 11-09-2008 >>
 
-        StudyBean parentStudy = new StudyBean();
-        if (currentStudy.getParentStudyId() > 0) {
+        Study parentStudy = new Study();
+        if (currentStudy.isSite()) {
             //StudyDAO sdao = new StudyDAO(sm.getDataSource());
-            parentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
+            parentStudy = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
         }
 
         ExtractBean eb = generateFileService.generateExtractBean(db, currentStudy, parentStudy);
@@ -221,7 +222,7 @@ public class ExportDatasetServlet extends SecureController {
                 String ODMXMLFileName = "";
                 // DRY
                 // HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "");
-                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true, true, true, null, ub);
+                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentStudy.getStudyId(), currentStudy.checkAndGetParentStudyId(), "99", true, true, true, null, ub);
 
                 for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
@@ -587,7 +588,7 @@ public class ExportDatasetServlet extends SecureController {
         resetPanel();
         panel.setStudyInfoShown(false);
         setToPanel(resword.getString("study_name"), eb.getStudy().getName());
-        setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier());
+        setToPanel(resword.getString("protocol_ID"), eb.getStudy().getUniqueIdentifier());
         setToPanel(resword.getString("dataset_name"), db.getName());
         setToPanel(resword.getString("created_date"), local_df.format(db.getCreatedDate()));
         setToPanel(resword.getString("dataset_owner"), db.getOwner().getName());

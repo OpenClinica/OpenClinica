@@ -17,9 +17,9 @@ import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.QueryStore;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
@@ -120,10 +120,10 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     };
 
     @Override
-    public List<DiscrepancyNoteBean> findAllDiscrepancyNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort, List<String> userTags) {
+    public List<DiscrepancyNoteBean> findAllDiscrepancyNotes(Study currentStudy, ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort, List<String> userTags) {
         Map<String, Object> arguments = listNotesArguments(currentStudy, userTags);
         List<DiscrepancyNoteBean> result =
-                getNamedParameterJdbcTemplate().query(listNotesSql(filter, sort, arguments, currentStudy.isSite(currentStudy.getParentStudyId()), userTags), arguments,
+                getNamedParameterJdbcTemplate().query(listNotesSql(filter, sort, arguments, currentStudy.isSite(), userTags), arguments,
                         DISCREPANCY_NOTE_ROW_MAPPER);
         return result;
     }
@@ -137,9 +137,9 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     }
 
     @Override
-    public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy, ViewNotesFilterCriteria filter, boolean isQueryOnly, List<String> userTags) {
+    public DiscrepancyNotesSummary calculateNotesSummary(Study currentStudy, ViewNotesFilterCriteria filter, boolean isQueryOnly, List<String> userTags) {
         Map<String, Object> arguments = new HashMap<String, Object>(2);
-        arguments.put("studyId", currentStudy.getId());
+        arguments.put("studyId", currentStudy.getStudyId());
         arguments.put("userTags", userTags);
 
         List<String> terms = new ArrayList<String>();
@@ -149,7 +149,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.where"));
 
         terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.studyHideCrf"));
-        if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+        if (currentStudy.isSite()) {
             terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.siteHideCrf"));
 
         }
@@ -244,9 +244,9 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         return result;
     }
 
-    protected Map<String, Object> listNotesArguments(StudyBean currentStudy, List<String> userTags) {
+    protected Map<String, Object> listNotesArguments(Study currentStudy, List<String> userTags) {
         Map<String, Object> arguments = new HashMap<String, Object>();
-        arguments.put("studyId", currentStudy.getId());
+        arguments.put("studyId", currentStudy.getStudyId());
         arguments.put("limit", 50);
         arguments.put("userTags", userTags);
         return arguments;

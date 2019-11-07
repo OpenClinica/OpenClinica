@@ -56,8 +56,8 @@
       }
  </script>
 
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='session' id='definitions' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
 <h1><span class="title_manage">
@@ -76,7 +76,7 @@
   <c:out value="${newStudy.name}"/>
   </td></tr>  
   <tr valign="top"><td class="table_header_column"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td class="table_cell">
-  <c:out value="${newStudy.identifier}"/>
+  <c:out value="${newStudy.uniqueIdentifier}"/>
   </td></tr>
   
   <tr valign="top"><td class="table_header_column"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b></td><td class="table_cell">
@@ -148,7 +148,7 @@
   </td></tr>  
   
    <c:choose>
-    <c:when test="${newStudy.parentStudyId == 0}">
+    <c:when test="${newStudy.study == null || newStudy.study.studyId == 0}">
        <c:set var="key" value="study_system_status"/>
     </c:when>
     <c:otherwise>
@@ -157,7 +157,7 @@
    </c:choose>
 
    <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
-  <%-- <c:out value="${newStudy.status.name}"/> --%>
+  <%-- <c:out value="${newStudy.status.description}"/> --%>
   <c:out value="Available"/>
    </td></tr> 
    

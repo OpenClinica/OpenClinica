@@ -15,15 +15,15 @@ import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractBean;
 import core.org.akaza.openclinica.bean.extract.SPSSReportBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.OpenClinicaMailSender;
 import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.PermissionService;
@@ -36,6 +36,7 @@ import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -45,6 +46,8 @@ public class ExampleSpringJob extends QuartzJobBean {
     // example code here
     private String message;
 
+    @Autowired
+    private StudyDao studyDao;
     // example code here
     public void setMessage(String message) {
         this.message = message;
@@ -160,7 +163,6 @@ public class ExampleSpringJob extends QuartzJobBean {
                 // trying to not throw an error if there's no dataset id
                 DatasetDAO dsdao = new DatasetDAO(dataSource);
                 DatasetBean datasetBean = (DatasetBean) dsdao.findByPK(dsId);
-                StudyDAO studyDao = new StudyDAO(dataSource);
                 UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
                 // hmm, three lines in the if block DRY?
                 String generalFileDir = "";
@@ -186,12 +188,12 @@ public class ExampleSpringJob extends QuartzJobBean {
                 // logger.debug("-- gen tab file 00");
 
                 // tbh #5796 - covers a bug when the user changes studies, 10/2010
-                StudyBean activeStudy = (StudyBean) studyDao.findByPK(studyId);
-                StudyBean parentStudy = new StudyBean();
-                logger.debug("active study: " + studyId + " parent study: " + activeStudy.getParentStudyId());
-                if (activeStudy.getParentStudyId() > 0) {
+                Study activeStudy = (Study) studyDao.findByPK(studyId);
+                Study parentStudy = new Study();
+                logger.debug("active study: " + studyId + " parent study: " + activeStudy.checkAndGetParentStudyId());
+                if (activeStudy.isSite()) {
                     // StudyDAO sdao = new StudyDAO(sm.getDataSource());
-                    parentStudy = (StudyBean) studyDao.findByPK(activeStudy.getParentStudyId());
+                    parentStudy = (Study) studyDao.findByPK(activeStudy.getStudy().getStudyId());
                 } else {
                     parentStudy = activeStudy;
                     // covers a bug in tab file creation, tbh 01/2009
@@ -219,7 +221,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 
                     logger.debug("-- gen tab file 01");
                     fileName =
-                        generateFileService.createTabFile(eb, sysTimeBegin, generalFileDir, datasetBean, activeStudy.getId(), parentStudy.getId(),
+                        generateFileService.createTabFile(eb, sysTimeBegin, generalFileDir, datasetBean, activeStudy.getStudyId(), parentStudy.getStudyId(),
                                 generalFileDirCopy, userBean);
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -240,7 +242,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     String odmVersion = "oc1.2";
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null, userBean);
+                                activeStudy.getStudyId(), parentStudy.getStudyId(),studySubjectNumber, true, true, true, null, userBean);
                     logger.debug("-- gen odm file");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -263,7 +265,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     String odmVersion = "1.2";
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true,true, null, userBean);
+                                activeStudy.getStudyId(), parentStudy.getStudyId(),studySubjectNumber, true, true,true, null, userBean);
                     logger.debug("-- gen odm file 1.2 default");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -283,7 +285,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     String odmVersion = "1.3";
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null, userBean);
+                                activeStudy.getStudyId(), parentStudy.getStudyId(),studySubjectNumber, true, true, true, null, userBean);
                     logger.debug("-- gen odm file 1.3");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -305,7 +307,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     String odmVersion = "oc1.3";
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null, userBean);
+                                activeStudy.getStudyId(), parentStudy.getStudyId(),studySubjectNumber, true, true, true, null, userBean);
                     logger.debug("-- gen odm file 1.3 oc");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="

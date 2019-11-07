@@ -6,7 +6,6 @@ import net.sf.json.util.JSONUtils;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
@@ -19,7 +18,6 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyUserRole;
 import core.org.akaza.openclinica.domain.datamap.StudyUserRoleId;
@@ -187,19 +185,18 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         updateStudyUserRoles(request, ub, userActiveStudyId, studyEnvUuid, false);
 
-        StudyDAO studyDAO = new StudyDAO(dataSource);
-        StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        Study currentPublicStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
         Study userStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
         if (currentPublicStudy == null) {
             return studyEnvUuidProcessed;
         }
 
-        int parentStudyId = currentPublicStudy.getParentStudyId() > 0 ? currentPublicStudy.getParentStudyId() : currentPublicStudy.getId();
+        int parentStudyId = currentPublicStudy.isSite() ? currentPublicStudy.getStudy().getStudyId() : currentPublicStudy.getStudyId();
         if (ub.getActiveStudy() != null && ub.getActiveStudy().getStudyId() == parentStudyId)
             return studyEnvUuidProcessed;
 
         // check to see if the user has a role for this study
-        ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(ub, currentPublicStudy.getId());
+        ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(ub, currentPublicStudy.getStudyId());
         if (userRoles.isEmpty()) {
             logger.error("Sorry you do not have a user role for this study:" + currentPublicStudy.getStudyEnvUuid());
             studyEnvUuidProcessed = true;
@@ -313,7 +310,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             if (siteFlag) {
                 // see if the parent is in this list. If found, assign the custom role of the parent
                 parentExists = checkIfParentExists(request, study, userRoles.getBody());
-            } else if (activeStudy != null && activeStudy.getStudy() != null && activeStudy.getStudy().getStudyId() > 0) {
+            } else if (activeStudy != null && activeStudy.isSite()) {
                 parentExists = activeStudy.getStudy().getStudyId() == study.getStudyId();
             }
             if (StringUtils.isNotEmpty(altStudyEnvUuid)) {

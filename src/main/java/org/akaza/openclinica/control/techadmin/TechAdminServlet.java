@@ -6,13 +6,14 @@ package org.akaza.openclinica.control.techadmin;
 //
 // import java.util.ArrayList;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,8 @@ import java.util.ArrayList;
  */
 public class TechAdminServlet extends SecureController {
 
+    @Autowired
+    private StudyDao studyDao;
     /*
      * (non-Javadoc)
      *
@@ -31,10 +34,9 @@ public class TechAdminServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         // find last 5 modifed studies
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         // ArrayList studies = (ArrayList) sdao.findAllByLimit(true);
         // request.setAttribute("studies", studies);
-        ArrayList allStudies = (ArrayList) sdao.findAll();
+        ArrayList allStudies = (ArrayList) studyDao.findAll();
         // request.setAttribute("allStudyNumber", new
         // Integer(allStudies.size()));
 

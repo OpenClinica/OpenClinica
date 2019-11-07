@@ -17,7 +17,6 @@ import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
@@ -34,6 +33,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.logic.rulerunner.ExecutionMode;
@@ -91,11 +91,11 @@ public class DataImportService {
 
     private ImportCRFDataService dataService;
 
-    public List<String> validateMetaData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, StudyBean studyBean,
+    public List<String> validateMetaData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, Study studyBean,
             UserAccountBean userBean, List<DisplayItemBeanWrapper> displayItemBeanWrappers, HashMap<Integer, String> importedCRFStatuses) {
 
-        logger.debug("passing an odm container and study bean id: " + studyBean.getId());
-        List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, studyBean.getId(),getLocale() );
+        logger.debug("passing an odm container and study bean id: " + studyBean.getStudyId());
+        List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, studyBean.getStudyId(),getLocale() );
 
         if (errors == null)
             return new ArrayList<String>();
@@ -126,7 +126,7 @@ public class DataImportService {
      *             msg - contains status messages
      * @return list of errors
      */
-    public HashMap validateData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean,
+    public HashMap validateData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, Study studyBean, UserAccountBean userBean,
             List<DisplayItemBeanWrapper> displayItemBeanWrappers, HashMap<Integer, String> importedCRFStatuses,HttpServletRequest request) {
         ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
         setRespage(respage);
@@ -243,7 +243,7 @@ public class DataImportService {
 
     }
 
-    public ArrayList<String> submitData(ODMContainer odmContainer, DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
+    public ArrayList<String> submitData(ODMContainer odmContainer, DataSource dataSource, Study studyBean, UserAccountBean userBean,
             List<DisplayItemBeanWrapper> displayItemBeanWrappers, Map<Integer, String> importedCRFStatuses) throws Exception {
 
         boolean discNotesGenerated = false;
@@ -346,7 +346,7 @@ public class DataImportService {
     }
 
     public DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message, EventCRFBean eventCrfBean, DisplayItemBean displayItemBean,
-            Integer parentId, UserAccountBean uab, DataSource ds, StudyBean study) {
+            Integer parentId, UserAccountBean uab, DataSource ds, Study study) {
 
         DiscrepancyNoteBean note = new DiscrepancyNoteBean();
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
@@ -361,7 +361,7 @@ public class DataImportService {
         }
 
         note.setField(itemBean.getName());
-        note.setStudyId(study.getId());
+        note.setStudyId(study.getStudyId());
         note.setEntityName(itemBean.getName());
         note.setEntityType("ItemData");
         note.setEntityValue(displayItemBean.getData().getValue());
@@ -385,7 +385,7 @@ public class DataImportService {
         return note;
     }
 
-    public List<ImportDataRuleRunnerContainer> runRulesSetup(DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
+    public List<ImportDataRuleRunnerContainer> runRulesSetup(DataSource dataSource, Study studyBean, UserAccountBean userBean,
             List<SubjectDataBean> subjectDataBeans, RuleSetServiceInterface ruleSetService) {
         List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
         if (ruleSetService.getCountByStudy(studyBean) > 0) {
@@ -402,8 +402,8 @@ public class DataImportService {
         return containers;
     }
 
-    public List<String> runRules(StudyBean studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
-            RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
+    public List<String> runRules(Study studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
+                                 RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
         List<String> messages = new ArrayList<String>();
         if (containers != null && !containers.isEmpty()) {
             HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(containers, studyBean, userBean, executionMode);

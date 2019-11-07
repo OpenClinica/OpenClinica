@@ -11,8 +11,9 @@ import core.org.akaza.openclinica.bean.core.CustomRole;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
@@ -39,6 +40,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -56,7 +58,8 @@ public class ChangeStudyServlet extends SecureController {
     /**
      * Checks whether the user has the correct privilege
      */
-
+    @Autowired
+    private StudyDao studyDao;
     Locale locale;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
@@ -64,7 +67,7 @@ public class ChangeStudyServlet extends SecureController {
     private StudyEventDAO studyEventDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
-    private StudyDAO studyDAO;
+//    private StudyDAO studyDAO;
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
@@ -90,9 +93,8 @@ public class ChangeStudyServlet extends SecureController {
         String action = request.getParameter("action");// action sent by user
         request.setAttribute("requestSchema", "public");
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
 
-        ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), (ArrayList) sdao.findAll());
+        ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), (ArrayList) studyDao.findAll());
         CustomRole customRole = new CustomRole();
 
         populateCustomUserRoles(customRole, ub.getName());
@@ -106,12 +108,12 @@ public class ChangeStudyServlet extends SecureController {
         }
 
         ArrayList<StudyUserRoleBean> validStudies = new ArrayList<>();
-        ArrayList<StudyBean> studyList = new ArrayList<>();
+        ArrayList<Study> studyList = new ArrayList<>();
         for (int i = 0; i < studies.size(); i++) {
             StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
-            StudyBean study = (StudyBean) sdao.findByPK(sr.getStudyId());
+            Study study = (Study) studyDao.findByPK(sr.getStudyId());
             if (study != null && study.getStatus().equals(Status.PENDING)) {
-                sr.setStatus(study.getStatus());
+                sr.setStatus(Status.get(study.getStatus().getCode()));
             }
             if (study.isPublished() == false)
                 continue;
@@ -134,7 +136,7 @@ public class ChangeStudyServlet extends SecureController {
 
     }
 
-    private void validateChangeStudy(List<StudyUserRoleBean> studies, List<StudyBean> studyList) throws Exception {
+    private void validateChangeStudy(List<StudyUserRoleBean> studies, List<Study> studyList) throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
         v.addValidation("studyId", Validator.IS_AN_INTEGER);
@@ -175,9 +177,9 @@ public class ChangeStudyServlet extends SecureController {
         }
     }
 
-    private StudyInfoObject getProtocolInfo(int studyId, List<StudyBean>studyList) {
-        for (StudyBean study: studyList) {
-            if (study.getId() == studyId) {
+    private StudyInfoObject getProtocolInfo(int studyId, List<Study>studyList) {
+        for (Study study: studyList) {
+            if (study.getStudyId() == studyId) {
                 StudyInfoObject studyInfoObject = new StudyInfoObject(study.getSchemaName(), study);
                 return studyInfoObject;
             }
@@ -193,27 +195,29 @@ public class ChangeStudyServlet extends SecureController {
         String studyEnvUuid = fp.getString("studyEnvUuid", true);
         String prevStudyEnvUuid = currentStudy != null ? currentStudy.getStudyEnvUuid() : null;
         
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-
         String oldStudySchema = null;
-        if (currentStudy.getParentStudyId() <= 0) {
-            oldStudySchema = sdao.findByStudyEnvUuid(currentStudy.getStudyEnvUuid()).getSchemaName();
+        if (!currentStudy.isSite()) {
+            oldStudySchema = studyDao.findByStudyEnvUuid(currentStudy.getStudyEnvUuid()).getSchemaName();
         } else {
-            oldStudySchema = sdao.findByStudyEnvUuid(currentStudy.getStudyEnvSiteUuid()).getSchemaName();
+            oldStudySchema = studyDao.findByStudyEnvUuid(currentStudy.getStudyEnvSiteUuid()).getSchemaName();
         }
         
-        StudyBean newPublicStudy = sdao.findByStudyEnvUuid(studyEnvUuid);
+        Study newPublicStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
         request.setAttribute("changeStudySchema", newStudySchema);
-        StudyBean newStudy = sdao.findByStudyEnvUuid(studyEnvUuid); 
+        Study newStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         ArrayList studyParameters = spvdao.findParamConfigByStudy(newStudy); 
         newStudy.setStudyParameters(studyParameters);
         request.setAttribute("changeStudySchema", null);
 
-        if (currentStudy != null) { 
-            int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-            request.setAttribute("requestSchema", oldStudySchema); 
+        if (currentStudy != null) {
+            int parentStudyId;
+            if(currentStudy.isSite())
+                parentStudyId = currentStudy.getStudy().getStudyId();
+            else
+                parentStudyId = currentStudy.getStudyId();
+            request.setAttribute("requestSchema", oldStudySchema);
             StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
             newStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
             request.setAttribute("requestSchema", "public");
@@ -226,11 +230,11 @@ public class ChangeStudyServlet extends SecureController {
             }
             request.setAttribute("requestSchema", newStudySchema); //schema we are changing to.
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-            if (newStudy.getParentStudyId() <= 0) {// top study
+            if (!newStudy.isSite()) {// top study
                 scs.setParametersForStudy(newStudy); 
             } else {
-                if (newStudy.getParentStudyId() > 0) {
-                    newStudy.setParentStudyName((sdao.findByPK(newStudy.getParentStudyId())).getName());
+                if (newStudy.isSite()) {
+                    newStudy.getStudy().setName((studyDao.findByPK(newStudy.getStudy().getStudyId())).getName());
                 }
                 scs.setParametersForSite(newStudy);
 
@@ -245,23 +249,22 @@ public class ChangeStudyServlet extends SecureController {
             currentPublicStudy = newPublicStudy;
             // change user's active study id
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-            ub.setActiveStudyId(newPublicStudy.getId());
+            ub.setActiveStudyId(newPublicStudy.getStudyId());
             ub.setUpdater(ub);
             ub.setUpdatedDate(new java.util.Date());
             udao.update(ub);
 
             String accessToken = (String) request.getSession().getAttribute("accessToken");
-            getStudyBuildService().processModule(accessToken, newPublicStudy.getOid(), ModuleProcessor.Modules.PARTICIPATE);
+            getStudyBuildService().processModule(accessToken, newPublicStudy.getOc_oid(), ModuleProcessor.Modules.PARTICIPATE);
             request.setAttribute("changeStudySchema", newStudySchema);
-            StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
-            StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);
-            study.setParentStudyName(newStudy.getParentStudyName());
+            Study study = studyDao.findByStudyEnvUuid(studyEnvUuid);
+            study.getStudy().setName(newStudy.getStudy().getName());
             study.setStudyParameterConfig(newStudy.getStudyParameterConfig());
             session.setAttribute("study", study);
             currentStudy = study;
 
-            StudyBean userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), sm.getDataSource());
-            if (userRoleStudy.getParentStudyId() > 0) {
+            Study userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), sm.getDataSource());
+            if (userRoleStudy.isSite()) {
                 /*
                  * The Role decription will be set depending on whether the user
                  * logged in at study lever or site level. issue-2422
@@ -353,12 +356,12 @@ public class ChangeStudyServlet extends SecureController {
             return;
         }
         if (currentRole.isMonitor()) {
-            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId() + "&studyJustChanged=yes");
+            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getStudyId() + "&studyJustChanged=yes");
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
             setupSubjectEventStatusStatisticsTable();
             setupStudySubjectStatusStatisticsTable();
-            if (currentStudy.getParentStudyId() == 0) {
+            if (currentStudy.getStudy() ==null || currentStudy.getStudy().getStudyId() == 0) {
                 setupStudyStatisticsTable();
             }
 
@@ -384,7 +387,7 @@ public class ChangeStudyServlet extends SecureController {
 
             if (role == null) {
                 // The user inherit a study level role
-                StudyBean parent = (StudyBean)getStudyDAO().findByPK(currentStudy.getParentStudyId());
+                Study parent = (Study)studyDao.findByPK(currentStudy.getStudy().getStudyId());
                 role = roles.stream()
                         .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(parent.getStudyEnvUuid()))
                         .findAny()
@@ -412,7 +415,6 @@ public class ChangeStudyServlet extends SecureController {
         StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
-        factory.setStudyDao(getStudyDAO());
         String studySubjectStatusStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySubjectStatusStatistics", studySubjectStatusStatistics);
     }
@@ -423,7 +425,7 @@ public class ChangeStudyServlet extends SecureController {
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
         factory.setStudyEventDao(getStudyEventDAO());
-        factory.setStudyDao(getStudyDAO());
+        factory.setStudyDao(studyDao);
         String subjectEventStatusStatistics = factory.createTable(request, response).render();
         request.setAttribute("subjectEventStatusStatistics", subjectEventStatusStatistics);
     }
@@ -433,7 +435,7 @@ public class ChangeStudyServlet extends SecureController {
         SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
-        factory.setStudyDao(getStudyDAO());
+        factory.setStudyDao(studyDao);
         String studySiteStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySiteStatistics", studySiteStatistics);
 
@@ -444,7 +446,7 @@ public class ChangeStudyServlet extends SecureController {
         StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
-        factory.setStudyDao(getStudyDAO());
+        factory.setStudyDao(studyDao);
         String studyStatistics = factory.createTable(request, response).render();
         request.setAttribute("studyStatistics", studyStatistics);
 
@@ -460,7 +462,6 @@ public class ChangeStudyServlet extends SecureController {
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
-        factory.setStudyDAO(getStudyDAO());
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
         factory.setEventCRFDAO(getEventCRFDAO());
@@ -499,11 +500,6 @@ public class ChangeStudyServlet extends SecureController {
     public StudyEventDAO getStudyEventDAO() {
         studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
         return studyEventDAO;
-    }
-
-    public StudyDAO getStudyDAO() {
-        studyDAO = this.studyDAO == null ? new StudyDAO(sm.getDataSource()) : studyDAO;
-        return studyDAO;
     }
 
     public EventCRFDAO getEventCRFDAO() {

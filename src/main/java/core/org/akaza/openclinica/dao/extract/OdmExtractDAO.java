@@ -24,6 +24,7 @@ import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -32,12 +33,14 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.job.JobTerminationMonitor;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
@@ -54,13 +57,14 @@ public class OdmExtractDAO extends DatasetDAO {
     StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
     CRFVersionDAO cvdao = new CRFVersionDAO<>(ds);
     CRFDAO crfdao = new CRFDAO(ds);
-    StudyDAO sdao = new StudyDAO(ds);
     FormLayoutDAO fldao = new FormLayoutDAO(ds);
     EventDefinitionCrfTagDAO edctdao = new EventDefinitionCrfTagDAO(ds);
     StudyEventDAO sedao = new StudyEventDAO(ds);
     EventCRFDAO ecdao = new EventCRFDAO(ds);
     Set<Integer> edcSet;
 
+    @Autowired
+    private StudyDao sDao;
     private final Integer MAX_STRING_LENGTH = 4000;
 
     EventDefinitionCrfTagService eventDefinitionCrfTagService;
@@ -764,12 +768,8 @@ public class OdmExtractDAO extends DatasetDAO {
             odmVersion = "oc1.3";
 
         if ("oc1.3".equals(odmVersion)) {
-            if (metadata.getStudy().getParentStudyId() > 0) {
                 // this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
                 this.getMetadataOC1_3(parentStudyId, studyId, metadata, odmVersion,permissionTags);
-            } else {
-                this.getMetadataOC1_3(parentStudyId, studyId, metadata, odmVersion,permissionTags);
-            }
         } else if ("oc1.2".equals(odmVersion)) {
             this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion,permissionTags);
         } else {
@@ -2117,10 +2117,10 @@ public class OdmExtractDAO extends DatasetDAO {
         return 0;
     }
 
-    public void getAdminData(StudyBean study, DatasetBean dataset, OdmAdminDataBean data, String odmVersion) {
+    public void getAdminData(Study study, DatasetBean dataset, OdmAdminDataBean data, String odmVersion) {
         String dbName = CoreResources.getDBName();
         this.setStudyUsersTypesExpected();
-        ArrayList rows = this.select(this.getStudyUsersSql(study.getId() + ""));
+        ArrayList rows = this.select(this.getStudyUsersSql(study.getStudyId() + ""));
         Iterator it = rows.iterator();
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
@@ -2141,21 +2141,21 @@ public class OdmExtractDAO extends DatasetDAO {
         // loc.setName(study.getName());
         MetaDataVersionRefBean meta = new MetaDataVersionRefBean();
         meta.setElementDefOID(data.getMetaDataVersionOID());
-        meta.setStudyOID(study.getOid());
-        meta.setEffectiveDate(study.getCreatedDate());
+        meta.setStudyOID(study.getOc_oid());
+        meta.setEffectiveDate(study.getDateCreated());
         // loc.setMetaDataVersionRef(meta);
         // data.getLocations().add(loc);
     }
 
-    protected HashMap<String, String> getNullValueCVs(StudyBean study) {
+    protected HashMap<String, String> getNullValueCVs(Study study) {
         HashMap<String, String> nullValueCVs = new HashMap<String, String>();
-        int studyId = study.getId();
+        int studyId = study.getStudyId();
         this.setNullValueCVsTypesExpected();
         ArrayList viewRows = new ArrayList();
-        if (study.getParentStudyId() > 0) {
+        if (study.isSite()) {
             viewRows = select(this.getNullValueCVsSql(studyId + ""));
             if (viewRows.size() <= 0) {
-                viewRows = select(this.getNullValueCVsSql(study.getParentStudyId() + ""));
+                viewRows = select(this.getNullValueCVsSql(study.getStudy().getStudyId() + ""));
             }
         } else {
             viewRows = select(this.getNullValueCVsSql(studyId + ""));
@@ -2171,7 +2171,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return nullValueCVs;
     }
 
-    public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType , String permissionTagsString) {
+    public void getClinicalData(Study study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType , String permissionTagsString) {
         String dbName = CoreResources.getDBName();
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
@@ -2195,7 +2195,7 @@ public class OdmExtractDAO extends DatasetDAO {
         // studyIds += ids.get(ids.size() - 1);
         // }
 
-        String studyIds = study.getId() + "";
+        String studyIds = study.getStudyId() + "";
         int datasetItemStatusId = dataset.getDatasetItemStatus().getId();
         String sql = dataset.getSQLStatement().split("order by")[0].trim();
         sql = sql.split("study_event_definition_id in")[1];
@@ -2385,7 +2385,7 @@ public class OdmExtractDAO extends DatasetDAO {
                         it.setItemOID(itOID);
                         it.setTransactionType("Insert");
                         it.setItemName(itemName);
-                        String nullKey = study.getId() + "-" + se.getStudyEventOID() + "-" + form.getFormOID();
+                        String nullKey = study.getStudyId() + "-" + se.getStudyEventOID() + "-" + form.getFormOID();
                         if (ClinicalDataUtil.isNull(itValue, nullKey, nullValueCVs)) {
                             // if
                             // (nullValueMap.containsKey(itValue.trim().toUpperCase()))
@@ -2478,7 +2478,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    public void getClinicalData(StudyBean study, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType) {
+    public void getClinicalData(Study study, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType) {
 
         String dbName = CoreResources.getDBName();
         String subprev = "";
@@ -2490,7 +2490,7 @@ public class OdmExtractDAO extends DatasetDAO {
         String oidPos = "";
         HashMap<Integer, String> oidPoses = new HashMap<Integer, String>();
         HashMap<Integer, String> idataOidPoses = new HashMap<Integer, String>();
-        String studyIds = study.getId() + "";
+        String studyIds = study.getStudyId() + "";
 
     }
 
@@ -2520,7 +2520,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    protected void setOCSubjectDataAuditLogs(StudyBean study, OdmClinicalDataBean data, String studySubjectOids, HashMap<String, String> subOidPoses) {
+    protected void setOCSubjectDataAuditLogs(Study study, OdmClinicalDataBean data, String studySubjectOids, HashMap<String, String> subOidPoses) {
         this.setOCSubjectDataAuditsTypesExpected();
         logger.debug("Begin to execute GetOCSubjectDataAuditsSql");
         logger.debug("getOCSubjectDataAuditsSql= " + this.getOCSubjectDataAuditsSql(studySubjectOids));
@@ -2574,7 +2574,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    protected void setOCEventDataAuditLogs(StudyBean study, OdmClinicalDataBean data, String studySubjectOids, HashMap<String, String> evnOidPoses) {
+    protected void setOCEventDataAuditLogs(Study study, OdmClinicalDataBean data, String studySubjectOids, HashMap<String, String> evnOidPoses) {
         this.setOCEventDataAuditsTypesExpected();
         logger.debug("Begin to execute GetOCEventDataAuditsSql");
         logger.debug("getOCEventDataAuditsSql= " + this.getOCEventDataAuditsSql(studySubjectOids));
@@ -2643,7 +2643,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    protected void setOCFormDataAuditLogs(StudyBean study, OdmClinicalDataBean data, String studySubjectOids, String ecIds,
+    protected void setOCFormDataAuditLogs(Study study, OdmClinicalDataBean data, String studySubjectOids, String ecIds,
             HashMap<Integer, String> formOidPoses) {
         this.setOCFormDataAuditsTypesExpected();
         String dbName = CoreResources.getDBName();
@@ -2717,7 +2717,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    protected void setOCItemDataAuditLogs(StudyBean study, OdmClinicalDataBean data, String idataIds, HashMap<Integer, String> idataOidPoses) {
+    protected void setOCItemDataAuditLogs(Study study, OdmClinicalDataBean data, String idataIds, HashMap<Integer, String> idataOidPoses) {
         this.setOCItemDataAuditsTypesExpected();
         logger.debug("Begin to execute GetOCItemDataAuditsSql");
         logger.debug("getOCItemDataAuditsSql= " + this.getOCItemDataAuditsSql(idataIds));
@@ -3034,7 +3034,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    protected void setDataWithOCAttributes(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, Iterator iter,
+    protected void setDataWithOCAttributes(Study study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, Iterator iter,
             HashMap<Integer, String> oidPoses, String odmType , String permissionTagsString) {
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
@@ -3043,7 +3043,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<String, Integer> igpos = new HashMap<String, Integer>();
         String igprev = "";
         String oidPos = "";
-        StudyBean parentStudy = study.getParentStudyId() > 0 ? (StudyBean) new StudyDAO(this.ds).findByPK(study.getParentStudyId()) : study;
+        Study parentStudy = study.isSite() ? (Study) sDao.findByPK(study.getStudy().getStudyId()) : study;
         setStudyParemeterConfig(parentStudy);
         HashSet<Integer> sgcIdSet = new HashSet<Integer>();
         HashMap<String, String> subOidPoses = new HashMap<String, String>();
@@ -3344,8 +3344,8 @@ public class OdmExtractDAO extends DatasetDAO {
         return stage.getName();
     }
 
-    protected void setStudyParemeterConfig(StudyBean study) {
-        StudyParameterValueBean param = new StudyParameterValueDAO(this.ds).findByHandleAndStudy(study.getId(), "collectDob");
+    protected void setStudyParemeterConfig(Study study) {
+        StudyParameterValueBean param = new StudyParameterValueDAO(this.ds).findByHandleAndStudy(study.getStudyId(), "collectDob");
         study.getStudyParameterConfig().setCollectDob(param.getValue());
     }
 
@@ -3870,7 +3870,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
 
     private EventDefinitionCRFBean getEventDefCRF(StudyEventDefBean studyEventDefBean, ElementRefBean formRef, int studyId) {
-        StudyBean studyBean = (StudyBean) sdao.findByPK(studyId);
+        Study studyBean = (Study) sDao.findByPK(studyId);
         StudyEventDefinitionBean sedBean = seddao.findByOid(studyEventDefBean.getOid());
         CRFBean crfBean = crfdao.findByOid(formRef.getElementDefOID());
         return edcdao.findByStudyEventDefinitionIdAndCRFId(studyBean, sedBean.getId(), crfBean.getId());

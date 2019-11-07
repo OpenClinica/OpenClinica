@@ -8,12 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.domain.datamap.FormLayout;
 import core.org.akaza.openclinica.domain.xform.XformParser;
@@ -67,7 +67,8 @@ public class EditFormController {
     @Autowired
     private UtilService utilService;
 
-
+    @Autowired
+    private StudyDao sdao;
     private RestfulServiceHelper restfulServiceHelper;
 
     public static final String FORM_CONTEXT = "ecid";
@@ -75,7 +76,6 @@ public class EditFormController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     UserAccountDAO udao;
-    StudyDAO sdao;
     public static final String QUERY_FLAVOR = "-query";
     public static final String PARTICIPATE_FLAVOR = "-participate";
     public static final String NO_FLAVOR = "";
@@ -145,31 +145,30 @@ public class EditFormController {
 
     }
 
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(String studyOid) {
+        Study study = getStudy(studyOid);
+        if (study.isSite()) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = (Study) sdao.findByPK(study.getStudy().getStudyId());
             return parentStudy;
         }
 
     }
 
-    private StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+    private Study getStudy(String oid) {
+        Study studyBean = (Study) sdao.findByOcOID(oid);
         return studyBean;
     }
 
     private boolean mayProceed(String studyOid) throws Exception {
         boolean accessPermission = false;
-        StudyBean siteStudy = getStudy(studyOid);
-        StudyBean study = getParentStudy(studyOid);
+        Study siteStudy = getStudy(studyOid);
+        Study study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE ,
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOc_oid()).toString(); // ACTIVE ,
                                                                                                             // PENDING ,
                                                                                                             // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled

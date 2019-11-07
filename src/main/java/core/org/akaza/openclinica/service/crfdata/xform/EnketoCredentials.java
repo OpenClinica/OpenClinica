@@ -15,13 +15,16 @@ public class EnketoCredentials implements Serializable {
     private String ocInstanceUrl = null;
     protected static final Logger logger = LoggerFactory.getLogger(EnketoCredentials.class);
 
-    @Autowired
     private static StudyDao studyDao;
 
     private EnketoCredentials() {
 
     }
-
+    @Autowired
+    public EnketoCredentials(StudyDao studyDao)
+    {
+        EnketoCredentials.studyDao = studyDao;
+    }
     public static EnketoCredentials getInstance(String studyOid) {
         Study study = getParentStudy(studyOid);
         studyOid = study.getOc_oid();
@@ -71,7 +74,7 @@ public class EnketoCredentials implements Serializable {
     }
 
     public static Study getSiteStudy(String studyOid) {
-        Study study = studyDao.findByOcOID(studyOid);
+            Study study = studyDao.findByOcOID(studyOid);
         if (study.getStudy() == null) {
             logger.debug("The Study Oid: " + studyOid + " is a Study level Oid");
             return study;
@@ -80,13 +83,4 @@ public class EnketoCredentials implements Serializable {
             return null;
         }
     }
-
-    public static StudyDao getStudyDao() {
-        return studyDao;
-    }
-
-    public static void setStudyDao(StudyDao studyDao) {
-        EnketoCredentials.studyDao = studyDao;
-    }
-
 }

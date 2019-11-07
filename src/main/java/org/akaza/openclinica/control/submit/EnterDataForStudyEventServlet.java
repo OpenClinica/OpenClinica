@@ -23,13 +23,14 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
@@ -37,7 +38,6 @@ import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -49,6 +49,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author ssachs
@@ -56,6 +57,8 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 public class EnterDataForStudyEventServlet extends SecureController {
 
     Locale locale;
+    @Autowired
+    private StudyDao studyDao;
     // < ResourceBundleresexception,respage;
 
     public static final String INPUT_EVENT_ID = "eventId";
@@ -86,10 +89,10 @@ public class EnterDataForStudyEventServlet extends SecureController {
     private StudyEventBean getStudyEvent(int eventId) throws Exception {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 
-        StudyBean studyWithSED = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithSED = new StudyBean();
-            studyWithSED.setId(currentStudy.getParentStudyId());
+        Study studyWithSED = currentStudy;
+        if (currentStudy.isSite()) {
+            studyWithSED = new Study();
+            studyWithSED.setId(currentStudy.checkAndGetParentStudyId());
         }
 
         AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
@@ -134,16 +137,15 @@ public class EnterDataForStudyEventServlet extends SecureController {
         StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
         int studyId = studySubjectBean.getStudyId();
 
-        StudyDAO studydao = new StudyDAO(sm.getDataSource());
-        StudyBean study = (StudyBean) studydao.findByPK(studyId);
+        Study study = (Study) studyDao.findByPK(studyId);
         // If the study subject derives from a site, and is being viewed from a
         // parent study,
         // then the study IDs will be different. However, since each note is
         // saved with the specific
         // study ID, then its study ID may be different than the study subject's
         // ID.
-        boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
-        boolean isParentStudy = study.getParentStudyId() < 1;
+        boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getStudyId();
+        boolean isParentStudy = !study.isSite();
 
         // Get any disc notes for this study event
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
@@ -200,7 +202,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
                 seb.getSubjectEventStatus(), study);
 
         // Issue 3212 BWP << hide certain CRFs at the site level
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
             HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
 
             uncompletedEventDefinitionCRFs = hideCRFManager.removeHiddenEventDefinitionCRFBeans(uncompletedEventDefinitionCRFs);

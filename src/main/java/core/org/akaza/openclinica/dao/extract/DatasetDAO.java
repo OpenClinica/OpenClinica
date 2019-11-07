@@ -11,13 +11,13 @@ import core.org.akaza.openclinica.bean.core.DatasetItemStatus;
 import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.sql.Types;
 import java.util.ArrayList;
@@ -419,8 +419,8 @@ public class DatasetDAO extends AuditableEntityDAO {
         return al;
     }
 
-    public Collection findTopFive(StudyBean currentStudy) {
-        int studyId = currentStudy.getId();
+    public Collection findTopFive(Study currentStudy) {
+        int studyId = currentStudy.getStudyId();
         this.setTypesExpected();
         HashMap variables = new HashMap();
         variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
@@ -491,13 +491,13 @@ public class DatasetDAO extends AuditableEntityDAO {
      * @param name
      * @return
      */
-    public EntityBean findByNameAndStudy(String name, StudyBean study) {
+    public EntityBean findByNameAndStudy(String name, Study study) {
         DatasetBean eb = new DatasetBean();
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
         variables.put(Integer.valueOf(1), name);
-        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getStudyId()));
         String sql = digester.getQuery("findByNameAndStudy");
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();

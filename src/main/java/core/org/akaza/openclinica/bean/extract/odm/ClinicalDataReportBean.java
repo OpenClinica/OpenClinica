@@ -12,15 +12,14 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.odmbeans.*;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -30,6 +29,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -44,12 +44,13 @@ import java.util.List;
  */
 
 public class ClinicalDataReportBean extends OdmXmlReportBean {
+    @Autowired
+    private StudyDao studyDao;
     private OdmClinicalDataBean clinicalData;
     private DataSource dataSource;
     private UserAccountBean userBean;
     protected Locale locale = ResourceBundleProvider.getLocale();
     private final String COMMON = "common";
-    private StudyDAO sdao;
     private String[] permissionTagsStringArray;
     private ODMFilterDTO odmFilter;
 
@@ -86,14 +87,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         Role role = null; // OpenClinica:
         StudyUserRoleBean userRole = null;
-        StudyBean publicStudyBean = CoreResources.getPublicStudy(userBean.getActiveStudyId(), dataSource);
-             userRole = userBean.getRoleByStudy(publicStudyBean.getId());
+        Study publicStudyBean = CoreResources.getPublicStudy(userBean.getActiveStudyId(), dataSource);
+             userRole = userBean.getRoleByStudy(publicStudyBean.getStudyId());
             if (userRole == null || !userRole.isActive())
-                userRole = userBean.getRoleByStudy(publicStudyBean.getParentStudyId());
+                userRole = userBean.getRoleByStudy(publicStudyBean.getStudy().getStudyId());
 
             role = userRole.getRole();
 
-        StudyBean userRoleStudy = CoreResources.getPublicStudy(userRole.getStudyId(), dataSource);
+        Study userRoleStudy = CoreResources.getPublicStudy(userRole.getStudyId(), dataSource);
         setRoleDescription(role, userRoleStudy);
 
         if (odmFilter.isCrossForm()) {
@@ -144,8 +145,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
             StudyEventDefinitionDAO<String, ArrayList> seddao = new StudyEventDefinitionDAO(dataSource);
             CRFDAO crfdao = new CRFDAO(dataSource);
-            StudyBean parentStudyBean = getParentStudy(clinicalData.getStudyOID());
-            StudyBean studyBean = getStudy(clinicalData.getStudyOID());
+            Study parentStudyBean = getParentStudy(clinicalData.getStudyOID());
+            Study studyBean = getStudy(clinicalData.getStudyOID());
             // List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
 
 
@@ -163,7 +164,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(edc.getStudyEventDefinitionId());
                         CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
 
-                        if (studyBean.getParentStudyId() == 0 || (studyBean.getParentStudyId() != 0 && !edc.isHideCrf())) {
+                        if (studyBean.getStudy() == null || studyBean.getStudy().getStudyId() == 0 || (studyBean.getStudy().getStudyId() != 0 && !edc.isHideCrf())) {
                             if (sed.getType().equals(COMMON) && !sub.getStatus().equals("removed")) {
                                 if (sed.isRepeating() || (!sed.isRepeating() && validateAddNewForNonRepeating(sub, crf, sed))) {
                                     xml.append(indent + indent + indent + indent + "<OpenClinica:Link rel=\"common-add-new\" tag=\""
@@ -919,19 +920,19 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
     }
 
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(String studyOid) {
+        Study study = getStudy(studyOid);
+        if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
             return parentStudy;
         }
     }
 
-    private StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+    private Study getStudy(String oid) {
+
+        Study studyBean = (Study) studyDao.findByOcOID(oid);
         return studyBean;
     }
 
@@ -957,8 +958,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     }
 
 
-    private void setRoleDescription(Role role , StudyBean userRoleStudy){
-        if (userRoleStudy.getParentStudyId() > 0) {
+    private void setRoleDescription(Role role , Study userRoleStudy){
+        if (userRoleStudy.isSite()) {
             /*
              * The Role decription will be set depending on whether the user logged in at study lever or site level.
              * issue-2422

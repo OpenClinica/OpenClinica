@@ -39,7 +39,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.domain.datamap.Study" />
 <jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
@@ -172,13 +172,13 @@
 	</c:choose>
 	<tr>
 		<td class="formlabel" align="right">
-            <c:if test="${study.parentStudyId == 0}">
+            <c:if test="${study.study == null || study.study.studyId == 0}">
                 <fmt:message key="date_of_enrollment_for_study" bundle="${resword}"/>'
                 <c:out value="${study.name}" /> ' 
             </c:if>
-            <c:if test="${study.parentStudyId > 0}">
+            <c:if test="${study.study != null && study.study.studyId > 0}">
                 <fmt:message key="date_of_enrollment_for_study" bundle="${resword}"/>'
-                <c:out value="${study.parentStudyName}" /> ' 
+                <c:out value="${study.study.name}" /> '
             </c:if>
 
         </td>

@@ -12,7 +12,7 @@
 <jsp:include page="../include/sidebar.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean' />
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study' />
 
 <jsp:useBean scope='request' id='studySubjects' class='java.util.ArrayList' />
 <jsp:useBean scope='request' id='studySubjectAudits' class='java.util.HashMap' />

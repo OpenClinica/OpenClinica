@@ -10,7 +10,6 @@
 			<pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
 		</encoder>
 	</appender>
-
 	<logger name="org.hibernate.SQL" level="${hibernateSQLLogLevel}" />
 	<logger name="org.hibernate.type" level="${hibernateTypeLogLevel}" />
 	<logger name="org.springframework.security" level="ERROR" />

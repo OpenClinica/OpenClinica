@@ -13,9 +13,12 @@ import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.UserType;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author thickerson
@@ -29,6 +32,8 @@ public class UserAccountBean extends AuditableEntityBean {
     /**
      * LDAP/Active Directory users are identified by having this password stored in the database
      */
+    @Autowired
+    private StudyDao studyDao;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public static final String LDAP_PASSWORD = "*";
@@ -400,8 +405,8 @@ public class UserAccountBean extends AuditableEntityBean {
         }
     }
 
-    public StudyUserRoleBean getRoleByStudy(StudyBean study) {
-        return getRoleByStudy(study.getId());
+    public StudyUserRoleBean getRoleByStudy(Study study) {
+        return getRoleByStudy(study.getStudyId());
     }
 
     public StudyUserRoleBean getRoleByStudy(int studyId) {
@@ -551,5 +556,28 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 
-
+    public UserAccount  toUserAccount(){
+        UserAccount ua = new UserAccount();
+        ua.setPasswd(getPasswd());
+        ua.setFirstName(getFirstName());
+        ua.setLastName(getLastName());
+        ua.setEmail(getEmail());
+        ua.setInstitutionalAffiliation(getInstitutionalAffiliation());
+        ua.setDateLastvisit(getLastVisitDate());
+        ua.setPasswdTimestamp(getPasswdTimestamp());
+        ua.setPasswdChallengeQuestion(getPasswdChallengeQuestion());
+        ua.setPasswdChallengeAnswer(getPasswdChallengeAnswer());
+        ua.setPhone(getPhone());
+        ua.setEnabled(getEnabled());
+        ua.setAccountNonLocked(getAccountNonLocked());
+        ua.setLockCounter(getLockCounter());
+        ua.setRunWebservices(getRunWebservices());
+        ua.setAccessCode(getAccessCode());
+        ua.setTimeZone(getTime_zone());
+        ua.setEnableApiKey(isEnableApiKey());
+        ua.setApiKey(getApiKey());
+        ua.setUserUuid(getUserUuid());
+        ua.setActiveStudy(studyDao.findByPK(getActiveStudyId()));
+        return ua;
+    }
 }

@@ -4,27 +4,20 @@ package core.org.akaza.openclinica.domain.datamap;
 
 import static javax.persistence.EnumType.STRING;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
+import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
+import core.org.akaza.openclinica.core.SessionManager;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
@@ -114,6 +107,9 @@ public class Study extends DataMapDomainObject {
     private int filePath;
     private String studyUuid;
     private int subjectCount;
+
+    private transient StudyParameterConfig studyParameterConfig;
+    private transient ArrayList studyParameters;
 
     @Column(name = "study_env_uuid", unique = false, nullable = false)
     public String getStudyEnvUuid() {
@@ -236,6 +232,7 @@ public class Study extends DataMapDomainObject {
         this.userAccount = userAccount;
     }
 
+    // @JoinColumn(name = "type_id")
     // @JoinColumn(name = "type_id")
     // public StudyType getStudyType() {
     // return this.studyType;
@@ -873,5 +870,137 @@ public class Study extends DataMapDomainObject {
     @Column(name = "subject_count")
     public void setSubjectCount(int subjectCount) {
         this.subjectCount = subjectCount;
+    }
+
+    @Transient
+    public StudyParameterConfig getStudyParameterConfig(){
+        if(studyParameterConfig != null )
+            return studyParameterConfig;
+        studyParameterConfig = new StudyParameterConfig();
+        List<StudyParameterValue> parameters = getStudyParameterValues();
+        for (int i = 0; i < parameters.size(); i++) {
+            StudyParameterValue spv =  parameters.get(i);
+            if(spv !=null){
+                String handle = spv.getStudyParameter().getHandle();
+                // TO DO: will change to use java reflection later
+                if (handle.equalsIgnoreCase("collectDob")) {
+                    studyParameterConfig.setCollectDob(spv.getValue());
+                } else if (handle.equalsIgnoreCase("genderRequired")) {
+                    studyParameterConfig.setGenderRequired(spv.getValue());
+                } else if (handle.equalsIgnoreCase("discrepancyManagement")) {
+                    studyParameterConfig.setDiscrepancyManagement(spv.getValue());
+                } else if (handle.equalsIgnoreCase("subjectPersonIdRequired")) {
+                    studyParameterConfig.setSubjectPersonIdRequired(spv.getValue().toLowerCase());
+                    // logger.info("subjectPersonIdRequired" +
+                    // studyParameterConfig.getSubjectPersonIdRequired());
+                } else if (handle.equalsIgnoreCase("interviewerNameRequired")) {
+                    studyParameterConfig.setInterviewerNameRequired(spv.getValue());
+                } else if (handle.equalsIgnoreCase("interviewerNameDefault")) {
+                    studyParameterConfig.setInterviewerNameDefault(spv.getValue());
+                } else if (handle.equalsIgnoreCase("interviewerNameEditable")) {
+                    studyParameterConfig.setInterviewerNameEditable(spv.getValue());
+                } else if (handle.equalsIgnoreCase("interviewDateRequired")) {
+                    studyParameterConfig.setInterviewDateRequired(spv.getValue());
+                } else if (handle.equalsIgnoreCase("interviewDateDefault")) {
+                    studyParameterConfig.setInterviewDateDefault(spv.getValue());
+                } else if (handle.equalsIgnoreCase("interviewDateEditable")) {
+                    studyParameterConfig.setInterviewDateEditable(spv.getValue());
+                } else if (handle.equalsIgnoreCase("subjectIdGeneration")) {
+                    studyParameterConfig.setSubjectIdGeneration(spv.getValue());
+                } else if (handle.equalsIgnoreCase("subjectIdPrefixSuffix")) {
+                    studyParameterConfig.setSubjectIdPrefixSuffix(spv.getValue());
+                } else if (handle.equalsIgnoreCase("personIdShownOnCRF")) {
+                    studyParameterConfig.setPersonIdShownOnCRF(spv.getValue());
+                } else if (handle.equalsIgnoreCase("secondaryLabelViewable")) {
+                    studyParameterConfig.setSecondaryLabelViewable(spv.getValue());
+                } else if (handle.equalsIgnoreCase("enforceEnrollmentCap")) {
+                    studyParameterConfig.setEnforceEnrollmentCap(spv.getValue());
+                } else if (handle.equalsIgnoreCase("adminForcedReasonForChange")) {
+                    studyParameterConfig.setAdminForcedReasonForChange(spv.getValue());
+                } else if (handle.equalsIgnoreCase("eventLocationRequired")) {
+                    studyParameterConfig.setEventLocationRequired(spv.getValue());
+                } else if (handle.equalsIgnoreCase("participantPortal")) {
+                    studyParameterConfig.setParticipantPortal(spv.getValue());
+                } else if (handle.equalsIgnoreCase("randomization")) {
+                    studyParameterConfig.setRandomization(spv.getValue());
+                } else if (handle.equalsIgnoreCase("participantIdTemplate")) {
+                    studyParameterConfig.setParticipantIdTemplate(spv.getValue());
+                }
+            }
+        }
+        return studyParameterConfig;
+    }
+
+    public void setStudyParameterConfig(StudyParameterConfig spc){
+        this.studyParameterConfig = spc;
+    }
+
+    @Transient
+    public boolean isSite() {
+        return getStudy() != null && getStudy().getStudyId() > 0 ? true : false;
+    }
+
+    public int checkAndGetParentStudyId(){
+        return isSite() ? this.getStudy().getStudyId() : 0;
+    }
+
+    @Transient
+    public List<StudyParamsConfig> getStudyParameters() {
+        if(studyParameters != null && studyParameters.size() > 0)
+            return studyParameters;
+        else{
+            List<StudyParamsConfig> spcList = new ArrayList<>();
+            List<StudyParameterValue> parameters = getStudyParameterValues();
+            for (int i = 0; i < parameters.size(); i++) {
+                StudyParameterValue spv = parameters.get(i);
+                StudyParamsConfig spc = new StudyParamsConfig();
+
+                spc.setParameter(spv.getStudyParameter());
+                StudyParameterValueBean spvb = new StudyParameterValueBean();
+                spvb.setValue(spv.getValue());
+                spvb.setStudyId(spv.getStudy().getStudyId());
+                spvb.setParameter(spv.getStudyParameter().getHandle());
+                spc.setValue(spvb);
+                spcList.add(spc);
+            }
+            return spcList;
+        }
+    }
+    public void setStudyParameters(List<StudyParamsConfig> spcList){
+        List<StudyParameterValue> spvList = new ArrayList<>();
+        for(StudyParamsConfig spc: spcList){
+            StudyParameterValue spv = new StudyParameterValue();
+            spv.setStudyParameterValueId(spc.getParameter().getStudyParameterId());
+            spv.setStudy(this);
+            spv.setStudyParameter(spc.getParameter());
+            spv.setValue(spc.getValue().getValue());
+            spvList.add(spv);
+        }
+        this.studyParameters = (ArrayList) spcList;
+        setStudyParameterValues(spvList);
+    }
+
+    /**
+     * @return Returns the updater.
+     */
+    @Transient
+    public UserAccountBean getUpdater() {
+        UserAccountBean updater;
+        UserAccountDAO udao;
+        try {
+                udao = new UserAccountDAO(SessionManager.getStaticDataSource());
+                updater = (UserAccountBean) udao.findByPK(getUpdateId());
+        } catch (Exception e) {
+            updater = null;
+        }
+        return updater;
+    }
+    public void setUpdater(UserAccountBean updater){
+        updateId = updater.getId();
+    }
+
+    @Transient
+    public String getManager() {
+        return CoreResources.getStudyManager();
     }
 }

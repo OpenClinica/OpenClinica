@@ -38,7 +38,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope="session" id="parentName" class="java.lang.String"/>
 <h1><span class="title_manage">
 <fmt:message key="confirm_site_details" bundle="${resword}"/>
@@ -60,7 +60,7 @@
   </td></tr>
   
   <tr valign="top"><td class="table_header_column"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td class="table_cell">
-  <c:out value="${newStudy.identifier}"/>
+  <c:out value="${newStudy.uniqueIdentifier}"/>
   </td></tr>
   
   <tr valign="top"><td class="table_header_column"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b>:</td><td class="table_cell">
@@ -132,7 +132,7 @@
   </td></tr>  
   
   <c:choose>
-   <c:when test="${newStudy.parentStudyId == 0}">
+   <c:when test="${newStudy.study == null || newStudy.study.studyId == 0}">
       <c:set var="key" value="study_system_status"/>
    </c:when>
    <c:otherwise>
@@ -141,7 +141,7 @@
   </c:choose>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
-   <%-- <c:out value="${newStudy.status.name}"/> --%> <c:out value="Available"/>
+   <%-- <c:out value="${newStudy.status.description}"/> --%> <c:out value="Available"/>
    </td></tr> 
    
    <c:forEach var="config" items="${newStudy.studyParameters}">   
