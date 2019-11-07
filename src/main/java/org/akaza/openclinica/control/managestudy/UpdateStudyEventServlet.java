@@ -213,7 +213,7 @@ public class UpdateStudyEventServlet extends SecureController {
          * set the event back to COMPLETED
          */
 
-        Study studyBean = (Study) studyDao.findByPK(ssub.getStudyId());
+        Study studyBean = (Study) getStudyDao().findByPK(ssub.getStudyId());
         checkRoleByUserAndStudy(ub, studyBean);
         // To remove signed status from the list
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
@@ -452,7 +452,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
 
-                Study study = (Study) studyDao.findByPK(ssb.getStudyId());
+                Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
 
                 ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
@@ -613,7 +613,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
 
-                Study study = (Study) studyDao.findByPK(ssb.getStudyId());
+                Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
 
                 ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);

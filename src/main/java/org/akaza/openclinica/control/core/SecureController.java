@@ -151,8 +151,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     private final static String STUDY_ENV_UUID = "studyEnvUuid";
     private final static String FORCE_RENEW_AUTH = "forceRenewAuth";
 
-    @Autowired
-    private StudyDao studyDao;
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
     protected static final Logger logger = LoggerFactory.getLogger(SecureController.class);
@@ -514,7 +512,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     CoreResources.setRequestSchema(request, "public");
                     StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-                    currentPublicStudy = studyDao.findByPK(ub.getActiveStudyId());
+                    currentPublicStudy = getStudyDao().findByPK(ub.getActiveStudyId());
 
                     ArrayList studyParameters = spvdao.findParamConfigByStudy(currentPublicStudy);
 
@@ -541,7 +539,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     forwardPage(Page.ERROR);
                     return;
                 }
-                currentStudy = (Study) studyDao.findByUniqueId(currentPublicStudy.getUniqueIdentifier());
+                currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 if (currentStudy != null) {
                     currentStudy.getStudy().setName(currentPublicStudy.getStudy().getName());
                     StudyConfigService scs = new StudyConfigService(sm.getDataSource());
@@ -550,7 +548,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
                     } else {
                         // YW <<
-                        currentStudy.getStudy().setName(((Study) studyDao.findByPK(currentStudy.getStudy().getStudyId())).getName());
+                        currentStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId())).getName());
                         // YW >>
                         scs.setParametersForSite(currentStudy);
                     }
@@ -562,9 +560,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // YW 06-20-2007<< set site's parentstudy name when site is
                 // restored
             if (currentPublicStudy.isSite()) {
-                    currentPublicStudy.getStudy().setName(((Study) studyDao.findByPK(currentPublicStudy.getStudy().getStudyId())).getName());
+                    currentPublicStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentPublicStudy.getStudy().getStudyId())).getName());
                     request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
-                    currentStudy.getStudy().setName(((Study) studyDao.findByPK(currentStudy.getStudy().getStudyId())).getName());
+                    currentStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId())).getName());
                     request.setAttribute("requestSchema", "public");
                 }
                 // YW >>
@@ -587,7 +585,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
 
 
-            Study userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), sm.getDataSource());
+            Study userRoleStudy = getStudyBuildService().getPublicStudy(currentRole.getStudyId());
 
             if (userRoleStudy.isSite()) {
                 /*
@@ -964,18 +962,18 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      *            javax.sql.DataSource
      */
     protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao, DataSource ds) {
-        ArrayList<Study> studies = (ArrayList<Study>) studyDao.findAllByUserNotRemoved(userName);
+        ArrayList<Study> studies = (ArrayList<Study>) getStudyDao().findAllByUserNotRemoved(userName);
         for (int i = 0; i < studies.size(); ++i) {
             Study publicStudy = studies.get(i);
             CoreResources.setRequestSchema(request, publicStudy.getSchemaName());
-            Study study = studyDao.findByOcOID(publicStudy.getOc_oid());
+            Study study = getStudyDao().findByOcOID(publicStudy.getOc_oid());
             if (adao.findByPKAndStudy(entityId, study).getId() > 0) {
                 return true;
             }
             // Here follow the current logic - study subjects at sites level are
             // visible to parent studies.
             if (!study.isSite()) {
-                ArrayList<Study> sites = (ArrayList<Study>) studyDao.findAllByParent(study.getStudyId());
+                ArrayList<Study> sites = (ArrayList<Study>) getStudyDao().findAllByParent(study.getStudyId());
                 if (sites.size() > 0) {
                     for (int j = 0; j < sites.size(); ++j) {
                         if (adao.findByPKAndStudy(entityId, sites.get(j)).getId() > 0) {
@@ -1055,7 +1053,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         if (currentStudy == null)
             return allDefs;
         if (currentStudy.isSite()) {
-            Study parentStudy = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
+            Study parentStudy = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(parentStudy);
         } else {
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(currentStudy);
@@ -1075,7 +1073,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         int parentStudyId = currentStudy.getStudy().getStudyId();
         ArrayList studyGroupClasses = new ArrayList();
         if (parentStudyId > 0) {
-            Study parentStudy = (Study) studyDao.findByPK(parentStudyId);
+            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
             studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(parentStudy);
         } else {
             parentStudyId = currentStudy.getStudyId();
@@ -1321,7 +1319,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         if (StringUtils.isNotEmpty(tenantStudy.getSchemaName()))
             study = tenantStudy;
         else
-            study = studyDao.findPublicStudy(tenantStudy.getOc_oid());
+            study = getStudyDao().findPublicStudy(tenantStudy.getOc_oid());
 
         StudyUserRoleBean studyUserRole = ub.getRoleByStudy(study.getStudy().getStudyId());
         StudyUserRoleBean siteUserRole = new StudyUserRoleBean();
@@ -1399,9 +1397,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         Study sb = null;
         if(currentStudy.getStudy() != null && currentStudy.getStudy().getStudyId() != 0){
-            sb = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
+            sb = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
         }else{
-             sb = (Study) studyDao.findByPK(currentStudy.getStudyId());
+             sb = (Study) getStudyDao().findByPK(currentStudy.getStudyId());
         }
         int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
@@ -1478,7 +1476,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         CoreResources.setRequestSchema(request, "public");
         StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildService.class);
 
-        Study tmpPublicStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
+        Study tmpPublicStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
 
         if (tmpPublicStudy == null) {
             CoreResources.setRequestSchema(request,currentSchema);
@@ -1502,9 +1500,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         } else {
             currentPublicStudy = tmpPublicStudy;
             CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
-            currentStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
+            currentStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
             if (currentStudy.isSite()) {
-                currentStudy.getStudy().setName(studyDao.findByPK(currentStudy.getStudy().getStudyId()).getName());
+                currentStudy.getStudy().setName(getStudyDao().findByPK(currentStudy.getStudy().getStudyId()).getName());
                 currentPublicStudy.getStudy().setName(currentStudy.getStudy().getName());
             }
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
@@ -1550,12 +1548,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     protected void populateCustomUserRoles(CustomRole customRole, String username) {
-        StudyBuildService studyBuildService = (StudyBuildService) SpringServletAccess.getApplicationContext(context).getBean("studyBuildService");
         List<ChangeStudyDTO> byUser = getStudyDao().findByUser(username);
         List<StudyEnvironmentRoleDTO> userRoles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
         if (userRoles == null) {
             logger.error("******************userRoles should not be null");
-            ResponseEntity<List<StudyEnvironmentRoleDTO>> responseEntity = studyBuildService.getUserRoles(request, true);
+            ResponseEntity<List<StudyEnvironmentRoleDTO>> responseEntity = getStudyBuildService().getUserRoles(request, true);
             userRoles = responseEntity.getBody();
         }
         if (byUser == null) {
@@ -1617,6 +1614,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return subjectCount;
     }
 
+    protected  StudyBuildService getStudyBuildService(){
+        return (StudyBuildService) SpringServletAccess.getApplicationContext(context).getBean("studyBuildService");
+    }
     protected CryptoConverter getCrytoConverter() {
         return (CryptoConverter) SpringServletAccess.getApplicationContext(context).getBean("cryptoConverter");
     }

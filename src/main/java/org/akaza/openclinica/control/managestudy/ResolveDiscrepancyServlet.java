@@ -898,11 +898,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
     }
 
     private Study getParentStudy(String studyOid, DataSource ds) {
-        Study study = (Study) studyDao.findByOcOID(studyOid);
+        Study study = (Study) getStudyDao().findByOcOID(studyOid);
         if (!study.isSite()) {
             return study;
         } else {
-            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+            Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
             return parentStudy;
         }
     }

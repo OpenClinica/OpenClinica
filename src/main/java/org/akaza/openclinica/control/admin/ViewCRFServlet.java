@@ -246,11 +246,11 @@ public class ViewCRFServlet extends SecureController {
             return studyBeans;
         }
 
-        ArrayList<Integer> studyIds = (ArrayList<Integer>) studyDao.getStudyIdsByCRF(crfId);
+        ArrayList<Integer> studyIds = (ArrayList<Integer>) getStudyDao().getStudyIdsByCRF(crfId);
         Study tempBean = new Study();
 
         for (Integer id : studyIds) {
-            tempBean = (Study) studyDao.findByPK(id);
+            tempBean = (Study) getStudyDao().findByPK(id);
             studyBeans.add(tempBean);
 
         }

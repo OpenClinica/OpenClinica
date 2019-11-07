@@ -42,9 +42,9 @@ public class AdminSystemServlet extends SecureController {
     protected void processRequest() throws Exception {
 
         // find last 5 modifed studies
-        ArrayList studies = (ArrayList) studyDao.findAllByLimit(true);
+        ArrayList studies = (ArrayList) getStudyDao().findAllByLimit(true);
         request.setAttribute("studies", studies);
-        ArrayList allStudies = (ArrayList) studyDao.findAll();
+        ArrayList allStudies = (ArrayList) getStudyDao().findAll();
         request.setAttribute("allStudyNumber", new Integer(allStudies.size()));
 
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

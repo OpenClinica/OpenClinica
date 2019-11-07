@@ -134,7 +134,7 @@ public class ListEventsForSubjectServlet extends SecureController {
 
         if (currentStudy.isSite()) {
 
-            Study parent = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
+            Study parent = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
 
             allDefs = seddao.findAllActiveByStudy(parent);
 

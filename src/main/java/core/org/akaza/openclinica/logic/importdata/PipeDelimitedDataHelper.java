@@ -49,6 +49,7 @@ import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,9 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 	private final DataSource ds;
 	@Autowired
 	private StudyDao studyDao;
+
+	@Autowired
+	private StudyBuildService studyBuildService;
 	public PipeDelimitedDataHelper(DataSource ds) {
 		super();
 		this.ds = ds;
@@ -1054,7 +1058,7 @@ public ArrayList<ErrorObj> validateStudyMetadata(String formOIDValue,
             eo = new ErrorObj(ErrorConstants.ERR_STUDY_NOT_EXIST,mf.format(arguments));
             errors.add(eo); 
             
-        } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, studyOid, ds)) {
+        } else if (!studyBuildService.isPublicStudySameAsTenantStudy(studyBean, studyOid)) {
             mf.applyPattern(respage.getString("your_current_study_is_not_the_same_as"));
             Object[] arguments = { studyBean.getName() };           
             eo = new ErrorObj(ErrorConstants.ERR_STUDY_NOT_EXIST,mf.format(arguments));

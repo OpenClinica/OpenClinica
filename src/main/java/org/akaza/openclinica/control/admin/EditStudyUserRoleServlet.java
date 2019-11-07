@@ -62,7 +62,7 @@ public class EditStudyUserRoleServlet extends SecureController {
         String uName = fp.getString(ARG_USER_NAME);
         StudyUserRoleBean studyUserRole = udao.findRoleByUserNameAndStudyId(uName, studyId);
 
-        Study sb = (Study) studyDao.findByPK(studyUserRole.getStudyId());
+        Study sb = (Study) getStudyDao().findByPK(studyUserRole.getStudyId());
         if (sb != null) {
             studyUserRole.setStudyName(sb.getName());
         }
@@ -80,7 +80,7 @@ public class EditStudyUserRoleServlet extends SecureController {
 
             roleMap = new LinkedHashMap();
             ResourceBundle resterm = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-            Study study = (Study) studyDao.findByPK(studyUserRole.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studyUserRole.getStudyId());
             if (!study.isSite()) {
                 for (Iterator it = getRoles().iterator(); it.hasNext();) {
                     Role role = (Role) it.next();

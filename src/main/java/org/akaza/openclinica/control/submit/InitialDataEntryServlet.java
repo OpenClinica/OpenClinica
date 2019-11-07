@@ -356,4 +356,13 @@ public class InitialDataEntryServlet extends DataEntryServlet {
         return false;
     }
 
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
 }

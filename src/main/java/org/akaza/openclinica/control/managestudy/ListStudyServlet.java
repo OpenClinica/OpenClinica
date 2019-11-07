@@ -63,14 +63,14 @@ public class ListStudyServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        ArrayList studies = (ArrayList) studyDao.findAll();
+        ArrayList studies = (ArrayList) getStudyDao().findAll();
         // find all parent studies
-        ArrayList parents = (ArrayList) studyDao.findAllParents();
+        ArrayList parents = (ArrayList) getStudyDao().findAllParents();
         ArrayList displayStudies = new ArrayList();
 
         for (int i = 0; i < parents.size(); i++) {
             Study parent = (Study) parents.get(i);
-            ArrayList children = (ArrayList) studyDao.findAllByParent(parent.getStudyId());
+            ArrayList children = (ArrayList) getStudyDao().findAllByParent(parent.getStudyId());
             DisplayStudyBean displayStudy = new DisplayStudyBean();
             displayStudy.setParent(parent);
             displayStudy.setChildren(children);

@@ -704,4 +704,14 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         return result;
 
     }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
 }

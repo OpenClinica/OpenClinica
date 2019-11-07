@@ -90,7 +90,7 @@ public class ExportDatasetServlet extends SecureController {
     public Study getPublicStudy(String uniqueId) {
         String studySchema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");
-        Study study = studyDao.findByUniqueId(uniqueId);
+        Study study = getStudyDao().findByUniqueId(uniqueId);
         CoreResources.setRequestSchema(studySchema);
         return study;
     }
@@ -117,7 +117,7 @@ public class ExportDatasetServlet extends SecureController {
             }
         }
         DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
-        Study study = (Study)studyDao.findByPK(db.getStudyId());
+        Study study = (Study)getStudyDao().findByPK(db.getStudyId());
         checkRoleByUserAndStudy(ub, study);
 
         //Checks if the study is current study or child of current study
@@ -141,7 +141,7 @@ public class ExportDatasetServlet extends SecureController {
         Study parentStudy = new Study();
         if (currentStudy.isSite()) {
             //StudyDAO sdao = new StudyDAO(sm.getDataSource());
-            parentStudy = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
+            parentStudy = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
         }
 
         ExtractBean eb = generateFileService.generateExtractBean(db, currentStudy, parentStudy);

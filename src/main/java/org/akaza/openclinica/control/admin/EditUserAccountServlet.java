@@ -74,7 +74,7 @@ public class EditUserAccountServlet extends SecureController {
     @Autowired
     private StudyDao studyDao;
     private ArrayList getAllStudies() {
-        return (ArrayList) studyDao.findAll();
+        return (ArrayList) getStudyDao().findAll();
     }
 
     public static String getLink(int userId) {

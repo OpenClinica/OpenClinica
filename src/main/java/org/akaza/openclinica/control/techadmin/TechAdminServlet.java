@@ -36,7 +36,7 @@ public class TechAdminServlet extends SecureController {
         // find last 5 modifed studies
         // ArrayList studies = (ArrayList) sdao.findAllByLimit(true);
         // request.setAttribute("studies", studies);
-        ArrayList allStudies = (ArrayList) studyDao.findAll();
+        ArrayList allStudies = (ArrayList) getStudyDao().findAll();
         // request.setAttribute("allStudyNumber", new
         // Integer(allStudies.size()));
 

@@ -94,7 +94,7 @@ public class ChangeStudyServlet extends SecureController {
         request.setAttribute("requestSchema", "public");
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 
-        ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), (ArrayList) studyDao.findAll());
+        ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), (ArrayList) getStudyDao().findAll());
         CustomRole customRole = new CustomRole();
 
         populateCustomUserRoles(customRole, ub.getName());
@@ -111,7 +111,7 @@ public class ChangeStudyServlet extends SecureController {
         ArrayList<Study> studyList = new ArrayList<>();
         for (int i = 0; i < studies.size(); i++) {
             StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
-            Study study = (Study) studyDao.findByPK(sr.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(sr.getStudyId());
             if (study != null && study.getStatus().equals(Status.PENDING)) {
                 sr.setStatus(Status.get(study.getStatus().getCode()));
             }
@@ -197,14 +197,14 @@ public class ChangeStudyServlet extends SecureController {
         
         String oldStudySchema = null;
         if (!currentStudy.isSite()) {
-            oldStudySchema = studyDao.findByStudyEnvUuid(currentStudy.getStudyEnvUuid()).getSchemaName();
+            oldStudySchema = getStudyDao().findByStudyEnvUuid(currentStudy.getStudyEnvUuid()).getSchemaName();
         } else {
-            oldStudySchema = studyDao.findByStudyEnvUuid(currentStudy.getStudyEnvSiteUuid()).getSchemaName();
+            oldStudySchema = getStudyDao().findByStudyEnvUuid(currentStudy.getStudyEnvSiteUuid()).getSchemaName();
         }
         
-        Study newPublicStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
+        Study newPublicStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
         request.setAttribute("changeStudySchema", newStudySchema);
-        Study newStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
+        Study newStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         ArrayList studyParameters = spvdao.findParamConfigByStudy(newStudy); 
@@ -234,7 +234,7 @@ public class ChangeStudyServlet extends SecureController {
                 scs.setParametersForStudy(newStudy); 
             } else {
                 if (newStudy.isSite()) {
-                    newStudy.getStudy().setName((studyDao.findByPK(newStudy.getStudy().getStudyId())).getName());
+                    newStudy.getStudy().setName((getStudyDao().findByPK(newStudy.getStudy().getStudyId())).getName());
                 }
                 scs.setParametersForSite(newStudy);
 
@@ -257,13 +257,13 @@ public class ChangeStudyServlet extends SecureController {
             String accessToken = (String) request.getSession().getAttribute("accessToken");
             getStudyBuildService().processModule(accessToken, newPublicStudy.getOc_oid(), ModuleProcessor.Modules.PARTICIPATE);
             request.setAttribute("changeStudySchema", newStudySchema);
-            Study study = studyDao.findByStudyEnvUuid(studyEnvUuid);
+            Study study = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
             study.getStudy().setName(newStudy.getStudy().getName());
             study.setStudyParameterConfig(newStudy.getStudyParameterConfig());
             session.setAttribute("study", study);
             currentStudy = study;
 
-            Study userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), sm.getDataSource());
+            Study userRoleStudy = getStudyBuildService().getPublicStudy(currentRole.getStudyId());
             if (userRoleStudy.isSite()) {
                 /*
                  * The Role decription will be set depending on whether the user
@@ -387,7 +387,7 @@ public class ChangeStudyServlet extends SecureController {
 
             if (role == null) {
                 // The user inherit a study level role
-                Study parent = (Study)studyDao.findByPK(currentStudy.getStudy().getStudyId());
+                Study parent = (Study)getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
                 role = roles.stream()
                         .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(parent.getStudyEnvUuid()))
                         .findAny()

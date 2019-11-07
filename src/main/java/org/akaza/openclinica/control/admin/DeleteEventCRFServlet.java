@@ -136,7 +136,7 @@ public class DeleteEventCRFServlet extends SecureController {
 
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
-            Study study = (Study) studyDao.findByPK(studySub.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
 
             DisplayEventCRFBean dec = new DisplayEventCRFBean();

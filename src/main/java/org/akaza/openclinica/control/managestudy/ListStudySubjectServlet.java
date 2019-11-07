@@ -132,7 +132,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
         // allDefs holds the list of study event definitions used in the table,
         // tbh
         if (parentStudyId > 0) {
-            Study parentStudy = (Study) studyDao.findByPK(parentStudyId);
+            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
             studyGroupClasses = sgcdao.findAllActiveByStudy(parentStudy);
             allDefs = seddao.findAllActiveByStudy(parentStudy);
         } else {

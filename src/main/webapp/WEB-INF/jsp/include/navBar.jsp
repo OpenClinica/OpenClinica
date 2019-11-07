@@ -246,46 +246,46 @@
             <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo"/></a>
         </div>
 
-        <div id="StudyInfo">
-            <c:choose>
-                <c:when test='${study.study != null && study.study.studyId > 0}'>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.study.studyId}&viewFull=yes"
-                        title="<c:out value='${study.study.name}'/>"
-                        alt="<c:out value='${study.study.name}'/>" ><c:out value="${study.study.name}" /></a>
-                        :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.studyId}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.name}" /></a></b>
-                </c:when>
-                <c:otherwise>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.studyId}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.name}" /></a></b>
-                </c:otherwise>
-            </c:choose>
-            (<c:out value="${study.studyId}" />)&nbsp;&nbsp;
-            <c:if test="${study.envType == 'PROD'}">
-                <c:if test="${study.status.pending}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="design" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.locked}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="locked" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.frozen}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="frozen" bundle="${resword}"/></span>
-                </c:if>
-            </c:if>
-            <c:if test="${study.envType == 'TEST'}">
-                <c:if test="${study.status.pending}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="design" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.locked}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="locked" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.frozen}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="frozen" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.available}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span>
-                </c:if>
-            </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
-        </div>
+         <div id="StudyInfo">
+              <c:choose>
+                  <c:when test='${study.study != null && study.study.studyId > 0}'>
+                      <b><a href="${urlPrefix}ViewStudy?id=${study.study.studyId}&viewFull=yes"
+                          title="<c:out value='${study.study.name}'/>"
+                          alt="<c:out value='${study.study.name}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
+                          :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                  </c:when>
+                  <c:otherwise>
+                      <b><a href="${urlPrefix}ViewStudy?id=${study.studyId}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                  </c:otherwise>
+              </c:choose>
+              (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;
+              <c:if test="${study.envType == 'PROD'}">
+                  <c:if test="${study.status.pending}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="design" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.locked}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="locked" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.frozen}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="frozen" bundle="${resword}"/></span>
+                  </c:if>
+              </c:if>
+              <c:if test="${study.envType == 'TEST'}">
+                  <c:if test="${study.status.pending}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="design" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.locked}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="locked" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.frozen}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="frozen" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.available}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span>
+                  </c:if>
+              </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
+              <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
+          </div>
 
         <div id="UserInfo">
             <div id="userDropdown">

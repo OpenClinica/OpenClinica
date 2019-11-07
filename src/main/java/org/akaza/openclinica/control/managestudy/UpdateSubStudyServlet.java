@@ -74,7 +74,7 @@ public class UpdateSubStudyServlet extends SecureController {
     public void processRequest() throws Exception {
 
         Study study = (Study) session.getAttribute("newStudy");
-        parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+        parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
 
         logger.info("study from session:" + study.getName() + "\n" + study.getDateCreated() + "\n");
         String action = request.getParameter("action");
@@ -140,7 +140,7 @@ public class UpdateSubStudyServlet extends SecureController {
         } else {
 
             Study studyCheck = (Study) session.getAttribute("newStudy");
-            parentStudy = (Study) studyDao.findByPK(studyCheck.checkAndGetParentStudyId());
+            parentStudy = (Study) getStudyDao().findByPK(studyCheck.checkAndGetParentStudyId());
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             String participateFormStatus = spvdao.findByHandleAndStudy(parentStudy.getStudyId(), "participantPortal").getValue();
             request.setAttribute("participateFormStatus", participateFormStatus);
@@ -240,7 +240,7 @@ public class UpdateSubStudyServlet extends SecureController {
         if (!site.isSite()) {
             parentStudyBean = site;
         } else {
-            parentStudyBean = (Study) studyDao.findByPK(site.getStudy().getStudyId());
+            parentStudyBean = (Study) getStudyDao().findByPK(site.getStudy().getStudyId());
         }
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         ArrayList<EventDefinitionCRFBean> eventDefCrfList = (ArrayList<EventDefinitionCRFBean>) edcdao

@@ -397,7 +397,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 dnb.setSubjectId(ssub.getId());
                 dnb.setStudySub(ssub);
                 int parentStudyForSubject = 0;
-                Study studyBeanSub = (Study) studyDao.findByPK(ssub.getStudyId());
+                Study studyBeanSub = (Study) getStudyDao().findByPK(ssub.getStudyId());
                 if (null != studyBeanSub) {
                     parentStudyForSubject = studyBeanSub.checkAndGetParentStudyId();
                 }
@@ -784,7 +784,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                                 + "ResolveDiscrepancy?flavor=-query&noteId=" + note.getEntityId()
                                 + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
                         message.append(respage.getString("you_received_this_from"));
-                        Study study = (Study) studyDao.findByPK(note.getStudyId());
+                        Study study = (Study) getStudyDao().findByPK(note.getStudyId());
                         SectionDAO sectionDAO = new SectionDAO(sm.getDataSource());
 
                         if ("itemData".equalsIgnoreCase(entityType)) {
@@ -940,7 +940,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         CoreResources.setRequestSchema(request, "public");
 
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-        Study subjectStudy = studyDao.findByStudySubjectId(subjectId);
+        Study subjectStudy = getStudyDao().findByStudySubjectId(subjectId);
         // study id, tbh 03/2009
         ArrayList userAccounts = new ArrayList();
         if (currentStudy.isSite()) {

@@ -45,7 +45,7 @@ public class ViewSectionDataEntryByIdServlet extends ViewSectionDataEntryServlet
     @Override
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        Study currentStudy = (Study) studyDao.findByPK(1);
+        Study currentStudy = (Study) getStudyDao().findByPK(1);
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(getDataSource());
         if (request.getParameter("id") == null) {
             forwardPage(Page.LOGIN, request, response);

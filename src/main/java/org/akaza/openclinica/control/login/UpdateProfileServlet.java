@@ -60,7 +60,7 @@ public class UpdateProfileServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean userBean1 = (UserAccountBean) udao.findByUserName(ub.getName());
 
-        Collection studies = studyDao.findAllByUser(ub.getName());
+        Collection studies = getStudyDao().findAllByUser(ub.getName());
 
         if (StringUtils.isBlank(action)) {
             request.setAttribute("studies", studies);
@@ -140,7 +140,7 @@ public class UpdateProfileServlet extends SecureController {
         userBean1.setPhone(fp.getString("phone"));
         userBean1.setActiveStudyId(fp.getInt("activeStudyId"));
 
-        Study newActiveStudy = (Study) studyDao.findByPK(userBean1.getActiveStudyId());
+        Study newActiveStudy = (Study) getStudyDao().findByPK(userBean1.getActiveStudyId());
         request.setAttribute("newActiveStudy", newActiveStudy);
 
         if (errors.isEmpty()) {

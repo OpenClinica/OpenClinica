@@ -351,6 +351,14 @@ public class StudyEventController {
 		return null;
 	}
 
+	@ApiOperation( value = "To Update an event for participant at site level", notes = "Will read the information of StudyOID, ParticipantID, StudyEventOID, Event Repeat Key, Start Date, End Date and Event Status" )
+	@RequestMapping( value = "{studyOID}/events/check", method = RequestMethod.GET )
+	public ResponseEntity<Object> checkWorking(HttpServletRequest request,
+														 @PathVariable( "studyOID" ) String studyOid) throws Exception {
+		Study s = studyDao.findByOcOID(studyOid);
+		return null;
+	}
+
 	public String startBulkEventJob(MultipartFile file, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean) {
 		utilService.setSchemaFromStudyOid(studyOid);
 

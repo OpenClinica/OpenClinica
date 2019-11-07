@@ -77,7 +77,7 @@ public class ViewSiteServlet extends SecureController {
             forwardPage(Page.SITE_LIST_SERVLET);
         } else {
             int siteId = Integer.valueOf(idString.trim()).intValue();
-            Study study = (Study) studyDao.findByPK(siteId);
+            Study study = (Study) getStudyDao().findByPK(siteId);
 
             checkRoleByUserAndStudy(ub, study);
             // if (currentStudy.getId() != study.getId()) {
@@ -91,7 +91,7 @@ public class ViewSiteServlet extends SecureController {
 
             String parentStudyName = "";
             if (study.isSite()) {
-                Study parent = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+                Study parent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                 parentStudyName = parent.getName();
             }
             request.setAttribute("parentName", parentStudyName);

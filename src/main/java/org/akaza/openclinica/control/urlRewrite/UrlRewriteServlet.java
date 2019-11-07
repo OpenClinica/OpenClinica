@@ -64,6 +64,16 @@ public class UrlRewriteServlet extends CoreSecureController {
 
     }
 
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
+
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -263,7 +273,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                         if ((null != URLParamValue) && (!URLParamValue.equals(""))) {
                             switch (i) {
                             case 0: {// study OID
-                                study = studyDao.findByOcOID(URLParamValue);
+                                study = getStudyDao().findByOcOID(URLParamValue);
                                 //validate study OID
                                 if(study == null){
                                 	openClinicaResource.setInValid(true);

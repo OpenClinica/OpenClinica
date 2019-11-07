@@ -160,7 +160,7 @@ public class KeycloakController {
                 String accessToken = (String) req.getSession().getAttribute("accessToken");
                 studyBuildService.processModule(accessToken, publicStudy.getOc_oid(), ModuleProcessor.Modules.PARTICIPATE);
 
-                SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOc_oid(),dataSource));
+                SecureController.refreshUserRole(req, ub, studyBuildService.getPublicStudy(publicStudy.getOc_oid()));
             }
 
         } else {

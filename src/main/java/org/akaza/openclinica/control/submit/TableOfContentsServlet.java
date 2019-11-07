@@ -671,7 +671,7 @@ public class TableOfContentsServlet extends SecureController {
         CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
         answer.setCrf(cb);
 
-        Study studyForStudySubject = new TableOfContentsServlet().studyDao.findByStudySubjectId(ssb.getId());
+        Study studyForStudySubject = new TableOfContentsServlet().getStudyDao().findByStudySubjectId(ssb.getId());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
         EventDefinitionCRFBean edcb = edcdao.findByStudyEventDefinitionIdAndCRFId(studyForStudySubject, sedb.getId(), cb.getId());
         answer.setEventDefinitionCRF(edcb);

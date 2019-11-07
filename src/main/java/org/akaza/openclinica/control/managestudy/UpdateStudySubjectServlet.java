@@ -97,7 +97,7 @@ public class UpdateStudySubjectServlet extends SecureController {
 
             studySub = (StudySubjectBean) studySubdao.findByPK(studySubId);
             subject = (SubjectBean) sdao.findByPK(studySub.getSubjectId());
-            Study study = (Study) studyDao.findByPK(studySub.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
 
 
             StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
@@ -117,7 +117,7 @@ public class UpdateStudySubjectServlet extends SecureController {
                 // YW <<
                 int parentStudyId = currentStudy.checkAndGetParentStudyId();
                 if (parentStudyId > 0) {
-                    Study parentStudy = (Study) studyDao.findByPK(parentStudyId);
+                    Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
                     classes = sgcdao.findAllActiveByStudy(parentStudy);
                 } else {
                     classes = sgcdao.findAllActiveByStudy(currentStudy);
@@ -415,7 +415,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(study, studySubId));
         } else {
             if (!isParentStudy) {
-                Study stParent = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+                Study stParent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                 allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, study, subjectId);
                 allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent, study, studySubId));
             } else {

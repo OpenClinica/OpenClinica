@@ -63,7 +63,7 @@ public class SetStudyUserRoleServlet extends SecureController {
             String action = request.getParameter("action");
             FormProcessor fp = new FormProcessor(request);
             UserAccountBean user = (UserAccountBean) udao.findByUserName(name);
-            Study userStudy = (Study) studyDao.findByPK(fp.getInt("studyId"));
+            Study userStudy = (Study) getStudyDao().findByPK(fp.getInt("studyId"));
             if ("confirm".equalsIgnoreCase(action)) {
                 int studyId = Integer.valueOf(studyIdString.trim()).intValue();
 
@@ -77,7 +77,7 @@ public class SetStudyUserRoleServlet extends SecureController {
                 roles.remove(Role.ADMIN); // admin is not a user role, only used for tomcat
                 roles.remove(Role.RESEARCHASSISTANT2);
 
-                Study studyBean = (Study) studyDao.findByPK(uRole.getStudyId());
+                Study studyBean = (Study) getStudyDao().findByPK(uRole.getStudyId());
 
                 if (currentStudy.isSite()) {
                     roles.remove(Role.COORDINATOR);
@@ -141,7 +141,7 @@ public class SetStudyUserRoleServlet extends SecureController {
      */
     private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
 
-        Study study = (Study) studyDao.findByPK(sub.getStudyId());
+        Study study = (Study) getStudyDao().findByPK(sub.getStudyId());
         logger.info("Sending email...");
         String body =
             u.getFirstName() + " " + u.getLastName() + " (" + resword.getString("username") + ": " + u.getName() + ") "

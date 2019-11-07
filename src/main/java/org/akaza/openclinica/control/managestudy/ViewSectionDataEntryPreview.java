@@ -409,11 +409,11 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
             age = Utils.getInstacne().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
         }
         // Get the study then the parent study
-        Study study = (Study) studyDao.findByPK(studyId);
+        Study study = (Study) getStudyDao().findByPK(studyId);
 
         if (study.isSite()) {
             // this is a site,find parent
-            Study parentStudy = (Study) studyDao.findByPK(study.checkAndGetParentStudyId());
+            Study parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
             request.setAttribute("studyTitle", parentStudy.getName() + " - " + study.getName());
         } else {
             request.setAttribute("studyTitle", study.getName());
@@ -559,5 +559,15 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
     @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
         return false;
+    }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
     }
 }

@@ -75,7 +75,7 @@ public class DeleteStudyEventServlet extends SecureController{
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
             event.setStudyEventDefinition(sed);
 
-            Study study = (Study) studyDao.findByPK(studySub.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
             request.setAttribute("study", study);
 
             String action = request.getParameter("action");

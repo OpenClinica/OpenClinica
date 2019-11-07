@@ -255,7 +255,7 @@ public class ViewNoteServlet extends SecureController {
             } else {
                 // The SubjectStudy is not belong to currentstudy and current study is not a site.
                 Collection sites;
-                sites = studyDao.findOlnySiteIdsByStudy(currentStudy);
+                sites = getStudyDao().findOlnySiteIdsByStudy(currentStudy);
                 if (!sites.contains(note.getStudySub().getStudyId())) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                     forwardPage(Page.MENU_SERVLET);

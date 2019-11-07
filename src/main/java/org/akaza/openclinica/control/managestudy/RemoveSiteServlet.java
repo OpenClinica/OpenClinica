@@ -72,7 +72,7 @@ public class RemoveSiteServlet extends SecureController {
         logger.info("site id:" + idString);
 
         int siteId = Integer.valueOf(idString.trim()).intValue();
-        Study study = (Study) studyDao.findByPK(siteId);
+        Study study = (Study) getStudyDao().findByPK(siteId);
         if (currentStudy.getStudyId() != study.checkAndGetParentStudyId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));
@@ -112,7 +112,7 @@ public class RemoveSiteServlet extends SecureController {
                 study.setStatus(core.org.akaza.openclinica.domain.Status.DELETED);
                 study.setUpdater(ub);
                 study.setDateUpdated(new Date());
-                studyDao.update(study);
+                getStudyDao().update(study);
 
                 // remove all users and roles
                 for (int i = 0; i < userRoles.size(); i++) {

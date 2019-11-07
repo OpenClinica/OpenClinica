@@ -71,7 +71,7 @@ public class AccessFileServlet extends SecureController {
         int parentId = currentStudy.checkAndGetParentStudyId();
         if(parentId==0)//Logged in at study level
         {
-            Study studyBean = (Study)studyDao.findByPK(dsBean.getStudyId());
+            Study studyBean = (Study)getStudyDao().findByPK(dsBean.getStudyId());
             parentId =  studyBean.checkAndGetParentStudyId();//parent id of dataset created
 
         }

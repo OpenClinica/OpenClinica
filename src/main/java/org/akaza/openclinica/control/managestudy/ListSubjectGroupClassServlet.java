@@ -77,7 +77,7 @@ public class ListSubjectGroupClassServlet extends SecureController {
         int parentStudyId = currentStudy.checkAndGetParentStudyId();
         ArrayList groups = new ArrayList();
         if (parentStudyId > 0) {
-            Study parentStudy = (Study) studyDao.findByPK(parentStudyId);
+            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
             groups = sgcdao.findAllByStudy(parentStudy);
         } else {
             groups = sgcdao.findAllByStudy(currentStudy);

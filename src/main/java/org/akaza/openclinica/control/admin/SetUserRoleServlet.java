@@ -64,8 +64,8 @@ public class SetUserRoleServlet extends SecureController {
         } else {
             String action = request.getParameter("action");
             UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
-            ArrayList studies = (ArrayList) studyDao.findAll();
-            ArrayList studiesHaveRole = (ArrayList) studyDao.findAllByUser(user.getName());
+            ArrayList studies = (ArrayList) getStudyDao().findAll();
+            ArrayList studiesHaveRole = (ArrayList) getStudyDao().findAllByUser(user.getName());
             studies.removeAll(studiesHaveRole);
             HashSet<Study> studiesNotHaveRole = new HashSet<Study>();
             HashSet<Study> sitesNotHaveRole = new HashSet<Study>();
@@ -103,7 +103,7 @@ public class SetUserRoleServlet extends SecureController {
             Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request.getParameter("changeRoles"));
             int studyId = fp.getInt("studyId");
             if (changeRoles) {
-                Study study = (Study) studyDao.findByPK(studyId);
+                Study study = (Study) getStudyDao().findByPK(studyId);
                 roleMap = new LinkedHashMap();
                 ResourceBundle resterm = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 
@@ -194,7 +194,7 @@ public class SetUserRoleServlet extends SecureController {
                 // set role
                 String userName = fp.getString("name");
                 studyId = fp.getInt("studyId");
-                Study userStudy = (Study) studyDao.findByPK(studyId);
+                Study userStudy = (Study) getStudyDao().findByPK(studyId);
                 int roleId = fp.getInt("roleId");
                 // new user role
                 StudyUserRoleBean sur = new StudyUserRoleBean();

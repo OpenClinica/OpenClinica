@@ -40,9 +40,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -75,7 +78,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     @Autowired
     private ParticipateService participateService;
-
 
     @Autowired
     private RestfulServiceHelper serviceHelper;
@@ -628,4 +630,82 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         existingStudyUserRoles.forEach(studyToDelete -> studyUserRoleDao.getCurrentSession().delete(studyToDelete));
     }
 
+    public Study getPublicStudy(String ocId) {
+        HttpServletRequest request = getRequest();
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
+        Study study = studyDao.findStudyByOid(ocId);
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(schema) && request != null)
+            request.setAttribute("requestSchema", schema);
+        return study;
+    }
+
+    public Study getParentPublicStudy(String ocId) {
+        Study resultBean;
+        HttpServletRequest request = getRequest();
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
+        Study study = getPublicStudy(ocId);
+        if (study.getStudy().getStudyId() == 0) {
+            resultBean = study;
+        } else {
+            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+            resultBean = parentStudy;
+        }
+        CoreResources.setRequestSchema(schema);
+        return resultBean;
+    }
+
+    public Study getPublicStudy(int id) {
+        HttpServletRequest request = getRequest();
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
+        Study study = (Study) studyDao.findByPK(id);
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(schema) && request != null)
+            request.setAttribute("requestSchema", schema);
+        return study;
+    }
+    public static HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
+    }
+
+    public Boolean isPublicStudySameAsTenantStudy(Study tenantStudy, String publicStudyOID) {
+        Study publicStudy = getPublicStudy(tenantStudy.getOc_oid());
+        return publicStudy.getOc_oid().equals(publicStudyOID);
+    }
+
+    public void setRequestSchemaByStudy(String ocId) {
+        Study studyBean = getPublicStudy(ocId);
+        if (studyBean != null)
+            CoreResources.setRequestSchema(studyBean.getSchemaName());
+    }
 }

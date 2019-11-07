@@ -119,7 +119,7 @@ public class ViewUserAccountServlet extends SecureController {
 
         for (int i = 0; i < roles.size(); i++) {
             StudyUserRoleBean sur = (StudyUserRoleBean) roles.get(i);
-            Study sb = (Study) studyDao.findByPK(sur.getStudyId());
+            Study sb = (Study) getStudyDao().findByPK(sur.getStudyId());
             sur.setStudyName(sb.getName());
             roles.set(i, sur);
         }

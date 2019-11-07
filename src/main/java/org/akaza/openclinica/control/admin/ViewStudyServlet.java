@@ -61,7 +61,7 @@ public class ViewStudyServlet extends SecureController {
 
         FormProcessor fp = new FormProcessor(request);
         int studyId = fp.getInt("id");
-        Study study = (Study) studyDao.findByPK(studyId);
+        Study study = (Study) getStudyDao().findByPK(studyId);
 
         if (studyId == 0) {
             addPageMessage(respage.getString("please_choose_a_study_to_view"));
@@ -110,8 +110,8 @@ public class ViewStudyServlet extends SecureController {
                     request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                     subjects = ssdao.findAllByStudy(currentStudy);
                 } else {
-                    sites = (ArrayList) studyDao.findAllByParent(studyId);
-                    Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
+                    sites = (ArrayList) getStudyDao().findAllByParent(studyId);
+                    Study publicStudy = getStudyDao().findPublicStudy(study.getOc_oid());
                     request.setAttribute("requestSchema", "public");
                     userRoles = udao.findAllUsersByStudy(publicStudy.getStudyId());
                     request.setAttribute("requestSchema", publicStudy.getSchemaName());

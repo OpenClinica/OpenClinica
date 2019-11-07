@@ -104,7 +104,7 @@ public class AuditLogStudyServlet extends SecureController {
             // logger.info("just set a subject with a status of
             // "+subject.getStatus().getName());
             // request.setAttribute("subject"+ss, subject);
-            Study study = (Study) studyDao.findByPK(studySubject.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySubject.getStudyId());
             request.setAttribute("study", study);
             // hmm, repetitive work?
 

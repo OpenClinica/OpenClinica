@@ -61,7 +61,7 @@ public class ViewSubjectGroupClassServlet extends SecureController {
             SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
 
             StudyGroupClassBean sgcb = (StudyGroupClassBean) sgcdao.findByPK(classId);
-            Study study = (Study)studyDao.findByPK(sgcb.getStudyId());
+            Study study = (Study)getStudyDao().findByPK(sgcb.getStudyId());
 
             checkRoleByUserAndStudy(ub, study);
 

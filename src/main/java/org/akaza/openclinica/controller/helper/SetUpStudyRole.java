@@ -9,6 +9,7 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,6 +31,8 @@ public class SetUpStudyRole {
 
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    private StudyBuildService studyBuildService;
     public static final String STUDY_INFO_PANEL = "panel";
 
     public SetUpStudyRole(DataSource dataSource) {
@@ -124,7 +127,7 @@ public class SetUpStudyRole {
         }
 
 
-        Study userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), dataSource);
+        Study userRoleStudy = studyBuildService.getPublicStudy(currentRole.getStudyId());
 
         if (userRoleStudy.isSite()) {
             /*The Role decription will be set depending on whether the user logged in at

@@ -53,7 +53,7 @@ public class InitUpdateStudyServlet extends SecureController {
             forwardPage(Page.ERROR);
         } else {
             int studyId = Integer.valueOf(idString.trim()).intValue();
-            Study study = (Study) studyDao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
             study = scs.setParametersForStudy(study);
 

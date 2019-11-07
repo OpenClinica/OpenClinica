@@ -54,13 +54,16 @@ public class UtilServiceImpl implements UtilService {
     @Autowired
     RestfulServiceHelper restfulServiceHelper;
 
+    @Autowired
+    StudyBuildService studyBuildService;
+
 
     public String getAccessTokenFromRequest(HttpServletRequest request) {
         return (String) request.getSession().getAttribute("accessToken");
     }
 
     public void setSchemaFromStudyOid(String studyOid) {
-        CoreResources.setRequestSchemaByStudy(studyOid,dataSource);
+        studyBuildService.setRequestSchemaByStudy(studyOid);
     }
 
     public String getCustomerUuidFromRequest(HttpServletRequest request) {

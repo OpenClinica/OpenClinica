@@ -41,6 +41,7 @@ import core.org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
@@ -82,7 +83,8 @@ public class ImportCRFDataService {
     private PipeDelimitedDataHelper pipeDelimitedDataHelper;
     private RestfulServiceHelper restfulServiceHelper;
 
-
+    @Autowired
+    private StudyBuildService studyBuildService;
     @Autowired
     private ViewStudySubjectService viewStudySubjectService;
 
@@ -1492,7 +1494,7 @@ public class ImportCRFDataService {
                 throw new OpenClinicaException("Unknown Study OID", "");
 
                 // } else if (studyBean.getId() != currentStudyId) {
-            } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, studyOid, ds)) {
+            } else if (!studyBuildService.isPublicStudySameAsTenantStudy(studyBean, studyOid)) {
                 mf.applyPattern(respage.getString("your_current_study_is_not_the_same_as"));
                 Object[] arguments = { studyBean.getName() };
                 //

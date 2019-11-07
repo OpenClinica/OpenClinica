@@ -57,7 +57,7 @@ public class ManageStudyServlet extends SecureController {
         // find last 5 modifed sites
         // ArrayList sites = (ArrayList)
         // sdao.findAllByParentAndLimit(currentStudy.getId(),true);
-        ArrayList allSites = (ArrayList) studyDao.findAllByParent(currentStudy.getStudyId());
+        ArrayList allSites = (ArrayList) getStudyDao().findAllByParent(currentStudy.getStudyId());
         ArrayList sites = new ArrayList();
         for (int i = 0; i < allSites.size(); i++) {
             sites.add(allSites.get(i));

@@ -371,4 +371,14 @@ public class PrintEventCRFServlet extends DataEntryServlet {
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
         return false; //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
 }

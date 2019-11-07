@@ -93,13 +93,13 @@ public class CreateJobImportServlet extends SecureController {
         // sdao.findAll());
         // request.setAttribute("studies", studies);
         // tbh, replacing the above with another version, 06/2009
-        ArrayList<Study> all = (ArrayList<Study>) studyDao.findAll();
+        ArrayList<Study> all = (ArrayList<Study>) getStudyDao().findAll();
         ArrayList<Study> finalList = new ArrayList<Study>();
         for (Study sb : all) {
             if (!sb.isSite()) {
                 finalList.add(sb);
                 // System.out.println("found study name: " + sb.getName());
-                finalList.addAll(studyDao.findAllByParent(sb.getStudyId()));
+                finalList.addAll(getStudyDao().findAllByParent(sb.getStudyId()));
             }
         }
         // System.out.println("found list of studies: " + finalList.toString());
@@ -148,7 +148,7 @@ public class CreateJobImportServlet extends SecureController {
             } else {
                 logger.info("found no validation errors, continuing");
                 int studyId = fp.getInt(STUDY_ID);
-                Study studyBean = (Study) studyDao.findByPK(studyId);
+                Study studyBean = (Study) getStudyDao().findByPK(studyId);
                 SimpleTrigger trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), studyBean, LocaleResolver.getLocale(request).getLanguage());
 
                 // SimpleTrigger trigger = new SimpleTrigger();

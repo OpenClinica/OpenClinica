@@ -83,6 +83,9 @@ public class ParticipateServiceImpl implements ParticipateService {
     @Autowired
     private RandomizationService randomizationService;
 
+    @Autowired
+    private StudyBuildService studyBuildService;
+
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
     public static final String PARTICIPATE_EDIT = "participate-edit";
@@ -413,7 +416,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     public void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs
             , String accessToken, String studyOid, String subjectOid) throws Exception{
         boolean completeStudyEvent = true;
-        Study parentPublicStudy = CoreResources.getParentPublicStudy(studyOid, dataSource);
+        Study parentPublicStudy = studyBuildService.getParentPublicStudy(studyOid);
         // Loop thru event CRFs and complete all that are participant events.
         for (EventDefinitionCrf eventDefCrf:eventDefCrfs) {
             boolean foundEventCrfMatch = false;

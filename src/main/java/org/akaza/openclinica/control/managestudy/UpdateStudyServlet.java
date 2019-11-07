@@ -444,7 +444,7 @@ public class UpdateStudyServlet extends SecureController {
         study1.setDateUpdated(new Date());
         study1.setUpdater((UserAccountBean) session.getAttribute("userBean"));
         logger.debug("study's parentId=" + study1.checkAndGetParentStudyId());
-        studyDao.update(study1);
+        getStudyDao().update(study1);
 
         StudyParameterValueBean spv = new StudyParameterValueBean();
 
@@ -507,12 +507,12 @@ public class UpdateStudyServlet extends SecureController {
             session.setAttribute("study", study1);
         }
         // update manage_pedigrees for all sites
-        ArrayList children = (ArrayList) studyDao.findAllByParent(study1.getStudyId());
+        ArrayList children = (ArrayList) getStudyDao().findAllByParent(study1.getStudyId());
         for (int i = 0; i < children.size(); i++) {
             Study child = (Study) children.get(i);
             child.setDateUpdated(new Date());
             child.setUpdater(ub);
-            studyDao.update(child);
+            getStudyDao().update(child);
             // YW << update "collectDob" and "genderRequired" for sites
             StudyParameterValueBean childspv = new StudyParameterValueBean();
             childspv.setStudyId(child.getStudyId());
