@@ -10,14 +10,12 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -27,6 +25,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import core.org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionBean;
@@ -103,7 +102,7 @@ public class JobTriggerService {
 						// item Specific Rule
 						logger.debug("*** Item Specific Rule ***");
 						ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
-						StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
+						Study currentStudy = (Study) studyDao.findByPK(ruleSet.getStudyId());
 						ResourceBundleProvider.updateLocale(Locale.getDefault());
 						UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
 						ruleSetBeans.add(ruleSet);
@@ -135,10 +134,6 @@ public class JobTriggerService {
 
 	public UserAccountDAO getUserAccountDao() {
 		return new UserAccountDAO(ds);
-	}
-
-	public StudyDAO getStudyDao() {
-		return new StudyDAO(ds);
 	}
 
 }

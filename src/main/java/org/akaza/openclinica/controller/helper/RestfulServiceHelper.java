@@ -3,12 +3,12 @@ package org.akaza.openclinica.controller.helper;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
@@ -24,6 +24,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,7 +56,8 @@ public class RestfulServiceHelper {
 
 
 	private DataSource dataSource;	
-	private StudyDAO studyDao; 
+	@Autowired
+	private StudyDao studyDao;
 	private UserAccountDAO userAccountDAO;
 	private PipeDelimitedDataHelper importDataHelper;
 	private MessageLogger messageLogger;
@@ -72,9 +74,9 @@ public class RestfulServiceHelper {
 	  * @return
 	 * @throws Exception 
 	  */
-	 public StudyBean setSchema(String studyOid, HttpServletRequest request) throws OpenClinicaSystemException {
+	 public Study setSchema(String studyOid, HttpServletRequest request) throws OpenClinicaSystemException {
 		// first time, the default DB schema for restful service is public
-		 StudyBean study = getStudyDao().findByPublicOid(studyOid);
+		 Study study = studyDao.findPublicStudy(studyOid);
 
 		 Connection con;
 		 String schemaNm="";
@@ -87,7 +89,7 @@ public class RestfulServiceHelper {
 		 }
 		 request.setAttribute("requestSchema", schemaNm);
 		 // get correct study from the right DB schema
-		 study = getStudyDao().findByOid(studyOid);
+		 study = studyDao.findByOcOID(studyOid);
 
 		 return study;
 	 }
@@ -235,15 +237,6 @@ public class RestfulServiceHelper {
         
     	return new File(SpringServletAccess.getPropertiesDir(context) + fileNm);
     }
-    /**
-	 * 
-	 * @return
-	 */
-	 public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-     }
-	 
 
     public UserAccountDAO getUserAccountDAO() {
     	userAccountDAO = userAccountDAO != null ? userAccountDAO : new UserAccountDAO(dataSource);

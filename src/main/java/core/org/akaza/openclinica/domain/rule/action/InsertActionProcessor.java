@@ -2,9 +2,9 @@ package core.org.akaza.openclinica.domain.rule.action;
 
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import core.org.akaza.openclinica.logic.rulerunner.ExecutionMode;
@@ -31,7 +31,7 @@ public class InsertActionProcessor implements ActionProcessor {
     }
 
     public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean,
-            String itemData, StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
+                                  String itemData, Study currentStudy, UserAccountBean ub, Object... arguments) {
 
         switch (executionMode) {
         case DRY_RUN: {
@@ -55,20 +55,20 @@ public class InsertActionProcessor implements ActionProcessor {
         }
     }
 
-    private RuleActionBean saveWithStatusUpdated(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+    private RuleActionBean saveWithStatusUpdated(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy, UserAccountBean ub) {
         itemDataBean.setStatus(Status.UNAVAILABLE);
         getItemMetadataService().insert(itemDataBean, ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet,null);
         ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
         return null;
     }
 
-    private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+    private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy, UserAccountBean ub) {
         getItemMetadataService().insert(itemDataBean.getId(), ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet,null);
         ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
         return null;
     }
 
-    private void ruleActionRunLogSaveOrUpdate(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+    private void ruleActionRunLogSaveOrUpdate(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy, UserAccountBean ub) {
         RuleActionRunLogBean ruleActionRunLog =
                 new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
         if (ruleActionRunLogDao.findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
@@ -77,13 +77,13 @@ public class InsertActionProcessor implements ActionProcessor {
         }
     }
 
-    private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
+    private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy,
             UserAccountBean ub) {
         //
         return ruleAction;
     }
 
-    private RuleActionBean dryRun(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+    private RuleActionBean dryRun(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy, UserAccountBean ub) {
         return ruleAction;
     }
 

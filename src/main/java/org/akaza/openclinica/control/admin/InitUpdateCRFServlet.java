@@ -37,9 +37,9 @@ public class InitUpdateCRFServlet extends SecureController {
         }
 
         boolean isStudyDirectorInParent = false;
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
             logger.info("2222");
-            Role r = ub.getRoleByStudy(currentStudy.getParentStudyId()).getRole();
+            Role r = ub.getRoleByStudy(currentStudy.getStudy().getStudyId()).getRole();
             if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.ADMIN)) {
                 isStudyDirectorInParent = true;
             }

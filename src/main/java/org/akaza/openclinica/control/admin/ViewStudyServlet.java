@@ -7,15 +7,15 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyConfigService;
@@ -25,6 +25,7 @@ import core.org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
 import core.org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -34,6 +35,9 @@ import java.util.*;
  * Processes the reuqest of 'view study details'
  */
 public class ViewStudyServlet extends SecureController {
+
+    @Autowired
+    private StudyDao studyDao;
     /**
      * Checks whether the user has the correct privilege
      */
@@ -55,17 +59,16 @@ public class ViewStudyServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int studyId = fp.getInt("id");
-        StudyBean study = (StudyBean) sdao.findByPK(studyId);
+        Study study = (Study) studyDao.findByPK(studyId);
 
         if (studyId == 0) {
             addPageMessage(respage.getString("please_choose_a_study_to_view"));
             forwardPage(Page.ERROR);
         } else {
-            if (currentStudy.getId() != studyId && currentStudy.getParentStudyId() != studyId) {
-                checkRoleByUserAndStudy(ub, study, sdao);
+            if (currentStudy.getStudyId() != studyId && currentStudy.getStudy().getStudyId() != studyId) {
+                checkRoleByUserAndStudy(ub, study);
             }
 
             String viewFullRecords = fp.getString("viewFull");
@@ -75,13 +78,13 @@ public class ViewStudyServlet extends SecureController {
             study = scs.setParametersForStudy(study);
 
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-            String randomizationStatusInOC = spvdao.findByHandleAndStudy(study.getId(), "randomization").getValue();
-            String participantStatusInOC = spvdao.findByHandleAndStudy(study.getId(), "participantPortal").getValue();
+            String randomizationStatusInOC = spvdao.findByHandleAndStudy(study.getStudyId(), "randomization").getValue();
+            String participantStatusInOC = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal").getValue();
             if(participantStatusInOC=="") participantStatusInOC="disabled";
             if(randomizationStatusInOC=="") randomizationStatusInOC="disabled";
 
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-            SeRandomizationDTO seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid(), false);
+            SeRandomizationDTO seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOc_oid(), false);
 
             if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")){
                 study.getStudyParameterConfig().setRandomization("enabled");
@@ -90,7 +93,7 @@ public class ViewStudyServlet extends SecureController {
             };
 
              ParticipantPortalRegistrar  participantPortalRegistrar = new ParticipantPortalRegistrar();
-             String pStatus = participantPortalRegistrar.getCachedRegistrationStatus(study.getOid(), session);
+             String pStatus = participantPortalRegistrar.getCachedRegistrationStatus(study.getOc_oid(), session);
              study.getStudyParameterConfig().setParticipantPortal("enabled");
 
             request.setAttribute("studyToView", study);
@@ -100,17 +103,17 @@ public class ViewStudyServlet extends SecureController {
                 ArrayList sites = new ArrayList();
                 ArrayList userRoles = new ArrayList();
                 ArrayList subjects = new ArrayList();
-                if (this.currentStudy.getParentStudyId() > 0 && this.currentRole.getRole().getId() > 3) {
+                if (this.currentStudy.isSite() && this.currentRole.getRole().getId() > 3) {
                     sites.add(this.currentStudy);
                     request.setAttribute("requestSchema", "public");
-                    userRoles = udao.findAllUsersByStudy(currentPublicStudy.getId());
+                    userRoles = udao.findAllUsersByStudy(currentPublicStudy.getStudyId());
                     request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                     subjects = ssdao.findAllByStudy(currentStudy);
                 } else {
-                    sites = (ArrayList) sdao.findAllByParent(studyId);
-                    StudyBean publicStudy = sdao.getPublicStudy(study.getOid());
+                    sites = (ArrayList) studyDao.findAllByParent(studyId);
+                    Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
                     request.setAttribute("requestSchema", "public");
-                    userRoles = udao.findAllUsersByStudy(publicStudy.getId());
+                    userRoles = udao.findAllUsersByStudy(publicStudy.getStudyId());
                     request.setAttribute("requestSchema", publicStudy.getSchemaName());
                     subjects = ssdao.findAllByStudy(study);
                 }

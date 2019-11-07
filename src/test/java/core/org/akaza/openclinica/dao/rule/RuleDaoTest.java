@@ -1,7 +1,7 @@
 package core.org.akaza.openclinica.dao.rule;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.hibernate.RuleDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.expression.Context;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionBean;
@@ -55,8 +55,8 @@ public class RuleDaoTest extends core.org.akaza.openclinica.templates.HibernateO
        // RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
         RuleBean ruleBean = new RuleBean();
         ruleBean.setOid("RULE_1");
-        StudyBean studyBean = new StudyBean();
-        studyBean.setId(1);
+        Study studyBean = new Study();
+        studyBean.setStudyId(1);
         ruleBean.setStudy(studyBean);
         RuleBean persistentRuleBean = ruleDao.findByOid(ruleBean);
 

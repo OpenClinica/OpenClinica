@@ -9,7 +9,6 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -48,14 +47,12 @@ public class ListSubjectServlet extends SecureController {
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
 
         ListSubjectTableFactory factory = new ListSubjectTableFactory();
         factory.setSubjectDao(sdao);
         factory.setStudySubjectDao(subdao);
         factory.setUserAccountDao(uadao);
-        factory.setStudyDao(studyDao);
         factory.setCurrentStudy(currentStudy);
 
 

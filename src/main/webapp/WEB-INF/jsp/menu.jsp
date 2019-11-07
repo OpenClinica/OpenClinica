@@ -7,7 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='session' id='userRole' class='core.org.akaza.openclinica.bean.login.StudyUserRoleBean'/>
 
 <jsp:include page="include/home-header.jsp"/>
@@ -94,8 +94,8 @@
     <span class="title_manage" style="line-height:35px;">
         <fmt:message key="welcome_to" bundle="${restext}"/>
             <c:choose>
-                <c:when test='${study.parentStudyId > 0}'>
-                    <c:out value='${study.parentStudyName}'/>
+                <c:when test='${study.study != null && study.study.studyId > 0}'>
+                    <c:out value='${study.study.name}'/>
                 </c:when>
                 <c:otherwise>
                     <c:out value='${study.name}'/>
@@ -114,18 +114,18 @@
     <%--
     <c:set var="linkStudy">
     <c:choose>
-       <c:when test="${study.parentStudyId>0}">
-         <a href="ViewSite?id=<c:out value="${study.id}"/>">
+       <c:when test="${study.study != null && study.study.studyId>0}">
+         <a href="ViewSite?id=<c:out value="${study.studyId}"/>">
        </c:when>
        <c:otherwise>
-         <a href="ViewStudy?id=<c:out value="${study.id}"/>&viewFull=yes">
+         <a href="ViewStudy?id=<c:out value="${study.studyId}"/>&viewFull=yes">
        </c:otherwise>
     </c:choose>
     <c:out value="${study.name}"/></a></span>
     </c:set>
      --%>
     <c:set var="studyidentifier">
-        <span class="alert"><c:out value="${study.identifier}"/></span>
+        <span class="alert"><c:out value="${study.uniqueIdentifier}"/></span>
     </c:set>
 
 </c:if>

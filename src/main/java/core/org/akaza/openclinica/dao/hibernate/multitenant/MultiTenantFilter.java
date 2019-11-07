@@ -4,9 +4,9 @@ package core.org.akaza.openclinica.dao.hibernate.multitenant;
  * Created by yogi on 2/1/17.
  */
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.core.ExtendedBasicDataSource;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -97,7 +97,7 @@ import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenant
         default:
             if (session == null)
                 return tenant;
-            StudyBean publicStudy = (StudyBean) session.getAttribute("publicStudy");
+            Study publicStudy = (Study) session.getAttribute("publicStudy");
             if (publicStudy != null) {
                 req.setAttribute("requestSchema", publicStudy.getSchemaName());
                 tenant = publicStudy.getSchemaName();

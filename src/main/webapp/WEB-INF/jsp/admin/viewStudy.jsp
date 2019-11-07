@@ -55,7 +55,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <h1><div class="title_manage"><fmt:message key="view_study_metadata" bundle="${resword}"/>
 </div></h1></br>
 
@@ -71,7 +71,7 @@
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="unique_protocol_ID" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.identifier}"/>
+  <c:out value="${studyToView.uniqueIdentifier}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
@@ -107,7 +107,7 @@
   </td></tr>
 
   <c:choose>
-   <c:when test="${studyToView.parentStudyId == 0}">
+   <c:when test="${studyToView.study == null || studyToView.study.studyId == 0}">
       <c:set var="key" value="study_system_status"/>
    </c:when>
    <c:otherwise>
@@ -116,11 +116,11 @@
   </c:choose>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.status.name}"/>
+  <c:out value="${studyToView.status.description}"/>
    </td></tr>
 
   <c:choose>
-  <c:when test="${studyToView.protocolTypeKey=='interventional'}">
+  <c:when test="${studyToView.protocolType=='interventional'}">
 
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="assignment" bundle="${resword}"/>:</td><td class="table_cell">

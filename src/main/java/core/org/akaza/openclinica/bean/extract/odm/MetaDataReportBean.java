@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import core.org.akaza.openclinica.bean.odmbeans.CodeListBean;
 import core.org.akaza.openclinica.bean.odmbeans.CodeListItemBean;
@@ -48,6 +47,7 @@ import core.org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import core.org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
@@ -254,7 +254,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
 
         //
         addProtocol(currentIndent + indent);
-        boolean isStudy = meta.getStudy().getParentStudyId() > 0 ? false : true;
+        boolean isStudy = !meta.getStudy().isSite();
         if (meta.getStudyEventDefs().size() > 0) {
             addStudyEventDef(isStudy, currentIndent + indent);
             if (meta.getItemGroupDefs().size() > 0) {
@@ -268,7 +268,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 } else if ("oc1.3".equalsIgnoreCase(ODMVersion)) {
                     addMultiSelectList(currentIndent + indent);
                     addStudyGroupClassList(currentIndent + indent);
-                    if (meta.getStudy().getParentStudyId() > 0) {
+                    if (meta.getStudy().isSite()) {
                         this.addStudyDetails(currentIndent + indent);
                     } else {
                         this.addStudyDetails(currentIndent + indent);
@@ -677,18 +677,18 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     public void addStudyDetails(String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
-        StudyBean study = odmstudy.getMetaDataVersion().getStudy();
+        Study study = odmstudy.getMetaDataVersion().getStudy();
         String temp = "";
-        if (study.getId() > 0) {
-            xml.append(currentIndent + "<OpenClinica:StudyDetails StudyOID=\"" + StringEscapeUtils.escapeXml(study.getOid()) + "\"");
+        if (study != null && study.getStudyId() > 0) {
+            xml.append(currentIndent + "<OpenClinica:StudyDetails StudyOID=\"" + StringEscapeUtils.escapeXml(study.getOc_oid()) + "\"");
 
-            if (study.getParentStudyId() > 0) {
+            if (study.isSite()) {
                 temp = study.getName();
                 if (temp != null && temp.length() > 0) {
                     xml.append(" SiteName=\"" + StringEscapeUtils.escapeXml(temp) + "\"");
 
                 }
-                temp = study.getParentStudyName();
+                temp = study.getStudy().getName();
                 if (temp != null && temp.length() > 0) {
                     xml.append(" ParentStudyName=\"" + StringEscapeUtils.escapeXml(temp) + "\"");
                 }
@@ -705,7 +705,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             if (temp != null && temp.length() > 0) {
                 xml.append(" SecondaryIDs=\"" + StringEscapeUtils.escapeXml(temp) + "\"");
             }
-            xml.append(" DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getCreatedDate()) + "\"");
+            xml.append(" DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDateCreated()) + "\"");
             if (study.getDatePlannedStart() instanceof java.util.Date) {
                 xml.append(" StartDate=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDatePlannedStart()) + "\"");
             }
@@ -890,7 +890,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             temp = study.getMedlineIdentifier();
             facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:MEDLINEIdentifier>"
                     + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:MEDLINEIdentifier>" + nls : "");
-            facility.append(currentIndent + indent + indent + "<OpenClinica:ResultsReference>" + (study.isResultsReference() ? "Yes" : "No")
+            facility.append(currentIndent + indent + indent + "<OpenClinica:ResultsReference>" + (study.getResultsReference() ? "Yes" : "No")
                     + "</OpenClinica:ResultsReference>" + nls);
             temp = study.getUrl();
             facility.append(temp != null && temp.length() > 0

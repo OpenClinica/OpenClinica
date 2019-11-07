@@ -7,16 +7,19 @@
  */
 package core.org.akaza.openclinica.dao.service;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.bean.service.StudyParameter;
 import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -24,6 +27,9 @@ public class StudyConfigService {
 
     private DataSource ds;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+    @Autowired
+    private StudyDao studyDao;
 
     public StudyConfigService(DataSource ds) {
         this.ds = ds;
@@ -58,7 +64,6 @@ public class StudyConfigService {
      * @return
      */
     public String hasDefinedParameterValue(int studyId, String parameterHandle) {
-        StudyDAO sdao = new StudyDAO(ds);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
 
         if (studyId <= 0 || StringUtil.isBlank(parameterHandle)) {
@@ -67,13 +72,13 @@ public class StudyConfigService {
 
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(studyId, parameterHandle);
         StudyParameter sp = spvdao.findParameterByHandle(parameterHandle);
-        StudyBean study = (StudyBean) sdao.findByPK(studyId);
+        Study study = (Study) studyDao.findByPK(studyId);
         if (spv.getId() > 0) {// there is a row for that study, no matter it
             // is a
             // top study or not
             return spv.getValue();
         }
-        int parentId = study.getParentStudyId();
+        int parentId = study.getStudy() != null ? study.getStudy().getStudyId() : 0;
         if (parentId > 0) {
             StudyParameterValueBean spvParent = spvdao.findByHandleAndStudy(parentId, parameterHandle);
             if (spvParent.getId() > 0 && sp.isInheritable()) {
@@ -91,70 +96,26 @@ public class StudyConfigService {
      * @param study
      * @return
      */
-    public StudyBean setParametersForStudy(StudyBean study) {
+    public Study setParametersForStudy(Study study) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
         ArrayList parameters = spvdao.findAllParameters();
-        StudyParameterConfig spc = new StudyParameterConfig();
-
+        List resultparamsList = new ArrayList();
         for (int i = 0; i < parameters.size(); i++) {
-            StudyParameter sp = (StudyParameter) parameters.get(i);
+            core.org.akaza.openclinica.domain.datamap.StudyParameter sp = (core.org.akaza.openclinica.domain.datamap.StudyParameter) parameters.get(i);
             String handle = sp.getHandle();
             // logger.info("handle:" + handle);
-            StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), handle);
-            // TO DO: will change to use java reflection later
-            if (spv.getId() > 0) {
-                if (handle.equalsIgnoreCase("collectDob")) {
-                    spc.setCollectDob(spv.getValue());
-                } else if (handle.equalsIgnoreCase("genderRequired")) {
-                    spc.setGenderRequired(spv.getValue());
-                } else if (handle.equalsIgnoreCase("discrepancyManagement")) {
-                    spc.setDiscrepancyManagement(spv.getValue());
-                } else if (handle.equalsIgnoreCase("subjectPersonIdRequired")) {
-                    spc.setSubjectPersonIdRequired(spv.getValue().toLowerCase());
-                    // logger.info("subjectPersonIdRequired" +
-                    // spc.getSubjectPersonIdRequired());
-                } else if (handle.equalsIgnoreCase("interviewerNameRequired")) {
-                    spc.setInterviewerNameRequired(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewerNameDefault")) {
-                    spc.setInterviewerNameDefault(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewerNameEditable")) {
-                    spc.setInterviewerNameEditable(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewDateRequired")) {
-                    spc.setInterviewDateRequired(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewDateDefault")) {
-                    spc.setInterviewDateDefault(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewDateEditable")) {
-                    spc.setInterviewDateEditable(spv.getValue());
-                } else if (handle.equalsIgnoreCase("subjectIdGeneration")) {
-                    spc.setSubjectIdGeneration(spv.getValue());
-                    logger.debug("subjectIdGeneration" + spc.getSubjectIdGeneration());
-                } else if (handle.equalsIgnoreCase("subjectIdPrefixSuffix")) {
-                    spc.setSubjectIdPrefixSuffix(spv.getValue());
-                } else if (handle.equalsIgnoreCase("personIdShownOnCRF")) {
-                    spc.setPersonIdShownOnCRF(spv.getValue());
-                } else if (handle.equalsIgnoreCase("secondaryLabelViewable")) {
-                    spc.setSecondaryLabelViewable(spv.getValue());
-                } else if (handle.equalsIgnoreCase("enforceEnrollmentCap")) {
-                    spc.setEnforceEnrollmentCap(spv.getValue());
-                } else if (handle.equalsIgnoreCase("adminForcedReasonForChange")) {
-                    spc.setAdminForcedReasonForChange(spv.getValue());
-                } else if (handle.equalsIgnoreCase("eventLocationRequired")) {
-                    spc.setEventLocationRequired(spv.getValue());
-                } else if (handle.equalsIgnoreCase("participantPortal")) {
-                    spc.setParticipantPortal(spv.getValue());
-                } else if (handle.equalsIgnoreCase("randomization")) {
-                    spc.setRandomization(spv.getValue());
-                } else if (handle.equalsIgnoreCase("participantIdTemplate")) {
-                    spc.setParticipantIdTemplate(spv.getValue());
-                }
-            }
+            StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), handle);
+            StudyParamsConfig spc = new StudyParamsConfig();
+            spc.setParameter(sp);
+            spc.setValue(spv);
+            resultparamsList.add(spc);
         }
-        study.setStudyParameterConfig(spc);
+        study.setStudyParameters(resultparamsList);
         return study;
 
     }
 
-    public StudyBean setParameterValuesForStudy(StudyBean study) {
+    public Study setParameterValuesForStudy(Study study) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
         ArrayList theParameters = spvdao.findParamConfigByStudy(study);
         study.setStudyParameters(theParameters);
@@ -210,10 +171,9 @@ public class StudyConfigService {
 
     }
 
-    public StudyBean setParametersForSite(StudyBean site) {
-        StudyDAO sdao = new StudyDAO(ds);
+    public Study setParametersForSite(Study site) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-        StudyBean parent = (StudyBean) sdao.findByPK(site.getParentStudyId());
+        Study parent = (Study) studyDao.findByPK(site.getStudy().getStudyId());
         parent = this.setParameterValuesForStudy(parent);
         site.setStudyParameterConfig(parent.getStudyParameterConfig());
         ArrayList siteParameters = spvdao.findAllParameterValuesByStudy(site);

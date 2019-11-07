@@ -60,7 +60,7 @@
 </script>
 <h1><span class="title_manage">
     <c:choose>
-        <c:when test="${study.parentStudyId > 0}">
+        <c:when test="${study.study != null && study.study.studyId > 0}">
             <fmt:message key="assign_users_to_current_site" bundle="${resword}"/>
         </c:when>
         <c:otherwise>
@@ -72,7 +72,7 @@
 </h1>
 
 <c:choose>
-    <c:when test="${study.parentStudyId > 0}">
+    <c:when test="${study.study != null && study.study.studyId > 0}">
         <fmt:message key="assign_site_user_note" bundle="${resword}"/>
         <a href="${pageContext.request.contextPath}/ChangeStudy"><fmt:message key="that_study" bundle="${resword}"/></a>
     </c:when>

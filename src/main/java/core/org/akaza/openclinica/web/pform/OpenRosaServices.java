@@ -4,14 +4,11 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.Utils;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import core.org.akaza.openclinica.core.util.EncryptionUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
@@ -24,6 +21,7 @@ import core.org.akaza.openclinica.web.pform.formlist.XFormList;
 import core.org.akaza.openclinica.web.pform.manifest.Manifest;
 import core.org.akaza.openclinica.web.pform.manifest.MediaFile;
 import core.org.akaza.openclinica.web.restful.ODMClinicaDataResource;
+import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +33,6 @@ import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -134,7 +131,7 @@ public class OpenRosaServices {
     private SCDItemMetadataDao scdItemMetadataDao;
     ParticipantPortalRegistrar participantPortalRegistrar;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    StudyDAO sdao;
+
 
     static ConcurrentMap<String, String> studyUserMap = new ConcurrentHashMap<>();
     /**
@@ -293,12 +290,12 @@ public class OpenRosaServices {
 
         }
 
-        StudyBean publicStudy = getPublicStudy(studyOID);
+        Study publicStudy = getPublicStudy(studyOID);
         CoreResources.setRequestSchema(publicStudy.getSchemaName());
         LOGGER.info("Schema name after setting it to : " + CoreResources.getRequestSchema());
         LOGGER.info("StudyOid is :" + studyOID);
 
-        StudyBean study = getParentStudy(studyOID);
+        Study study = getParentStudy(studyOID);
 
         String xformOutput = "";
         String attribute = "";
@@ -535,9 +532,9 @@ public class OpenRosaServices {
             LOGGER.info("formLayoutOID from ecid: " + formLayoutOID);
             LOGGER.info("formLoadMode from ecid: " + formLoadMode);
         }
-        StudyBean publicStudy = getPublicStudy(studyOID);
+        Study publicStudy = getPublicStudy(studyOID);
         CoreResources.setRequestSchema(publicStudy.getSchemaName());
-        StudyBean study = getParentStudy(studyOID);
+        Study study = getParentStudy(studyOID);
         LOGGER.info("Schema name after setting it to: " + CoreResources.getRequestSchema());
 
         CrfBean crf = formLayout.getCrf();
@@ -603,7 +600,7 @@ public class OpenRosaServices {
             @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
-        StudyBean publicStudy = getPublicStudy(studyOID);
+        Study publicStudy = getPublicStudy(studyOID);
         CoreResources.setRequestSchema(publicStudy.getSchemaName());
         // Decrypt the encrypted form layout media id
         String encryptionKey = getCoreResources().getDataInfo().getProperty(DATABASE_ID_ENCRYPTION_KEY_PROPERTY);
@@ -848,24 +845,22 @@ public class OpenRosaServices {
         this.scdItemMetadataDao = scdItemMetadataDao;
     }
 
-    private StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+    private Study getStudy(String oid) {
+        Study studyBean = (Study) studyDao.findByOcOID(oid);
         return studyBean;
     }
 
-    private StudyBean getStudyById(int id) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByPK(id);
-        return studyBean;
+    private Study getStudyById(int id) {
+        Study study = (Study) studyDao.findByPK(id);
+        return study;
     }
 
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(String studyOid) {
+        Study study = getStudy(studyOid);
+        if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
             return parentStudy;
         }
 
@@ -907,8 +902,8 @@ public class OpenRosaServices {
             ssBean = ssDao.findByOcOID(studySubjectOID);
             studyAndSiteEnvUuid.currentUser = userAccountDao.findByUserId(userAccountID);
         }
-        StudyBean publicStudy = null;
-        StudyBean parentPublicStudy = null;
+        Study publicStudy = null;
+        Study parentPublicStudy = null;
         if (ssBean != null) {
             publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
             parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
@@ -916,7 +911,7 @@ public class OpenRosaServices {
             publicStudy = getPublicStudy(studyOID);
             parentPublicStudy = getParentPublicStudy(studyOID);
         }
-        if (publicStudy.getParentStudyId() == 0) {
+        if (publicStudy.getStudy().getStudyId() == 0) {
             studyAndSiteEnvUuid.studyEnvUuid = publicStudy.getStudyEnvUuid();
         } else {
             studyAndSiteEnvUuid.studyEnvUuid = parentPublicStudy.getStudyEnvUuid();
@@ -937,11 +932,11 @@ public class OpenRosaServices {
         StudySubject ssBean = ssDao.findByOcOID(studySubjectOID);
 
         if (ssBean != null) {
-            StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
-            StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
+            Study publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
+            Study parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
             CoreResources.setRequestSchema("public");
             UserAccount currentUser = userAccountDao.findByUserId(userAccountID);
-            users = userAccountDao.findNonRootNonParticipateUsersByStudyId(publicStudy.getId(), parentPublicStudy.getId());
+            users = userAccountDao.findNonRootNonParticipateUsersByStudyId(publicStudy.getStudyId(), parentPublicStudy.getStudyId());
             CoreResources.setRequestSchema(publicStudy.getSchemaName());
             for (UserAccount userAccount : users) {
                 Element item = doc.createElement("item");
@@ -966,9 +961,9 @@ public class OpenRosaServices {
 
     private boolean mayProceedSubmission(String studyOid, StudySubjectBean ssBean) throws Exception {
         boolean accessPermission = false;
-        StudyBean study = getParentPublicStudy(studyOid);
+        Study study = getParentPublicStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
         String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
         // PENDING ,
@@ -986,7 +981,7 @@ public class OpenRosaServices {
 
     private boolean mayProceedPreview(HttpServletRequest request, String studyOid) throws Exception {
         boolean accessPermission = false;
-        StudyBean study = getParentPublicStudy(studyOid);
+        Study study = getParentPublicStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         request.setAttribute("requestSchema", study.getSchemaName());
         // PENDING ,
@@ -1017,24 +1012,23 @@ public class OpenRosaServices {
         }
     }
 
-    private StudyBean getPublicStudy(String studyOid) {
+    private Study getPublicStudy(String studyOid) {
         String schema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(studyOid);
+        Study studyBean = (Study) studyDao.findByOcOID(studyOid);
         CoreResources.setRequestSchema(schema);
         return studyBean;
     }
 
-    private StudyBean getParentPublicStudy(String studyOid) {
-        StudyBean resultBean = null;
+    private Study getParentPublicStudy(String studyOid) {
+        Study resultBean = null;
         String schema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+        Study study = getStudy(studyOid);
+        if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
             resultBean = study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
             resultBean = parentStudy;
         }
         CoreResources.setRequestSchema(schema);

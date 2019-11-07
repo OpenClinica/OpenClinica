@@ -19,7 +19,6 @@ import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -47,7 +46,6 @@ public class ListEventsForSubjectsServlet extends SecureController {
     private StudyEventDAO studyEventDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
-    private StudyDAO studyDAO;
     private StudyGroupDAO studyGroupDAO;
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
@@ -128,7 +126,6 @@ public class ListEventsForSubjectsServlet extends SecureController {
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
-        factory.setStudyDAO(getStudyDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
@@ -180,11 +177,6 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public StudyEventDAO getStudyEventDAO() {
         studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
         return studyEventDAO;
-    }
-
-    public StudyDAO getStudyDAO() {
-        studyDAO = this.studyDAO == null ? new StudyDAO(sm.getDataSource()) : studyDAO;
-        return studyDAO;
     }
 
     public EventCRFDAO getEventCRFDAO() {

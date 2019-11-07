@@ -14,16 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.ListDiscNotesSubjectFilter;
 import core.org.akaza.openclinica.dao.managestudy.ListDiscNotesSubjectSort;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -39,6 +38,8 @@ import org.jmesa.limit.Limit;
 import org.jmesa.limit.Sort;
 import org.jmesa.limit.SortSet;
 import org.jmesa.view.component.Row;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * 
  * @author jnyayapathi
@@ -53,11 +54,11 @@ public class DiscNotesSubjectStatisticsFactory extends AbstractTableFactory{
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
     private StudyGroupDAO studyGroupDAO;
-    private StudyDAO studyDAO;
+
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
-    private StudyBean studyBean;
+    private Study studyBean;
 
     private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
     private ArrayList<StudyGroupClassBean> studyGroupClasses;
@@ -114,7 +115,7 @@ public class DiscNotesSubjectStatisticsFactory extends AbstractTableFactory{
 	    }
 	@Override
 	public void setDataAndLimitVariables(TableFacade tableFacade) {
-        StudyBean study = this.getStudyBean();
+        Study study = this.getStudyBean();
         Limit limit = tableFacade.getLimit();
 
         ListDiscNotesSubjectFilter subjectFilter = getSubjectFilter(limit);
@@ -280,11 +281,11 @@ public class DiscNotesSubjectStatisticsFactory extends AbstractTableFactory{
 	        this.studyEventDefinitionDao = studyEventDefinitionDao;
 	    }
 
-	    public StudyBean getStudyBean() {
+	    public Study getStudyBean() {
 	        return studyBean;
 	    }
 
-	    public void setStudyBean(StudyBean studyBean) {
+	    public void setStudyBean(Study studyBean) {
 	        this.studyBean = studyBean;
 	    }
 
@@ -326,14 +327,6 @@ public class DiscNotesSubjectStatisticsFactory extends AbstractTableFactory{
 
 	    public void setSubjectGroupMapDAO(SubjectGroupMapDAO subjectGroupMapDAO) {
 	        this.subjectGroupMapDAO = subjectGroupMapDAO;
-	    }
-
-	    public StudyDAO getStudyDAO() {
-	        return studyDAO;
-	    }
-
-	    public void setStudyDAO(StudyDAO studyDAO) {
-	        this.studyDAO = studyDAO;
 	    }
 
 	    public StudyUserRoleBean getCurrentRole() {

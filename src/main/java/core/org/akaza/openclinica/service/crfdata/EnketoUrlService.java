@@ -22,7 +22,6 @@ import core.org.akaza.openclinica.core.form.xform.QueryType;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
@@ -152,8 +151,6 @@ public class EnketoUrlService {
     ParticipantPortalRegistrar participantPortalRegistrar;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    UserAccountDAO udao;
-    StudyDAO sdao;
 
     public FormUrlObject getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid,
                                                 String flavor, Role role,

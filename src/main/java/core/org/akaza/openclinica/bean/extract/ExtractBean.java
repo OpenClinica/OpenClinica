@@ -26,7 +26,6 @@ import core.org.akaza.openclinica.bean.core.ApplicationConstants;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupBean;
@@ -44,6 +43,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,9 +76,9 @@ public class ExtractBean {
 
     private String showUniqueId = "1";
 
-    private StudyBean parentStudy;
+    private Study parentStudy;
 
-    private StudyBean study;
+    private Study study;
 
     private DatasetBean dataset;
 
@@ -189,8 +189,8 @@ public class ExtractBean {
 
     public ExtractBean(DataSource ds) {
         this.ds = ds;
-        study = new StudyBean();
-        parentStudy = new StudyBean();
+        study = new Study();
+        parentStudy = new Study();
         studyEvents = new ArrayList();
 
         data = new HashMap();
@@ -222,8 +222,8 @@ public class ExtractBean {
         this.long_sdf = long_sdf;
         // TODO need to refactor the below
         this.ds = ds;
-        study = new StudyBean();
-        parentStudy = new StudyBean();
+        study = new Study();
+        parentStudy = new Study();
         studyEvents = new ArrayList();
 
         data = new HashMap();
@@ -820,7 +820,7 @@ public class ExtractBean {
 
         if (dataset.isShowSubjectGroupInformation()) {
             // logger.info("found study id for maps: "+study.getId());
-            studyGroupMaps = studygroupDAO.findSubjectGroupMaps(study.getId());
+            studyGroupMaps = studygroupDAO.findSubjectGroupMaps(study.getStudyId());
             // below is for a given subject; we need a data structure for
             // all subjects
             // studyGroupMap = studygroupDAO.findByStudySubject(currentSubject);
@@ -1513,15 +1513,15 @@ public class ExtractBean {
 
     public String getParentProtocolId() {
         // updated 11-2007 to support protocol id - site id terminology, tbh
-        if (!parentStudy.isActive()) {
-            return study.getIdentifier();
+        if (parentStudy == null) {
+            return study.getUniqueIdentifier();
         } else {
-            return parentStudy.getIdentifier() + "_" + study.getIdentifier();
+            return parentStudy.getUniqueIdentifier() + "_" + study.getUniqueIdentifier();
         }
     }
 
     public String getParentStudyName() {
-        if (!parentStudy.isActive()) {
+        if (parentStudy == null) {
             return study.getName();
         } else {
             return parentStudy.getName();
@@ -1529,7 +1529,7 @@ public class ExtractBean {
     }
 
     public String getParentStudySummary() {
-        if (!parentStudy.isActive()) {
+        if (parentStudy == null) {
             return study.getSummary();
         } else {
             return parentStudy.getSummary();
@@ -1537,7 +1537,7 @@ public class ExtractBean {
     }
 
     private String getSiteName() {
-        if (parentStudy.isActive()) {
+        if (parentStudy != null) {
             return study.getName();
         } else {
             return "";
@@ -2008,7 +2008,7 @@ public class ExtractBean {
     /**
      * @return Returns the study.
      */
-    public StudyBean getStudy() {
+    public Study getStudy() {
         return study;
     }
 
@@ -2016,14 +2016,14 @@ public class ExtractBean {
      * @param study
      *            The study to set.
      */
-    public void setStudy(StudyBean study) {
+    public void setStudy(Study study) {
         this.study = study;
     }
 
     /**
      * @return Returns the parentStudy.
      */
-    public StudyBean getParentStudy() {
+    public Study getParentStudy() {
         return parentStudy;
     }
 
@@ -2031,7 +2031,7 @@ public class ExtractBean {
      * @param parentStudy
      *            The parentStudy to set.
      */
-    public void setParentStudy(StudyBean parentStudy) {
+    public void setParentStudy(Study parentStudy) {
         this.parentStudy = parentStudy;
     }
 

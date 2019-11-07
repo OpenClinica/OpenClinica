@@ -248,17 +248,17 @@
 
         <div id="StudyInfo">
             <c:choose>
-                <c:when test='${study.parentStudyId > 0}'>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
-                        title="<c:out value='${study.parentStudyName}'/>"
-                        alt="<c:out value='${study.parentStudyName}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
-                        :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                <c:when test='${study.study != null && study.study.studyId > 0}'>
+                    <b><a href="${urlPrefix}ViewStudy?id=${study.study.studyId}&viewFull=yes"
+                        title="<c:out value='${study.study.name}'/>"
+                        alt="<c:out value='${study.study.name}'/>" ><c:out value="${study.study.name}" /></a>
+                        :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.studyId}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.name}" /></a></b>
                 </c:when>
                 <c:otherwise>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                    <b><a href="${urlPrefix}ViewStudy?id=${study.studyId}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.name}" /></a></b>
                 </c:otherwise>
             </c:choose>
-            (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;
+            (<c:out value="${study.studyId}" />)&nbsp;&nbsp;
             <c:if test="${study.envType == 'PROD'}">
                 <c:if test="${study.status.pending}">
                     <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="design" bundle="${resword}"/></span>
@@ -405,7 +405,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <li>
-                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
+                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}"><fmt:message
                                                                                                     key="nav_sdv" bundle="${resword}"/></a></li>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
@@ -477,7 +477,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
+                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}"><fmt:message
                         key="nav_source_data_verification" bundle="${resword}"/></a></div>
                 <c:if test="${enableEmbeddedReports}">
                     <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
@@ -573,10 +573,10 @@
                 <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a>
                 </div>
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                    <c:when test="${study.study != null && study.study.studyId > 0 && (userRole.coordinator || userRole.director) }">
                     </c:when>
                     <c:otherwise>
-                        <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study"
+                        <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.studyId}&viewFull=yes"><fmt:message key="nav_view_study"
                                                                                                                        bundle="${resword}"/></a></div>
                         <div class="taskLink"></div>
                     </c:otherwise>
@@ -587,12 +587,12 @@
             </div>
             <div class="taskRightColumn">
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                    <c:when test="${study.study != null && study.study.studyId > 0 && (userRole.coordinator || userRole.director) }">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
                         <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
+                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}"><fmt:message
                                 key="nav_source_data_verification" bundle="${resword}"/></a><br/></div>
                     </c:otherwise>
                 </c:choose>

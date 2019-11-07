@@ -35,7 +35,6 @@ import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import core.org.akaza.openclinica.dao.managestudy.ListNotesSort;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -66,22 +65,25 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.*;
 
 public class ListNotesTableFactory extends AbstractTableFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(ListNotesTableFactory.class.getName());
 
+    @Autowired
+    private StudyDao studyDao;
     private AuditUserLoginDao auditUserLoginDao;
     private StudySubjectDAO studySubjectDao;
     private UserAccountDAO userAccountDao;
     private DiscrepancyNoteDAO discrepancyNoteDao;
-    private StudyDAO studyDao;
     private SubjectDAO subjectDao;
     private StudyEventDefinitionDAO studyEventDefinitionDao;
     private EventDefinitionCRFDAO eventDefinitionCRFDao;
     private EventCRFDAO eventCRFDao;
-    private StudyBean currentStudy;
+    private Study currentStudy;
     private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
     private ResourceBundle resformat;
     private List<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -246,7 +248,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         Limit limit = tableFacade.getLimit();
 
         if (!limit.isComplete()) {
-            parentStudyId = currentStudy.getId();
+            parentStudyId = currentStudy.getStudyId();
 
             // Build row count of various DN types
             int totalRows = getDiscrepancyNoteDao().getSubjectDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
@@ -695,19 +697,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         this.subjectDao = subjectDao;
     }
 
-    public StudyDAO getStudyDao() {
-        return studyDao;
-    }
-
-    public void setStudyDao(StudyDAO studyDao) {
-        this.studyDao = studyDao;
-    }
-
-    public StudyBean getCurrentStudy() {
+    public Study getCurrentStudy() {
         return currentStudy;
     }
 
-    public void setCurrentStudy(StudyBean currentStudy) {
+    public void setCurrentStudy(Study currentStudy) {
         this.currentStudy = currentStudy;
     }
 
@@ -912,7 +906,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         return permissionService;
     }
 
-    public List<CustomColumn> getCustomColumns(DiscrepancyNoteBean discrepancyNoteBean, StudyBean studyBean, HttpServletRequest request) {
+    public List<CustomColumn> getCustomColumns(DiscrepancyNoteBean discrepancyNoteBean, Study studyBean, HttpServletRequest request) {
         List<CustomColumn> customColumns = new ArrayList<>();
         String[] tableColumns = getViewStudySubjectService().getTableColumns(PAGE_NAME, COMPONENT_NAME);
         if (tableColumns != null
@@ -1014,7 +1008,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         return customColumns;
     }
 
-    public int getNetCountCustomColumns(StudyBean studyBean, HttpServletRequest request) {
+    public int getNetCountCustomColumns(Study studyBean, HttpServletRequest request) {
         int columnCount = 0;
         String[] tableColumns = getViewStudySubjectService().getTableColumns(PAGE_NAME, COMPONENT_NAME);
         if (tableColumns != null) {

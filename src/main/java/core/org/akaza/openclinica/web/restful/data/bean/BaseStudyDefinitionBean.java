@@ -1,14 +1,14 @@
 package core.org.akaza.openclinica.web.restful.data.bean;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 public class BaseStudyDefinitionBean {
 
     private String studyUniqueId;
     private String siteUniqueId;
     private UserAccountBean user;
-    private StudyBean study;
+    private Study study;
 
     public BaseStudyDefinitionBean(String studyUniqueId, String siteUniqueId, UserAccountBean user) {
         super();
@@ -51,14 +51,14 @@ public class BaseStudyDefinitionBean {
 	/**
 	 * @param study the study to set
 	 */
-	public void setStudy(StudyBean study) {
+	public void setStudy(Study study) {
 		this.study = study;
 	}
 
 	/**
 	 * @return the study
 	 */
-	public StudyBean getStudy() {
+	public Study getStudy() {
 		return study;
 	}
 

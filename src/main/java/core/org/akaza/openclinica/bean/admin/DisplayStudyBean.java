@@ -9,7 +9,7 @@
 package core.org.akaza.openclinica.bean.admin;
 
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.util.ArrayList;
 
@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * relationship
  */
 public class DisplayStudyBean extends AuditableEntityBean {
-    private StudyBean parent;
+    private Study parent;
     private ArrayList children;
 
     /**
@@ -41,7 +41,7 @@ public class DisplayStudyBean extends AuditableEntityBean {
     /**
      * @return Returns the parent.
      */
-    public StudyBean getParent() {
+    public Study getParent() {
         return parent;
     }
 
@@ -49,7 +49,7 @@ public class DisplayStudyBean extends AuditableEntityBean {
      * @param parent
      *            The parent to set.
      */
-    public void setParent(StudyBean parent) {
+    public void setParent(Study parent) {
         this.parent = parent;
     }
 }

@@ -351,7 +351,6 @@ public class StudyEventController {
 		return null;
 	}
 
-
 	public String startBulkEventJob(MultipartFile file, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean) {
 		utilService.setSchemaFromStudyOid(studyOid);
 

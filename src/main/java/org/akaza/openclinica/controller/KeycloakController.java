@@ -1,13 +1,12 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.domain.datamap.Study;
 import net.sf.json.util.JSONUtils;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.service.CallbackService;
 import core.org.akaza.openclinica.service.KeycloakUser;
 import core.org.akaza.openclinica.service.StudyBuildService;
@@ -48,7 +47,6 @@ public class KeycloakController {
     @Autowired
     @Qualifier("dataSource")
     private DataSource dataSource;
-    private StudyDAO studyDAO;
 
     public String buildAuthorizeUrl(HttpServletRequest request) {
         AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
@@ -152,18 +150,17 @@ public class KeycloakController {
             // Public study will be null if there is no active study for this user
             if (ub.getActiveStudyId() != 0) {
 
-                StudyBean publicStudy = null;
-                publicStudy = (StudyBean) req.getSession().getAttribute("publicStudy");
+                Study publicStudy = null;
+                publicStudy = (Study) req.getSession().getAttribute("publicStudy");
 
                 if (publicStudy == null) {
-                    studyDAO = new StudyDAO(dataSource);
-                    publicStudy = studyDAO.findByPublicPK(ub.getActiveStudyId());
+                    publicStudy = studyDao.findPublicStudyById(ub.getActiveStudyId());
                 }
 
                 String accessToken = (String) req.getSession().getAttribute("accessToken");
-                studyBuildService.processModule(accessToken, publicStudy.getOid(), ModuleProcessor.Modules.PARTICIPATE);
+                studyBuildService.processModule(accessToken, publicStudy.getOc_oid(), ModuleProcessor.Modules.PARTICIPATE);
 
-                SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOid(),dataSource));
+                SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOc_oid(),dataSource));
             }
 
         } else {

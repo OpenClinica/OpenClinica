@@ -1,6 +1,5 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.rule.FileProperties;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -249,7 +248,7 @@ public class OpenRosaSubmissionController {
 
 
     private void checkRandomization(Map<String, String> subjectContext, String studyOid, String subjectOid) throws Exception {
-        StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(studyOid, dataSource);
+        Study parentPublicStudy = CoreResources.getParentPublicStudy(studyOid, dataSource);
         String accessToken = subjectContext.get("accessToken");
         randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
     }

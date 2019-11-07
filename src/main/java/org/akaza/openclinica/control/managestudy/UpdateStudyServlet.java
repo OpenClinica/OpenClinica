@@ -11,16 +11,17 @@ import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.InterventionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ import java.util.StringTokenizer;
  * 
  */
 public class UpdateStudyServlet extends SecureController {
+    @Autowired
+    private StudyDao studyDao;
     public static final String INPUT_START_DATE = "startDate";
     public static final String INPUT_END_DATE = "endDate";
     public static final String INPUT_VER_DATE = "protocolDateVerification";
@@ -66,8 +69,7 @@ public class UpdateStudyServlet extends SecureController {
         panel.setIconInfoShown(true);
         panel.setManageSubject(false);
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean study = (StudyBean) session.getAttribute("newStudy");
+        Study study = (Study) session.getAttribute("newStudy");
 
         if (study == null) {
             addPageMessage(respage.getString("please_choose_a_study_to_edit"));
@@ -170,7 +172,7 @@ public class UpdateStudyServlet extends SecureController {
             logger.info("no errors in the first section");
             request.setAttribute("studyPhaseMap", CreateStudyServlet.studyPhaseMap);
             request.setAttribute("statuses", Status.toActiveArrayList());
-            StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+            Study newStudy = (Study) session.getAttribute("newStudy");
             fp.addPresetValue(INPUT_START_DATE, local_df.format(newStudy.getDatePlannedStart()));
             if (newStudy.getDatePlannedEnd() != null) {
                 fp.addPresetValue(INPUT_END_DATE, local_df.format(newStudy.getDatePlannedEnd()));
@@ -205,7 +207,7 @@ public class UpdateStudyServlet extends SecureController {
             logger.info("no errors");
             ArrayList interventionArray = new ArrayList();
             if (isInterventional) {
-                interventionArray = parseInterventions((StudyBean) session.getAttribute("newStudy"));
+                interventionArray = parseInterventions((Study) session.getAttribute("newStudy"));
                 setMaps(isInterventional, interventionArray);
                 forwardPage(Page.UPDATE_STUDY3);
             } else {
@@ -305,7 +307,7 @@ public class UpdateStudyServlet extends SecureController {
             Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
         }
 
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.setConditions(fp.getString("conditions"));
         newStudy.setKeywords(fp.getString("keywords"));
         newStudy.setEligibility(fp.getString("eligibility"));
@@ -350,7 +352,7 @@ public class UpdateStudyServlet extends SecureController {
         v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         errors = v.validate();
 
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
 
         newStudy.setFacilityCity(fp.getString("facCity"));
         newStudy.setFacilityContactDegree(fp.getString("facConDrgree"));
@@ -384,7 +386,7 @@ public class UpdateStudyServlet extends SecureController {
 
         errors = v.validate();
 
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.setMedlineIdentifier(fp.getString("medlineIdentifier"));
         newStudy.setResultsReference(fp.getBoolean("resultsReference"));
         newStudy.setUrl(fp.getString("url"));
@@ -404,7 +406,7 @@ public class UpdateStudyServlet extends SecureController {
         Validator v = new Validator(request);
         errors = v.validate();
 
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.getStudyParameterConfig().setCollectDob(fp.getString("collectDob"));
         newStudy.getStudyParameterConfig().setDiscrepancyManagement(fp.getString("discrepancyManagement"));
         newStudy.getStudyParameterConfig().setGenderRequired(fp.getString("genderRequired"));
@@ -435,19 +437,18 @@ public class UpdateStudyServlet extends SecureController {
     }
 
     private void submitStudy() {
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 
-        StudyBean study1 = (StudyBean) session.getAttribute("newStudy");
+        Study study1 = (Study) session.getAttribute("newStudy");
         logger.info("study bean to be updated:" + study1.getName());
-        study1.setUpdatedDate(new Date());
+        study1.setDateUpdated(new Date());
         study1.setUpdater((UserAccountBean) session.getAttribute("userBean"));
-        logger.debug("study's parentId=" + study1.getParentStudyId());
-        sdao.update(study1);
+        logger.debug("study's parentId=" + study1.checkAndGetParentStudyId());
+        studyDao.update(study1);
 
         StudyParameterValueBean spv = new StudyParameterValueBean();
 
-        spv.setStudyId(study1.getId());
+        spv.setStudyId(study1.getStudyId());
         spv.setParameter("collectDob");
         spv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
         updateParameter(spvdao, spv);
@@ -500,22 +501,21 @@ public class UpdateStudyServlet extends SecureController {
         spv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
         updateParameter(spvdao, spv);
 
-        StudyBean curStudy = (StudyBean) session.getAttribute("study");
-        if (curStudy != null && study1.getId() == curStudy.getId()) {
+        Study curStudy = (Study) session.getAttribute("study");
+        if (curStudy != null && study1 != null && study1.getStudyId() == curStudy.getStudyId()) {
             super.currentStudy = study1;
             session.setAttribute("study", study1);
         }
         // update manage_pedigrees for all sites
-        ArrayList children = (ArrayList) sdao.findAllByParent(study1.getId());
+        ArrayList children = (ArrayList) studyDao.findAllByParent(study1.getStudyId());
         for (int i = 0; i < children.size(); i++) {
-            StudyBean child = (StudyBean) children.get(i);
-            child.setType(study1.getType());// same as parent's type
-            child.setUpdatedDate(new Date());
+            Study child = (Study) children.get(i);
+            child.setDateUpdated(new Date());
             child.setUpdater(ub);
-            sdao.update(child);
+            studyDao.update(child);
             // YW << update "collectDob" and "genderRequired" for sites
             StudyParameterValueBean childspv = new StudyParameterValueBean();
-            childspv.setStudyId(child.getId());
+            childspv.setStudyId(child.getStudyId());
             childspv.setParameter("collectDob");
             childspv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
             updateParameter(spvdao, childspv);
@@ -535,12 +535,12 @@ public class UpdateStudyServlet extends SecureController {
      * @param request
      * @return
      */
-    private StudyBean createStudyBean() {
+    private Study createStudyBean() {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         newStudy.setName(fp.getString("name"));
         newStudy.setOfficialTitle(fp.getString("officialTitle"));
-        newStudy.setIdentifier(fp.getString("uniqueProId"));
+        newStudy.setUniqueIdentifier(fp.getString("uniqueProId"));
         newStudy.setSecondaryIdentifier(fp.getString("secondProId"));
         newStudy.setPrincipalInvestigator(fp.getString("prinInvestigator"));
 
@@ -562,11 +562,11 @@ public class UpdateStudyServlet extends SecureController {
      */
     private boolean updateStudy2() {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean newStudy = (StudyBean) session.getAttribute("newStudy");
+        Study newStudy = (Study) session.getAttribute("newStudy");
         // this is not fully supported yet, because the system will not handle
         // studies which are pending
         // or private...
-        newStudy.setStatus(Status.get(fp.getInt("statusId")));
+        newStudy.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(fp.getInt("statusId")));
 
         newStudy.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE));
 
@@ -580,12 +580,6 @@ public class UpdateStudyServlet extends SecureController {
 
         newStudy.setPhase(fp.getString("phase"));
 
-        if (fp.getInt("genetic") == 1) {
-            newStudy.setGenetic(true);
-        } else {
-            newStudy.setGenetic(false);
-        }
-
         session.setAttribute("newStudy", newStudy);
 
         String interventional = resadmin.getString("interventional");
@@ -595,7 +589,7 @@ public class UpdateStudyServlet extends SecureController {
 
     private void updateStudy3(boolean isInterventional) {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean study = (StudyBean) session.getAttribute("newStudy");
+        Study study = (Study) session.getAttribute("newStudy");
         study.setPurpose(fp.getString("purpose"));
         ArrayList interventionArray = new ArrayList();
         if (isInterventional) {
@@ -637,7 +631,7 @@ public class UpdateStudyServlet extends SecureController {
      * @param sb
      * @return
      */
-    private ArrayList parseInterventions(StudyBean sb) {
+    private ArrayList parseInterventions(Study sb) {
         ArrayList inters = new ArrayList();
         String interventions = sb.getInterventions();
         try {

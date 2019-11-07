@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.domain.datamap.Study;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +10,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import core.org.akaza.openclinica.bean.core.UserType;
 import core.org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -222,8 +222,8 @@ public class OdmController {
         }
 
         logger.info("UserAccount username: " +ub.getName());
-        StudyBean currentStudy = participateService.getStudy(studyOid);
-        logger.info("Study OId: " +currentStudy.getOid());
+        Study currentStudy = participateService.getStudy(studyOid);
+        logger.info("Study OId: " +currentStudy.getOc_oid());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         String userName=ub.getName();
         int lastIndexOfDot= userName.lastIndexOf(".");
@@ -234,9 +234,9 @@ public class OdmController {
 
         logger.info("StudySubject Id: " +studySubject.getLabel());
 
-        StudyBean siteBean = participateService.getStudyById(studySubject.getStudyId());
+        Study siteBean = participateService.getStudyById(studySubject.getStudyId());
 
-        if (participateService.mayProceed(siteBean.getOid()) && studySubject != null && studySubject.isActive() && studySubject.getStatus().isAvailable()) {
+        if (participateService.mayProceed(siteBean.getOc_oid()) && studySubject != null && studySubject.isActive() && studySubject.getStatus().isAvailable()) {
             odm = participateService.getODM(studyOid, studySubject.getOid(), ub);
         }
 
@@ -276,8 +276,8 @@ public class OdmController {
         }
 
         logger.info("UserAccount username: " +ub.getName());
-        StudyBean currentStudy = participateService.getStudy(studyOid);
-        logger.info("Study OId: " +currentStudy.getOid());
+        Study currentStudy = participateService.getStudy(studyOid);
+        logger.info("Study OId: " +currentStudy.getOc_oid());
       
         String userName=ub.getName();
         int lastIndexOfDot= userName.lastIndexOf(".");

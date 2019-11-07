@@ -2,7 +2,6 @@ package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -82,10 +81,10 @@ public class UtilServiceImpl implements UtilService {
     }
 
 
-    public boolean isParticipantIDSystemGenerated(StudyBean tenantStudy) {
+    public boolean isParticipantIDSystemGenerated(Study tenantStudy) {
         String idSetting = "";
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spvBean = spvdao.findByHandleAndStudy(tenantStudy.getParentStudyId() == 0 ? tenantStudy.getId() : tenantStudy.getParentStudyId(), "subjectIdGeneration");
+        StudyParameterValueBean spvBean = spvdao.findByHandleAndStudy(!tenantStudy.isSite() ? tenantStudy.getStudyId() : tenantStudy.getStudy().getStudyId(), "subjectIdGeneration");
         idSetting = spvBean.getValue();
 
         logger.info("subject Id Generation :" + idSetting);

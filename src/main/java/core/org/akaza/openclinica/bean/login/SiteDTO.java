@@ -1,6 +1,7 @@
 package core.org.akaza.openclinica.bean.login;
 
-import core.org.akaza.openclinica.bean.core.Status;
+
+import core.org.akaza.openclinica.domain.Status;
 
 import java.util.ArrayList;
 

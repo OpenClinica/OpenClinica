@@ -1075,6 +1075,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
 
     }
 
+    //findPublicStudy
     public StudyBean getPublicStudy(String ocId) {
         StudyBean study = findByPublicOid(ocId);
         return study;

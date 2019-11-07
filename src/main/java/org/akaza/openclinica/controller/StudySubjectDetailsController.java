@@ -1,8 +1,8 @@
 package org.akaza.openclinica.controller;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,9 +35,9 @@ public class StudySubjectDetailsController {
 
         ModelMap modelMap = new ModelMap();
 
-        StudyBean study = (StudyBean) request.getSession().getAttribute("study");
-        StudySubject studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(label, studyDao.findByOcOID(study.getOid()));
-        modelMap.addAttribute("studyOid", study.getOid());
+        Study study = (Study) request.getSession().getAttribute("study");
+        StudySubject studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(label, studyDao.findByOcOID(study.getOc_oid()));
+        modelMap.addAttribute("studyOid", study.getOc_oid());
         modelMap.addAttribute("studySubjectOid", studySubject.getOcOid());
         return modelMap;
     }

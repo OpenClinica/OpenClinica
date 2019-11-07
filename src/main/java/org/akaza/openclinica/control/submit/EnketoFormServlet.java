@@ -81,11 +81,11 @@ public class EnketoFormServlet extends SecureController {
         }
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(String.valueOf(ub.getId()));
-        subjectContext.setStudyOid((currentStudy.getOid()));
+        subjectContext.setStudyOid((currentStudy.getOc_oid()));
         subjectContext.setFormLoadMode(mode);
         contextHash = cache.putSubjectContext(subjectContext);
 
-        Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOid());
+        Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOc_oid());
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role role = currentRole.getRole();
         EventCrf eventCrf = null;

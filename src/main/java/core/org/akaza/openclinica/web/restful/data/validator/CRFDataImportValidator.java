@@ -1,11 +1,12 @@
 package core.org.akaza.openclinica.web.restful.data.validator;
 
-import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.web.restful.data.bean.BaseStudyDefinitionBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
 import org.springframework.validation.Validator;
@@ -16,7 +17,8 @@ import javax.sql.DataSource;
 public class CRFDataImportValidator implements Validator {
 
     DataSource dataSource;
-    StudyDAO studyDAO;
+    @Autowired
+    StudyDao studyDao;
     UserAccountDAO userAccountDAO;
     BaseVSValidatorImplementation helper;
     RestfulServiceHelper restfulServiceHelper;
@@ -49,11 +51,11 @@ public class CRFDataImportValidator implements Validator {
              return;
         }
         Status[] included_status= new Status[]{Status.AVAILABLE ,  Status.PENDING};
-        StudyBean study = helper.verifyStudyByOID( getStudyDAO(), crfDataImportBean.getStudyUniqueId(), included_status, e);
+        Study study = helper.verifyStudyByOID( studyDao, crfDataImportBean.getStudyUniqueId(), included_status, e);
         if (study == null) return; 
       
         String userName = crfDataImportBean.getUser().getName();
-        String study_oid = study.getOid();
+        String study_oid = study.getOc_oid();
         boolean isRoleVerified = this.getRestfulServiceHelper().verifyRole(userName, study_oid, null, e);
         if ( !isRoleVerified ) {
         	 /**
@@ -101,12 +103,6 @@ public class CRFDataImportValidator implements Validator {
 
     }
 
-    public StudyDAO getStudyDAO() {
-        return this.studyDAO != null ? studyDAO : new StudyDAO(dataSource);
-    }
-
-   
-
     public UserAccountDAO getUserAccountDAO() {
         return this.userAccountDAO != null ? userAccountDAO : new UserAccountDAO(dataSource);
     }
@@ -120,11 +116,11 @@ public class CRFDataImportValidator implements Validator {
              return;
         }
         Status[] included_status= new Status[]{Status.AVAILABLE ,  Status.PENDING};
-        StudyBean study = helper.verifyStudyByOID( getStudyDAO(), crfDataImportBean.getStudyUniqueId(), included_status, e);
+        Study study = helper.verifyStudyByOID( studyDao, crfDataImportBean.getStudyUniqueId(), included_status, e);
         if (study == null) return; 
       
         String userName = crfDataImportBean.getUser().getName();
-        String study_oid = study.getOid();
+        String study_oid = study.getOc_oid();
         boolean isRoleVerified = this.getRestfulServiceHelper().verifyRole(userName, study_oid, null, e);
         if ( !isRoleVerified ) {
         	

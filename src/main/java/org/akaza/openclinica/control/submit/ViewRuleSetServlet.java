@@ -82,7 +82,7 @@ public class ViewRuleSetServlet extends SecureController {
             UserAccountBean currentUser = (UserAccountBean) request.getSession().getAttribute("userBean");
 
             request.setAttribute("designerUrl", designerUrl);
-            request.setAttribute("currentStudy", currentStudy.getOid());
+            request.setAttribute("currentStudy", currentStudy.getOc_oid());
             request.setAttribute("providerUser", currentUser.getName());
             request.setAttribute("validRuleSetRuleIds", validRuleSetRuleIds);
             request.setAttribute("ruleSetRuleBeans", orderRuleSetRulesByStatus(ruleSetBean));

@@ -33,13 +33,13 @@ import core.org.akaza.openclinica.bean.login.ErrorMessage;
 import core.org.akaza.openclinica.bean.login.ImportDataResponseFailureDTO;
 import core.org.akaza.openclinica.bean.login.ImportDataResponseSuccessDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.submit.ImportCRFInfo;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
@@ -333,7 +333,7 @@ public class DataController {
 
             // if no error then continue to validate
             if (!errors.hasErrors()) {
-                StudyBean studyBean = crfDataImportBean.getStudy();
+                Study studyBean = crfDataImportBean.getStudy();
 
                 List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                 HashMap<Integer, String> importedCRFStatuses = new HashMap<Integer, String>();

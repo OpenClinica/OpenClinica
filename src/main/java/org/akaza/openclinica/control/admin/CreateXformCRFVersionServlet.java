@@ -60,7 +60,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
             crfName = crfBean.getName();
         }
 
-        FormArtifactTransferObj transferObj = getFormArtifactsFromFM(items, currentStudy.getOid(), crfName);
+        FormArtifactTransferObj transferObj = getFormArtifactsFromFM(items, currentStudy.getOc_oid(), crfName);
         if (transferObj.getErr().size() != 0) {
             for (ErrorObj er : transferObj.getErr()) {
                 errors.rejectValue("name", er.getCode(), er.getMessage());

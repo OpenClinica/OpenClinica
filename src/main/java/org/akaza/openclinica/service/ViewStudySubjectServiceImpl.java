@@ -1,18 +1,14 @@
 package org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.CustomColumn;
-import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.service.Component;
-import core.org.akaza.openclinica.service.Page;
-import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
-import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
-import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.service.Component;
+import core.org.akaza.openclinica.service.Page;
+import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
+import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

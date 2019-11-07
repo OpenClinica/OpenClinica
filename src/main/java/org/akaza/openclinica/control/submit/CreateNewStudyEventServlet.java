@@ -21,10 +21,10 @@ import javax.sql.DataSource;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -129,10 +129,10 @@ public class CreateNewStudyEventServlet extends SecureController {
         // TODO: make this sensitive to permissions
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 
-        StudyBean studyWithEventDefinitions = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithEventDefinitions = new StudyBean();
-            studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
+        Study studyWithEventDefinitions = currentStudy;
+        if (currentStudy.isSite()) {
+            studyWithEventDefinitions = new Study();
+            studyWithEventDefinitions.setId(currentStudy.getStudy().getStudyId());
         }
         // find all active definitions with CRFs
         ArrayList<StudyEventDefinitionBean> eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);

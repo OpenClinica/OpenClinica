@@ -8,6 +8,7 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.EventCRFLocker;
 import core.org.akaza.openclinica.core.LockInfo;
@@ -136,7 +137,7 @@ public class ChangeCRFVersionController {
         // set default CRF version label
         setupResource(request);
 
-        StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+        Study study = (Study) request.getSession().getAttribute("study");
 
         CRFDAO cdao = new CRFDAO(dataSource);
         CRFBean crfBean = (CRFBean) cdao.findByPK(crfId);
@@ -162,14 +163,14 @@ public class ChangeCRFVersionController {
         }
         HttpSession session = request.getSession();
         UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-        StudyBean currentPublicStudy = (StudyBean) session.getAttribute("publicStudy");
+        Study currentPublicStudy = (Study) session.getAttribute("publicStudy");
         if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
                 + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
             String errorData = getErrorData(request, ecb, currentPublicStudy);
             if (redirect(request, response, "/ViewStudySubject?id=" + seb.getStudySubjectId() + "&errorData=" + errorData) == null)
                 return null;
         }
-        if (study.getParentStudyId() > 0) {
+        if (study.isSite()) {
             EventDefinitionCRFDAO edfdao = new EventDefinitionCRFDAO(dataSource);
             EventDefinitionCRFBean edf = (EventDefinitionCRFBean) edfdao.findByPK(eventDefinitionCRFId);
 
@@ -198,7 +199,7 @@ public class ChangeCRFVersionController {
         return gridMap;
     }
 
-    private String getErrorData(HttpServletRequest request, EventCRFBean ecb, StudyBean currentPublicStudy) {
+    private String getErrorData(HttpServletRequest request, EventCRFBean ecb, Study currentPublicStudy) {
         LockInfo lockInfo = eventCRFLocker.getLockOwner(currentPublicStudy.getSchemaName()
                 + ecb.getStudyEventId() + ecb.getFormLayoutId());
         UserAccount userAccount = userAccountDao.findByUserId(lockInfo.getUserId());
@@ -537,7 +538,7 @@ public class ChangeCRFVersionController {
             EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
             StudyEventDAO sed = new StudyEventDAO(dataSource);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-            StudyBean currentPublicStudy = (StudyBean) session.getAttribute("publicStudy");
+            Study currentPublicStudy = (Study) session.getAttribute("publicStudy");
             EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
             StudyEventBean seb = (StudyEventBean) sed.findByPK(ecb.getStudyEventId());
             if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
@@ -601,7 +602,7 @@ public class ChangeCRFVersionController {
 
     @ExceptionHandler(NullPointerException.class)
     public String handleNullPointerException(NullPointerException ex, HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         if (currentStudy == null) {
             return "redirect:/MainMenu";
         }

@@ -419,13 +419,13 @@
                                     </td>
                                     <td class="table_cell">
                                       <c:choose>
-                                        <c:when test="${subjectStudy.parentStudyId>0}">
-                                          <a href="ViewStudy?id=<c:out value="${parentStudy.id}"/>&amp;viewFull=yes">
+                                        <c:when test="${subjectStudy.study != null && subjectStudy.study.studyId>0}">
+                                          <a href="ViewStudy?id=<c:out value="${parentStudy.studyId}"/>&amp;viewFull=yes">
                                             <c:out value="${parentStudy.name}"/>
                                           </a>
                                         </c:when>
                                         <c:otherwise>
-                                          <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>&amp;viewFull=yes">
+                                          <a href="ViewStudy?id=<c:out value="${subjectStudy.studyId}"/>&amp;viewFull=yes">
                                             <c:out value="${subjectStudy.name}"/>
                                           </a>
                                         </c:otherwise>
@@ -435,8 +435,8 @@
                                       <fmt:message key="site_name" bundle="${resword}"/>
                                     </td>
                                     <td class="table_cell">
-                                      <c:if test="${subjectStudy.parentStudyId>0}">
-                                        <a href="ViewSite?id=<c:out value="${subjectStudy.id}"/>">
+                                      <c:if test="${subjectStudy.study != null && subjectStudy.study.studyId>0}">
+                                        <a href="ViewSite?id=<c:out value="${subjectStudy.studyId}"/>">
                                           <c:out value="${subjectStudy.name}"/>
                                         </a>
                                       </c:if>
@@ -1015,13 +1015,13 @@
                                   </td>
                                   <td class="table_cell_top">
                                     <c:choose>
-                                      <c:when test="${subjectStudy.parentStudyId>0}">
-                                        <a href="ViewStudy?id=<c:out value="${parentStudy.id}"/>&amp;viewFull=yes">
+                                      <c:when test="${subjectStudy.study != null && subjectStudy.study.studyId>0}">
+                                        <a href="ViewStudy?id=<c:out value="${parentStudy.studyId}"/>&amp;viewFull=yes">
                                           <c:out value="${parentStudy.name}"/>
                                         </a>
                                       </c:when>
                                       <c:otherwise>
-                                        <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>&amp;viewFull=yes">
+                                        <a href="ViewStudy?id=<c:out value="${subjectStudy.studyId}"/>&amp;viewFull=yes">
                                           <c:out value="${subjectStudy.name}"/>
                                         </a>
                                       </c:otherwise>
@@ -1031,8 +1031,8 @@
                                     <fmt:message key="site_name" bundle="${resword}"/>
                                   </td>
                                   <td class="table_cell_top">
-                                    <c:if test="${subjectStudy.parentStudyId>0}">
-                                      <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>">
+                                    <c:if test="${subjectStudy.study != null && subjectStudy.study.studyId>0}">
+                                      <a href="ViewStudy?id=<c:out value="${subjectStudy.studyId}"/>">
                                         <c:out value="${subjectStudy.name}"/>
                                       </a>
                                     </c:if>

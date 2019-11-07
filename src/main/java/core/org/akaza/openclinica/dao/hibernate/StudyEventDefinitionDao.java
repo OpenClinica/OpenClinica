@@ -24,11 +24,11 @@ public class StudyEventDefinitionDao extends AbstractDomainDao<StudyEventDefinit
 
     public ArrayList findAllByStudy(Study study) {
 
-        if (study.getStudy().getId() > 0) {
+        if (study.getStudy() != null && study.getStudy().getStudyId() > 0) {
             // If the study has a parent than it is a site, in this case we
             // should get the event definitions of the parent
             Study parentStudy = new Study();
-            parentStudy = (Study) studyDao.findById(study.getStudy().getId());
+            parentStudy = (Study) studyDao.findById(study.getStudy().getStudyId());
             return findAllByStudy(parentStudy);
         } else {
             return findAllByStudy(study);

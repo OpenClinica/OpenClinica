@@ -6,7 +6,6 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.PrintCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -16,6 +15,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
@@ -69,7 +69,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
     @Override
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+        Study currentStudy =    (Study)  request.getSession().getAttribute("study");
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
         // The PrintDataEntry servlet handles this parameter
         int eventCRFId = fp.getInt("ecId");
@@ -216,8 +216,8 @@ public class PrintEventCRFServlet extends DataEntryServlet {
             }
             String studyName = null;
             String siteName = null;
-            if (currentStudy.getParentStudyId() > 0) {
-                studyName = currentStudy.getParentStudyName();
+            if (currentStudy.isSite()) {
+                studyName = currentStudy.getStudy().getName();
                 siteName = currentStudy.getName();
             } else {
                 studyName = currentStudy.getName();

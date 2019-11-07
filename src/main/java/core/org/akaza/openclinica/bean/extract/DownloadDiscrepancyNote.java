@@ -282,7 +282,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getStatus().getName()));
         writer.append(",");
 
-        writer.append(escapeQuotesInCSV(discNoteBean.getStudy().getOid()));
+        writer.append(escapeQuotesInCSV(discNoteBean.getStudy().getOc_oid()));
         writer.append(",");
 
 
@@ -807,7 +807,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         table.addCell(cell);
         cell = new Cell("Date updated: "+discBean.getUpdatedDateString());
         table.addCell(cell);
-        cell = new Cell("Study ID: "+discBean.getStudy().getIdentifier());
+        cell = new Cell("Study ID: "+discBean.getStudy().getUniqueIdentifier());
         table.addCell(cell);
 
         if (discBean.getCustomColumns() != null) {

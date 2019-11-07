@@ -9,13 +9,13 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfo;
@@ -49,7 +49,7 @@ public class TriggerService {
 
     private static String IMPORT_TRIGGER = "importTrigger";
 
-    public SimpleTrigger generateTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study, String locale) {
+    public SimpleTrigger generateTrigger(FormProcessor fp, UserAccountBean userAccount, Study study, String locale) {
         Date startDateTime = fp.getDateTime(DATE_START_JOB);
         // check the above?
         int datasetId = fp.getInt(DATASET_ID);
@@ -115,21 +115,21 @@ public class TriggerService {
         jobDataMap.put(SPSS, spss);
         jobDataMap.put(USER_ID, userAccount.getId());
         // StudyDAO studyDAO = new StudyDAO();
-        jobDataMap.put(STUDY_ID, study.getId());
+        jobDataMap.put(STUDY_ID, study.getStudyId());
         jobDataMap.put(STUDY_NAME, study.getName());
-        jobDataMap.put(STUDY_OID, study.getOid());
+        jobDataMap.put(STUDY_OID, study.getOc_oid());
 
         trigger.getTriggerBuilder().usingJobData(jobDataMap);
 
         return trigger;
     }
 
-    public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study, String locale) {
+    public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, Study study, String locale) {
         Date startDateTime = new Date(System.currentTimeMillis());
         return generateImportTrigger(fp, userAccount, study, startDateTime, locale);
     }
 
-    public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study, Date startDateTime, String locale) {
+    public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, Study study, Date startDateTime, String locale) {
 
         String jobName = fp.getString(JOB_NAME);
 
@@ -162,7 +162,7 @@ public class TriggerService {
         jobDataMap.put(EMAIL, email);
         jobDataMap.put(USER_ID, userAccount.getId());
         jobDataMap.put(STUDY_NAME, study.getName());
-        jobDataMap.put(STUDY_OID, study.getOid());
+        jobDataMap.put(STUDY_OID, study.getOc_oid());
         jobDataMap.put(DIRECTORY, directory);
         jobDataMap.put(ExampleSpringJob.LOCALE, locale);
         jobDataMap.put("hours", hours);

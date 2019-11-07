@@ -11,19 +11,19 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
@@ -33,6 +33,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -46,6 +47,8 @@ import java.util.Date;
  * 
  */
 public class RestoreSiteServlet extends SecureController {
+    @Autowired
+    private StudyDao studyDao;
     /**
      *
      */
@@ -68,12 +71,11 @@ public class RestoreSiteServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         String idString = request.getParameter("id");
         logger.info("site id:" + idString);
 
         int siteId = Integer.valueOf(idString.trim()).intValue();
-        StudyBean study = (StudyBean) sdao.findByPK(siteId);
+        Study study = (Study) studyDao.findByPK(siteId);
 
         // find all user and roles
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
@@ -95,7 +97,7 @@ public class RestoreSiteServlet extends SecureController {
             if ("confirm".equalsIgnoreCase(action)) {
                 // site can be restored when its parent study is not "removed"
                 // -- YW -6-21-2007
-                StudyBean parentstudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+                Study parentstudy = (Study) studyDao.findByPK(study.checkAndGetParentStudyId());
                 if (!"removed".equals(parentstudy.getStatus().getName())) {
                     request.setAttribute("siteToRestore", study);
 
@@ -116,11 +118,10 @@ public class RestoreSiteServlet extends SecureController {
             } else {
                 logger.info("submit to restore the site");
                 // change all statuses to unavailable
-                StudyDAO studao = new StudyDAO(sm.getDataSource());
-                study.setStatus(study.getOldStatus());
+                study.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(study.getOldStatusId()));
                 study.setUpdater(ub);
-                study.setUpdatedDate(new Date());
-                studao.update(study);
+                study.setDateUpdated(new Date());
+                studyDao.update(study);
 
                 // restore all users and roles
                 for (int i = 0; i < userRoles.size(); i++) {
@@ -139,12 +140,12 @@ public class RestoreSiteServlet extends SecureController {
                 // YW 06-19-2007 << Meanwhile update current active study
                 // attribute of session if restored study is current active
                 // study
-                if (study.getId() == currentStudy.getId()) {
-                    currentStudy.setStatus(Status.AVAILABLE);
+                if (study != null && currentStudy != null && study.getStudyId() == currentStudy.getStudyId()) {
+                    currentStudy.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
 
-                    StudyUserRoleBean r = (new UserAccountDAO(sm.getDataSource())).findRoleByUserNameAndStudyId(ub.getName(), currentStudy.getId());
+                    StudyUserRoleBean r = (new UserAccountDAO(sm.getDataSource())).findRoleByUserNameAndStudyId(ub.getName(), currentStudy.getStudyId());
                     StudyUserRoleBean rInParent =
-                        (new UserAccountDAO(sm.getDataSource())).findRoleByUserNameAndStudyId(ub.getName(), currentStudy.getParentStudyId());
+                        (new UserAccountDAO(sm.getDataSource())).findRoleByUserNameAndStudyId(ub.getName(), currentStudy.checkAndGetParentStudyId());
                     // according to logic in SecureController.java: inherited
                     // role from parent study, pick the higher role
                     currentRole.setRole(Role.max(r.getRole(), rInParent.getRole()));
@@ -229,7 +230,7 @@ public class RestoreSiteServlet extends SecureController {
                 }// for subjects
 
                 DatasetDAO datadao = new DatasetDAO(sm.getDataSource());
-                ArrayList dataset = datadao.findAllByStudyId(study.getId());
+                ArrayList dataset = datadao.findAllByStudyId(study.getStudyId());
                 for (int i = 0; i < dataset.size(); i++) {
                     DatasetBean data = (DatasetBean) dataset.get(i);
                     data.setStatus(Status.AVAILABLE);

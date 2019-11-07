@@ -10,14 +10,15 @@ package org.akaza.openclinica.control.managestudy;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -26,6 +27,9 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
  * Preferences - Java - Code Style - Code Templates
  */
 public class ViewStudyUserServlet extends SecureController {
+
+    @Autowired
+    private StudyDao studyDao;
     /**
      *
      */
@@ -65,8 +69,7 @@ public class ViewStudyUserServlet extends SecureController {
             StudyUserRoleBean uRole = udao.findRoleByUserNameAndStudyId(name, studyId);
             request.setAttribute("uRole", uRole);
 
-            StudyDAO sdao = new StudyDAO(sm.getDataSource());
-            StudyBean study = (StudyBean) sdao.findByPK(studyId);
+            Study study = (Study) studyDao.findByPK(studyId);
             request.setAttribute("uStudy", study);
             request.setAttribute("siteRoleMap", Role.siteRoleMap);
             // BWP 12/7/07 >>To provide the view with the correct date format

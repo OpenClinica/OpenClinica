@@ -11,15 +11,16 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.TermType;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,9 @@ import java.util.HashMap;
  * Preferences - Java - Code Style - Code Templates
  */
 public class RequestStudyServlet extends SecureController {
+    
+    @Autowired
+    private StudyDao studyDao;
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
@@ -40,8 +44,7 @@ public class RequestStudyServlet extends SecureController {
     public void processRequest() throws Exception {
 
         String action = request.getParameter("action");
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        ArrayList studies = sdao.findAllByStatus(Status.AVAILABLE);
+        ArrayList studies = (ArrayList) studyDao.findAllByStatus(Status.AVAILABLE);
         ArrayList roles = Role.toArrayList();
         roles.remove(Role.ADMIN); // admin is not a user role, only used for
         // tomcat
@@ -82,8 +85,7 @@ public class RequestStudyServlet extends SecureController {
             newRole.setRole(Role.get(fp.getInt("studyRoleId")));
         }
         newRole.setStudyId(fp.getInt("studyId"));
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean studyRequested = (StudyBean) sdao.findByPK(newRole.getStudyId());
+        Study studyRequested = (Study) studyDao.findByPK(newRole.getStudyId());
         newRole.setStudyName(studyRequested.getName());
         session.setAttribute("newRole", newRole);
         if (!errors.isEmpty()) {

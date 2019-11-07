@@ -11,15 +11,16 @@ import core.org.akaza.openclinica.bean.admin.AuditEventBean;
 import core.org.akaza.openclinica.bean.admin.TriggerBean;
 import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +37,9 @@ import javax.sql.DataSource;
  * 
  */
 public class AuditEventDAO extends AuditableEntityDAO {
+
+    @Autowired
+    private StudyDao studyDao;
     // private DAODigester digester;
 
     public AuditEventDAO(DataSource ds) {
@@ -134,8 +138,7 @@ public class AuditEventDAO extends AuditableEntityDAO {
 
     public AuditEventBean setStudyAndSubjectInfo(AuditEventBean aeb) {
         if (aeb.getStudyId() > 0) {
-            StudyDAO sdao = new StudyDAO(this.ds);
-            StudyBean sbean = (StudyBean) sdao.findByPK(aeb.getStudyId());
+            Study sbean = (Study) studyDao.findByPK(aeb.getStudyId());
             aeb.setStudyName(sbean.getName());
         }
         if (aeb.getSubjectId() > 0) {

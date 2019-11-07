@@ -52,7 +52,6 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.datamap.Study;
@@ -112,7 +111,6 @@ public class StudyParticipantController {
 	@Autowired
 	private StudySubjectDao studySubjectDao;
 
-	private StudyDAO studyDAO;
 	private StudySubjectDAO ssDao;
 	private UserAccountDAO userAccountDao;
 
@@ -163,8 +161,7 @@ public class StudyParticipantController {
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String accessToken = utilService.getAccessTokenFromRequest(request);
 		Study tenantStudy = studyDao.findByOcOID(studyOid);
-		StudyDAO sDao = new StudyDAO(dataSource);
-		StudyBean tenantStudyBean = sDao.findByOid(studyOid);
+		Study tenantStudyBean = studyDao.findByOcOID(studyOid);
 		ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(request.getLocale());
 		AddParticipantResponseDTO result=null;
 		try {
@@ -220,8 +217,7 @@ public class StudyParticipantController {
 
 		Study site = studyDao.findByOcOID(siteOid.trim());
 		Study study = studyDao.findByOcOID(studyOid.trim());
-		StudyDAO sDao = new StudyDAO(dataSource);
-		StudyBean tenantStudyBean=sDao.findByOid(studyOid);
+		Study tenantStudyBean=studyDao.findByOcOID(studyOid);
 
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String accessToken = utilService.getAccessTokenFromRequest(request);
@@ -255,7 +251,7 @@ public class StudyParticipantController {
 
 
 
-	
+
 	@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 	public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
@@ -276,7 +272,7 @@ public class StudyParticipantController {
 		return listStudySubjects(studyOid, siteOid, request);
 	}
 
-	
+
 	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participant", method = RequestMethod.GET)
 	public ResponseEntity<Object> getStudySubjectInfo(
@@ -287,19 +283,19 @@ public class StudyParticipantController {
 			HttpServletRequest request) throws Exception {
 
 		utilService.setSchemaFromStudyOid(studyOid);
-		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);		
-		
+		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+
 		boolean includeRelatedInfo = false;
 		if(includeParticipateInfo!=null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
 			includeRelatedInfo = true;
 		}
-		
+
 		String accessToken = utilService.getAccessTokenFromRequest(request);
-		String customerUuid = utilService.getCustomerUuidFromRequest(request);					
+		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		StudyParticipantDetailDTO result =  null;
-		
-		try {			
-			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);							
+
+		try {
+			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);
 			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,customerUuid,userAccountBean,participantID,includeRelatedInfo);
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
@@ -308,7 +304,7 @@ public class StudyParticipantController {
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 
-	
+
 	/**
 	 * @param studyOid
 	 * @param siteOid
@@ -321,7 +317,7 @@ public class StudyParticipantController {
 		ResponseEntity<Object> response = null;
 		try {
 
-			StudyBean study = null;
+			Study study = null;
 			try {
 				study = this.getRestfulServiceHelper().setSchema(studyOid, request);
 				study = participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
@@ -341,16 +337,16 @@ public class StudyParticipantController {
 			if(study != null) {
         ResponseSuccessListAllParticipantsByStudyDTO responseSuccess =  new ResponseSuccessListAllParticipantsByStudyDTO();
 
-        ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);            	  		 	            
+        ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);
         responseSuccess.setStudyParticipants(studyParticipantDTOs);
         responseSuccess.setSiteOID(siteOid);
         if (siteOid != null) {
-          StudyBean site = this.getStudyDAO().findByOid(siteOid);
-          responseSuccess.setSiteID(site.getIdentifier());
+          Study site = studyDao.findByOcOID(siteOid);
+          responseSuccess.setSiteID(site.getUniqueIdentifier());
           responseSuccess.setSiteName(site.getName());
-        }       	
+        }
 		 	  response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
-		  }	
+		  }
 
 		} catch (Exception eee) {
 			logger.error("Error while listing study subjects: ",eee);
@@ -367,14 +363,14 @@ public class StudyParticipantController {
 	 * @return
 	 * @throws Exception
 	 */
-	private ArrayList<StudyParticipantDTO> getStudyParticipantDTOs(String studyOid, String siteOid,StudyBean study) throws Exception {
+	private ArrayList<StudyParticipantDTO> getStudyParticipantDTOs(String studyOid, String siteOid,Study study) throws Exception {
 
-		StudyBean studyToCheck;
+		Study studyToCheck;
 		/**
 		 *  pass in site OID, so will return data in site level
 		 */
 		if(siteOid != null) {
-			studyToCheck = this.getStudyDAO().findByOid(siteOid);
+			studyToCheck = studyDao.findByOcOID(siteOid);
 		}else {
 			studyToCheck = study;
 		}
@@ -498,16 +494,6 @@ public class StudyParticipantController {
 	 */
 	public void setDateFormat(String dateFormat) {
 		this.dateFormat = dateFormat;
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public StudyDAO getStudyDAO() {
-		studyDAO = studyDAO
-				!= null ? studyDAO : new StudyDAO(dataSource);
-		return studyDAO;
 	}
 
 	public UserAccountDAO getUserAccountDao() {

@@ -9,22 +9,23 @@ package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.InterventionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,9 +38,10 @@ public class UpdateStudyServletNew extends SecureController {
     public static final String INPUT_START_DATE = "startDate";
     public static final String INPUT_END_DATE = "endDate";
     public static final String INPUT_VER_DATE = "protocolDateVerification";
-    public static StudyBean study;
+    public static Study study;
     private CoreResources core;
-
+    @Autowired
+    private StudyDao studyDao;
     /**
      *
      */
@@ -65,17 +67,16 @@ public class UpdateStudyServletNew extends SecureController {
         int studyId = fp.getInt("id");
         studyId = studyId == 0 ? fp.getInt("studyId") : studyId;
         String action = fp.getString("action");
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         boolean isInterventional = false;
 
-        study = (StudyBean) sdao.findByPK(studyId);
-        if (study.getId() != currentStudy.getId()) {
+        study = (Study) studyDao.findByPK(studyId);
+        if (study.getStudyId() != currentStudy.getStudyId()) {
             addPageMessage(respage.getString("not_current_study") + respage.getString("change_study_contact_sysadmin"));
             forwardPage(Page.MENU_SERVLET);
             return;
         }
 
-        study.setId(studyId);
+        study.setStudyId(studyId);
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         study = scs.setParametersForStudy(study);
         request.setAttribute("studyToView", study);
@@ -89,11 +90,11 @@ public class UpdateStudyServletNew extends SecureController {
         isInterventional = interventional.equalsIgnoreCase(study.getProtocolType());
 
         request.setAttribute("isInterventional", isInterventional ? "1" : "0");
-        String protocolType = study.getProtocolTypeKey();
+        String protocolType = study.getProtocolType();
 
         // A. Hamid. 5001
-        if (study.getParentStudyId() > 0) {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+        if (study.isSite()) {
+            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
             request.setAttribute("parentStudy", parentStudy);
         }
 
@@ -368,12 +369,12 @@ public class UpdateStudyServletNew extends SecureController {
         }
     }
 
-    private StudyBean createStudyBean(FormProcessor fp) {
-        StudyBean newStudy = study;
-        newStudy.setId(fp.getInt("studyId"));
+    private Study createStudyBean(FormProcessor fp) {
+        Study newStudy = study;
+        newStudy.setStudyId(fp.getInt("studyId"));
         newStudy.setName(fp.getString("name"));
         newStudy.setOfficialTitle(fp.getString("officialTitle"));
-        newStudy.setIdentifier(fp.getString("uniqueProId"));
+        newStudy.setUniqueIdentifier(fp.getString("uniqueProId"));
         newStudy.setSecondaryIdentifier(fp.getString("secondProId"));
         newStudy.setPrincipalInvestigator(fp.getString("prinInvestigator"));
 
@@ -388,8 +389,8 @@ public class UpdateStudyServletNew extends SecureController {
 
     private boolean updateStudy2(FormProcessor fp) {
 
-        study.setOldStatus(study.getStatus());
-        study.setStatus(Status.get(fp.getInt("status")));
+        study.setOldStatusId(study.getStatus().getCode());
+        study.setStatus(Status.getByCode(fp.getInt("status")));
 
         if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
             study.setProtocolDateVerification(null);
@@ -406,12 +407,6 @@ public class UpdateStudyServletNew extends SecureController {
         }
 
         study.setPhase(fp.getString("phase"));
-
-        if (fp.getInt("genetic") == 1) {
-            study.setGenetic(true);
-        } else {
-            study.setGenetic(false);
-        }
 
         String interventional = resadmin.getString("interventional");
         return interventional.equalsIgnoreCase(study.getProtocolType());
@@ -449,7 +444,7 @@ public class UpdateStudyServletNew extends SecureController {
         request.setAttribute("interventions", interventionArray);
     }
 
-    private ArrayList parseInterventions(StudyBean sb) {
+    private ArrayList parseInterventions(Study sb) {
         ArrayList inters = new ArrayList();
         String interventions = sb.getInterventions();
         try {
@@ -490,24 +485,23 @@ public class UpdateStudyServletNew extends SecureController {
 
     }
 
-    private void submitStudy(StudyBean newStudy) {
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
+    private void submitStudy(Study newStudy) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 
-        StudyBean study1 = newStudy;
+        Study study1 = newStudy;
         logger.info("study bean to be updated:" + study1.getName());
-        study1.setUpdatedDate(new Date());
+        study1.setDateUpdated(new Date());
         study1.setUpdater((UserAccountBean) session.getAttribute("userBean"));
-        sdao.update(study1);
+        studyDao.update(study1);
 
-        ArrayList siteList = (ArrayList) sdao.findAllByParent(newStudy.getId());
+        ArrayList siteList = (ArrayList) studyDao.findAllByParent(newStudy.getStudyId());
         if (siteList.size() > 0) {
-            sdao.updateSitesStatus(study1);
+            studyDao.updateSitesStatus(study1);
         }
 
         StudyParameterValueBean spv = new StudyParameterValueBean();
 
-        spv.setStudyId(study1.getId());
+        spv.setStudyId(study1.getStudyId());
         spv.setParameter("collectDob");
         spv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
         updateParameter(spvdao, spv);
@@ -538,8 +532,8 @@ public class UpdateStudyServletNew extends SecureController {
 
         // BWP 1/12/2009 3169 Update interviewerNameEditable and
         // interviewDateEditable parameters for all sites>>
-        List<StudyBean> sites = new ArrayList<StudyBean>();
-        sites = (ArrayList) sdao.findAllByParent(newStudy.getId());
+        List<Study> sites = new ArrayList<Study>();
+        sites = (ArrayList) studyDao.findAllByParent(newStudy.getStudyId());
         if (sites != null && !sites.isEmpty()) {
             updateInterviewerForSites(newStudy, sites, spvdao, "interviewerNameEditable");
         }
@@ -587,23 +581,22 @@ public class UpdateStudyServletNew extends SecureController {
         spv.setValue(study1.getStudyParameterConfig().getEventLocationRequired());
         updateParameter(spvdao, spv);
 
-        StudyBean curStudy = (StudyBean) session.getAttribute("study");
-        if (curStudy != null && study1.getId() == curStudy.getId()) {
+        Study curStudy = (Study) session.getAttribute("study");
+        if (curStudy != null && study1.getStudyId() == curStudy.getStudyId()) {
             super.currentStudy = study1;
 
             session.setAttribute("study", study1);
         }
         // update manage_pedigrees for all sites
-        ArrayList children = (ArrayList) sdao.findAllByParent(study1.getId());
+        ArrayList children = (ArrayList) studyDao.findAllByParent(study1.getStudyId());
         for (int i = 0; i < children.size(); i++) {
-            StudyBean child = (StudyBean) children.get(i);
-            child.setType(study1.getType());// same as parent's type
-            child.setUpdatedDate(new Date());
+            Study child = (Study) children.get(i);
+            child.setDateUpdated(new Date());
             child.setUpdater(ub);
-            sdao.update(child);
+            studyDao.update(child);
             // YW << update "collectDob" and "genderRequired" for sites
             StudyParameterValueBean childspv = new StudyParameterValueBean();
-            childspv.setStudyId(child.getId());
+            childspv.setStudyId(child.getStudyId());
             childspv.setParameter("collectDob");
             childspv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
             updateParameter(spvdao, childspv);
@@ -630,7 +623,7 @@ public class UpdateStudyServletNew extends SecureController {
         }
     }
 
-    private void updateInterviewerForSites(StudyBean studyBean, List<StudyBean> sites, StudyParameterValueDAO studyParameterValueDAO, String parameterType) {
+    private void updateInterviewerForSites(Study studyBean, List<Study> sites, StudyParameterValueDAO studyParameterValueDAO, String parameterType) {
 
         StudyParameterValueBean studyParameterValueBean = new StudyParameterValueBean();
 
@@ -641,8 +634,8 @@ public class UpdateStudyServletNew extends SecureController {
             studyParameterValueBean.setParameter("interviewDateEditable");
             studyParameterValueBean.setValue(studyBean.getStudyParameterConfig().getInterviewDateEditable());
         }
-        for (StudyBean siteBean : sites) {
-            studyParameterValueBean.setStudyId(siteBean.getId());
+        for (Study siteBean : sites) {
+            studyParameterValueBean.setStudyId(siteBean.getStudyId());
             updateParameter(studyParameterValueDAO, studyParameterValueBean);
         }
 

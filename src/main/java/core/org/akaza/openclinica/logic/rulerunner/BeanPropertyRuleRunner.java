@@ -4,12 +4,12 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import core.org.akaza.openclinica.service.rule.expression.ExpressionService;
 import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
@@ -39,7 +40,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 public class BeanPropertyRuleRunner extends RuleRunner{
 	NotificationActionProcessor notificationActionProcessor;
 	StudyEventDAO studyEventDAO;
-
+	
+	@Autowired
+	StudyDao studyDao;
 	public BeanPropertyRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
 		super(ds, contextPath, contextPath, mailSender);
 		// TODO Auto-generated constructor stub
@@ -71,8 +74,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 					{
 						RuleBean rule = ruleSetRule.getRuleBean();
 						//       StudyBean currentStudy = rule.getStudy();//TODO:Fix me!
-						StudyDAO sdao = new StudyDAO(ds);
-						StudyBean currentStudy = (StudyBean) sdao.findByPK(rule.getStudyId());
+						Study currentStudy = (Study) studyDao.findByPK(rule.getStudyId());
 						ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBeanId, studyEventDaoHib, studyEventDefDaoHib);
 						try {
 							// StopWatch sw = new StopWatch();
