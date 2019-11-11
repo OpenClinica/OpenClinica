@@ -122,7 +122,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 
     private void createTable() {
 
-        ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, getCoreResources().getField("designer.url")+"access?host="+getHostPathFromSysUrl(getCoreResources().getField("sysURL.base"),request.getContextPath())+"&app="+getContextPath(request), isDesigner);
+        ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, getCoreResources().getField("designer.url")+"access?host="+getHostPathFromSysUrl(getCoreResources().getField("sysURL.base"),request.getContextPath())+"&app="+getContextPath(request), isDesigner, getRuleSetService().getRuleSetDao().count(currentStudy));
         factory.setRuleSetService(getRuleSetService());
         factory.setItemFormMetadataDAO(getItemFormMetadataDAO());
         factory.setCurrentStudy(currentStudy);

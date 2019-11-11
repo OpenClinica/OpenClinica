@@ -62,6 +62,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private ResourceBundle resword;
     private final boolean showMoreLink;
     private final boolean isDesignerRequest;
+    private final Long rowcount;
     private ItemFormMetadataDAO itemFormMetadataDAO;
     private List<Integer> ruleSetRuleIds;
     private final String designerURL;
@@ -76,10 +77,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     public void setCurrentUser(UserAccountBean currentUser) {
         this.currentUser = currentUser;
     }
-    public ViewRuleAssignmentTableFactory(boolean showMoreLink, String designerURL, boolean isDesignerRequest) {
+    public ViewRuleAssignmentTableFactory(boolean showMoreLink, String designerURL, boolean isDesignerRequest, Long rowcount) {
         this.showMoreLink = showMoreLink;
         this.designerURL = designerURL;
         this.isDesignerRequest = isDesignerRequest;
+        this.rowcount = rowcount;
     }
 
     @Override
@@ -159,7 +161,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     @Override
     protected ExportType[] getExportTypes() {
-        if (isDesignerRequest) {
+        if (isDesignerRequest || rowcount == 0) {
             return new ExportType[] {};
         }
         return new ExportType[] { ExportType.CSV, ExportType.EXCEL, ExportType.PDF };
