@@ -1018,7 +1018,7 @@ public class ImportServiceImpl implements ImportService {
 	private ErrorObj checkEventAvailable(StudyEvent studyEvent) {
 		ErrorObj errorObj = null;	
 
-		if (studyEvent != null && (studyEvent.getStatusId() != Status.AVAILABLE.getCode() ||
+		if (studyEvent != null && (
 				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() || 
 				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
 				studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())) {
@@ -1396,14 +1396,21 @@ public class ImportServiceImpl implements ImportService {
 
         ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
 
+        String changeReason = null;
+    	try {
+    		changeReason = itemDataBean.getDiscrepancyNotes().getDiscrepancyNotes().get(0).getChildNotes().get(0).getDetailedNote();
+    	}catch(Exception e) {
+    		changeReason = null;
+    	}
+    	
         if (itemData != null) {
             if (itemData.getValue().equals(itemDataBean.getValue())) {
                 itemCountInForm.setInsertedUpdatedSkippedItemCountInForm(itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() + 1);
                 return new ErrorObj(NO_CHANGE, null);
 
             } else {
-                if(isEventCrfCompleted(eventCrf)) {
-                    ErrorObj eb = createQuery(userAccount, study, studySubject, itemData);
+                if(isEventCrfCompleted(eventCrf)) {                	                	
+                    ErrorObj eb = createQuery(userAccount, study, studySubject, itemData,changeReason);
                     if(eb != null) {
                         return eb;
                     }
@@ -1416,7 +1423,7 @@ public class ImportServiceImpl implements ImportService {
         } else {
             itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
             if(isEventCrfCompleted(eventCrf)) {
-                ErrorObj eb = createQuery(userAccount, study, studySubject, itemData);
+                ErrorObj eb = createQuery(userAccount, study, studySubject, itemData,changeReason);
                 if(eb != null) {
                     return eb;
                 }
@@ -1433,14 +1440,19 @@ public class ImportServiceImpl implements ImportService {
      * @param studySubject
      * @param itemData
      */
-    private ErrorObj createQuery(UserAccount userAccount, Study study, StudySubject studySubject, ItemData itemData) {
+    private ErrorObj createQuery(UserAccount userAccount, Study study, StudySubject studySubject, ItemData itemData, String changeReason) {
 
         ErrorObj eb = null;
 
         try {
             QueryBean queryBean = new QueryBean();
             queryBean.setType(QueryType.REASON.getName());
-            queryBean.setComment(this.DetailedNotes);
+            if(changeReason !=null && !(changeReason.isEmpty())) {
+            	queryBean.setComment(changeReason);
+            }else {
+            	queryBean.setComment(this.DetailedNotes);
+            }
+            
 
             QueryServiceHelperBean helperBean = new QueryServiceHelperBean();
             helperBean.setItemData(itemData);
