@@ -502,14 +502,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName);
 				mergedPdfFileNm = mergedPdfFile.getName();
 				userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
-				
-				// when add footer, need this file is ready -- can be read
-				while(!(mergedPdfFile.canRead())) {
-					;//wait
-				}
-				String footerMsg = "OpenClinica CaseBook ";
-				pdfService.addFooter(fullFinalFilePathName, footerMsg);
-				
+							
 				
 			} catch (Exception e) {
 	            userService.persistJobFailed(jobDetail, mergedPdfFileNm);
