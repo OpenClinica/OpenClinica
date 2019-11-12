@@ -598,7 +598,8 @@ public class StudyParticipantController {
 			
 			//Setting the destination file
 	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
-	        int index= fullFinalFilePathName.lastIndexOf("\\");
+	        int index= fullFinalFilePathName.lastIndexOf(File.separator);
+	      
 	    	String fileName = fullFinalFilePathName.substring(index + 1);
 	    	
 			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.PARTICIPANT_PDF_CASEBOOK, fileName);

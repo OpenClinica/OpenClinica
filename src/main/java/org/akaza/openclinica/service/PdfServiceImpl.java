@@ -3,6 +3,8 @@
  */
 package org.akaza.openclinica.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,14 +57,25 @@ public class PdfServiceImpl implements PdfService {
         PDFmerger.setDestinationFileName(fullFinalFilePathName);
         
         //Loading an existing PDF document   
+        int page_counter = 1;
+        String footerMsg = "OpenClinica CaseBook ";
+        
         ArrayList<PDDocument>  pDDocuments = new ArrayList<>();
         for(File file: files) {
         	 PDDocument doc = PDDocument.load(file);
+        	
+        	 page_counter = this.addFooter(doc, footerMsg, page_counter);
+        	
+        	 // after add footer, use the new content       	        	        	 
+        	 ByteArrayOutputStream out = new ByteArrayOutputStream();
+        	 doc.save(out);        	
+        	 ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+        	 
         	 // track doc and  keep it open
         	 pDDocuments.add(doc);
         	
         	//adding the source files
-        	 PDFmerger.addSource(file);
+        	 PDFmerger.addSource(in);
         }
         
         //Merging all PDFs
@@ -95,20 +108,17 @@ public class PdfServiceImpl implements PdfService {
     }
     
     
-    public void addFooter(String mergedFilePath, String footerMsg) throws IOException {
-    	    
+    public int addFooter(PDDocument document, String footerMsg, int page_counter) throws IOException {
+	    
     	String footerMessage = "Page ";    	
     	if(footerMsg != null && !(footerMsg.isEmpty())) {
     		footerMessage = footerMsg + "     "+ footerMessage;
         }
-        	
-    	File file = new File(mergedFilePath);
-        PDDocument document = PDDocument.load(file);        
+        
      
         PDFont font = PDType1Font.TIMES_ROMAN;
         float fontSize = 10.0f;
-       
-        int page_counter = 1;
+        
         for( PDPage page : document.getPages() )
         {
             PDRectangle pageSize = page.getMediaBox();
@@ -145,10 +155,12 @@ public class PdfServiceImpl implements PdfService {
             
             page_counter++;
         }
-
-        document.save(file);
-        document.close();
+        
+        return page_counter;
+   
     }
+    
+   
 
 
 

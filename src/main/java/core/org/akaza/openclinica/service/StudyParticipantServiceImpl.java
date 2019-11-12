@@ -500,10 +500,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    }//for-loop-1		   
 			    
 				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName);
-				String footerMsg = "OpenClinica CaseBook ";
-				pdfService.addFooter(fullFinalFilePathName, footerMsg);
 				mergedPdfFileNm = mergedPdfFile.getName();
 				userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
+							
+				
 			} catch (Exception e) {
 	            userService.persistJobFailed(jobDetail, mergedPdfFileNm);
 	            this.writeToFile(e.getMessage(), fullFinalFilePathName);
