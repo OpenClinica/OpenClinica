@@ -103,7 +103,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
         }   else {
                 criteria+= " INTERSECT " + mainQuery();
                 criteria = criteria + " where ";
-                criteria = criteria  + columnMapping.get(property) + " like ('%" + ((String) value).toUpperCase() + "%')" + " ";
+                criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like ('%" + ((String) value).toUpperCase() + "%')" + " ";
             }
         }
         return criteria;
