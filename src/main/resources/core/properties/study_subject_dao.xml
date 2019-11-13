@@ -105,7 +105,7 @@
     <query>
         <name>getWithFilterAndSort</name>
         <sql>
-			select DISTINCT(ss.*)from study_subject ss  where ss.study_subject_id in (select study_subject_id from study_subject ss where ss.study_id in (select study_id from study st where ST.study_id=? or ST.parent_study_id=?))
+			select ss.* ,unique_identifier  from study_subject ss JOIN study st ON st.study_id=ss.study_id and (ST.study_id=? or ST.parent_study_id=?)
 		</sql>
     </query>
     <query>
