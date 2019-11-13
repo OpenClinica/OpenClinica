@@ -383,10 +383,13 @@ $(function() {
                 foreach(components, function(col) {
                     var item = items[col];
                     if (item) {
-                        if (item.Question)
+                        if (item['@BriefDescription']) {
+                            columnTitles.push(item['@BriefDescription']);
+                        } else if (item.Question) {
                             columnTitles.push(item.Question.TranslatedText);
-                        else
+                        } else {
                             columnTitles.push(item['@Name']);
+                        }
                     }
                     else {
                         columnTitles.push('!?' + col);
