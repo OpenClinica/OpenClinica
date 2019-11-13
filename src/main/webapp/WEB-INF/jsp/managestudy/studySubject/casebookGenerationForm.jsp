@@ -89,9 +89,10 @@
         $('#getPdfMessage').slideDown();
         jQuery.ajax({
             'type': 'POST',
-            'url': '${pageContext.request.contextPath}/studies/${study.oid}/participants/${studySub.oid}/casebook',
+            'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/casebook',
             'contentType': 'application/json',
-            'dataType': 'json'
+            'dataType': 'json',
+            'data': {}
         });
     });
 
