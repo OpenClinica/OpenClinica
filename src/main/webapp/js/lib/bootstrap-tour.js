@@ -10,6 +10,7 @@ jQuery(document).ready(function() {
         currentPID = jQuery(this)[0].id.split("pid-")[1];
         tourElement = new Tour({
             name: "pidv",
+            framework: 'bootstrap4',
             backdrop: true,
             backdropPadding: {
                 top: -10,
@@ -146,8 +147,7 @@ jQuery(document).ready(function() {
 
             }
         });
-
-        tourElement.init();
+        console.log(tourElement);
         tourElement.start(true);
     });
 

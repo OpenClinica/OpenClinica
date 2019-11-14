@@ -84,8 +84,10 @@
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:otherwise>
 </c:choose>
-<link href="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
-        <script src="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
+<link href="${pageContext.request.contextPath}/includes/bootstrap-tourist-0.3.1/bootstrap-tourist.css" rel="stylesheet">
+<script src="${pageContext.request.contextPath}/includes/popper.min.js"></script>
+<script src="${pageContext.request.contextPath}/includes/bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/includes/bootstrap-tourist-0.3.1/bootstrap-tourist.js"></script>
 
 <script type="text/javascript">
 
