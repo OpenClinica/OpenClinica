@@ -7,8 +7,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="include/managestudy_top_pages.jsp"/>
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
 <link rel="stylesheet" href="../includes/css/icomoon-style.css">
 
 

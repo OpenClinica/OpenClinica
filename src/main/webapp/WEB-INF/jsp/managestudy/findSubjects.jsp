@@ -10,20 +10,11 @@
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
 <style>
     .icon > span {
         font-family: 'Open Sans', arial, helvetica, sans-serif;
     }
 </style>
-
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 
 <c:if test="${participantIDVerification == 'true'}">
     <script type="text/javascript" language="JavaScript" src="js/lib/bootstrap-tour.js"></script>
