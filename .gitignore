@@ -1,4 +1,6 @@
 target/
+odm/src/main/java/
+odm/target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -8,9 +10,11 @@ release.properties
 .project
 .settings/
 .idea/
+LibreClinica.iml
 OpenClinica.iml
 web/src/main/resources/datainfo.properties
 core/*.iml
+odm/*.iml
 web/*.iml
 ws/*.iml
 .DS_Store
@@ -20,10 +24,6 @@ ws/.DS_Store
 
 # git
 *.orig
-/ws/*.iml
-/web/OpenClinica-web.iml
-/core/OpenClinica-core.iml
-/core/OpenClinica-core.iml
 
 # netbeans
 nb-configuration.xml

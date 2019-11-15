@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.libreclinica</groupId>
         <artifactId>LibreClinica</artifactId>
-      <version>0.3.0</version>
+      <version>0.4.0</version>
     </parent>
     <dependencies>
 		<dependency>
@@ -229,10 +229,11 @@
             <version>1.4</version>
         </dependency>
 		<dependency>
-    		<groupId>org.akaza.openclinica.odm</groupId>
-			<artifactId>openclinica-odm</artifactId>
+    		<groupId>org.libreclinica.odm</groupId>
+			<artifactId>LibreClinica-odm</artifactId>
+			<version>2.2</version>
 		</dependency>
-		         <dependency>
+		 <dependency>
 			<groupId>org.mvel</groupId>
 			<artifactId>mvel2</artifactId>
 			<version>2.0.19</version>
@@ -252,16 +253,16 @@
 		</dependency>
 
 		<dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-core-lgpl</artifactId>
-    <version>1.8.1</version>
-</dependency>
+    		<groupId>org.codehaus.jackson</groupId>
+    		<artifactId>jackson-core-lgpl</artifactId>
+    		<version>1.8.1</version>
+		</dependency>
 
-<dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-mapper-lgpl</artifactId>
-    <version>1.8.1</version>
-</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-lgpl</artifactId>
+			<version>1.8.1</version>
+		</dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon</artifactId>
