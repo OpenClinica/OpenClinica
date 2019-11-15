@@ -611,7 +611,7 @@
     dropdown = document.getElementById("subnav_Tasks");
 
     //close dropdown using esc
-    $(document).keyup(function(e) {
+    jQuery(document).keyup(function(e) {
         if (e.keyCode == 27) { // escape key maps to keycode `27`
             dropdown.style.display="none";
             jQuery.unblockUI();
@@ -619,27 +619,27 @@
     });
 
     //we have it open on mouse-over OR click when it is closed
-    $(document).ready(function(){
+    jQuery(document).ready(function(){
         var participantIDVerification = '<c:out value="${participantIDVerification}"/>';
         if (participantIDVerification == 'true') {
             // disable right click
-            $("input[name='findSubjects_f_studySubject.label']").on('contextmenu',function(){
+            jQuery("input[name='findSubjects_f_studySubject.label']").on('contextmenu',function(){
                 return false;
             });
             // disable cut copy paste
-            $("input[name='findSubjects_f_studySubject.label']").bind('cut copy paste', function (e) {
+            jQuery("input[name='findSubjects_f_studySubject.label']").bind('cut copy paste', function (e) {
                 e.preventDefault();
             });
         }
         // Show hide popover
-        $(".nav_TaskB").click(function(){
-            $(this).find(".dropdown").slideToggle("fast");
+        jQuery(".nav_TaskB").click(function(){
+            jQuery(this).find(".dropdown").slideToggle("fast");
         });
     });
-    $(document).on("click", function(event){
-        var $trigger = $(".nav_TaskB");
+    jQuery(document).on("click", function(event){
+        var $trigger = jQuery(".nav_TaskB");
         if($trigger !== event.target && !$trigger.has(event.target).length){
-            $(".dropdown").slideUp("fast");
+            jQuery(".dropdown").slideUp("fast");
         }
     });
     function showDropdown() {
