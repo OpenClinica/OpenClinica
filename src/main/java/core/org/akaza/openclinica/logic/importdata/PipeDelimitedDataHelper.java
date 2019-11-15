@@ -1076,7 +1076,7 @@ public ArrayList<ErrorObj> validateStudyMetadata(String formOIDValue,
    
         String sedOid = studyEventOIDValue;
         StudyEventDefinitionBean studyEventDefintionBean = studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getStudyId(),
-                    studyBean.getStudy().getStudyId());
+                    studyBean.checkAndGetParentStudyId());
 
         if (studyEventDefintionBean == null) {
             mf.applyPattern(respage.getString("your_study_event_oid_for_study_oid"));

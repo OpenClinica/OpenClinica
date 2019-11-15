@@ -279,17 +279,17 @@ $(function() {
     }
 
     $.when(
-        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n&links=y', function(data) {
+        $.get('rest/clinicaldata/json/view/${study.oc_oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n&links=y', function(data) {
             odm = data;
             var study = findone(odm.Study, function(study) {
-                return study['@OID'] === '${study.oid}';
+                return study['@OID'] === '${study.oc_oid}';
             }, errors);
 
             if (study && study.MetaDataVersion) {
                 metadata = study.MetaDataVersion;
             }
             else {
-                return logError('Unable to fetch metadata for study: ${study.oid}', study);
+                return logError('Unable to fetch metadata for study: ${study.oc_oid}', study);
             }
 
             foreach(metadata.CodeList, function(codelist) {
@@ -330,7 +330,7 @@ $(function() {
             logError('Unable to load any Common Events.', e);
         }),
 
-        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson) {
+        $.get('pages/api/studies/${study.oc_oid}/pages/view%20subject', function(pageJson) {
             foreach(pageJson.components, function(component) {
                 columns[component.name] = component.columns;
             }, errors);
@@ -355,7 +355,7 @@ $(function() {
                     studyEventOid = studyEvent['@OID'];
                     $.ajax({
                         type: "GET",
-                        url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
+                        url: 'rest/clinicaldata/json/stats/${study.oc_oid}/${studySub.oid}/' + studyEventOid,
                         async: false,
                         success: function(statData) {
                             var stats = statData;
@@ -534,7 +534,7 @@ $(function() {
             var studyEventOid = sectionDiv.data('section-oid');
             var studyEvent = studyEvents[studyEventOid];
             var sectionErrors = [];
-            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n&links=y', function(data) {
+            $.get('rest/clinicaldata/json/view/${study.oc_oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n&links=y', function(data) {
                 var odm = data;
                 for (var formOid in studyEvent.forms) {
                     var form = studyEvent.forms[formOid];

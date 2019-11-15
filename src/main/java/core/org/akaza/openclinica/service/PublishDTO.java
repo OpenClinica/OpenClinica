@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.akaza.openclinica.service.Page;
 import org.cdisc.ns.odm.v130.ODM;
 import java.util.List;
 

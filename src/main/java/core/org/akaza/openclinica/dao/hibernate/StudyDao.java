@@ -37,7 +37,8 @@ public class StudyDao extends AbstractDomainDao<Study> {
 
     public Study update(Study study){
         study.setOc_oid(getValidOid(study));
-        return saveOrUpdate(study);
+        getCurrentSession().update(study);
+        return study;
     }
 
     public Study create(Study study){
@@ -279,7 +280,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         CriteriaQuery<Study> cq = cb.createQuery(Study.class);
         Root<Study> study = cq.from(Study.class);
         ParameterExpression<Integer> pParentStudyId = cb.parameter(Integer.class);
-        cq.where(cb.equal(study.get("study.studyId"), pParentStudyId));
+        cq.where(cb.equal(study.get("study").get("studyId"), pParentStudyId));
         TypedQuery<Study> query = getCurrentSession().createQuery(cq);
         query.setParameter(pParentStudyId, parentStudyId);
         if(isLimited)
@@ -301,14 +302,11 @@ public class StudyDao extends AbstractDomainDao<Study> {
     }
     @Transactional
     public Study findByPK(int ID) {
-        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
-        CriteriaQuery<Study> cq = cb.createQuery(Study.class);
-        Root<Study> study = cq.from(Study.class);
-        ParameterExpression<Integer> pId = cb.parameter(Integer.class);
-        cq.where(cb.equal(study.get("studyId"), pId));
-        TypedQuery query = getCurrentSession().createQuery(cq);
-        query.setParameter(pId, ID);
-        return (Study) query.getSingleResult();
+        String query = "select do from Study do where do.studyId = :studyId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyId", ID);
+        Study study = (Study) q.uniqueResult();
+        return study;
     }
     @Transactional
     public Study findByName(String name){
@@ -429,7 +427,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
     }
     @Transactional
     public Study findByStudySubjectId(int studySubjectId) {
-        String query="select s.* from StudySubject ss, "+ getDomainClassName() +" s where ss.studySubjectId = :studySubjectId and ss.study.studyId = s.studyId";
+        String query="select s from StudySubject ss, "+ getDomainClassName() +" s where ss.studySubjectId = :studySubjectId and ss.study.studyId = s.studyId";
         Query q=getCurrentSession().createQuery(query);
         q.setParameter("studySubjectId", studySubjectId);
         return (Study) q.uniqueResult();
@@ -440,7 +438,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         CriteriaQuery<Study> cq = cb.createQuery(Study.class);
         Root<Study> study = cq.from(Study.class);
         ParameterExpression<Integer> pParentStudyId = cb.parameter(Integer.class);
-        Predicate predicate = cb.or(cb.equal(study.get("studyId"), pParentStudyId),cb.equal(study.get("study.studyId"), pParentStudyId));
+        Predicate predicate = cb.or(cb.equal(study.get("studyId"), pParentStudyId),cb.equal(study.get("study").get("studyId"), pParentStudyId));
         cq.where(predicate).orderBy(cb.asc(study.get("studyId")));
         TypedQuery query=getCurrentSession().createQuery(cq);
         query.setParameter(pParentStudyId, parentStudyId);

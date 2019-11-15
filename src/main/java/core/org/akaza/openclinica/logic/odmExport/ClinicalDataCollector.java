@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.job.JobTerminationMonitor;
@@ -41,8 +42,8 @@ public class ClinicalDataCollector extends OdmDataCollector {
      * @param ds
      * @param dataset
      */
-    public ClinicalDataCollector(DataSource ds, DatasetBean dataset, Study currentStudy ) {
-        super(ds, dataset, currentStudy);
+    public ClinicalDataCollector(DataSource ds, DatasetBean dataset, Study currentStudy, StudyDao studyDao) {
+        super(ds, dataset, currentStudy, studyDao);
         this.odmClinicalDataMap = new LinkedHashMap<String, OdmClinicalDataBean>();
     }
 
@@ -57,7 +58,7 @@ public class ClinicalDataCollector extends OdmDataCollector {
         while (it.hasNext()) {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
-            ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
+            ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory(), studyDao);
             cdata.setCategory(this.getCategory());
             StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
             cdata.setStudySubjectIds(ssdao.findStudySubjectIdsByStudyIds(u.getStudy().getStudyId()+""));

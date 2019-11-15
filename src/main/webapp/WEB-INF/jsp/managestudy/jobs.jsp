@@ -89,8 +89,8 @@
     return 'ERROR: ' + e.status + ': ' + e.statusText;
   }
 
-  var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}';
-  var siteOid = '${atSiteLevel ? theSite.oid : null}';
+  var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oc_oid}';
+  var siteOid = '${atSiteLevel ? theSite.oc_oid : null}';
   if (siteOid)
     url += '/sites/' + siteOid;
   url += '/jobs';

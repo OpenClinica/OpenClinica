@@ -93,7 +93,6 @@ public class RuleController {
     @Autowired
     @Qualifier("dataSource")
     private BasicDataSource dataSource;
-    @Autowired
     private StudyDao studyDao;
     private RuleSetRuleDao ruleSetRuleDao;
     private RuleSetServiceInterface ruleSetService;
@@ -257,8 +256,8 @@ public class RuleController {
 
         currentStudy = studyDao.findByOcOID(studyOid);
 
-        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy, getRuleSetRuleDao(),null);
-        AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy, getRuleSetRuleDao(),null, studyDao);
+        AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy, studyDao);
         // RulesDataCollector rdc = new RulesDataCollector(sm.getDataSource(), currentStudy,getRuleSetRuleDao());
         MetaDataCollector.setTextLength(200);
 
@@ -544,6 +543,14 @@ public class RuleController {
 
     public RuleSetRuleDao getRuleSetRuleDao() {
         return ruleSetRuleDao;
+    }
+
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+    @Autowired
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
     }
 
     @Autowired

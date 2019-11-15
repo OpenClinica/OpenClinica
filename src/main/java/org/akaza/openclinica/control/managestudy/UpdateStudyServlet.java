@@ -407,22 +407,22 @@ public class UpdateStudyServlet extends SecureController {
         errors = v.validate();
 
         Study newStudy = (Study) session.getAttribute("newStudy");
-        newStudy.getStudyParameterConfig().setCollectDob(fp.getString("collectDob"));
-        newStudy.getStudyParameterConfig().setDiscrepancyManagement(fp.getString("discrepancyManagement"));
-        newStudy.getStudyParameterConfig().setGenderRequired(fp.getString("genderRequired"));
+        newStudy.setCollectDob(fp.getString("collectDob"));
+        newStudy.setDiscrepancyManagement(fp.getString("discrepancyManagement"));
+        newStudy.setGenderRequired(fp.getString("genderRequired"));
 
-        newStudy.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-        newStudy.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-        newStudy.getStudyParameterConfig().setInterviewDateEditable(fp.getString("interviewDateEditable"));
-        newStudy.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
-        newStudy.getStudyParameterConfig().setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
-        newStudy.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+        newStudy.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
+        newStudy.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+        newStudy.setInterviewDateEditable(fp.getString("interviewDateEditable"));
+        newStudy.setInterviewDateRequired(fp.getString("interviewDateRequired"));
+        newStudy.setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
+        newStudy.setInterviewDateDefault(fp.getString("interviewDateDefault"));
 
-        newStudy.getStudyParameterConfig().setSubjectIdGeneration(fp.getString("subjectIdGeneration"));
-        newStudy.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
-        newStudy.getStudyParameterConfig().setSubjectIdPrefixSuffix(fp.getString("subjectIdPrefixSuffix"));
+        newStudy.setSubjectIdGeneration(fp.getString("subjectIdGeneration"));
+        newStudy.setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
+        newStudy.setSubjectIdPrefixSuffix(fp.getString("subjectIdPrefixSuffix"));
 
-        newStudy.getStudyParameterConfig().setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
+        newStudy.setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
 
         session.setAttribute("newStudy", newStudy);
 
@@ -450,55 +450,55 @@ public class UpdateStudyServlet extends SecureController {
 
         spv.setStudyId(study1.getStudyId());
         spv.setParameter("collectDob");
-        spv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
+        spv.setValue(new Integer(study1.getCollectDob()).toString());
         updateParameter(spvdao, spv);
 
         spv.setParameter("discrepancyManagement");
-        spv.setValue(study1.getStudyParameterConfig().getDiscrepancyManagement());
+        spv.setValue(study1.getDiscrepancyManagement());
         updateParameter(spvdao, spv);
 
         spv.setParameter("genderRequired");
-        spv.setValue(study1.getStudyParameterConfig().getGenderRequired());
+        spv.setValue(study1.getGenderRequired());
         updateParameter(spvdao, spv);
 
         spv.setParameter("subjectPersonIdRequired");
-        spv.setValue(study1.getStudyParameterConfig().getSubjectPersonIdRequired());
+        spv.setValue(study1.getSubjectPersonIdRequired());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewerNameRequired");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewerNameRequired());
+        spv.setValue(study1.getInterviewerNameRequired());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewerNameDefault");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewerNameDefault());
+        spv.setValue(study1.getInterviewerNameDefault());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewerNameEditable");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewerNameEditable());
+        spv.setValue(study1.getInterviewerNameEditable());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewDateRequired");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewDateRequired());
+        spv.setValue(study1.getInterviewDateRequired());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewDateDefault");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewDateDefault());
+        spv.setValue(study1.getInterviewDateDefault());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewDateEditable");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewDateEditable());
+        spv.setValue(study1.getInterviewDateEditable());
         updateParameter(spvdao, spv);
 
         spv.setParameter("subjectIdGeneration");
-        spv.setValue(study1.getStudyParameterConfig().getSubjectIdGeneration());
+        spv.setValue(study1.getSubjectIdGeneration());
         updateParameter(spvdao, spv);
 
         spv.setParameter("subjectIdPrefixSuffix");
-        spv.setValue(study1.getStudyParameterConfig().getSubjectIdPrefixSuffix());
+        spv.setValue(study1.getSubjectIdPrefixSuffix());
         updateParameter(spvdao, spv);
 
         spv.setParameter("personIdShownOnCRF");
-        spv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
+        spv.setValue(study1.getPersonIdShownOnCRF());
         updateParameter(spvdao, spv);
 
         Study curStudy = (Study) session.getAttribute("study");
@@ -517,10 +517,10 @@ public class UpdateStudyServlet extends SecureController {
             StudyParameterValueBean childspv = new StudyParameterValueBean();
             childspv.setStudyId(child.getStudyId());
             childspv.setParameter("collectDob");
-            childspv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
+            childspv.setValue(new Integer(study1.getCollectDob()).toString());
             updateParameter(spvdao, childspv);
             childspv.setParameter("genderRequired");
-            childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());
+            childspv.setValue(study1.getGenderRequired());
             updateParameter(spvdao, childspv);
             // YW >>
         }

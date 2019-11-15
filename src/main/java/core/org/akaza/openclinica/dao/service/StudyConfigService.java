@@ -7,7 +7,6 @@
  */
 package core.org.akaza.openclinica.dao.service;
 
-import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.core.form.StringUtil;
@@ -78,7 +77,7 @@ public class StudyConfigService {
             // top study or not
             return spv.getValue();
         }
-        int parentId = study.getStudy() != null ? study.getStudy().getStudyId() : 0;
+        int parentId = study.checkAndGetParentStudyId();
         if (parentId > 0) {
             StudyParameterValueBean spvParent = spvdao.findByHandleAndStudy(parentId, parameterHandle);
             if (spvParent.getId() > 0 && sp.isInheritable()) {
@@ -96,6 +95,7 @@ public class StudyConfigService {
      * @param study
      * @return
      */
+
     public Study setParametersForStudy(Study study) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
         ArrayList parameters = spvdao.findAllParameters();
@@ -116,55 +116,57 @@ public class StudyConfigService {
     }
 
     public Study setParameterValuesForStudy(Study study) {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-        ArrayList theParameters = spvdao.findParamConfigByStudy(study);
-        study.setStudyParameters(theParameters);
+        if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0) {
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
+            ArrayList theParameters = spvdao.findParamConfigByStudy(study);
+            study.setStudyParameters(theParameters);
 
-        ArrayList parameters = spvdao.findAllParameterValuesByStudy(study);
+            ArrayList parameters = spvdao.findAllParameterValuesByStudy(study);
 
-        for (int i = 0; i < parameters.size(); i++) {
-            StudyParameterValueBean spvb = (StudyParameterValueBean) parameters.get(i);
-            String parameter = spvb.getParameter();
-            if (parameter.equalsIgnoreCase("collectDob")) {
-                study.getStudyParameterConfig().setCollectDob(spvb.getValue());
-            } else if (parameter.equalsIgnoreCase("genderRequired")) {
-                study.getStudyParameterConfig().setGenderRequired(spvb.getValue());
+            for (int i = 0; i < parameters.size(); i++) {
+                StudyParameterValueBean spvb = (StudyParameterValueBean) parameters.get(i);
+                String parameter = spvb.getParameter();
+                if (parameter.equalsIgnoreCase("collectDob")) {
+                    study.setCollectDob(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("genderRequired")) {
+                    study.setGenderRequired(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("subjectPersonIdRequired")) {
-                study.getStudyParameterConfig().setSubjectPersonIdRequired(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("subjectPersonIdRequired")) {
+                    study.setSubjectPersonIdRequired(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("discrepancyManagement")) {
-                study.getStudyParameterConfig().setDiscrepancyManagement(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("discrepancyManagement")) {
+                    study.setDiscrepancyManagement(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("subjectIdGeneration")) {
-                study.getStudyParameterConfig().setSubjectIdGeneration(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("subjectIdGeneration")) {
+                    study.setSubjectIdGeneration(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("subjectIdPrefixSuffix")) {
-                study.getStudyParameterConfig().setSubjectIdPrefixSuffix(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("subjectIdPrefixSuffix")) {
+                    study.setSubjectIdPrefixSuffix(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("interviewerNameRequired")) {
-                study.getStudyParameterConfig().setInterviewerNameRequired(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("interviewerNameRequired")) {
+                    study.setInterviewerNameRequired(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("interviewerNameDefault")) {
-                study.getStudyParameterConfig().setInterviewerNameDefault(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("interviewerNameDefault")) {
+                    study.setInterviewerNameDefault(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("interviewerNameEditable")) {
-                study.getStudyParameterConfig().setInterviewerNameEditable(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("interviewerNameEditable")) {
+                    study.setInterviewerNameEditable(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("interviewDateRequired")) {
-                study.getStudyParameterConfig().setInterviewDateRequired(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("interviewDateRequired")) {
+                    study.setInterviewDateRequired(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("interviewDateDefault")) {
-                study.getStudyParameterConfig().setInterviewDateDefault(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("interviewDateDefault")) {
+                    study.setInterviewDateDefault(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("interviewDateEditable")) {
-                study.getStudyParameterConfig().setInterviewDateEditable(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("interviewDateEditable")) {
+                    study.setInterviewDateEditable(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("personIdShownOnCRF")) {
-                study.getStudyParameterConfig().setPersonIdShownOnCRF(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("personIdShownOnCRF")) {
+                    study.setPersonIdShownOnCRF(spvb.getValue());
 
-            } else if (parameter.equalsIgnoreCase("adminForcedReasonForChange")) {
-                study.getStudyParameterConfig().setAdminForcedReasonForChange(spvb.getValue());
+                } else if (parameter.equalsIgnoreCase("adminForcedReasonForChange")) {
+                    study.setAdminForcedReasonForChange(spvb.getValue());
+                }
             }
         }
         return study;
@@ -173,54 +175,55 @@ public class StudyConfigService {
 
     public Study setParametersForSite(Study site) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-        Study parent = (Study) studyDao.findByPK(site.getStudy().getStudyId());
+        Study parent = site.getStudy();
         parent = this.setParameterValuesForStudy(parent);
-        site.setStudyParameterConfig(parent.getStudyParameterConfig());
+        site.setStudyParameterValues(parent.getStudyParameterValues());
         ArrayList siteParameters = spvdao.findAllParameterValuesByStudy(site);
 
         for (int i = 0; i < siteParameters.size(); i++) {
             StudyParameterValueBean spvb = (StudyParameterValueBean) siteParameters.get(i);
+            site.setIndividualStudyParameterValue(spvb.getParameter(),spvb.getValue());
             String parameter = spvb.getParameter();
             if (parameter.equalsIgnoreCase("collectDob")) {
-                site.getStudyParameterConfig().setCollectDob(spvb.getValue());
+                site.setCollectDob(spvb.getValue());
             } else if (parameter.equalsIgnoreCase("genderRequired")) {
-                site.getStudyParameterConfig().setGenderRequired(spvb.getValue());
+                site.setGenderRequired(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("subjectPersonIdRequired")) {
-                site.getStudyParameterConfig().setSubjectPersonIdRequired(spvb.getValue());
+                site.setSubjectPersonIdRequired(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("discrepancyManagement")) {
-                site.getStudyParameterConfig().setDiscrepancyManagement(spvb.getValue());
+                site.setDiscrepancyManagement(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("subjectIdGeneration")) {
-                site.getStudyParameterConfig().setSubjectIdGeneration(spvb.getValue());
+                site.setSubjectIdGeneration(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("subjectIdPrefixSuffix")) {
-                site.getStudyParameterConfig().setSubjectIdPrefixSuffix(spvb.getValue());
+                site.setSubjectIdPrefixSuffix(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("interviewerNameRequired")) {
-                site.getStudyParameterConfig().setInterviewerNameRequired(spvb.getValue());
+                site.setInterviewerNameRequired(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("interviewerNameDefault")) {
-                site.getStudyParameterConfig().setInterviewerNameDefault(spvb.getValue());
+                site.setInterviewerNameDefault(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("interviewerNameEditable")) {
-                site.getStudyParameterConfig().setInterviewerNameEditable(spvb.getValue());
+                site.setInterviewerNameEditable(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("interviewDateRequired")) {
-                site.getStudyParameterConfig().setInterviewDateRequired(spvb.getValue());
+                site.setInterviewDateRequired(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("interviewDateDefault")) {
-                site.getStudyParameterConfig().setInterviewDateDefault(spvb.getValue());
+                site.setInterviewDateDefault(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("interviewDateEditable")) {
-                site.getStudyParameterConfig().setInterviewDateEditable(spvb.getValue());
+                site.setInterviewDateEditable(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("personIdShownOnCRF")) {
-                site.getStudyParameterConfig().setPersonIdShownOnCRF(spvb.getValue());
+                site.setPersonIdShownOnCRF(spvb.getValue());
 
             } else if (parameter.equalsIgnoreCase("adminForcedReasonForChange")) {
-                site.getStudyParameterConfig().setAdminForcedReasonForChange(spvb.getValue());
+                site.setAdminForcedReasonForChange(spvb.getValue());
             }
 
             // will add interview name/date features later

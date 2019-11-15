@@ -857,7 +857,7 @@ public class OpenRosaServices {
 
     private Study getParentStudy(String studyOid) {
         Study study = getStudy(studyOid);
-        if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
+        if (!study.isSite()) {
             return study;
         } else {
             Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
@@ -911,7 +911,7 @@ public class OpenRosaServices {
             publicStudy = getPublicStudy(studyOID);
             parentPublicStudy = getParentPublicStudy(studyOID);
         }
-        if (publicStudy.getStudy().getStudyId() == 0) {
+        if (!publicStudy.isSite()) {
             studyAndSiteEnvUuid.studyEnvUuid = publicStudy.getStudyEnvUuid();
         } else {
             studyAndSiteEnvUuid.studyEnvUuid = parentPublicStudy.getStudyEnvUuid();
@@ -1025,7 +1025,7 @@ public class OpenRosaServices {
         String schema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");
         Study study = getStudy(studyOid);
-        if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
+        if (!study.isSite()) {
             resultBean = study;
         } else {
             Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());

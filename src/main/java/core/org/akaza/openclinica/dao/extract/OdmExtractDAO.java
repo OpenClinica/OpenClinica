@@ -63,25 +63,27 @@ public class OdmExtractDAO extends DatasetDAO {
     EventCRFDAO ecdao = new EventCRFDAO(ds);
     Set<Integer> edcSet;
 
-    @Autowired
-    private StudyDao sDao;
+    private StudyDao studyDao;
     private final Integer MAX_STRING_LENGTH = 4000;
 
     EventDefinitionCrfTagService eventDefinitionCrfTagService;
     protected boolean showArchived;
 
-    public OdmExtractDAO(DataSource ds) {
+    public OdmExtractDAO(DataSource ds, StudyDao studyDao) {
         super(ds);
+        this.studyDao = studyDao;
     }
 
-    public OdmExtractDAO(DataSource ds,Set<Integer> edcSet) {
+    public OdmExtractDAO(DataSource ds,Set<Integer> edcSet, StudyDao studyDao) {
         super(ds);
         this.edcSet=edcSet;
+        this.studyDao = studyDao;
     }
 
-    public OdmExtractDAO(DataSource ds, boolean showArchived) {
+    public OdmExtractDAO(DataSource ds, boolean showArchived, StudyDao studyDao) {
         super(ds);
         this.showArchived = showArchived;
+        this.studyDao = studyDao;
     }
 
     @Override
@@ -2155,7 +2157,7 @@ public class OdmExtractDAO extends DatasetDAO {
         if (study.isSite()) {
             viewRows = select(this.getNullValueCVsSql(studyId + ""));
             if (viewRows.size() <= 0) {
-                viewRows = select(this.getNullValueCVsSql(study.getStudy().getStudyId() + ""));
+                viewRows = select(this.getNullValueCVsSql(study.checkAndGetParentStudyId() + ""));
             }
         } else {
             viewRows = select(this.getNullValueCVsSql(studyId + ""));
@@ -3043,7 +3045,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<String, Integer> igpos = new HashMap<String, Integer>();
         String igprev = "";
         String oidPos = "";
-        Study parentStudy = study.isSite() ? (Study) sDao.findByPK(study.getStudy().getStudyId()) : study;
+        Study parentStudy = study.isSite() ? (Study) studyDao.findByPK(study.getStudy().getStudyId()) : study;
         setStudyParemeterConfig(parentStudy);
         HashSet<Integer> sgcIdSet = new HashSet<Integer>();
         HashMap<String, String> subOidPoses = new HashMap<String, String>();
@@ -3123,7 +3125,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 if (dob != null) {
                     if (dataset.isShowSubjectDob()) {
-                        if (parentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
+                        if (parentStudy.getCollectDob().equals("2")) {
                             Calendar cal = Calendar.getInstance();
                             cal.setTime(dob);
                             int year = cal.get(Calendar.YEAR);
@@ -3346,7 +3348,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected void setStudyParemeterConfig(Study study) {
         StudyParameterValueBean param = new StudyParameterValueDAO(this.ds).findByHandleAndStudy(study.getStudyId(), "collectDob");
-        study.getStudyParameterConfig().setCollectDob(param.getValue());
+        study.setCollectDob(param.getValue());
     }
 
     protected HashMap<String, Integer> getItemGroupOIDPos(MetaDataVersionBean metadata) {
@@ -3870,7 +3872,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
 
     private EventDefinitionCRFBean getEventDefCRF(StudyEventDefBean studyEventDefBean, ElementRefBean formRef, int studyId) {
-        Study studyBean = (Study) sDao.findByPK(studyId);
+        Study studyBean = (Study) studyDao.findByPK(studyId);
         StudyEventDefinitionBean sedBean = seddao.findByOid(studyEventDefBean.getOid());
         CRFBean crfBean = crfdao.findByOid(formRef.getElementDefOID());
         return edcdao.findByStudyEventDefinitionIdAndCRFId(studyBean, sedBean.getId(), crfBean.getId());

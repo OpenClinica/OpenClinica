@@ -141,7 +141,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
             se.setStudyEventDefinition(sed);
             // Let us process the age
-            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+            if (currentStudy.getCollectDob().equals("1")) {
                 // YW 11-16-2007 enrollment-date is used for computing age
                 age = Utils.getInstacne().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
             }

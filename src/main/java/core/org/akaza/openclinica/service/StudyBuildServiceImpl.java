@@ -469,6 +469,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         if (moduleProcessor != null)
             moduleProcessor.processModule(study, moduleEnabled, accessToken);
+        int i = 0;
     }
 
     public void processModule(String accessToken, String studyOid, ModuleProcessor.Modules module) {
@@ -476,7 +477,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
         processSingleModule(study, moduleConfigDTOs, module, accessToken);
     }
-
+    public void processModule(String accessToken, Study study, ModuleProcessor.Modules module) {
+        List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
+        processSingleModule(study, moduleConfigDTOs, module, accessToken);
+    }
 
     private Study getModuleStudy(String studyOid) {
         utilService.setSchemaFromStudyOid(studyOid);

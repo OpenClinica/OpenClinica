@@ -44,7 +44,6 @@ public class MetadataUnit extends OdmUnit {
     private RuleSetRuleDao ruleSetRuleDao;
     private String permissionTagsString;
 
-    @Autowired
     private StudyDao studyDao;
 
     public static final String FAKE_STUDY_NAME = "OC_FORM_LIB_STUDY";
@@ -58,9 +57,10 @@ public class MetadataUnit extends OdmUnit {
     public MetadataUnit() {
     }
 
-    public MetadataUnit(DataSource ds, Study study, int category) {
+    public MetadataUnit(DataSource ds, Study study, int category, StudyDao studyDao) {
         super(ds, study, category);
         this.odmStudy = new OdmStudyBean();
+        this.studyDao = studyDao;
         if (study.isSite()) {
             this.parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
         } else {
@@ -68,21 +68,24 @@ public class MetadataUnit extends OdmUnit {
         }
     }
 
-    public MetadataUnit(DataSource ds, boolean showArchived) {
+    public MetadataUnit(DataSource ds, boolean showArchived, StudyDao studyDao) {
         super(ds, showArchived);
         this.ds = ds;
+        this.studyDao = studyDao;
     }
 
-    public MetadataUnit(DataSource ds) {
+    public MetadataUnit(DataSource ds,StudyDao studyDao) {
         this.ds = ds;
+        this.studyDao = studyDao;
     }
 
     public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, RuleSetRuleDao ruleSetRuleDao,
-            boolean showArchived ,String permissionTagsString) {
+            boolean showArchived ,String permissionTagsString, StudyDao studyDao) {
         super(ds, dataset, odmBean, study, category, showArchived);
         this.odmStudy = new OdmStudyBean();
         this.ruleSetRuleDao = ruleSetRuleDao;
         this.permissionTagsString=permissionTagsString;
+        this.studyDao = studyDao;
         if (study.isSite()) {
             this.parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
         } else {
@@ -142,11 +145,11 @@ public class MetadataUnit extends OdmUnit {
 
     private void collectBasicDefinitions() {
         int studyid = studyBase.getStudy().isSite() ? studyBase.getStudy().getStudy().getStudyId() : studyBase.getStudy().getStudyId();
-        new OdmExtractDAO(this.ds).getBasicDefinitions(studyid, odmStudy.getBasicDefinitions());
+        new OdmExtractDAO(this.ds, studyDao).getBasicDefinitions(studyid, odmStudy.getBasicDefinitions());
     }
 
     private void collectBasicDefinitions(String formVersionOID) {
-        new OdmExtractDAO(this.ds).getBasicDefinitions(formVersionOID, odmStudy.getBasicDefinitions());
+        new OdmExtractDAO(this.ds, studyDao).getBasicDefinitions(formVersionOID, odmStudy.getBasicDefinitions());
     }
 
     /**
@@ -156,7 +159,7 @@ public class MetadataUnit extends OdmUnit {
      */
     private void collectMetaDataVersion(String formVersionOID) {
         Study study = studyBase.getStudy();
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds, showArchived);
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds, showArchived, studyDao);
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
 
         ODMBean odmBean = new ODMBean();
@@ -202,7 +205,7 @@ public class MetadataUnit extends OdmUnit {
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(parentId, "discrepancyManagement");
         metadata.setSoftHard(spv.getValue().equalsIgnoreCase("true") ? "Hard" : "Soft");
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds, showArchived);
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds, showArchived, studyDao);
         int studyId = study.getStudyId();
         int parentStudyId = study.isSite() ? study.getStudy().getStudyId() : studyId;
         if (this.getCategory() == 1 && study.isSite()) {

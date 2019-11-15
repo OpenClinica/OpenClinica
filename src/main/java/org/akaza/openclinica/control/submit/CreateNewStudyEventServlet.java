@@ -284,7 +284,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             // v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
             v.addValidation(INPUT_STUDY_SUBJECT_LABEL, Validator.NO_BLANKS);
             v.addValidation(INPUT_LOCATION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-            if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
+            if (currentStudy.getEventLocationRequired().equalsIgnoreCase("required")) {
                 v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
             }
 
@@ -295,7 +295,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 if (!StringUtil.isBlank(fp.getString(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
                     // logger.debug("has scheduled definition******");
                     v.addValidation(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i], Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
-                    if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
+                    if (currentStudy.getEventLocationRequired().equalsIgnoreCase("required")) {
                         v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
                         v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
                                 2000);

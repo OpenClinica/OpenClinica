@@ -164,7 +164,7 @@ public class RestoreStudyEventServlet extends SecureController {
                     if (study.isSite()) {
                         edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getStudyId());
                         if (edc == null || !edc.isActive()) {
-                            edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getStudy().getStudyId());
+                            edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.checkAndGetParentStudyId());
                         }
                     } else {
                         edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getStudyId());

@@ -66,8 +66,8 @@ public class AccountController {
 	AuthoritiesDao authoritiesDao;
 	ParticipantPortalRegistrar participantPortalRegistrar;
     private AuditUserLoginDao auditUserLoginDao;
-	@Autowired
-    private StudyDao sdao;
+
+    private StudyDao studyDao;
 	
 	/**
 	 * @api {post} /pages/accounts/login Retrieve a user account
@@ -647,7 +647,7 @@ public class AccountController {
 	}
 
 	private ArrayList<UserAccountBean> getUserAccountByStudy(String userName, ArrayList allStudies) {
-		udao = new UserAccountDAO(dataSource);
+		udao = new UserAccountDAO(dataSource,getStudyDao());
 		ArrayList<UserAccountBean> userAccountBeans = udao.findStudyByUser(userName, allStudies);
 		return userAccountBeans;
 	}
@@ -665,12 +665,12 @@ public class AccountController {
 	}
 
 	private Study getStudy(String oid) {
-		Study studyBean = (Study) sdao.findByOcOID(oid);
+		Study studyBean = (Study) getStudyDao().findByOcOID(oid);
 		return studyBean;
 	}
 
 	private Study getStudy(Integer id) {
-		Study studyBean = (Study) sdao.findByPK(id);
+		Study studyBean = (Study) getStudyDao().findByPK(id);
 		return studyBean;
 	}
 
@@ -871,7 +871,7 @@ public class AccountController {
 		if (!study.isSite()) {
 			return study;
 		} else {
-			Study parentStudy = (Study) sdao.findByPK(study.getStudy().getStudyId());
+			Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
 			return parentStudy;
 		}
 
@@ -882,7 +882,7 @@ public class AccountController {
 		if (!study.isSite()) {
 			return study;
 		} else {
-			Study parentStudy = (Study) sdao.findByPK(study.getStudy().getStudyId());
+			Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
 			return parentStudy;
 		}
 
@@ -1052,6 +1052,12 @@ public class AccountController {
 	                    "auditUserLoginDao");
 	        return auditUserLoginDao;
 	    }
+	    public StudyDao getStudyDao(){
+			this.studyDao =
+					this.studyDao != null ? studyDao : (StudyDao) SpringServletAccess.getApplicationContext(context).getBean(
+							"studyDaoDomain");
+			return studyDao;
+		}
 
 	
     public Boolean isApiKeyExist(String uuid) {

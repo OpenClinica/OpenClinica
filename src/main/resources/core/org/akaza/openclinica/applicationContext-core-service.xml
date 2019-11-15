@@ -67,6 +67,7 @@
 
     <bean id="userAccountDAO" class="core.org.akaza.openclinica.dao.login.UserAccountDAO">
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
     <bean id="archivedDatasetFileDao" class="core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO">
@@ -82,6 +83,7 @@
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="coreResources"/>
         <constructor-arg ref="ruleSetRuleDao"/>
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
     <bean id="odmFileCreation" class="core.org.akaza.openclinica.service.extract.OdmFileCreation">

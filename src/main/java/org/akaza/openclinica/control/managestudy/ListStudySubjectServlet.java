@@ -142,15 +142,15 @@ public abstract class ListStudySubjectServlet extends SecureController {
         }
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
-        currentStudy.getStudyParameterConfig().setCollectDob(parentSPV.getValue());
+        currentStudy.setCollectDob(parentSPV.getValue());
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderRequired");
-        currentStudy.getStudyParameterConfig().setGenderRequired(parentSPV.getValue());
+        currentStudy.setGenderRequired(parentSPV.getValue());
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectPersonIdRequired");
-        currentStudy.getStudyParameterConfig().setSubjectPersonIdRequired(parentSPV.getValue());
+        currentStudy.setSubjectPersonIdRequired(parentSPV.getValue());
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+        currentStudy.setSubjectIdGeneration(parentSPV.getValue());
         parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdPrefixSuffix");
-        currentStudy.getStudyParameterConfig().setSubjectIdPrefixSuffix(parentSPV.getValue());
+        currentStudy.setSubjectIdPrefixSuffix(parentSPV.getValue());
 
         // YW >>
 
@@ -359,7 +359,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
         request.setAttribute("table", table);
         // request.setAttribute("subjects", subjects);
 
-        String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+        String idSetting = currentStudy.getSubjectIdGeneration();
         // logger.info("subject id setting :" + idSetting);
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
@@ -395,7 +395,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
         // out whether it's required. If so, then return from the method false.
         for (EventCRFBean crfBean : crfBeans) {
             if (crfBean != null && crfBean.getCompletionStatusId() == 0) {
-                if (eventDefinitionDAO.isRequiredInDefinition(crfBean.getCRFVersionId(), studyEvent)) {
+                if (eventDefinitionDAO.isRequiredInDefinition(crfBean.getCRFVersionId(), studyEvent, getStudyDao())) {
                     return true;
                 }
             }

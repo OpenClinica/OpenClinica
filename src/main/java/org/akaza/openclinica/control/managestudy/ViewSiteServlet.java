@@ -38,8 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *         Preferences - Java - Code Style - Code Templates
  */
 public class ViewSiteServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
+
     EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
 
     /**
@@ -106,7 +105,7 @@ public class ViewSiteServlet extends SecureController {
     private void viewSiteEventDefinitions(Study siteToView) throws MalformedURLException {
         int siteId = siteToView.getStudyId();
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());

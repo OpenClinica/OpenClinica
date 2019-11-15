@@ -85,7 +85,7 @@ import java.util.*;
         else
             spvdao.create(spv);
         Study currentStudy = (Study) request.getSession().getAttribute("study");
-        currentStudy.getStudyParameterConfig().setParticipantPortal("disabled");
+        currentStudy.setParticipantPortal("disabled");
 
         return "redirect:/pages/studymodule";
     }
@@ -104,7 +104,7 @@ import java.util.*;
         else
             spvdao.create(spv);
         Study currentStudy = (Study) request.getSession().getAttribute("study");
-        currentStudy.getStudyParameterConfig().setRandomization("disabled");
+        currentStudy.setRandomization("disabled");
 
         return "redirect:/pages/studymodule";
     }
@@ -123,7 +123,7 @@ import java.util.*;
         else
             spvdao.create(spv);
         Study currentStudy = (Study) request.getSession().getAttribute("study");
-        currentStudy.getStudyParameterConfig().setParticipantPortal("enabled");
+        currentStudy.setParticipantPortal("enabled");
 
         return "redirect:/pages/studymodule";
     }
@@ -142,7 +142,7 @@ import java.util.*;
         else
             spvdao.create(spv);
         Study currentStudy = (Study) request.getSession().getAttribute("study");
-        currentStudy.getStudyParameterConfig().setRandomization("enabled");
+        currentStudy.setRandomization("enabled");
 
         return "redirect:/pages/studymodule";
     }
@@ -194,7 +194,7 @@ import java.util.*;
             else
                 spvdao.create(spv);
             Study currentStudy = (Study) request.getSession().getAttribute("study");
-            currentStudy.getStudyParameterConfig().setParticipantPortal("enabled");
+            currentStudy.setParticipantPortal("enabled");
         }
 
         return "redirect:/pages/studymodule";
@@ -316,7 +316,7 @@ import java.util.*;
         String portalURL = CoreResources.getField("portalURL");
         map.addAttribute("portalURL", portalURL);
         if (portalURL != null && !portalURL.equals("")) {
-            String participateOCStatus = currentStudy.getStudyParameterConfig().getParticipantPortal();
+            String participateOCStatus = currentStudy.getParticipantPortal();
             ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
             Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOc_oid());
             String participateStatus = "";
@@ -349,7 +349,7 @@ import java.util.*;
         map.addAttribute("moduleManager", moduleManager);
         if (moduleManager != null && !moduleManager.equals("")) {
 
-            String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
+            String randomizationOCStatus = currentStudy.getRandomization();
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
             SeRandomizationDTO randomization = null;
             try {

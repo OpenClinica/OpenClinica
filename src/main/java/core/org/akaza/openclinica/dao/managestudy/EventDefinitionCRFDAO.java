@@ -33,8 +33,7 @@ import java.util.*;
 public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	// private DAODigester digester;
 
-	@Autowired
-	private StudyDao studyDao;
+
 	private void setQueryNames() {
 		getCurrentPKName = "getCurrentPK";
 		getNextPKName = "getNextPK";
@@ -687,7 +686,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * 
 	 * @return boolean to tell us if it's required or not.
 	 */
-	public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent) {
+	public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent, StudyDao studyDao) {
 		Study study = studyDao.findByStudySubjectId(studyEvent.getStudySubjectId());
 		int studyEventId = studyEvent.getId();
 

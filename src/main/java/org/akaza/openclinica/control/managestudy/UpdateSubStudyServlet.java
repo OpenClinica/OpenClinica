@@ -74,7 +74,7 @@ public class UpdateSubStudyServlet extends SecureController {
     public void processRequest() throws Exception {
 
         Study study = (Study) session.getAttribute("newStudy");
-        parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
+        parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
 
         logger.info("study from session:" + study.getName() + "\n" + study.getDateCreated() + "\n");
         String action = request.getParameter("action");
@@ -202,10 +202,10 @@ public class UpdateSubStudyServlet extends SecureController {
         // study.setStatusId(fp.getInt("statusId"));
         study.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(fp.getInt("statusId")));
         // YW 10-12-2007 <<
-        study.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-        study.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-        study.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
-        study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+        study.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
+        study.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+        study.setInterviewDateRequired(fp.getString("interviewDateRequired"));
+        study.setInterviewDateDefault(fp.getString("interviewDateDefault"));
         // YW >>
 
         ArrayList parameters = (ArrayList) study.getStudyParameters();

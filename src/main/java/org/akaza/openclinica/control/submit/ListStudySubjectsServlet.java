@@ -51,8 +51,6 @@ public class ListStudySubjectsServlet extends SecureController {
     private StudyEventDAO studyEventDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
-    @Autowired
-    private StudyDao studyDao;
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
@@ -108,7 +106,7 @@ public class ListStudySubjectsServlet extends SecureController {
         StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
         StudyParameterValue parentSPV = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "subjectIdGeneration");
 
-        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+        currentStudy.setSubjectIdGeneration(parentSPV.getValue());
 
         String addNewSubjectOverlay = fp.getRequest().getParameter("addNewSubject");
         if (addNewSubjectOverlay != null){
@@ -123,8 +121,8 @@ public class ListStudySubjectsServlet extends SecureController {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
         logger.info("CurrentStudy:" + currentPublicStudy.getSchemaName());
-        logger.info("StudyParameterConfig:" + currentPublicStudy.getStudyParameterConfig().toString());
-        String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+//        logger.info("StudyParameterConfig:" + currentPublicStudy.getStudyParameterConfig().toString());
+        String idSetting = currentStudy.getSubjectIdGeneration();
         logger.info("idSetting:" + idSetting);
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
@@ -170,6 +168,7 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
         factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyDAO(getStudyDao());
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
@@ -329,5 +328,9 @@ public class ListStudySubjectsServlet extends SecureController {
     public StudyEventDefinitionDao getStudyEventDefinitionHibDao() {
         return studyEventDefinitionHibDao= (StudyEventDefinitionDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefDaoDomain");
 
+    }
+
+    public StudyDao getStudyDao() {
+        return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
     }
 }

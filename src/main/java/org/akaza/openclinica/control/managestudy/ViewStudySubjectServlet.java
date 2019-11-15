@@ -168,7 +168,7 @@ public class ViewStudySubjectServlet extends SecureController {
         int parentStudyId = currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId();
         StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
         StudyParameterValue parentSPV = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "subjectIdGeneration");
-        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+        currentStudy.setSubjectIdGeneration(parentSPV.getValue());
 
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
@@ -248,7 +248,7 @@ public class ViewStudySubjectServlet extends SecureController {
             }
 
             SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
-            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
+            if (currentStudy.getCollectDob().equals("2")) {
                 Date dob = subject.getDateOfBirth();
                 if (dob != null) {
                     Calendar cal = Calendar.getInstance();
@@ -269,9 +269,9 @@ public class ViewStudySubjectServlet extends SecureController {
             // YW 11-26-2007 <<
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             if (isParentStudy) {
-                study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
+                study.setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
             } else {
-                study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(study.getStudy().getStudyId(), "collectDob").getValue());
+                study.setCollectDob(spvdao.findByHandleAndStudy(study.getStudy().getStudyId(), "collectDob").getValue());
             }
 
             // YW >>

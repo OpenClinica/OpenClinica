@@ -34,6 +34,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
@@ -55,20 +56,22 @@ public class GenerateExtractFileService {
     private static List<File> oldFiles = new LinkedList<File>();
     private final RuleSetRuleDao ruleSetRuleDao;
     private PermissionService permissionService;
-
+    public StudyDao studyDao;
 
     public GenerateExtractFileService(DataSource ds, HttpServletRequest request, CoreResources coreResources,
-            RuleSetRuleDao ruleSetRuleDao) {
+            RuleSetRuleDao ruleSetRuleDao, StudyDao studyDao) {
         this.ds = ds;
         this.request = request;
         this.coreResources = coreResources;
         this.ruleSetRuleDao = ruleSetRuleDao;
+        this.studyDao = studyDao;
     }
 
-    public GenerateExtractFileService(DataSource ds, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
+    public GenerateExtractFileService(DataSource ds, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao, StudyDao studyDao) {
         this.ds = ds;
         this.coreResources = coreResources;
         this.ruleSetRuleDao = ruleSetRuleDao;
+        this.studyDao = studyDao;
     }
 
     public void setUpResourceBundles() {
@@ -94,6 +97,7 @@ public class GenerateExtractFileService {
         DatasetDAO dsdao = new DatasetDAO(ds);
         // create the extract bean here, tbh
         eb = dsdao.getDatasetData(eb, activeStudyId, parentStudyId);
+        eb.setStudyDao(getStudyDao());
         eb.getMetadata();
         eb.computeReport(answer);
 
@@ -666,4 +670,11 @@ public class GenerateExtractFileService {
        // }
     }
 
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

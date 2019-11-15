@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.job.JobTerminationMonitor;
 import core.org.akaza.openclinica.logic.odmExport.AdminDataCollector;
@@ -51,7 +52,7 @@ public class OdmFileCreation {
     private RuleSetRuleDao ruleSetRuleDao;
     private DataSource dataSource;
     private CoreResources coreResources;
-
+    private StudyDao studyDao;
     private static File files[] = null;
     private static List<File> oldFiles = new LinkedList<File>();
 
@@ -62,9 +63,9 @@ public class OdmFileCreation {
 
 
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
-        MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy, ruleSetRuleDao,permissionTagsString);
-        AdminDataCollector adc = new AdminDataCollector(dataSource, datasetBean, currentStudy);
-        ClinicalDataCollector cdc = new ClinicalDataCollector(dataSource, datasetBean, currentStudy);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy, ruleSetRuleDao,permissionTagsString, studyDao);
+        AdminDataCollector adc = new AdminDataCollector(dataSource, datasetBean, currentStudy, studyDao);
+        ClinicalDataCollector cdc = new ClinicalDataCollector(dataSource, datasetBean, currentStudy, studyDao);
 
         MetaDataCollector.setTextLength(200);
         if (deleteOld) {
@@ -190,7 +191,7 @@ public class OdmFileCreation {
                 } // for
                 studySubjectIds = studySubjectIds.replaceFirst(",", "");
 
-                ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds,permissionTagsString,edcSet);
+                ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds,permissionTagsString,edcSet, studyDao);
                 cdata.setCategory(cdc.getCategory());
                 cdata.collectOdmClinicalData();
 
@@ -389,6 +390,14 @@ public class OdmFileCreation {
 
     public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         this.ruleSetRuleDao = ruleSetRuleDao;
+    }
+
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
     }
 
     public CoreResources getCoreResources() {

@@ -325,10 +325,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 					if (isActiveRoleAtSite) {
 						siteId = study.getStudyId();
-						parentStudyId = study.getStudy().getStudyId();
+						parentStudyId = study.checkAndGetParentStudyId();
 						hiddenCrfs = listOfHiddenCrfs(siteId, parentStudyId, edcs, ecrf);
 					} else {
-						parentStudyId = study.getStudy().getStudyId();
+						parentStudyId = study.checkAndGetParentStudyId();
 						hiddenCrfs = listOfHiddenCrfs(parentStudyId, parentStudyId, edcs, ecrf);
 					}
 
@@ -341,7 +341,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 					if (eventDefinitionCrf == null) {
 						eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-								se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudy().getStudyId());
+								se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.checkAndGetParentStudyId());
 					}
 
 				} else {

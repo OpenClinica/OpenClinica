@@ -66,7 +66,6 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
     private StudyGroupDAO studyGroupDAO;
-    @Autowired
     private StudyDao studyDao;
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
@@ -292,7 +291,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         // method false.
         for (EventCRFBean crfBean : eventCrfBeans) {
             if (crfBean != null && crfBean.getCompletionStatusId() == 0) {
-                if (getEventDefintionCRFDAO().isRequiredInDefinition(crfBean.getCRFVersionId(), studyEventBean)) {
+                if (getEventDefintionCRFDAO().isRequiredInDefinition(crfBean.getCRFVersionId(), studyEventBean, getStudyDao())) {
                     return true;
                 }
             }
@@ -1274,4 +1273,11 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         return discCounts;
     }
 
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

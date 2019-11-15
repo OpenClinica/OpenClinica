@@ -5,8 +5,6 @@ import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.service.Component;
-import core.org.akaza.openclinica.service.Page;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import org.apache.commons.lang.SerializationUtils;
@@ -155,7 +153,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
                 crf.getCrfId(), study.getStudyId());
         if (edc == null) {
             edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(),
-                    study.getStudy().getStudyId());
+                    study.checkAndGetParentStudyId());
         }
         if (edc == null || edc.getStatusId().equals(Status.DELETED.getCode()) || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
             logger.error("EventDefinitionCrf for StudyEventDefinition Oid {},Crf Oid {} and Study Oid {}is null or has Removed Status",

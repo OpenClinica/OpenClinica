@@ -464,5 +464,6 @@ public class ParticipateServiceImpl implements ParticipateService {
             spv.setValue(statusValue);
             spvdao.update(spv);
         }
+        int i = 0;
     }
 }

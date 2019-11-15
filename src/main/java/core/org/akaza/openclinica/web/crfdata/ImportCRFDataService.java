@@ -135,7 +135,7 @@ public class ImportCRFDataService {
                 String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getStudyId(), studyBean.getStudy().getStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
 
@@ -414,7 +414,7 @@ public class ImportCRFDataService {
         //EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(), study.getStudyId());
         if (edc == null || edc.getId() == 0) {
             edc = eventDefinitionCRFDAO.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getId(), crf.getId(),
-                    study.getStudy().getStudyId());
+                    study.checkAndGetParentStudyId());
         }
         if (edc == null || edc.getStatus().equals(Status.DELETED) || edc.getStatus().equals(Status.AUTO_DELETED)) {
             logger.error("EventDefinitionCrf for StudyEventDefinition Oid {},Crf Oid {} and Study Oid {}is null or has Removed Status",
@@ -524,7 +524,7 @@ public class ImportCRFDataService {
                 }
                 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getStudyId(), studyBean.getStudy().getStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
 
@@ -752,10 +752,10 @@ public class ImportCRFDataService {
                 }
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getStudyId(), studyBean.getStudy().getStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 // more detail log
                 if(studyEventDefinitionBean == null) {
-                	logger.error("studyEventDefinitionBean == null for OID:" + studyEventDataBean.getStudyEventOID() + "-StudyId:"+ studyBean.getStudyId() + "-ParentStudyId:" + studyBean.getStudy().getStudyId());
+                	logger.error("studyEventDefinitionBean == null for OID:" + studyEventDataBean.getStudyEventOID() + "-StudyId:"+ studyBean.getStudyId() + "-ParentStudyId:" + studyBean.checkAndGetParentStudyId());
                 }
                 if(studySubjectBean == null) {
                 	
@@ -851,7 +851,7 @@ public class ImportCRFDataService {
                 String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getStudyId(), studyBean.getStudy().getStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
                 StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
@@ -959,7 +959,7 @@ public class ImportCRFDataService {
             StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
 
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-                int parentStudyId = studyBean.isSite() ? studyBean.getStudy().getStudyId() : 0;
+                int parentStudyId = studyBean.checkAndGetParentStudyId();
                 StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getStudyId(), parentStudyId);
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
                 logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());

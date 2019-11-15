@@ -233,7 +233,7 @@
     <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_cap_enforced" bundle="${resword}"/>:</td><td class="table_cell">
 
        <c:choose>
-       <c:when test="${studyToView.studyParameterConfig.enforceEnrollmentCap == 'false'}">
+       <c:when test="${studyToView.enforceEnrollmentCap == 'false'}">
        <fmt:message key="no" bundle="${resword}"/>
        </c:when>
        <c:otherwise>
@@ -303,10 +303,10 @@
   <!-- <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '1'}">
+   <c:when test="${studyToView.collectDob == '1'}">
   <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '2'}">
+   <c:when test="${studyToView.collectDob == '2'}">
      <fmt:message key="only_year_of_birth" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -320,7 +320,7 @@
     <td class="table_header_column"><fmt:message key="method_of_creation" bundle="${resword}"/></td>
     <td class="table_cell">
       <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'manual'}">
+        <c:when test="${studyToView.subjectIdGeneration == 'manual'}">
           <fmt:message key="manual_entry" bundle="${resword}"/>
         </c:when>
         <c:otherwise>
@@ -333,17 +333,17 @@
   <tr valign="top">
     <td class="table_header_column"><fmt:message key="id_template" bundle="${resword}"/></td>
     <td class="table_cell">
-      <c:out value="${studyToView.studyParameterConfig.participantIdTemplate}"/>
+      <c:out value="${studyToView.participantIdTemplate}"/>
     </td>
   </tr>
 
 <!--   <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-       <c:when test="${(studyToView.studyParameterConfig.subjectPersonIdRequired == 'required')
-            or ((studyToView.studyParameterConfig.subjectPersonIdRequired == 'always'))}">    <fmt:message key="required" bundle="${resword}"/>
+       <c:when test="${(studyToView.subjectPersonIdRequired == 'required')
+            or ((studyToView.subjectPersonIdRequired == 'always'))}">    <fmt:message key="required" bundle="${resword}"/>
         </c:when>
-        <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+        <c:when test="${studyToView.subjectPersonIdRequired == 'optional'}">
             <fmt:message key="optional" bundle="${resword}"/>
         </c:when>
         <c:otherwise>
@@ -357,7 +357,7 @@
    <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
+   <c:when test="${studyToView.subjectIdPrefixSuffix == 'true'}">
     Yes
    </c:when>
    <c:otherwise>
@@ -394,14 +394,14 @@
   <c:forEach var="site" items="${sitesToView}">
   <tr valign="top">
    <td class="table_cell_left"><c:out value="${site.name}"/></td>
-   <td class="table_cell"><c:out value="${site.oid}"/></td>
+   <td class="table_cell"><c:out value="${site.oc_oid}"/></td>
    <td class="table_cell">
     <c:out value="${site.principalInvestigator}"/>
    </td>
-   <td class="table_cell"><c:out value="${site.status.name}"/></td>
+   <td class="table_cell"><c:out value="${site.status.description}"/></td>
    <td class="table_cell">
      <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
-     <a href="ViewSite?id=<c:out value="${site.id}"/>"
+     <a href="ViewSite?id=<c:out value="${site.studyId}"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
       name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>

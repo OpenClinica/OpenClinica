@@ -41,8 +41,7 @@ public abstract class OdmDataCollector {
     private ODMBean odmbean;
     protected boolean showArchived;
 
-    @Autowired
-    private StudyDao studyDao;
+    protected StudyDao studyDao;
     // key is study/site oc_oid.
     private LinkedHashMap<String, OdmStudyBase> studyBaseMap;
     // 0: one Study Element; 1: one parent study and its sites
@@ -53,8 +52,13 @@ public abstract class OdmDataCollector {
     public OdmDataCollector() {
     }
 
-    public OdmDataCollector(DataSource ds, Study study, boolean showArchived) {
-        this(ds, study);
+
+    public OdmDataCollector(DataSource ds, StudyDao studyDao) {
+        this.ds = ds;
+        this.studyDao = studyDao;
+    }
+    public OdmDataCollector(DataSource ds, Study study, boolean showArchived, StudyDao studyDao) {
+        this(ds, study, studyDao);
         this.showArchived = showArchived;
     }
 
@@ -67,12 +71,13 @@ public abstract class OdmDataCollector {
      * @param ds
      * @param study
      */
-    public OdmDataCollector(DataSource ds, Study study) {
+    public OdmDataCollector(DataSource ds, Study study, StudyDao studyDao) {
         this.ds = ds;
         if (this.ds == null) {
             logger.info("DataSource is null!");
             return;
         }
+        this.studyDao = studyDao;
         if (study == null)
             createFakeStudyObj();
 
@@ -129,12 +134,13 @@ public abstract class OdmDataCollector {
      * @param ds
      * @param dataset
      */
-    public OdmDataCollector(DataSource ds, DatasetBean dataset, Study currentStudy) {
+    public OdmDataCollector(DataSource ds, DatasetBean dataset, Study currentStudy, StudyDao studyDao) {
         this.ds = ds;
         if (this.ds == null) {
             logger.info("DataSource is null!");
             return;
         }
+        this.studyDao = studyDao;
         this.dataset = dataset;
         odmbean = new ODMBean();
         Study study = (Study) studyDao.findByPK(dataset.getStudyId());

@@ -17,6 +17,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.KeycloakController;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -511,12 +512,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 session.setAttribute(USER_BEAN_NAME, ub);
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     CoreResources.setRequestSchema(request, "public");
-                    StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+//                    StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
                     currentPublicStudy = getStudyDao().findByPK(ub.getActiveStudyId());
 
-                    ArrayList studyParameters = spvdao.findParamConfigByStudy(currentPublicStudy);
+//                    ArrayList studyParameters = spvdao.findParamConfigByStudy(currentPublicStudy);
 
-                    currentPublicStudy.setStudyParameters(studyParameters);
+//                    currentPublicStudy.setStudyParameters(studyParameters);
 
                     // set up the panel here, tbh
                     panel.reset();
@@ -541,32 +542,24 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
                 currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 if (currentStudy != null) {
-                    currentStudy.getStudy().setName(currentPublicStudy.getStudy().getName());
+                    if(currentPublicStudy != null && currentPublicStudy.getStudy() != null)
+                    {
+                        if(currentStudy.getStudy() == null)
+                            currentStudy.setStudy(new Study());
+                        currentStudy.getStudy().setName(currentPublicStudy.getStudy().getName());
+                    }
                     StudyConfigService scs = new StudyConfigService(sm.getDataSource());
                     if (!currentStudy.isSite()) {// top study
-                        scs.setParametersForStudy(currentStudy);
+                        if(currentStudy.getStudyParameterValues() == null || currentStudy.getStudyParameterValues().size() == 0)
+                            scs.setParametersForStudy(currentStudy);
 
                     } else {
-                        // YW <<
-                        currentStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId())).getName());
-                        // YW >>
                         scs.setParametersForSite(currentStudy);
                     }
                 }
-                request.setAttribute("requestSchema", "public");
-
                 session.setAttribute("study", currentStudy);
-            } else if (currentPublicStudy.getStudyId() > 0) {
-                // YW 06-20-2007<< set site's parentstudy name when site is
-                // restored
-            if (currentPublicStudy.isSite()) {
-                    currentPublicStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentPublicStudy.getStudy().getStudyId())).getName());
-                    request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
-                    currentStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId())).getName());
-                    request.setAttribute("requestSchema", "public");
-                }
-                // YW >>
             }
+            request.setAttribute("requestSchema", "public");
             currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
             if (currentRole == null || !currentRole.isActive() || currentRole.getId() <= 0) {
@@ -584,10 +577,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 session.setAttribute("userRole", currentRole);
             }
 
-
-            Study userRoleStudy = getStudyBuildService().getPublicStudy(currentRole.getStudyId());
-
-            if (userRoleStudy.isSite()) {
+            if (currentPublicStudy.isSite()) {
                 /*
                  * The Role decription will be set depending on whether the user logged in at study lever or site level.
                  * issue-2422
@@ -1070,7 +1060,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public ArrayList getStudyGroupClassesByCurrentStudy() {
         StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(sm.getDataSource());
         StudyGroupDAO studyGroupDAO = new StudyGroupDAO(sm.getDataSource());
-        int parentStudyId = currentStudy.getStudy().getStudyId();
+        int parentStudyId = currentStudy.checkAndGetParentStudyId();
         ArrayList studyGroupClasses = new ArrayList();
         if (parentStudyId > 0) {
             Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
@@ -1321,7 +1311,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         else
             study = getStudyDao().findPublicStudy(tenantStudy.getOc_oid());
 
-        StudyUserRoleBean studyUserRole = ub.getRoleByStudy(study.getStudy().getStudyId());
+        StudyUserRoleBean studyUserRole = ub.getRoleByStudy(study.checkAndGetParentStudyId());
         StudyUserRoleBean siteUserRole = new StudyUserRoleBean();
         if (study.getStudyId() != 0) {
             siteUserRole = ub.getRoleByStudy(study.getStudyId());
@@ -1396,10 +1386,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
 
         Study sb = null;
-        if(currentStudy.getStudy() != null && currentStudy.getStudy().getStudyId() != 0){
-            sb = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
+        if(currentStudy.isSite()){
+            sb = (Study) currentStudy.getStudy();
         }else{
-             sb = (Study) getStudyDao().findByPK(currentStudy.getStudyId());
+             sb = (Study) currentStudy;
         }
         int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
@@ -1640,9 +1630,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(sm.getDataSource());
         String contactsModuleStatus=null;
         if(currentStudy.getStudy() != null && currentStudy.getStudy().getStudyId() != 0){
-            contactsModuleStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudy().getStudyId(), "contactsModule").getValue();
+            contactsModuleStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudy().getStudyId(), StudyParamNames.CONTACTS_MODULE).getValue();
         }else {
-            contactsModuleStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudyId(), "contactsModule").getValue();
+            contactsModuleStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudyId(), StudyParamNames.CONTACTS_MODULE).getValue();
         }
         request.setAttribute("requestSchema", previousSchema);
 

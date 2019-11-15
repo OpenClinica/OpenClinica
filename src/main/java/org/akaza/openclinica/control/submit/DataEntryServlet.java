@@ -588,7 +588,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         logMe("Entering  Get the study then the parent study end  "+System.currentTimeMillis());
         // Let us process the age
-        if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+        if (currentStudy.getCollectDob().equals("1")) {
             // YW 11-16-2007 erollment-date is used for calculating age.
             Date enrollmentDate = ssb.getEnrollmentDate();
             age = Utils.getInstacne().processAge(enrollmentDate, subject.getDateOfBirth());
@@ -1233,11 +1233,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
             populateInstantOnChange(request.getSession(), ecb, section);
             // logger.debug("+++ try to populate notes, got count of field notes: " + discNotes.getFieldNotes().toString());
 
-            if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")) {
+            if (currentStudy.getInterviewerNameRequired().equals("yes")) {
                 v.addValidation(INPUT_INTERVIEWER, Validator.NO_BLANKS);
             }
 
-            if (currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes")) {
+            if (currentStudy.getInterviewDateRequired().equals("yes")) {
                 v.addValidation(INPUT_INTERVIEW_DATE, Validator.NO_BLANKS);
             }
 
@@ -2359,14 +2359,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 ecb.setCreatedDate(new Date());
                 ecb.setCRFVersionId(crfVersionId);
 
-                if (currentStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+                if (currentStudy.getInterviewerNameDefault().equals("blank")) {
                     ecb.setInterviewerName("");
                 } else {
                     // default will be event's owner name
                     ecb.setInterviewerName(sEvent.getOwner().getName());
 
                 }
-                if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+                if (!currentStudy.getInterviewDateDefault().equals("blank")) {
                     if (sEvent.getDateStarted() != null) {
                         ecb.setDateInterviewed(sEvent.getDateStarted());// default
                         // date
@@ -4822,13 +4822,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
     private EventCRFBean updateECB(StudyEventBean sEvent, HttpServletRequest request) {
         Study currentStudy =    (Study)  request.getSession().getAttribute("study");
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        if (!currentStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")
+        if (!currentStudy.getInterviewerNameDefault().equals("blank")
             && ("".equals(ecb.getInterviewerName()) || ecb.getInterviewerName() == null)) {
             // default will be event's owner name
             ecb.setInterviewerName(sEvent.getOwner().getName());
         }
 
-        if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")
+        if (!currentStudy.getInterviewDateDefault().equals("blank")
             && ("".equals(ecb.getDateInterviewed()) || ecb.getDateInterviewed() == null)) {
             if (sEvent.getDateStarted() != null) {
                 ecb.setDateInterviewed(sEvent.getDateStarted());// default date

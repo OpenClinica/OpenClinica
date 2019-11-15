@@ -137,7 +137,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
         request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
-        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllByStudy(currentStudy);
         ArrayList tempList = new ArrayList<>();
         for (StudyEventDefinitionBean defn : definitions) {

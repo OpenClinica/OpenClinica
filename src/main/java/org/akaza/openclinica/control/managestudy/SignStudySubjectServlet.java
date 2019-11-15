@@ -297,7 +297,7 @@ public class SignStudySubjectServlet extends SecureController {
         int subjectId = studySub.getSubjectId();
 
         SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
-        if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
+        if (currentStudy.getCollectDob().equals("2")) {
             Date dob = subject.getDateOfBirth();
             if (dob != null) {
                 Calendar cal = Calendar.getInstance();
@@ -314,7 +314,7 @@ public class SignStudySubjectServlet extends SecureController {
         Study study = (Study) getStudyDao().findByPK(studyId);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
+        study.setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
         // request.setAttribute("study", study);
 
         if (study.isSite()) {// this is a site,find parent

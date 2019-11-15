@@ -25,6 +25,7 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
 
@@ -36,14 +37,12 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
     WebApplicationContext context;
     String studyOIDS;
 
-    @Autowired
-    private StudyDao studyDao;
     public static ResourceBundle restext;
 
     private static String GlOBAL_STUDY_OID = "*";
 
     @Override
-
+    @Transactional
     public ContainerRequest filter(ContainerRequest containerRequest) {
         request.setAttribute("requestSchema", "public");
         // get tenant schema
@@ -120,8 +119,13 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
         return (DataSource) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean("dataSource");
     }
 
+    public StudyDao getStudyDao() {
+        return (StudyDao) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean("studyDaoDomain");
+
+    }
+
     private Study getStudyByOID(String OID, DataSource ds) {
-        return studyDao.findByOcOID(OID);
+        return getStudyDao().findByOcOID(OID);
     }
 
     private StudyUserRoleBean getRoleByStudy(Study studyBean, DataSource ds, UserAccountBean userBean) {
@@ -130,8 +134,9 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
 
     }
 
+
     private Study getStudyByID(int id, DataSource ds) {
-        return (Study) studyDao.findByPK(id);
+        return (Study) getStudyDao().findByPK(id);
     }
 
     @Override

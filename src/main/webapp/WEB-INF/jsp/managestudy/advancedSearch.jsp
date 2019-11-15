@@ -164,7 +164,7 @@ function doSearch(params) {
   datatable.clear();
   datatable.draw();
 
-  var url = '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/searchByFields?';
+  var url = '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/searchByFields?';
   jQuery.ajax({
     type: 'get',
     url: url + params,

@@ -39,9 +39,6 @@ public class MetadataCollectorResource {
     private DataSource dataSource;
 
     @Autowired
-    private StudyDao studyDao;
-
-    @Autowired
     private RuleSetRuleDao ruleSetRuleDao;
 
     @Autowired
@@ -95,10 +92,10 @@ public class MetadataCollectorResource {
 
     public String collectODMMetadata(String studyOID, HttpServletRequest request) {
 
-        Study studyBean = studyDao.findByOcOID(studyOID);
+        Study studyBean = studyDaoHib.findByOcOID(studyOID);
         String permissionTagsString = permissionService.getPermissionTagsString(studyBean,request);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString);
-        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString, studyDaoHib);
+        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean, studyDaoHib);
         MetaDataCollector.setTextLength(200);
 
         ODM odm = new ODM();
@@ -150,13 +147,13 @@ public class MetadataCollectorResource {
     }
 
     public String collectODMMetadataForForm(String studyOID, String formVersionOID,HttpServletRequest request) {
-        Study studyBean = studyDao.findByOcOID(studyOID);
+        Study studyBean = studyDaoHib.findByOcOID(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
         String permissionTagsString = permissionService.getPermissionTagsString(studyBean,request);
 
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString);
-        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString, studyDaoHib);
+        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean, studyDaoHib);
         MetaDataCollector.setTextLength(200);
 
         ODMBean odmb = mdc.getODMBean();
@@ -190,11 +187,11 @@ public class MetadataCollectorResource {
     public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
                                                              boolean showArchived , String permissionTagsString, boolean includeMetadata) {
         FullReportBean report = new FullReportBean();
-            Study studyBean = studyDao.findByOcOID(studyOID);
+            Study studyBean = studyDaoHib.findByOcOID(studyOID);
             if (studyBean != null)
                 studyBean = populateStudyBean(studyBean);
-            MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived, permissionTagsString);
-            AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
+            MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived, permissionTagsString, studyDaoHib);
+            AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean, studyDaoHib);
             MetaDataCollector.setTextLength(200);
 
             ODMBean odmb = mdc.getODMBean();
@@ -241,7 +238,7 @@ public class MetadataCollectorResource {
 
         } else {
             // YW <<
-            studyBean.getStudy().setName(((Study) studyDao.findByPK(studyBean.getStudy().getStudyId())).getName());
+            studyBean.getStudy().setName(((Study) studyDaoHib.findByPK(studyBean.getStudy().getStudyId())).getName());
             // YW >>
             studyBean = scs.setParametersForSite(studyBean);
         }

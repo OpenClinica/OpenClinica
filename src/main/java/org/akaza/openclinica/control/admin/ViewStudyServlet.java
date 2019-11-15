@@ -87,14 +87,14 @@ public class ViewStudyServlet extends SecureController {
             SeRandomizationDTO seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOc_oid(), false);
 
             if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")){
-                study.getStudyParameterConfig().setRandomization("enabled");
+                study.setRandomization("enabled");
             } else {
-                study.getStudyParameterConfig().setRandomization("disabled");
+                study.setRandomization("disabled");
             };
 
              ParticipantPortalRegistrar  participantPortalRegistrar = new ParticipantPortalRegistrar();
              String pStatus = participantPortalRegistrar.getCachedRegistrationStatus(study.getOc_oid(), session);
-             study.getStudyParameterConfig().setParticipantPortal("enabled");
+             study.setParticipantPortal("enabled");
 
             request.setAttribute("studyToView", study);
             if ("yes".equalsIgnoreCase(viewFullRecords)) {
@@ -118,7 +118,7 @@ public class ViewStudyServlet extends SecureController {
                     subjects = ssdao.findAllByStudy(study);
                 }
               // find all subjects in the study, include ones in sites
-                StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+                StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
                 EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
                 // find all events in the study, include ones in sites

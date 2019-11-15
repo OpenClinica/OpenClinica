@@ -144,6 +144,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         factory.setStudySubjectDAO(sdao);
         factory.setStudyEventDAO(sedao);
         factory.setStudyBean(currentStudy);
+        factory.setStudyDao(getStudyDao());
         factory.setStudyGroupClassDAO(sgcdao);
         factory.setSubjectGroupMapDAO(sgmdao);
         factory.setCurrentRole(currentRole);

@@ -14,11 +14,11 @@
 			  <jsp:include page="../include/showSubmitted.jsp" />
 			  <input type="hidden" name="addWithEvent" value="1"/>
 				<c:choose>
-			      <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+			      <c:when test="${study.subjectIdGeneration =='auto non-editable'}">
 			       <input type="text" value="<c:out value="${label}"/>" tabindex ="<c:out value="${tabCount}"/>" size="12" class="formfield" disabled>
 			       <input type="hidden" name="label" value="<c:out value="${label}"/>">
 			      </c:when>
-			      <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto editable'}">
+			      <c:when test="${study.subjectIdGeneration =='auto editable'}">
 			       <input onfocus="this.select()" onclick ="<%--if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="label" tabindex ="<c:out value="${tabCount}"/>" value="<c:out value="${label}"/>" size="12" class="formfield">
 			      </c:when>
 			      <c:otherwise>
@@ -30,14 +30,14 @@
 			<c:set var="tabCount" value="${tabCount+1}"/>
 
 			<td valign="top" class="table_cell" nowrap>
-            <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
+            <c:if test="${study.genderRequired !='not used'}">
             <select name="gender" class="formfield" tabindex="<c:out value="${tabCount}"/>">
 				<option value=""><fmt:message key="gender" bundle="${resword}"/>:</option>
 				<option value="m"><fmt:message key="male" bundle="${resword}"/></option>
 				<option value="f"><fmt:message key="female" bundle="${resword}"/></option>
 			</select>
              <c:choose>
-             <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
+             <c:when test="${study.genderRequired !='false'}">
                 <span class="formlabel">*</span>
              </c:when>
              </c:choose>
@@ -103,10 +103,10 @@
 		<tr id="AddSubjectRow2" style="display:none">
 			<td valign="top" align="left" colspan="2" class="table_cell_left" nowrap>
 			 <c:choose>
-	           <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
+	           <c:when test="${study.subjectPersonIdRequired =='required'}">
 			    &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="person_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield"><span class="formlabel">*</span>
 			   </c:when>
-			   <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
+			   <c:when test="${study.subjectPersonIdRequired =='optional'}">
 			    &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="person_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield">
 			   </c:when>
 			   <c:otherwise>
@@ -120,7 +120,7 @@
 				<tr>
 					<td valign="top" align="right">
 					 <c:choose>
-	                    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+	                    <c:when test="${study.collectDob == '1'}">
 						&nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="DOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="dob" size="20" value="<fmt:message key="DOB" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="dobField" ><span class="formlabel">*</span>
 						</td>
 						 <td valign="top" align="left">
@@ -133,7 +133,7 @@
                              </a>
 
                         </c:when>
-					    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
+					    <c:when test="${study.collectDob == '2'}">
 					     &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="YOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="yob" size="15" value="YOB: YYYY" class="formfield" tabindex="<c:out value="${tabCount}"/>"/><span class="formlabel">*</span>
 					    </c:when>
 					    <c:otherwise>

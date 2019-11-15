@@ -18,6 +18,7 @@ import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import core.org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 
 /**
@@ -31,7 +32,7 @@ public class ClinicalDataUnit extends OdmUnit {
     private String studySubjectIds;
     private String permissionTagsString;
     private Set<Integer> edcSet;
-
+    private StudyDao studyDao;
     public ClinicalDataUnit() {
     }
 
@@ -40,14 +41,15 @@ public class ClinicalDataUnit extends OdmUnit {
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, StudyDao studyDao) {
         super(ds, dataset, odmBean, study, category);
-
+        this.studyDao = studyDao;
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, String studySubjectIds,String permissionTagsString , Set<Integer> edcSet) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, String studySubjectIds,String permissionTagsString , Set<Integer> edcSet, StudyDao studyDao) {
         super(ds, dataset, odmBean, study, category);
+        this.studyDao = studyDao;
         this.permissionTagsString=permissionTagsString;
         this.odmClinicalData = new OdmClinicalDataBean();
         this.studySubjectIds = studySubjectIds;
@@ -63,7 +65,7 @@ public class ClinicalDataUnit extends OdmUnit {
         }
         odmClinicalData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds,edcSet);
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds,edcSet, studyDao);
 
         if (this.getCategory() == 1 && study.isSite()) {
             String mvoid = "";

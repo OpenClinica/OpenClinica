@@ -19,6 +19,7 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -61,8 +62,6 @@ public class AddNewSubjectServlet extends SecureController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    @Autowired
-    private StudyDao studyDao;
     // Shaoyu Su
     private final Object simpleLockObj = new Object();
     public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";// global
@@ -155,18 +154,18 @@ public class AddNewSubjectServlet extends SecureController {
             parentStudyId = currentStudy.getStudyId();
             classes = sgcdao.findAllActiveByStudy(currentStudy);
         } else {
-            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
+            Study parentStudy = (Study) currentStudy.getStudy();
             classes = sgcdao.findAllActiveByStudy(parentStudy);
         }
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
-        currentStudy.getStudyParameterConfig().setCollectDob(parentSPV.getValue());
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderRequired");
-        currentStudy.getStudyParameterConfig().setGenderRequired(parentSPV.getValue());
+        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, StudyParamNames.COLLECT_DOB);
+        currentStudy.setCollectDob(parentSPV.getValue());
+        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, StudyParamNames.GENDER_REQUIRED);
+        currentStudy.setGenderRequired(parentSPV.getValue());
         // YW >>
         // tbh
-        StudyParameterValueBean checkPersonId = spvdao.findByHandleAndStudy(parentStudyId, "subjectPersonIdRequired");
-        currentStudy.getStudyParameterConfig().setSubjectPersonIdRequired(checkPersonId.getValue());
+        StudyParameterValueBean checkPersonId = spvdao.findByHandleAndStudy(parentStudyId, StudyParamNames.SUBJECT_PERSON_ID_REQUIRED);
+        currentStudy.setSubjectPersonIdRequired(checkPersonId.getValue());
         // end fix for 1750, tbh 10 2007
 
         if (!fp.isSubmitted()) {
@@ -181,10 +180,10 @@ public class AddNewSubjectServlet extends SecureController {
                 // YW 10-07-2007 <<
                 String idSetting = "";
                 if (currentStudy.isSite()) {
-                    parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-                    currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+                    parentSPV = spvdao.findByHandleAndStudy(parentStudyId, StudyParamNames.SUBJECT_ID_GENERATION);
+                    currentStudy.setSubjectIdGeneration(parentSPV.getValue());
                 }
-                idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+                idSetting = currentStudy.getSubjectIdGeneration();
                 // YW >>
                 logger.info("subject id setting :" + idSetting);
                 // set up auto study subject id
@@ -218,7 +217,7 @@ public class AddNewSubjectServlet extends SecureController {
             }
             v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
 
-            String subIdSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+            String subIdSetting = currentStudy.getSubjectIdGeneration();
             if (!subIdSetting.equalsIgnoreCase("auto editable")) {
                 v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
             }

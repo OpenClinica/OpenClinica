@@ -36,6 +36,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -64,6 +65,8 @@ public class ExtractBean {
     public static final int TXT_FORMAT = 6;
 
     public static final String UNGROUPED = "Ungrouped";
+
+    StudyDao studyDao;
 
     // java.text.SimpleDateFormat sdf = new
     // SimpleDateFormat(ResourceBundleProvider
@@ -338,9 +341,9 @@ public class ExtractBean {
         // general order: subject info first, then group info, then event info,
         // then CRF info
         if (dataset.isShowSubjectDob()) {
-            if (study.getStudyParameterConfig().getCollectDob().equals("2")) {
+            if (study.getCollectDob().equals("2")) {
                 answer.nextCell("YOB");
-            } else if (study.getStudyParameterConfig().getCollectDob().equals("1")) {
+            } else if (study.getCollectDob().equals("1")) {
                 answer.nextCell("DOB");
             }
         }
@@ -420,7 +423,7 @@ public class ExtractBean {
                     eventDescriptions.put(eventStatus, description);
                 }
                 if (dataset.isShowSubjectAgeAtEvent()
-                        && ("1".equals(study.getStudyParameterConfig().getCollectDob()) || "2".equals(study.getStudyParameterConfig().getCollectDob()))) {
+                        && ("1".equals(study.getCollectDob()) || "2".equals(study.getCollectDob()))) {
                     String subjectAgeAtEvent = getColumnLabel(i, j, "AgeAtEvent", numSamples);
                     String description = getColumnDescription(i, j, "Age At Event for ", currentDef.getName(), numSamples);
                     answer.nextCell(subjectAgeAtEvent);
@@ -563,11 +566,11 @@ public class ExtractBean {
             // ////////////////////////
             // subject column data
             if (dataset.isShowSubjectDob()) {
-                if (study.getStudyParameterConfig().getCollectDob().equals("2")) {
+                if (study.getCollectDob().equals("2")) {
                     String yob = getSubjectYearOfBirth(h);
                     answer.nextCell(yob);
                     didb.setSubjectDob(yob);
-                } else if (study.getStudyParameterConfig().getCollectDob().equals("1")) {
+                } else if (study.getCollectDob().equals("1")) {
                     String dob = getSubjectDateOfBirth(h);
                     answer.nextCell(dob);
                     didb.setSubjectDob(dob);
@@ -680,7 +683,7 @@ public class ExtractBean {
                         didb.getEventValues().add(status);
                     }
                     if (dataset.isShowSubjectAgeAtEvent()
-                            && ("1".equals(study.getStudyParameterConfig().getCollectDob()) || "2".equals(study.getStudyParameterConfig().getCollectDob()))) {
+                            && ("1".equals(study.getCollectDob()) || "2".equals(study.getCollectDob()))) {
                         String ageAtEvent = currentSubject.getDateOfBirth() != null ? getAgeAtEvent(h, i, j) : "";
                         answer.nextCell(ageAtEvent);
                         didb.getEventValues().add(ageAtEvent);
@@ -2944,4 +2947,10 @@ public class ExtractBean {
         aBASE_ITEMDATAID = abase_itemdataid;
     }
 
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+    public void setStudyDao(StudyDao studyDao){
+        this.studyDao = studyDao;
+    }
 }

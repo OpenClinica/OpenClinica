@@ -475,7 +475,7 @@
 <c:if test="${displayItem.metadata.required}">
   <span class="alert">*</span>
 </c:if>
-<c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+<c:if test="${study.discrepancyManagement=='true' && !study.status.locked}">
     <c:choose>
     <c:when test="${displayItem.discrepancyNoteStatus == 0}">
         <c:set var="imageFileName" value="icon_noNote" />

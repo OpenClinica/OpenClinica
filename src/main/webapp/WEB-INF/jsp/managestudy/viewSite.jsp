@@ -196,18 +196,18 @@
   </c:choose>
    </td></tr>
 
-  <c:forEach var="config" items="${siteToView.studyParameters}">
+  <c:forEach var="config" items="${siteToView.studyParameterValues}">
    <c:choose>
   
-  <c:when test="${config.parameter.handle=='interviewerNameRequired'}">
+  <c:when test="${config.studyParameter.handle=='interviewerNameRequired'}">
        <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data" bundle="${resword}"/></td><td class="table_cell">
        
        <c:choose>
-       <c:when test="${   config.value.value == 'yes' }">
+       <c:when test="${   config.value == 'yes' }">
        <fmt:message key="yes" bundle="${resword}"/>
 
        </c:when>
-       <c:when test="${config.value.value == 'no' }">
+       <c:when test="${config.value == 'no' }">
             <fmt:message key="no" bundle="${resword}"/>
       </c:when>
        <c:otherwise>
@@ -217,10 +217,10 @@
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='interviewerNameDefault'}">
+  <c:when test="${config.studyParameter.handle=='interviewerNameDefault'}">
       <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
        <c:choose>
-       <c:when test="${config.value.value== 'blank'}">
+       <c:when test="${config.value == 'blank'}">
         <fmt:message key="blank" bundle="${resword}"/>
 
        </c:when>
@@ -231,15 +231,15 @@
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='interviewDateRequired'}">
+  <c:when test="${config.studyParameter.handle=='interviewDateRequired'}">
       <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${resword}"/></td><td class="table_cell">
       
       <c:choose>
-       <c:when test="${  config.value.value == 'yes'}">
+       <c:when test="${  config.value == 'yes'}">
        <fmt:message key="yes" bundle="${resword}"/>
 
        </c:when>
-      <c:when test="${config.value.value == 'no'  }">
+      <c:when test="${config.value == 'no'  }">
             <fmt:message key="no" bundle="${resword}"/>
       </c:when>
        <c:otherwise>
@@ -249,10 +249,10 @@
       </td>
       </tr>
     </c:when>
-  <c:when test="${config.parameter.handle=='interviewDateDefault'}">
+  <c:when test="${config.studyParameter.handle=='interviewDateDefault'}">
       <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
        <c:choose>
-       <c:when test="${config.value.value== 'blank'}">
+       <c:when test="${config.value == 'blank'}">
        <fmt:message key="blank" bundle="${resword}"/>
 
        </c:when>

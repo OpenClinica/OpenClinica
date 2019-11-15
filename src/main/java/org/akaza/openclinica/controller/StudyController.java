@@ -31,7 +31,7 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.login.UserRole;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.dto.ParticipantIdModel;
 import org.akaza.openclinica.controller.dto.ParticipantIdVariable;
@@ -281,44 +281,89 @@ public class StudyController {
         return  new ResponseEntity(studyEnvStatusDTO, org.springframework.http.HttpStatus.OK);
     }
 
-    private StudyParameterConfig processStudyConfigParameters(HashMap<String, Object> map, ArrayList<ErrorObj> errorObjects , String templateID) {
-        StudyParameterConfig spc = new StudyParameterConfig();
+    private List<StudyParameterValue> processStudyParameterValues(HashMap<String, Object> map, ArrayList<ErrorObj> errorObjects , String templateID) {
+        List<StudyParameterValue> studyParameterValues = new ArrayList<>();
         String collectBirthDate = (String) map.get("collectDateOfBirth");
         Boolean collectSex = (Boolean) map.get("collectSex");
         String collectPersonId = (String) map.get("collectPersonId");
         Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
         String enforceEnrollmentCap =  String.valueOf(map.get("enforceEnrollmentCap"));
+
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.COLLECT_DOB, "1"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.DISCREPANCY_MANAGEMENT, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.GENDER_REQUIRED, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, "required"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED, "not_used"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_DEFAULT, "blank"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_EDITABLE, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_REQUIRED, "not_used"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_DEFAULT, "blank"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_EDITABLE, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "manual"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF, "false"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, "false"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.EVENT_LOCATION_REQUIRED, "not_used"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_PORTAL, "disabled"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.RANDOMIZATION, "disabled"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, "false"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, ""));
+
         if (collectBirthDate == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
             errorObjects.add(errorObject);
         } else {
             collectBirthDate = collectBirthDate.trim();
         }
-        spc.setCollectDob(collectBirthDate);
+        if (StringUtils.isEmpty(collectBirthDate)) {
+            collectBirthDate ="3";
+        } else {
+            switch (collectBirthDate.toLowerCase()) {
+                case "always":
+                    collectBirthDate  = "1";
+                    break;
+                case "only_the_year":
+                    collectBirthDate = "2";
+                    break;
+                default:
+                    collectBirthDate = "3";
+                    break;
+            }
+        }
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.COLLECT_DOB, collectBirthDate));
+
         if (collectSex == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectSex");
             errorObjects.add(errorObject);
         }
-        spc.setGenderRequired(Boolean.toString(collectSex));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.GENDER_REQUIRED, Boolean.toString(collectSex)));
         if (collectPersonId == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectPersonId");
             errorObjects.add(errorObject);
         } else {
             collectPersonId = collectPersonId.trim();
         }
-        spc.setSubjectPersonIdRequired(collectPersonId);
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, collectPersonId));
         if (showSecondaryId == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "ShowSecondaryId");
             errorObjects.add(errorObject);
         }
-        spc.setSecondaryLabelViewable(Boolean.toString(showSecondaryId));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, Boolean.toString(showSecondaryId)));
         if (enforceEnrollmentCap == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "EnforceEnrollmentCap");
             errorObjects.add(errorObject);
         }
-        spc.setEnforceEnrollmentCap(enforceEnrollmentCap);
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, enforceEnrollmentCap));
 
-        return spc;
+        return studyParameterValues;
+    }
+    public StudyParameterValue createStudyParameterValueWithHandleAndValue(String handle, String parameterValue){
+        StudyParameterValue spv = new StudyParameterValue();
+        StudyParameter parameter = studyParameterDao.findByHandle(handle);
+        spv.setStudyParameter(parameter);
+        spv.setValue(parameterValue);
+        return  spv;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
@@ -351,7 +396,7 @@ public class StudyController {
         CoreResources.setRequestSchema(request, schema);
         Study schemaStudy = studyDao.findByStudyEnvUuid(existingStudy.getStudyEnvUuid());
         setChangeableStudySettings(schemaStudy, parameters);
-        updateStudyConfigParameters(request, schemaStudy, parameters.studyParameterConfig,parameters.templateID , parameters.enrollmentCap);
+        updateStudyConfigParameters(request, schemaStudy, parameters.studyParameterValues, parameters.templateID , parameters.enrollmentCap);
 
         ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
         responseSuccess.setMessage(validation_passed_message);
@@ -377,7 +422,7 @@ public class StudyController {
         Integer expectedTotalEnrollment;
         Date startDate;
         Date endDate;
-        StudyParameterConfig studyParameterConfig;
+        List<StudyParameterValue> studyParameterValues;
         core.org.akaza.openclinica.domain.Status status;
         String templateID;
         Boolean enrollmentCap;
@@ -500,8 +545,7 @@ public class StudyController {
                 errorObjects.add(errorObject);
             }
 
-
-            studyParameterConfig = processStudyConfigParameters(map, errorObjects , templateID);
+            studyParameterValues = processStudyParameterValues(map, errorObjects, templateID);
             Locale locale = new Locale("en_US");
             request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
             ResourceBundleProvider.updateLocale(locale);
@@ -602,7 +646,7 @@ public class StudyController {
             return getResponseSuccess(byOidEnvType);
         }
         Study schemaStudy = createSchemaStudy(request, study, ownerUserAccount);
-        setStudyConfigParameters(request, study, schemaStudy, parameters.studyParameterConfig , parameters.templateID);
+        setStudyParameterValuesToTheStudy(request, study, schemaStudy, parameters.studyParameterValues , parameters.templateID);
         logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 
         if (errorObjects != null && errorObjects.size() != 0) {
@@ -664,75 +708,20 @@ public class StudyController {
         return schemaStudy;
     }
 
-    private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, StudyParameterConfig studyParameterConfig , String templateID ,Boolean enrollmentCap) {
+    private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, List<StudyParameterValue> newStudyParameterValues, String templateID ,Boolean enrollmentCap) {
         List<StudyParameterValue> studyParameterValues = schemaStudy.getStudyParameterValues();
 
         addParameterValue(studyParameterValues, templateID, schemaStudy, "participantIdTemplate");
         addParameterValue(studyParameterValues, enrollmentCap.toString(), schemaStudy, "enforceEnrollmentCap");
 
-
-        for (StudyParameterValue spv : studyParameterValues) {
-            switch (spv.getStudyParameter().getHandle()) {
-                case "collectDob":
-                    String collectDobValue;
-                    if (StringUtils.isEmpty(studyParameterConfig.getCollectDob())) {
-                        collectDobValue = "3";
-                    } else {
-                        switch (studyParameterConfig.getCollectDob().toLowerCase()) {
-                            case "always":
-                                collectDobValue = "1";
-                                break;
-                            case "only_the_year":
-                                collectDobValue = "2";
-                                break;
-                            default:
-                                collectDobValue = "3";
-                                break;
-                        }
-                    }
-                    spv.setValue(collectDobValue);
-                    break;
-                case "discrepancyManagement":
-                    spv.setValue(studyParameterConfig.getDiscrepancyManagement());
-                    break;
-                case "genderRequired":
-                    spv.setValue(studyParameterConfig.getGenderRequired());
-                    break;
-                case "subjectPersonIdRequired":
-                    spv.setValue(handlePersonIdRequired(studyParameterConfig.getSubjectPersonIdRequired()));
-                    break;
-                case "interviewerNameRequired":
-                    spv.setValue(studyParameterConfig.getInterviewerNameRequired());
-                    break;
-                case "interviewerNameEditable":
-                    spv.setValue(studyParameterConfig.getInterviewerNameEditable());
-                    break;
-                case "interviewDateRequired":
-                    spv.setValue(studyParameterConfig.getInterviewDateRequired());
-                    break;
-                case "interviewDateDefault":
-                    spv.setValue(studyParameterConfig.getInterviewDateDefault());
-                    break;
-                case "interviewDateEditable":
-                    spv.setValue(studyParameterConfig.getInterviewDateEditable());
-                    break;
-                case "subjectIdGeneration":
-                    if (templateID != null && !StringUtils.isEmpty(templateID)) {
-                        spv.setValue("auto non-editable");
-                    } else {
-                        spv.setValue(studyParameterConfig.getSubjectIdGeneration());
-                    }
-                    break;
-                case "subjectIdPrefixSuffix":
-                    spv.setValue(studyParameterConfig.getSubjectIdPrefixSuffix());
-                    break;
-                case "personIdShownOnCRF":
-                    spv.setValue(studyParameterConfig.getPersonIdShownOnCRF());
-                    break;
-                case "secondaryLabelViewable":
-                    spv.setValue(studyParameterConfig.getSecondaryLabelViewable());
-                    break;
-            }
+        for(StudyParameterValue spv : newStudyParameterValues){
+            if(spv.getStudyParameter().getHandle().equalsIgnoreCase(StudyParamNames.SUBJECT_ID_GENERATION)) {
+                if (templateID != null && !StringUtils.isEmpty(templateID))
+                    addParameterValue(studyParameterValues, "auto non-editable", schemaStudy, StudyParamNames.SUBJECT_ID_GENERATION);
+                else
+                    addParameterValue(studyParameterValues, spv.getValue(), schemaStudy, spv.getStudyParameter().getHandle());
+            }else
+                    addParameterValue(studyParameterValues, spv.getValue(), schemaStudy, spv.getStudyParameter().getHandle());
         }
         studyDao.saveOrUpdate(schemaStudy);
     }
@@ -755,123 +744,14 @@ public class StudyController {
         return outputStr;
     }
 
-    private void setStudyConfigParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig, String templateID) {
+    private void setStudyParameterValuesToTheStudy(HttpServletRequest request, Study study, Study schemaStudy, List<StudyParameterValue> studyParameterValues, String templateID) {
         String schema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, study.getSchemaName());
-        List<StudyParameterValue> studyParameterValues = new ArrayList<>();
-
-        schemaStudy.setStudyParameterValues(studyParameterValues);
-        StudyParameterValue collectDobValue = new StudyParameterValue();
-        collectDobValue.setStudy(schemaStudy);
-        StudyParameter collectDob = studyParameterDao.findByHandle("collectDob");
-        collectDobValue.setStudyParameter(collectDob);
-        if (StringUtils.isEmpty(studyParameterConfig.getCollectDob())) {
-            collectDobValue.setValue("3");
-        } else {
-            switch (studyParameterConfig.getCollectDob().toLowerCase()) {
-                case "always":
-                    collectDobValue.setValue("1");
-                    break;
-                case "only_the_year":
-                    collectDobValue.setValue("2");
-                    break;
-                default:
-                    collectDobValue.setValue("3");
-                    break;
-            }
+//        List<StudyParameterValue> studyParameterValues = new ArrayList<>();
+        for(StudyParameterValue spv: studyParameterValues){
+            spv.setStudy(schemaStudy);
         }
-        studyParameterValues.add(collectDobValue);
-
-        StudyParameterValue discrepancyManagementValue = new StudyParameterValue();
-        discrepancyManagementValue.setStudy(schemaStudy);
-        StudyParameter discrepancyManagement = studyParameterDao.findByHandle("discrepancyManagement");
-        discrepancyManagementValue.setStudyParameter(discrepancyManagement);
-        discrepancyManagementValue.setValue(studyParameterConfig.getDiscrepancyManagement());
-        studyParameterValues.add(discrepancyManagementValue);
-
-        StudyParameterValue genderRequiredValue = new StudyParameterValue();
-        genderRequiredValue.setStudy(schemaStudy);
-        StudyParameter genderRequired = studyParameterDao.findByHandle("genderRequired");
-        genderRequiredValue.setStudyParameter(genderRequired);
-        genderRequiredValue.setValue(studyParameterConfig.getGenderRequired());
-        studyParameterValues.add(genderRequiredValue);
-
-        StudyParameterValue subjectPersonIdRequiredValue = new StudyParameterValue();
-        subjectPersonIdRequiredValue.setStudy(schemaStudy);
-        StudyParameter subjectPersonIdRequired = studyParameterDao.findByHandle("subjectPersonIdRequired");
-        subjectPersonIdRequiredValue.setStudyParameter(subjectPersonIdRequired);
-        subjectPersonIdRequiredValue.setValue(handlePersonIdRequired(studyParameterConfig.getSubjectPersonIdRequired()));
-        studyParameterValues.add(subjectPersonIdRequiredValue);
-
-        StudyParameterValue interviewerNameRequiredValue = new StudyParameterValue();
-        interviewerNameRequiredValue.setStudy(schemaStudy);
-        StudyParameter interviewerNameRequired = studyParameterDao.findByHandle("interviewerNameRequired");
-        interviewerNameRequiredValue.setStudyParameter(interviewerNameRequired);
-        interviewerNameRequiredValue.setValue(studyParameterConfig.getInterviewerNameRequired());
-        studyParameterValues.add(interviewerNameRequiredValue);
-
-        StudyParameterValue interviewerNameEditableValue = new StudyParameterValue();
-        interviewerNameEditableValue.setStudy(schemaStudy);
-        StudyParameter interviewerNameEditable = studyParameterDao.findByHandle("interviewerNameEditable");
-        interviewerNameEditableValue.setStudyParameter(interviewerNameEditable);
-        interviewerNameEditableValue.setValue(studyParameterConfig.getInterviewerNameEditable());
-        studyParameterValues.add(interviewerNameEditableValue);
-
-        StudyParameterValue interviewDateRequiredValue = new StudyParameterValue();
-        interviewDateRequiredValue.setStudy(schemaStudy);
-        StudyParameter interviewDateRequired = studyParameterDao.findByHandle("interviewDateRequired");
-        interviewDateRequiredValue.setStudyParameter(interviewDateRequired);
-        interviewDateRequiredValue.setValue(studyParameterConfig.getInterviewDateRequired());
-        studyParameterValues.add(interviewDateRequiredValue);
-
-        StudyParameterValue interviewDateDefaultValue = new StudyParameterValue();
-        interviewDateDefaultValue.setStudy(schemaStudy);
-        StudyParameter interviewDateDefault = studyParameterDao.findByHandle("interviewDateDefault");
-        interviewDateDefaultValue.setStudyParameter(interviewDateDefault);
-        interviewDateDefaultValue.setValue(studyParameterConfig.getInterviewDateDefault());
-        studyParameterValues.add(interviewDateDefaultValue);
-
-        StudyParameterValue interviewDateEditableValue = new StudyParameterValue();
-        interviewDateEditableValue.setStudy(schemaStudy);
-        StudyParameter interviewDateEditable = studyParameterDao.findByHandle("interviewDateEditable");
-        interviewDateEditableValue.setStudyParameter(interviewDateEditable);
-        interviewDateEditableValue.setValue(studyParameterConfig.getInterviewDateEditable());
-        studyParameterValues.add(interviewDateEditableValue);
-
-        StudyParameterValue subjectIdGenerationValue = new StudyParameterValue();
-        subjectIdGenerationValue.setStudy(schemaStudy);
-        StudyParameter subjectIdGeneration = studyParameterDao.findByHandle("subjectIdGeneration");
-        subjectIdGenerationValue.setStudyParameter(subjectIdGeneration);
-        subjectIdGenerationValue.setValue(studyParameterConfig.getSubjectIdGeneration());
-        studyParameterValues.add(subjectIdGenerationValue);
-
-        StudyParameterValue subjectIdPrefixSuffixValue = new StudyParameterValue();
-        subjectIdPrefixSuffixValue.setStudy(schemaStudy);
-        StudyParameter subjectIdPrefixSuffix = studyParameterDao.findByHandle("subjectIdPrefixSuffix");
-        subjectIdPrefixSuffixValue.setStudyParameter(subjectIdPrefixSuffix);
-        subjectIdPrefixSuffixValue.setValue(studyParameterConfig.getSubjectIdPrefixSuffix());
-        studyParameterValues.add(subjectIdPrefixSuffixValue);
-
-        StudyParameterValue personIdShownOnCRFValue = new StudyParameterValue();
-        personIdShownOnCRFValue.setStudy(schemaStudy);
-        StudyParameter personIdShownOnCRF = studyParameterDao.findByHandle("personIdShownOnCRF");
-        personIdShownOnCRFValue.setStudyParameter(personIdShownOnCRF);
-        personIdShownOnCRFValue.setValue(studyParameterConfig.getPersonIdShownOnCRF());
-        studyParameterValues.add(personIdShownOnCRFValue);
-
-        StudyParameterValue secondaryLabelViewableValue = new StudyParameterValue();
-        secondaryLabelViewableValue.setStudy(schemaStudy);
-        StudyParameter secondaryLabelViewable = studyParameterDao.findByHandle("secondaryLabelViewable");
-        secondaryLabelViewableValue.setStudyParameter(secondaryLabelViewable);
-        secondaryLabelViewableValue.setValue(studyParameterConfig.getSecondaryLabelViewable());
-        studyParameterValues.add(secondaryLabelViewableValue);
-
-        StudyParameterValue enforceEnrollmentCapValue = new StudyParameterValue();
-        enforceEnrollmentCapValue.setStudy(schemaStudy);
-        StudyParameter enforceEnrollmentCapViewable = studyParameterDao.findByHandle("enforceEnrollmentCap");
-        enforceEnrollmentCapValue.setStudyParameter(enforceEnrollmentCapViewable);
-        enforceEnrollmentCapValue.setValue(studyParameterConfig.getEnforceEnrollmentCap());
-        studyParameterValues.add(enforceEnrollmentCapValue);
+        schemaStudy.setStudyParameterValues(studyParameterValues);
 
         studyDao.saveOrUpdate(schemaStudy);
         if (StringUtils.isNotEmpty(schema))
@@ -1699,7 +1579,7 @@ public class StudyController {
                                                       Study parentStudy) {
 
         StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
-        seddao = new StudyEventDefinitionDAO(dataSource);
+        seddao = new StudyEventDefinitionDAO(dataSource, studyDao);
         ArrayList defs = seddao.findAllByStudy(parentStudy);
         if (defs == null || defs.isEmpty()) {
             sed.setOrdinal(1);

@@ -7,12 +7,8 @@ release.properties
 .classpath
 .project
 .settings/
-<<<<<<< HEAD
 .DS_Store
 catalina.home_IS_UNDEFINED/
-=======
-src/main/webapp/WEB-INF/jsp/managestudy/reassignStudySubjectConfirm.jsp.DS_Store
->>>>>>> OC-11624: StudyDao to Hibernate
 
 # intellij idea
 .idea/

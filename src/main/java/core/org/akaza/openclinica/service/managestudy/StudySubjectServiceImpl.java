@@ -79,7 +79,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             eventDefinitionCrfByStudyEventDefinition = eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinitionForStudy(studySubject.getId());
         } else { // Is a site
             eventDefinitionCrfByStudyEventDefinition = eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinition(studySubject.getId(),
-                    study.getStudyId(), study.getStudy().getStudyId());
+                    study.getStudyId(), study.checkAndGetParentStudyId());
         }
 
         Map<Integer, SortedSet<EventCRFBean>> eventCrfListByStudyEvent = eventCrfDao.buildEventCrfListByStudyEvent(studySubject.getId());
