@@ -52,8 +52,8 @@
 
     jQuery(document).ready(function() {
         jQuery('#addSubject').click(function() {
-            $('#sidebar_Alerts_open .sidebar_tab_content').html('<i></i>');
-            $('#spanAlert-label').hide();
+            jQuery('#sidebar_Alerts_open .sidebar_tab_content').html('<i></i>');
+            jQuery('#spanAlert-label').hide();
             jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
         });
 
