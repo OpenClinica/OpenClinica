@@ -113,7 +113,7 @@ public class SelectItemsServlet extends SecureController {
             events = new HashMap();
         }
         request.setAttribute("eventlist", events);
-        logger.info("found dob setting: " + currentStudy.getStudyParameterConfig().getCollectDob());
+        logger.info("found dob setting: " + currentStudy.getCollectDob());
 
         if (crfId == 0) {// no crf selected
             if (eventAttr == 0 && subAttr == 0 && CRFAttr == 0 && groupAttr == 0 && discAttr == 0) {
@@ -121,13 +121,13 @@ public class SelectItemsServlet extends SecureController {
                 forwardPage(Page.CREATE_DATASET_2);
             } else if (eventAttr > 0) {
                 request.setAttribute("subjectAgeAtEvent", "1");
-                if (currentStudy.getStudyParameterConfig().getCollectDob().equals("3")) {
+                if (currentStudy.getCollectDob().equals("3")) {
                     request.setAttribute("subjectAgeAtEvent", "0");
                     logger.info("dob not collected, setting age at event to 0");
                 }
                 forwardPage(Page.CREATE_DATASET_EVENT_ATTR);
             } else if (subAttr > 0) {
-                if (currentStudy.getStudyParameterConfig().getCollectDob().equals("3")) {
+                if (currentStudy.getCollectDob().equals("3")) {
                     logger.info("dob not collected, setting age at event to 0");
                 }
                 forwardPage(Page.CREATE_DATASET_SUB_ATTR);

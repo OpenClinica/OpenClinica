@@ -104,6 +104,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         // overridable bool,
         StudyParameter sp = new StudyParameter();
         // super.setEntityAuditInformation(spvb, hm);
+        sp.setStudyParameterId(((Integer) hm.get("study_parameter_id")).intValue());
         sp.setId(((Integer) hm.get("study_parameter_id")).intValue());
         sp.setHandle((String) hm.get("handle"));
         sp.setName((String) hm.get("name"));

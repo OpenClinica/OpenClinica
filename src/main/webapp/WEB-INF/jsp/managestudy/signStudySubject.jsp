@@ -279,13 +279,13 @@
                 <td class="table_cell_top"><c:out value="${subject.uniqueIdentifier}"/></td>
             </tr>
             <c:choose>
-                <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+                <c:when test="${study.collectDob == '1'}">
                     <tr>
                         <td class="table_header_column_top"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
                         <td class="table_cell_top"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></td>
                     </tr>
                 </c:when>
-                <c:when test="${study.studyParameterConfig.collectDob == '3'}">
+                <c:when test="${study.collectDob == '3'}">
                     <tr>
                         <td class="table_header_column_top"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
                         <td class="table_cell_top"><fmt:message key="not_used" bundle="${resword}"/></td>
@@ -888,13 +888,13 @@
                 <td class="table_divider" colspan="2">&nbsp;</td>
             </tr>
             <c:choose>
-                <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+                <c:when test="${study.collectDob == '1'}">
                     <tr>
                         <td class="table_header_column_top"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
                         <td class="table_cell_top"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></td>
                     </tr>
                 </c:when>
-                <c:when test="${study.studyParameterConfig.collectDob == '3'}">
+                <c:when test="${study.collectDob == '3'}">
                     <tr>
                         <td class="table_header_column_top"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
                         <td class="table_cell_top">&nbsp;</td>

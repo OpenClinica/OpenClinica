@@ -753,24 +753,24 @@ public class CreateStudyServlet extends SecureController {
         errors = v.validate();
 
         Study newStudy = (Study) session.getAttribute("newStudy");
-        newStudy.getStudyParameterConfig().setCollectDob(fp.getString("collectDob"));
-        newStudy.getStudyParameterConfig().setDiscrepancyManagement(fp.getString("discrepancyManagement"));
-        newStudy.getStudyParameterConfig().setGenderRequired(fp.getString("genderRequired"));
+        newStudy.setCollectDob(fp.getString("collectDob"));
+        newStudy.setDiscrepancyManagement(fp.getString("discrepancyManagement"));
+        newStudy.setGenderRequired(fp.getString("genderRequired"));
 
-        newStudy.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-        newStudy.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-        newStudy.getStudyParameterConfig().setInterviewDateEditable(fp.getString("interviewDateEditable"));
-        newStudy.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
-        newStudy.getStudyParameterConfig().setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
-        newStudy.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+        newStudy.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
+        newStudy.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+        newStudy.setInterviewDateEditable(fp.getString("interviewDateEditable"));
+        newStudy.setInterviewDateRequired(fp.getString("interviewDateRequired"));
+        newStudy.setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
+        newStudy.setInterviewDateDefault(fp.getString("interviewDateDefault"));
 
-        newStudy.getStudyParameterConfig().setSubjectIdGeneration(fp.getString("subjectIdGeneration"));
-        newStudy.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
-        newStudy.getStudyParameterConfig().setSubjectIdPrefixSuffix(fp.getString("subjectIdPrefixSuffix"));
-        newStudy.getStudyParameterConfig().setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
-        newStudy.getStudyParameterConfig().setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
-        newStudy.getStudyParameterConfig().setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
-      //  newStudy.getStudyParameterConfig().setParticipantPortant(fp.getString("participantPortal"));
+        newStudy.setSubjectIdGeneration(fp.getString("subjectIdGeneration"));
+        newStudy.setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
+        newStudy.setSubjectIdPrefixSuffix(fp.getString("subjectIdPrefixSuffix"));
+        newStudy.setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
+        newStudy.setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
+        newStudy.setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
+      //  newStudy.setParticipantPortant(fp.getString("participantPortal"));
         
         session.setAttribute("newStudy", newStudy);
 
@@ -809,63 +809,63 @@ public class CreateStudyServlet extends SecureController {
         StudyParameterValueBean spv = new StudyParameterValueBean();
         spv.setStudyId(finalStudy.getStudyId());
         spv.setParameter("collectDob");
-        spv.setValue(newStudy.getStudyParameterConfig().getCollectDob());
+        spv.setValue(newStudy.getCollectDob());
         spvdao.create(spv);
 
         spv.setParameter("discrepancyManagement");
-        spv.setValue(newStudy.getStudyParameterConfig().getDiscrepancyManagement());
+        spv.setValue(newStudy.getDiscrepancyManagement());
         spvdao.create(spv);
 
         spv.setParameter("genderRequired");
-        spv.setValue(newStudy.getStudyParameterConfig().getGenderRequired());
+        spv.setValue(newStudy.getGenderRequired());
         spvdao.create(spv);
 
         spv.setParameter("subjectPersonIdRequired");
-        spv.setValue(newStudy.getStudyParameterConfig().getSubjectPersonIdRequired());
+        spv.setValue(newStudy.getSubjectPersonIdRequired());
         spvdao.create(spv);
 
         spv.setParameter("interviewerNameRequired");
-        spv.setValue(newStudy.getStudyParameterConfig().getInterviewerNameRequired());
+        spv.setValue(newStudy.getInterviewerNameRequired());
         spvdao.create(spv);
 
         spv.setParameter("interviewerNameDefault");
-        spv.setValue(newStudy.getStudyParameterConfig().getInterviewerNameDefault());
+        spv.setValue(newStudy.getInterviewerNameDefault());
         spvdao.create(spv);
 
         spv.setParameter("interviewerNameEditable");
-        spv.setValue(newStudy.getStudyParameterConfig().getInterviewerNameEditable());
+        spv.setValue(newStudy.getInterviewerNameEditable());
         spvdao.create(spv);
 
         spv.setParameter("interviewDateRequired");
-        spv.setValue(newStudy.getStudyParameterConfig().getInterviewDateRequired());
+        spv.setValue(newStudy.getInterviewDateRequired());
         spvdao.create(spv);
 
         spv.setParameter("interviewDateDefault");
-        spv.setValue(newStudy.getStudyParameterConfig().getInterviewDateDefault());
+        spv.setValue(newStudy.getInterviewDateDefault());
         spvdao.create(spv);
 
         spv.setParameter("interviewDateEditable");
-        spv.setValue(newStudy.getStudyParameterConfig().getInterviewDateEditable());
+        spv.setValue(newStudy.getInterviewDateEditable());
         spvdao.create(spv);
 
         spv.setParameter("subjectIdGeneration");
-        spv.setValue(newStudy.getStudyParameterConfig().getSubjectIdGeneration());
+        spv.setValue(newStudy.getSubjectIdGeneration());
         spvdao.create(spv);
 
         spv.setParameter("subjectIdPrefixSuffix");
-        spv.setValue(newStudy.getStudyParameterConfig().getSubjectIdPrefixSuffix());
+        spv.setValue(newStudy.getSubjectIdPrefixSuffix());
         spvdao.create(spv);
 
         spv.setParameter("personIdShownOnCRF");
-        spv.setValue(newStudy.getStudyParameterConfig().getPersonIdShownOnCRF());
+        spv.setValue(newStudy.getPersonIdShownOnCRF());
         spvdao.create(spv);
 
         spv.setParameter("secondaryLabelViewable");
-        spv.setValue(newStudy.getStudyParameterConfig().getSecondaryLabelViewable());
+        spv.setValue(newStudy.getSecondaryLabelViewable());
         spvdao.create(spv);
 
         spv.setParameter("adminForcedReasonForChange");
-        spv.setValue(newStudy.getStudyParameterConfig().getAdminForcedReasonForChange());
+        spv.setValue(newStudy.getAdminForcedReasonForChange());
         spvdao.create(spv);
 
         logger.info("study parameters created done");

@@ -5,8 +5,6 @@ package org.akaza.openclinica.service;
 
 import javax.servlet.http.HttpServletRequest;
 
-import core.org.akaza.openclinica.service.Component;
-import core.org.akaza.openclinica.service.Page;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import core.org.akaza.openclinica.domain.user.UserAccount;

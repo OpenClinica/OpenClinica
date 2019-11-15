@@ -171,7 +171,7 @@ public class MainMenuServlet extends SecureController {
         int parentStudyId = currentStudy.checkAndGetParentStudyId();
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+        currentStudy.setSubjectIdGeneration(parentSPV.getValue());
         String idSetting = parentSPV.getValue();
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
             //Shaoyu Su
@@ -228,6 +228,7 @@ public class MainMenuServlet extends SecureController {
 
         EventStatusStatisticsTableFactory factory = new EventStatusStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
+        factory.setStudyDao(getStudyDao());
         factory.setCurrentStudy(currentStudy);
         factory.setStudyEventDao(getStudyEventDAO());
         String subjectEventStatusStatistics = factory.createTable(request, response).render();
@@ -238,6 +239,7 @@ public class MainMenuServlet extends SecureController {
 
         SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
+        factory.setStudyDao(getStudyDao());
         factory.setCurrentStudy(currentStudy);
         String studySiteStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySiteStatistics", studySiteStatistics);
@@ -248,6 +250,7 @@ public class MainMenuServlet extends SecureController {
 
         StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
+        factory.setStudyDao(getStudyDao());
         factory.setCurrentStudy(currentPublicStudy);
         String studyStatistics = factory.createTable(request, response).render();
         request.setAttribute("studyStatistics", studyStatistics);
@@ -261,6 +264,7 @@ public class MainMenuServlet extends SecureController {
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
         factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyDAO(getStudyDao());
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
@@ -337,4 +341,7 @@ public class MainMenuServlet extends SecureController {
         return (SDVUtil) SpringServletAccess.getApplicationContext(context).getBean("sdvUtil");
     }
 
+    public StudyDao getStudyDao() {
+        return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
+    }
 }

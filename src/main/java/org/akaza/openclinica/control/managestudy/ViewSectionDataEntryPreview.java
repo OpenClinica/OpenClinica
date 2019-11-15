@@ -398,7 +398,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
         SubjectBean subject = (SubjectBean) subjectDao.findByPK(subjectId);
         Study currentStudy =    (Study)  request.getSession().getAttribute("study");
         // Let us process the age
-        if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+        if (currentStudy.getCollectDob().equals("1")) {
             StudyEventDAO sedao = new StudyEventDAO(getDataSource());
             StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());

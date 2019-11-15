@@ -141,13 +141,13 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             SubjectBean subject = (SubjectBean) sdao.findByPK(studySubject.getSubjectId());
 
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-            study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(study.getStudyId(), "collectDob").getValue());
+            study.setCollectDob(spvdao.findByHandleAndStudy(study.getStudyId(), "collectDob").getValue());
             String collectdob = "used";
-            if (study.getStudyParameterConfig().getCollectDob().equals("2")) {
+            if (study.getCollectDob().equals("2")) {
                 collectdob = "yearOnly";
-            } else if (study.getStudyParameterConfig().getCollectDob().equals("3")) {
+            } else if (study.getCollectDob().equals("3")) {
                 collectdob = "notUsed";
-            } else if (study.getStudyParameterConfig().getCollectDob().equals("1")) {
+            } else if (study.getCollectDob().equals("1")) {
                 collectdob = "used";
             }
 

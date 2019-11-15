@@ -306,7 +306,7 @@
 		</td>
 	</tr>
 
-    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
+    <c:if test="${study.eventLocationRequired != 'not_used'}">
     <tr>
         <td class="formlabel" align="right"><fmt:message key="location" bundle="${resword}"/></td>
           <td valign="top">
@@ -317,8 +317,8 @@
                     <input type="text" name="location" value="<c:out value="${location}"/>" size="50" class="formfieldXL">
                 </div>
                 </td>
-                <td><c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=location&column=location','spanAlert-location'); return false;">
+                <td><c:if test="${study.eventLocationRequired == 'required'}">*</c:if>
+                    <c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=location&column=location','spanAlert-location'); return false;">
                     </a></c:if></td>
             </tr>
             <tr>
@@ -328,7 +328,7 @@
         </td>
     </tr>
     </c:if>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+    <c:if test="${study.eventLocationRequired == 'not_used'}">
         <input type="hidden" name="location" value="">
     </c:if>
 </table>
@@ -391,7 +391,7 @@
 			</table>
 		</td>
 	</tr>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
+    <c:if test="${study.eventLocationRequired != 'not_used'}">
 	<tr>
 		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -403,8 +403,8 @@
 				</div>
 				</td>
 				<td>
-                    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled0'); return false;">
+                    <c:if test="${study.eventLocationRequired == 'required'}">*</c:if>
+                    <c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled0'); return false;">
                     </a></c:if>
                 </td>
 			</tr>
@@ -415,7 +415,7 @@
 		</td>
 	</tr>
     </c:if>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+    <c:if test="${study.eventLocationRequired == 'not_used'}">
         <input type="hidden" name="location" value="">
     </c:if>
 	<tr>
@@ -424,7 +424,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="startScheduled0"/><c:param name="count" value="3"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled0&column=start_date','spanAlert-startScheduled0'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled0&column=start_date','spanAlert-startScheduled0'); return false;">
 				</a></c:if></td>
 			</tr>
 			<tr>
@@ -439,7 +439,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="endScheduled0"/><c:param name="count" value="4"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled0&column=end_date','spanAlert-endScheduled0'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled0&column=end_date','spanAlert-endScheduled0'); return false;">
 				</a></c:if></td>
 			</tr>
 			<tr>
@@ -514,7 +514,7 @@
 			</table>
 		</td>
 	</tr>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
+    <c:if test="${study.eventLocationRequired != 'not_used'}">
 	<tr>
 		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -526,8 +526,8 @@
 				</div>
 				</td>
 				<td>
-                    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled1'); return false;">
+                    <c:if test="${study.eventLocationRequired == 'required'}">*</c:if>
+                    <c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled1'); return false;">
                     </a></c:if></td>
 			</tr>
 			<tr>
@@ -537,7 +537,7 @@
 		</td>
 	</tr>
     </c:if>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+    <c:if test="${study.eventLocationRequired == 'not_used'}">
         <input type="hidden" name="location" value="">
     </c:if>
     
@@ -547,7 +547,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="startScheduled1"/><c:param name="count" value="3"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)*<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled1&column=start_date','spanAlert-startScheduled1'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)*<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled1&column=start_date','spanAlert-startScheduled1'); return false;">
 				</a></c:if></td>
 			</tr>
 			<tr>
@@ -562,7 +562,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="endScheduled1"/><c:param name="count" value="4"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled1&column=end_date','spanAlert-endScheduled1'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled1&column=end_date','spanAlert-endScheduled1'); return false;">
 				</a></c:if></td>
 			</tr>
 			<tr>
@@ -639,7 +639,7 @@
 			</table>
 		</td>
 	</tr>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
+    <c:if test="${study.eventLocationRequired != 'not_used'}">
 	<tr>
 		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -651,8 +651,8 @@
 				</div>
 				</td>
 				<td>
-                    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled2'); return false;">
+                    <c:if test="${study.eventLocationRequired == 'required'}">*</c:if>
+                    <c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled2'); return false;">
                     </a></c:if></td>
 			</tr>
 			<tr>
@@ -662,7 +662,7 @@
 		</td>
 	</tr>
     </c:if>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+    <c:if test="${study.eventLocationRequired == 'not_used'}">
         <input type="hidden" name="location" value="">
     </c:if>
 
@@ -672,7 +672,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="startScheduled2"/><c:param name="count" value="3"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)*<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled2&column=start_date','spanAlert-startScheduled2'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)*<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled2&column=start_date','spanAlert-startScheduled2'); return false;">
 				</a></c:if></td>
 			</tr>
 			<tr>
@@ -687,7 +687,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="endScheduled2"/><c:param name="count" value="4"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled2&column=end_date','spanAlert-endScheduled2'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled2&column=end_date','spanAlert-endScheduled2'); return false;">
 				</a></c:if></td>
 			</tr>
 			<tr>
@@ -764,7 +764,7 @@
 		</td>
 	</tr>
 
-    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
+    <c:if test="${study.eventLocationRequired != 'not_used'}">
 	<tr>
 		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -776,8 +776,8 @@
 				</div>
 				</td>
 				<td>
-                    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled3'); return false;">
+                    <c:if test="${study.eventLocationRequired == 'required'}">*</c:if>
+                    <c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled3'); return false;">
                     </a></c:if></td>
 			</tr>
 			<tr>
@@ -787,7 +787,7 @@
 		</td>
 	</tr>
     </c:if>
-    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+    <c:if test="${study.eventLocationRequired == 'not_used'}">
         <input type="hidden" name="location" value="">
     </c:if>
 
@@ -797,7 +797,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="startScheduled3"/><c:param name="count" value="3"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)*<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled3&column=start_date','spanAlert-startScheduled3'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)*<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled3&column=start_date','spanAlert-startScheduled3'); return false;">
 				</a></c:if></td>
 			</tr>
 			<tr>
@@ -812,7 +812,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="endScheduled3"/><c:param name="count" value="4"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled3&column=end_date','spanAlert-endScheduled3'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled3&column=end_date','spanAlert-endScheduled3'); return false;">
 				</a></c:if></td>
 			</tr>
 			<tr>

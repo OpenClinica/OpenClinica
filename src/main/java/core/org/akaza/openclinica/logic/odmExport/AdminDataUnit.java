@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AdminDataUnit extends OdmUnit {
     private OdmAdminDataBean odmAdminData;
 
-    @Autowired
     private StudyDao studyDao;
     public AdminDataUnit() {
     }
@@ -39,8 +38,9 @@ public class AdminDataUnit extends OdmUnit {
         this.odmAdminData = new OdmAdminDataBean();
     }
 
-    public AdminDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category) {
+    public AdminDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, StudyDao studyDao) {
         super(ds, dataset, odmBean, study, category);
+        this.studyDao = studyDao;
         this.odmAdminData = new OdmAdminDataBean();
     }
 
@@ -54,7 +54,7 @@ public class AdminDataUnit extends OdmUnit {
         }
         odmAdminData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds, studyDao);
         if (this.getCategory() == 1 && study.isSite()) {
             String mvoid = "";
             if (this.dataset != null && this.dataset.getId() > 0) {

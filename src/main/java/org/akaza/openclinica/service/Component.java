@@ -3,11 +3,18 @@
  */
 package org.akaza.openclinica.service;
 
+<<<<<<< HEAD
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+=======
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import java.io.Serializable;
+>>>>>>> OC-11624: Removed the links with studyParameterConfig
 
 /**
  * @author joekeremian

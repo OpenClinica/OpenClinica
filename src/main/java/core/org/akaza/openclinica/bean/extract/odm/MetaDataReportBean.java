@@ -45,7 +45,6 @@ import core.org.akaza.openclinica.bean.odmbeans.StudyGroupClassListBean;
 import core.org.akaza.openclinica.bean.odmbeans.StudyGroupItemBean;
 import core.org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import core.org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
-import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RulesPostImportContainer;
@@ -905,43 +904,42 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(currentIndent + indent + "</OpenClinica:RelatedInformation>");
             xml.append(nls);
 
-            StudyParameterConfig spc = study.getStudyParameterConfig();
             xml.append(currentIndent + indent + "<OpenClinica:StudyParameterConfiguration>");
             xml.append(nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_collectDob\"" + " Value=\""
-                    + spc.getCollectDob() + "\"/>" + nls);
+                    + study.getCollectDob() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_discrepancyManagement\"" + " Value=\""
-                    + spc.getDiscrepancyManagement() + "\"/>" + nls);
+                    + study.getDiscrepancyManagement() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_subjectPersonIdRequired\"" + " Value=\""
-                    + spc.getSubjectPersonIdRequired() + "\"/>" + nls);
+                    + study.getSubjectPersonIdRequired() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_genderRequired\"" + " Value=\""
-                    + spc.getGenderRequired() + "\"/>" + nls);
+                    + study.getGenderRequired() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_subjectIdGeneration\"" + " Value=\""
-                    + spc.getSubjectIdGeneration() + "\"/>" + nls);
-          if(!StringUtils.isEmpty(spc.getParticipantIdTemplate())) {
+                    + study.getSubjectIdGeneration() + "\"/>" + nls);
+          if(!StringUtils.isEmpty(study.getParticipantIdTemplate())) {
               xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_subjectIdTemplate\"" + " Value=\""
-                      +  StringEscapeUtils.escapeXml(spc.getParticipantIdTemplate())  + "\"/>" + nls);
+                      +  StringEscapeUtils.escapeXml(study.getParticipantIdTemplate())  + "\"/>" + nls);
           }
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameRequired\"" + " Value=\""
-                    + spc.getInterviewerNameRequired() + "\"/>" + nls);
+                    + study.getInterviewerNameRequired() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameDefault\"" + " Value=\""
-                    + spc.getInterviewerNameDefault() + "\"/>" + nls);
+                    + study.getInterviewerNameDefault() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameEditable\"" + " Value=\""
-                    + spc.getInterviewerNameEditable() + "\"/>" + nls);
+                    + study.getInterviewerNameEditable() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateRequired\"" + " Value=\""
-                    + spc.getInterviewDateRequired() + "\"/>" + nls);
+                    + study.getInterviewDateRequired() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateDefault\"" + " Value=\""
-                    + spc.getInterviewDateDefault() + "\"/>" + nls);
+                    + study.getInterviewDateDefault() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateEditable\"" + " Value=\""
-                    + spc.getInterviewDateEditable() + "\"/>" + nls);
+                    + study.getInterviewDateEditable() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_personIdShownOnCRF\"" + " Value=\""
-                    + spc.getPersonIdShownOnCRF() + "\"/>" + nls);
+                    + study.getPersonIdShownOnCRF() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_secondaryLabelViewable\"" + " Value=\""
-                    + spc.getSecondaryLabelViewable() + "\"/>" + nls);
+                    + study.getSecondaryLabelViewable() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_adminForcedReasonForChange\""
-                    + " Value=\"" + spc.getAdminForcedReasonForChange() + "\"/>" + nls);
+                    + " Value=\"" + study.getAdminForcedReasonForChange() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_eventLocationRequired\"" + " Value=\""
-                    + spc.getEventLocationRequired() + "\"/>" + nls);
+                    + study.getEventLocationRequired() + "\"/>" + nls);
 
             addStudyParameterLists(currentIndent + indent + indent);
 

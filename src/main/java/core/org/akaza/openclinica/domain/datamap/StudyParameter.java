@@ -52,7 +52,7 @@ public class StudyParameter  extends DataMapDomainObject {
 		return this.studyParameterId;
 	}
 
-	public void setStudyParameterId(int studyParameterId) {
+	public void setStudyParameterId(Integer studyParameterId) {
 		this.studyParameterId = studyParameterId;
 	}
 

@@ -433,7 +433,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         // currentStudy.setStudyParameters(studyParameters);
         // refresh study params here, tbh 06/2009
         Study currentStudy =    (Study) request.getSession().getAttribute("study");
-        if (currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange().equals("true")) {
+        if (currentStudy.getAdminForcedReasonForChange().equals("true")) {
         	LOGGER.debug("returning true for forced reason for change");
             return true;
         } else {

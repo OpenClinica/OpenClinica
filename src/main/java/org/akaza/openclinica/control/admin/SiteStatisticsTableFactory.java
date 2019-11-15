@@ -15,6 +15,7 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.renderer.HtmlTableRenderer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +28,7 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletResponse;
 
 public class SiteStatisticsTableFactory extends AbstractTableFactory {
-
+    @Autowired
     private StudyDao studyDao;
     private StudySubjectDAO studySubjectDao;
     private Study currentStudy;

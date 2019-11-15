@@ -18,7 +18,7 @@ public class StudyInfoObject {
 
     public StudyInfoObject(String schema, Study study) {
         this.schema = schema;
-        this.studyBean = study;
+        this.study = study;
     }
 
     public String getSchema() {
@@ -37,17 +37,9 @@ public class StudyInfoObject {
         this.study = study;
     }
 
-    public Study getStudyBean() {
-        return studyBean;
-    }
-
-    public void setStudyBean(Study studyBean) {
-        this.studyBean = studyBean;
-    }
-
     private String schema;
     private Study study;
-    private Study studyBean;
+
 
     public boolean isUserUpdated() {
         return isUserUpdated;

@@ -185,14 +185,14 @@ public class ImportDataHelper {
             // eventCrfBean.setCrfVersion(crfVersion);
             if (eventCRFId == 0) {// no event CRF created yet
                 // ???
-                if (studyBean.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+                if (studyBean.getInterviewerNameDefault().equals("blank")) {
                     eventCrfBean.setInterviewerName("");
                 } else {
                     // default will be event's owner name
                     eventCrfBean.setInterviewerName(studyEventBean.getOwner().getName());
                 }
 
-                if (!studyBean.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+                if (!studyBean.getInterviewDateDefault().equals("blank")) {
                     if (studyEventBean.getDateStarted() != null) {
                         eventCrfBean.setDateInterviewed(studyEventBean.getDateStarted());// default
                         // date

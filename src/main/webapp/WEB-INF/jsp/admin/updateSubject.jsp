@@ -56,7 +56,7 @@
 
 <div class="textbox_center">
 <table border="0" cellpadding="2" cellspacing="2">
-<c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
+<c:if test="${study.subjectPersonIdRequired=='required' || study.subjectPersonIdRequired=='optional'}">
 	<tr valign="top">
 	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
 		<td colspan="2">
@@ -74,7 +74,7 @@
           <input type="radio" name="gender"  <c:if test="${!(subjectToUpdate.gender == 109 || subjectToUpdate.gender == 102)}">checked</c:if> value=" "><fmt:message key="not_specified" bundle="${resword}"/>
          
        
-        <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+        <c:if test="${study.discrepancyManagement=='true'}">
 		<a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=gender&column=gender','spanAlert-gender'); return false;">
 		<span name="flag_gender" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 		</c:if>
@@ -82,29 +82,29 @@
 		</td>
 	</tr>
 	<%-- DOB collected in one form or another --%>
-	<c:if test="${study.studyParameterConfig.collectDob=='1' || study.studyParameterConfig.collectDob=='2' }">
+	<c:if test="${study.collectDob=='1' || study.collectDob=='2' }">
 	<tr valign="top">
 		<td class="formlabel" >
-		<c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:message key="date_of_birth" bundle="${resword}"/></c:if>
-		<c:if test="${study.studyParameterConfig.collectDob=='2'}"><fmt:message key="year_of_birth" bundle="${resword}"/></c:if>
+		<c:if test="${study.collectDob=='1'}"><fmt:message key="date_of_birth" bundle="${resword}"/></c:if>
+		<c:if test="${study.collectDob=='2'}"><fmt:message key="year_of_birth" bundle="${resword}"/></c:if>
 		:</td>
 	  	<td>
 		  <div class="formfieldXL_BG">
-		<%--  <c:if test="${study.studyParameterConfig.collectDob=='1'}">
+		<%--  <c:if test="${study.collectDob=='1'}">
 		  <input type="text" name="localBirthDate" size="15" value="<fmt:formatDate value="${subjectToUpdate.dateOfBirth}"  pattern="${dteFormat}"/>" class="formfieldXL">
 		  </c:if>
-		  <c:if test="${study.studyParameterConfig.collectDob=='2'}">
+		  <c:if test="${study.collectDob=='2'}">
 		  --%>
 	  		<input type="text" name="localBirthDate" size="15" value="<c:out value="${localBirthDate}"/>" class="formfieldXL">
 	  	<%--  </c:if>--%>
 		  </div>
 		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="localBirthDate"/></jsp:include>
 	  	</td><td class="formlabel" style="padding-left: 0px;padding-right: 0px;">(
-	  	<c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:message key="date_format" bundle="${resformat}"/></c:if>
-	  	<c:if test="${study.studyParameterConfig.collectDob=='2'}"><fmt:message key="date_format_year" bundle="${resformat}"/></c:if>
+	  	<c:if test="${study.collectDob=='1'}"><fmt:message key="date_format" bundle="${resformat}"/></c:if>
+	  	<c:if test="${study.collectDob=='2'}"><fmt:message key="date_format_year" bundle="${resformat}"/></c:if>
 	  	) *
 	  
-	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+	  	<c:if test="${study.discrepancyManagement=='true'}">
 		 <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
 		 <span name="flag_dateOfBirth" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 		</c:if>

@@ -33,7 +33,7 @@
   });
 </script>
 <script type="text/javascript" language="javascript">
-  function studySubjectResource()  { return "${study.oid}/${studySub.oid}"; }
+  function studySubjectResource()  { return "${study.oc_oid}/${studySub.oid}"; }
   
   function checkCRFLocked(ecId, url){
       jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
@@ -57,10 +57,10 @@
   }
 </script>
 <script>
-  var studyKey = '/study.oid';
+  var studyKey = '/study.oc_oid';
   var participantKey = '/views/participants/';
 
-  if (sessionStorage.getItem(studyKey) !== '${study.oid}') {
+  if (sessionStorage.getItem(studyKey) !== '${study.oc_oid}') {
     function isParticipantData(key) {
         return key.lastIndexOf(participantKey, 0) === 0;
     }
@@ -72,7 +72,7 @@
       if (isParticipantData(key))
         sessionStorage.removeItem(key);
     });
-    sessionStorage.setItem(studyKey, '${study.oid}');
+    sessionStorage.setItem(studyKey, '${study.oc_oid}');
   }
   function store(callback) {
     if (callback)
@@ -352,7 +352,7 @@
         <tr id="general-actions">
           <!-- Table Tools/Actions cell -->
           <td>
-           <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
+           <c:if test="${study.subjectIdGeneration=='manual' && study.status.available}">
               <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
                 <fmt:message key="edit" bundle="${resword}"/>
               </a>
@@ -784,7 +784,7 @@
                                   <td class="table_header_row">
                                     <fmt:message key="person_ID" bundle="${resword}"/>
                                     <%-- DN for person ID goes here --%>
-                                    <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                    <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                       <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasUniqueIDNote eq 'yes'}">
@@ -820,11 +820,11 @@
                                     <c:out value="${studySub.secondaryLabel}"/>
                                   </td>
                                   <c:choose>
-                                    <c:when test="${subjectStudy.studyParameterConfig.collectDob == '1'}">
+                                    <c:when test="${subjectStudy.collectDob == '1'}">
                                       <td class="table_header_row">
                                         <fmt:message key="date_of_birth" bundle="${resword}"/>
                                         <%-- DN for DOB goes here --%>
-                                        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                        <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
@@ -852,11 +852,11 @@
                                         <fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/>
                                       </td>
                                     </c:when>
-                                    <c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
+                                    <c:when test="${subjectStudy.collectDob == '3'}">
                                       <td class="table_header_row">
                                         <fmt:message key="date_of_birth" bundle="${resword}"/>
                                         <%-- DN for DOB goes here --%>
-                                        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                        <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
@@ -888,7 +888,7 @@
                                       <td class="table_header_row">
                                         <fmt:message key="year_of_birth" bundle="${resword}"/>
                                         <%-- DN for DOB goes here --%>
-                                        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                        <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
@@ -928,7 +928,7 @@
                                   <td class="table_header_row">
                                     <fmt:message key="gender" bundle="${resword}"/>
                                     <%-- DN for Gender goes here --%>
-                                    <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                    <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                       <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasGenderNote eq 'yes'}">
@@ -977,7 +977,7 @@
                                     <fmt:message key="enrollment_date" bundle="${resword}"/>
                                     &nbsp;
                                     <%-- DN for enrollment date goes here --%>
-                                    <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                    <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                       <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasEnrollmentNote eq 'yes'}">
@@ -1125,7 +1125,7 @@
                                             <td valign="top">
                                                 <div class="formfieldXL_BG">
                                                     <c:choose>
-                                                        <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+                                                        <c:when test="${study.subjectIdGeneration =='auto non-editable'}">
                                                             <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45"
                                                                    class="formfield form-control" disabled>
                                                             <input class="form-control" type="hidden" name="label" value="<c:out value="${label}"/>">
@@ -1738,7 +1738,7 @@
     function getAccessCode(includeAccessCode) {
         jQuery.ajax({
             type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?includeAccessCode='+includeAccessCode,
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?includeAccessCode='+includeAccessCode,
             success: function(data) {
                 $('#access-code-input').val(data.accessCode !=null ? data.accessCode:"loading...");
                 $('#access-url').text(data.host);
@@ -1753,7 +1753,7 @@
         if ($('#contactInformation, #partid-edit').length) {
             jQuery.ajax({
                 type: 'get',
-                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${esc.escapeJavaScript(studySub.label)}',
                 success: updateParticipateInfo,
                 error: logDump
             });
@@ -1795,7 +1795,7 @@
             }
             jQuery.ajax({
                 type: 'post',
-                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(data) {

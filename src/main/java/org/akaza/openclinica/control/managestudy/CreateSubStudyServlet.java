@@ -139,17 +139,17 @@ public class CreateSubStudyServlet extends SecureController {
                 newStudy.setStudyParameters(configs);
 
                 // YW 10-12-2007 <<
-                // newStudy.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-                // newStudy.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-                // newStudy.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
-                // newStudy.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+                // newStudy.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
+                // newStudy.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+                // newStudy.setInterviewDateRequired(fp.getString("interviewDateRequired"));
+                // newStudy.setInterviewDateDefault(fp.getString("interviewDateDefault"));
                 // YW >>
 
                 // BWP 3169 1-12-2008 <<
-                newStudy.getStudyParameterConfig().setInterviewerNameEditable(currentStudy.getStudyParameterConfig().getInterviewerNameEditable());
-                newStudy.getStudyParameterConfig().setInterviewerNameDefault(currentStudy.getStudyParameterConfig().getInterviewerNameDefault());
-                newStudy.getStudyParameterConfig().setInterviewDateEditable(currentStudy.getStudyParameterConfig().getInterviewDateEditable());
-                newStudy.getStudyParameterConfig().setInterviewDateDefault(currentStudy.getStudyParameterConfig().getInterviewDateDefault());
+                newStudy.setInterviewerNameEditable(currentStudy.getInterviewerNameEditable());
+                newStudy.setInterviewerNameDefault(currentStudy.getInterviewerNameDefault());
+                newStudy.setInterviewDateEditable(currentStudy.getInterviewDateEditable());
+                newStudy.setInterviewDateDefault(currentStudy.getInterviewDateDefault());
                 // >>
 
                 try {
@@ -394,10 +394,10 @@ public class CreateSubStudyServlet extends SecureController {
         }
 
         // YW 10-12-2007 <<
-        study.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-        study.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-        study.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
-        study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+        study.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
+        study.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+        study.setInterviewDateRequired(fp.getString("interviewDateRequired"));
+        study.setInterviewDateDefault(fp.getString("interviewDateDefault"));
         // YW >>
 
         return study;
@@ -484,7 +484,7 @@ public class CreateSubStudyServlet extends SecureController {
         Study parentStudy = (Study) getStudyDao().findByPK(site.getStudy().getStudyId());
         seds = (ArrayList<StudyEventDefinitionBean>) session.getAttribute("definitions");
         if (seds == null || seds.size() <= 0) {
-            StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
             seds = sedDao.findAllByStudy(parentStudy);
         }
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
@@ -757,7 +757,7 @@ public class CreateSubStudyServlet extends SecureController {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());

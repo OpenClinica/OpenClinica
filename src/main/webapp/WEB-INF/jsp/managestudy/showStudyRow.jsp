@@ -20,12 +20,12 @@
 </c:choose>
 <tr valign="top" bgcolor="#F5F5F5">
       <td class="table_cell_left"><b><c:out value="${currRow.bean.parent.name}"/></b></td>
-      <td class="table_cell"><c:out value="${currRow.bean.parent.identifier}"/></td>
-      <td class="table_cell"><c:out value="${currRow.bean.parent.oid}"/></td>
+      <td class="table_cell"><c:out value="${currRow.bean.parent.uniqueIdentifier}"/></td>
+      <td class="table_cell"><c:out value="${currRow.bean.parent.oc_oid}"/></td>
       <td class="table_cell"><c:out value="${currRow.bean.parent.principalInvestigator}"/></td>  
       <td class="table_cell"><c:out value="${currRow.bean.parent.facilityName}"/>&nbsp;</td> 
-      <td class="table_cell"><fmt:formatDate value="${currRow.bean.parent.createdDate}" pattern="${dteFormat}"/></td>
-      <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.parent.status.name}"/></td> 
+      <td class="table_cell"><fmt:formatDate value="${currRow.bean.parent.dateCreated}" pattern="${dteFormat}"/></td>
+      <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.parent.status.description}"/></td>
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
       <tr>
@@ -36,14 +36,14 @@
       </td>
           <c:choose>
           <c:when test="${!currRow.bean.parent.status.deleted}">
-          <td><a href="RemoveStudy?action=confirm&id=<c:out value="${currRow.bean.parent.id}"/>"
+          <td><a href="RemoveStudy?action=confirm&id=<c:out value="${currRow.bean.parent.studyId}"/>"
       onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
       onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span 
       name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
      </td>
           </c:when>
          <c:otherwise>
-          <td><a href="RestoreStudy?action=confirm&id=<c:out value="${currRow.bean.parent.id}"/>"
+          <td><a href="RestoreStudy?action=confirm&id=<c:out value="${currRow.bean.parent.studyId}"/>"
       onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
       onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span 
       name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
@@ -57,21 +57,21 @@
    <c:forEach var="child" items="${currRow.bean.children}">
      <%-- color-coded statuses...--%>
   <c:choose>
-    <c:when test="${child.status.name eq 'available'}">
+    <c:when test="${child.status.description eq 'available'}">
       <c:set var="className" value="aka_green_highlight"/>
     </c:when>
-    <c:when test="${child.status.name eq 'removed'}">
+    <c:when test="${child.status.description eq 'removed'}">
       <c:set var="className" value="aka_red_highlight"/>
     </c:when>
   </c:choose>
     <tr>
       <td class="table_cell_left"><div class="homebox_bullets"><c:out value="${child.name}"/></div></td>
-      <td class="table_cell"><c:out value="${child.identifier}"/></td>
-      <td class="table_cell"><c:out value="${child.oid}"/></td>            
+      <td class="table_cell"><c:out value="${child.uniqueIdentifier}"/></td>
+      <td class="table_cell"><c:out value="${child.oc_oid}"/></td>
       <td class="table_cell"><c:out value="${child.principalInvestigator}"/></td>  
       <td class="table_cell"><c:out value="${child.facilityName}"/>&nbsp;</td> 
-      <td class="table_cell"><fmt:formatDate value="${child.createdDate}" pattern="${dteFormat}"/></td>
-      <td class="table_cell <c:out value='${className}'/>"><c:out value="${child.status.name}"/></td>
+      <td class="table_cell"><fmt:formatDate value="${child.dateCreated}" pattern="${dteFormat}"/></td>
+      <td class="table_cell <c:out value='${className}'/>"><c:out value="${child.status.description}"/></td>
       <td class="table_cell">
         <table border="0" cellpadding="0" cellspacing="0">
       <tr>

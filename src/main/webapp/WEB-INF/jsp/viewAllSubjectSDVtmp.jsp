@@ -156,7 +156,7 @@
       }, 1);
     }
   }
-  store.key = '${study.oid}.SDVs';
+  store.key = '${study.oc_oid}.SDVs';
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     sdvChecks: {}
   };

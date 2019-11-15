@@ -83,7 +83,7 @@ public class RemoveStudyServlet extends SecureController {
         ArrayList subjects = ssdao.findAllByStudy(study);
 
         // find all events in the study, include ones in sites
-        StudyEventDefinitionDAO sefdao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO sefdao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         ArrayList definitions = sefdao.findAllByStudy(study);
 
         String action = request.getParameter("action");

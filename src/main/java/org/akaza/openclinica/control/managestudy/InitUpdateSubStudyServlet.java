@@ -147,7 +147,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
 
         int siteId = Integer.valueOf(request.getParameter("id").trim());
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());

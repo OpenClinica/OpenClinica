@@ -345,25 +345,25 @@ public class UpdateStudyServletNew extends SecureController {
 
     private void confirmWholeStudy(FormProcessor fp) {
         if (study.getStatus().isLocked()) {
-            study.getStudyParameterConfig().setDiscrepancyManagement("false");
+            study.setDiscrepancyManagement("false");
         } else {
-            study.getStudyParameterConfig().setDiscrepancyManagement(fp.getString("discrepancyManagement"));
+            study.setDiscrepancyManagement(fp.getString("discrepancyManagement"));
         }
-        study.getStudyParameterConfig().setCollectDob(fp.getString("collectDob"));
-        study.getStudyParameterConfig().setGenderRequired(fp.getString("genderRequired"));
-        study.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-        study.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-        study.getStudyParameterConfig().setInterviewDateEditable(fp.getString("interviewDateEditable"));
-        study.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
-        study.getStudyParameterConfig().setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
-        study.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
-        study.getStudyParameterConfig().setSubjectIdGeneration(fp.getString("subjectIdGeneration"));
-        study.getStudyParameterConfig().setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
-        study.getStudyParameterConfig().setSubjectIdPrefixSuffix(fp.getString("subjectIdPrefixSuffix"));
-        study.getStudyParameterConfig().setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
-        study.getStudyParameterConfig().setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
-        study.getStudyParameterConfig().setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
-        study.getStudyParameterConfig().setEventLocationRequired(fp.getString("eventLocationRequired"));
+        study.setCollectDob(fp.getString("collectDob"));
+        study.setGenderRequired(fp.getString("genderRequired"));
+        study.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
+        study.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+        study.setInterviewDateEditable(fp.getString("interviewDateEditable"));
+        study.setInterviewDateRequired(fp.getString("interviewDateRequired"));
+        study.setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
+        study.setInterviewDateDefault(fp.getString("interviewDateDefault"));
+        study.setSubjectIdGeneration(fp.getString("subjectIdGeneration"));
+        study.setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
+        study.setSubjectIdPrefixSuffix(fp.getString("subjectIdPrefixSuffix"));
+        study.setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
+        study.setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
+        study.setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
+        study.setEventLocationRequired(fp.getString("eventLocationRequired"));
         if (!errors.isEmpty()) {
             request.setAttribute("formMessages", errors);
         }
@@ -503,31 +503,31 @@ public class UpdateStudyServletNew extends SecureController {
 
         spv.setStudyId(study1.getStudyId());
         spv.setParameter("collectDob");
-        spv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
+        spv.setValue(new Integer(study1.getCollectDob()).toString());
         updateParameter(spvdao, spv);
 
         spv.setParameter("discrepancyManagement");
-        spv.setValue(study1.getStudyParameterConfig().getDiscrepancyManagement());
+        spv.setValue(study1.getDiscrepancyManagement());
         updateParameter(spvdao, spv);
 
         spv.setParameter("genderRequired");
-        spv.setValue(study1.getStudyParameterConfig().getGenderRequired());
+        spv.setValue(study1.getGenderRequired());
         updateParameter(spvdao, spv);
 
         spv.setParameter("subjectPersonIdRequired");
-        spv.setValue(study1.getStudyParameterConfig().getSubjectPersonIdRequired());
+        spv.setValue(study1.getSubjectPersonIdRequired());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewerNameRequired");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewerNameRequired());
+        spv.setValue(study1.getInterviewerNameRequired());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewerNameDefault");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewerNameDefault());
+        spv.setValue(study1.getInterviewerNameDefault());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewerNameEditable");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewerNameEditable());
+        spv.setValue(study1.getInterviewerNameEditable());
         updateParameter(spvdao, spv);
 
         // BWP 1/12/2009 3169 Update interviewerNameEditable and
@@ -540,15 +540,15 @@ public class UpdateStudyServletNew extends SecureController {
         // >>
 
         spv.setParameter("interviewDateRequired");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewDateRequired());
+        spv.setValue(study1.getInterviewDateRequired());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewDateDefault");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewDateDefault());
+        spv.setValue(study1.getInterviewDateDefault());
         updateParameter(spvdao, spv);
 
         spv.setParameter("interviewDateEditable");
-        spv.setValue(study1.getStudyParameterConfig().getInterviewDateEditable());
+        spv.setValue(study1.getInterviewDateEditable());
         updateParameter(spvdao, spv);
         // BWP 1/12/2009 3169>>
         if (sites != null && !sites.isEmpty()) {
@@ -556,29 +556,29 @@ public class UpdateStudyServletNew extends SecureController {
         }
         // >>
         spv.setParameter("subjectIdGeneration");
-        spv.setValue(study1.getStudyParameterConfig().getSubjectIdGeneration());
+        spv.setValue(study1.getSubjectIdGeneration());
         updateParameter(spvdao, spv);
 
         spv.setParameter("subjectIdPrefixSuffix");
-        spv.setValue(study1.getStudyParameterConfig().getSubjectIdPrefixSuffix());
+        spv.setValue(study1.getSubjectIdPrefixSuffix());
         updateParameter(spvdao, spv);
 
         spv.setParameter("personIdShownOnCRF");
-        spv.setValue(study1.getStudyParameterConfig().getPersonIdShownOnCRF());
+        spv.setValue(study1.getPersonIdShownOnCRF());
         updateParameter(spvdao, spv);
         spv.setParameter("secondaryLabelViewable");
-        spv.setValue(study1.getStudyParameterConfig().getSecondaryLabelViewable());
+        spv.setValue(study1.getSecondaryLabelViewable());
         updateParameter(spvdao, spv);
 
         // tbh, 06/04/2009 3684>>
         spv.setParameter("adminForcedReasonForChange");
-        spv.setValue(study1.getStudyParameterConfig().getAdminForcedReasonForChange());
+        spv.setValue(study1.getAdminForcedReasonForChange());
         updateParameter(spvdao, spv);
         // >>
 
         // AH 08/26/2010 5732
         spv.setParameter("eventLocationRequired");
-        spv.setValue(study1.getStudyParameterConfig().getEventLocationRequired());
+        spv.setValue(study1.getEventLocationRequired());
         updateParameter(spvdao, spv);
 
         Study curStudy = (Study) session.getAttribute("study");
@@ -598,10 +598,10 @@ public class UpdateStudyServletNew extends SecureController {
             StudyParameterValueBean childspv = new StudyParameterValueBean();
             childspv.setStudyId(child.getStudyId());
             childspv.setParameter("collectDob");
-            childspv.setValue(new Integer(study1.getStudyParameterConfig().getCollectDob()).toString());
+            childspv.setValue(new Integer(study1.getCollectDob()).toString());
             updateParameter(spvdao, childspv);
             childspv.setParameter("genderRequired");
-            childspv.setValue(study1.getStudyParameterConfig().getGenderRequired());
+            childspv.setValue(study1.getGenderRequired());
             updateParameter(spvdao, childspv);
         }
     }
@@ -629,10 +629,10 @@ public class UpdateStudyServletNew extends SecureController {
 
         if ("interviewerNameEditable".equalsIgnoreCase(parameterType)) {
             studyParameterValueBean.setParameter("interviewerNameEditable");
-            studyParameterValueBean.setValue(studyBean.getStudyParameterConfig().getInterviewerNameEditable());
+            studyParameterValueBean.setValue(studyBean.getInterviewerNameEditable());
         } else {
             studyParameterValueBean.setParameter("interviewDateEditable");
-            studyParameterValueBean.setValue(studyBean.getStudyParameterConfig().getInterviewDateEditable());
+            studyParameterValueBean.setValue(studyBean.getInterviewDateEditable());
         }
         for (Study siteBean : sites) {
             studyParameterValueBean.setStudyId(siteBean.getStudyId());

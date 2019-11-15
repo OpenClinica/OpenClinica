@@ -88,10 +88,10 @@
  	
 	<b><fmt:message key="collect_subject" bundle="${resword}"/></b>&nbsp; 
 	<c:choose>
-    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+    <c:when test="${study.collectDob == '1'}">
     <fmt:message key="yes" bundle="${resword}"/>
     </c:when>
-    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
+    <c:when test="${study.collectDob == '2'}">
     <fmt:message key="only_year_of_birth" bundle="${resword}"/>
     </c:when>
     <c:otherwise>

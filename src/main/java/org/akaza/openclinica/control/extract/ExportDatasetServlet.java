@@ -103,7 +103,8 @@ public class ExportDatasetServlet extends SecureController {
 
         GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(),request,
                 (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources"),
-                (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao"));
+                (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao"),
+                (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain"));
         String action = fp.getString("action");
         int datasetId = fp.getInt("datasetId");
         int adfId = fp.getInt("adfId");
@@ -298,6 +299,7 @@ public class ExportDatasetServlet extends SecureController {
                 TabReportBean answer = new TabReportBean();
 
                 eb = dsdao.getDatasetData(eb, currentstudyid, parentstudy);
+                eb.setStudyDao(getStudyDao());
                 eb.getMetadata();
                 eb.computeReport(answer);
                 request.setAttribute("dataset", db);
@@ -310,7 +312,7 @@ public class ExportDatasetServlet extends SecureController {
                 // removed three lines here and put them in generate file
                 // service, createSPSSFile method. tbh 01/2009
                 eb = dsdao.getDatasetData(eb, currentstudyid, parentstudy);
-
+                eb.setStudyDao(getStudyDao());
                 eb.getMetadata();
 
                 eb.computeReport(answer);
@@ -353,6 +355,7 @@ public class ExportDatasetServlet extends SecureController {
             } else if ("csv".equalsIgnoreCase(action)) {
                 CommaReportBean answer = new CommaReportBean();
                 eb = dsdao.getDatasetData(eb, currentstudyid, parentstudy);
+                eb.setStudyDao(getStudyDao());
                 eb.getMetadata();
                 eb.computeReport(answer);
                 long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;

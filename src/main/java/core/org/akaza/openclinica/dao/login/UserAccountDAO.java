@@ -65,7 +65,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
         super(ds);
         setQueryNames();
     }
-
+    public UserAccountDAO(DataSource ds, StudyDao studyDao) {
+        super(ds);
+        this.studyDao = studyDao;
+        setQueryNames();
+    }
     public UserAccountDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
@@ -1216,4 +1220,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return al;
     }
 
+    public StudyDao getStudyDao(){
+        return this.studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao){
+        this.studyDao = studyDao;
+    }
 }

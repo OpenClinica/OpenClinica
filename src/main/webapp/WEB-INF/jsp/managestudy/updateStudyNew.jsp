@@ -800,12 +800,12 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/>:</td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '1'}">
+   <c:when test="${studyToView.collectDob == '1'}">
     <input type="radio" checked name="collectDob" value="1"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" name="collectDob" value="2"><fmt:message key="only_year_of_birth" bundle="${resword}"/>
      <input type="radio" name="collectDob" value="3"><fmt:message key="not_used" bundle="${resword}"/>
    </c:when>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '2'}">
+   <c:when test="${studyToView.collectDob == '2'}">
     <input type="radio" name="collectDob" value="1"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" checked name="collectDob" value="2"><fmt:message key="only_year_of_birth" bundle="${resword}"/>
      <input type="radio" name="collectDob" value="3"><fmt:message key="not_used" bundle="${resword}"/>
@@ -820,7 +820,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/>:</td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.discrepancyManagement == 'false'}">
+   <c:when test="${studyToView.discrepancyManagement == 'false'}">
     <input type="radio" name="discrepancyManagement" value="true"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" checked name="discrepancyManagement" value="false"><fmt:message key="no" bundle="${resword}"/>
    </c:when>
@@ -834,7 +834,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="gender_required" bundle="${resword}"/>:</td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.genderRequired == 'false'}">
+   <c:when test="${studyToView.genderRequired == 'false'}">
     <input type="radio" name="genderRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" checked name="genderRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
    </c:when>
@@ -848,12 +848,12 @@
   <tr><td>&nbsp;</td></tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required'}">
+   <c:when test="${studyToView.subjectPersonIdRequired == 'required'}">
     <input type="radio" checked name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
     <input type="radio" name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
     <input type="radio" name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
    </c:when>
-    <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+    <c:when test="${studyToView.subjectPersonIdRequired == 'optional'}">
     <input type="radio" name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
     <input type="radio" checked name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
     <input type="radio" name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
@@ -871,7 +871,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="show_person_id_on_crf_header" bundle="${resword}"/>:</td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.personIdShownOnCRF == 'true'}">
+   <c:when test="${studyToView.personIdShownOnCRF == 'true'}">
     <input type="radio" checked name="personIdShownOnCRF" value="true"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" name="personIdShownOnCRF" value="false"><fmt:message key="no" bundle="${resword}"/>
 
@@ -888,12 +888,12 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="how_to_generate_the_study_subject_ID" bundle="${resword}"/>:</td><td>
     <c:choose>
-    <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'manual'}">
+    <c:when test="${studyToView.subjectIdGeneration == 'manual'}">
      <input type="radio" checked name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
      <input type="radio" name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
      <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
     </c:when>
-     <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'auto editable'}">
+     <c:when test="${studyToView.subjectIdGeneration == 'auto editable'}">
      <input type="radio" name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
      <input type="radio" checked name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
      <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
@@ -912,15 +912,15 @@
    <tr><td>&nbsp;</td></tr>
    <tr valign="top">
        <td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.interviewerNameRequired== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.interviewerNameRequired== 'no'}">checked</c:if> name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.interviewerNameRequired== 'not_used'}">checked</c:if> name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
+            <input type="radio" <c:if test="${studyToView.interviewerNameRequired== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+            <input type="radio" <c:if test="${studyToView.interviewerNameRequired== 'no'}">checked</c:if> name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
+            <input type="radio" <c:if test="${studyToView.interviewerNameRequired== 'not_used'}">checked</c:if> name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
        </td>
   </tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewerNameDefault== 'blank'}">
+   <c:when test="${studyToView.interviewerNameDefault== 'blank'}">
     <input type="radio" checked name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
     <input type="radio" name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
 
@@ -935,7 +935,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_name_editable" bundle="${resword}"/></td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewerNameEditable== 'true'}">
+   <c:when test="${studyToView.interviewerNameEditable== 'true'}">
     <input type="radio" checked name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" name="interviewerNameEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
 
@@ -949,15 +949,15 @@
   </tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_required" bundle="${resword}"/></td><td>
-    <input type="radio" <c:if test="${studyToView.studyParameterConfig.interviewDateRequired== 'yes'}"> checked </c:if> name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-    <input type="radio" <c:if test="${studyToView.studyParameterConfig.interviewDateRequired== 'no'}"> checked </c:if> name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-    <input type="radio" <c:if test="${studyToView.studyParameterConfig.interviewDateRequired== 'not_used'}"> checked </c:if> name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
+    <input type="radio" <c:if test="${studyToView.interviewDateRequired== 'yes'}"> checked </c:if> name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+    <input type="radio" <c:if test="${studyToView.interviewDateRequired== 'no'}"> checked </c:if> name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
+    <input type="radio" <c:if test="${studyToView.interviewDateRequired== 'not_used'}"> checked </c:if> name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
   </td>
   </tr>
 
   <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_default_as_blank" bundle="${resword}"/></td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewDateDefault== 'blank'}">
+   <c:when test="${studyToView.interviewDateDefault== 'blank'}">
     <input type="radio" checked name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
     <input type="radio" name="interviewDateDefault" value="pre-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
 
@@ -972,7 +972,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewDateEditable== 'true'}">
+   <c:when test="${studyToView.interviewDateEditable== 'true'}">
     <input type="radio" checked name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
 
@@ -987,7 +987,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="secondary_label_viewable" bundle="${resword}"/></td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.secondaryLabelViewable== 'true'}">
+   <c:when test="${studyToView.secondaryLabelViewable== 'true'}">
     <input type="radio" checked name="secondaryLabelViewable" value="true"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" name="secondaryLabelViewable" value="false"><fmt:message key="no" bundle="${resword}"/>
 
@@ -1002,7 +1002,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="forced_reason_for_change" bundle="${resword}"/></td><td>
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.adminForcedReasonForChange== 'true'}">
+   <c:when test="${studyToView.adminForcedReasonForChange== 'true'}">
     <input type="radio" checked name="adminForcedReasonForChange" value="true"><fmt:message key="yes" bundle="${resword}"/>
     <input type="radio" name="adminForcedReasonForChange" value="false"><fmt:message key="no" bundle="${resword}"/>
 
@@ -1018,9 +1018,9 @@
 
   <tr valign="top">
       <td class="formlabel"><fmt:message key="event_location_required" bundle="${resword}"/></td><td>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'required'}"> checked </c:if> name="eventLocationRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'optional'}"> checked </c:if> name="eventLocationRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
-            <input type="radio" <c:if test="${studyToView.studyParameterConfig.eventLocationRequired== 'not_used'}"> checked </c:if> name="eventLocationRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
+            <input type="radio" <c:if test="${studyToView.eventLocationRequired== 'required'}"> checked </c:if> name="eventLocationRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
+            <input type="radio" <c:if test="${studyToView.eventLocationRequired== 'optional'}"> checked </c:if> name="eventLocationRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
+            <input type="radio" <c:if test="${studyToView.eventLocationRequired== 'not_used'}"> checked </c:if> name="eventLocationRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
       </td>
   </tr>
 

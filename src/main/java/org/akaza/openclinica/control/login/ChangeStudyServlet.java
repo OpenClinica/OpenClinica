@@ -58,8 +58,6 @@ public class ChangeStudyServlet extends SecureController {
     /**
      * Checks whether the user has the correct privilege
      */
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
@@ -92,7 +90,7 @@ public class ChangeStudyServlet extends SecureController {
 
         String action = request.getParameter("action");// action sent by user
         request.setAttribute("requestSchema", "public");
-        UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+        UserAccountDAO udao = new UserAccountDAO(sm.getDataSource(), getStudyDao());
 
         ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), (ArrayList) getStudyDao().findAll());
         CustomRole customRole = new CustomRole();
@@ -162,9 +160,9 @@ public class ChangeStudyServlet extends SecureController {
                     } else // should this be DEFAULT_TENANT_ID from CoreResources?
                         request.setAttribute("changeStudySchema", "public");
 
-                    String studyEnvUuid = StringUtils.isNotEmpty(studyInfoObject.getStudyBean().getStudyEnvUuid()) ?
-                            studyInfoObject.getStudyBean().getStudyEnvUuid()
-                            : studyInfoObject.getStudyBean().getStudyEnvSiteUuid();
+                    String studyEnvUuid = StringUtils.isNotEmpty(studyInfoObject.getStudy().getStudyEnvUuid()) ?
+                            studyInfoObject.getStudy().getStudyEnvUuid()
+                            : studyInfoObject.getStudy().getStudyEnvSiteUuid();
                     request.setAttribute("studyEnvUuid", studyEnvUuid);
                     request.setAttribute("currentStudy", currentStudy);
                     return;
@@ -204,11 +202,12 @@ public class ChangeStudyServlet extends SecureController {
         
         Study newPublicStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
         request.setAttribute("changeStudySchema", newStudySchema);
+        request.setAttribute("requestSchema",newStudySchema);
         Study newStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        ArrayList studyParameters = spvdao.findParamConfigByStudy(newStudy); 
-        newStudy.setStudyParameters(studyParameters);
+//        ArrayList studyParameters = spvdao.findParamConfigByStudy(newStudy);
+        newStudy.setStudyParameters(spvdao.findParamConfigByStudy(newStudy));
         request.setAttribute("changeStudySchema", null);
 
         if (currentStudy != null) {
@@ -219,9 +218,9 @@ public class ChangeStudyServlet extends SecureController {
                 parentStudyId = currentStudy.getStudyId();
             request.setAttribute("requestSchema", oldStudySchema);
             StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-            newStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+            newStudy.setSubjectIdGeneration(parentSPV.getValue());
             request.setAttribute("requestSchema", "public");
-            String idSetting = newStudy.getStudyParameterConfig().getSubjectIdGeneration();
+            String idSetting = newStudy.getSubjectIdGeneration();
             if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
                 request.setAttribute("changeStudySchema", newStudySchema);
                 int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
@@ -230,15 +229,8 @@ public class ChangeStudyServlet extends SecureController {
             }
             request.setAttribute("requestSchema", newStudySchema); //schema we are changing to.
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-            if (!newStudy.isSite()) {// top study
-                scs.setParametersForStudy(newStudy); 
-            } else {
-                if (newStudy.isSite()) {
-                    newStudy.getStudy().setName((getStudyDao().findByPK(newStudy.getStudy().getStudyId())).getName());
-                }
+            if (newStudy.isSite())
                 scs.setParametersForSite(newStudy);
-
-            }
         }
         request.setAttribute("requestSchema", "public");
         if (newStudy.getStatus().equals(Status.DELETED) || newStudy.getStatus().equals(Status.AUTO_DELETED)) {
@@ -255,13 +247,10 @@ public class ChangeStudyServlet extends SecureController {
             udao.update(ub);
 
             String accessToken = (String) request.getSession().getAttribute("accessToken");
-            getStudyBuildService().processModule(accessToken, newPublicStudy.getOc_oid(), ModuleProcessor.Modules.PARTICIPATE);
+            session.setAttribute("study", newStudy);
+            getStudyBuildService().processModule(accessToken, newPublicStudy, ModuleProcessor.Modules.PARTICIPATE);
             request.setAttribute("changeStudySchema", newStudySchema);
-            Study study = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
-            study.getStudy().setName(newStudy.getStudy().getName());
-            study.setStudyParameterConfig(newStudy.getStudyParameterConfig());
-            session.setAttribute("study", study);
-            currentStudy = study;
+            currentStudy = newStudy;
 
             Study userRoleStudy = getStudyBuildService().getPublicStudy(currentRole.getStudyId());
             if (userRoleStudy.isSite()) {
@@ -425,7 +414,7 @@ public class ChangeStudyServlet extends SecureController {
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
         factory.setStudyEventDao(getStudyEventDAO());
-        factory.setStudyDao(studyDao);
+        factory.setStudyDao(getStudyDao());
         String subjectEventStatusStatistics = factory.createTable(request, response).render();
         request.setAttribute("subjectEventStatusStatistics", subjectEventStatusStatistics);
     }
@@ -435,7 +424,7 @@ public class ChangeStudyServlet extends SecureController {
         SiteStatisticsTableFactory factory = new SiteStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
-        factory.setStudyDao(studyDao);
+        factory.setStudyDao(getStudyDao());
         String studySiteStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySiteStatistics", studySiteStatistics);
 
@@ -446,7 +435,7 @@ public class ChangeStudyServlet extends SecureController {
         StudyStatisticsTableFactory factory = new StudyStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
-        factory.setStudyDao(studyDao);
+        factory.setStudyDao(getStudyDao());
         String studyStatistics = factory.createTable(request, response).render();
         request.setAttribute("studyStatistics", studyStatistics);
 
@@ -459,6 +448,7 @@ public class ChangeStudyServlet extends SecureController {
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
         factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyDAO(getStudyDao());
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
@@ -542,4 +532,7 @@ public class ChangeStudyServlet extends SecureController {
         return ctx.getBean("studyBuildService", StudyBuildService.class);
     }
 
+    public StudyDao getStudyDao() {
+        return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
+    }
 }

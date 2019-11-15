@@ -266,7 +266,7 @@ public class EventProcessor implements Processor {
                 hiddenSiteCrfCount = eventDefinitionCrfDao
                         .findSiteHiddenByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(), study.getStudyId()).size();
                 crfCount = eventDefinitionCrfDao
-                        .findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(), study.getStudy().getStudyId()).size();
+                        .findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(), study.checkAndGetParentStudyId()).size();
             } else
                 crfCount = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(), study.getStudyId()).size();
             // Get a count of completed CRFs for the event

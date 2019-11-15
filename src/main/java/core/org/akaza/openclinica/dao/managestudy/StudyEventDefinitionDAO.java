@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
 
-    @Autowired
     private StudyDao studyDao;
     private void setQueryNames() {
         findAllByStudyName = "findAllByStudy";
@@ -45,6 +44,11 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
     public StudyEventDefinitionDAO(DataSource ds) {
         super(ds);
         setQueryNames();
+    }
+    public StudyEventDefinitionDAO(DataSource ds,StudyDao studyDao) {
+        super(ds);
+        setQueryNames();
+        this.studyDao = studyDao;
     }
 
     public StudyEventDefinitionDAO(DataSource ds, DAODigester digester) {

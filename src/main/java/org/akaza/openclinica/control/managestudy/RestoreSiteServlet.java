@@ -86,7 +86,7 @@ public class RestoreSiteServlet extends SecureController {
         ArrayList subjects = ssdao.findAllByStudy(study);
 
         // find all events
-        StudyEventDefinitionDAO sefdao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO sefdao = new StudyEventDefinitionDAO(sm.getDataSource(),getStudyDao());
         ArrayList definitions = sefdao.findAllByStudy(study);
 
         String action = request.getParameter("action");

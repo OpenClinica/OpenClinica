@@ -101,6 +101,7 @@ public class ExampleSpringJob extends QuartzJobBean {
             ruleSetRuleDao = (RuleSetRuleDao) appContext.getBean("ruleSetRuleDao");
             dataSource = (DataSource) appContext.getBean("dataSource");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
+            studyDao = (StudyDao) appContext.getBean("studyDaoDomain");
             AuditEventDAO auditEventDAO = new AuditEventDAO(dataSource);
             // Scheduler scheduler = context.getScheduler();
             // JobDetail detail = context.getJobDetail();
@@ -183,7 +184,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                 userBean = (UserAccountBean) userAccountDAO.findByPK(userId);
                 // needs to also be captured by the servlet, tbh
                 // logger.debug("-- gen tab file 00");
-                generateFileService = new GenerateExtractFileService(dataSource, coreResources, ruleSetRuleDao);
+                generateFileService = new GenerateExtractFileService(dataSource, coreResources, ruleSetRuleDao, studyDao);
 
                 // logger.debug("-- gen tab file 00");
 

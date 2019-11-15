@@ -12,7 +12,6 @@ import java.util.Set;
 import javax.persistence.*;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.core.SessionManager;
@@ -21,6 +20,7 @@ import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -107,9 +107,6 @@ public class Study extends DataMapDomainObject {
     private int filePath;
     private String studyUuid;
     private int subjectCount;
-
-    private transient StudyParameterConfig studyParameterConfig;
-    private transient ArrayList studyParameters;
 
     @Column(name = "study_env_uuid", unique = false, nullable = false)
     public String getStudyEnvUuid() {
@@ -873,69 +870,6 @@ public class Study extends DataMapDomainObject {
     }
 
     @Transient
-    public StudyParameterConfig getStudyParameterConfig(){
-        if(studyParameterConfig != null )
-            return studyParameterConfig;
-        studyParameterConfig = new StudyParameterConfig();
-        List<StudyParameterValue> parameters = getStudyParameterValues();
-        for (int i = 0; i < parameters.size(); i++) {
-            StudyParameterValue spv =  parameters.get(i);
-            if(spv !=null){
-                String handle = spv.getStudyParameter().getHandle();
-                // TO DO: will change to use java reflection later
-                if (handle.equalsIgnoreCase("collectDob")) {
-                    studyParameterConfig.setCollectDob(spv.getValue());
-                } else if (handle.equalsIgnoreCase("genderRequired")) {
-                    studyParameterConfig.setGenderRequired(spv.getValue());
-                } else if (handle.equalsIgnoreCase("discrepancyManagement")) {
-                    studyParameterConfig.setDiscrepancyManagement(spv.getValue());
-                } else if (handle.equalsIgnoreCase("subjectPersonIdRequired")) {
-                    studyParameterConfig.setSubjectPersonIdRequired(spv.getValue().toLowerCase());
-                    // logger.info("subjectPersonIdRequired" +
-                    // studyParameterConfig.getSubjectPersonIdRequired());
-                } else if (handle.equalsIgnoreCase("interviewerNameRequired")) {
-                    studyParameterConfig.setInterviewerNameRequired(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewerNameDefault")) {
-                    studyParameterConfig.setInterviewerNameDefault(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewerNameEditable")) {
-                    studyParameterConfig.setInterviewerNameEditable(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewDateRequired")) {
-                    studyParameterConfig.setInterviewDateRequired(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewDateDefault")) {
-                    studyParameterConfig.setInterviewDateDefault(spv.getValue());
-                } else if (handle.equalsIgnoreCase("interviewDateEditable")) {
-                    studyParameterConfig.setInterviewDateEditable(spv.getValue());
-                } else if (handle.equalsIgnoreCase("subjectIdGeneration")) {
-                    studyParameterConfig.setSubjectIdGeneration(spv.getValue());
-                } else if (handle.equalsIgnoreCase("subjectIdPrefixSuffix")) {
-                    studyParameterConfig.setSubjectIdPrefixSuffix(spv.getValue());
-                } else if (handle.equalsIgnoreCase("personIdShownOnCRF")) {
-                    studyParameterConfig.setPersonIdShownOnCRF(spv.getValue());
-                } else if (handle.equalsIgnoreCase("secondaryLabelViewable")) {
-                    studyParameterConfig.setSecondaryLabelViewable(spv.getValue());
-                } else if (handle.equalsIgnoreCase("enforceEnrollmentCap")) {
-                    studyParameterConfig.setEnforceEnrollmentCap(spv.getValue());
-                } else if (handle.equalsIgnoreCase("adminForcedReasonForChange")) {
-                    studyParameterConfig.setAdminForcedReasonForChange(spv.getValue());
-                } else if (handle.equalsIgnoreCase("eventLocationRequired")) {
-                    studyParameterConfig.setEventLocationRequired(spv.getValue());
-                } else if (handle.equalsIgnoreCase("participantPortal")) {
-                    studyParameterConfig.setParticipantPortal(spv.getValue());
-                } else if (handle.equalsIgnoreCase("randomization")) {
-                    studyParameterConfig.setRandomization(spv.getValue());
-                } else if (handle.equalsIgnoreCase("participantIdTemplate")) {
-                    studyParameterConfig.setParticipantIdTemplate(spv.getValue());
-                }
-            }
-        }
-        return studyParameterConfig;
-    }
-
-    public void setStudyParameterConfig(StudyParameterConfig spc){
-        this.studyParameterConfig = spc;
-    }
-
-    @Transient
     public boolean isSite() {
         return getStudy() != null && getStudy().getStudyId() > 0 ? true : false;
     }
@@ -946,9 +880,6 @@ public class Study extends DataMapDomainObject {
 
     @Transient
     public List<StudyParamsConfig> getStudyParameters() {
-        if(studyParameters != null && studyParameters.size() > 0)
-            return studyParameters;
-        else{
             List<StudyParamsConfig> spcList = new ArrayList<>();
             List<StudyParameterValue> parameters = getStudyParameterValues();
             for (int i = 0; i < parameters.size(); i++) {
@@ -964,19 +895,38 @@ public class Study extends DataMapDomainObject {
                 spcList.add(spc);
             }
             return spcList;
+    }
+
+
+
+    public void setIndividualStudyParameterValue(String parameterName, String value){
+        for(StudyParameterValue spv: getStudyParameterValues()){
+            if(spv.getStudyParameter().getHandle().equalsIgnoreCase(parameterName))
+                spv.setValue(value);
         }
     }
+    @Transient
+    public String getIndividualStudyParameterValue(String parameterName){
+        for(StudyParameterValue spv : getStudyParameterValues()) {
+            if (spv.getStudyParameter().getHandle().equalsIgnoreCase(parameterName))
+                return spv.getValue();
+        }
+        return "";
+    }
+    @Transient
     public void setStudyParameters(List<StudyParamsConfig> spcList){
         List<StudyParameterValue> spvList = new ArrayList<>();
         for(StudyParamsConfig spc: spcList){
+            if(spc.getValue() == null || spc.getValue().getId() == 0)
+                continue;
             StudyParameterValue spv = new StudyParameterValue();
-            spv.setStudyParameterValueId(spc.getParameter().getStudyParameterId());
+            spv.setStudyParameterValueId(spc.getValue().getId());
             spv.setStudy(this);
             spv.setStudyParameter(spc.getParameter());
             spv.setValue(spc.getValue().getValue());
+
             spvList.add(spv);
         }
-        this.studyParameters = (ArrayList) spcList;
         setStudyParameterValues(spvList);
     }
 
@@ -1028,5 +978,284 @@ public class Study extends DataMapDomainObject {
             name = name.substring(0, 27) + "...";
         }
         return name;
+    }
+    /**
+     * @return Returns the collectDob.
+     */
+    @Transient
+    public String getCollectDob() {
+        return getIndividualStudyParameterValue(StudyParamNames.COLLECT_DOB);
+    }
+
+    /**
+     * @param collectDob
+     *            The collectDob to set.
+     */
+    public void setCollectDob(String collectDob) {
+        setIndividualStudyParameterValue(StudyParamNames.COLLECT_DOB, collectDob);
+    }
+
+    /**
+     * @return Returns the discrepancyManagement.
+     */
+    @Transient
+    public String getDiscrepancyManagement() {
+        return getIndividualStudyParameterValue(StudyParamNames.DISCREPANCY_MANAGEMENT);
+    }
+
+    /**
+     * @param discrepancyManagement
+     *            The discrepancyManagement to set.
+     */
+    public void setDiscrepancyManagement(String discrepancyManagement) {
+        setIndividualStudyParameterValue(StudyParamNames.DISCREPANCY_MANAGEMENT, discrepancyManagement);
+    }
+
+    /**
+     * @return Returns the genderRequired.
+     */
+    @Transient
+    public String getGenderRequired() {
+        return getIndividualStudyParameterValue(StudyParamNames.GENDER_REQUIRED);
+    }
+
+    /**
+     * @param genderRequired
+     *            The genderRequired to set.
+     */
+    public void setGenderRequired(String genderRequired) {
+        setIndividualStudyParameterValue(StudyParamNames.GENDER_REQUIRED, genderRequired);
+    }
+
+    /**
+     * @return Returns the interviewDateDefault.
+     */
+    @Transient
+    public String getInterviewDateDefault() {
+        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_DEFAULT);
+    }
+
+    /**
+     * @param interviewDateDefault
+     *            The interviewDateDefault to set.
+     */
+    public void setInterviewDateDefault(String interviewDateDefault) {
+        setIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_DEFAULT, interviewDateDefault);
+    }
+
+    /**
+     * @return Returns the interviewDateEditable.
+     */
+    @Transient
+    public String getInterviewDateEditable() {
+        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_EDITABLE);
+    }
+
+    /**
+     * @param interviewDateEditable
+     *            The interviewDateEditable to set.
+     */
+    public void setInterviewDateEditable(String interviewDateEditable) {
+        setIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_EDITABLE, interviewDateEditable);
+    }
+
+    /**
+     * @return Returns the interviewDateRequired.
+     */
+    @Transient
+    public String getInterviewDateRequired() {
+        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_REQUIRED);
+    }
+
+    /**
+     * @param interviewDateRequired
+     *            The interviewDateRequired to set.
+     */
+    public void setInterviewDateRequired(String interviewDateRequired) {
+        setIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_REQUIRED, interviewDateRequired);
+    }
+
+    /**
+     * @return Returns the interviewerNameDefault.
+     */
+    @Transient
+    public String getInterviewerNameDefault() {
+        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_DEFAULT);
+    }
+
+    /**
+     * @param interviewerNameDefault
+     *            The interviewerNameDefault to set.
+     */
+    public void setInterviewerNameDefault(String interviewerNameDefault) {
+        setIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_DEFAULT, interviewerNameDefault);
+    }
+
+    /**
+     * @return Returns the interviewerNameEditable.
+     */
+    @Transient
+    public String getInterviewerNameEditable() {
+        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_EDITABLE);
+    }
+
+    /**
+     * @param interviewerNameEditable
+     *            The interviewerNameEditable to set.
+     */
+    public void setInterviewerNameEditable(String interviewerNameEditable) {
+        setIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_EDITABLE, interviewerNameEditable);
+    }
+
+    /**
+     * @return Returns the interviewerNameRequired.
+     */
+    @Transient
+    public String getInterviewerNameRequired() {
+        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED);
+    }
+
+    /**
+     * @param interviewerNameRequired
+     *            The interviewerNameRequired to set.
+     */
+    public void setInterviewerNameRequired(String interviewerNameRequired) {
+        setIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED, interviewerNameRequired);
+    }
+
+    /**
+     * @return Returns the subjectIdGeneration.
+     */
+    @Transient
+    public String getSubjectIdGeneration() {
+        return getIndividualStudyParameterValue(StudyParamNames.SUBJECT_ID_GENERATION);
+    }
+
+    /**
+     * @param subjectIdGeneration
+     *            The subjectIdGeneration to set.
+     */
+    public void setSubjectIdGeneration(String subjectIdGeneration) {
+        setIndividualStudyParameterValue(StudyParamNames.SUBJECT_ID_GENERATION, subjectIdGeneration);
+    }
+
+    /**
+     * @return Returns the subjectIdPrefixSuffix.
+     */
+    @Transient
+    public String getSubjectIdPrefixSuffix() {
+        return getIndividualStudyParameterValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX);
+    }
+
+    /**
+     * @param subjectIdPrefixSuffix
+     *            The subjectIdPrefixSuffix to set.
+     */
+    public void setSubjectIdPrefixSuffix(String subjectIdPrefixSuffix) {
+        setIndividualStudyParameterValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX, subjectIdPrefixSuffix);
+    }
+
+    /**
+     * @return Returns the subjectPersonIdRequired.
+     */
+    @Transient
+    public String getSubjectPersonIdRequired() {
+        return getIndividualStudyParameterValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED);
+    }
+
+    /**
+     * @param subjectPersonIdRequired
+     *            The subjectPersonIdRequired to set.
+     */
+    public void setSubjectPersonIdRequired(String subjectPersonIdRequired) {
+        setIndividualStudyParameterValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, subjectPersonIdRequired);
+    }
+
+    /**
+     * @return Returns the personIdShownOnCRF.
+     */
+    @Transient
+    public String getPersonIdShownOnCRF() {
+        return getIndividualStudyParameterValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF);
+    }
+
+    /**
+     * @param personIdShownOnCRF
+     *            The personIdShownOnCRF to set.
+     */
+    public void setPersonIdShownOnCRF(String personIdShownOnCRF) {
+        setIndividualStudyParameterValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF, personIdShownOnCRF);
+    }
+
+    @Transient
+    public String getSecondaryLabelViewable() {
+        return getIndividualStudyParameterValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE);
+    }
+
+    public void setSecondaryLabelViewable(String secondaryLabelViewable) {
+        setIndividualStudyParameterValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, secondaryLabelViewable);
+    }
+
+    @Transient
+    public String getAdminForcedReasonForChange() {
+        return getIndividualStudyParameterValue(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE);
+    }
+
+    public void setAdminForcedReasonForChange(String adminForcedReasonForChange) {
+        setIndividualStudyParameterValue(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE, adminForcedReasonForChange);
+    }
+
+    @Transient
+    public String getEventLocationRequired() {
+        return getIndividualStudyParameterValue(StudyParamNames.EVENT_LOCATION_REQUIRED);
+    }
+
+    public void setEventLocationRequired(String eventLocationRequired) {
+        setIndividualStudyParameterValue(StudyParamNames.EVENT_LOCATION_REQUIRED, eventLocationRequired);
+    }
+
+    @Transient
+    public String getEnforceEnrollmentCap() {
+        return getIndividualStudyParameterValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP);
+    }
+
+    @Transient
+    public String getParticipantIdTemplate() {
+        return getIndividualStudyParameterValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE);
+    }
+
+    public void setEnforceEnrollmentCap(String enforceEnrollmentCap) {
+        setIndividualStudyParameterValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, enforceEnrollmentCap);
+    }
+    public void setParticipantIdTemplate(String participantIdTemplate) {
+        setIndividualStudyParameterValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, participantIdTemplate);
+    }
+
+    @Transient
+    public String getContactsModule() {
+        return getIndividualStudyParameterValue(StudyParamNames.CONTACTS_MODULE);
+    }
+
+    public void setContactsModule(String contactsModule) {
+        setIndividualStudyParameterValue(StudyParamNames.CONTACTS_MODULE, contactsModule);
+    }
+
+    @Transient
+    public String getRandomization() {
+        return getIndividualStudyParameterValue(StudyParamNames.RANDOMIZATION);
+    }
+
+    public void setRandomization(String randomization) {
+        setIndividualStudyParameterValue(StudyParamNames.RANDOMIZATION, randomization);
+    }
+
+    @Transient
+    public String getParticipantPortal() {
+        return getIndividualStudyParameterValue(StudyParamNames.PARTICIPANT_PORTAL);
+    }
+
+    public void setParticipantPortal(String participantPortal) {
+        setIndividualStudyParameterValue(StudyParamNames.PARTICIPANT_PORTAL, participantPortal);
+
     }
 }

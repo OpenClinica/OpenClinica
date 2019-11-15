@@ -48,7 +48,6 @@ import java.util.*;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
-    @Autowired
     private StudyDao studyDAO;
     private StudyEventDefinitionDAO studyEventDefinitionDao;
     private StudySubjectDAO studySubjectDAO;
@@ -273,9 +272,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         Study sb = null;
         if (studyBean.getStudy() != null && studyBean.getStudy().getStudyId() != 0) {
-            sb = (Study) studyDAO.findByPK(studyBean.getStudy().getStudyId());
+            sb = (Study) getStudyDAO().findByPK(studyBean.getStudy().getStudyId());
         } else {
-            sb = (Study) studyDAO.findByPK(studyBean.getStudyId());
+            sb = (Study) getStudyDAO().findByPK(studyBean.getStudyId());
         }
         int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
@@ -309,7 +308,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
         for (StudySubjectBean studySubjectBean : items) {
-            Study study = (Study) studyDAO.findByPK(studySubjectBean.getStudyId());
+            Study study = (Study) getStudyDAO().findByPK(studySubjectBean.getStudyId());
 
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("studySubject", studySubjectBean);
@@ -509,7 +508,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // method false.
         for (EventCRFBean crfBean : eventCrfBeans) {
             if (crfBean != null && crfBean.getCompletionStatusId() == 0) {
-                if (getEventDefintionCRFDAO().isRequiredInDefinition(crfBean.getCRFVersionId(), studyEventBean)) {
+                if (getEventDefintionCRFDAO().isRequiredInDefinition(crfBean.getCRFVersionId(), studyEventBean, getStudyDAO())) {
                     return true;
                 }
             }
@@ -661,7 +660,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ArrayList<StudyGroupClassBean> getStudyGroupClasses() {
         if (this.studyGroupClasses == null) {
             if (studyBean.isSite()) {
-                Study parentStudy = (Study) studyDAO.findByPK(studyBean.getStudy().getStudyId());
+                Study parentStudy = (Study) getStudyDAO().findByPK(studyBean.getStudy().getStudyId());
                 studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(parentStudy);
             } else {
                 studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(studyBean);
@@ -1057,7 +1056,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     private String participateStatus(StudySubjectBean studySubjectBean) {
-        Study study = (Study) studyDAO.findByPK(studySubjectBean.getStudyId());
+        Study study = (Study) getStudyDAO().findByPK(studySubjectBean.getStudyId());
         Study pStudy = getParentStudy(study.getOc_oid());
         String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getStudyId(), "participantPortal").getValue();
         return participateFormStatus;
@@ -1072,7 +1071,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception {
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        Study study = (Study) studyDAO.findByPK(studySubjectBean.getStudyId());
+        Study study = (Study) getStudyDAO().findByPK(studySubjectBean.getStudyId());
         Study pStudy = getParentStudy(study.getOc_oid());
         String pManageStatus = participantPortalRegistrar.getCachedRegistrationStatus(pStudy.getOc_oid(), session).toString(); // ACTIVE
         return pManageStatus;
@@ -1083,13 +1082,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
             return study;
         } else {
-            Study parentStudy = (Study) studyDAO.findByPK(study.getStudy().getStudyId());
+            Study parentStudy = (Study) getStudyDAO().findByPK(study.getStudy().getStudyId());
             return parentStudy;
         }
     }
 
     private Study getStudy(String oid) {
-        Study studyBean = (Study) studyDAO.findByOcOID(oid);
+        Study studyBean = (Study) getStudyDAO().findByOcOID(oid);
         return studyBean;
     }
 
@@ -1104,7 +1103,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        Study study = (Study) studyDAO.findByPK(studySubject.getStudyId());
+        Study study = (Study) getStudyDAO().findByPK(studySubject.getStudyId());
         Study pStudy = getParentStudy(study.getOc_oid());
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOc_oid());
         logger.info("URL: {}",url);
@@ -1862,6 +1861,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 property = property + "." + item.getItemDataType().getName();
         }
         return property;
+    }
+    public StudyDao getStudyDAO() {
+        return studyDAO;
+    }
 
+    public void setStudyDAO(StudyDao studyDAO) {
+        this.studyDAO = studyDAO;
     }
 }

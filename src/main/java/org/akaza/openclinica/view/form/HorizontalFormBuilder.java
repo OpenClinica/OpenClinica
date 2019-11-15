@@ -115,7 +115,7 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
         int tabindex = tabindexSeed;
         boolean hasDiscrepancyMgt = false;
         Study studBean = this.getStudyBean();
-        if (studBean != null && studBean.getStudyParameterConfig().getDiscrepancyManagement().equalsIgnoreCase("true")) {
+        if (studBean != null && studBean.getDiscrepancyManagement().equalsIgnoreCase("true")) {
 
             hasDiscrepancyMgt = true;
         }

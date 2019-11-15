@@ -179,7 +179,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             // Should discrepancy note icons be displayed
             boolean hasDiscrepancyMgt = false;
             Study studBean = this.getStudyBean();
-            if (studBean != null && studBean.getStudyParameterConfig().getDiscrepancyManagement().equalsIgnoreCase("true")) {
+            if (studBean != null && studBean.getDiscrepancyManagement().equalsIgnoreCase("true")) {
 
                 hasDiscrepancyMgt = true;
             }
@@ -542,7 +542,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             // Should discrepancy note icons be displayed
             boolean hasDiscrepancyMgt = false;
             Study studBean = this.getStudyBean();
-            if (studBean != null && studBean.getStudyParameterConfig().getDiscrepancyManagement().equalsIgnoreCase("true")) {
+            if (studBean != null && studBean.getDiscrepancyManagement().equalsIgnoreCase("true")) {
 
                 hasDiscrepancyMgt = true;
             }

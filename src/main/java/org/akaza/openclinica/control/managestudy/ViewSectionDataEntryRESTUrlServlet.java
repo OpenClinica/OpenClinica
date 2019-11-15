@@ -347,7 +347,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
             SubjectBean subject = (SubjectBean) subjectDao.findByPK(subjectId);
             // BWP 01/08 >> check for a null currentStudy
             // Let us process the age
-            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+            if (currentStudy.getCollectDob().equals("1")) {
                 StudyEventDAO sedao = new StudyEventDAO(getDataSource());
                 StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
                 StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());

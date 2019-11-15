@@ -150,7 +150,7 @@
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
 	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" /><input type="text" disabled="disabled" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 </c:if>
-<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+<c:if test="${study.discrepancyManagement=='true'}">
 	<c:choose>
 		<c:when test="${displayItem.numDiscrepancyNotes > 0}">
 			<c:set var="imageFileName" value="icon_Note" />

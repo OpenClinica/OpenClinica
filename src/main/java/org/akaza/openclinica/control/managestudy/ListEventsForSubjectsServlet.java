@@ -86,7 +86,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         } else {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
-        String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+        String idSetting = currentStudy.getSubjectIdGeneration();
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
             // Shaoyu Su

@@ -94,7 +94,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         Study publicStudyBean = studyBuildService.getPublicStudy(userBean.getActiveStudyId());
              userRole = userBean.getRoleByStudy(publicStudyBean.getStudyId());
             if (userRole == null || !userRole.isActive())
-                userRole = userBean.getRoleByStudy(publicStudyBean.getStudy().getStudyId());
+                userRole = userBean.getRoleByStudy(publicStudyBean.checkAndGetParentStudyId());
 
             role = userRole.getRole();
 
