@@ -589,6 +589,11 @@ public class StudyParticipantController {
 		    }
 			if(studyOid != null) {
 				study = studyDao.findByOcOID(studyOid);
+				
+				if(study.getStudy() != null) {
+					site = study;
+					study = study.getStudy(); 
+				}
 			}
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());

@@ -405,14 +405,17 @@ public class CoreResources implements InitializingBean {
     }
 
     public static boolean setRequestSchema(String schema) {
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null && requestAttributes.getRequest() != null) {
-            HttpServletRequest request = requestAttributes.getRequest();
-            request.setAttribute("requestSchema", schema);
-            return true;
-        } else {
-            CoreResources.tenantSchema.set(schema);
-        }
+    	if(schema!=null && schema.trim().length() > 0) {
+    		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (requestAttributes != null && requestAttributes.getRequest() != null) {
+                HttpServletRequest request = requestAttributes.getRequest();
+                request.setAttribute("requestSchema", schema);
+                return true;
+            } else {
+                CoreResources.tenantSchema.set(schema);
+            }
+    	}
+        
 
         return false;
     }
