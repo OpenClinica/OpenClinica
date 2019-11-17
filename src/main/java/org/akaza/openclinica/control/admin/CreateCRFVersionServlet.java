@@ -267,7 +267,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     } else {
                         nib1.insertToDB();
                     }
-                    request.setAttribute("core/queries", nib1.getQueries());
+                    request.setAttribute("queries", nib1.getQueries());
                     // YW << for add a link to "View CRF Version Data Entry".
                     // For this purpose, CRFVersion id is needed.
                     // So the latest CRFVersion Id of A CRF Id is it.

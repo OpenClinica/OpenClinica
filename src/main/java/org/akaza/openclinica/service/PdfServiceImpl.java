@@ -99,7 +99,7 @@ public class PdfServiceImpl implements PdfService {
      * @return
      */
     public String getCaseBookFileRootPath() {
-        String dirPath = CoreResources.getField("filePath") + "bulk_jobs" + File.separator + JobType.PARTICIPANT_PDF_CASEBOOK;
+        String dirPath = CoreResources.getField("filePath") + "bulk_jobs" + File.separator + JobType.PARTICIPANT_PDF_CASEBOOK.toString().toLowerCase();
         File directory = new File(dirPath);
         if (!directory.exists()) {
             directory.mkdirs();

@@ -46,11 +46,15 @@
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}"/>
 <c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/includes/jmesa/jmesa.css" type="text/css">
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery-migrate-3.1.0.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.jmesa.js"></script>
+<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 <c:choose>
     <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
         <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
-        <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
-        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/icomoon-style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
@@ -69,8 +73,6 @@
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:when>
     <c:otherwise>
-        <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
-        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="includes/css/icomoon-style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
@@ -611,7 +613,7 @@
     dropdown = document.getElementById("subnav_Tasks");
 
     //close dropdown using esc
-    $(document).keyup(function(e) {
+    jQuery(document).keyup(function(e) {
         if (e.keyCode == 27) { // escape key maps to keycode `27`
             dropdown.style.display="none";
             jQuery.unblockUI();
@@ -619,27 +621,27 @@
     });
 
     //we have it open on mouse-over OR click when it is closed
-    $(document).ready(function(){
+    jQuery(document).ready(function(){
         var participantIDVerification = '<c:out value="${participantIDVerification}"/>';
         if (participantIDVerification == 'true') {
             // disable right click
-            $("input[name='findSubjects_f_studySubject.label']").on('contextmenu',function(){
+            jQuery("input[name='findSubjects_f_studySubject.label']").on('contextmenu',function(){
                 return false;
             });
             // disable cut copy paste
-            $("input[name='findSubjects_f_studySubject.label']").bind('cut copy paste', function (e) {
+            jQuery("input[name='findSubjects_f_studySubject.label']").bind('cut copy paste', function (e) {
                 e.preventDefault();
             });
         }
         // Show hide popover
-        $(".nav_TaskB").click(function(){
-            $(this).find(".dropdown").slideToggle("fast");
+        jQuery(".nav_TaskB").click(function(){
+            jQuery(this).find(".dropdown").slideToggle("fast");
         });
     });
-    $(document).on("click", function(event){
-        var $trigger = $(".nav_TaskB");
+    jQuery(document).on("click", function(event){
+        var $trigger = jQuery(".nav_TaskB");
         if($trigger !== event.target && !$trigger.has(event.target).length){
-            $(".dropdown").slideUp("fast");
+            jQuery(".dropdown").slideUp("fast");
         }
     });
     function showDropdown() {
