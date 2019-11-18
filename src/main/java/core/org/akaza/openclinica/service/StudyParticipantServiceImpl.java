@@ -426,6 +426,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
   
     @Transactional
     public void startCaseBookPDFJob(JobDetail jobDetail,
+    		                        String schema,
 						    		String studyOID,  
 						            String studySubjectIdentifier,            
 						            ServletContext servletContext,
@@ -436,6 +437,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 						            String landscape,
 						            List<String> permissionTags) throws Exception {
 		
+    	    CoreResources.setRequestSchema(schema);
     	    ArrayList<File> pdfFiles = new ArrayList<File>();
 		    File mergedPdfFile = null;
 		    String mergedPdfFileNm = null;
@@ -460,7 +462,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    		formLayoutOID = eventCrf.getFormLayout().getOcOid();
 			    		
 			    		int studyEventDefinitionId = studyEvent.getStudyEventDefinition().getStudyEventDefinitionId();
-			    		EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinitionId, eventCrf.getCrfVersion().getCrf().getCrfId(), studyId);
+			    		EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyIdorSiteId(studyEventDefinitionId, eventCrf.getCrfVersion().getCrf().getCrfId(), studyId);
 			    	    if(edc != null && validateService.hasCRFpermissionTag(edc, permissionTags)) {
 			    	    	PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
 				    		studyEventDefinitionID = studyEventDefinitionId + "";
