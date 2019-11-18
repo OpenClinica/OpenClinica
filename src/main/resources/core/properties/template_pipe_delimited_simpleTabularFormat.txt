@@ -1,0 +1,4 @@
+ParticipantID|firstName|lastName|birthDate|MRN|Ethnicity|Gender
+SS_PID001|Renuka|Bhatnagar|1982-01-07|RB0107|0|F
+SS_PID002|Iryna|Galchuk|1985-01-08|RB0108|1|F
+SS_PID003|Iryna|Gupta|1990-01-07|SG0107|0|M

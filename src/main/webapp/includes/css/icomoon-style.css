@@ -1,0 +1,194 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('//cdn.rawgit.com/OpenClinica/OpenClinica/bc369c40582a7a4e8b27537677d4abe488069333/web/src/main/webapp/includes/fonts/icomoon.eot?37gwv7');
+  src:  url('//cdn.rawgit.com/OpenClinica/OpenClinica/bc369c40582a7a4e8b27537677d4abe488069333/web/src/main/webapp/includes/fonts/icomoon.eot?37gwv7#iefix') format('embedded-opentype'),
+    url('//cdn.rawgit.com/OpenClinica/OpenClinica/bc369c40582a7a4e8b27537677d4abe488069333/web/src/main/webapp/includes/fonts/icomoon.ttf?37gwv7') format('truetype'),
+    url('//cdn.rawgit.com/OpenClinica/OpenClinica/bc369c40582a7a4e8b27537677d4abe488069333/web/src/main/webapp/includes/fonts/icomoon.woff?37gwv7') format('woff'),
+    url('//cdn.rawgit.com/OpenClinica/OpenClinica/bc369c40582a7a4e8b27537677d4abe488069333/web/src/main/webapp/includes/fonts/icomoon.svg?37gwv7#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-doc-text-solid:before {
+  content: "\e901";
+}
+.icon-doc:before {
+  content: "\e80f";
+}
+.icon-ok:before {
+  content: "\e810";
+}
+.icon-lock:before {
+  content: "\e811";
+}
+.icon-lock-open:before {
+  content: "\e812";
+}
+.icon-search:before {
+  content: "\e813";
+}
+.icon-pencil:before {
+  content: "\e814";
+}
+.icon-user:before {
+  content: "\e815";
+}
+.icon-cancel:before {
+  content: "\e816";
+}
+.icon-ccw:before {
+  content: "\e817";
+}
+.icon-calendar:before {
+  content: "\e818";
+}
+.icon-plus:before {
+  content: "\e819";
+}
+.icon-flag:before {
+  content: "\e81a";
+}
+.icon-download:before {
+  content: "\e81b";
+}
+.icon-upload:before {
+  content: "\e81c";
+}
+.icon-print:before {
+  content: "\e81d";
+}
+.icon-icon-sdv-text:before {
+  content: "\e919";
+}
+.icon-icon-sign:before {
+  content: "\e91a";
+}
+.icon-plus-square-o:before {
+  content: "\e91b";
+}
+.icon-icon-stop:before {
+  content: "\e91c";
+}
+.icon-icon-removeRole:before {
+  content: "\e91d";
+}
+.icon-icon-locked:before {
+  content: "\e91e";
+}
+.icon-icon-dataEntryCompleted:before {
+  content: "\e920";
+}
+.icon-icon-newVersion:before {
+  content: "\e921";
+}
+.icon-icon-unArchive:before {
+  content: "\e925";
+}
+.icon-icon-unsavedData:before {
+  content: "\e926";
+}
+.icon-icon-doubleDataEntry:before {
+  content: "\e927";
+}
+.icon-caret-right:before {
+  content: "\e928";
+}
+.icon-caret-right-blue:before {
+  content: "\e928";
+}
+.icon-caret-left:before {
+  content: "\e929";
+}
+.icon-caret-up:before {
+  content: "\e92a";
+}
+.icon-caret-down:before {
+  content: "\e92b";
+}
+.icon-question-circle:before {
+  content: "\e92c";
+}
+.icon-question:before {
+  content: "\e92d";
+}
+.icon-archive:before {
+  content: "\e92e";
+}
+.icon-icon-reassign3:before {
+  content: "\e92f";
+}
+.icon-minus-square-o:before {
+  content: "\e930";
+}
+.icon-icon-SDV-doubleCheck:before {
+  content: "\e931";
+}
+.icon-doc-text-half:before {
+  content: "\e932";
+}
+.icon-clock:before {
+  content: "\e950";
+}
+.icon-clock2:before {
+  content: "\e951";
+}
+.icon-redo:before {
+  content: "\e967";
+}
+.icon-redo2:before {
+  content: "\e969";
+}
+.icon-bubble-closed:before {
+  content: "\e96c";
+}
+.icon-bubble-open:before {
+  content: "\e96f";
+}
+.icon-first:before {
+  content: "\ea25";
+}
+.icon-last:before {
+  content: "\ea26";
+}
+.icon-previous2:before {
+  content: "\ea27";
+}
+.icon-next2:before {
+  content: "\ea28";
+}
+.icon-checkbox-checked:before {
+  content: "\ea53";
+}
+.icon-doc-text:before {
+  content: "\f0f7";
+}
+.icon-flag-empty:before {
+  content: "\f11e";
+}
+.icon-pencil-squared:before {
+  content: "\f14c";
+}
+.icon-file-excel:before {
+  content: "\f1c4";
+}
+.icon-trash:before {
+  content: "\f1f9";
+}
+.icon-stop-circle:before {
+  content: "\f28e";
+}

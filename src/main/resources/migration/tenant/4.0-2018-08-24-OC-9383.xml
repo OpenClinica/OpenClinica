@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="jkeremian" id="2018-08-24-OC-9383-01">
+		<createTable tableName="archived_dataset_file_permission_tag">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="archived_dataset_file_id" />
+			</column>
+			<column name="archived_dataset_file_id" type="INT" />
+			<column name="permission_tag_id" type="varchar(255)" />
+			<column name="owner_id" type="INT" />
+			<column name="update_id" type="INT" />
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="date_updated" type="TIMESTAMP WITH TIME ZONE" />
+		</createTable>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2018-08-24-OC-9383-02">
+		<addForeignKeyConstraint baseColumnNames="archived_dataset_file_id"
+			baseTableName="archived_dataset_file_permission_tag" constraintName="archived_dataset_file_permission_tag_archived_dataset_file_id_fk"
+			deferrable="false" initiallyDeferred="false" onDelete="RESTRICT"
+			onUpdate="RESTRICT" referencedColumnNames="archived_dataset_file_id"
+			referencedTableName="archived_dataset_file" />
+	</changeSet>
+
+
+</databaseChangeLog>
