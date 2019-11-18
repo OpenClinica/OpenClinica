@@ -44,10 +44,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author jxu
@@ -91,8 +89,8 @@ public class ChangeStudyServlet extends SecureController {
         String action = request.getParameter("action");// action sent by user
         request.setAttribute("requestSchema", "public");
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource(), getStudyDao());
-
-        ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), (ArrayList) getStudyDao().findAll());
+        Map<Integer, Study> allStudies = getStudyDao().findAll().stream().collect(Collectors.toMap(s->s.getStudyId(),s-> s));
+        ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), new ArrayList<Study>( allStudies.values()));
         CustomRole customRole = new CustomRole();
 
         populateCustomUserRoles(customRole, ub.getName());
@@ -106,16 +104,14 @@ public class ChangeStudyServlet extends SecureController {
         }
 
         ArrayList<StudyUserRoleBean> validStudies = new ArrayList<>();
-        ArrayList<Study> studyList = new ArrayList<>();
         for (int i = 0; i < studies.size(); i++) {
             StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
-            Study study = (Study) getStudyDao().findByPK(sr.getStudyId());
+            Study study = allStudies.get(sr.getStudyId());
             if (study != null && study.getStatus().equals(Status.PENDING)) {
                 sr.setStatus(Status.get(study.getStatus().getCode()));
             }
             if (study.isPublished() == false)
                 continue;
-            studyList.add(study);
             validStudies.add(sr);
         }
 
@@ -126,7 +122,7 @@ public class ChangeStudyServlet extends SecureController {
             forwardPage(Page.CHANGE_STUDY);
         } else {
 
-            validateChangeStudy(studies, studyList);
+            validateChangeStudy(studies, new ArrayList<Study> (allStudies.values()));
             logger.info("submit");
             changeStudy(customRole);
             return;
@@ -195,9 +191,9 @@ public class ChangeStudyServlet extends SecureController {
         
         String oldStudySchema = null;
         if (!currentStudy.isSite()) {
-            oldStudySchema = getStudyDao().findByStudyEnvUuid(currentStudy.getStudyEnvUuid()).getSchemaName();
+            oldStudySchema =currentStudy.getSchemaName();
         } else {
-            oldStudySchema = getStudyDao().findByStudyEnvUuid(currentStudy.getStudyEnvSiteUuid()).getSchemaName();
+            oldStudySchema = currentStudy.getStudy().getSchemaName();
         }
         
         Study newPublicStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
@@ -205,20 +201,15 @@ public class ChangeStudyServlet extends SecureController {
         request.setAttribute("requestSchema",newStudySchema);
         Study newStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
 
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-//        ArrayList studyParameters = spvdao.findParamConfigByStudy(newStudy);
-        newStudy.setStudyParameters(spvdao.findParamConfigByStudy(newStudy));
         request.setAttribute("changeStudySchema", null);
 
         if (currentStudy != null) {
-            int parentStudyId;
+            Study tempParentStudy;
             if(currentStudy.isSite())
-                parentStudyId = currentStudy.getStudy().getStudyId();
+                tempParentStudy = currentStudy.getStudy();
             else
-                parentStudyId = currentStudy.getStudyId();
-            request.setAttribute("requestSchema", oldStudySchema);
-            StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-            newStudy.setSubjectIdGeneration(parentSPV.getValue());
+                tempParentStudy = currentStudy;
+            newStudy.setSubjectIdGeneration(tempParentStudy.getSubjectIdGeneration());
             request.setAttribute("requestSchema", "public");
             String idSetting = newStudy.getSubjectIdGeneration();
             if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {

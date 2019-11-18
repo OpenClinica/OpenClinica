@@ -540,13 +540,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     forwardPage(Page.ERROR);
                     return;
                 }
-                currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
+                if(currentStudy == null || currentStudy.getStudyId() == 0 )
+                    currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 if (currentStudy != null) {
                     if(currentPublicStudy != null && currentPublicStudy.getStudy() != null)
                     {
                         if(currentStudy.getStudy() == null)
-                            currentStudy.setStudy(new Study());
-                        currentStudy.getStudy().setName(currentPublicStudy.getStudy().getName());
+                            currentStudy.setStudy(currentPublicStudy.getStudy());
                     }
                     StudyConfigService scs = new StudyConfigService(sm.getDataSource());
                     if (!currentStudy.isSite()) {// top study
@@ -559,6 +559,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
                 session.setAttribute("study", currentStudy);
             }
+            request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
+            if(currentStudy == null || currentStudy.getStudyId() == 0 )
+                currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
             request.setAttribute("requestSchema", "public");
             currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
@@ -568,7 +571,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             // YW << For the case that current role is not "invalid" but current
             // active study has been removed.
-            else if (currentPublicStudy.getStudyId() == 0)
+            else if (currentPublicStudy == null || currentPublicStudy.getStudyId() == 0)
                 throw new Exception("No study assigned to this user");
             else if (currentRole.getId() > 0
                     && (currentPublicStudy.getStatus().equals(Status.DELETED) || currentPublicStudy.getStatus().equals(Status.AUTO_DELETED))) {
@@ -646,8 +649,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             request.setAttribute("isAdminServlet", getAdminServlet());
 
-            boolean advSearch = isContactsModuleEnabled();
-            request.setAttribute("advsearchStatus", (advSearch? ENABLED : DISABLED));
+            request.setAttribute("advsearchStatus", isContactsModuleEnabled());
 
             this.request = request;
             this.response = response;
@@ -1364,12 +1366,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
 
     private boolean isEnrollmentCapEnforced(){
-        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(sm.getDataSource());
         String enrollmentCapStatus=null;
-        if(currentStudy.getStudy() != null && currentStudy.getStudy().getStudyId() != 0){
-            enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudy().getStudyId(), "enforceEnrollmentCap").getValue();
+        if(currentStudy.isSite()){
+            enrollmentCapStatus = currentStudy.getStudy().getEnforceEnrollmentCap();
         }else {
-            enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudyId(), "enforceEnrollmentCap").getValue();
+            enrollmentCapStatus = currentStudy.getEnforceEnrollmentCap();
         }
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         return capEnforced;
@@ -1492,11 +1493,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
             currentStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
             if (currentStudy.isSite()) {
-                currentStudy.getStudy().setName(getStudyDao().findByPK(currentStudy.getStudy().getStudyId()).getName());
                 currentPublicStudy.getStudy().setName(currentStudy.getStudy().getName());
             }
-            StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-            scs.setParametersForStudy(currentStudy);
 
             session.setAttribute("publicStudy", currentPublicStudy);
             session.setAttribute("study", currentStudy);
@@ -1623,24 +1621,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
     }
 
-    private boolean isContactsModuleEnabled(){
-        String previousSchema = (String) request.getAttribute("requestSchema");
-        request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
-
-        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(sm.getDataSource());
+    private String isContactsModuleEnabled(){
         String contactsModuleStatus=null;
-        if(currentStudy.getStudy() != null && currentStudy.getStudy().getStudyId() != 0){
-            contactsModuleStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudy().getStudyId(), StudyParamNames.CONTACTS_MODULE).getValue();
-        }else {
-            contactsModuleStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudyId(), StudyParamNames.CONTACTS_MODULE).getValue();
-        }
-        request.setAttribute("requestSchema", previousSchema);
-
-        if (contactsModuleStatus.equals(ENABLED)) {
-            return true;
-        } else {
-            return false;
-        }
+        if(currentStudy.isSite())
+            contactsModuleStatus = currentStudy.getStudy().getContactsModule();
+        else
+            contactsModuleStatus = currentStudy.getContactsModule();
+        return contactsModuleStatus.equals(ENABLED) ? ENABLED : DISABLED;
     }
 
 

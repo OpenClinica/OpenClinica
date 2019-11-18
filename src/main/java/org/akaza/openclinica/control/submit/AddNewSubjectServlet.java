@@ -149,25 +149,22 @@ public class AddNewSubjectServlet extends SecureController {
         // YW << update study parameters of current study.
         // "collectDob" and "genderRequired" are set as the same as the parent
         // study
-        int parentStudyId = currentStudy.checkAndGetParentStudyId();
-        if (parentStudyId <= 0) {
-            parentStudyId = currentStudy.getStudyId();
+        Study tempParentStudy = null;
+        if (!currentStudy.isSite()) {
+//            parentStudyId = currentStudy.getStudyId();
             classes = sgcdao.findAllActiveByStudy(currentStudy);
         } else {
-            Study parentStudy = (Study) currentStudy.getStudy();
-            classes = sgcdao.findAllActiveByStudy(parentStudy);
+            tempParentStudy = currentStudy.getStudy();
+            classes = sgcdao.findAllActiveByStudy(tempParentStudy);
         }
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, StudyParamNames.COLLECT_DOB);
-        currentStudy.setCollectDob(parentSPV.getValue());
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, StudyParamNames.GENDER_REQUIRED);
-        currentStudy.setGenderRequired(parentSPV.getValue());
-        // YW >>
-        // tbh
-        StudyParameterValueBean checkPersonId = spvdao.findByHandleAndStudy(parentStudyId, StudyParamNames.SUBJECT_PERSON_ID_REQUIRED);
-        currentStudy.setSubjectPersonIdRequired(checkPersonId.getValue());
-        // end fix for 1750, tbh 10 2007
-
+        if(currentStudy.isSite()) {
+            currentStudy.setCollectDob(tempParentStudy.getCollectDob());
+            currentStudy.setGenderRequired(tempParentStudy.getGenderRequired());
+            // YW >>
+            // tbh
+            currentStudy.setSubjectPersonIdRequired(tempParentStudy.getSubjectPersonIdRequired());
+            // end fix for 1750, tbh 10 2007
+        }
         if (!fp.isSubmitted()) {
             if (fp.getBoolean("instr")) {
                 session.removeAttribute(FORM_DISCREPANCY_NOTES_NAME);
@@ -180,8 +177,7 @@ public class AddNewSubjectServlet extends SecureController {
                 // YW 10-07-2007 <<
                 String idSetting = "";
                 if (currentStudy.isSite()) {
-                    parentSPV = spvdao.findByHandleAndStudy(parentStudyId, StudyParamNames.SUBJECT_ID_GENERATION);
-                    currentStudy.setSubjectIdGeneration(parentSPV.getValue());
+                    currentStudy.setSubjectIdGeneration(tempParentStudy.getSubjectIdGeneration());
                 }
                 idSetting = currentStudy.getSubjectIdGeneration();
                 // YW >>
