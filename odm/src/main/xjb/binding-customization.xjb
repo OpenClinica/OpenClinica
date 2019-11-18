@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+        xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        jaxb:version="2.1">
+    <jaxb:bindings schemaLocation="../schemas/ODM1-3-0-foundation.xsd" >
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.cdisc.ns.odm.v130"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="../schemas/OpenClinica-ODM1-3-0-OC2-0-foundation.xsd" >
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.openclinica.ns.odm_ext_v130.v31"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="../schemas/ODM1-3-0-api-foundation.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.cdisc.ns.odm.v130_api" />
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="../schemas/OpenClinica-ODM1-3-0-OC3-0-foundation.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.openclinica.ns.odm_ext_v130.v31_api" />
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="../schemas/rules-ODM.xsd" >
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.openclinica.ns.rules.v31"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="../schemas/ODM1-2-1-foundation.xsd" >
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.cdisc.ns.odm.v121"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="../schemas/OpenClinica-ODM1-2-1-OC1-foundation.xsd" >
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.openclinica.ns.odm_ext_v121.v31"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="../schemas/response.xsd" >
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.openclinica.ns.response.v31"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="../schemas/rules-test.xsd" >
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.openclinica.ns.rules_test.v31"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+</jaxb:bindings>

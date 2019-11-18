@@ -4,12 +4,13 @@
 	<groupId>org.libreclinica</groupId>
 	<artifactId>LibreClinica</artifactId>
 	<packaging>pom</packaging>
-	<version>0.3.0</version>
+	<version>0.4.0</version>
 	<name>LibreClinica</name>
 	<description>LibreClinica</description>
 
 	<modules>
 		<module>core</module>
+		<module>odm</module>
 		<module>web</module>
 		<module>ws</module>
 	</modules>
@@ -94,8 +95,8 @@
 				<version>2.4.2-oc</version>
 			</dependency>
 			<dependency>
-				<groupId>org.akaza.openclinica.odm</groupId>
-				<artifactId>openclinica-odm</artifactId>
+				<groupId>org.libreclinica.odm</groupId>
+				<artifactId>LibreClinica-odm</artifactId>
 				<version>2.2</version>
 			</dependency>
 			<dependency>
