@@ -554,13 +554,14 @@ public class StudyParticipantController {
 										          ) throws IOException {
 											 
 		
-		  utilService.setSchemaFromStudyOid(studyOid);		 	  
+		  utilService.setSchemaFromStudyOid(studyOid);	
+		  String schema = CoreResources.getRequestSchema();
 	 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 	 	  String siteOid = null;
 	 	  
 		  try {				 
 			  validateService.validateStudyAndRoles(studyOid,userAccountBean);			 	 			 	 		 	 
-		 	  String uuid = startBulkCaseBookPDFJob(studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
+		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
 
 			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
 			  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -572,14 +573,15 @@ public class StudyParticipantController {
 		 }
 
 	
-	private String startBulkCaseBookPDFJob(String studyOid,
-											String siteOid, 
-											String participantId, 											 
-											HttpServletRequest request,
-											UserAccountBean userAccountBean, 
-											String format, 
-											String margin, 
-											String landscape) {
+	private String startBulkCaseBookPDFJob(String schema,
+										   String studyOid,
+										   String siteOid, 
+										   String participantId, 											 
+										   HttpServletRequest request,
+										   UserAccountBean userAccountBean, 
+										   String format, 
+										   String margin, 
+										   String landscape) {
 									 	 
 
 		    Study site = null;
@@ -589,6 +591,11 @@ public class StudyParticipantController {
 		    }
 			if(studyOid != null) {
 				study = studyDao.findByOcOID(studyOid);
+				
+				if(study.getStudy() != null) {
+					site = study;
+					study = study.getStudy(); 
+				}
 			}
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
@@ -614,7 +621,7 @@ public class StudyParticipantController {
 				try {
 					 ResourceBundleProvider.updateLocale(local);
 					 String userAccountID = userAccountBean.getId() +"";
-					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
 				 	
 					} catch (Exception e) {
 						logger.error("Exception is thrown while processing CaseBook PDF: " + e);
