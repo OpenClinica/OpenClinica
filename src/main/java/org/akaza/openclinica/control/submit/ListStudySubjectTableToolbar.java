@@ -149,7 +149,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
         public String enabled() {
             String js =
                 "var selectedValue = document.getElementById('sedDropDown').options[document.getElementById('sedDropDown').selectedIndex].value; "
-                    + " var maxrows = $('select[name=maxRows]').val();"
+                    + " var maxrows = jQuery('select[name=maxRows]').val();"
                     + " if (selectedValue != null  ) { " + "window.location='ListEventsForSubjects?module=submit&defId=' + selectedValue + '&listEventsForSubject_mr_=' + maxrows;" + " } ";
             HtmlBuilder html = new HtmlBuilder();
             html.select().id("sedDropDown").onchange(js).close();
