@@ -8,13 +8,6 @@
 <jsp:include page="../include/submit-header.jsp"/>
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <script type="text/javascript">
   function onInvokeAction(id,action) {
       if(id.indexOf('findSubjects') == -1)  {
@@ -90,7 +83,7 @@
         sessionStorage.setItem(store.key, JSON.stringify(store.data));
         if (
           store.data.ocStatusHide !== 'oc-status-removed' ||
-          store.data.datatables.some(function(state) {return canReset(state)}) ||
+          canResetAny(store.data.datatables) ||
           $('#studySubjectRecord.collapsed, #subjectEvents.collapsed, #commonEvents>.expanded').length
         )
           $('#reset-all-filters').removeClass('invisible');
@@ -103,7 +96,7 @@
   store.key = participantKey + '${studySub.oid}';
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     collapseSections: {},
-    datatables: [],
+    datatables: {},
     ocStatusHide: 'oc-status-removed'
   };
   store.dirty = false;
@@ -117,6 +110,14 @@
         || state.length > defaultPageSize;
   }
 
+  function canResetAny(states) {
+    for (var key in states) {
+      if (canReset(states[key]))
+        return true;
+    }
+    return false;
+  }
+  
   function resetAllFilters() {
     $('#oc-status-hide').val('oc-status-removed').change();
     $('table.datatable').each(function() {

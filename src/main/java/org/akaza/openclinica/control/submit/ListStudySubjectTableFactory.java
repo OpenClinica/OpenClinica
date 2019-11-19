@@ -130,6 +130,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         setDataAndLimitVariables(tableFacade);
         configureTableFacade(response, tableFacade);
         if (!tableFacade.getLimit().isExported()) {
+            tableFacade.autoFilterAndSort(false);
             configureColumns(tableFacade, locale);
             tableFacade.setMaxRowsIncrements(getMaxRowIncrements());
             configureTableFacadePostColumnConfiguration(tableFacade);
@@ -290,21 +291,18 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
         List<String> userStatuses = new ArrayList<>();
 
-        UserStatus participateStatusSetFilter = null;
-        if (getParticipateModuleStatus().equals(ENABLED)) {
-            participateStatusSetFilter = getParticipateStatusSetFilter(subjectFilter);
-        }
 
         if (!limit.isComplete()) {
-            int totalRows = getStudySubjectDAO().getCountWithFilter(subjectFilter, getStudyBean(), participateStatusSetFilter);
-            tableFacade.setTotalRows(totalRows);
+            Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, null, 0, 0);
+            if (items!=null)
+                tableFacade.setTotalRows(items.size());
         }
 
         FindSubjectsSort subjectSort = getSubjectSort(limit);
 
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
-        Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd, participateStatusSetFilter);
+        Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
@@ -342,8 +340,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         Item item = null;
 
                         if (!StringUtils.isEmpty(sedOid)) {
-                            studyEventDefinition = studyEventDefinitionHibDao.findByOcOID(sedOid);
-                            if (studyEventDefinition != null && !studyEventDefinition.getRepeating()) {
+                            studyEventDefinition = studyEventDefinitionHibDao.findByOcOID(sedOid);if (studyEventDefinition != null && !studyEventDefinition.getRepeating()) {
                                 studyEvents = studyEventDao.fetchListByStudyEventDefOID(sedOid, studySubjectBean.getId());
 
                                 if (studyEvents != null) {
@@ -407,7 +404,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                             }
                         }
                     }
-                    theItem.put(column, itemValue);
+                    theItem.put(column, itemValue != null ? itemValue : "");
                 }
             }
 
@@ -576,6 +573,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             String value = filter.getValue();
             if ("studySubject.status".equalsIgnoreCase(property)) {
                 value = Status.getByName(value).getId() + "";
+            } else if ("participate.status".equalsIgnoreCase(property)) {
+               UserStatus userStatus= UserStatus.valueOf(value.toUpperCase());
+                value=userStatus.getCode()+"";
             } else if (property.startsWith("sgc_")) {
                 int studyGroupClassId = property.endsWith("_") ? 0 : Integer.valueOf(property.split("_")[1]);
                 value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId() + "";
@@ -623,24 +623,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
      * @param limit The Limit to use.
      */
     protected FindSubjectsSort getSubjectSort(Limit limit) {
-        FindSubjectsSort auditUserLoginSort = new FindSubjectsSort();
+        FindSubjectsSort subjectSort = new FindSubjectsSort();
         SortSet sortSet = limit.getSortSet();
         Collection<Sort> sorts = sortSet.getSorts();
         List <Sort> disableSorts = new ArrayList<>();
         for (Sort sort : sorts) {
-            String property = sort.getProperty();
-            if (!(property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) && !property.equals(PARTICIPATE_STATUS)) {
+            String property = validateProperty(sort.getProperty());
                 String order = sort.getOrder().toParam();
-                auditUserLoginSort.addSort(property, order);
-            } else {
-                disableSorts.add(sort);
-            }
-        }
-        for (Sort disabledSort : disableSorts) {
-            sortSet.getSorts().remove(disabledSort);
+            subjectSort.addSort(property, order);
         }
 
-        return auditUserLoginSort;
+        return subjectSort;
     }
 
     private ArrayList<StudyEventDefinitionBean> getStudyEventDefinitions() {
@@ -1652,7 +1645,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         builder.a().href(href1 + href2);
         builder.onmouseover(onmouseover);
         builder.onmouseout(onmouseout);
-        builder.onclick(onClick1 + onClick2);
+        builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
     }
@@ -1672,8 +1665,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String onClick2 = "LockObject('Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
         String href = studyEvents.size() > 1 ? href1Repeating + href2 : href1 + href2;
         builder.a().href(href);
-        // builder.onmouseover(onmouseover);
-        // builder.onmouseout(onmouseout);
+        builder.onmouseover(onmouseover);
+        builder.onmouseout(onmouseout);
         builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
@@ -1729,21 +1722,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
-    }
-
-    public UserStatus getParticipateStatusSetFilter(FindSubjectsFilter subjectFilter) {
-        UserStatus participateStatusSetFilter = null;
-        if (subjectFilter.getFilters() != null && subjectFilter.getFilters().size() > 0) {
-            for (FindSubjectsFilter.Filter filter : subjectFilter.getFilters()) {
-                if (filter.getProperty().equals("participate.status")) {
-                    String filteredValue = (String) filter.getValue();
-                    participateStatusSetFilter = UserStatus.valueOf(filteredValue.toUpperCase());
-                    subjectFilter.removeFilter(filter);
-                    break;
-                }
-            }
-        }
-        return participateStatusSetFilter;
     }
 
     public HttpServletRequest getRequest() {
@@ -1811,5 +1789,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         this.permissionService = permissionService;
     }
 
-}
+    private String validateProperty(String property) {
+        if (property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) {
+            String itemOid = property.split("\\.")[2];
+            Item item = itemDao.findByOcOID(itemOid);
+            if (item != null)
+                property = property + "." + item.getItemDataType().getName();
+        }
+        return property;
 
+    }
+}
