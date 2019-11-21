@@ -357,7 +357,7 @@ public class UserServiceImpl implements UserService {
             writeToFile(userDTOS, studyOid, fileName);
         } catch (Exception e) {
             persistJobFailed(jobDetail, fileName);
-            logger.error(" Access code Job Creation Failed ");
+            logger.error(" Access code Job Creation Failed ",e);
         }
         persistJobCompleted(jobDetail, fileName);
     }
