@@ -5,3 +5,4 @@
 * [T004](tests/t004.md "T004 - study management")
 * [T005](tests/t005.md "T005 - CRF management")
 * [T006](tests/t006.md "T006 - event definitions")
+* [T007](tests/t007.md "T007 - subject group classes")
