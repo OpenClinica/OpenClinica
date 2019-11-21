@@ -64,7 +64,7 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
             throw new IllegalArgumentException("The query '" + queryId + "' could not be found in the file '" +
                     fileName + "'");
         }
-        return q;
+        return q+" ";
     }
 
     public boolean hasQuery(String fileName, String queryId) {
