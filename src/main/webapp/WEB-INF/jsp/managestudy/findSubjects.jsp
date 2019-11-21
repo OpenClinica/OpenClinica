@@ -16,10 +16,6 @@
     }
 </style>
 
-<c:if test="${participantIDVerification == 'true'}">
-    <script type="text/javascript" language="JavaScript" src="js/lib/bootstrap-tour.js"></script>
-</c:if>
-
 <script type="text/javascript">
     function onInvokeAction(id,action) {
         if(id.indexOf('findSubjects') == -1)  {
@@ -103,6 +99,9 @@
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='crf' class='core.org.akaza.openclinica.bean.admin.CRFBean'/>
 
+<c:if test="${participantIDVerification == 'true'}">
+    <c:import url="../submit/verifyID.jsp"></c:import>
+</c:if>
 
 <h1>
     <span class="title_manage">
