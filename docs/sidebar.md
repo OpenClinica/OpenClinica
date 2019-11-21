@@ -8,3 +8,4 @@
 * [T007](tests/t007.md "T007 - subject group classes")
 * [T008](tests/t008.md "T008 - rule management")
 * [T009](tests/t009.md "T009 - site management")
+* [T010](tests/t010.md "T010 - study user management")
