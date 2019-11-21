@@ -7,3 +7,4 @@
 * [T006](tests/t006.md "T006 - event definitions")
 * [T007](tests/t007.md "T007 - subject group classes")
 * [T008](tests/t008.md "T008 - rule management")
+* [T009](tests/t009.md "T009 - site management")
