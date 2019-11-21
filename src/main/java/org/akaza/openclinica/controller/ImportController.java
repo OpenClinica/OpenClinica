@@ -134,6 +134,11 @@ public class ImportController {
 
 
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
+
+        if (studyOID.isEmpty()) {
+            return new ResponseEntity(ErrorConstants.ERR_STUDY_OID_MISSING, HttpStatus.NOT_FOUND);
+        }
+
         studyOID = studyOID.toUpperCase();
         Study publicStudy = studyDao.findPublicStudy(studyOID);
         if (publicStudy == null) {
@@ -166,7 +171,7 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_AVAILABLE, HttpStatus.OK);
         }
 
-        if (siteOid!=null && !validateService.isStudyAvailable(siteOid)) {
+        if (siteOid != null && !validateService.isStudyAvailable(siteOid)) {
             return new ResponseEntity(ErrorConstants.ERR_SITE_NOT_AVAILABLE, HttpStatus.OK);
         }
 
@@ -176,7 +181,7 @@ public class ImportController {
 
         // If the import is performed by a system user, then we can skip the roles check.
         boolean isSystemUserImport = validateService.isUserSystemUser(request);
-        if (!isSystemUserImport){
+        if (!isSystemUserImport) {
             if (siteOid != null) {
                 if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
                     return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);

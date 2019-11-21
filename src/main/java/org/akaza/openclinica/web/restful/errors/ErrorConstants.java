@@ -38,6 +38,7 @@ public class ErrorConstants {
     public static final String ERR_NOT_SUPPORTED_FILE_FORMAT = "errorCode.notSupportedFileFormat";
     public static final String ERR_XML_NOT_WELL_FORMED = "errorCode.xmlNotWellFormed";
 
+    public static final String ERR_STUDY_OID_MISSING="errorCode.studyOidMissing";
     public static final String ERR_STUDY_NOT_EXIST = "errorCode.studyNotExist";
     public static final String ERR_STUDY_NOT_AVAILABLE = "errorCode.studyNotAvailable";
     public static final String ERR_SITE_NOT_AVAILABLE = "errorCode.siteNotAvailable";
