@@ -181,4 +181,8 @@ public class ErrorConstants {
     public static final String ERR_MULTIPLE_MOBILE_PHONE_HEADERS = "errorCode.multipleMobilePhoneHeaders";
 	public static final String ERR_IMPORT_XML_QUERY_CREAT_FAILED = "errorCode.importXMLcreateQueryFailed";
 
+    public static final String ERR_INVALID_PAGE_NUMBER_PARAMETER = "errorCode.invalidPageNumberParameter";
+    public static final String ERR_INVALID_PAGE_SIZE_PARAMETER = "errorCode.invalidPageSizeParameter";
+
+
 }

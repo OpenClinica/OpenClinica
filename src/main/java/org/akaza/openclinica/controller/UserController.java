@@ -19,6 +19,7 @@ import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,24 +189,30 @@ public class UserController {
     @ApiOperation( value = "Retrieve all participants contact information with or without their OpenClinica participate access code.", notes = "Will extract the data in a text file" )
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractParticipantsInfo", method = RequestMethod.POST )
     public ResponseEntity<Object> extractParticipantsInfo(HttpServletRequest request,
-              @ApiParam(value = "Study OID", required = true) @PathVariable( "studyOID" ) String studyOid,
-              @ApiParam(value = "Site OID", required = true) @PathVariable( "siteOID" ) String siteOid,
-              @ApiParam(value = "Use this parameter to retrieve participant's access code for OpenClinica Participant module. Possible values - y or n.", required = false) @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo) throws InterruptedException {
+                                                          @ApiParam( value = "Study OID", required = true ) @PathVariable( "studyOID" ) String studyOid,
+                                                          @ApiParam( value = "Site OID", required = true ) @PathVariable( "siteOID" ) String siteOid,
+                                                          @ApiParam( value = "Use this parameter to retrieve participant's access code for OpenClinica Participant module. Possible values - y or n.", required = false )
+                                                          @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo,
+                                                          @RequestParam( value = "page_number", defaultValue = "1", required = false ) String pNumber,
+                                                          @RequestParam( value = "page_size", defaultValue = "100", required = false ) String pSize) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
         ResponseEntity<Object> response = null;
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-
+        int pageNumber = 1;
+        int pageSize = 100;
         boolean incRelatedInfo = false;
-        if(includeParticipateInfo!=null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
-        	incRelatedInfo = true;
+        if (includeParticipateInfo != null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
+            incRelatedInfo = true;
         }
 
         try {
-           validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean, incRelatedInfo);           
-           
+            pageNumber = validatePageNumber(pNumber);
+            pageSize = validatePageSize(pSize);
+            validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean, incRelatedInfo);
+
         } catch (OpenClinicaSystemException e) {
             String errorMsg = e.getErrorCode();
             HashMap<String, String> map = new HashMap<>();
@@ -219,7 +226,7 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-        String uuid = startExtractJob(studyOid, siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo);
+        String uuid = startExtractJob(studyOid, siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo, pageNumber, pageSize);
 
         logger.info("REST request to Extract Participants info ");
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -259,7 +266,7 @@ public class UserController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startExtractJob(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, boolean incRelatedInfo) {
+    public String startExtractJob(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, boolean incRelatedInfo,int pageNumber,int pageSize) {
         utilService.setSchemaFromStudyOid(studyOid);
         String schema = CoreResources.getRequestSchema();
 
@@ -269,7 +276,7 @@ public class UserController {
         JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE, null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             try {
-                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail, incRelatedInfo);
+                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail, incRelatedInfo,pageNumber,pageSize);
             } catch (Exception e) {
                 logger.error("Exeception is thrown while extracting job : " + e);
             }
@@ -278,4 +285,31 @@ public class UserController {
         return jobDetail.getUuid();
     }
 
+    private int validatePageNumber(String pNumber) {
+        int pageNumber = 1;
+        try {
+            pageNumber = Integer.parseInt(pNumber.trim());
+        } catch (NumberFormatException nfe) {
+            logger.info("invalid Page Number Format Exception: " + nfe.getMessage());
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PAGE_NUMBER_PARAMETER);
+        }
+        if (pageNumber < 1)
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PAGE_NUMBER_PARAMETER);
+
+        return pageNumber;
+    }
+
+    private int validatePageSize(String pSize) {
+        int pageSize = 1;
+        try {
+            pageSize = Integer.parseInt(pSize.trim());
+        } catch (NumberFormatException nfe) {
+            logger.info("invalid Page Number Format Exception: " + nfe.getMessage());
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PAGE_SIZE_PARAMETER);
+        }
+        if (pageSize < 1)
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PAGE_SIZE_PARAMETER);
+
+        return pageSize;
+    }
 }
