@@ -463,7 +463,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    		
 			    		int studyEventDefinitionId = studyEvent.getStudyEventDefinition().getStudyEventDefinitionId();
 			    		EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyIdorSiteId(studyEventDefinitionId, eventCrf.getCrfVersion().getCrf().getCrfId(), studyId);
-			    	    if(edc != null && validateService.hasCRFpermissionTag(edc, permissionTags)) {
+			    	    if(edc != null && validateService.hasFormAccess(edc, permissionTags)) {
 			    	    	PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
 				    		studyEventDefinitionID = studyEventDefinitionId + "";
 					        subjectContext.setStudyEventDefinitionId(studyEventDefinitionID);
