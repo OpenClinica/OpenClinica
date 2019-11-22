@@ -902,7 +902,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         if (!study.isSite()) {
             return study;
         } else {
-            Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
     }

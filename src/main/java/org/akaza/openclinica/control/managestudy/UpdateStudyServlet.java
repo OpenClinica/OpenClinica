@@ -13,7 +13,9 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.InterventionBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -446,60 +448,6 @@ public class UpdateStudyServlet extends SecureController {
         logger.debug("study's parentId=" + study1.checkAndGetParentStudyId());
         getStudyDao().update(study1);
 
-        StudyParameterValueBean spv = new StudyParameterValueBean();
-
-        spv.setStudyId(study1.getStudyId());
-        spv.setParameter("collectDob");
-        spv.setValue(new Integer(study1.getCollectDob()).toString());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("discrepancyManagement");
-        spv.setValue(study1.getDiscrepancyManagement());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("genderRequired");
-        spv.setValue(study1.getGenderRequired());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("subjectPersonIdRequired");
-        spv.setValue(study1.getSubjectPersonIdRequired());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("interviewerNameRequired");
-        spv.setValue(study1.getInterviewerNameRequired());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("interviewerNameDefault");
-        spv.setValue(study1.getInterviewerNameDefault());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("interviewerNameEditable");
-        spv.setValue(study1.getInterviewerNameEditable());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("interviewDateRequired");
-        spv.setValue(study1.getInterviewDateRequired());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("interviewDateDefault");
-        spv.setValue(study1.getInterviewDateDefault());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("interviewDateEditable");
-        spv.setValue(study1.getInterviewDateEditable());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("subjectIdGeneration");
-        spv.setValue(study1.getSubjectIdGeneration());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("subjectIdPrefixSuffix");
-        spv.setValue(study1.getSubjectIdPrefixSuffix());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("personIdShownOnCRF");
-        spv.setValue(study1.getPersonIdShownOnCRF());
-        updateParameter(spvdao, spv);
 
         Study curStudy = (Study) session.getAttribute("study");
         if (curStudy != null && study1 != null && study1.getStudyId() == curStudy.getStudyId()) {
@@ -512,17 +460,10 @@ public class UpdateStudyServlet extends SecureController {
             Study child = (Study) children.get(i);
             child.setDateUpdated(new Date());
             child.setUpdater(ub);
+            StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+            scs.updateOrCreateSpv(child, StudyParamNames.COLLECT_DOB, study1.getCollectDob());
+            scs.updateOrCreateSpv(child, StudyParamNames.GENDER_REQUIRED, study1.getGenderRequired());
             getStudyDao().update(child);
-            // YW << update "collectDob" and "genderRequired" for sites
-            StudyParameterValueBean childspv = new StudyParameterValueBean();
-            childspv.setStudyId(child.getStudyId());
-            childspv.setParameter("collectDob");
-            childspv.setValue(new Integer(study1.getCollectDob()).toString());
-            updateParameter(spvdao, childspv);
-            childspv.setParameter("genderRequired");
-            childspv.setValue(study1.getGenderRequired());
-            updateParameter(spvdao, childspv);
-            // YW >>
         }
 
         session.removeAttribute("newStudy");
@@ -683,12 +624,4 @@ public class UpdateStudyServlet extends SecureController {
         return SecureController.ADMIN_SERVLET_CODE;
     }
 
-    private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
-        StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
-        if (spv1.getId() > 0) {
-            spvdao.update(spv);
-        } else {
-            spvdao.create(spv);
-        }
-    }
 }

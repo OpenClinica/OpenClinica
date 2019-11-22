@@ -289,11 +289,10 @@ public class StudyController {
         Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
         String enforceEnrollmentCap =  String.valueOf(map.get("enforceEnrollmentCap"));
 
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.COLLECT_DOB, "1"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.DISCREPANCY_MANAGEMENT, "true"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.GENDER_REQUIRED, "true"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, "required"));
+
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED, "not_used"));
+
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_DEFAULT, "blank"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_EDITABLE, "true"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_REQUIRED, "not_used"));
@@ -302,12 +301,11 @@ public class StudyController {
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "manual"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX, "true"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF, "false"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, "false"));
+
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE, "true"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.EVENT_LOCATION_REQUIRED, "not_used"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_PORTAL, "disabled"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.RANDOMIZATION, "disabled"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, "false"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, ""));
 
         if (collectBirthDate == null) {
@@ -336,25 +334,33 @@ public class StudyController {
         if (collectSex == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectSex");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.GENDER_REQUIRED, "true"));
         }
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.GENDER_REQUIRED, Boolean.toString(collectSex)));
+        else
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.GENDER_REQUIRED, Boolean.toString(collectSex)));
         if (collectPersonId == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectPersonId");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, "required"));
         } else {
             collectPersonId = collectPersonId.trim();
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, collectPersonId));
         }
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, collectPersonId));
+
         if (showSecondaryId == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "ShowSecondaryId");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, "false"));
         }
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, Boolean.toString(showSecondaryId)));
+        else
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, Boolean.toString(showSecondaryId)));
         if (enforceEnrollmentCap == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "EnforceEnrollmentCap");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, "false"));
         }
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, enforceEnrollmentCap));
+        else
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, enforceEnrollmentCap));
 
         return studyParameterValues;
     }
@@ -457,7 +463,7 @@ public class StudyController {
 
             if (myStatus != null) {
                 myStatus = myStatus.equals("DESIGN") ? "PENDING" : myStatus;
-                statusObj = core.org.akaza.openclinica.domain.Status.getByName(myStatus);
+                statusObj = core.org.akaza.openclinica.domain.Status.getByName(myStatus.toLowerCase());
             }
             return statusObj;
         }
@@ -1047,7 +1053,7 @@ public class StudyController {
                 statusStr = statusStr.toLowerCase();
             }
             statusStr = statusStr.equalsIgnoreCase("PENDING") ? "Design" : statusStr;
-            status = Status.getByName(statusStr);
+            status = Status.getByName(statusStr.toLowerCase());
 
             if (status == null) {
                 ErrorObj errorObject = createErrorObject("Site Object", "Missing Field", "status");
@@ -1998,15 +2004,11 @@ public class StudyController {
 
         if (!parameterValueExist) {
             StudyParameterValue studyParameterValue = new StudyParameterValue();
+            studyParameterValue = createStudyParameterValueWithHandleAndValue(handle, parameter);
             studyParameterValue.setStudy(schemaStudy);
-            StudyParameter sp = studyParameterDao.findByHandle(handle);
-            studyParameterValue.setStudyParameter(sp);
-            studyParameterValue.setValue(parameter);
             studyParameterValues.add(studyParameterValue);
         }
-
     }
-
 }
 
 

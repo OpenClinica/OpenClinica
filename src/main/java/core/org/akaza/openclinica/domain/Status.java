@@ -61,7 +61,11 @@ public enum Status implements CodedEnum {
     }
 
     public static Status getByName(String name) {
-        return Status.valueOf(Status.class, name);
+        HashMap<String, Status> enumObjects = new HashMap<String, Status>();
+        for (Status theEnum : Status.values()) {
+            enumObjects.put(theEnum.getDescription(), theEnum);
+        }
+        return enumObjects.get(name.toLowerCase()   );
     }
 
     public static Status getByCode(Integer code) {

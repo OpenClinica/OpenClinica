@@ -878,27 +878,6 @@ public class Study extends DataMapDomainObject {
         return isSite() ? this.getStudy().getStudyId() : 0;
     }
 
-    @Transient
-    public List<StudyParamsConfig> getStudyParameters() {
-            List<StudyParamsConfig> spcList = new ArrayList<>();
-            List<StudyParameterValue> parameters = getStudyParameterValues();
-            for (int i = 0; i < parameters.size(); i++) {
-                StudyParameterValue spv = parameters.get(i);
-                StudyParamsConfig spc = new StudyParamsConfig();
-
-                spc.setParameter(spv.getStudyParameter());
-                StudyParameterValueBean spvb = new StudyParameterValueBean();
-                spvb.setValue(spv.getValue());
-                spvb.setStudyId(spv.getStudy().getStudyId());
-                spvb.setParameter(spv.getStudyParameter().getHandle());
-                spc.setValue(spvb);
-                spcList.add(spc);
-            }
-            return spcList;
-    }
-
-
-
     public void setIndividualStudyParameterValue(String parameterName, String value){
         for(StudyParameterValue spv: getStudyParameterValues()){
             if(spv.getStudyParameter().getHandle().equalsIgnoreCase(parameterName))
@@ -906,30 +885,22 @@ public class Study extends DataMapDomainObject {
         }
     }
     @Transient
-    public String getIndividualStudyParameterValue(String parameterName){
+    public String getIndividualStudyParameterValueOutput(String parameterName){
         for(StudyParameterValue spv : getStudyParameterValues()) {
             if (spv.getStudyParameter().getHandle().equalsIgnoreCase(parameterName))
                 return spv.getValue();
-        }
+    }
         return "";
     }
+
     @Transient
-    public void setStudyParameters(List<StudyParamsConfig> spcList){
-        List<StudyParameterValue> spvList = new ArrayList<>();
-        for(StudyParamsConfig spc: spcList){
-            if(spc.getValue() == null || spc.getValue().getId() == 0)
-                continue;
-            StudyParameterValue spv = new StudyParameterValue();
-            spv.setStudyParameterValueId(spc.getValue().getId());
-            spv.setStudy(this);
-            spv.setStudyParameter(spc.getParameter());
-            spv.setValue(spc.getValue().getValue());
-
-            spvList.add(spv);
+    public StudyParameterValue getIndividualStudyParameterValue(String paramName){
+        for(StudyParameterValue spv : getStudyParameterValues()) {
+            if (spv.getStudyParameter().getHandle().equalsIgnoreCase(paramName))
+                return spv;
         }
-        setStudyParameterValues(spvList);
+        return null;
     }
-
     /**
      * @return Returns the updater.
      */
@@ -984,7 +955,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getCollectDob() {
-        return getIndividualStudyParameterValue(StudyParamNames.COLLECT_DOB);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.COLLECT_DOB);
     }
 
     /**
@@ -1000,7 +971,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getDiscrepancyManagement() {
-        return getIndividualStudyParameterValue(StudyParamNames.DISCREPANCY_MANAGEMENT);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.DISCREPANCY_MANAGEMENT);
     }
 
     /**
@@ -1016,7 +987,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getGenderRequired() {
-        return getIndividualStudyParameterValue(StudyParamNames.GENDER_REQUIRED);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.GENDER_REQUIRED);
     }
 
     /**
@@ -1032,7 +1003,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getInterviewDateDefault() {
-        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_DEFAULT);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.INTERVIEW_DATE_DEFAULT);
     }
 
     /**
@@ -1048,7 +1019,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getInterviewDateEditable() {
-        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_EDITABLE);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.INTERVIEW_DATE_EDITABLE);
     }
 
     /**
@@ -1064,7 +1035,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getInterviewDateRequired() {
-        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEW_DATE_REQUIRED);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.INTERVIEW_DATE_REQUIRED);
     }
 
     /**
@@ -1080,7 +1051,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getInterviewerNameDefault() {
-        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_DEFAULT);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.INTERVIEWER_NAME_DEFAULT);
     }
 
     /**
@@ -1096,7 +1067,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getInterviewerNameEditable() {
-        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_EDITABLE);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.INTERVIEWER_NAME_EDITABLE);
     }
 
     /**
@@ -1112,7 +1083,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getInterviewerNameRequired() {
-        return getIndividualStudyParameterValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.INTERVIEWER_NAME_REQUIRED);
     }
 
     /**
@@ -1128,7 +1099,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getSubjectIdGeneration() {
-        return getIndividualStudyParameterValue(StudyParamNames.SUBJECT_ID_GENERATION);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.SUBJECT_ID_GENERATION);
     }
 
     /**
@@ -1144,7 +1115,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getSubjectIdPrefixSuffix() {
-        return getIndividualStudyParameterValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX);
     }
 
     /**
@@ -1160,7 +1131,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getSubjectPersonIdRequired() {
-        return getIndividualStudyParameterValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED);
     }
 
     /**
@@ -1176,7 +1147,7 @@ public class Study extends DataMapDomainObject {
      */
     @Transient
     public String getPersonIdShownOnCRF() {
-        return getIndividualStudyParameterValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.PERSON_ID_SHOWN_ON_CRF);
     }
 
     /**
@@ -1189,7 +1160,7 @@ public class Study extends DataMapDomainObject {
 
     @Transient
     public String getSecondaryLabelViewable() {
-        return getIndividualStudyParameterValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.SECONDARY_LABEL_VIEWABLE);
     }
 
     public void setSecondaryLabelViewable(String secondaryLabelViewable) {
@@ -1198,7 +1169,7 @@ public class Study extends DataMapDomainObject {
 
     @Transient
     public String getAdminForcedReasonForChange() {
-        return getIndividualStudyParameterValue(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE);
     }
 
     public void setAdminForcedReasonForChange(String adminForcedReasonForChange) {
@@ -1207,7 +1178,7 @@ public class Study extends DataMapDomainObject {
 
     @Transient
     public String getEventLocationRequired() {
-        return getIndividualStudyParameterValue(StudyParamNames.EVENT_LOCATION_REQUIRED);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.EVENT_LOCATION_REQUIRED);
     }
 
     public void setEventLocationRequired(String eventLocationRequired) {
@@ -1216,12 +1187,12 @@ public class Study extends DataMapDomainObject {
 
     @Transient
     public String getEnforceEnrollmentCap() {
-        return getIndividualStudyParameterValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.ENFORCE_ENROLLMENT_CAP);
     }
 
     @Transient
     public String getParticipantIdTemplate() {
-        return getIndividualStudyParameterValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.PARTICIPANT_ID_TEMPLATE);
     }
 
     public void setEnforceEnrollmentCap(String enforceEnrollmentCap) {
@@ -1233,7 +1204,7 @@ public class Study extends DataMapDomainObject {
 
     @Transient
     public String getContactsModule() {
-        return getIndividualStudyParameterValue(StudyParamNames.CONTACTS_MODULE);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.CONTACTS_MODULE);
     }
 
     public void setContactsModule(String contactsModule) {
@@ -1242,7 +1213,7 @@ public class Study extends DataMapDomainObject {
 
     @Transient
     public String getRandomization() {
-        return getIndividualStudyParameterValue(StudyParamNames.RANDOMIZATION);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.RANDOMIZATION);
     }
 
     public void setRandomization(String randomization) {
@@ -1251,7 +1222,7 @@ public class Study extends DataMapDomainObject {
 
     @Transient
     public String getParticipantPortal() {
-        return getIndividualStudyParameterValue(StudyParamNames.PARTICIPANT_PORTAL);
+        return getIndividualStudyParameterValueOutput(StudyParamNames.PARTICIPANT_PORTAL);
     }
 
     public void setParticipantPortal(String participantPortal) {

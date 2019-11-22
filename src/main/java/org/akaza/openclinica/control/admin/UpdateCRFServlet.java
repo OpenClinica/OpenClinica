@@ -49,7 +49,7 @@ public class UpdateCRFServlet extends SecureController {
         }
 
         // get current studyid
-        int studyId = currentStudy.getId();
+        int studyId = currentStudy.getStudyId();
 
         if (ub.hasRoleInStudy(studyId)) {
             Role r = ub.getRoleByStudy(studyId).getRole();

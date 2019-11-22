@@ -139,10 +139,9 @@ public class ExportDatasetServlet extends SecureController {
         int parentstudy = currentstudyid;
         // YW 11-09-2008 >>
 
-        Study parentStudy = new Study();
+        Study parentStudy = null;
         if (currentStudy.isSite()) {
-            //StudyDAO sdao = new StudyDAO(sm.getDataSource());
-            parentStudy = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
+            parentStudy = currentStudy.getStudy();
         }
 
         ExtractBean eb = generateFileService.generateExtractBean(db, currentStudy, parentStudy);

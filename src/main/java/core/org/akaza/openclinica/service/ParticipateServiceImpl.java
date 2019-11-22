@@ -376,7 +376,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         if (!study.isSite()) {
             return study;
         } else {
-            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
 
@@ -464,6 +464,5 @@ public class ParticipateServiceImpl implements ParticipateService {
             spv.setValue(statusValue);
             spvdao.update(spv);
         }
-        int i = 0;
     }
 }

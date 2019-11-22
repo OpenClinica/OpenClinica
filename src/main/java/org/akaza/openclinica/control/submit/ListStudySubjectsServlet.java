@@ -101,12 +101,8 @@ public class ListStudySubjectsServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         boolean showMoreLink;
 
-        int parentStudyId = currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId();
-
-        StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
-        StudyParameterValue parentSPV = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "subjectIdGeneration");
-
-        currentStudy.setSubjectIdGeneration(parentSPV.getValue());
+        if(currentStudy.isSite())
+            currentStudy.setSubjectIdGeneration(currentStudy.getStudy().getSubjectIdGeneration());
 
         String addNewSubjectOverlay = fp.getRequest().getParameter("addNewSubject");
         if (addNewSubjectOverlay != null){

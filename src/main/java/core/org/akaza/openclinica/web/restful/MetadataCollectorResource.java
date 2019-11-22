@@ -184,10 +184,9 @@ public class MetadataCollectorResource {
         return report.getXmlOutput().toString().trim();
     }
 
-    public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
+    public FullReportBean collectODMMetadataForClinicalData(Study studyBean, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
                                                              boolean showArchived , String permissionTagsString, boolean includeMetadata) {
         FullReportBean report = new FullReportBean();
-            Study studyBean = studyDaoHib.findByOcOID(studyOID);
             if (studyBean != null)
                 studyBean = populateStudyBean(studyBean);
             MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived, permissionTagsString, studyDaoHib);
@@ -227,22 +226,10 @@ public class MetadataCollectorResource {
     }
 
     private Study populateStudyBean(Study studyBean) {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(this.dataSource);
-        @SuppressWarnings("rawtypes")
-        ArrayList studyParameters = spvdao.findParamConfigByStudy(studyBean);
-
-        studyBean.setStudyParameters(studyParameters);
-        StudyConfigService scs = new StudyConfigService(this.dataSource);
-        if (!studyBean.isSite()) {// top study
-            studyBean = scs.setParametersForStudy(studyBean);
-
-        } else {
-            // YW <<
-            studyBean.getStudy().setName(((Study) studyDaoHib.findByPK(studyBean.getStudy().getStudyId())).getName());
-            // YW >>
-            studyBean = scs.setParametersForSite(studyBean);
+        if (studyBean.getStudyParameterValues() == null || studyBean.getStudyParameterValues().size() == 0) {
+            StudyConfigService scs = new StudyConfigService(this.dataSource);
+            scs.setParameterValuesForStudy(studyBean);
         }
-
         return studyBean;
     }
 

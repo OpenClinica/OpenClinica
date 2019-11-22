@@ -548,12 +548,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         if(currentStudy.getStudy() == null)
                             currentStudy.setStudy(currentPublicStudy.getStudy());
                     }
-                    StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-                    if (!currentStudy.isSite()) {// top study
-                        if(currentStudy.getStudyParameterValues() == null || currentStudy.getStudyParameterValues().size() == 0)
-                            scs.setParametersForStudy(currentStudy);
-
-                    } else {
+                    if (currentStudy.isSite())  {
+                        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
                         scs.setParametersForSite(currentStudy);
                     }
                 }
@@ -1045,8 +1041,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         if (currentStudy == null)
             return allDefs;
         if (currentStudy.isSite()) {
-            Study parentStudy = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
-            allDefs = studyEventDefinitionDAO.findAllActiveByStudy(parentStudy);
+            allDefs = studyEventDefinitionDAO.findAllActiveByStudy(currentStudy.getStudy());
         } else {
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(currentStudy);
         }
@@ -1064,9 +1059,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         StudyGroupDAO studyGroupDAO = new StudyGroupDAO(sm.getDataSource());
         int parentStudyId = currentStudy.checkAndGetParentStudyId();
         ArrayList studyGroupClasses = new ArrayList();
-        if (parentStudyId > 0) {
-            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
-            studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(parentStudy);
+        if (currentStudy.isSite()) {
+            studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(currentStudy.getStudy());
         } else {
             parentStudyId = currentStudy.getStudyId();
             studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(currentPublicStudy);
@@ -1549,13 +1543,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         Set<CustomRole> customRoles = userRoles.stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
     }
 
-    protected String getParticipateStatus(int parentStudyId) {
-        String participateStatus = "";
-        StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
-        StudyParameterValue participantPortalStatus = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "participantPortal");
-        if (participantPortalStatus != null)
-            participateStatus = participantPortalStatus.getValue();
+    protected String getParticipateStatus(Study parentStudy) {
 
+        String participateStatus = parentStudy.getParticipantPortal();
         return participateStatus;
     }
     protected UserService getUserService() {
@@ -1564,8 +1554,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     protected void changeParticipantAccountStatus(Study study, StudySubjectBean studySub, UserStatus userStatus) {
         // check if particiate module enabled
-        int parentStudyId = (study.isSite()) ? study.getStudy().getStudyId() : study.getStudyId();
-        String participateStatus = getParticipateStatus(parentStudyId);
+        Study  parentStudy = (study.isSite()) ? study.getStudy() : study;
+        String participateStatus = getParticipateStatus(parentStudy);
         if (participateStatus.equals(ENABLED) && studySub.getUserId() != 0) {
             studySub.setUserStatus(userStatus);
             StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());

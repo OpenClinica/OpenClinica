@@ -385,7 +385,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
         while (it.hasNext()) {
             HashMap hm = (HashMap) it.next();
             ItemBean eb = (ItemBean) this.getEntityFromHashMap(hm);
-            Integer versionId = (Integer) hm.get("crf_version_id");
+            Integer versionId = Integer.parseInt( (String) hm.get("crf_version_id"));
             String versionName = (String) hm.get("cvname");
             ItemFormMetadataBean imf = new ItemFormMetadataBean();
             imf.setCrfVersionName(versionName);

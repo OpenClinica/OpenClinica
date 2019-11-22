@@ -165,9 +165,6 @@ public class MainMenuServlet extends SecureController {
         //  + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
         //Yufang code added by Jamuna, to optimize the query on MainMenu
 
-        Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(ub.getId(), currentStudy.getStudyId());
-        request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
-
         int parentStudyId = currentStudy.checkAndGetParentStudyId();
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");

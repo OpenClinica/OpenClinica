@@ -220,8 +220,8 @@ public class ChangeStudyServlet extends SecureController {
             }
             request.setAttribute("requestSchema", newStudySchema); //schema we are changing to.
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-            if (newStudy.isSite())
-                scs.setParametersForSite(newStudy);
+//            if (newStudy.isSite())
+//                scs.setParametersForSite(newStudy);
         }
         request.setAttribute("requestSchema", "public");
         if (newStudy.getStatus().equals(Status.DELETED) || newStudy.getStatus().equals(Status.AUTO_DELETED)) {
@@ -326,9 +326,6 @@ public class ChangeStudyServlet extends SecureController {
         // YW >>
 
         //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().countAllItemDataByStudyAndUser(currentStudy, ub);
-        Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
-                + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
-        request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
         request.setAttribute("enrollmentCapped", isEnrollmentCapped());
 
         if (currentRole.isInvestigator() || currentRole.isResearchAssistant()|| currentRole.isResearchAssistant2()) {
@@ -337,6 +334,7 @@ public class ChangeStudyServlet extends SecureController {
         }
         if (currentRole.isMonitor()) {
             response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getStudyId() + "&studyJustChanged=yes");
+            return;
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
             setupSubjectEventStatusStatisticsTable();
@@ -367,7 +365,7 @@ public class ChangeStudyServlet extends SecureController {
 
             if (role == null) {
                 // The user inherit a study level role
-                Study parent = (Study)getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
+                Study parent = currentStudy.getStudy();
                 role = roles.stream()
                         .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(parent.getStudyEnvUuid()))
                         .findAny()

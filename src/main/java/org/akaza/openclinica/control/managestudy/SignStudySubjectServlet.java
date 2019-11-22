@@ -313,8 +313,6 @@ public class SignStudySubjectServlet extends SecureController {
 
         Study study = (Study) getStudyDao().findByPK(studyId);
 
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        study.setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
         // request.setAttribute("study", study);
 
         if (study.isSite()) {// this is a site,find parent

@@ -11,8 +11,10 @@ import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyParameterDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyParameter;
+import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +28,6 @@ public class StudyConfigService {
 
     private DataSource ds;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
-    @Autowired
-    private StudyDao studyDao;
 
     public StudyConfigService(DataSource ds) {
         this.ds = ds;
@@ -62,7 +61,7 @@ public class StudyConfigService {
      * @param parameterHandle
      * @return
      */
-    public String hasDefinedParameterValue(int studyId, String parameterHandle) {
+    public String hasDefinedParameterValue(int studyId, String parameterHandle, StudyDao studyDao) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
 
         if (studyId <= 0 || StringUtil.isBlank(parameterHandle)) {
@@ -95,80 +94,11 @@ public class StudyConfigService {
      * @param study
      * @return
      */
-
-    public Study setParametersForStudy(Study study) {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-        ArrayList parameters = spvdao.findAllParameters();
-        List resultparamsList = new ArrayList();
-        for (int i = 0; i < parameters.size(); i++) {
-            core.org.akaza.openclinica.domain.datamap.StudyParameter sp = (core.org.akaza.openclinica.domain.datamap.StudyParameter) parameters.get(i);
-            String handle = sp.getHandle();
-            // logger.info("handle:" + handle);
-            StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), handle);
-            StudyParamsConfig spc = new StudyParamsConfig();
-            spc.setParameter(sp);
-            spc.setValue(spv);
-            resultparamsList.add(spc);
-        }
-        study.setStudyParameters(resultparamsList);
-        return study;
-
-    }
-
     public Study setParameterValuesForStudy(Study study) {
-        if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0) {
-            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-            ArrayList theParameters = spvdao.findParamConfigByStudy(study);
-            study.setStudyParameters(theParameters);
-
-            ArrayList parameters = spvdao.findAllParameterValuesByStudy(study);
-
-            for (int i = 0; i < parameters.size(); i++) {
-                StudyParameterValueBean spvb = (StudyParameterValueBean) parameters.get(i);
-                String parameter = spvb.getParameter();
-                if (parameter.equalsIgnoreCase("collectDob")) {
-                    study.setCollectDob(spvb.getValue());
-                } else if (parameter.equalsIgnoreCase("genderRequired")) {
-                    study.setGenderRequired(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("subjectPersonIdRequired")) {
-                    study.setSubjectPersonIdRequired(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("discrepancyManagement")) {
-                    study.setDiscrepancyManagement(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("subjectIdGeneration")) {
-                    study.setSubjectIdGeneration(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("subjectIdPrefixSuffix")) {
-                    study.setSubjectIdPrefixSuffix(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("interviewerNameRequired")) {
-                    study.setInterviewerNameRequired(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("interviewerNameDefault")) {
-                    study.setInterviewerNameDefault(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("interviewerNameEditable")) {
-                    study.setInterviewerNameEditable(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("interviewDateRequired")) {
-                    study.setInterviewDateRequired(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("interviewDateDefault")) {
-                    study.setInterviewDateDefault(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("interviewDateEditable")) {
-                    study.setInterviewDateEditable(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("personIdShownOnCRF")) {
-                    study.setPersonIdShownOnCRF(spvb.getValue());
-
-                } else if (parameter.equalsIgnoreCase("adminForcedReasonForChange")) {
-                    study.setAdminForcedReasonForChange(spvb.getValue());
-                }
-            }
-        }
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
+        ArrayList<StudyParameterValueBean> parameters = (ArrayList<StudyParameterValueBean>) spvdao.findAllParameterValuesByStudy(study);
+        for(StudyParameterValueBean spvb : parameters)
+            updateOrCreateSpv(study, spvb.getParameter(), spvb.getValue());
         return study;
 
     }
@@ -176,60 +106,41 @@ public class StudyConfigService {
     public Study setParametersForSite(Study site) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
         Study parent = site.getStudy();
-        parent = this.setParameterValuesForStudy(parent);
-        site.setStudyParameterValues(parent.getStudyParameterValues());
-        ArrayList siteParameters = spvdao.findAllParameterValuesByStudy(site);
-
-        for (int i = 0; i < siteParameters.size(); i++) {
-            StudyParameterValueBean spvb = (StudyParameterValueBean) siteParameters.get(i);
-            site.setIndividualStudyParameterValue(spvb.getParameter(),spvb.getValue());
-            String parameter = spvb.getParameter();
-            if (parameter.equalsIgnoreCase("collectDob")) {
-                site.setCollectDob(spvb.getValue());
-            } else if (parameter.equalsIgnoreCase("genderRequired")) {
-                site.setGenderRequired(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("subjectPersonIdRequired")) {
-                site.setSubjectPersonIdRequired(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("discrepancyManagement")) {
-                site.setDiscrepancyManagement(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("subjectIdGeneration")) {
-                site.setSubjectIdGeneration(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("subjectIdPrefixSuffix")) {
-                site.setSubjectIdPrefixSuffix(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("interviewerNameRequired")) {
-                site.setInterviewerNameRequired(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("interviewerNameDefault")) {
-                site.setInterviewerNameDefault(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("interviewerNameEditable")) {
-                site.setInterviewerNameEditable(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("interviewDateRequired")) {
-                site.setInterviewDateRequired(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("interviewDateDefault")) {
-                site.setInterviewDateDefault(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("interviewDateEditable")) {
-                site.setInterviewDateEditable(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("personIdShownOnCRF")) {
-                site.setPersonIdShownOnCRF(spvb.getValue());
-
-            } else if (parameter.equalsIgnoreCase("adminForcedReasonForChange")) {
-                site.setAdminForcedReasonForChange(spvb.getValue());
-            }
-
-            // will add interview name/date features later
-        }
+        this.setParameterValuesForStudy(parent);
+        setParentParamValuesToChildStudy(site);
+        setParameterValuesForStudy(site);
         return site;
+    }
+    public void setParentParamValuesToChildStudy(Study study){
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
+        Study parentStudy = study.getStudy();
+        for(StudyParameterValue  spv: parentStudy.getStudyParameterValues()){
+            updateOrCreateSpv(study,spv.getStudyParameter().getHandle(), spv.getValue());
+        }
 
+    }
+    public void updateOrCreateSpv(Study study, String handle, String value){
+        boolean paramIsPresent = false;
+        if(study.getStudyParameterValues() != null && study.getStudyParameterValues().size() != 0){
+            for(StudyParameterValue spv : study.getStudyParameterValues()) {
+                if (spv.getStudyParameter().getHandle().equals(handle)) {
+                    spv.setValue(value);
+                    paramIsPresent = true;
+                    break;
+                }
+            }
+        }
+        if(!paramIsPresent){
+            StudyParameterValue newSpv = new StudyParameterValue();
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
+            StudyParameter parameter = spvdao.findParameterByHandle(handle);
+            newSpv.setStudyParameter(parameter);
+            newSpv.setValue(value);
+            newSpv.setStudy(study);
+            if(study.getStudyParameterValues() == null)
+                study.setStudyParameterValues(new ArrayList<StudyParameterValue>());
+            study.getStudyParameterValues().add(newSpv);
+        }
     }
 
 }

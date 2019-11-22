@@ -426,13 +426,13 @@ public class CreateCRFVersionServlet extends SecureController {
                     htab = new SpreadSheetTableRepeating(inStream, ub,
                             // SpreadSheetTable htab = new SpreadSheetTable(new
                             // FileInputStream(theDir + tempFile), ub,
-                            version.getName(), locale, currentStudy.getId());
+                            version.getName(), locale, currentStudy.getStudyId());
 
                     htab.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));
 
                     if (!htab.isRepeating()) {
                         inStreamClassic = new FileInputStream(theDir + tempFile);
-                        sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(), locale, currentStudy.getId());
+                        sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(), locale, currentStudy.getStudyId());
                         sstc.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));
                     }
                     // logger.debug("finishing with feedin file-input-stream, did

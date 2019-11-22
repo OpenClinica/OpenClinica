@@ -96,8 +96,7 @@ public abstract class OdmDataCollector {
                     this.studyBaseMap.put(study.getOc_oid(), new OdmStudyBase(ds, study));
                     this.category = 0;
                 } else {
-                    int parentStudyId = study.isSite() ? study.getStudy().getStudyId() : study.getStudyId();
-                    this.studyBaseMap = populateCompletedStudyBaseMap(parentStudyId);
+                    this.studyBaseMap = populateCompletedStudyBaseMap(study.getStudyId());
                     category = 1;
                 }
             }

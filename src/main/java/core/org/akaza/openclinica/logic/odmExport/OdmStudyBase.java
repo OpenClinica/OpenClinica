@@ -75,7 +75,6 @@ public class OdmStudyBase {
             return;
         }
         this.study = study;
-        int parentStudyId = this.study.isSite() ? this.study.getStudy().getStudyId() : this.study.getStudyId();
         this.sedBeansInStudy = seds;
     }
     

@@ -169,7 +169,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
 
     public StudyParameter findParameterByHandle(String handle) {
         StudyParameter sp = new StudyParameter();
-        this.setTypesExpected();
+        this.setTypesExpectedForParameter();
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), handle);
@@ -179,7 +179,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {
-            sp = (StudyParameter) this.getEntityFromHashMap((HashMap) it.next());
+            sp = (StudyParameter) this.getParameterEntityFromHashMap((HashMap) it.next());
         }
         return sp;
 
@@ -245,6 +245,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
             spvb.setId(((Integer) hm.get("study_parameter_value_id")).intValue());
 
             StudyParameter sp = new StudyParameter();
+            sp.setStudyParameterId(((Integer) hm.get("study_parameter_id")).intValue());
             sp.setId(((Integer) hm.get("study_parameter_id")).intValue());
             sp.setHandle((String) hm.get("handle"));
             sp.setName((String) hm.get("name"));

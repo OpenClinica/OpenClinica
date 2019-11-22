@@ -143,7 +143,7 @@ public class ODMClinicaDataResource {
         }
 
         XMLSerializer xmlSerializer = new XMLSerializer();
-             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
+             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyBean, formVersionOID,clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray, odmFilter);
         xmlSerializer.setTypeHintsEnabled(true);
@@ -285,7 +285,7 @@ public class ODMClinicaDataResource {
             clinicalDataBeans = null;
         }
 
-        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyBean, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray, odmFilter);
         LOGGER.debug(report.getXmlOutput().toString().trim());
@@ -336,7 +336,7 @@ public class ODMClinicaDataResource {
             clinicalDataBeans = null;
         }
 
-        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyBean, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         if (report.getClinicalDataMap() == null){
             LOGGER.info("ClinicalData Map is returning null in ODMClinicalDataResource");
