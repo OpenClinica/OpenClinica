@@ -106,11 +106,17 @@
                         <div class='formfieldXL_BG'>
                             <div>
                                 <input type='checkbox' name='checkboxReport' id='pidv-report-checkbox' value='true'/>
-                                <label style='font-size:16px; font-weight:600;'>Run data re-abstraction report</label>
+                                <label style='font-size:16px; font-weight:600;'>
+                                    <fmt:message key="run_reabstraction_report" bundle="${resword}"/>
+                                </label>
                             </div>
                             <div style='font-style:italic; color:#555555; padding-left:25px;'>
-                                Finished report can be accessed on <a href='Jobs'>the bulk actions log page</a>.<br>
-                                Please allow some time and refresh the page to see the report.
+                                <fmt:message key="run_reabstraction_desc_line1" bundle="${resword}"/>
+                                <a href='Jobs'>
+                                    <fmt:message key="run_reabstraction_desc_line2" bundle="${resword}"/>
+                                </a>.
+                                <br>
+                                <fmt:message key="run_reabstraction_desc_line3" bundle="${resword}"/>
                             </div>
                         </div>
                     </td>
