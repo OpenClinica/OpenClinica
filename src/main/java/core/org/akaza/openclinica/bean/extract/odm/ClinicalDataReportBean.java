@@ -926,10 +926,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
     private Study getParentStudy(String studyOid) {
         Study study = getStudy(studyOid);
-        if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
+        if (!study.isSite()) {
             return study;
         } else {
-            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
     }

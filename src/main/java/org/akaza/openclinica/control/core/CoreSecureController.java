@@ -327,21 +327,10 @@ public abstract class CoreSecureController extends SecureController {
 
             if (currentStudy == null || currentStudy.getStudyId() <= 0) {
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
-                    StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
                     currentStudy = (Study) getStudyDao().findByPK(ub.getActiveStudyId());
 
-                    ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
-
-                    currentStudy.setStudyParameters(studyParameters);
-
                     StudyConfigService scs = new StudyConfigService(getDataSource());
-                    if (!currentStudy.isSite()) {// top study
-                        scs.setParametersForStudy(currentStudy);
-
-                    } else {
-                        // YW <<
-                        currentStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId())).getName());
-                        // YW >>
+                    if (currentStudy.isSite()) {
                         scs.setParametersForSite(currentStudy);
                     }
 
@@ -811,14 +800,11 @@ public abstract class CoreSecureController extends SecureController {
     public ArrayList getEventDefinitionsByCurrentStudy(HttpServletRequest request) {
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(getDataSource());
         Study currentStudy = (Study) request.getSession().getAttribute("study");
-        int parentStudyId =0;
         ArrayList allDefs = new ArrayList();
         if (currentStudy.isSite()) {
-            parentStudyId = currentStudy.getStudy().getStudyId();
-            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
+            Study parentStudy = currentStudy.getStudy();
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(parentStudy);
         } else {
-            parentStudyId = currentStudy.getStudyId();
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(currentStudy);
         }
         return allDefs;
@@ -831,8 +817,7 @@ public abstract class CoreSecureController extends SecureController {
         int parentStudyId = 0;
         ArrayList studyGroupClasses = new ArrayList();
         if (currentStudy.isSite()) {
-            parentStudyId = currentStudy.getStudy().getStudyId();
-            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
+            Study parentStudy = currentStudy.getStudy();
             studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(parentStudy);
         } else {
             parentStudyId = currentStudy.getStudyId();

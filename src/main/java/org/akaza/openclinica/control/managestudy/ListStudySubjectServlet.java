@@ -132,27 +132,18 @@ public abstract class ListStudySubjectServlet extends SecureController {
         // allDefs holds the list of study event definitions used in the table,
         // tbh
         if (parentStudyId > 0) {
-            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
+            Study parentStudy = currentStudy.getStudy();
             studyGroupClasses = sgcdao.findAllActiveByStudy(parentStudy);
             allDefs = seddao.findAllActiveByStudy(parentStudy);
+            currentStudy.setCollectDob( parentStudy.getCollectDob());
+            currentStudy.setGenderRequired(parentStudy.getGenderRequired());
+            currentStudy.setSubjectPersonIdRequired(parentStudy.getSubjectPersonIdRequired());
+            currentStudy.setSubjectIdGeneration(parentStudy.getSubjectIdGeneration());
+            currentStudy.setSubjectIdPrefixSuffix(parentStudy.getSubjectIdPrefixSuffix());
         } else {
-            parentStudyId = currentStudy.getStudyId();
             studyGroupClasses = sgcdao.findAllActiveByStudy(currentStudy);
             allDefs = seddao.findAllActiveByStudy(currentStudy);
         }
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
-        currentStudy.setCollectDob(parentSPV.getValue());
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderRequired");
-        currentStudy.setGenderRequired(parentSPV.getValue());
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectPersonIdRequired");
-        currentStudy.setSubjectPersonIdRequired(parentSPV.getValue());
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-        currentStudy.setSubjectIdGeneration(parentSPV.getValue());
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdPrefixSuffix");
-        currentStudy.setSubjectIdPrefixSuffix(parentSPV.getValue());
-
-        // YW >>
 
         // for all the study groups for each group class
         for (int i = 0; i < studyGroupClasses.size(); i++) {

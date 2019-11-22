@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
@@ -20,7 +21,10 @@ import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -50,8 +54,6 @@ public class UpdateSubStudyServlet extends SecureController {
     public static final String INPUT_END_DATE = "endDate";
     public static Study parentStudy;
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      * *
      */
@@ -201,22 +203,21 @@ public class UpdateSubStudyServlet extends SecureController {
         study.setFacilityZip(fp.getString("facZip"));
         // study.setStatusId(fp.getInt("statusId"));
         study.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(fp.getInt("statusId")));
-        // YW 10-12-2007 <<
-        study.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-        study.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-        study.setInterviewDateRequired(fp.getString("interviewDateRequired"));
-        study.setInterviewDateDefault(fp.getString("interviewDateDefault"));
-        // YW >>
 
-        ArrayList parameters = (ArrayList) study.getStudyParameters();
+        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+        scs.updateOrCreateSpv(study, StudyParamNames.INTERVIEWER_NAME_REQUIRED, fp.getString(StudyParamNames.INTERVIEWER_NAME_REQUIRED));
+        scs.updateOrCreateSpv(study, StudyParamNames.INTERVIEWER_NAME_DEFAULT, fp.getString(StudyParamNames.INTERVIEWER_NAME_DEFAULT));
+        scs.updateOrCreateSpv(study, StudyParamNames.INTERVIEW_DATE_REQUIRED, fp.getString(StudyParamNames.INTERVIEW_DATE_REQUIRED));
+        scs.updateOrCreateSpv(study, StudyParamNames.INTERVIEW_DATE_DEFAULT, fp.getString(StudyParamNames.INTERVIEW_DATE_DEFAULT));
 
-        for (int i = 0; i < parameters.size(); i++) {
-            StudyParamsConfig scg = (StudyParamsConfig) parameters.get(i);
-            String value = fp.getString(scg.getParameter().getHandle());
-            logger.info("get value:" + value);
-            scg.getValue().setStudyId(study.getStudyId());
-            scg.getValue().setParameter(scg.getParameter().getHandle());
-            scg.getValue().setValue(value);
+        List<StudyParameterValue> spvList = study.getStudyParameterValues();
+        if(spvList != null){
+            for(StudyParameterValue spv : spvList){
+                String value = fp.getString(spv.getStudyParameter().getHandle());
+                if(value != null){
+                    spv.setValue(value);
+                }
+            }
         }
 
         return study;
@@ -468,7 +469,6 @@ public class UpdateSubStudyServlet extends SecureController {
      */
     private void submitStudy() throws MalformedURLException {
         Study study = (Study) session.getAttribute("newStudy");
-        ArrayList parameters = (ArrayList) study.getStudyParameters();
         submitSiteEventDefinitions(study);
 
         // session.removeAttribute("newStudy");

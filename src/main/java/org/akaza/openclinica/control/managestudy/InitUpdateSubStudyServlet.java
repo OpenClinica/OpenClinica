@@ -9,6 +9,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
@@ -20,6 +21,7 @@ import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -88,34 +90,21 @@ public class InitUpdateSubStudyServlet extends SecureController {
                 createEventDefinitions(parent);
             }
 
-            if (currentStudy.getStudyId() != study.getStudyId()) {
-                ArrayList parentConfigs = (ArrayList) currentStudy.getStudyParameters();
-                // logger.info("parentConfigs size:" + parentConfigs.size());
-                ArrayList configs = new ArrayList();
-                StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-                for (int i = 0; i < parentConfigs.size(); i++) {
-                    StudyParamsConfig scg = (StudyParamsConfig) parentConfigs.get(i);
-                    if (scg != null) {
-                        // find the one that sub study can change
-                        if (scg.getValue().getId() > 0 && scg.getParameter().isOverridable()) {
-                            // logger.info("parameter:" +
-                            // scg.getParameter().getHandle());
-                            // logger.info("value:" +
-                            // scg.getValue().getValue());
-                            StudyParameterValueBean spvb = spvdao.findByHandleAndStudy(study.getStudyId(), scg.getParameter().getHandle());
-                            if (spvb.getValue().equals("enabled"))
+            if(currentStudy.getStudyId() != study.getStudyId()){
+                if(study.getStudyParameterValues() != null && study.getStudyParameterValues().size() > 0){
+                    List<StudyParameterValue> spvList = currentStudy.getStudyParameterValues();
+                    for(StudyParameterValue currentStudySpv : spvList){
+
+                        if(currentStudySpv.getStudyParameterValueId() > 0 && currentStudySpv.getStudyParameter().isOverridable() &&
+                                study.getIndividualStudyParameterValue(currentStudySpv.getStudyParameter().getHandle()) != null){
+                            StudyParameterValue studySpv = study.getIndividualStudyParameterValue(currentStudySpv.getStudyParameter().getHandle());
+                            if(studySpv.getValue().equals("enabled"))
                                 baseUrl();
-                            if (spvb.getId() > 0) {
-                                // the sub study itself has the parameter
-                                scg.setValue(spvb);
-                            }
-                            configs.add(scg);
+                            if(studySpv.getStudyParameterValueId() > 0)
+                                currentStudySpv.setValue(studySpv.getValue());
                         }
                     }
-
                 }
-
-                study.setStudyParameters(configs);
             }
             request.setAttribute("parentStudy", parent);
             session.setAttribute("parentName", parentStudyName);

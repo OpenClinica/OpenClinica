@@ -49,7 +49,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     private FormLayoutDAO formLayoutDAO;
     private final String COMMON = "common";
 
-    @Autowired
     public StudyDao studyDao;
     public CRFVersionDAO getCrfVersionDAO() {
         return crfVersionDAO;
@@ -196,7 +195,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             theItem.put("studySubject", studySubjectBean);
             theItem.put("studySubject.label", studySubjectBean.getLabel());
             theItem.put("studySubject.status", studySubjectBean.getStatus());
-            theItem.put("enrolledAt", ((Study) studyDao.findByPK(studySubjectBean.getStudyId())).getUniqueIdentifier());
+            Study study = studyDao.findByPK(studySubjectBean.getStudyId());
+            theItem.put("enrolledAt", study.getUniqueIdentifier());
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
             theItem.put("subject", subjectBean);
@@ -492,6 +492,14 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     public CRFDAO getCrfDAO() {
         return crfDAO;
+    }
+
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
     }
 
     public void setCrfDAO(CRFDAO crfDAO) {

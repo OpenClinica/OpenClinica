@@ -79,20 +79,10 @@ public class ViewSiteServlet extends SecureController {
             Study study = (Study) getStudyDao().findByPK(siteId);
 
             checkRoleByUserAndStudy(ub, study);
-            // if (currentStudy.getId() != study.getId()) {
-
-            ArrayList configs = new ArrayList();
-            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-            configs = spvdao.findParamConfigByStudy(study);
-            study.setStudyParameters(configs);
-
-            // }
 
             String parentStudyName = "";
-            if (study.isSite()) {
-                Study parent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
-                parentStudyName = parent.getName();
-            }
+            if (study.isSite())
+                parentStudyName = study.getStudy().getName();
             request.setAttribute("parentName", parentStudyName);
             request.setAttribute("siteToView", study);
             request.setAttribute("idToSort", request.getAttribute("idToSort"));

@@ -57,18 +57,8 @@ public class SetUpStudyRole {
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
             currentStudy = (Study) studyDao.findByPK(userAccountBean.getActiveStudyId());
 
-            ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
-
-            currentStudy.setStudyParameters(studyParameters);
-
             StudyConfigService scs = new StudyConfigService(dataSource);
-            if (!currentStudy.isSite()) {// top study
-                scs.setParametersForStudy(currentStudy);
-
-            } else {
-                // YW <<
-                currentStudy.getStudy().setName(((Study) studyDao.findByPK(currentStudy.getStudy().getStudyId())).getName());
-                // YW >>
+            if (currentStudy.isSite()) {
                 scs.setParametersForSite(currentStudy);
             }
 
@@ -91,10 +81,6 @@ public class SetUpStudyRole {
         httpSession.setAttribute("study", currentStudy);
         // YW 06-20-2007<< set site's parentstudy name when site is
         // restored
-        if (currentStudy.isSite()) {
-            currentStudy.getStudy().setName(((Study) studyDao.findByPK(currentStudy.getStudy().getStudyId())).getName());
-        }
-        // YW >>
 
         if (currentRole.getId() <= 0) {
             // if (ub.getId() > 0 && currentStudy.getId() > 0) {

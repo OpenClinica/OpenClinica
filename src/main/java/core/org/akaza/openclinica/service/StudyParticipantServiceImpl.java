@@ -116,7 +116,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         Study tenantStudyBean = studyDao.findByOcOID(studyOid);
         Study tenantSiteBean = studyDao.findByOcOID(siteOid);
        
-        if (isEnrollmentCapped(tenantStudyBean,tenantSiteBean))
+        if (    isEnrollmentCapped(tenantStudyBean,tenantSiteBean))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
         
         if (StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()))
@@ -365,18 +365,17 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
      * @return
      */
     private boolean isEnrollmentCapEnforced(Study currentStudy,Study siteStudy){
-        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(this.dataSource);
-       
+
         boolean capEnforcedSite = false;
         String  enrollmentCapStatusSite = null;
         
-        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getStudyId(), "enforceEnrollmentCap").getValue();
+        String enrollmentCapStatus = currentStudy.getEnforceEnrollmentCap();
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         
         // check at the site level
         if(siteStudy != null) {
         	int siteId = siteStudy.getStudyId();
-        	enrollmentCapStatusSite = studyParameterValueDAO.findByHandleAndStudy(siteId, "enforceEnrollmentCap").getValue();
+        	enrollmentCapStatusSite =siteStudy.getEnforceEnrollmentCap();
         	capEnforcedSite = Boolean.valueOf(enrollmentCapStatusSite);        	
         }
         

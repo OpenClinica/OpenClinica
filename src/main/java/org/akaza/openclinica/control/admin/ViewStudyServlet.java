@@ -73,10 +73,6 @@ public class ViewStudyServlet extends SecureController {
 
             String viewFullRecords = fp.getString("viewFull");
 
-
-            StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-            study = scs.setParametersForStudy(study);
-
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             String randomizationStatusInOC = spvdao.findByHandleAndStudy(study.getStudyId(), "randomization").getValue();
             String participantStatusInOC = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal").getValue();

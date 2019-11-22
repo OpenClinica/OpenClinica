@@ -15,7 +15,9 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.InterventionBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -753,24 +755,24 @@ public class CreateStudyServlet extends SecureController {
         errors = v.validate();
 
         Study newStudy = (Study) session.getAttribute("newStudy");
-        newStudy.setCollectDob(fp.getString("collectDob"));
-        newStudy.setDiscrepancyManagement(fp.getString("discrepancyManagement"));
-        newStudy.setGenderRequired(fp.getString("genderRequired"));
+        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.COLLECT_DOB, fp.getString(StudyParamNames.COLLECT_DOB));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.DISCREPANCY_MANAGEMENT, fp.getString(StudyParamNames.DISCREPANCY_MANAGEMENT));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.GENDER_REQUIRED, fp.getString(StudyParamNames.GENDER_REQUIRED));
 
-        newStudy.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-        newStudy.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-        newStudy.setInterviewDateEditable(fp.getString("interviewDateEditable"));
-        newStudy.setInterviewDateRequired(fp.getString("interviewDateRequired"));
-        newStudy.setInterviewerNameEditable(fp.getString("interviewerNameEditable"));
-        newStudy.setInterviewDateDefault(fp.getString("interviewDateDefault"));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.INTERVIEWER_NAME_REQUIRED, fp.getString(StudyParamNames.INTERVIEWER_NAME_REQUIRED));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.INTERVIEWER_NAME_DEFAULT, fp.getString(StudyParamNames.INTERVIEWER_NAME_DEFAULT));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.INTERVIEW_DATE_EDITABLE, fp.getString(StudyParamNames.INTERVIEW_DATE_EDITABLE));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.INTERVIEW_DATE_REQUIRED, fp.getString(StudyParamNames.INTERVIEW_DATE_REQUIRED));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.INTERVIEWER_NAME_EDITABLE, fp.getString(StudyParamNames.INTERVIEWER_NAME_EDITABLE));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.INTERVIEW_DATE_DEFAULT, fp.getString(StudyParamNames.INTERVIEW_DATE_DEFAULT));
 
-        newStudy.setSubjectIdGeneration(fp.getString("subjectIdGeneration"));
-        newStudy.setSubjectPersonIdRequired(fp.getString("subjectPersonIdRequired"));
-        newStudy.setSubjectIdPrefixSuffix(fp.getString("subjectIdPrefixSuffix"));
-        newStudy.setPersonIdShownOnCRF(fp.getString("personIdShownOnCRF"));
-        newStudy.setSecondaryLabelViewable(fp.getString("secondaryLabelViewable"));
-        newStudy.setAdminForcedReasonForChange(fp.getString("adminForcedReasonForChange"));
-      //  newStudy.setParticipantPortant(fp.getString("participantPortal"));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.SUBJECT_ID_GENERATION, fp.getString(StudyParamNames.SUBJECT_ID_GENERATION));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, fp.getString(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX, fp.getString(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.PERSON_ID_SHOWN_ON_CRF, fp.getString(StudyParamNames.PERSON_ID_SHOWN_ON_CRF));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.SECONDARY_LABEL_VIEWABLE, fp.getString(StudyParamNames.SECONDARY_LABEL_VIEWABLE));
+        scs.updateOrCreateSpv(newStudy, StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE, fp.getString(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE));
         
         session.setAttribute("newStudy", newStudy);
 
@@ -795,7 +797,6 @@ public class CreateStudyServlet extends SecureController {
      *
      */
     private void submitStudy() {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         Study newStudy = (Study) session.getAttribute("newStudy");
 
         logger.info("study bean to be created:" + newStudy.getName() + newStudy.getProtocolDateVerification());
@@ -803,72 +804,10 @@ public class CreateStudyServlet extends SecureController {
         newStudy.setUserAccount(ub.toUserAccount());
         newStudy.setDateCreated(new Date());
         // newStudy.setStatus(Status.AVAILABLE);
+
+
+
         Study finalStudy = (Study) getStudyDao().create(newStudy);
-
-        logger.info("new study created");
-        StudyParameterValueBean spv = new StudyParameterValueBean();
-        spv.setStudyId(finalStudy.getStudyId());
-        spv.setParameter("collectDob");
-        spv.setValue(newStudy.getCollectDob());
-        spvdao.create(spv);
-
-        spv.setParameter("discrepancyManagement");
-        spv.setValue(newStudy.getDiscrepancyManagement());
-        spvdao.create(spv);
-
-        spv.setParameter("genderRequired");
-        spv.setValue(newStudy.getGenderRequired());
-        spvdao.create(spv);
-
-        spv.setParameter("subjectPersonIdRequired");
-        spv.setValue(newStudy.getSubjectPersonIdRequired());
-        spvdao.create(spv);
-
-        spv.setParameter("interviewerNameRequired");
-        spv.setValue(newStudy.getInterviewerNameRequired());
-        spvdao.create(spv);
-
-        spv.setParameter("interviewerNameDefault");
-        spv.setValue(newStudy.getInterviewerNameDefault());
-        spvdao.create(spv);
-
-        spv.setParameter("interviewerNameEditable");
-        spv.setValue(newStudy.getInterviewerNameEditable());
-        spvdao.create(spv);
-
-        spv.setParameter("interviewDateRequired");
-        spv.setValue(newStudy.getInterviewDateRequired());
-        spvdao.create(spv);
-
-        spv.setParameter("interviewDateDefault");
-        spv.setValue(newStudy.getInterviewDateDefault());
-        spvdao.create(spv);
-
-        spv.setParameter("interviewDateEditable");
-        spv.setValue(newStudy.getInterviewDateEditable());
-        spvdao.create(spv);
-
-        spv.setParameter("subjectIdGeneration");
-        spv.setValue(newStudy.getSubjectIdGeneration());
-        spvdao.create(spv);
-
-        spv.setParameter("subjectIdPrefixSuffix");
-        spv.setValue(newStudy.getSubjectIdPrefixSuffix());
-        spvdao.create(spv);
-
-        spv.setParameter("personIdShownOnCRF");
-        spv.setValue(newStudy.getPersonIdShownOnCRF());
-        spvdao.create(spv);
-
-        spv.setParameter("secondaryLabelViewable");
-        spv.setValue(newStudy.getSecondaryLabelViewable());
-        spvdao.create(spv);
-
-        spv.setParameter("adminForcedReasonForChange");
-        spv.setValue(newStudy.getAdminForcedReasonForChange());
-        spvdao.create(spv);
-
-        logger.info("study parameters created done");
 
     }
 

@@ -26,7 +26,10 @@ import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -107,36 +110,18 @@ public class CreateSubStudyServlet extends SecureController {
                 newStudy.setFacilityContactPhone(SQLInitServlet.getField(CreateStudyServlet.FAC_CONTACT_PHONE));
                 newStudy.setFacilityZip(SQLInitServlet.getField(CreateStudyServlet.FAC_ZIP));
 
-                List<StudyParamsConfig> parentConfigs = currentStudy.getStudyParameters();
-                // logger.info("parentConfigs size:" + parentConfigs.size());
-                ArrayList configs = new ArrayList();
-
-                for (StudyParamsConfig scg : parentConfigs) {
-                    // StudyParamsConfig scg = (StudyParamsConfig)
-                    // parentConfigs.get(i);
-                    if (scg != null) {
-                        // find the one that sub study can change
-                        if (scg.getValue().getId() > 0 && scg.getParameter().isOverridable()) {
-                            logger.info("parameter:" + scg.getParameter().getHandle());
-                            logger.info("value:" + scg.getValue().getValue());
-                            // YW 10-12-2007, set overridable study parameters
-                            // for a site
-                            if (scg.getParameter().getHandle().equalsIgnoreCase("interviewerNameRequired")) {
-                                scg.getValue().setValue(fp.getString("interviewerNameRequired"));
-                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("interviewerNameDefault")) {
-                                scg.getValue().setValue(fp.getString("interviewerNameDefault"));
-                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("interviewDateRequired")) {
-                                scg.getValue().setValue(fp.getString("interviewDateRequired"));
-                            } else if (scg.getParameter().getHandle().equalsIgnoreCase("interviewDateDefault")) {
-                                scg.getValue().setValue(fp.getString("interviewDateDefault"));
+                List<StudyParameterValue> spvList = currentStudy.getStudyParameterValues();
+                if(spvList != null && spvList.size() > 0){
+                    for(StudyParameterValue spv : spvList){
+                        if(spv.getStudyParameterValueId() > 0 && spv.getStudyParameter().isOverridable()){
+                            String handle = spv.getStudyParameter().getHandle();
+                        if(  handle.equalsIgnoreCase(StudyParamNames.INTERVIEWER_NAME_REQUIRED) || handle.equalsIgnoreCase(StudyParamNames.INTERVIEWER_NAME_DEFAULT)
+                            || handle.equalsIgnoreCase(StudyParamNames.INTERVIEW_DATE_REQUIRED) || handle.equalsIgnoreCase(StudyParamNames.INTERVIEW_DATE_DEFAULT)){
+                                newStudy.setIndividualStudyParameterValue(handle , fp.getString(handle));
                             }
-                            // YW >>
-                            configs.add(scg);
                         }
                     }
-
                 }
-                newStudy.setStudyParameters(configs);
 
                 // YW 10-12-2007 <<
                 // newStudy.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
@@ -383,22 +368,20 @@ public class CreateSubStudyServlet extends SecureController {
         study.setFacilityZip(fp.getString("facZip"));
         study.setStatus(core.org.akaza.openclinica.domain.Status.getByCode(fp.getInt("statusId")));
 
-        ArrayList parameters = (ArrayList) study.getStudyParameters();
-
-        for (int i = 0; i < parameters.size(); i++) {
-            StudyParamsConfig scg = (StudyParamsConfig) parameters.get(i);
-            String value = fp.getString(scg.getParameter().getHandle());
-            logger.info("get value:" + value);
-            scg.getValue().setParameter(scg.getParameter().getHandle());
-            scg.getValue().setValue(value);
+        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+        List<StudyParameterValue> spvList = study.getStudyParameterValues();
+        if(spvList != null){
+            for(StudyParameterValue spv : spvList){
+                String value = fp.getString(spv.getStudyParameter().getHandle());
+                if(value != null){
+                    spv.setValue(value);
+                }
+            }
         }
-
-        // YW 10-12-2007 <<
-        study.setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-        study.setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-        study.setInterviewDateRequired(fp.getString("interviewDateRequired"));
-        study.setInterviewDateDefault(fp.getString("interviewDateDefault"));
-        // YW >>
+        scs.updateOrCreateSpv(study, StudyParamNames.INTERVIEWER_NAME_REQUIRED, fp.getString(StudyParamNames.INTERVIEWER_NAME_REQUIRED));
+        scs.updateOrCreateSpv(study, StudyParamNames.INTERVIEWER_NAME_DEFAULT, fp.getString(StudyParamNames.INTERVIEWER_NAME_DEFAULT));
+        scs.updateOrCreateSpv(study, StudyParamNames.INTERVIEW_DATE_REQUIRED, fp.getString(StudyParamNames.INTERVIEW_DATE_REQUIRED));
+        scs.updateOrCreateSpv(study, StudyParamNames.INTERVIEW_DATE_DEFAULT, fp.getString(StudyParamNames.INTERVIEW_DATE_DEFAULT));
 
         return study;
     }
@@ -411,7 +394,6 @@ public class CreateSubStudyServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         Study study = (Study) session.getAttribute("newStudy");
 
-        ArrayList parameters = (ArrayList) study.getStudyParameters();
         logger.info("study bean to be created:\n");
         logger.info(study.getName() + "\n" + study.getUniqueIdentifier() + "\n" + study.checkAndGetParentStudyId() + "\n" + study.getSummary() + "\n"
                 + study.getPrincipalInvestigator() + "\n" + study.getDatePlannedStart() + "\n" + study.getDatePlannedEnd() + "\n" + study.getFacilityName()
@@ -425,31 +407,17 @@ public class CreateSubStudyServlet extends SecureController {
         // YW 10-10-2007, enable setting site status
         study.setStatus(study.getStatus());
         // YW >>
-
-        study = (Study) getStudyDao().create(study);
-
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        for (int i = 0; i < parameters.size(); i++) {
-            StudyParamsConfig config = (StudyParamsConfig) parameters.get(i);
-            StudyParameterValueBean spv = config.getValue();
-            spv.setStudyId(study.getStudyId());
-            spv = (StudyParameterValueBean) spvdao.create(config.getValue());
+        for(StudyParameterValue spv: study.getStudyParameterValues()) {
+            spv.setStudy(study);
         }
-
-        // YW << here only "collectDob" and "genderRequired" have been corrected
-        // for sites.
-        StudyParameterValueBean spv = new StudyParameterValueBean();
-        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parent.getStudyId(), "collectDob");
-        spv.setStudyId(study.getStudyId());
-        spv.setParameter("collectDob");
-        spv.setValue(parentSPV.getValue());
-        spvdao.create(spv);
-
-        parentSPV = spvdao.findByHandleAndStudy(parent.getStudyId(), "genderRequired");
-        spv.setParameter("genderRequired");
-        spv.setValue(parentSPV.getValue());
-        spvdao.create(spv);
-        // YW >>
+        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+        if(parent != null){
+            if(parent.getIndividualStudyParameterValue(StudyParamNames.COLLECT_DOB) != null)
+                scs.updateOrCreateSpv(study, StudyParamNames.COLLECT_DOB, parent.getIndividualStudyParameterValueOutput(StudyParamNames.COLLECT_DOB));
+            if(parent.getIndividualStudyParameterValue(StudyParamNames.GENDER_REQUIRED) != null)
+                scs.updateOrCreateSpv(study, StudyParamNames.GENDER_REQUIRED, parent.getIndividualStudyParameterValueOutput(StudyParamNames.GENDER_REQUIRED));
+        }
+        study = (Study) getStudyDao().create(study);
 
         this.submitSiteEventDefinitions(study);
 

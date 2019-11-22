@@ -87,7 +87,7 @@ public class MetadataUnit extends OdmUnit {
         this.permissionTagsString=permissionTagsString;
         this.studyDao = studyDao;
         if (study.isSite()) {
-            this.parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+            this.parentStudy = study.getStudy();
         } else {
             this.parentStudy = new Study();
         }
@@ -130,7 +130,10 @@ public class MetadataUnit extends OdmUnit {
     private void collectGlobalVariables() {
         Study study = studyBase.getStudy();
         String sn = study.getName();
-        String sd = study.getSummary().trim();
+        String sd ="";
+        if(study.getSummary() != null)
+            sd = study.getSummary();
+        sd = sd.trim();
         String pn = study.getUniqueIdentifier();
         if (parentStudy.isSite()) {
             sn = parentStudy.getName() + " - " + study.getName();
@@ -195,15 +198,19 @@ public class MetadataUnit extends OdmUnit {
 
         Study study = studyBase.getStudy();
 
-        StudyConfigService studyConfig = new StudyConfigService(this.ds);
-        study = studyConfig.setParametersForStudy(study);
 
+        if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0) {
+            StudyConfigService studyConfig = new StudyConfigService(this.ds);
+            studyConfig.setParameterValuesForStudy(study);
+        }
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
         metadata.setStudy(study);
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(this.ds);
-        int parentId = study.isSite() ? study.getStudy().getStudyId() : study.getStudyId();
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(parentId, "discrepancyManagement");
-        metadata.setSoftHard(spv.getValue().equalsIgnoreCase("true") ? "Hard" : "Soft");
+        String discrepancyManagementValue = null;
+        if(study.isSite())
+            discrepancyManagementValue = study.getStudy().getDiscrepancyManagement();
+        else
+            discrepancyManagementValue = study.getDiscrepancyManagement();
+        metadata.setSoftHard(discrepancyManagementValue.equalsIgnoreCase("true") ? "Hard" : "Soft");
 
         OdmExtractDAO oedao = new OdmExtractDAO(this.ds, showArchived, studyDao);
         int studyId = study.getStudyId();
@@ -263,7 +270,7 @@ public class MetadataUnit extends OdmUnit {
             // studyId,
             // metadata, this.getODMBean().getODMVersion());
             // studyBase.setNullClSet(nullCodeSet);
-            oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTagsString);
+            oedao.getMetadata(study.isSite() ? study.getStudy() : study , study, metadata, this.odmBean.getODMVersion(),permissionTagsString);
             metadata.setRuleSetRules(getRuleSetRuleDao().findByRuleSetStudyIdAndStatusAvail(parentStudyId));
         }
     }

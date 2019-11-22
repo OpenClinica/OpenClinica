@@ -210,7 +210,6 @@ public class AccountController {
 		uDTO = null;
 		logger.debug("I'm in getAccount4");
 		Study parentStudy = getParentStudy(studyOid);
-		Integer pStudyId = parentStudy.getStudyId();
 		String oid = parentStudy.getOc_oid();
 
 		if (isStudySubjecAndCRCRolesMatch(studySubjectId, crcUserName, studyOid))
@@ -871,7 +870,7 @@ public class AccountController {
 		if (!study.isSite()) {
 			return study;
 		} else {
-			Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
+			Study parentStudy = study.getStudy();
 			return parentStudy;
 		}
 
@@ -882,7 +881,7 @@ public class AccountController {
 		if (!study.isSite()) {
 			return study;
 		} else {
-			Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
+			Study parentStudy = study.getStudy();
 			return parentStudy;
 		}
 

@@ -415,7 +415,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(study, studySubId));
         } else {
             if (!isParentStudy) {
-                Study stParent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
+                Study stParent = study.getStudy();
                 allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, study, subjectId);
                 allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent, study, studySubId));
             } else {

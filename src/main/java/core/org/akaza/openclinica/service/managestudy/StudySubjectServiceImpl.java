@@ -59,7 +59,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySubject, UserAccountBean userAccount,
-            StudyUserRoleBean currentRole) {
+            StudyUserRoleBean currentRole, Study study) {
 
         StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
@@ -71,8 +71,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         ArrayList events = studyEventDao.findAllByStudySubject(studySubject);
 
         Map<Integer, StudyEventDefinitionBean> eventDefinitionByEvent = studyEventDefinitionDao.findByStudySubject(studySubject.getId());
-
-        Study study = (Study) studyDao.findByPK(studySubject.getStudyId());
 
         Map<Integer, SortedSet<EventDefinitionCRFBean>> eventDefinitionCrfByStudyEventDefinition;
         if (!study.isSite()) { // Is a study

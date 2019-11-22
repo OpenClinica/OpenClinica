@@ -98,7 +98,7 @@ public class RuleRunner {
         Study theStudy = (Study) studyDao.findByPK(studySubject.getStudyId());
         String theStudyName, theSiteName = "";
         if (theStudy.isSite()) {
-            Study theParentStudy = (Study) studyDao.findByPK(theStudy.getStudy().getStudyId());
+            Study theParentStudy = theStudy.getStudy();
             theStudyName = theParentStudy.getName() + " / " + theParentStudy.getUniqueIdentifier();
             theSiteName = theStudy.getName() + " / " + theStudy.getUniqueIdentifier();
         } else {

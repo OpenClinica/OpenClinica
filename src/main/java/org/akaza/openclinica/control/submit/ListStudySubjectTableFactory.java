@@ -271,10 +271,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         int numberOfSubjects = getStudySubjectDAO().getCountofActiveStudySubjects();
 
         Study sb = null;
-        if (studyBean.getStudy() != null && studyBean.getStudy().getStudyId() != 0) {
-            sb = (Study) getStudyDAO().findByPK(studyBean.getStudy().getStudyId());
+        if (studyBean.isSite()) {
+            sb = (Study) studyBean.getStudy();
         } else {
-            sb = (Study) getStudyDAO().findByPK(studyBean.getStudyId());
+            sb = studyBean;
         }
         int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
@@ -306,10 +306,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
-
+        Map<Integer, Study> studyMap = new HashMap<>();
+        if(getStudyBean() != null)
+            studyMap.put(getStudyBean().getStudyId(), getStudyBean());
+        Study study = null;
         for (StudySubjectBean studySubjectBean : items) {
-            Study study = (Study) getStudyDAO().findByPK(studySubjectBean.getStudyId());
-
+            if(studyMap.get(studySubjectBean.getStudyId()) == null)
+                studyMap.put(studySubjectBean.getStudyId() ,(Study) getStudyDAO().findByPK(studySubjectBean.getStudyId()));
+            study = studyMap.get(studySubjectBean.getStudyId());
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("studySubject", studySubjectBean);
             HtmlBuilder subjectLink = new HtmlBuilder();
@@ -660,7 +664,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ArrayList<StudyGroupClassBean> getStudyGroupClasses() {
         if (this.studyGroupClasses == null) {
             if (studyBean.isSite()) {
-                Study parentStudy = (Study) getStudyDAO().findByPK(studyBean.getStudy().getStudyId());
+                Study parentStudy =studyBean.getStudy();
                 studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(parentStudy);
             } else {
                 studyGroupClasses = getStudyGroupClassDAO().findAllActiveByStudy(studyBean);
@@ -1057,13 +1061,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String participateStatus(StudySubjectBean studySubjectBean) {
         Study study = (Study) getStudyDAO().findByPK(studySubjectBean.getStudyId());
-        Study pStudy = getParentStudy(study.getOc_oid());
+        Study pStudy = getParentStudy(study);
         String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getStudyId(), "participantPortal").getValue();
         return participateFormStatus;
     }
 
     private String getParticipateModuleStatus() {
-        Study pStudy = getParentStudy(studyBean.getOc_oid());
+        Study pStudy = getParentStudy(studyBean);
         String participatModuleStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getStudyId(), "participantPortal").getValue();
         return participatModuleStatus;
     }
@@ -1071,25 +1075,21 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception {
         participantPortalRegistrar = new ParticipantPortalRegistrar();
-        Study study = (Study) getStudyDAO().findByPK(studySubjectBean.getStudyId());
-        Study pStudy = getParentStudy(study.getOc_oid());
+        Study study = studyBean;
+        if(studyBean == null || studyBean.getStudyId() != studySubjectBean.getStudyId())
+            study = (Study) getStudyDAO().findByPK(studySubjectBean.getStudyId());
+        Study pStudy = getParentStudy(study);
         String pManageStatus = participantPortalRegistrar.getCachedRegistrationStatus(pStudy.getOc_oid(), session).toString(); // ACTIVE
         return pManageStatus;
     }
 
-    private Study getParentStudy(String studyOid) {
-        Study study = getStudy(studyOid);
-        if (study.getStudy() == null || study.getStudy().getStudyId() == 0) {
+    private Study getParentStudy(Study study) {
+        if (!study.isSite()) {
             return study;
         } else {
-            Study parentStudy = (Study) getStudyDAO().findByPK(study.getStudy().getStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
-    }
-
-    private Study getStudy(String oid) {
-        Study studyBean = (Study) getStudyDAO().findByOcOID(oid);
-        return studyBean;
     }
 
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
@@ -1104,7 +1104,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
         participantPortalRegistrar = new ParticipantPortalRegistrar();
         Study study = (Study) getStudyDAO().findByPK(studySubject.getStudyId());
-        Study pStudy = getParentStudy(study.getOc_oid());
+        Study pStudy = getParentStudy(study);
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOc_oid());
         logger.info("URL: {}",url);
 

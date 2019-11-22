@@ -765,17 +765,17 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    public void getMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion ,String permissionTags) {
+    public void getMetadata(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion ,String permissionTags) {
         if (odmVersion.equalsIgnoreCase("occlinical_data"))
             odmVersion = "oc1.3";
 
         if ("oc1.3".equals(odmVersion)) {
-                // this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
-                this.getMetadataOC1_3(parentStudyId, studyId, metadata, odmVersion,permissionTags);
+                // this.getOCMetadata(parentStudyId, study, metadata, odmVersion);
+                this.getMetadataOC1_3(parentStudy, study, metadata, odmVersion,permissionTags);
         } else if ("oc1.2".equals(odmVersion)) {
-            this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion,permissionTags);
+            this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion,permissionTags);
         } else {
-            this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion ,permissionTags);
+            this.getODMMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion ,permissionTags);
         }
     }
 
@@ -1507,7 +1507,7 @@ public class OdmExtractDAO extends DatasetDAO {
         // return nullClSet;
     }
 
-    public void getStudyEventAndFormMetaOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, boolean isIncludedSite , String permissionTags) {
+    public void getStudyEventAndFormMetaOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, boolean isIncludedSite , String permissionTags) {
         ArrayList<StudyEventDefBean> seds = (ArrayList<StudyEventDefBean>) metadata.getStudyEventDefs();
         ArrayList<FormDefBean> forms = (ArrayList<FormDefBean>) metadata.getFormDefs();
 
@@ -1515,7 +1515,7 @@ public class OdmExtractDAO extends DatasetDAO {
             List<ElementRefBean> formRefs = sed.getFormRefs();
             for (ElementRefBean formRef : formRefs) {
                 ConfigurationParameters conf = new ConfigurationParameters();
-                EventDefinitionCRFBean edc = getEventDefCRF(sed, formRef, studyId);
+                EventDefinitionCRFBean edc = getEventDefCRF(sed, formRef, study);
                 CRFBean cBean = (CRFBean) crfdao.findByPK(edc.getCrfId());
                 String crfPath = sed.getOid() + "." + cBean.getOid();
                 conf = populateConfigurationParameters(edc, conf, crfPath);
@@ -1532,9 +1532,9 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setStudyEventAndFormMetaOC1_3TypesExpected();
         logger.debug("Begin to execute GetStudyEventAndFormMetaOC1_3Sql");
         logger.info("getStudyEventAndFormMetaOC1_3SQl= "
-                + this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite, showArchivedSql(showArchived),permissionTags));
+                + this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived),permissionTags));
 
-        ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite, showArchivedSql(showArchived),permissionTags));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived),permissionTags));
         Iterator iter = rows.iterator();
         String sedOIDs = "";
         while (iter.hasNext()) {
@@ -1647,8 +1647,8 @@ public class OdmExtractDAO extends DatasetDAO {
         return formDetail;
     }
 
-    public void getMetadataOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
-        this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion , permissionTags);
+    public void getMetadataOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
+        this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion , permissionTags);
 
         // StudyBean study = metadata.getStudy();
         // if(study.getId()>0) {
@@ -1659,7 +1659,7 @@ public class OdmExtractDAO extends DatasetDAO {
         // StudyConfigService studyConfig = new StudyConfigService(this.ds);
         // study = studyConfig.setParametersForStudy(study);
 
-        this.getStudyEventAndFormMetaOC1_3(parentStudyId, studyId, metadata, odmVersion, false,permissionTags);
+        this.getStudyEventAndFormMetaOC1_3(parentStudy, study, metadata, odmVersion, false,permissionTags);
 
         String cvIds = metadata.getCvIds();
         ArrayList<ItemGroupDefBean> igs = (ArrayList<ItemGroupDefBean>) metadata.getItemGroupDefs();
@@ -3045,7 +3045,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<String, Integer> igpos = new HashMap<String, Integer>();
         String igprev = "";
         String oidPos = "";
-        Study parentStudy = study.isSite() ? (Study) studyDao.findByPK(study.getStudy().getStudyId()) : study;
+        Study parentStudy = study.isSite() ? (Study) study.getStudy() : study;
         setStudyParemeterConfig(parentStudy);
         HashSet<Integer> sgcIdSet = new HashSet<Integer>();
         HashMap<String, String> subOidPoses = new HashMap<String, String>();
@@ -3871,8 +3871,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
 
 
-    private EventDefinitionCRFBean getEventDefCRF(StudyEventDefBean studyEventDefBean, ElementRefBean formRef, int studyId) {
-        Study studyBean = (Study) studyDao.findByPK(studyId);
+    private EventDefinitionCRFBean getEventDefCRF(StudyEventDefBean studyEventDefBean, ElementRefBean formRef, Study studyBean) {
         StudyEventDefinitionBean sedBean = seddao.findByOid(studyEventDefBean.getOid());
         CRFBean crfBean = crfdao.findByOid(formRef.getElementDefOID());
         return edcdao.findByStudyEventDefinitionIdAndCRFId(studyBean, sedBean.getId(), crfBean.getId());

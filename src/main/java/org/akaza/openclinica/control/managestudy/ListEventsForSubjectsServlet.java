@@ -131,6 +131,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         factory.setCurrentUser(ub);
         factory.setEventCRFDAO(getEventCRFDAO());
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
+        factory.setStudyDao(getStudyDao());
         factory.setCrfDAO(getCrfDAO());
         factory.setCrfVersionDAO(getCRFVersionDAO());
         factory.setFormLayoutDAO(getFormLayoutDAO());

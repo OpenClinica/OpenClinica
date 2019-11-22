@@ -198,7 +198,12 @@ public class AddNewSubjectServlet extends SecureController {
                 forwardPage(Page.ADD_NEW_SUBJECT);
 
             }
+            if(tempParentStudy != null)
+                tempParentStudy = null;
         } else {// submitted
+            if
+            (tempParentStudy != null)
+                tempParentStudy = null;
             discNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
             if (discNotes == null) {
                 discNotes = new FormDiscrepancyNotes();
@@ -498,10 +503,10 @@ public class AddNewSubjectServlet extends SecureController {
     public String generateParticipantIdUsingTemplate() {
         Map<String, Object> data = new HashMap<String, Object>();
         String templateID = "";
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId(), "participantIdTemplate");
-        if (spv != null)
-            templateID = spv.getValue();
+        if(currentStudy.isSite())
+            templateID = currentStudy.getStudy().getParticipantIdTemplate();
+        else
+            templateID = currentStudy.getParticipantIdTemplate();
 
         int subjectCount = getSubjectCount(currentStudy);
 

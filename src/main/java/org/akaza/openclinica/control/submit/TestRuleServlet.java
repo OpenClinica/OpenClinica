@@ -410,7 +410,7 @@ public class TestRuleServlet extends SecureController {
         target.setValue(targetString);
         ruleSet.setTarget(target);
 
-        RuleSetBean persistentRuleSet = getRuleSetDao().findByExpressionAndStudy(ruleSet,currentStudy.getId());
+        RuleSetBean persistentRuleSet = getRuleSetDao().findByExpressionAndStudy(ruleSet,currentStudy.getStudyId());
 
         if (persistentRuleSet != null) {
 if(item!=null)

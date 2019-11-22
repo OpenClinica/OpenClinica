@@ -355,7 +355,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
                                 dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
                             }
                             dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-                            dnb.setStudyId(currentStudy.getId());
+                            dnb.setStudyId(currentStudy.getStudyId());
                             dnb.setAssignedUserId(ub.getId());
                             dnb.setOwner(ub);
                             dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);

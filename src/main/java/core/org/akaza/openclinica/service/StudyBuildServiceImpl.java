@@ -446,14 +446,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
     }
 
-    public void processAllModules(String accessToken, String studyOid) {
-        Study study = getModuleStudy(studyOid);
-        List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
-        Stream.of(ModuleProcessor.Modules.values()).forEach(module -> {
-            processSingleModule(study, moduleConfigDTOs, module, accessToken);
-        });
-    }
-
     private void processSingleModule(Study study, List<ModuleConfigDTO> moduleConfigDTOs, ModuleProcessor.Modules module, String accessToken) {
         String moduleEnabled = isModuleEnabled(moduleConfigDTOs, study, module);
         ModuleProcessor moduleProcessor = null;
@@ -469,27 +461,14 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         if (moduleProcessor != null)
             moduleProcessor.processModule(study, moduleEnabled, accessToken);
-        int i = 0;
     }
 
-    public void processModule(String accessToken, String studyOid, ModuleProcessor.Modules module) {
-        Study study = getModuleStudy(studyOid);
-        List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
-        processSingleModule(study, moduleConfigDTOs, module, accessToken);
-    }
     public void processModule(String accessToken, Study study, ModuleProcessor.Modules module) {
+        if(study.getStudy() != null)
+            study = study.getStudy();
         List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
         processSingleModule(study, moduleConfigDTOs, module, accessToken);
     }
-
-    private Study getModuleStudy(String studyOid) {
-        utilService.setSchemaFromStudyOid(studyOid);
-        Study study = studyDao.findByOcOID(studyOid);
-        if (study.getStudy() != null)
-            study = study.getStudy();
-        return study;
-    }
-
 
     public String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
         for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {

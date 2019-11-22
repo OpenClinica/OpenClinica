@@ -162,7 +162,7 @@ public class OdmStudySubjectController {
         if (!study.isSite()) {
             return study;
         } else {
-            Study parentStudy = (Study) sdao.findByPK(study.getStudy().getStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
 

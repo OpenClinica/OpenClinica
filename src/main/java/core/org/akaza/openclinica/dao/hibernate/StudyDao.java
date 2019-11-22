@@ -36,7 +36,8 @@ public class StudyDao extends AbstractDomainDao<Study> {
     }
 
     public Study update(Study study){
-        study.setOc_oid(getValidOid(study));
+        if(study.getOc_oid() == null || StringUtils.isEmpty(study.getOc_oid()))
+            study.setOc_oid(getValidOid(study));
         getCurrentSession().update(study);
         return study;
     }
