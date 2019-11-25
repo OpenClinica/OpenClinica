@@ -2,11 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/include/sideIconsDataEntry.jsp
-=======
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="reswords"/>
-
->>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/include/sideIconsDataEntry.jsp
 <link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="reswords"/>

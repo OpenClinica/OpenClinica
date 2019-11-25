@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
   <c:set var="tabCount" value="${1}"/>
   <table border="0" cellpadding="0" cellspacing="0" width="100%"
          style="background-color:#CCCCCC">

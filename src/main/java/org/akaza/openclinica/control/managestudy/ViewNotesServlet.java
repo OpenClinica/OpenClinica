@@ -9,7 +9,6 @@ import java.util.Set;
 
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
-
 import core.org.akaza.openclinica.bean.managestudy.CustomColumn;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;

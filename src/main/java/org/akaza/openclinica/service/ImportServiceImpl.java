@@ -313,6 +313,7 @@ public class ImportServiceImpl implements ImportService {
                                 Object itemObject = null;
 
                                 itemObject = validateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm, tenantStudy, studySubject, reasonForChange);
+
                                 if (itemObject instanceof ErrorObj) {
                                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), ((ErrorObj) itemObject).getCode(), null, ((ErrorObj) itemObject).getMessage());
                                     dataImportReports.add(dataImportReport);
@@ -1342,6 +1343,11 @@ public class ImportServiceImpl implements ImportService {
         if (itemGroup == null || (itemGroup != null && !itemGroup.getStatus().equals(Status.AVAILABLE))) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
         }
+        //Item Group invalid Oid in Form
+        ItemGroup itmGroup = itemGroupDao.findByNameCrfId(itemGroup.getName(), crf);
+        if (itmGroup == null) {
+            return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
+        }
 
         errorObj = validateItemGroupRepeat(eventCrf, itemGroupDataBean, itemGroup);
         if (errorObj != null) return errorObj;
@@ -1356,7 +1362,8 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
-        Item item = itemDao.findByOcOIDCrfId(itemDataBean.getItemOID(), crf.getCrfId());
+        Item item = itemDao.findByOcOID(itemDataBean.getItemOID());
+
         // ItemOID is not valid
         if (item == null || (item != null && !item.getStatus().equals(Status.AVAILABLE))) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
@@ -1422,7 +1429,7 @@ public class ImportServiceImpl implements ImportService {
      * @param studySubject
      * @param itemData
      */
-    private ErrorObj createQuery(UserAccount userAccount, Study study, StudySubject studySubject, ItemData itemData, String reasonForChange) {
+    private ErrorObj createQuery(UserAccount userAccount, Study study, StudySubject studySubject, ItemData itemData) {
 
         ErrorObj eb = null;
 

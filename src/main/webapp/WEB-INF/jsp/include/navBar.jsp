@@ -46,15 +46,11 @@
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}"/>
 <c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}"/>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/includes/jmesa/jmesa.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery-migrate-3.1.0.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 <c:choose>
     <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
         <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
+        <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/icomoon-style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
@@ -73,6 +69,8 @@
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:when>
     <c:otherwise>
+        <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="includes/css/icomoon-style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
@@ -163,6 +161,19 @@
     })();
 
 
+    // Walkme snippet
+    (function () {
+        var walkme = document.createElement('script');
+        walkme.type = 'text/javascript';
+        walkme.async = true;
+        walkme.src = '<c:out value="${sessionScope.walkmeURL}" />';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(walkme, s);
+        window._walkmeConfig = {
+            smartLoad: true
+        };
+    })();
+
     function confirmCancel(pageName) {
         var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
         if (confirm1) {
@@ -216,9 +227,7 @@
         sessionStorage && sessionStorage.clear();
     }
 </script>
-<!-- Help Scout -->
-<script type="text/javascript">!function(e,t,n){function a(){var e=t.getElementsByTagName("script")[0],n=t.createElement("script");n.type="text/javascript",n.async=!0,n.src="https://beacon-v2.helpscout.net",e.parentNode.insertBefore(n,e)}if(e.Beacon=n=function(t,n,a){e.Beacon.readyQueue.push({method:t,options:n,data:a})},n.readyQueue=[],"complete"===t.readyState)return a();e.attachEvent?e.attachEvent("onload",a):e.addEventListener("load",a,!1)}(window,document,window.Beacon||function(){});</script>
-<script type="text/javascript">window.Beacon('init', 'fd568fcb-41a8-40bd-bcd7-0ba9518cfc49')</script>
+
 <!-- Main Navigation -->
 <div class="oc_nav">
     <div class="nav-top-bar">
@@ -615,7 +624,7 @@
     dropdown = document.getElementById("subnav_Tasks");
 
     //close dropdown using esc
-    jQuery(document).keyup(function(e) {
+    $(document).keyup(function(e) {
         if (e.keyCode == 27) { // escape key maps to keycode `27`
             dropdown.style.display="none";
             jQuery.unblockUI();
@@ -623,27 +632,27 @@
     });
 
     //we have it open on mouse-over OR click when it is closed
-    jQuery(document).ready(function(){
+    $(document).ready(function(){
         var participantIDVerification = '<c:out value="${participantIDVerification}"/>';
         if (participantIDVerification == 'true') {
             // disable right click
-            jQuery("input[name='findSubjects_f_studySubject.label']").on('contextmenu',function(){
+            $("input[name='findSubjects_f_studySubject.label']").on('contextmenu',function(){
                 return false;
             });
             // disable cut copy paste
-            jQuery("input[name='findSubjects_f_studySubject.label']").bind('cut copy paste', function (e) {
+            $("input[name='findSubjects_f_studySubject.label']").bind('cut copy paste', function (e) {
                 e.preventDefault();
             });
         }
         // Show hide popover
-        jQuery(".nav_TaskB").click(function(){
-            jQuery(this).find(".dropdown").slideToggle("fast");
+        $(".nav_TaskB").click(function(){
+            $(this).find(".dropdown").slideToggle("fast");
         });
     });
-    jQuery(document).on("click", function(event){
-        var $trigger = jQuery(".nav_TaskB");
+    $(document).on("click", function(event){
+        var $trigger = $(".nav_TaskB");
         if($trigger !== event.target && !$trigger.has(event.target).length){
-            jQuery(".dropdown").slideUp("fast");
+            $(".dropdown").slideUp("fast");
         }
     });
     function showDropdown() {

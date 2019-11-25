@@ -21,15 +21,7 @@ import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/login/RequestPasswordServlet.java
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/control/login/RequestPasswordServlet.java
 import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
-=======
-import core.org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/control/login/RequestPasswordServlet.java
-=======
-import org.akaza.openclinica.web.filter.OpenClinicaJdbcService;
->>>>>>> OC-11521: Merged the properties and test calsses. Issue with bean creation:web/src/main/java/org/akaza/openclinica/control/login/RequestPasswordServlet.java
 
 import java.util.Calendar;
 import java.util.Date;

@@ -781,7 +781,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         String alertEmail = assignedUser.getEmail();
                         message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),assignedUser.getLastName()));
                         message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base")
-                                + "ResolveDiscrepancy?flavor=-query&noteId=" + note.getEntityId()
+                                + "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=" + assignedUser.getName()
+                                + "&listNotes_f_entityName=" + note.getEntityName()
                                 + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
                         message.append(respage.getString("you_received_this_from"));
                         Study study = (Study) getStudyDao().findByPK(note.getStudyId());

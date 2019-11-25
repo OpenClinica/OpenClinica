@@ -21,15 +21,10 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.PermissionService;
-import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.DropdownFilter;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -61,7 +56,6 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
-import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
@@ -95,6 +89,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private ViewNotesService viewNotesService;
     private final boolean showMoreLink;
     private DiscrepancyNotesSummary notesSummary;
+    private DiscrepancyNotesSummary notesSummaryOnlyForQuery;
     private final TypeDroplistFilterEditor discrepancyNoteTypeDropdown = new TypeDroplistFilterEditor();
     private final ResolutionStatusDroplistFilterEditor resolutionStatusDropdown = new ResolutionStatusDroplistFilterEditor();
     private static final String QUERY_FLAVOR = "-query";
@@ -130,7 +125,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     List<String> permissionTagsList = null;
     private final String  PARTICIPATE_STATUS="participate.status";
     private String[] columnNames = new String[]{};
-    private ResponseSet responseSet;
 
 
     public ListNotesTableFactory(boolean showMoreLink, List<String> userTags) {
@@ -160,24 +154,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         if (tableColumns != null) {
             for (String column : tableColumns) {
                 if (permissionService.isUserHasPermission(column, request, currentStudy)) {
-                    String formOid = column.split("\\.")[1];
                     String itemOid = column.split("\\.")[2];
                     Item item = itemDao.findByOcOID(itemOid);
-                    CrfBean crf = crfDao.findByOcOID(formOid);
-                    ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crf.getCrfVersions().get(0).getCrfVersionId());
-                    responseSet = itemFormMetadata.getResponseSet();
-                    ResponseType responseType = responseSet.getResponseType();
                     if (item != null) {
-                        if (responseType.getName().equals(CHECKBOX)
-                                || responseType.getName().equals(MULTI_SELECT)
-                                || responseType.getName().equals(RADIO)
-                                || responseType.getName().equals(SINGLE_SELECT)) {
-                            configureColumn(row.getColumn(column), item.getBriefDescription()!=null? item.getBriefDescription() :itemFormMetadata.getLeftItemText(), new ItemIdCellEditor(), new CustomColumnDroplistFilterEditor(),true,true);
-                        } else {
-                            configureColumn(row.getColumn(column), item.getBriefDescription()!=null? item.getBriefDescription() :itemFormMetadata.getLeftItemText(), new ItemIdCellEditor(), null,true,true);
-                        }
-                    }
+                        configureColumn(row.getColumn(column), item != null ? item.getName() : null, new ItemIdCellEditor(), null,true,true);
 
+                    }
                 }
             }
         }
@@ -231,7 +213,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
                 resolutionStatusDropdown.getDecoder());
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
-                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet(),itemDao), userTags);
+                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()), userTags);
         return items;
     }
 
@@ -263,11 +245,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 resolutionStatusDropdown.getDecoder());
 
         notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, false, userTags);
+        notesSummaryOnlyForQuery = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, true, userTags);
 
         int pageSize = limit.getRowSelect().getMaxRows();
         int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
         if (firstRecordShown > notesSummary.getTotal() && notesSummary.getTotal() != 0) { // The page selected goes
-            // beyond the dataset size
+                                                                                          // beyond the dataset size
             // Move to the last page
             limit.getRowSelect().setPage((int) Math.ceil((double) notesSummary.getTotal() / pageSize));
             filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
@@ -275,7 +258,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         }
 
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
-                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet(),itemDao), userTags);
+                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()), userTags);
 
         this.setAllNotes(items);
 
@@ -470,17 +453,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         this.auditUserLoginDao = auditUserLoginDao;
     }
 
-    private class CustomColumnDroplistFilterEditor extends DroplistFilterEditor {
-        List<String> optionsText = Arrays.asList(responseSet.getOptionsText().split("\\s*,\\s*"));
-        @Override
-        protected List<DroplistFilterEditor.Option> getOptions() {
-            List<Option> options = new ArrayList<Option>();
-            for (String optionText : optionsText) {
-                options.add(new Option( optionText, optionText));
-            }
-            return options;
-        }
-    }
     private class ItemIdCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int rowcount) {
             Object itemValue = ItemUtils.getItemValue(item, property);
@@ -619,7 +591,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             } else if (dnb.getEntityType().equals(DiscrepancyNoteBean.EVENT_CRF)) {
                 builder.a().href("ViewStudySubject?id=" + studySubjectId);
             } else if (!dnb.getEntityType().equals(DiscrepancyNoteBean.SUBJECT) && !dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA) && !dnb.getEntityType().equals(DiscrepancyNoteBean.STUDY_EVENT) && !dnb.getEntityType().equals(DiscrepancyNoteBean.EVENT_CRF)){
-                builder.a().href("ViewStudySubject?id=" + studySubjectId);
+               builder.a().href("ViewStudySubject?id=" + studySubjectId); 
             }
             builder.close();
             builder.append("<span title='" + resword.getString("View_Query_Within_Record")
@@ -797,6 +769,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     public DiscrepancyNotesSummary getNotesSummary() {
         return notesSummary;
+    }
+
+    public DiscrepancyNotesSummary getNotesSummaryForQuery() {
+        return notesSummaryOnlyForQuery;
     }
 
     public ViewStudySubjectService getViewStudySubjectService() {

@@ -165,9 +165,13 @@
                 <h3 class="form-name">
                     {{form.[@Name]}}
                 </h3>
-                {{#if form.addNew}}
-                    <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>' data-url="{{form.addNew}}">
-                {{/if}}                
+                <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
+                    {{#if form.addNew}}
+                        data-url="{{form.addNew}}"
+                    {{else}}
+                        disabled="disabled"
+                    {{/if}}
+                >
             </div>
             <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
             <thead>
@@ -383,13 +387,10 @@ $(function() {
                 foreach(components, function(col) {
                     var item = items[col];
                     if (item) {
-                        if (item['@BriefDescription']) {
-                            columnTitles.push(item['@BriefDescription']);
-                        } else if (item.Question) {
+                        if (item.Question)
                             columnTitles.push(item.Question.TranslatedText);
-                        } else {
+                        else
                             columnTitles.push(item['@Name']);
-                        }
                     }
                     else {
                         columnTitles.push('!?' + col);
@@ -453,19 +454,17 @@ $(function() {
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
         function datatablefy($tables) {
-            $tables.each(function() {
+            $tables.each(function(i) {
                 var table = $(this);
-                var subsection = table.closest('.subsection');
-                var id = subsection.attr('id');
                 var datatable = table.DataTable({
                     stateSave: true,
                     stateSaveCallback: function(settings, state) {
                         store(function(data) {
-                            data.datatables[id] = state;
+                            data.datatables[i] = state;
                         });
                     },
                     stateLoadCallback: function(settings, callback) {
-                        var data = store.data.datatables[id];
+                        var data = store.data.datatables[i];
                         callback(data);
                         if (!data)
                             this.fnSortNeutral();
@@ -500,7 +499,7 @@ $(function() {
                     }
                 });
                 var tableWidth = table.width();
-                subsection.css('max-width', tableWidth < 500 ? 500 : tableWidth);
+                table.closest('.subsection').css('max-width', tableWidth < 500 ? 500 : tableWidth);
             })
             .prev('.dataTables_filter').each(function(i) {
                 var searchbox = $(this);
