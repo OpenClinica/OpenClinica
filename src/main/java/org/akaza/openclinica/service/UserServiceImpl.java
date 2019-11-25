@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
 
 
     public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,
-                                        UserAccountBean userAccountBean, String customerUuid, ResourceBundle restext) {
+                                        UserAccountBean userAccountBean, String realm,String customerUuid, ResourceBundle restext) {
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
         String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
@@ -170,17 +170,17 @@ public class UserServiceImpl implements UserService {
             if (validateService.isParticipateActive(tenantStudy)) {
                 if (studySubject.getUserId() == null ) {
                     logger.info("Participate has not registered yet");
-                    accessCode = generateAccessCode(accessToken, customerUuid);
+                    accessCode = generateAccessCode(accessToken, realm);
                     // create participant user Account In Keycloak
-                    String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
+                    String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, realm,customerUuid);
                     // create participant user Account In Runtime
                     pUserAccount = createUserAccount(participantDTO, studySubject, userAccountBean, username, publicStudy, keycloakUserId);
                     // create study subject detail Account
                     userStatus = UserStatus.CREATED;
                     userId = pUserAccount.getUserId();
                 } else if (participantDTO.isResetAccessCode()) {
-                    accessCode = generateAccessCode(accessToken, customerUuid);
-                    keycloakClient.resetParticipateUserAccessCode(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
+                    accessCode = generateAccessCode(accessToken, realm);
+                    keycloakClient.resetParticipateUserAccessCode(accessToken, null, username, accessCode, studyEnvironment, realm);
                 }
             }
             studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, userStatus, userId, tenantStudy, userAccount);
@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
         ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
         if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
-            ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,false);
+            ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean,false);
             boolean updateUserStatus = false;
 
             if (participantDTO.isInviteViaSms())
@@ -250,11 +250,11 @@ public class UserServiceImpl implements UserService {
         return ocUserDTO;
     }
 
-    private String generateAccessCode(String accessToken, String customerUuid) {
+    private String generateAccessCode(String accessToken, String realm) {
         String accessCode;
         do {
             accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
-        } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, customerUuid));
+        } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, realm));
         return accessCode;
     }
 
@@ -331,7 +331,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo) {
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo) {
 
         CoreResources.setRequestSchema(schema);
 
@@ -350,21 +350,22 @@ public class UserServiceImpl implements UserService {
         try {
             OCUserDTO userDTO = null;
             for (StudySubject studySubject : studySubjects) {
-                userDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,studySubject);
-                userDTOS.add(userDTO);
+                userDTO = getOCUserDTO(siteOid, accessToken, realm, userAccountBean, incRelatedInfo,studySubject);
+                if(userDTO!=null)
+                    userDTOS.add(userDTO);
             }
 
             // add a new method to write this object into text file
             writeToFile(userDTOS, studyOid, fileName);
         } catch (Exception e) {
             persistJobFailed(jobDetail, fileName);
-            logger.error(" Access code Job Creation Failed ");
+            logger.error(" Access code Job Creation Failed ",e);
         }
         persistJobCompleted(jobDetail, fileName);
     }
 
     @Transactional
-    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
+    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
     {
 
 
@@ -387,7 +388,7 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            ocuserDTO = getOCUserDTO(siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo,
+            ocuserDTO = getOCUserDTO(siteOid, accessToken, realm, userAccountBean, incRelatedInfo,
                     ss);
 
 
@@ -440,7 +441,7 @@ public class UserServiceImpl implements UserService {
      * @param ocuserDTO
      * @return
      */
-    private OCUserDTO getOCUserDTO(String siteOid, String accessToken, String customerUuid,
+    private OCUserDTO getOCUserDTO(String siteOid, String accessToken, String realm,
                                    UserAccountBean userAccountBean, boolean incRelatedInfo, StudySubject studySubject) {
 
         OCUserDTO ocuserDTO = null;
@@ -458,7 +459,7 @@ public class UserServiceImpl implements UserService {
 
                 //Get accessToken from Keycloak
                 ocuserDTO = buildOcUserDTO(studySubject,incRelatedInfo);
-                ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean,incRelatedInfo,incRelatedInfo);
+                ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), realm, userAccountBean,incRelatedInfo,incRelatedInfo);
 
 
                 if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
@@ -682,11 +683,11 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
-        return getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,auditAccessCodeViewing,true);
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String realm, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
+        return getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean,auditAccessCodeViewing,true);
     }
 
-    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean,boolean auditAccessCodeViewing,boolean includeAccessCode) {
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String realm, UserAccountBean userAccountBean,boolean auditAccessCodeViewing,boolean includeAccessCode) {
         Study tenantStudy = getStudy(studyOid);
         if (!validateService.isParticipateActive(tenantStudy)) {
             logger.error("Participant account is not Active");
@@ -706,7 +707,7 @@ public class UserServiceImpl implements UserService {
 
         String accessCode = null;
         if(includeAccessCode) {
-            accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), customerUuid);
+            accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), realm);
             if (accessCode == null) {
                 logger.error(" Access code from Keycloack returned null ");
                 return null;
@@ -722,9 +723,7 @@ public class UserServiceImpl implements UserService {
             if (moduleConfigDTO != null) {
                 ModuleConfigAttributeDTO moduleConfigAttributeDTO = studyBuildService.getModuleConfigAttribute(moduleConfigDTO.getAttributes(), tenantStudy);
                 if (moduleConfigAttributeDTO != null) {
-                    logger.info("Participant Access Link is :{}", moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
                     ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();
-
 
                     participantAccessDTO.setAccessCode(accessCode);
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
@@ -798,10 +797,12 @@ public class UserServiceImpl implements UserService {
         PrintWriter writer = null;
         try {
             writer = openFile(file);
+            writer.print(writeToTextFile(userDTOs));
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             logger.error("Error while accessing file for writing: ",e);
+        } catch (Exception exception) {
+            logger.error("Error while writing to file : ",exception);
         } finally {
-            writer.print(writeToTextFile(userDTOs));
             closeFile(writer);
         }
         StringBuilder body = new StringBuilder();

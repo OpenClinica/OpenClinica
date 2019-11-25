@@ -101,7 +101,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     * @throws OpenClinicaException
     */
     public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy,String accessToken,
-                                    String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
+                                    String realm,String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
 
 
         // create subject
@@ -183,7 +183,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             oCParticipantDTO.setIdentifier(subjectTransfer.getIdentifier());
             ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(locale);
             userService.connectParticipant(currentStudy.getOid(), subjectTransfer.getPersonId(),
-                    oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
+                    oCParticipantDTO, accessToken, userAccountBean, realm,customerUuid, textsBundle);
         }
 
 

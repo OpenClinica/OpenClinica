@@ -138,7 +138,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
    
 
-    public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, String studyOid, String siteOid , String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
+    public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, String studyOid, String siteOid , String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
         boolean createNewParticipant=false;
         Study tenantStudy = studyHibDao.findByOcOID(studyOid);
         Study tenantSite = studyHibDao.findByOcOID(siteOid);
@@ -240,7 +240,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             oCParticipantDTO.setPhoneNumber(addParticipantRequestDTO.getPhoneNumber());
             oCParticipantDTO.setIdentifier(addParticipantRequestDTO.getIdentifier());
             userService.connectParticipant(studyOid, addParticipantRequestDTO.getSubjectKey(),
-                    oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
+                    oCParticipantDTO, accessToken, userAccountBean, realm,customerUuid, textsBundle);
             studySubject=studySubjectHibDao.findById(studySubject.getStudySubjectId());
         }
 
@@ -256,7 +256,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     }
 
 
-    public void startBulkAddParticipantJob(MultipartFile file, Study study, Study site, UserAccountBean userAccountBean,  JobDetail jobDetail, String schema,String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
+    public void startBulkAddParticipantJob(MultipartFile file, Study study, Study site, UserAccountBean userAccountBean,  JobDetail jobDetail, String schema,String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
         ResponseEntity response = null;
         String logFileName = null;
         CoreResources.setRequestSchema(schema);
@@ -277,7 +277,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
                 AddParticipantResponseDTO result = null;
                 DataImportReport dataImportReport = null;
                 try {
-                    result = addParticipant(addParticipantRequestDTO, userAccountBean, study.getOc_oid(), site.getOc_oid(), customerUuid, textsBundle, accessToken, register);
+                    result = addParticipant(addParticipantRequestDTO, userAccountBean, study.getOc_oid(), site.getOc_oid(), realm,customerUuid, textsBundle, accessToken, register);
                     dataImportReport = new DataImportReport(participantId, ((AddParticipantResponseDTO) result).getSubjectOid(), ((AddParticipantResponseDTO) result).getStatus(), ((AddParticipantResponseDTO) result).getParticipateStatus(), SUCCESS, rowNumber);
                 } catch (OpenClinicaSystemException ose) {
                     dataImportReport = new DataImportReport(rowNumber, participantId, FAILED, ose.getMessage());

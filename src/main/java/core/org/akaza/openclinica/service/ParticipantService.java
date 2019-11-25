@@ -13,7 +13,7 @@ import java.util.Locale;
 
 public interface ParticipantService {
 
-	 abstract String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy, String accessToken, String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception;
+	 abstract String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy, String accessToken,String realm, String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception;
 
 	 List<StudySubjectBean> getStudySubject(StudyBean study);
 	 StudyBean validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request);

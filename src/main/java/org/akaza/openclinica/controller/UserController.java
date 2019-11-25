@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -71,7 +72,8 @@ public class UserController {
     private StudyDao studyDao;
     @Autowired
     UserAccountDao userAccountDao;
-
+    @Autowired
+    KeycloakClientImpl keycloakClient;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private static final String ENTITY_NAME = "UserController";
 
@@ -114,8 +116,9 @@ public class UserController {
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
         ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
+        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 
-        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid, textsBundle);
+        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, realm, customerUuid,textsBundle);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
@@ -160,8 +163,9 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 
-        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,incldAccessCode,incldAccessCode);
+        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean,incldAccessCode,incldAccessCode);
         if (participantAccessDTO == null) {
             logger.error("REST request to GET AccessLink Object for Participant not found ");
             return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.NOT_FOUND);
@@ -218,8 +222,9 @@ public class UserController {
 
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
+        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 
-        String uuid = startExtractJob(studyOid, siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo);
+        String uuid = startExtractJob(studyOid, siteOid, accessToken, realm, userAccountBean, incRelatedInfo);
 
         logger.info("REST request to Extract Participants info ");
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -259,7 +264,7 @@ public class UserController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startExtractJob(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, boolean incRelatedInfo) {
+    public String startExtractJob(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, boolean incRelatedInfo) {
         utilService.setSchemaFromStudyOid(studyOid);
         String schema = CoreResources.getRequestSchema();
 
@@ -269,7 +274,7 @@ public class UserController {
         JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE, null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             try {
-                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail, incRelatedInfo);
+                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, realm, userAccountBean, schema, jobDetail, incRelatedInfo);
             } catch (Exception e) {
                 logger.error("Exeception is thrown while extracting job : " + e);
             }

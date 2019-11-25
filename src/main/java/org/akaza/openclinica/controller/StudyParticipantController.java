@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.core.Context;
 
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
@@ -117,6 +118,9 @@ public class StudyParticipantController {
 	private UserAccountDAO userAccountDao;
 
 	@Autowired
+	KeycloakClientImpl keycloakClient;
+
+	@Autowired
 	private StudyParticipantService studyParticipantService;
 		 
     @Autowired
@@ -162,6 +166,7 @@ public class StudyParticipantController {
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String accessToken = utilService.getAccessTokenFromRequest(request);
+		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 		Study tenantStudy = studyDao.findByOcOID(studyOid);
 		StudyDAO sDao = new StudyDAO(dataSource);
 		StudyBean tenantStudyBean = sDao.findByOid(studyOid);
@@ -173,7 +178,7 @@ public class StudyParticipantController {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
 			if (utilService.isParticipantIDSystemGenerated(tenantStudyBean))
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_SYSTEM_GENERATED_ID_ENABLED);
-			 result = studyParticipantService.addParticipant(addParticipantRequestDTO, userAccountBean, studyOid, siteOid, customerUuid, textsBundle, accessToken, register);
+			 result = studyParticipantService.addParticipant(addParticipantRequestDTO, userAccountBean, studyOid, siteOid,realm, customerUuid, textsBundle, accessToken, register);
 
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
@@ -225,6 +230,7 @@ public class StudyParticipantController {
 
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String accessToken = utilService.getAccessTokenFromRequest(request);
+		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 		ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(request.getLocale());
 
 		try {
@@ -243,7 +249,7 @@ public class StudyParticipantController {
 
 		}
 
-		String uuid = startBulkAddParticipantJob(file, schema, studyOid, siteOid, userAccountBean,customerUuid,textsBundle,accessToken,register);
+		String uuid = startBulkAddParticipantJob(file, schema, studyOid, siteOid, userAccountBean,realm,customerUuid,textsBundle,accessToken,register);
 
 		logger.info("REST request to Import Job uuid {} ", uuid);
 		return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -295,12 +301,13 @@ public class StudyParticipantController {
 		}
 		
 		String accessToken = utilService.getAccessTokenFromRequest(request);
-		String customerUuid = utilService.getCustomerUuidFromRequest(request);					
+		String customerUuid = utilService.getCustomerUuidFromRequest(request);
+		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 		StudyParticipantDetailDTO result =  null;
 		
 		try {			
 			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);							
-			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,customerUuid,userAccountBean,participantID,includeRelatedInfo);
+			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,realm,userAccountBean,participantID,includeRelatedInfo);
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
 		}
@@ -524,7 +531,7 @@ public class StudyParticipantController {
 		serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource);
 		return serviceHelper;
 	}
-	public String startBulkAddParticipantJob(MultipartFile file, String schema, String studyOid, String siteOid,UserAccountBean userAccountBean, String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
+		public String startBulkAddParticipantJob(MultipartFile file, String schema, String studyOid, String siteOid,UserAccountBean userAccountBean, String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
 		utilService.setSchemaFromStudyOid(studyOid);
 		UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 
@@ -533,7 +540,8 @@ public class StudyParticipantController {
 		JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.BULK_ADD_PARTICIPANTS, file.getOriginalFilename());
 		CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 			try {
-				studyParticipantService.startBulkAddParticipantJob(file, study, site,userAccountBean, jobDetail, schema, customerUuid,  textsBundle, accessToken,  register);
+				studyParticipantService.startBulkAddParticipantJob(file, study, site,userAccountBean, jobDetail, schema, realm,customerUuid,  textsBundle, accessToken,  register);
+
 			} catch (Exception e) {
 				logger.error("Exception is thrown while processing dataImport: " + e);
 			}
