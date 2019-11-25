@@ -92,8 +92,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private StudyEventDAO studyEventDAO;
     private EventDefinitionCRFDAO eventDefinitionCRFDAO;
     private ExpressionService expressionService;
-    // Randomization is removed from LibreClinica
-    //private RandomizeService randomizeService;
     
     public DynamicsMetadataService(DataSource ds) {
         // itemsAlreadyShown = new ArrayList<Integer>();
@@ -519,16 +517,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
         if (property.getValueExpression() == null) {
             logger.info("There is no ValueExpression for property ="+property.getOid());
-
-            // Randomization was removed from LibreClinica
-//            if (stratificationFactorBeans != null) {
-//                try {
-//                    value = getRandomizeService().getRandomizationCode(eventCrfBean, stratificationFactorBeans, ruleSet);
-//                } catch (JSONException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//            }
         } else {
             String expression =
                 getExpressionService().constructFullExpressionIfPartialProvided(property.getValueExpression().getValue(), ruleSet.getTarget().getValue());
@@ -547,7 +535,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
         }
         return value;
-
     }
 
     private String getDateFormat(PropertyBean property){
@@ -561,7 +548,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         logger.info("The format of the date will be : {}", format);
         return format;
     }
-
 
     public void insert(ItemDataBean itemDataBean, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,List<StratificationFactorBean> stratificationFactorBeans) {
         insert(itemDataBean.getId(), properties, ub, ruleSet, itemDataBean.getStatus(), stratificationFactorBeans);
@@ -1107,21 +1093,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     public void setExpressionService(ExpressionService expressionService) {
         this.expressionService = expressionService;
     }
-
-// Randomization is removed from LibreClinica
-//    public RandomizeService getRandomizeService() {
-//        return randomizeService;
-//    }
-//
-//    public void setRandomizeService(RandomizeService randomizeService) {
-//        this.randomizeService = randomizeService;
-//    }
-
-
-
-
-
-
+    
     class ItemOrItemGroupHolder {
 
         ItemBean itemBean;
