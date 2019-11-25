@@ -473,10 +473,6 @@ public class SystemController {
             HashMap<String, Object> mapParticipantModule = getParticipateModule(studyBean);
             listOfModules.add(mapParticipantModule);
 
-            // Randomization is removed from LibreClinica
-            //HashMap<String, Object> mapRandomizeModule = getRandomizeModule(studyBean);
-            //listOfModules.add(mapRandomizeModule);
-
             HashMap<String, Object> mapRuleDesignerModule = getRuleDesignerModuleInSession(studyBean, session);
             listOfModules.add(mapRuleDesignerModule);
 
@@ -1057,7 +1053,6 @@ public class SystemController {
     }
 
     public String getWriteAccess(File file) {
-
         if (file.canWrite()) {
             return "Yes";
         } else {
@@ -1071,7 +1066,6 @@ public class SystemController {
         } else {
             return "No";
         }
-
     }
 
     public String sendEmail(JavaMailSenderImpl mailSender, String emailSubject, String message) throws OpenClinicaSystemException {
@@ -1131,7 +1125,6 @@ public class SystemController {
 
     public void getRandomizeMod() {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-
     }
 
     public HashMap<String, Object> getParticipateModule(StudyBean studyBean) {
