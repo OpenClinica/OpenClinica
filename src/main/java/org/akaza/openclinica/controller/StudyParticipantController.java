@@ -554,13 +554,14 @@ public class StudyParticipantController {
 										          ) throws IOException {
 											 
 		
-		  utilService.setSchemaFromStudyOid(studyOid);		 	  
+		  utilService.setSchemaFromStudyOid(studyOid);	
+		  String schema = CoreResources.getRequestSchema();
 	 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 	 	  String siteOid = null;
 	 	  
 		  try {				 
-			  validateService.validateStudyAndRoles(studyOid,userAccountBean);			 	 			 	 		 	 
-		 	  String uuid = startBulkCaseBookPDFJob(studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
+			  validateService.validateStudyAndRoles(studyOid.trim(),userAccountBean);			 	 			 	 		 	 
+		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
 
 			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
 			  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -572,33 +573,46 @@ public class StudyParticipantController {
 		 }
 
 	
-	private String startBulkCaseBookPDFJob(String studyOid,
-											String siteOid, 
-											String participantId, 											 
-											HttpServletRequest request,
-											UserAccountBean userAccountBean, 
-											String format, 
-											String margin, 
-											String landscape) {
+	private String startBulkCaseBookPDFJob(String schema,
+										   String studyOid,
+										   String siteOid, 
+										   String participantId, 											 
+										   HttpServletRequest request,
+										   UserAccountBean userAccountBean, 
+										   String format, 
+										   String margin, 
+										   String landscape) {
 									 	 
 
 		    Study site = null;
 		    Study study = null;
 		    if(siteOid !=null) {
-		    	site = studyDao.findByOcOID(siteOid);
+		    	site = studyDao.findByOcOID(siteOid.trim());
 		    }
 			if(studyOid != null) {
-				study = studyDao.findByOcOID(studyOid);
+				study = studyDao.findByOcOID(studyOid.trim());
+				
+				if(study.getStudy() != null) {
+					site = study;
+					study = study.getStudy(); 
+				}
 			}
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 			//currently studySubjectIdentifier is OID
-			StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantId, study);
-			String studySubjectIdentifier = ss.getOcOid();
+			StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantId.trim(), study);
 			
+			if(ss == null) {
+				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
+			}
+			
+			String 	studySubjectIdentifier = ss.getOcOid();
+			
+						
 			//Setting the destination file
 	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
-	        int index= fullFinalFilePathName.lastIndexOf("\\");
+	        int index= fullFinalFilePathName.lastIndexOf(File.separator);
+	      
 	    	String fileName = fullFinalFilePathName.substring(index + 1);
 	    	
 			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.PARTICIPANT_PDF_CASEBOOK, fileName);
@@ -613,7 +627,7 @@ public class StudyParticipantController {
 				try {
 					 ResourceBundleProvider.updateLocale(local);
 					 String userAccountID = userAccountBean.getId() +"";
-					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
 				 	
 					} catch (Exception e) {
 						logger.error("Exception is thrown while processing CaseBook PDF: " + e);

@@ -214,11 +214,12 @@ public class DatasetDAO extends AuditableEntityDAO {
         this.setTypeExpected(11, TypeNames.DATE);// updated
         this.setTypeExpected(12, TypeNames.INT);// update id
         this.setTypeExpected(13, TypeNames.STRING);// oc_oid
+        this.setTypeExpected(14, TypeNames.STRING);
 
-        this.setTypeExpected(14, TypeNames.INT);// sed_id
-        this.setTypeExpected(15, TypeNames.STRING);// sed_name
-        this.setTypeExpected(16, TypeNames.INT);// crf_id
-        this.setTypeExpected(17, TypeNames.STRING);// crf_name
+        this.setTypeExpected(15, TypeNames.INT);// sed_id
+        this.setTypeExpected(16, TypeNames.STRING);// sed_name
+        this.setTypeExpected(17, TypeNames.INT);// crf_id
+        this.setTypeExpected(18, TypeNames.STRING);// crf_name
     }
 
     public EntityBean update(EntityBean eb) {

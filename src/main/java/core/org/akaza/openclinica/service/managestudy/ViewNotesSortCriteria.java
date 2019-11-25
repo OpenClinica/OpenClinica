@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import core.org.akaza.openclinica.core.util.Pair;
+import core.org.akaza.openclinica.dao.hibernate.ItemDao;
+import core.org.akaza.openclinica.domain.datamap.Item;
 import org.jmesa.limit.Sort;
 import org.jmesa.limit.SortSet;
 
@@ -46,12 +48,21 @@ public class ViewNotesSortCriteria {
         return criteria;
     }
     
-    public static ViewNotesSortCriteria buildFilterCriteria(SortSet sortSet) {
+    public static ViewNotesSortCriteria buildFilterCriteria(SortSet sortSet,ItemDao itemDao) {
         ViewNotesSortCriteria criteria = new ViewNotesSortCriteria();
-        for (Sort sort : sortSet.getSorts()) {
-            String sortField = SORT_BY_TABLE_COLUMN.get(sort.getProperty());
-            criteria.getSorters().put(sortField, sort.getOrder().name());
-        }
+        String sortField = "";
+        if(sortSet!=null){
+            for (Sort sort : sortSet.getSorts()) {
+                String property = sort.getProperty();
+                if (property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) {
+                    sortField = validateProperty(property,itemDao);
+                } else {
+                    sortField = SORT_BY_TABLE_COLUMN.get(sort.getProperty());
+                }
+
+                criteria.getSorters().put(sortField, sort.getOrder().name());
+            }
+    }
         return criteria;
     }
 
@@ -59,4 +70,14 @@ public class ViewNotesSortCriteria {
         return sorters;
     }
 
+    private static String validateProperty(String property,ItemDao itemDao) {
+        if (property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) {
+            String itemOid = property.split("\\.")[2];
+            Item item = itemDao.findByOcOID(itemOid);
+            if (item != null)
+                property = property + "." + item.getItemDataType().getName();
+        }
+        return property;
+
+    }
 }

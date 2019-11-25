@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public class DiscrepancyNotesBean {
     private String entityID;
-    private ArrayList<DiscrepancyNoteBean> dns = new ArrayList<DiscrepancyNoteBean>();
+    private ArrayList<DiscrepancyNoteBean> discrepancyNotes = new ArrayList<DiscrepancyNoteBean>();
     
     public String getEntityID() {
         return entityID;
@@ -28,9 +28,9 @@ public class DiscrepancyNotesBean {
         this.entityID = entityID;
     }
     public ArrayList<DiscrepancyNoteBean> getDiscrepancyNotes() {
-        return dns;
+        return discrepancyNotes;
     }
     public void setDiscrepancyNotes(ArrayList<DiscrepancyNoteBean> dns) {
-        this.dns = dns;
+        this.discrepancyNotes = dns;
     }
 }

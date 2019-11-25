@@ -6,6 +6,7 @@ package org.akaza.openclinica.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 /**
  * @author Tao Li
@@ -18,5 +19,5 @@ public interface PdfService {
 	
 	String getCaseBookFileRootPath();
 	
-	void addFooter(String mergedFilePath, String footerMsg) throws IOException;
+	int addFooter(PDDocument document, String footerMsg, int page_counter) throws IOException;
 }

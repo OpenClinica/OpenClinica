@@ -10,24 +10,11 @@
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
 <style>
     .icon > span {
         font-family: 'Open Sans', arial, helvetica, sans-serif;
     }
 </style>
-
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
-
-<c:if test="${participantIDVerification == 'true'}">
-    <script type="text/javascript" language="JavaScript" src="js/lib/bootstrap-tour.js"></script>
-</c:if>
 
 <script type="text/javascript">
     function onInvokeAction(id,action) {
@@ -52,8 +39,8 @@
 
     jQuery(document).ready(function() {
         jQuery('#addSubject').click(function() {
-            $('#sidebar_Alerts_open .sidebar_tab_content').html('<i></i>');
-            $('#spanAlert-label').hide();
+            jQuery('#sidebar_Alerts_open .sidebar_tab_content').html('<i></i>');
+            jQuery('#spanAlert-label').hide();
             jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
         });
 
@@ -112,6 +99,9 @@
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='crf' class='core.org.akaza.openclinica.bean.admin.CRFBean'/>
 
+<c:if test="${participantIDVerification == 'true'}">
+    <c:import url="../submit/verifyID.jsp"></c:import>
+</c:if>
 
 <h1>
     <span class="title_manage">
