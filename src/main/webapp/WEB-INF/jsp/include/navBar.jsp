@@ -86,8 +86,6 @@
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:otherwise>
 </c:choose>
-<link href="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
-        <script src="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
 
 <script type="text/javascript">
 
