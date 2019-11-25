@@ -481,6 +481,11 @@
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                         key="nav_source_data_verification" bundle="${resword}"/></a></div>
+                <c:if test="${enableEmbeddedReports}">
+                    <div class="taskLink"><a href="${urlPrefix}insight">
+                        <fmt:message key="reports" bundle="${resword}"/></a>
+                    </div>
+                </c:if>
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
@@ -580,6 +585,11 @@
                         <div class="taskLink"></div>
                     </c:otherwise>
                 </c:choose>
+                <c:if test="${enableEmbeddedReports}">
+                    <div class="taskLink"><a href="${urlPrefix}insight">
+                        <fmt:message key="reports" bundle="${resword}"/></a>
+                    </div>
+                </c:if>
             </div>
             <div class="taskRightColumn">
                 <c:choose>

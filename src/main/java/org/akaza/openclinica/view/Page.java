@@ -635,6 +635,9 @@ public enum Page {
     JOBS ("/WEB-INF/jsp/" + "managestudy/jobs.jsp", "jobs (bulk logfile)"),
     JOBS_SERVLET ("/Jobs", "jobs (bulk logfile)"),
 
+    INSIGHT ("/WEB-INF/jsp/" + "managestudy/embed-insight.jsp", "embedded insight reports"),
+    INSIGHT_SERVLET ("/insight", "embedded insight reports"),
+
     FILE_UPLOAD ("/WEB-INF/jsp/submit/uploadFile.jsp", "Form For File Uploading"),
     //UPLOAD_FILE_SERVLET ("/UploadFile", "Upload File"),
     DOWNLOAD_ATTACHED_FILE ("/WEB-INF/jsp/submit/downloadAttachedFile.jsp", "Download Attached File"),

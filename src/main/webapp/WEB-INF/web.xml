@@ -2335,4 +2335,14 @@
         <url-pattern>/Jobs</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <display-name>Insight</display-name>
+        <servlet-name>InsightServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.InsightServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InsightServlet</servlet-name>
+        <url-pattern>/insight</url-pattern>
+    </servlet-mapping>
+
 </web-app>
