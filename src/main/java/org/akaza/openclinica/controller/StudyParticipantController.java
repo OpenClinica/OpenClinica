@@ -560,7 +560,7 @@ public class StudyParticipantController {
 	 	  String siteOid = null;
 	 	  
 		  try {				 
-			  validateService.validateStudyAndRoles(studyOid,userAccountBean);			 	 			 	 		 	 
+			  validateService.validateStudyAndRoles(studyOid.trim(),userAccountBean);			 	 			 	 		 	 
 		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
 
 			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
@@ -587,10 +587,10 @@ public class StudyParticipantController {
 		    Study site = null;
 		    Study study = null;
 		    if(siteOid !=null) {
-		    	site = studyDao.findByOcOID(siteOid);
+		    	site = studyDao.findByOcOID(siteOid.trim());
 		    }
 			if(studyOid != null) {
-				study = studyDao.findByOcOID(studyOid);
+				study = studyDao.findByOcOID(studyOid.trim());
 				
 				if(study.getStudy() != null) {
 					site = study;
@@ -600,9 +600,15 @@ public class StudyParticipantController {
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 			//currently studySubjectIdentifier is OID
-			StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantId, study);
-			String studySubjectIdentifier = ss.getOcOid();
+			StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantId.trim(), study);
 			
+			if(ss == null) {
+				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
+			}
+			
+			String 	studySubjectIdentifier = ss.getOcOid();
+			
+						
 			//Setting the destination file
 	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
 	        int index= fullFinalFilePathName.lastIndexOf(File.separator);
