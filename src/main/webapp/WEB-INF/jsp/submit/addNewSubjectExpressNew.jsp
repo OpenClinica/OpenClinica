@@ -31,7 +31,7 @@
     </c:if>
 </c:forEach>
 
-<form name="subjectForm" action="AddNewSubject" method="post">
+<form name="subjectForm" action="AddNewSubject" method="post" id="subjectFormID">
 <input type="hidden" name="subjectOverlay" value="true">
 
 <table border="0" cellpadding="0" align="center" style="cursor:default;">
@@ -93,3 +93,10 @@
 </table>
 
 </form>
+
+<!-- OC-11588 Disable Add button once clicked  -->
+<script type="text/javascript">
+    jQuery('#subjectFormID').one('submit', function() {
+        jQuery(this).find('input[type="submit"]').attr({'disabled':'disabled', 'value': 'Adding...'});
+    });
+</script>
