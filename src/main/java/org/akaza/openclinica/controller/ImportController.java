@@ -4,7 +4,6 @@ import core.org.akaza.openclinica.service.CustomParameterizedException;
 import core.org.akaza.openclinica.service.UtilService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import core.org.akaza.openclinica.bean.core.ApplicationConstants;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;

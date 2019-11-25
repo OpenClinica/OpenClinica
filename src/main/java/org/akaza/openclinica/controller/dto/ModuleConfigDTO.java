@@ -7,15 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import core.org.akaza.openclinica.domain.enumsupport.ModuleStatus;
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/dto/ModuleConfigDTO.java
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/dto/ModuleConfigDTO.java
 import org.akaza.openclinica.service.AbstractAuditingDTO;
-=======
-import core.org.akaza.openclinica.service.AbstractAuditingDTO;
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/dto/ModuleConfigDTO.java
-=======
-import org.akaza.openclinica.service.AbstractAuditingDTO;
->>>>>>> OC-11521: Merged the properties and test calsses. Issue with bean creation:web/src/main/java/org/akaza/openclinica/controller/dto/ModuleConfigDTO.java
 
 /**
  * A DTO for the ModuleConfig entity.

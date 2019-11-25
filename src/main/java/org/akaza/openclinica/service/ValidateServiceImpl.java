@@ -1,7 +1,6 @@
 package org.akaza.openclinica.service;
 
 import liquibase.util.StringUtils;
-
 import core.org.akaza.openclinica.bean.core.ApplicationConstants;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.UserType;
@@ -52,11 +51,6 @@ public class ValidateServiceImpl implements ValidateService {
 
     @Autowired
     StudyParameterValueDao studyParameterValueDao;
-    
-    @Autowired
-    EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
-    
-   
 
     @Autowired
     private TokenService tokenService;
@@ -289,50 +283,6 @@ public class ValidateServiceImpl implements ValidateService {
 
     }
     
-    /**
-     *  this is used by casebook PDF process
-     *  studyOid may be at study level or site level
-     */
-    public void validateStudyAndRoles(String studyOid,  UserAccountBean userAccountBean) {
-
-        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-        if (studyOid != null)
-            studyOid = studyOid.toUpperCase();
-       
-        if (!isStudyOidValid(studyOid)) {
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
-        }
-              
-        if (!isStudyAvailable(studyOid)) {
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
-        }
-        
-        if (!isUserHasAccessToStudy(userRoles, studyOid)) {
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-        } 
-
-    }
-   
-    public boolean hasCRFpermissionTag(EventDefinitionCrf edc,List<String> permissionTags) {
-    	boolean formIsTagged= isFormTagged(edc);
-    	if(formIsTagged) {
-    		List<EventDefinitionCrfPermissionTag> list = eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getEventDefinitionCrfId(), edc.getParentId() !=null ? edc.getParentId():0, permissionTags);
-        	
-       	    return (list.size() > 0 ?  true:  false) ;
-    	}else {
-    	    return true;	
-    	}
-    	
-    	
-    }
-    
-    private boolean isFormTagged(EventDefinitionCrf edc) {
-        logger.debug("Begin to permissionTagsLookup");       
-        ArrayList list = (ArrayList) eventDefinitionCrfPermissionTagDao.findTagsForEDC(edc);
-       
-        return (list.size() > 0 ?  true:  false) ;
-    }
-   
     /**
      *  this method is used when get/extract participant information
      *  

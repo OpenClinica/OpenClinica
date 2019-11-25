@@ -2,15 +2,7 @@ package org.akaza.openclinica.controller.dto;
 
 
 import core.org.akaza.openclinica.domain.enumsupport.StudyEnvironmentStatus;
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/dto/StudyEnvironmentDTO.java
-<<<<<<< HEAD:src/main/java/org/akaza/openclinica/controller/dto/StudyEnvironmentDTO.java
 import org.akaza.openclinica.service.AbstractAuditingDTO;
-=======
-import core.org.akaza.openclinica.service.AbstractAuditingDTO;
->>>>>>> OC-11521: Moved the files from core to web without refactoring:web/src/main/java/org/akaza/openclinica/controller/dto/StudyEnvironmentDTO.java
-=======
-import org.akaza.openclinica.service.AbstractAuditingDTO;
->>>>>>> OC-11521: Merged the properties and test calsses. Issue with bean creation:web/src/main/java/org/akaza/openclinica/controller/dto/StudyEnvironmentDTO.java
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

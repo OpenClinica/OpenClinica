@@ -23,8 +23,6 @@ import org.akaza.openclinica.service.Component;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
-import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;

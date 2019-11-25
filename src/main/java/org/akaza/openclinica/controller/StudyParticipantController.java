@@ -1,30 +1,32 @@
 package org.akaza.openclinica.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.core.Context;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import core.org.akaza.openclinica.bean.login.*;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
-import org.akaza.openclinica.service.PdfService;
-import org.akaza.openclinica.service.UserService;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.JobDetail;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.*;
+import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,46 +34,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import core.org.akaza.openclinica.bean.login.ErrorObject;
-import core.org.akaza.openclinica.bean.login.ResponseSuccessListAllParticipantsByStudyDTO;
-import core.org.akaza.openclinica.bean.login.StudyParticipantDTO;
-import core.org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
-import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
-import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.domain.datamap.JobDetail;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.domain.datamap.StudySubject;
-import core.org.akaza.openclinica.domain.enumsupport.JobType;
-import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
-import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.service.CSVService;
-import core.org.akaza.openclinica.service.ParticipantService;
-import core.org.akaza.openclinica.service.PermissionService;
-import core.org.akaza.openclinica.service.StudyParticipantService;
-import core.org.akaza.openclinica.service.UtilService;
-import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.text.ParseException;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
@@ -99,26 +69,18 @@ public class StudyParticipantController {
 
 	@Autowired
 	private CSVService csvService;
-	
-	@Autowired
-    PdfService pdfService;
 
 	@Autowired
 	private UserAccountDao uAccountDao;
 
 	@Autowired
 	private StudyDao studyDao;
-	@Autowired
-	private StudySubjectDao studySubjectDao;
 
 	private StudySubjectDAO ssDao;
 	private UserAccountDAO userAccountDao;
 
 	@Autowired
 	private StudyParticipantService studyParticipantService;
-		 
-    @Autowired
-    PermissionService permissionService;
 
 	private RestfulServiceHelper serviceHelper;
 	private String dateFormat;
@@ -642,5 +604,5 @@ public class StudyParticipantController {
 		return fullFinalFilePathName;
 	}
 	
-	
+
 }

@@ -124,7 +124,6 @@ public class EventProcessor implements Processor {
                     logger.info("***  Existing EventCrf with same CRF Version  ***");
                     // use existing event crf
                     container.setEventCrf(existingEventCrf);
-                    break;
                 } else {
                     // different version already exists. log error and abort submission
                     errors.reject("Existing EventCrf with other CRF version");

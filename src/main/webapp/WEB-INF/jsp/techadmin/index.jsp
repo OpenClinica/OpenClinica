@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="core.org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 <jsp:include page="../include/tech-admin-header.jsp"/>
 
@@ -34,12 +34,6 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<<<<<<< HEAD:src/main/webapp/WEB-INF/jsp/techadmin/index.jsp
-=======
-<jsp:useBean scope="session" id="studyWithRole" class="core.org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
-<jsp:useBean scope="request" id="studyId" type="java.lang.Integer"/>
-<h1><span class="title_manage"><fmt:message key="confirm_changing_study" bundle="${resword}"/></span></h1>
->>>>>>> OC-11521: Merged core to web working:ws/src/main/webapp/WEB-INF/jsp/login/changeStudyConfirm.jsp
 
 <h1><span class="title_manage">
 <fmt:message key="technical_administrator" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/brief-overview')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>

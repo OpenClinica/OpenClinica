@@ -104,11 +104,6 @@ public class EnketoFormServlet extends SecureController {
 
         } else {
             eventCrf = eventCrfDao.findById(eventCrfId);
-            if(eventCrf!=null && !eventCrf.getFormLayout().getOcOid().equals(formLayout.getOcOid())) {
-                formLayout=eventCrf.getFormLayout();
-                subjectContext.setFormLayoutOid(eventCrf.getFormLayout().getOcOid());
-                contextHash = cache.putSubjectContext(subjectContext);
-            }
         }
         final EventCrf ec = eventCrf;
         if (eventCrfId != 0 || studyEvent != null) {
