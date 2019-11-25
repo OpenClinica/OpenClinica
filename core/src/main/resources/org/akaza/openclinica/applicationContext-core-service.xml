@@ -21,8 +21,6 @@
 
     <bean id="dynamicsMetadataService" class="org.akaza.openclinica.service.crfdata.DynamicsMetadataService" autowire="byName">
         <constructor-arg ref="dataSource"/>
-        <!-- Randomization was removed from LibreClinica -->
-        <!--<property name="randomizeService" ref="randomizeService"/>-->
     </bean>
     
     <bean id="ruleSetService" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName">
@@ -44,11 +42,6 @@
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>
     </bean>
-
-<!--    Randomization is removed from LibreClinica-->
-<!--    <bean id="randomizeService" class="org.akaza.openclinica.service.RandomizeService">-->
-<!--        <constructor-arg ref="dataSource"/>-->
-<!--    </bean>-->
 
     <bean id="insertActionValidator" class="org.akaza.openclinica.validator.rule.action.InsertActionValidator">
         <constructor-arg ref="dataSource"/>
