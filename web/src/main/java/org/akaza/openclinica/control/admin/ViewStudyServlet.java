@@ -77,22 +77,6 @@ public class ViewStudyServlet extends SecureController {
             if(participantStatusInOC=="") participantStatusInOC="disabled";
             // Randomization is removed from LibreClinica
             study.getStudyParameterConfig().setRandomization("disabled");
-//            if(randomizationStatusInOC=="") randomizationStatusInOC="disabled";
-//
-//            SeRandomizationDTO seRandomizationDTO = null;
-//            try {
-//                RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-//                seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid(), false);
-//            }
-//            catch (Exception e) {
-//                logger.error(e.getMessage(), e);
-//                e.printStackTrace();
-//            }
-//            if (seRandomizationDTO != null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")) {
-//                study.getStudyParameterConfig().setRandomization("enabled");
-//            } else {
-//                study.getStudyParameterConfig().setRandomization("disabled");
-//            }
 
              ParticipantPortalRegistrar  participantPortalRegistrar = new ParticipantPortalRegistrar();
              String pStatus = participantPortalRegistrar.getCachedRegistrationStatus(study.getOid(), session);
