@@ -231,46 +231,6 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
-// Randomization is removed from LibreClinica
-//    @RequestMapping(value = "/{study}/randomize", method = RequestMethod.POST)
-//    public String registerRandimization(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
-//        studyDao = new StudyDAO(dataSource);
-//        StudyBean study = studyDao.findByOid(studyOid);
-//        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-//        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
-//        RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-//
-//        Locale locale = LocaleResolver.getLocale(request);
-//        ResourceBundleProvider.updateLocale(locale);
-//        respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-//        String status = "";
-//        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-//
-//            // Update OC Study configuration
-//
-//        // send another email to sales@openclinica.com thru MandrillViaOcUi
-//         status = randomizationRegistrar.randomizeStudy(study.getOid(),study.getIdentifier() , userBean);
-//        if (status.equals("")) {
-//    //        addRegMessage(request, respage.getString("randomization_not_available"));
-//        } else {
-//            // Update OC Study configuration
-//            randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
-//
-//            spv.setStudyId(study.getId());
-//            spv.setParameter("randomization");
-//            spv.setValue("enabled");
-//            if (spv.getId() > 0)
-//                spvdao.update(spv);
-//            else
-//                spvdao.create(spv);
-//
-//            StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-//            currentStudy.getStudyParameterConfig().setRandomization("enabled");
-//           }
-//
-//        return "redirect:/pages/studymodule";
-//    }
-
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap handleMainPage(HttpServletRequest request, HttpServletResponse response) {
         ModelMap map = new ModelMap();
@@ -420,31 +380,8 @@ public class StudyModuleController {
 
             String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
 
-// Randomization is removed from LibreClinica
-//            RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-//            SeRandomizationDTO randomization=null;
-//                try {
-//                    randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid(), true);
-//                } catch (Exception e1) {
-//                    // TODO Auto-generated catch block
-//                    e1.printStackTrace();
-//                }
-
             String randomizationStatus = "";
             URL randomizeUrl = null;
-
-// Randomization is removed from LibreClinica
-//                if (randomization != null && randomization.getStatus() != null){
-//                    randomizationStatus = randomization.getStatus();
-//                    if (randomization.getUrl()!=null){
-//                    try {
-//                        randomizeUrl= new URL (randomization.getUrl());
-//                    } catch (MalformedURLException e) {
-//                        // TODO Auto-generated catch block
-//                        e.printStackTrace();
-//                    }
-//                   }
-//                }
             
             map.addAttribute("randomizeURL", randomizeUrl);
             map.addAttribute("randomizationOCStatus", randomizationOCStatus);
