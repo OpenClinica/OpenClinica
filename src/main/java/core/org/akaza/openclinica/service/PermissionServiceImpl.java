@@ -200,6 +200,20 @@ public class PermissionServiceImpl implements PermissionService {
         return true;
     }
 
+    public boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList) {
+   	 List<String> tagsForEDC = permissionTagDao.findTagsForEDC(edc);
+        if (CollectionUtils.isEmpty(tagsForEDC))
+            return true;
+        if (CollectionUtils.isNotEmpty(tagsForEDC) && CollectionUtils.isEmpty(permissionTagsList))
+            return false;
+        List<String> list = tagsForEDC.stream().filter(permissionTagsList::contains).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(list))
+            return false;
+
+        return true;
+   	
+   }
+    
     public List<String> getPermissionTagsList(StudyBean study, HttpServletRequest request) {
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
         return getTagList(roles, study);

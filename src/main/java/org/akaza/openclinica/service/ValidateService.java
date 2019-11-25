@@ -59,8 +59,6 @@ public interface ValidateService {
      boolean hasCRFpermissionTag(EventDefinitionCrf edc,List<String> permissionTags);
 
     ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
-    
-    boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList);
 
 
     }

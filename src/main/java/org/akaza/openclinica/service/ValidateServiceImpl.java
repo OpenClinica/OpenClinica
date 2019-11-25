@@ -17,7 +17,6 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -325,20 +323,6 @@ public class ValidateServiceImpl implements ValidateService {
     	    return true;	
     	}
     	
-    	
-    }
-    
-    public boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList) {
-    	 List<String> tagsForEDC = eventDefinitionCrfPermissionTagDao.findTagsForEDC(edc);
-         if (CollectionUtils.isEmpty(tagsForEDC))
-             return true;
-         if (CollectionUtils.isNotEmpty(tagsForEDC) && CollectionUtils.isEmpty(permissionTagsList))
-             return false;
-         List<String> list = tagsForEDC.stream().filter(permissionTagsList::contains).collect(Collectors.toList());
-         if (CollectionUtils.isEmpty(list))
-             return false;
-
-         return true;
     	
     }
     

@@ -2,6 +2,8 @@ package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
+import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,4 +27,6 @@ public interface PermissionService {
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);
 
     boolean isUserHasPermission(String column,HttpServletRequest request,StudyBean studyBean);
+    
+    boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList);
 }
