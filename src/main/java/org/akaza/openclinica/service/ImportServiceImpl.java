@@ -1292,7 +1292,12 @@ public class ImportServiceImpl implements ImportService {
             }
         }
         if (studySubject != null && !studySubject.getStatus().equals(Status.AVAILABLE)) {
-            return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+            //if participant has already signed, show they are not available instead of not found
+            if (studySubject.getStatus().equals(Status.SIGNED)) {
+                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_AVAILABLE);
+            } else {
+                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+            }
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
