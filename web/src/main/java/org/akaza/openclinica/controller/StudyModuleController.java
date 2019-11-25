@@ -33,8 +33,6 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
-import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -233,45 +231,6 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
-    @RequestMapping(value = "/{study}/randomize", method = RequestMethod.POST)
-    public String registerRandimization(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
-        studyDao = new StudyDAO(dataSource);
-        StudyBean study = studyDao.findByOid(studyOid);
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
-        RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-
-        Locale locale = LocaleResolver.getLocale(request);
-        ResourceBundleProvider.updateLocale(locale);
-        respage = ResourceBundleProvider.getPageMessagesBundle(locale);
-        String status = "";
-        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-
-            // Update OC Study configuration
-
-        // send another email to sales@openclinica.com thru MandrillViaOcUi
-         status = randomizationRegistrar.randomizeStudy(study.getOid(),study.getIdentifier() , userBean); 
-        if (status.equals("")) {
-    //        addRegMessage(request, respage.getString("randomization_not_available"));
-        } else {
-            // Update OC Study configuration
-            randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
-         
-            spv.setStudyId(study.getId());
-            spv.setParameter("randomization");
-            spv.setValue("enabled");
-            if (spv.getId() > 0)
-                spvdao.update(spv);
-            else
-                spvdao.create(spv);
-
-            StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-            currentStudy.getStudyParameterConfig().setRandomization("enabled");
-           }
-
-        return "redirect:/pages/studymodule";
-    }
-
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap handleMainPage(HttpServletRequest request, HttpServletResponse response) {
         ModelMap map = new ModelMap();
@@ -414,41 +373,20 @@ public class StudyModuleController {
             map.addAttribute("participateURLDisplay", url);
         }
 
-
         // Load Randomization  information
         String moduleManager = CoreResources.getField("moduleManager");
         map.addAttribute("moduleManager", moduleManager);
         if (moduleManager != null && !moduleManager.equals("")) {
 
-        String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
-            RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-            SeRandomizationDTO randomization=null;
-                try {
-                    randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid(), true);
-                } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+            String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
+
             String randomizationStatus = "";
-
-                URL randomizeUrl=null;
-                if (randomization != null && randomization.getStatus() != null){
-                    randomizationStatus = randomization.getStatus();
-                    if (randomization.getUrl()!=null){
-                    try {
-                        randomizeUrl= new URL (randomization.getUrl());
-                    } catch (MalformedURLException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                   } 
-                }
-                map.addAttribute("randomizeURL", randomizeUrl);
-              map.addAttribute("randomizationOCStatus", randomizationOCStatus);
-                map.addAttribute("randomizationStatus", randomizationStatus);
-
+            URL randomizeUrl = null;
+            
+            map.addAttribute("randomizeURL", randomizeUrl);
+            map.addAttribute("randomizationOCStatus", randomizationOCStatus);
+            map.addAttribute("randomizationStatus", randomizationStatus);
         }
-
 
         // @pgawade 13-April-2011- #8877: Added the rule designer URL
         if (null != coreResources) {
