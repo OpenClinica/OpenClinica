@@ -71,10 +71,10 @@ public class Study extends DataMapDomainObject {
     private String conditions;
     private String keywords;
     private String eligibility;
-    private String gender;
+    private String gender = "both";
     private String ageMax;
     private String ageMin;
-    private Boolean healthyVolunteerAccepted;
+    private Boolean healthyVolunteerAccepted = false;
     private String purpose;
     private String allocation;
     private String masking;
@@ -86,7 +86,7 @@ public class Study extends DataMapDomainObject {
     private String selection;
     private String timing;
     private String officialTitle;
-    private Boolean resultsReference;
+    private Boolean resultsReference = false;
     private String oc_oid;
     private Integer oldStatusId;
     private List<CrfBean> crfs;
@@ -563,6 +563,8 @@ public class Study extends DataMapDomainObject {
 
     @Column(name = "gender", length = 30)
     public String getGender() {
+        if(this.gender == null)
+            this.gender = "both";
         return this.gender;
     }
 
@@ -590,6 +592,8 @@ public class Study extends DataMapDomainObject {
 
     @Column(name = "healthy_volunteer_accepted")
     public Boolean getHealthyVolunteerAccepted() {
+        if(healthyVolunteerAccepted == null)
+            healthyVolunteerAccepted = false;
         return this.healthyVolunteerAccepted;
     }
 
@@ -698,6 +702,8 @@ public class Study extends DataMapDomainObject {
 
     @Column(name = "results_reference")
     public Boolean getResultsReference() {
+        if(resultsReference == null)
+            this.resultsReference = false;
         return this.resultsReference;
     }
 
