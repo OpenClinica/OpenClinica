@@ -2341,8 +2341,8 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ReportsServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>InsightServlet</servlet-name>
-        <url-pattern>/insight</url-pattern>
+        <servlet-name>ReportsServlet</servlet-name>
+        <url-pattern>/reports</url-pattern>
     </servlet-mapping>
 
 </web-app>
