@@ -213,7 +213,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
                 resolutionStatusDropdown.getDecoder());
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
-                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()), userTags);
+                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet(), itemDao), userTags);
         return items;
     }
 
@@ -258,7 +258,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         }
 
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
-                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()), userTags);
+                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet(), itemDao), userTags);
 
         this.setAllNotes(items);
 
@@ -769,10 +769,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     public DiscrepancyNotesSummary getNotesSummary() {
         return notesSummary;
-    }
-
-    public DiscrepancyNotesSummary getNotesSummaryForQuery() {
-        return notesSummaryOnlyForQuery;
     }
 
     public ViewStudySubjectService getViewStudySubjectService() {

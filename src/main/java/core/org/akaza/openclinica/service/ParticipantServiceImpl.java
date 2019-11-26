@@ -219,7 +219,7 @@ private void updateStudySubjectSize(Study currentStudy) {
             if (study == null) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier", "The study identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(study);
+
             
             StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
             if (studyLevelRole == null) {
@@ -237,13 +237,13 @@ private void updateStudySubjectSize(Study currentStudy) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier",
                         "The study identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(study);
+
             
             if (site == null || site.getStudy().getStudyId() != study.getStudyId()) {
                 throw new OpenClinicaSystemException("errorCode.invalidSiteIdentifier",
                         "The site identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(site);
+
             
             /**
              * check study level
@@ -270,51 +270,6 @@ private void updateStudySubjectSize(Study currentStudy) {
         return study;
         
     }
-
-	/**
-	  * OC-11162
-	  * AC1: When bulk add participant API is called for a study OID which is either in Design, Frozen or Locked status then 
-	  * instead of starting the process, system should return an errorcode.studyNotAvailable.
-	  * AC2: When bulk add participant API is called for a site OID which is either in Design, Frozen or Locked status then 
-	  * instead of starting the process, system should return an errorcode.siteNotAvailable.
-	 * @param study
-	 * @throws OpenClinicaSystemException
-	 */
-	private void checkStudyOrSiteStatus(Study study) throws OpenClinicaSystemException {
-		
-		String errorCode=null;
-		String msg = null;
-		boolean isNotAvailableStatus = false;
-		
-		// site
-		if(study.isSite()) {
-			errorCode = "errorCode.siteNotAvailable"; 
-			msg = "The site is not available,";
-		}else {
-			errorCode = "errorCode.studyNotAvailable"; 
-			msg = "The study is not available,";
-		}
-		
-		String studyStatus = study.getStatus().getName().toString().toLowerCase();
-		if(studyStatus != null ) {
-			if(studyStatus.equals("design")) {
-				isNotAvailableStatus = true;				
-				msg = msg + "it is in design status.";
-			}else if(studyStatus.equals("locked")) {
-				isNotAvailableStatus = true;				
-				msg = msg + "it is in locked status.";
-			}else if(studyStatus.equals("frozen")) {
-				isNotAvailableStatus = true;				
-				msg = msg + "it is in frozen status.";
-			}
-			if(isNotAvailableStatus) {
-				throw new OpenClinicaSystemException(errorCode, msg);
-			}
-			
-		}
-	}
-    
-           
 
     
     /**

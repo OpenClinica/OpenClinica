@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
@@ -64,7 +63,7 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
             throw new IllegalArgumentException("The query '" + queryId + "' could not be found in the file '" +
                     fileName + "'");
         }
-        return q;
+        return q+" ";
     }
 
     public boolean hasQuery(String fileName, String queryId) {

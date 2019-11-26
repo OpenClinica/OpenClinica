@@ -1,6 +1,12 @@
 package core.org.akaza.openclinica.service.crfdata.xform;
 
+import java.io.File;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,7 +22,9 @@ import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
+import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -28,9 +36,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -70,6 +82,7 @@ public class EnketoAPI {
 
     // public static final String INSTANCE_100_PERCENT_READONLY = "/api/v2/instance/view/iframe";
     public static final String INSTANCE_100_PERCENT_READONLY = "/oc/api/v1/instance/view";
+    public static final String INSTANCE_FORM_PDF = "/oc/api/v1/instance/view/pdf";
 
     // public static final String INSTANCE_READONLY_DN = "/api/v2/instance/fieldsubmission/note/iframe";
     public static final String INSTANCE_READONLY_DN = "/oc/api/v1/instance/note";
@@ -89,6 +102,7 @@ public class EnketoAPI {
     public static final String SURVEY_WRITABLE_PARTICIPATE = "/oc/api/v1/survey/collect/participant";
     public static final String INSTANCE_WRITABLE_PARTICIPATE = "/oc/api/v1/instance/edit/participant";
     public static final String DATABASE_ID_ENCRYPTION_KEY_PROPERTY = "databaseIdEncryptionKey";
+    public static final String PDF_CASEBOOK_DIRECTORY = "pdf_casebook";
 
     private String userPasswdCombo;
 
@@ -651,4 +665,173 @@ public class EnketoAPI {
         EnketoFormResponse enketoFormResponse = new EnketoFormResponse(urlResponse, lockOn);
         return enketoFormResponse;
     }
+
+    /**
+     *
+     * @param actionUrlObject
+     * @return
+     * @throws Exception
+     */
+    public EnketoPDFResponse getPDFForm(PdfActionUrlObject actionUrlObject) throws Exception {
+        String ecid = actionUrlObject.ecid;
+        String crfOid = actionUrlObject.crfOid;
+        List<FormLayoutMedia> mediaList = actionUrlObject.mediaList;
+        String instance = actionUrlObject.instance;
+        String redirect = actionUrlObject.redirect;
+        String studyOid = actionUrlObject.studyOid;
+        String studySubjectOID = actionUrlObject.getStudySubjectOID();
+        EnketoPDFResponse pdfResponse = null;
+        URI finalUrl = null;
+
+        if (enketoURL == null)
+            return null;
+
+        try {
+            // Build instanceId to cache populated instance at Enketo with
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            String hashString = ecid + "." + String.valueOf(cal.getTimeInMillis());
+            ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
+            String instanceId = encoder.encodePassword(hashString, null);
+            URL eURL = null;
+            eURL = new URL(enketoURL + INSTANCE_FORM_PDF);
+            String eurlStr = eURL.toString();
+            String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
+
+            InstanceAttachment attachment = new InstanceAttachment();
+            String databaseIdEncryptionKey = CoreResources.getField(DATABASE_ID_ENCRYPTION_KEY_PROPERTY);
+
+            for (FormLayoutMedia media : mediaList) {
+                String fileName = media.getName();
+                String baseUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+                int formLayoutMediaId = media.getFormLayoutMediaId();
+                // Encrypt the form layout media id so we don't expose database ids to users
+                String encryptedFormLayoutMediaId = EncryptionUtil.encryptValue(Integer.toString(formLayoutMediaId), databaseIdEncryptionKey);
+                String downLoadUrl = baseUrl + "/downloadMediaEncrypted?formLayoutMediaId=" + encryptedFormLayoutMediaId;
+                attachment.setAdditionalProperty(fileName, downLoadUrl);
+            }
+
+            /**
+             * prepare request header
+             */
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.add("Authorization", "Basic " + userPasswdCombo);
+            headers.add("Accept-Charset", "UTF-8");
+
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(eurlStr);
+            finalUrl = builder.build().toUri();
+            /**
+             *  prepare body
+             */
+            LinkedMultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("server_url", ocURL);
+            body.add("ecid", actionUrlObject.ecid);
+            body.add("form_id", crfOid);
+            body.add("instance", instance);
+            body.add("instance_id", instanceId);
+            body.add("return_url", redirect);
+            String format = actionUrlObject.getFormat();
+            if(format == null || format.trim().length() == 0) {
+                format = "A4";
+            }
+            body.add("format", format);
+
+            String margin =actionUrlObject.getMargin();
+            if(margin == null || margin.trim().length()==0 ) {
+                margin =  "0.5in";
+            }
+            body.add("margin", margin);
+
+            String landscape = actionUrlObject.getLandscape();
+            if(landscape != null && landscape.equalsIgnoreCase("true")) {
+                landscape = "true";
+            }else {
+                landscape = "false";
+            }
+            body.add("landscape", landscape);
+
+            HttpEntity<LinkedMultiValueMap> request = new HttpEntity<LinkedMultiValueMap>(body, headers);
+
+            RestTemplate rest = new RestTemplate();
+            ResponseEntity<byte[]> response = rest.postForEntity(eURL.toString(), request, byte[].class);
+
+            if (response != null) {
+                pdfResponse = new EnketoPDFResponse();
+
+                SimpleDateFormat sdf_pdfFile = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");
+                String fileName = studySubjectOID+"_"+crfOid + "_" + sdf_pdfFile.format(new Date()) + ".pdf";
+                String filePath = getCaseBookFileTempPath() + File.separator +  fileName;
+
+                Path pdfFile = Files.write(Paths.get(filePath), response.getBody());
+                pdfResponse.setPdfFile(pdfFile.toFile());
+                pdfResponse.setStatusCode(response.getStatusCodeValue()+"");
+            }
+
+        } catch(HttpClientErrorException ec) {
+            String bodyStr =ec.getResponseBodyAsString();
+            String msg = "ClientError:"+ec.getMessage();
+            String finalUrlStr = finalUrl.toString();
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_CLIENT,msg+ ":" + bodyStr + ":" + finalUrlStr);
+
+        } catch(HttpServerErrorException es) {
+            String bodyStr =es.getResponseBodyAsString();
+            String msg = "ServerError:" + es.getMessage();
+            String finalUrlStr = finalUrl.toString();
+
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_SERVER,msg+ ":" + bodyStr + ":" + finalUrlStr);
+        } catch (Exception e) {
+            throw e;
+        }
+
+        return pdfResponse;
+    }
+
+    /**
+     *
+     * @param pdfActionUrlObject
+     * @return
+     * @throws Exception
+     */
+    public EnketoPDFResponse registerAndGetFormPDF(PdfActionUrlObject pdfActionUrlObject) throws Exception {
+        EnketoPDFResponse enketoPDFResponse = null;
+        try {
+            enketoPDFResponse = this.getPDFForm(pdfActionUrlObject);
+        } catch (Exception e) {
+            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
+                savePformRegistration();
+                try {
+                    enketoPDFResponse = getPDFForm(pdfActionUrlObject);
+                } catch (Exception e1) {
+                    logger.error(e.getMessage());
+                    logger.error(ExceptionUtils.getStackTrace(e));
+                }
+            } else {
+                logger.error(e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+            }
+
+            throw e;
+
+
+        }
+        return enketoPDFResponse;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static String getCaseBookFileTempPath() {
+        String tempDir = System.getProperty( "java.io.tmpdir");
+        String dirPath = tempDir+ File.separator+ PDF_CASEBOOK_DIRECTORY;
+
+        File directory = new File(dirPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        return dirPath;
+    }
+
+
 }
