@@ -401,7 +401,7 @@ public class CreateSubStudyServlet extends SecureController {
                 + study.getFacilityRecruitmentStatus() + "\n" + study.getFacilityContactName() + "\n" + study.getFacilityContactEmail() + "\n"
                 + study.getFacilityContactPhone() + "\n" + study.getFacilityContactDegree());
 
-        study.setUserAccount(ub.toUserAccount());
+        study.setUserAccount(ub.toUserAccount(getStudyDao()));
         study.setDateCreated(new Date());
         Study parent = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
         // YW 10-10-2007, enable setting site status

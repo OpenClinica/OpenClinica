@@ -424,7 +424,7 @@ public class CreateStudyServlet extends SecureController {
             request.setAttribute("statuses", Status.toActiveArrayList());
             logger.info("setting arrays to request, size of list: " + Status.toArrayList().size());
             if (request.getParameter("Save") != null && request.getParameter("Save").length() > 0) {
-                studyBean.setUserAccount(ub.toUserAccount());
+                studyBean.setUserAccount(ub.toUserAccount(getStudyDao()));
                 studyBean.setDateCreated(new Date());
                 studyBean.setStatus(core.org.akaza.openclinica.domain.Status.PENDING);
                 studyBean = (Study) getStudyDao().create(studyBean);
@@ -801,7 +801,7 @@ public class CreateStudyServlet extends SecureController {
 
         logger.info("study bean to be created:" + newStudy.getName() + newStudy.getProtocolDateVerification());
         // newStudy.setType(StudyType.NONGENETIC);//need to refine in the future
-        newStudy.setUserAccount(ub.toUserAccount());
+        newStudy.setUserAccount(ub.toUserAccount(getStudyDao()));
         newStudy.setDateCreated(new Date());
         // newStudy.setStatus(Status.AVAILABLE);
 

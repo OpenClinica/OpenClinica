@@ -2,6 +2,7 @@ package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.controller.StudyController;
 import org.slf4j.Logger;
@@ -24,12 +25,12 @@ public class SiteBuildServiceImpl implements SiteBuildService {
     @Autowired
     private DataSource dataSource;
 
-    public void process(Study parentStudy, Study siteBean, UserAccountBean ownerUserAccount) throws Exception  {
+    public void process(Study parentStudy, Study siteBean, UserAccountBean ownerUserAccount, StudyDao studyDao) throws Exception  {
         String schemaName = null;
         Study site = new Study();
 
         try {
-            StudyController studyController = new StudyController();
+            StudyController studyController = new StudyController(studyDao);
             site.setName(siteBean.getName());
             site.setUniqueIdentifier(siteBean.getUniqueIdentifier());
             // generate OC id
@@ -37,7 +38,7 @@ public class SiteBuildServiceImpl implements SiteBuildService {
             site.setStatus(siteBean.getStatus());
             site.setProtocolDateVerification(siteBean.getProtocolDateVerification());
             site.setDatePlannedStart(siteBean.getDatePlannedStart());
-            site.setUserAccount(ownerUserAccount.toUserAccount());
+            site.setUserAccount(ownerUserAccount.toUserAccount(studyDao));
             site.setStudy(parentStudy);
             site.setPublished(parentStudy.isPublished());
             site.setStudyEnvSiteUuid(siteBean.getStudyEnvSiteUuid());
@@ -51,8 +52,7 @@ public class SiteBuildServiceImpl implements SiteBuildService {
             site.setFacilityContactName(siteBean.getFacilityContactName());
             site.setFacilityContactPhone(siteBean.getFacilityContactPhone());
             site.setFacilityContactEmail(siteBean.getFacilityContactEmail());
-            
-            Study createdSite = studyController.createStudyWithDatasource(site, dataSource);
+            Study createdSite = studyController.createStudy(site);
             StudyUserRoleBean sub = null;
         } catch (Exception e) {
             logger.error("Error while creating a site entry" + schemaName);
