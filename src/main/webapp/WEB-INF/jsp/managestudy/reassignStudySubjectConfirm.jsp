@@ -56,7 +56,7 @@
 <form action="ReassignStudySubject" method="post">
 <input type="hidden" name="action" value="submit">
 <input type="hidden" name="id" value="<c:out value="${studySub.id}"/>">
-<input type="hidden" name="studyId" value="<c:out value="${newStudy.stduyId}"/>">
+<input type="hidden" name="studyId" value="<c:out value="${newStudy.studyId}"/>">
 <p><fmt:message key="you_choose_to_reassign_subject2" bundle="${restext}"/> <b><c:out value="${subject.uniqueIdentifier}"/></b> <fmt:message key="to_study" bundle="${restext}"/>  <b><c:out value="${newStudy.name}"/></b>.</p>
 <br>
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></td></tr>
