@@ -101,6 +101,10 @@ public class StudyController {
     @Autowired
     private Configuration freemarkerConfiguration;
 
+    public StudyController(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
+
     private enum SiteSaveCheck {
         CHECK_UNIQUE_SAVE(0), CHECK_UNIQUE_UPDATE(1), NO_CHECK(2);
         private int code;
@@ -1297,11 +1301,11 @@ public class StudyController {
             siteBean.setSchemaName(siteParameters.parentStudy.getSchemaName());
             siteBean.setStudyEnvSiteUuid(siteParameters.studyEnvSiteUuid);
             siteBean.setEnvType(siteParameters.parentStudy.getEnvType());
-            Study sBean = createStudy(siteBean, siteParameters.ownerUserAccount);
+            Study sBean = createStudy(siteBean);
             // get the schema study
             request.setAttribute("requestSchema", siteParameters.parentStudy.getSchemaName());
             Study schemaStudy = getStudyByEnvId(studyEnvUuid);
-            siteBuildService.process(schemaStudy, sBean, siteParameters.ownerUserAccount);
+            siteBuildService.process(schemaStudy, sBean, siteParameters.ownerUserAccount,studyDao);
             siteDTO.setSiteOid(sBean.getOc_oid());
             siteDTO.setMessage(validation_passed_message);
             StudyUserRoleBean sub = null;
@@ -1614,7 +1618,7 @@ public class StudyController {
         study.setUniqueIdentifier(parameters.uniqueIdentifier);
         study.setStudy(parameters.parentStudy);
         study.setPublished(parameters.parentStudy.isPublished());
-        study.setUserAccount(parameters.ownerUserAccount.toUserAccount());
+        study.setUserAccount(parameters.ownerUserAccount.toUserAccount(studyDao));
         setChangeableSiteSettings(study, parameters);
         return study;
     }
@@ -1636,15 +1640,8 @@ public class StudyController {
         study.setUniqueIdentifier(parameters.uniqueIdentifier);
     }
 
-    public Study createStudy(Study studyBean, UserAccountBean owner) {
+    public Study createStudy(Study studyBean) {
         Study sBean = (Study) studyDao.create(studyBean);
-        sBean = (Study) studyDao.findByPK(sBean.getStudyId());
-        return sBean;
-    }
-
-    public Study createStudyWithDatasource(Study studyBean, DataSource ds) {
-        Study sBean = (Study) studyDao.create(studyBean);
-        sBean = (Study) studyDao.findByPK(sBean.getStudyId());
         return sBean;
     }
 
@@ -1868,7 +1865,7 @@ public class StudyController {
         study.setExpectedTotalEnrollment(expectedTotalEnrollment);
         study.setDatePlannedStart(startDate);
 
-        study.setUserAccount(owner.toUserAccount());
+        study.setUserAccount(owner.toUserAccount(studyDao));
 
         return study;
     }
@@ -1883,7 +1880,7 @@ public class StudyController {
 
         study.setUniqueIdentifier(uniqueStudyId);
         study.setName(name);
-        study.setUserAccount(accountBean.toUserAccount());
+        study.setUserAccount(accountBean.toUserAccount(studyDao));
         return study;
     }
 

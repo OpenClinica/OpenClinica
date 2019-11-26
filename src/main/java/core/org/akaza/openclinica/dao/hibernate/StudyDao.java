@@ -44,7 +44,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
 
     public Study create(Study study){
         study.setOc_oid(getValidOid(study));
-        save(study);
+        getCurrentSession().save(study);
         return study;
     }
     private String getOid(Study study) {

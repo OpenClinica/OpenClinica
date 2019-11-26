@@ -556,8 +556,9 @@ public class UserAccountBean extends AuditableEntityBean {
 	}
 
 
-    public UserAccount  toUserAccount(){
+    public UserAccount  toUserAccount(StudyDao studyDao){
         UserAccount ua = new UserAccount();
+        ua.setUserId(getId());
         ua.setPasswd(getPasswd());
         ua.setFirstName(getFirstName());
         ua.setLastName(getLastName());
