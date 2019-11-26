@@ -311,6 +311,7 @@ public class StudyController {
         if (collectBirthDate == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.COLLECT_DOB, "3"));
         } else {
             collectBirthDate = collectBirthDate.trim();
         }
