@@ -1,5 +1,8 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,6 +27,7 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.service.PdfService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.UserService;
@@ -37,9 +41,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.core.Context;
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -71,16 +81,24 @@ public class StudyParticipantController {
 	private CSVService csvService;
 
 	@Autowired
+	PdfService pdfService;
+
+	@Autowired
 	private UserAccountDao uAccountDao;
 
 	@Autowired
 	private StudyDao studyDao;
+	@Autowired
+	private StudySubjectDao studySubjectDao;
 
 	private StudySubjectDAO ssDao;
 	private UserAccountDAO userAccountDao;
 
 	@Autowired
 	private StudyParticipantService studyParticipantService;
+
+	@Autowired
+	PermissionService permissionService;
 
 	private RestfulServiceHelper serviceHelper;
 	private String dateFormat;
@@ -570,7 +588,7 @@ public class StudyParticipantController {
 			servletContext.setAttribute("accessToken", accessToken);
 			servletContext.setAttribute("studyID", study.getStudyId()+"");
 			Locale local = LocaleResolver.resolveLocale(request);
-			List<String> permissionTagsString =permissionService.getPermissionTagsList((StudyBean)request.getSession().getAttribute("study"),request);
+			List<String> permissionTagsString =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
 			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 				try {
 					 ResourceBundleProvider.updateLocale(local);
@@ -596,7 +614,7 @@ public class StudyParticipantController {
 	 */
 	public String getMergedPDFcasebookFileName(String studyOID, String participantId) {
 		Date now = new Date();	
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");
 		String timeStamp = simpleDateFormat.format(now);
         String pathStr = pdfService.getCaseBookFileRootPath();
     	String fileName = "Participant_"+participantId+"_Casebook_"+timeStamp+".pdf";
