@@ -9,7 +9,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 /**
  * @author ronpanduwana
  */
-public class InsightServlet extends SecureController {
+public class ReportsServlet extends SecureController {
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -21,6 +21,6 @@ public class InsightServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        forwardPage(Page.INSIGHT);
+        forwardPage(Page.REPORTS);
     }
 }

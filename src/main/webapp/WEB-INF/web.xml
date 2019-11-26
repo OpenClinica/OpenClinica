@@ -2336,9 +2336,9 @@
     </servlet-mapping>
 
     <servlet>
-        <display-name>Insight</display-name>
-        <servlet-name>InsightServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.InsightServlet</servlet-class>
+        <display-name>Reports</display-name>
+        <servlet-name>ReportsServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ReportsServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>InsightServlet</servlet-name>

@@ -73,7 +73,7 @@ import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenant
         if (session != null) {
             session.setAttribute(tenantKey, tenant);
         }
-        request.setAttribute("enableEmbeddedReports", CoreResources.getField("insight.enableEmbeddedReports"));
+        request.setAttribute("enableEmbeddedReports", CoreResources.getField("enableEmbeddedReports"));
         
         chain.doFilter(req, response);
     }
