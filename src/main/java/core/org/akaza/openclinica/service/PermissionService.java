@@ -1,12 +1,9 @@
 package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
-<<<<<<< HEAD
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 
-=======
 import core.org.akaza.openclinica.domain.datamap.Study;
->>>>>>> OC-11624: StudyDao to Hibernate
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,9 +25,9 @@ public interface PermissionService {
     String[] getPermissionTagsStringArray(Study study ,HttpServletRequest request);
 
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);
-
     
     boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList);
+
     boolean isUserHasPermission(String column, HttpServletRequest request, Study studyBean);
 
 }

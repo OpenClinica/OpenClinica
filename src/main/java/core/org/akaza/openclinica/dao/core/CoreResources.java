@@ -42,7 +42,6 @@ import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenant
 @Component("coreResources")
 public class CoreResources implements InitializingBean {
 
-    private StudyDao studyDao;
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
     private static String DB_NAME;
@@ -74,18 +73,6 @@ public class CoreResources implements InitializingBean {
 
     }
 
-    public StudyDao getStudyDao() {
-        return studyDao;
-    }
-
-    public void setStudyDao(StudyDao studyDao) {
-        this.studyDao = studyDao;
-    }
-
-    public CoreResources(StudyDao studyDao)
-    {
-        this.studyDao=studyDao;
-    }
     /**
      * TODO: Delete me!
      *
@@ -448,80 +435,6 @@ public class CoreResources implements InitializingBean {
             return request;
         }
         return null;
-    }
-
-    public static Boolean isPublicStudySameAsTenantStudy(Study tenantStudy, String publicStudyOID, DataSource ds) {
-        Study publicStudy = getPublicStudy(tenantStudy.getOc_oid(), ds);
-        return publicStudy.getOc_oid().equals(publicStudyOID);
-    }
-
-    public static Study getPublicStudy(String ocId, DataSource ds) {
-        CoreResources coreResources=new CoreResources();
-        HttpServletRequest request = getRequest();
-        String schema = null;
-        if (request == null) {
-            schema = CoreResources.getRequestSchema();
-        } else {
-            if (request != null)
-                schema = (String) request.getAttribute("requestSchema");
-        }
-        if (request != null)
-            request.setAttribute("requestSchema", "public");
-
-        Study study = coreResources.studyDao.findStudyByOid(ocId);
-        if (StringUtils.isNotEmpty(schema) && request != null)
-            request.setAttribute("requestSchema", schema);
-        return study;
-    }
-
-    public static Study getParentPublicStudy(String ocId, DataSource ds) {
-        CoreResources coreResources=new CoreResources();
-        Study resultBean;
-        HttpServletRequest request = getRequest();
-        String schema = null;
-        if (request == null) {
-            schema = CoreResources.getRequestSchema();
-        } else {
-            if (request != null)
-                schema = (String) request.getAttribute("requestSchema");
-        }
-        if (request != null)
-            request.setAttribute("requestSchema", "public");
-
-        Study study = getPublicStudy(ocId, ds);
-        if (study.getStudy().getStudyId() == 0) {
-            resultBean = study;
-        } else {
-            Study parentStudy = (Study) coreResources.studyDao.findByPK(study.getStudy().getStudyId());
-            resultBean = parentStudy;
-        }
-        CoreResources.setRequestSchema(schema);
-        return resultBean;
-    }
-
-    public static Study getPublicStudy(int id, DataSource ds) {
-        CoreResources coreResources=new CoreResources();
-        HttpServletRequest request = getRequest();
-        String schema = null;
-        if (request == null) {
-            schema = CoreResources.getRequestSchema();
-        } else {
-            if (request != null)
-                schema = (String) request.getAttribute("requestSchema");
-        }
-        if (request != null)
-            request.setAttribute("requestSchema", "public");
-
-        Study study = (Study) coreResources.studyDao.findByPK(id);
-        if (StringUtils.isNotEmpty(schema) && request != null)
-            request.setAttribute("requestSchema", schema);
-        return study;
-    }
-
-    public static void setRequestSchemaByStudy(String ocId, DataSource ds) {
-        Study studyBean = getPublicStudy(ocId, ds);
-        if (studyBean != null)
-            setRequestSchema(studyBean.getSchemaName());
     }
 
     private static String handleMultiSchemaConnection(Connection conn) throws SQLException {
@@ -1178,7 +1091,6 @@ public class CoreResources implements InitializingBean {
     }
 
     public static Properties loadProperties(String fileProps) {
-        StudyDao studyDaoCheck=new CoreResources().studyDao;
         Properties internalProp = null;
         InputStream inpStream;
         Properties externalProp = null;

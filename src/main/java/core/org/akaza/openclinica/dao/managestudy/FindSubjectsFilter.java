@@ -19,6 +19,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
         columnMapping.put("enrolledAt", "ST.unique_identifier");
         columnMapping.put("studySubject.secondaryLabel", "ss.secondary_label");
         columnMapping.put("subject.charGender", "s.gender");
+        columnMapping.put("participate.status", "ss.user_status_id");
 
     }
 
@@ -42,14 +43,13 @@ public class FindSubjectsFilter implements CriteriaCommand {
         value = StringEscapeUtils.escapeSql(value.toString());
         if (value != null) {
             if (property.equals("studySubject.status")) {
-                criteria+= " INTERSECT " +
-                        " select ss.* from study_subject ss  ";
+                criteria+= " INTERSECT " + mainQuery();
                 criteria = criteria + " where ";
                 criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
             } else if (property.startsWith("sed_")) {
                 value = SubjectEventStatus.getSubjectEventStatusIdByName(value.toString()) + "";
-                criteria+= " INTERSECT " +
-                        " select ss.* from study_subject ss JOIN study_event se  ON  se.study_subject_id=ss.study_subject_id ";
+                criteria+= " INTERSECT " + mainQuery() +
+                        "  JOIN study_event se  ON  se.study_subject_id=ss.study_subject_id ";
 
                 if (!value.equals("2")) {
                     criteria += " and ";
@@ -59,7 +59,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
                     criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != " + property.substring(4);
                     criteria += " AND (select count(*) from  study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id";
                     criteria +=
-                        " where  study_event.study_event_definition_id =" + property.substring(4) + " and ss.study_subject_id = ss1.study_subject_id) =0))";
+                            " where  study_event.study_event_definition_id =" + property.substring(4) + " and ss.study_subject_id = ss1.study_subject_id) =0))";
 
                 }
             } else if (property.startsWith("sgc_")) {
@@ -67,11 +67,11 @@ public class FindSubjectsFilter implements CriteriaCommand {
 
                 int group_id = Integer.parseInt(value.toString());
                 criteria +=
-                    "AND " + group_id + " = (" + " select distinct sgm.study_group_id"
-                        + " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s" + " WHERE " + " sgm.study_group_class_id = "
-                        + study_group_class_id + " AND sgm.study_subject_id = SS.study_subject_id" + " AND sgm.study_group_id = sg.study_group_id"
-                        + " AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)" + " AND sgm.study_group_class_id = sgc.study_group_class_id"
-                        + " ) ";
+                        "AND " + group_id + " = (" + " select distinct sgm.study_group_id"
+                                + " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s" + " WHERE " + " sgm.study_group_class_id = "
+                                + study_group_class_id + " AND sgm.study_subject_id = SS.study_subject_id" + " AND sgm.study_group_id = sg.study_group_id"
+                                + " AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)" + " AND sgm.study_group_class_id = sgc.study_group_class_id"
+                                + " ) ";
 
             }else if(property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")){
                 String sedOid = property.split("\\.")[0];
@@ -79,13 +79,14 @@ public class FindSubjectsFilter implements CriteriaCommand {
                 String itemOid = property.split("\\.")[2];
 
                 criteria+= " INTERSECT " +
-                        " select ss.* from item_data id JOIN event_crf ec ON id.event_crf_id=ec.event_crf_id\n" +
+                        " select ss.* , unique_identifier from item_data id JOIN event_crf ec ON id.event_crf_id=ec.event_crf_id\n" +
                         "                                          JOIN study_event se ON se.study_event_id=ec.study_event_id\n" +
                         "                                          JOIN crf_version cv ON cv.crf_version_id=ec.crf_version_id\n" +
                         "                                          JOIN crf c ON c.crf_id=cv.crf_id\n" +
                         "                                          JOIN item i ON i.item_id=id.item_id\n" +
                         "                                          JOIN study_event_definition sed ON sed.study_event_definition_id=se.study_event_definition_id\n" +
                         "                                          JOIN study_subject ss ON ss.study_subject_id=se.study_subject_id\n"+
+                        "                                          JOIN study st ON ss.study_id=st.study_id or ss.study_id=st.parent_study_id"+
                         "                                          where\n" +
                         "                                          sed.oc_oid=\'"+sedOid+"\' AND\n" +
                         "                                          c.oc_oid=\'"+formOid+"\' AND\n" +
@@ -93,11 +94,14 @@ public class FindSubjectsFilter implements CriteriaCommand {
                         "                                          UPPER(id.value)like  \'%"+((String) value).toUpperCase()+"%\'";
 
 
-            }
 
-            else {
-                criteria+= " INTERSECT " +
-                        " select ss.* from study_subject ss JOIN study st ON st.study_id=ss.study_id\n";
+            } else if (property.equals("participate.status")) {
+                criteria+= " INTERSECT " + mainQuery();
+                criteria = criteria + " where ";
+                criteria = criteria  + columnMapping.get(property) + " = " + value  + " ";
+
+            }   else {
+                criteria+= " INTERSECT " + mainQuery();
                 criteria = criteria + " where ";
                 criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like ('%" + ((String) value).toUpperCase() + "%')" + " ";
             }
@@ -130,4 +134,9 @@ public class FindSubjectsFilter implements CriteriaCommand {
     public void setFilters(List<Filter> filters) {
         this.filters = filters;
     }
+
+    private String mainQuery(){
+        return  " select ss.* , unique_identifier from study_subject ss JOIN study st ON st.study_id=ss.study_id ";
+    }
+
 }

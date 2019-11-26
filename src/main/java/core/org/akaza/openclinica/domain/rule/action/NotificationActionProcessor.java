@@ -189,11 +189,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		if (eventOrdinal != 1)
 			eventName = eventName + "(" + eventOrdinal + ")";
 
-		Study studyBean = getStudyBean(studySubject.getStudy().getStudyId());
+		Study studyBean = studySubject.getStudy();
 		Study siteBean=null;
 		if(studyBean.isSite()) {    // it is a site level study
 			siteBean = studyBean;
-			studyBean = (Study) sdao.findByPK  (siteBean.getStudy().getStudyId());
+			studyBean = siteBean.getStudy();
 		}
 
 		if (message==null) message="";
@@ -216,11 +216,10 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		ParticipantDTO pDTO = null;
 		String[] listOfEmails = emailList.split(",");
-		Study parentStudyBean = getParentStudy(ds, studyBean);
+		Study parentStudyBean = getParentStudy(studyBean);
 		OCUserDTO userDTO=null;
 
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getStudyId(), "participantPortal");
-		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+		String participateStatus = parentStudyBean.getParticipantPortal(); // enabled , disabled
 		String accessToken = keycloakClientImpl.getSystemToken();
 
 		if(studySubject.getUserId()!=null) {
@@ -386,7 +385,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		return seBean;
 	}
 
-	private Study getParentStudy(DataSource ds, Study study) {
+	private Study getParentStudy( Study study) {
 		if (!study.isSite()) {
 			return study;
 		} else {
@@ -399,11 +398,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	public StudyEventDefinitionBean getStudyEventDefnBean(int sed_Id) {
 		StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(ds);
 		return (StudyEventDefinitionBean) sedao.findByPK(sed_Id);
-	};
-
-	public Study getStudyBean(int studyId) {
-		return (Study) sdao.findByPK(studyId);
-
 	}
 
 	public RuleSetService getRuleSetService() {

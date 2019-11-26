@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
@@ -31,6 +30,7 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
@@ -38,8 +38,8 @@ import core.org.akaza.openclinica.dao.core.TypeNames;
 
 /**
  * @author thickerson
- * 
- * 
+ *
+ *
  */
 public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
     // private DAODigester digester;
@@ -82,6 +82,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
         this.setTypeExpected(11, TypeNames.DATE);// updated
         this.setTypeExpected(12, TypeNames.INT);// update id
         this.setTypeExpected(13, TypeNames.STRING);// oc_oid
+        this.setTypeExpected(14, TypeNames.STRING);// brief_description
     }
 
     public EntityBean update(EntityBean eb) {
@@ -177,6 +178,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
         eb.setName((String) hm.get("name"));
         eb.setId(((Integer) hm.get("item_id")).intValue());
         eb.setDescription((String) hm.get("description"));
+        eb.setBriefDescription((String) hm.get("brief_description"));
         eb.setUnits((String) hm.get("units"));
         eb.setPhiStatus(((Boolean) hm.get("phi_status")).booleanValue());
         eb.setItemDataTypeId(((Integer) hm.get("item_data_type_id")).intValue());
@@ -375,8 +377,8 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
     public ArrayList findAllActiveByCRF(CRFBean crf) {
         HashMap variables = new HashMap();
         this.setTypesExpected();
-        this.setTypeExpected(14, TypeNames.INT);// crf_version_id
-        this.setTypeExpected(15, TypeNames.STRING);// version name
+        this.setTypeExpected(15, TypeNames.INT);// crf_version_id
+        this.setTypeExpected(16, TypeNames.STRING);// version name
         variables.put(new Integer(1), new Integer(crf.getId()));
         String sql = digester.getQuery("findAllActiveByCRF");
         ArrayList alist = this.select(sql, variables);
@@ -385,7 +387,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
         while (it.hasNext()) {
             HashMap hm = (HashMap) it.next();
             ItemBean eb = (ItemBean) this.getEntityFromHashMap(hm);
-            Integer versionId = Integer.parseInt( (String) hm.get("crf_version_id"));
+            Integer versionId = (Integer) hm.get("crf_version_id");
             String versionName = (String) hm.get("cvname");
             ItemFormMetadataBean imf = new ItemFormMetadataBean();
             imf.setCrfVersionName(versionName);
@@ -466,7 +468,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
     /**
      * Finds the children of an item in a given CRF Version, sorted by
      * columnNumber in ascending order.
-     * 
+     *
      * @param parentId
      *            The id of the children's parent.
      * @param crfVersionId
@@ -664,7 +666,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
      * where item.item_id= item_group_metadata.item_id and item_group_metadata.item_group_id = item_group.item_group_id
      * and item_group_metadata.crf_version_id = crf_version.crf_version_id
      * and item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
-     * 
+     *
      */
     public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemGroupCRFVersionMetadataByCRFId(String crfName) {
         this.unsetTypeExpected();

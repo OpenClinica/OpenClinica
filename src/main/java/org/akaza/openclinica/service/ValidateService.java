@@ -5,6 +5,7 @@ package org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -51,8 +52,10 @@ public interface ValidateService {
 
     boolean isUserHas_DM_DEP_DS_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOid);
 
+    void validateStudyAndRoles(String studyOid,  UserAccountBean userAccountBean);
      void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean);
      void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includePII);
+    boolean hasCRFpermissionTag(EventDefinitionCrf edc, List<String> permissionTags);
 
     ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
 

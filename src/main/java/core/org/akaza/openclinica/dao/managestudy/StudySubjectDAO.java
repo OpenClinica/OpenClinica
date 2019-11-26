@@ -716,53 +716,45 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         }
     }
 
+
     public ArrayList<StudySubjectBean> getWithFilterAndSort(Study currentStudy, FindSubjectsFilter filter, FindSubjectsSort sort, int rowStart,
-            int rowEnd ,UserStatus participateStatusSetFilter) {
+                                                            int rowEnd) {
         ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
-        setTypesExpected();
+        unsetTypeExpected();
+        int variableIndex=0;
+        int ind=1;
+        ind= setStudySubjectTypeExpected(ind);
+
         String partialSql;
         HashMap variables = new HashMap();
 
         String sql;
-        if (filter.getFilters().isEmpty()){
-            sql = digester.getQuery("getFromStudy");
-        }
-        else {
-            sql = digester.getQuery("getWithFilterAndSort");
-        }
-
-        if(participateStatusSetFilter ==null) {
-            variables.put(new Integer(1), currentStudy.getStudyId());
-            variables.put(new Integer(2), currentStudy.getStudyId());
-        }else{
-            sql = sql + " AND ss.user_status_id = ?";
-            variables.put(new Integer(1), currentStudy.getStudyId());
-            variables.put(new Integer(2), currentStudy.getStudyId());
-            variables.put(new Integer(3), participateStatusSetFilter.getCode());
-        }
-
+        sql = digester.getQuery("getWithFilterAndSort");
+        variables.put(new Integer(++variableIndex), currentStudy.getStudyId());
+        variables.put(new Integer(++variableIndex), currentStudy.getStudyId());
 
         sql = sql + filter.execute("");
-        // Order by Clause for the defect id 0005480
 
-        partialSql = sort.execute("");
-        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            if (partialSql.equals(""))
-                sql += " ORDER BY SS.label )x)where r between " + (rowStart + 1) + " and " + rowEnd;
-            else
-                sql += ")x)where r between " + (rowStart + 1) + " and " + rowEnd;
+        if(sort!=null) {
+            partialSql = sort.execute("");
 
-            sql = sql + partialSql;
-        } else {
+            if (!StringUtils.isEmpty(partialSql)) {
+                int filterCountInPartialSql = StringUtils.countMatches(partialSql, "FILTERED_SQL");
+                filterCountInPartialSql = filterCountInPartialSql * 2 - 2;
 
-            sql = sql + partialSql;
-            if (partialSql.equals(""))
-                sql = sql + "  ORDER BY label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
-            else
-                sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+                if (filterCountInPartialSql > 0)
+                    this.setTypeExpected(ind + 1, TypeNames.STRING);
+
+                for (int i = 0; i < filterCountInPartialSql; i++) {
+                    variables.put(new Integer(++variableIndex), currentStudy.getStudyId());
+                }
+                sql = partialSql.replaceAll("FILTERED_SQL", sql);
+            } else {
+                sql = sql + " order by label asc ";
+            }
+            sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
 
-        // System.out.println("SQL: "+sql);
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 

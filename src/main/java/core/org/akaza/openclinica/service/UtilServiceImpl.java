@@ -86,9 +86,10 @@ public class UtilServiceImpl implements UtilService {
 
     public boolean isParticipantIDSystemGenerated(Study tenantStudy) {
         String idSetting = "";
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spvBean = spvdao.findByHandleAndStudy(!tenantStudy.isSite() ? tenantStudy.getStudyId() : tenantStudy.getStudy().getStudyId(), "subjectIdGeneration");
-        idSetting = spvBean.getValue();
+        if(tenantStudy.isSite())
+            idSetting = tenantStudy.getStudy().getSubjectIdGeneration();
+        else
+            idSetting = tenantStudy.getSubjectIdGeneration();
 
         logger.info("subject Id Generation :" + idSetting);
 

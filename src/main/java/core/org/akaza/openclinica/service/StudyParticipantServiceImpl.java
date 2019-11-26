@@ -1,5 +1,14 @@
 package core.org.akaza.openclinica.service;
 
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.domain.xform.dto.Bind;
+import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
+import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import core.org.akaza.openclinica.web.pform.OpenRosaServices;
+import core.org.akaza.openclinica.web.pform.PFormCache;
 import liquibase.util.StringUtils;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -7,15 +16,13 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.controller.dto.*;
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import core.org.akaza.openclinica.dao.hibernate.SubjectDao;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.PdfService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.ImportService;
@@ -27,9 +34,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletContext;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -92,6 +103,26 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     EventDefinitionCrfDao eventDefinitionCrfDao;
 
 
+
+    @Autowired
+    FormLayoutDao formLayoutDao;
+
+    @Autowired
+    EnketoUrlService urlService;
+
+    @Autowired
+    OpenRosaServices openRosaServices;
+
+
+    @Autowired
+    PdfService pdfService;
+
+    @Autowired
+    PermissionService permissionService;
+
+    @Autowired
+    EventDefinitionCrfDao eventDefinitionCrfDao;
+
     @Autowired
     private StudyDao studyDao;
     private StudySubjectDAO studySubjectDao;
@@ -113,10 +144,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         boolean createNewParticipant=false;
         Study tenantStudy = studyHibDao.findByOcOID(studyOid);
         Study tenantSite = studyHibDao.findByOcOID(siteOid);
-        Study tenantStudyBean = studyDao.findByOcOID(studyOid);
-        Study tenantSiteBean = studyDao.findByOcOID(siteOid);
-       
-        if (    isEnrollmentCapped(tenantStudyBean,tenantSiteBean))
+
+        if (isEnrollmentCapped(tenantStudy,tenantSite))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
         
         if (StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()))
@@ -160,11 +189,11 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
         Subject subject = null;
         StudySubject studySubject = null;
-        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getStudyId());
+        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudy.getStudyId());
 
         StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
-        if (tenantStudyBean.isSite()) {
-            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getStudy().getStudyId());// <
+        if (tenantStudy.isSite()) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudy.getStudy().getStudyId());// <
         }
         if (studySubjectBean == null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             createNewParticipant=true;
@@ -176,10 +205,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             studySubjectBean = new StudySubjectBean();
 
             studySubjectBean.setSubjectId(subjectBean.getId());
-            if (tenantSiteBean != null) {
-                studySubjectBean.setStudyId(tenantSiteBean.getStudyId());
+            if (tenantSite != null) {
+                studySubjectBean.setStudyId(tenantSite.getStudyId());
             } else {
-                studySubjectBean.setStudyId(tenantStudyBean.getStudyId());
+                studySubjectBean.setStudyId(tenantStudy.getStudyId());
             }
 
             studySubjectBean.setLabel(addParticipantRequestDTO.getSubjectKey());
@@ -198,9 +227,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
         if(createNewParticipant) {
                 //update at site level
-                updateStudySubjectSize(tenantSite,tenantSiteBean);
+                studyHibDao.saveOrUpdate(tenantSite);
                 // update at parent level
-                updateStudySubjectSize(tenantStudy,tenantStudyBean);
+                studyHibDao.saveOrUpdate(tenantStudy);
         }
 
         if ((register.equalsIgnoreCase("y") || register.equalsIgnoreCase("yes") ) && validateService.isParticipateActive(tenantStudy)) {
@@ -328,14 +357,6 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             }
         }
         return subjectCount;
-    }
-
-
-
-    private void updateStudySubjectSize(Study study, Study currentStudy) {
-        int subjectCount = getSubjectCount(currentStudy);
-        study.setSubjectCount(subjectCount+1);
-        studyHibDao.saveOrUpdate(study);
     }
 
 
@@ -521,6 +542,145 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
       
         return subjectContextKey;
     }
+
+    @Transactional
+    public void startCaseBookPDFJob(JobDetail jobDetail,
+                                    String schema,
+                                    String studyOID,
+                                    String studySubjectIdentifier,
+                                    ServletContext servletContext,
+                                    String userAccountID,
+                                    String fullFinalFilePathName,
+                                    String format,
+                                    String margin,
+                                    String landscape,
+                                    List<String> permissionTags) throws Exception {
+
+        CoreResources.setRequestSchema(schema);
+        ArrayList<File> pdfFiles = new ArrayList<File>();
+        File mergedPdfFile = null;
+        String mergedPdfFileNm = null;
+        int studyId = Integer.parseInt((String) servletContext.getAttribute("studyID"));
+        /**
+         *  need to check the number of study/events/forms for this subject
+         *  each for need a rest service call to Enketo
+         */
+        String studyEventDefinitionID = null;
+        String formLayoutOID = null;
+        String studyEventID = null;
+        String studySubjectOID = studySubjectIdentifier;
+        String studyEventOrdinal = null;
+
+        try {
+
+            ArrayList<StudyEvent> subjectStudyEvents = studySubjectHibDao.fetchListSEs(studySubjectOID);
+            for(StudyEvent studyEvent : subjectStudyEvents) {
+                List<EventCrf> eventCRFs = studyEvent.getEventCrfs();
+
+                for(EventCrf eventCrf : eventCRFs) {
+                    formLayoutOID = eventCrf.getFormLayout().getOcOid();
+
+                    int studyEventDefinitionId = studyEvent.getStudyEventDefinition().getStudyEventDefinitionId();
+                    EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyIdorSiteId(studyEventDefinitionId, eventCrf.getCrfVersion().getCrf().getCrfId(), studyId);
+                    if(edc != null && permissionService.hasFormAccess(edc, permissionTags)) {
+                        PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
+                        studyEventDefinitionID = studyEventDefinitionId + "";
+                        subjectContext.setStudyEventDefinitionId(studyEventDefinitionID);
+                        subjectContext.setFormLayoutOid(formLayoutOID);
+                        studyEventID = studyEvent.getStudyEventId()+"";
+                        subjectContext.setStudyEventId(studyEventID);
+
+                        subjectContext.setStudySubjectOid(studySubjectOID);
+                        studyEventOrdinal = studyEvent.getSampleOrdinal() +"";
+                        subjectContext.setOrdinal(studyEventOrdinal);
+                        subjectContext.setUserAccountId(userAccountID);
+                        UserAccountDAO udao = new UserAccountDAO(dataSource);
+                        UserAccountBean ub = (UserAccountBean) udao.findByPK(Integer.parseInt(userAccountID));
+
+                        FormLayout formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
+                        Role role = Role.RESEARCHASSISTANT;
+                        String mode = PFormCache.VIEW_MODE;
+
+                        List<Bind> binds = openRosaServices.getBinds(formLayout,EnketoAPI.QUERY_FLAVOR,studyOID);
+                        boolean formContainsContactData=false;
+                        if(openRosaServices.isFormContainsContactData(binds))
+                            formContainsContactData=true;
+
+                        String subjectContextKey;
+
+                        subjectContextKey = this.createSubjectContextKey(studyOID, formLayout, studyEvent, studySubjectOID, userAccountID, servletContext);
+                        File pdfFile = urlService.getFormPdf(subjectContextKey, subjectContext, studyOID, studySubjectOID,formLayout, EnketoAPI.QUERY_FLAVOR, null, role, mode, null, false,formContainsContactData,binds,ub,
+                                format, margin, landscape);
+
+                        if(pdfFile !=null) {
+                            pdfFiles.add(pdfFile);
+                        }
+                    }
+
+                }//for-loop-2
+            }//for-loop-1
+
+            mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName);
+            mergedPdfFileNm = mergedPdfFile.getName();
+            userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
+
+
+        } catch (Exception e) {
+            userService.persistJobFailed(jobDetail, mergedPdfFileNm);
+            this.writeToFile(e.getMessage(), fullFinalFilePathName);
+            throw e;
+        }
+
+
+    }
+
+    /**
+     *
+     * @param msg
+     * @param fileName
+     */
+    public void writeToFile(String msg, String fileName) {
+        logger.debug("writing report to File");
+
+        File file = new File(fileName);
+
+        PrintWriter writer = null;
+        try {
+            file.createNewFile();
+            writer = new PrintWriter(file.getPath(), "UTF-8");
+            writer.print(msg);
+        } catch (IOException e) {
+            logger.error("Error while accessing file to start writing: ",e);
+        } finally {
+            writer.close();;
+        }
+
+    }
+
+
+    /**
+     *
+     * @param studyOID
+     * @param formLayout
+     * @param studyEvent
+     * @param studySubjectOID
+     * @param userAccountID
+     * @param servletContext
+     * @return
+     * @throws Exception
+     */
+    private String createSubjectContextKey(String studyOID, FormLayout formLayout, StudyEvent studyEvent, String studySubjectOID, String userAccountID,ServletContext servletContext) throws Exception {
+        String accessToken = (String) servletContext.getAttribute("accessToken");
+        PFormCache cache = PFormCache.getInstance(servletContext);
+        String subjectContextKey = cache.putSubjectContext(studySubjectOID, String.valueOf(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId()), String.valueOf(studyEvent.getSampleOrdinal()),
+                formLayout.getOcOid(),userAccountID ,String.valueOf(studyEvent.getStudyEventId()), studyOID, PFormCache.PARTICIPATE_MODE,accessToken);
+
+        return subjectContextKey;
+    }
+
+
+
+
 
 
 }

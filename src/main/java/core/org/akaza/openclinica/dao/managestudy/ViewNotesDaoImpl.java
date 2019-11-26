@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
@@ -46,6 +45,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     private static final String CRF_NAME = "crf_name";
     private static final String ENTITY_NAME = "entity_name";
     private static final String ENTITY_VALUE = "value";
+    private static final String SPACE = " ";
 
     private QueryStore queryStore;
 
@@ -128,11 +128,11 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         return result;
     }
 
-    private void addUserTagsConstraint(List<String> terms, List<String> userTags) {
+    private void addUserTagsConstraint(StringBuilder terms, List<String> userTags) {
         if (CollectionUtils.isEmpty(userTags)) {
-            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.permissionTagsEmptyUserTags"));
+            terms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.permissionTagsEmptyUserTags"));
         } else {
-            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.permissionTags"));
+            terms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.permissionTags"));
         }
     }
 
@@ -141,27 +141,14 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         Map<String, Object> arguments = new HashMap<String, Object>(2);
         arguments.put("studyId", currentStudy.getStudyId());
         arguments.put("userTags", userTags);
+        boolean isSite=currentStudy.isSite();
 
-        List<String> terms = new ArrayList<String>();
-        terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.count.select"));
-        terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.select"));
-        terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.join"));
-        terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.where"));
+        StringBuilder filteredTerms= new StringBuilder();
+        filteredTerms.append(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.count.select"));
+        filteredTerms.append(filterSubQuery(filter,arguments,isSite,userTags));
+        filteredTerms.append(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.count.group"));
 
-        terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.studyHideCrf"));
-        if (currentStudy.isSite()) {
-            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.siteHideCrf"));
-
-        }
-        addUserTagsConstraint(terms, userTags);
-        // Reuse the filter criteria from #fi
-        // ndAllDiscrepancyNotes, as both
-        // queries load data from the same view
-
-        filterSet( filter,  arguments, terms,  isQueryOnly);
-
-        terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.count.group"));
-        String query = StringUtils.join(terms, ' ');
+        String query = filteredTerms.toString();
 
         final Integer[][] result = new Integer[ResolutionStatus.list.size() + 1][DiscrepancyNoteType.list.size() + 1];
 
@@ -180,46 +167,38 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     }
 
     protected String listNotesSql(ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort, Map<String, Object> arguments, boolean isSite, List<String> userTags) {
-        List<String> terms = new ArrayList<String>();
-        terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.select"));
-        terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.join"));
-        terms.add(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.where"));
-
-
-        if(!isSite)
-        {
-            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.studyHideCrf"));
-        }
-        addUserTagsConstraint(terms, userTags);
-
-        if (isSite) {
-            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.siteHideCrf"));
-        }
-
-        filterSet( filter,  arguments, terms,  false);
-
+        StringBuilder filteredTerms= filterSubQuery(filter,arguments,isSite,userTags);
 
         // Append sort criteria
         if (sort != null) {
-            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.orderby"));
+            String sortQuery ="";
             if (!sort.getSorters().isEmpty()) {
-                for (String sortKey : sort.getSorters().keySet()) {
-                    String sortQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.sort." + sortKey);
-                    terms.add(sortQuery);
-                    terms.add(sort.getSorters().get(sortKey));
+                for (String property : sort.getSorters().keySet()) {
+                    if (property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) {
+                        filteredTerms= sortSubQuery(property,filteredTerms);
+
+                    }else {
+                        filteredTerms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.orderby"));
+                        sortQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.sort." + property);
+                        filteredTerms.append(sortQuery);
+                        filteredTerms.append(SPACE);
+                        filteredTerms.append(sort.getSorters().get(property));
+                        filteredTerms.append(SPACE);
+                    }
                 }
             } else {
                 // set default sorting OC-9405
                 String[] defaultSort = { "days","unique_identifier", "label", "thread_number"};
+                filteredTerms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.orderby"));
 
                 int count = 0;
                 for (String sortKey : defaultSort) {
                     count++;
-                    String sortQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.sort." + sortKey);
-                    terms.add(sortQuery);
-                    terms.add("ASC");
+                    sortQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.sort." + sortKey);
+                    filteredTerms.append(sortQuery);
+                    filteredTerms.append(" ASC ");
                     if (count < defaultSort.length) {
-                        terms.add(",");
+                        filteredTerms.append(",");
                     }
                 }
             }
@@ -227,19 +206,18 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
 
         if (filter.getPageNumber() != null && filter.getPageSize() != null) {
             if (queryStore.hasQuery(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationPrefix")) {
-                terms.add(0, queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationPrefix"));
-                terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationSuffix"));
+                filteredTerms.append( queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationPrefix"));
+                filteredTerms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationSuffix"));
                 arguments.put("first", 1 + ((filter.getPageNumber() - 1) * filter.getPageSize()));
                 arguments.put("last", filter.getPageSize() * filter.getPageNumber());
             } else {
                 // Limit number of results (pagination)
-                terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.limit"));
+                filteredTerms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.limit"));
                 arguments.put("limit", filter.getPageSize());
                 arguments.put("offset", (filter.getPageNumber() - 1) * filter.getPageSize());
             }
         }
-
-        String result = StringUtils.join(terms, ' ');
+        String result = filteredTerms.toString();
         LOG.debug("SQL: " + result);
         return result;
     }
@@ -260,7 +238,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         this.queryStore = queryStore;
     }
 
-    private void filterSet(ViewNotesFilterCriteria filter, Map<String, Object> arguments, List<String> terms, boolean isQueryOnly) {
+    private void filterSet(ViewNotesFilterCriteria filter, Map<String, Object> arguments, StringBuilder terms, boolean isQueryOnly) {
         if (filter != null) {
             for (String filterKey : filter.getFilters().keySet()) {
                 String filterQuery = "";
@@ -297,7 +275,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                         }
                     }
 
-                    terms.add(filterQuery);
+                    terms.append(filterQuery);
 
                 }
             }
@@ -316,11 +294,90 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                     filterQuery = filterQuery + queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.where");
                     filterQuery = filterQuery + " and sed.oc_oid=\'" + sedOid + "\' and c.oc_oid = \'" + formOid + "\' and i.oc_oid= \'" + itemOid + "\' and UPPER(id.value) like \'" + value + "\'";
 
-                    terms.add(filterQuery);
+                    terms.append(filterQuery);
                 }
             }
         }
     }
 
+    private StringBuilder filterSubQuery(ViewNotesFilterCriteria filter, Map<String, Object> arguments, boolean isSite, List<String> userTags) {
+        StringBuilder terms = new StringBuilder();
+        terms.append(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.select"));
+        terms.append(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.join"));
+        terms.append(queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.where"));
 
+        if (!isSite) {
+            terms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.studyHideCrf"));
+        } else {
+            terms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.siteHideCrf"));
+        }
+        addUserTagsConstraint(terms, userTags);
+
+        filterSet(filter, arguments, terms, false);
+
+        return terms;
+    }
+
+    private StringBuilder sortSubQuery(String property,StringBuilder filteredTerms){
+        StringBuilder sortedTerms= new StringBuilder();
+        String sedOid = property.split("\\.")[0];
+        String formOid = property.split("\\.")[1];
+        String itemOid = property.split("\\.")[2];
+        String itemDataType = property.split("\\.")[3];
+
+
+        String partialScript = "(" +
+                "select jj.* ,'' val from ("+filteredTerms.toString()+")jj \n" +
+                "\n" +
+                " Except " +
+                " \n" +
+                " select jj.* ,'' val from  "
+                + subScript(sedOid, formOid, itemOid,filteredTerms)+
+                " ) " +
+                "\n" +
+                " UNION " +
+                "\n" +
+                " select  jj.* ,id.value val from "
+                + subScript(sedOid, formOid, itemOid,filteredTerms);
+
+
+        partialScript = "select * from ( " + partialScript + " )kk " + sortByItemType(itemDataType);
+
+        sortedTerms.append(partialScript);
+
+        return sortedTerms;
+
+    }
+
+
+    private String subScript(String sedOid, String formOid, String itemOid,StringBuilder filteredTerms) {
+        return
+                "   item_data id JOIN event_crf ec ON id.event_crf_id=ec.event_crf_id\n" +
+                        "                                          JOIN study_event se ON se.study_event_id=ec.study_event_id\n" +
+                        "                                          JOIN crf_version cv ON cv.crf_version_id=ec.crf_version_id\n" +
+                        "                                          JOIN crf c ON c.crf_id=cv.crf_id\n" +
+                        "                                          JOIN item i ON i.item_id=id.item_id\n" +
+                        "                                          JOIN study_event_definition sed ON sed.study_event_definition_id=se.study_event_definition_id\n" +
+                        "                                          JOIN  ("+filteredTerms.toString()+") jj ON jj.study_subject_id=se.study_subject_id \n" +
+                        "                                         \n" +
+                        "                                          where\n" +
+                        "                                          jj.entity_type='itemData' AND\n"+
+                        "                                          sed.oc_oid=\'" + sedOid + "\' AND\n" +
+                        "                                          c.oc_oid=\'" + formOid + "\' AND\n" +
+                        "                                          i.oc_oid=\'" + itemOid + "\' ";
+    }
+
+    private String sortByItemType(String itemDataType) {
+        String append = "";
+        if (itemDataType.equalsIgnoreCase("Floating")) {
+            append = " order by  cast(Nullif(val,'' )as double precision)  ";
+        } else if (itemDataType.equalsIgnoreCase("Integer")) {
+            append = " order by  cast(Nullif(val,'' )as integer)  ";
+        } else if (itemDataType.equalsIgnoreCase("date")) {
+            append = " order by  cast(Nullif(val,'' )as date)  ";
+        } else{
+            append = " order by nullif(val,'') ";
+        }
+        return append;
+    }
 }
