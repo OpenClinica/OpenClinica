@@ -331,7 +331,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo) {
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo,int pageNumber,int pageSize) {
 
         CoreResources.setRequestSchema(schema);
 
@@ -342,7 +342,7 @@ public class UserServiceImpl implements UserService {
                 + Thread.currentThread().getName());
 
         // Get all list of StudySubjects by studyId
-        List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId());
+        List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId(),pageNumber, pageSize);
         List<OCUserDTO> userDTOS = new ArrayList<>();
         sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
         String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
@@ -805,12 +805,6 @@ public class UserServiceImpl implements UserService {
         } finally {
             closeFile(writer);
         }
-        StringBuilder body = new StringBuilder();
-
-
-        logger.info(body.toString());
-
-
     }
 
 
