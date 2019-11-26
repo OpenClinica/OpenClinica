@@ -1429,7 +1429,7 @@ public class ImportServiceImpl implements ImportService {
      * @param studySubject
      * @param itemData
      */
-    private ErrorObj createQuery(UserAccount userAccount, Study study, StudySubject studySubject, ItemData itemData) {
+    private ErrorObj createQuery(UserAccount userAccount, Study study, StudySubject studySubject, ItemData itemData, String reasonForChange) {
 
         ErrorObj eb = null;
 
