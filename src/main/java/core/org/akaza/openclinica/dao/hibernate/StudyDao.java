@@ -196,6 +196,16 @@ public class StudyDao extends AbstractDomainDao<Study> {
         q.setParameter(pStudyOid, studyOid);
         return (Study) q.getSingleResult();
     }
+
+    @Transactional
+    public Study findByOid(String studyOid) {
+        String query = "from Study do where do.oc_oid = :studyOid";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyOid", studyOid);
+        Study study = (Study) q.uniqueResult();
+        return study;
+    }
+
     @Transactional
     public Collection findAllByUser(String username) {
         Query q = getCurrentSession().createNativeQuery(digester.getQuery("findAllByUser"));

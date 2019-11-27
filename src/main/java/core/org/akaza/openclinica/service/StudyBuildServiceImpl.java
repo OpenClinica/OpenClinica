@@ -613,6 +613,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         existingStudyUserRoles.forEach(studyToDelete -> studyUserRoleDao.getCurrentSession().delete(studyToDelete));
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Study getPublicStudy(String ocId) {
         HttpServletRequest request = getRequest();
         String schema = null;
@@ -625,12 +626,13 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (request != null)
             request.setAttribute("requestSchema", "public");
 
-        Study study = studyDao.findStudyByOid(ocId);
+        Study study = studyDao.findByOid(ocId);
         if (org.apache.commons.lang.StringUtils.isNotEmpty(schema) && request != null)
             request.setAttribute("requestSchema", schema);
         return study;
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Study getParentPublicStudy(String ocId) {
         Study resultBean;
         HttpServletRequest request = getRequest();
@@ -645,16 +647,17 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             request.setAttribute("requestSchema", "public");
 
         Study study = getPublicStudy(ocId);
-        if (study.getStudy().getStudyId() == 0) {
+        if (study.isSite()) {
             resultBean = study;
         } else {
-            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
+            Study parentStudy = study.getStudy();
             resultBean = parentStudy;
         }
         CoreResources.setRequestSchema(schema);
         return resultBean;
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Study getPublicStudy(int id) {
         HttpServletRequest request = getRequest();
         String schema = null;
