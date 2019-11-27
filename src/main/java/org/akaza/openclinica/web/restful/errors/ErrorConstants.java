@@ -98,6 +98,7 @@ public class ErrorConstants {
 
     public static final String ERR_MISSING_PARTICIPANT_ID = "errorCode.missingParticipantID";
     public static final String ERR_PARTICIPANT_NOT_FOUND = "errorCode.participantNotFound";
+    public static final String ERR_PARTICIPANT_NOT_AVAILABLE = "errorCode.participantNotAvailable";
     public static final String ERR_PARTICIPANT_ID_NOT_AVAILABLE = "errorCode.participantIDNotAvailable";
     public static final String ERR_PARTICIPANT_ID_ALREADY_EXISTS="errorCode.participantIDAlreadyExists";
     public static final String ERR_PARTICIPANT_IDENTIFIERS_MISMATCH = "errorCode.participantIdentiersMismatch";
@@ -181,5 +182,9 @@ public class ErrorConstants {
     public static final String ERR_MULTIPLE_EMAIL_ADDRESS_HEADERS = "errorCode.multipleEmailAddressHeaders";
     public static final String ERR_MULTIPLE_MOBILE_PHONE_HEADERS = "errorCode.multipleMobilePhoneHeaders";
 	public static final String ERR_IMPORT_XML_QUERY_CREAT_FAILED = "errorCode.importXMLcreateQueryFailed";
+
+    public static final String ERR_INVALID_PAGE_NUMBER_PARAMETER = "errorCode.invalidPageNumberParameter";
+    public static final String ERR_INVALID_PAGE_SIZE_PARAMETER = "errorCode.invalidPageSizeParameter";
+
 
 }

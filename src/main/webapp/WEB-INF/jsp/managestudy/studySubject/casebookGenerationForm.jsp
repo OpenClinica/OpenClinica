@@ -86,6 +86,7 @@
     });
 
     $('#casebookPdfBtn').click(function () {
+        $(this).attr('disabled', 'disabled');
         $('#getPdfMessage').slideDown();
         jQuery.ajax({
             'type': 'POST',
