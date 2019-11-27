@@ -46,12 +46,9 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
     }
 
     private boolean isEnrollmentCapEnforced(HttpServletRequest httpServletRequest, Study currentStudy) {
-        String enrollmentCapStatus = "false";
-        int currentId = currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId();
-
-        StudyParameterValue enrollmentCap = studyParameterValueDao.findByStudyIdParameter(currentId, "enforceEnrollmentCap");
-        if (enrollmentCap != null)
-            enrollmentCapStatus = enrollmentCap.getValue();
+        String enrollmentCapStatus = currentStudy.getEnforceEnrollmentCap();
+        if (enrollmentCapStatus == null)
+            enrollmentCapStatus = "false";
 
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         return capEnforced;
@@ -65,7 +62,7 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
 
         if (currentStudy != null && currentStudy.getStudyId() != 0) {
             if (currentStudy.getStatus() != null && currentStudy.getStatus().isAvailable()) {
-                capIsOn = isEnrollmentCapEnforced(httpServletRequest, currentStudy);
+
 
                 StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
                 int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
@@ -76,6 +73,7 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
                 } else {
                     sb = (Study) studyDao.findByPK(currentStudy.getStudyId());
                 }
+                capIsOn = isEnrollmentCapEnforced(httpServletRequest, sb);
                 int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
                 if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
