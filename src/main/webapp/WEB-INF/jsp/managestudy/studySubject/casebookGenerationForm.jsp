@@ -58,7 +58,7 @@
         $('#getPdfMessage').slideDown();
         jQuery.ajax({
             'type': 'POST',
-            'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/casebook',
+            'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${studySub.label}/casebook',
             'contentType': 'application/json',
             'dataType': 'json',
             'data': {}
