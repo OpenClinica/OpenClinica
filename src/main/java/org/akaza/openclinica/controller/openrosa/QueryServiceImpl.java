@@ -335,7 +335,7 @@ public class QueryServiceImpl implements QueryService {
 
         message.append(
                 MessageFormat.format(respage.getString("mailDNHeader"), helperBean.getUserAccount().getFirstName(), helperBean.getUserAccount().getLastName()));
-        message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base") + "ResolveDiscrepancy?flavor=-query&noteId=" + helperBean.getDn().getDiscrepancyNoteId() + "'>"
+        message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base") + "ViewNotes?module=submit&maxRows=50&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=50&listNotes_f_discrepancyNoteBean.disType=Query&listNotes_f_discrepancyNoteBean.threadNumber=" + helperBean.getDn().getDiscrepancyNoteId() + "'>"
                 + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
         message.append(respage.getString("you_received_this_from"));
         message.append(respage.getString("email_body_separator"));
