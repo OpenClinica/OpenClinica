@@ -152,7 +152,7 @@
     <table id="tbl-jobs" class="datatable">
       <thead>
         <tr>
-          <th><fmt:message key="jobs_source_filename" bundle="${resword}"/></th>
+          <th><fmt:message key="source" bundle="${resword}"/></th>
           <th><fmt:message key="job_type" bundle="${resword}"/></th>
           <th><fmt:message key="site_name" bundle="${resword}"/></th>
           <th><fmt:message key="job_status" bundle="${resword}"/></th>
@@ -202,8 +202,15 @@
           if (logEntry.status === 'IN_PROGRESS') {
             actionView = actionDownload = actionDelete = '';
           }
+          var source = logEntry.sourceFileName;
+          if (logEntry.type === 'PARTICIPANT_PDF_CASEBOOK') {
+            source = source.split('-')[0].split('_');
+            source.splice(2, 2);
+            source.splice(0, 1);
+            source = source.join('_');
+          }
           return [
-            logEntry.sourceFileName,
+            source,
             logEntry.type,
             logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid,
             logEntry.status,
