@@ -31,8 +31,6 @@ import java.util.Locale;
  */
 public class ListStudyServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
 
     // < ResourceBundle resword,restext,respage,resexception;

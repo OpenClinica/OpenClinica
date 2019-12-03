@@ -30,8 +30,6 @@ import java.util.Date;
  * Removes a study user role
  */
 public class RemoveStudyUserRoleServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     /**
      * Checks whether the user has the right permission to proceed function
      */

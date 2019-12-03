@@ -28,15 +28,12 @@ public class SetUpStudyRole {
     @Autowired
     @Qualifier("dataSource")*/
     private DataSource dataSource;
-
-    @Autowired
-    private StudyDao studyDao;
-    @Autowired
     private StudyBuildService studyBuildService;
     public static final String STUDY_INFO_PANEL = "panel";
 
-    public SetUpStudyRole(DataSource dataSource) {
+    public SetUpStudyRole(DataSource dataSource, StudyBuildService studyBuildService) {
         this.dataSource = dataSource;
+        this.studyBuildService = studyBuildService;
     }
 
     public DataSource getDataSource() {
@@ -47,7 +44,7 @@ public class SetUpStudyRole {
         this.dataSource = dataSource;
     }
 
-    public void setUp(HttpSession httpSession, UserAccountBean userAccountBean){
+    public void setUp(HttpSession httpSession, UserAccountBean userAccountBean, StudyDao studyDao){
 
         StudyUserRoleBean currentRole = new StudyUserRoleBean();
         Study currentStudy = new Study();

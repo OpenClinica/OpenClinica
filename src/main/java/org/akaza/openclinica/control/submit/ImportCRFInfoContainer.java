@@ -43,8 +43,6 @@ public class ImportCRFInfoContainer {
     private Map<String, Map<String, Map<String, String>>> importCRFMap;
     private List<ImportCRFInfo> importCRFList;
 
-    @Autowired
-    private StudyDao studyDao;
 
     String stripNonAlphaNumeric(String input) {
         // Add capitalization too
@@ -64,7 +62,7 @@ public class ImportCRFInfoContainer {
      * process them. 2. importCRFMap: A Map multi-layer map of Subject/Event/Form only populated when the subsequent
      * EventCRF passes the UpsertOn rules.
      */
-    public ImportCRFInfoContainer(ODMContainer odmContainer, DataSource ds) {
+    public ImportCRFInfoContainer(ODMContainer odmContainer, DataSource ds, StudyDao studyDao) {
         importCRFList = new ArrayList<ImportCRFInfo>();
 
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();

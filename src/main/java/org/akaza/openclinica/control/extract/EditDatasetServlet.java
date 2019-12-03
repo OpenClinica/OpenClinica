@@ -37,8 +37,6 @@ import java.util.List;
  */
 public class EditDatasetServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     public static String getLink(int dsId) {
         return "EditDataset?dsId=" + dsId;
     }

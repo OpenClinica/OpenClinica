@@ -45,7 +45,6 @@ public class JobTriggerService {
 	RuleSetDao ruleSetDao;
 	DataSource ds;
 	UserAccountDAO userAccountDao;
-	@Autowired
 	StudyDao studyDao;
 	StudySubjectDAO ssdao;
 	StudyEventDAO sedao;
@@ -65,10 +64,11 @@ public class JobTriggerService {
 
 	private static final SimpleDateFormat currentDateFormat = new SimpleDateFormat("HH:mm:ss");
 
-	public JobTriggerService(DataSource ds, RuleSetDao ruleSetDao, RuleSetService ruleSetService) {
+	public JobTriggerService(DataSource ds, RuleSetDao ruleSetDao, RuleSetService ruleSetService, StudyDao studyDao) {
 		this.ds = ds;
 		this.ruleSetDao = ruleSetDao;
 		this.ruleSetService = ruleSetService;
+		this.studyDao = studyDao;
 	}
 
 	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes

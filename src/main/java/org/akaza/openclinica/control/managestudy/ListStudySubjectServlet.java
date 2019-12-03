@@ -62,8 +62,6 @@ public abstract class ListStudySubjectServlet extends SecureController {
     public static String FILTER_KEYWORD = "ebl_filterKeyword";
     public static String SEARCH_SUBMITTED = "submitted";
 
-    @Autowired
-    private StudyDao studyDao;
     // >>
 
     // < ResourceBundleresword;

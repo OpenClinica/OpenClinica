@@ -60,8 +60,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class CreateDatasetServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     public static final String BEAN_YEARS = "years";
 
     public static final String BEAN_MONTHS = "months";

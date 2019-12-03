@@ -36,8 +36,6 @@ import java.util.*;
  */
 public class ViewStudyServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      * Checks whether the user has the correct privilege
      */

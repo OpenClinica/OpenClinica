@@ -64,8 +64,6 @@ public class CreateUserAccountServlet extends SecureController {
     public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
     public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
 
-    @Autowired
-    private StudyDao studyDao;
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
@@ -221,7 +219,7 @@ public class CreateUserAccountServlet extends SecureController {
             v.addValidation(INPUT_INSTITUTION, Validator.NO_BLANKS);
             v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-            v.addValidation(INPUT_STUDY,Validator.HIBERNATE_ENTITY_EXISTS,studyDao);
+            v.addValidation(INPUT_STUDY,Validator.HIBERNATE_ENTITY_EXISTS,getStudyDao());
             v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
 
             HashMap errors = v.validate();

@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class DeleteStudyEventServlet extends SecureController{
-    @Autowired
-    private StudyDao studyDao;
     @Override
     public void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));

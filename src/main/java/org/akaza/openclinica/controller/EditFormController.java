@@ -11,6 +11,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -66,6 +67,9 @@ public class EditFormController {
 
     @Autowired
     private UtilService utilService;
+
+    @Autowired
+    private StudyBuildService studyBuildService;
 
     @Autowired
     private StudyDao sdao;
@@ -185,7 +189,7 @@ public class EditFormController {
     }
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, sdao);
         }
         return restfulServiceHelper;
     }

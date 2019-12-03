@@ -30,8 +30,6 @@ import java.util.Date;
  * Restores a removed study user role
  */
 public class RestoreStudyUserRoleServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     /**
      * Checks whether the user has the right permission to proceed function
      */

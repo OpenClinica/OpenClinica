@@ -37,8 +37,6 @@ import java.util.ResourceBundle;
  */
 public class SetUserRoleServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

@@ -80,7 +80,7 @@ public class ImportDataHelper {
         this.ub = ub;
     }
 
-    public EventCRFBean createEventCRF(HashMap<String, String> importedObject) {
+    public EventCRFBean createEventCRF(HashMap<String, String> importedObject, StudyDao studyDao) {
 
         EventCRFBean eventCrfBean = null;
 

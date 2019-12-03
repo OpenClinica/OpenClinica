@@ -29,8 +29,6 @@ public class ListUserAccountsServlet extends SecureController {
     public static final String PATH = "ListUserAccounts";
     public static final String ARG_MESSAGE = "message";
 
-    @Autowired
-    private StudyDao studyDao;
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         if (!ub.isSysAdmin()) {

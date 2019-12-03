@@ -36,14 +36,14 @@ public class CrfBusinessLogicHelper {
     DataSource ds;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    @Autowired
     private StudyDao studyDao;
     // public CrfBusinessLogicHelper(SessionManager sm) {
     // this.sm = sm;
     // }
 
-    public CrfBusinessLogicHelper(DataSource ds) {
+    public CrfBusinessLogicHelper(DataSource ds, StudyDao studyDao) {
         this.ds = ds;
+        this.studyDao = studyDao;
 
     }
 

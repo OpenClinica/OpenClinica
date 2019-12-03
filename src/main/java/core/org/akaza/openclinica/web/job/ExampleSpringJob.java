@@ -47,7 +47,7 @@ public class ExampleSpringJob extends QuartzJobBean {
     private String message;
 
     @Autowired
-    private StudyDao studyDao;
+
     // example code here
     public void setMessage(String message) {
         this.message = message;
@@ -80,6 +80,7 @@ public class ExampleSpringJob extends QuartzJobBean {
     private JobDetailFactoryBean jobDetailBean;
     private CoreResources coreResources;
     private RuleSetRuleDao ruleSetRuleDao;
+    private StudyDao studyDao;
     private PermissionService permissionService;
 
     @Override
@@ -102,7 +103,7 @@ public class ExampleSpringJob extends QuartzJobBean {
             dataSource = (DataSource) appContext.getBean("dataSource");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             studyDao = (StudyDao) appContext.getBean("studyDaoDomain");
-            AuditEventDAO auditEventDAO = new AuditEventDAO(dataSource);
+            AuditEventDAO auditEventDAO = new AuditEventDAO(dataSource, studyDao);
             // Scheduler scheduler = context.getScheduler();
             // JobDetail detail = context.getJobDetail();
             // jobDetailBean = (JobDetailBean) detail;

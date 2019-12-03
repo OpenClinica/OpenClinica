@@ -50,8 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DeleteEventCRFServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     public static String STUDY_SUB_ID = "ssId";
 
     public static String EVENT_CRF_ID = "eventCrfId";

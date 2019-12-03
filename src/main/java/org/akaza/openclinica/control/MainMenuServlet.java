@@ -60,8 +60,6 @@ public class MainMenuServlet extends SecureController {
     private DiscrepancyNoteDAO discrepancyNoteDAO;
     private StudyParameterValueDAO studyParameterValueDAO;
 
-    @Autowired
-    private StudyDao studyDao;
     // ResourceBundle respage;
 
     @Override public void mayProceed() throws InsufficientPermissionException {

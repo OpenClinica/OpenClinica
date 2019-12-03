@@ -40,11 +40,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 public class BeanPropertyRuleRunner extends RuleRunner{
 	NotificationActionProcessor notificationActionProcessor;
 	StudyEventDAO studyEventDAO;
-	
-	@Autowired
-	StudyDao studyDao;
-	public BeanPropertyRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
-		super(ds, contextPath, contextPath, mailSender);
+
+	public BeanPropertyRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, StudyDao studyDao) {
+		super(ds, contextPath, contextPath, mailSender,studyDao);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -74,7 +72,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 					{
 						RuleBean rule = ruleSetRule.getRuleBean();
 						//       StudyBean currentStudy = rule.getStudy();//TODO:Fix me!
-						Study currentStudy = (Study) studyDao.findByPK(rule.getStudyId());
+						Study currentStudy = (Study) getStudyDao().findByPK(rule.getStudyId());
 						ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBeanId, studyEventDaoHib, studyEventDefDaoHib);
 						try {
 							// StopWatch sw = new StopWatch();

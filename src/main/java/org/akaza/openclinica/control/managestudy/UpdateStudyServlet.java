@@ -40,8 +40,6 @@ import java.util.StringTokenizer;
  * 
  */
 public class UpdateStudyServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     public static final String INPUT_START_DATE = "startDate";
     public static final String INPUT_END_DATE = "endDate";
     public static final String INPUT_VER_DATE = "protocolDateVerification";

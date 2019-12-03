@@ -44,8 +44,6 @@ public class AuditLogStudyServlet extends SecureController {
 
     // <ResourceBundle resword,resexception,respage;
 
-    @Autowired
-    private StudyDao studyDao;
     public static String getLink(int userId) {
         return "AuditLogStudy";
     }

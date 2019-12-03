@@ -84,8 +84,6 @@ public class ViewStudySubjectServlet extends SecureController {
 
     public final static String visitBasedEventItempath=CoreResources.getField("visitBasedEventItem");
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      * Checks whether the user has the right permission to proceed function
      */
@@ -383,7 +381,7 @@ public class ViewStudySubjectServlet extends SecureController {
             request.setAttribute("groups", groupMaps);
 
             // find audit log for events
-            AuditEventDAO aedao = new AuditEventDAO(sm.getDataSource());
+            AuditEventDAO aedao = new AuditEventDAO(sm.getDataSource(), getStudyDao());
             ArrayList logs = aedao.findEventStatusLogByStudySubject(studySubId);
             // logger.warning("^^^ retrieved logs");
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

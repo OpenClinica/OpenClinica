@@ -40,8 +40,6 @@ public class ViewSelectedServlet extends SecureController {
     Locale locale;
 
     // < ResourceBundlerestext,resexception,respage;
-    @Autowired
-    private StudyDao studyDao;
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 

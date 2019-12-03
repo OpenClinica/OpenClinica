@@ -48,8 +48,6 @@ import java.util.Locale;
  */
 public class ListEventsForSubjectServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
 
     // < ResourceBundleresword;

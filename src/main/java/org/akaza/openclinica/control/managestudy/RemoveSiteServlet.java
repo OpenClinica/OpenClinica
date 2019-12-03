@@ -44,9 +44,7 @@ import java.util.Date;
  *         Removes a site from a study
  */
 public class RemoveSiteServlet extends SecureController {
-    
-    @Autowired
-    private StudyDao studyDao;
+
     /**
      *
      */

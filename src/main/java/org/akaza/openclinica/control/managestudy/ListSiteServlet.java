@@ -29,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *          $
  */
 public class ListSiteServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
 
     // < ResourceBundle resword,respage,resexception;

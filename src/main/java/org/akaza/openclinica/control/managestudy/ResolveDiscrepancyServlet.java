@@ -127,8 +127,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String VIEW_NOTES = "ViewNotes";
     public static final String FORWARD_SLASH = "/";
 
-    @Autowired
-    private StudyDao studyDao;
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();

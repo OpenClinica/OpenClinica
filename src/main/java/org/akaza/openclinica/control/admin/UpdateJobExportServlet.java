@@ -45,8 +45,6 @@ import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 public class UpdateJobExportServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     private static String SCHEDULER = "schedulerFactoryBean";
 
     private StdScheduler scheduler;

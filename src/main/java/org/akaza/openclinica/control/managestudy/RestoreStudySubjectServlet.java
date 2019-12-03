@@ -39,8 +39,6 @@ import java.util.Date;
  * Restores a removed subject to a study
  */
 public class RestoreStudySubjectServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

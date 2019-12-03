@@ -26,8 +26,6 @@ public class ViewUserAccountServlet extends SecureController {
     public static final String PATH = "ViewUserAccount";
     public static final String ARG_USER_ID = "userId";
 
-    @Autowired
-    private StudyDao studyDao;
     public static String getLink(int userId) {
         return PATH + '?' + ARG_USER_ID + '=' + userId;
     }

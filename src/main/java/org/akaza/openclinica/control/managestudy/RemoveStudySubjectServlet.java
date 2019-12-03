@@ -40,8 +40,6 @@ import java.util.Date;
  */
 public class RemoveStudySubjectServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

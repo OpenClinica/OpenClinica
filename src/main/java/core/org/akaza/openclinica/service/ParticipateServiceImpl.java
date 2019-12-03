@@ -169,7 +169,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         try {
             // Retrieve crfs for next event
             StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(ssoid);
-            ParticipantEventService participantEventService = new ParticipantEventService(dataSource);
+            ParticipantEventService participantEventService = new ParticipantEventService(dataSource, studyDao);
             StudyEventBean nextEvent = participantEventService.getNextParticipantEvent(studySubjectBean);
             if (nextEvent != null) {
                 logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());

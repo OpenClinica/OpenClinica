@@ -24,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version CVS: $Id: InitUpdateStudyServlet.java 13689 2009-12-16 21:10:37Z kkrumlian $
  */
 public class InitUpdateStudyServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

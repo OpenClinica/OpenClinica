@@ -47,9 +47,7 @@ import java.util.Date;
  * with this study will be removed
  */
 public class RemoveStudyServlet extends SecureController {
-    
-    @Autowired
-    private StudyDao studyDao;
+
     /**
      *
      */

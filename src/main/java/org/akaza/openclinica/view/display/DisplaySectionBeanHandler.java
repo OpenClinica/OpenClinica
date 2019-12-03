@@ -29,8 +29,6 @@ import javax.servlet.ServletContext;
  * class is used by PrintCRFServlet and PrintDataEntryServlet.
  */
 public class DisplaySectionBeanHandler {
-    @Autowired
-    private StudyDao studyDao;
     private boolean hasStoredData = false;
     private int crfVersionId;
     private int eventCRFId;
@@ -77,7 +75,7 @@ public class DisplaySectionBeanHandler {
      * @see org.akaza.openclinica.control.managestudy.PrintCRFServlet
      * @see org.akaza.openclinica.control.managestudy.PrintDataEntryServlet
      */
-    public List<DisplaySectionBean> getDisplaySectionBeans() {
+    public List<DisplaySectionBean> getDisplaySectionBeans(StudyDao studyDao) {
         FormBeanUtil formBeanUtil;
         ViewPersistanceHandler persistanceHandler;
         ArrayList<SectionBean> allCrfSections;

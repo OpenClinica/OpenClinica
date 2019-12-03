@@ -97,6 +97,9 @@ public class StudyEventController {
 	@Autowired
 	private ValidateService validateService;
 
+	@Autowired
+	private StudyBuildService studyBuildService;
+
 	PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
 			new PassiveExpiringMap<>(24, TimeUnit.HOURS);
 
@@ -195,7 +198,7 @@ public class StudyEventController {
 
 	public RestfulServiceHelper getRestfulServiceHelper() {
 		if (restfulServiceHelper == null) {
-			restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+			restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
 		}
 		return restfulServiceHelper;
 	}

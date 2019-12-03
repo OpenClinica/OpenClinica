@@ -35,8 +35,6 @@ import java.util.Date;
  * Assigns a study subject to another study
  */
 public class ReassignStudySubjectServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

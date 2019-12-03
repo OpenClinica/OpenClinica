@@ -79,8 +79,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *         Performs updating study event action
  */
 public class UpdateStudyEventServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     public static final String EVENT_ID = "event_id";
 
     public static final String STUDY_SUBJECT_ID = "ss_id";

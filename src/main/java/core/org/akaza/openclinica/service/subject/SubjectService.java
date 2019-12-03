@@ -29,12 +29,12 @@ public class SubjectService implements SubjectServiceInterface {
     StudyParameterValueDAO studyParameterValueDAO;
     StudySubjectDAO studySubjectDao;
     UserAccountDAO userAccountDao;
-    @Autowired
     StudyDao studyDao;
     DataSource dataSource;
 
-    public SubjectService(DataSource dataSource) {
+    public SubjectService(DataSource dataSource, StudyDao studyDao) {
         this.dataSource = dataSource;
+        this.studyDao = studyDao;
     }
 
     public SubjectService(SessionManager sessionManager) {

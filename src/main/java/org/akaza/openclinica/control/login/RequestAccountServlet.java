@@ -38,8 +38,6 @@ import java.util.HashMap;
 public class RequestAccountServlet extends SecureController {
     // private UserAccountBean ubForm = new UserAccountBean();
 
-    @Autowired
-    private StudyDao studyDao;
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 

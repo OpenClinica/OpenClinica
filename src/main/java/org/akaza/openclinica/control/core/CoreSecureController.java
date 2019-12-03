@@ -67,8 +67,6 @@ import java.util.*;
  */
 public abstract class CoreSecureController extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
 
     @Autowired
     private StudyBuildService studyBuildService;

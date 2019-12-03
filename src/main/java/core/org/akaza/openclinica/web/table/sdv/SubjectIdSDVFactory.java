@@ -57,7 +57,6 @@ import javax.sql.DataSource;
 public class SubjectIdSDVFactory extends AbstractTableFactory {
 
     private DataSource dataSource;
-    @Autowired
     private StudyDao studyDao;
     private int studyId;
     private String contextPath;
@@ -74,6 +73,14 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
     }
 
     @Override

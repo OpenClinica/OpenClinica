@@ -32,9 +32,7 @@ import java.util.HashMap;
  * Preferences - Java - Code Style - Code Templates
  */
 public class RequestStudyServlet extends SecureController {
-    
-    @Autowired
-    private StudyDao studyDao;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 

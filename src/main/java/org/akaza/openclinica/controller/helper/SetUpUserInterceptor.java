@@ -1,10 +1,12 @@
 package org.akaza.openclinica.controller.helper;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -27,6 +29,10 @@ public class SetUpUserInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     @Qualifier("dataSource")
     private DataSource dataSource;
+    @Autowired
+    private StudyDao studyDao;
+    @Autowired
+    private StudyBuildService studyBuildService;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
@@ -66,8 +72,8 @@ public class SetUpUserInterceptor extends HandlerInterceptorAdapter {
 
         userBean = userBean.getId() > 0 ? (UserAccountBean) userAccountDAO.findByPK(userBean.getId()) : userBean;
 
-        SetUpStudyRole setupStudy = new SetUpStudyRole(dataSource);
-        setupStudy.setUp(currentSession, userBean);
+        SetUpStudyRole setupStudy = new SetUpStudyRole(dataSource, studyBuildService );
+        setupStudy.setUp(currentSession, userBean, studyDao);
         Study study = (Study) currentSession.getAttribute("publicStudy");
         httpServletRequest.setAttribute("requestSchema", study.getSchemaName());
         return true;
@@ -79,5 +85,13 @@ public class SetUpUserInterceptor extends HandlerInterceptorAdapter {
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
     }
 }

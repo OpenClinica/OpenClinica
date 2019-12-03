@@ -9,6 +9,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
@@ -39,8 +40,8 @@ import javax.sql.DataSource;
 
 public class CrfBulkRuleRunner extends RuleRunner {
 
-    public CrfBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
-        super(ds, requestURLMinusServletPath, contextPath, mailSender);
+    public CrfBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, StudyDao studyDao) {
+        super(ds, requestURLMinusServletPath, contextPath, mailSender,studyDao );
     }
 
     /**

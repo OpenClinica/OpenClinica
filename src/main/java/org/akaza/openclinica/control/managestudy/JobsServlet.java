@@ -13,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *         Processes 'jobs (bulk logfile)' request
  */
 public class JobsServlet extends SecureController {
-
-    @Autowired
-    private StudyDao studyDao;
     /**
      * Checks whether the user has the right permission to proceed function
      */

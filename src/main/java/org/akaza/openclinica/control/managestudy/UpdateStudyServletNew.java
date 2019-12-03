@@ -41,8 +41,6 @@ public class UpdateStudyServletNew extends SecureController {
     public static final String INPUT_VER_DATE = "protocolDateVerification";
     public static Study study;
     private CoreResources core;
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

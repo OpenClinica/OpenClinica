@@ -41,8 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *         Removes a study event and all its related event CRFs, items
  */
 public class RemoveStudyEventServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

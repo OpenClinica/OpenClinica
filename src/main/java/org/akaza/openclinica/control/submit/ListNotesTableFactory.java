@@ -67,8 +67,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(ListNotesTableFactory.class.getName());
 
-    @Autowired
-    private StudyDao studyDao;
     private AuditUserLoginDao auditUserLoginDao;
     private StudySubjectDAO studySubjectDao;
     private UserAccountDAO userAccountDao;

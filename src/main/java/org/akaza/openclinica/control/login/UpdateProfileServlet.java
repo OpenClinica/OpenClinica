@@ -40,9 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Servlet for processing 'update profile' request from user
  */
 public class UpdateProfileServlet extends SecureController {
-    
-    @Autowired
-    private StudyDao studyDao;
+
     /**
 	 * 
 	 */

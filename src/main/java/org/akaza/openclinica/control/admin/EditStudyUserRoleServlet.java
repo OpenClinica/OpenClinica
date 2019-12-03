@@ -35,8 +35,6 @@ public class EditStudyUserRoleServlet extends SecureController {
     public static final String ARG_STUDY_ID = "studyId";
     public static final String ARG_USER_NAME = "userName";
 
-    @Autowired
-    private StudyDao studyDao;
     public static String getLink(StudyUserRoleBean s, UserAccountBean user) {
         int studyId = s.getStudyId();
         return PATH + "?" + ARG_STUDY_ID + "=" + studyId + "&" + ARG_USER_NAME + "=" + user.getName();

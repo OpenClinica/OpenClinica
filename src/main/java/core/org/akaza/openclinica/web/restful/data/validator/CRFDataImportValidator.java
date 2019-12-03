@@ -3,6 +3,7 @@ package core.org.akaza.openclinica.web.restful.data.validator;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.web.restful.data.bean.BaseStudyDefinitionBean;
@@ -17,21 +18,23 @@ import javax.sql.DataSource;
 public class CRFDataImportValidator implements Validator {
 
     DataSource dataSource;
-    @Autowired
     StudyDao studyDao;
     UserAccountDAO userAccountDAO;
     BaseVSValidatorImplementation helper;
     RestfulServiceHelper restfulServiceHelper;
+    StudyBuildService studyBuildService;
 
     public RestfulServiceHelper getRestfulServiceHelper(){
     	if(restfulServiceHelper ==null) {
-    		restfulServiceHelper = new RestfulServiceHelper(dataSource);
+    		restfulServiceHelper = new RestfulServiceHelper(dataSource, studyBuildService, studyDao);
     	}
     	
     	return restfulServiceHelper;
     }
-    public CRFDataImportValidator(DataSource dataSource) {
+    public CRFDataImportValidator(DataSource dataSource, StudyDao studyDao, StudyBuildService studyBuildService) {
         this.dataSource = dataSource;
+        this.studyDao = studyDao;
+        this.studyBuildService = studyBuildService;
         helper = new BaseVSValidatorImplementation();
     }
 

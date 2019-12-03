@@ -40,8 +40,6 @@ public class NotificationService  {
     String DB_CONNECTION_KEY = "dbConnection";
     private String sbsUrl = CoreResources.getField("SBSBaseUrl");
     @Autowired
-    private StudyDao studyDao;
-    @Autowired
     private Keycloak keycloak;
     DataSource ds;
 

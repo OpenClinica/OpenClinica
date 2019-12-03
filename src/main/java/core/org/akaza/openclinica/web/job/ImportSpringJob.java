@@ -116,8 +116,6 @@ public class ImportSpringJob extends QuartzJobBean {
     private EventCRFDAO eventCrfDao;// = new EventCRFDAO(sm.getDataSource());
     private AuditEventDAO auditEventDAO;
     private TriggerService triggerService;
-
-    @Autowired
     private StudyDao studyDao;
 
     @Override
@@ -155,10 +153,11 @@ public class ImportSpringJob extends QuartzJobBean {
             dataSource = (DataSource) appContext.getBean("dataSource");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
+            studyDao = (StudyDao) appContext.getBean("studyDaoDomain");
 
             itemDataDao = new ItemDataDAO(dataSource);
             eventCrfDao = new EventCRFDAO(dataSource);
-            auditEventDAO = new AuditEventDAO(dataSource);
+            auditEventDAO = new AuditEventDAO(dataSource, studyDao);
 
             int userId = dataMap.getInt(USER_ID);
             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
@@ -430,7 +429,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 }
 
             }
-            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
+            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource, studyDao);
             // validation errors, the same as in the ImportCRFDataServlet. DRY?
             // create a 'fake' request to generate the validation errors
             // here, tbh 05/2009
@@ -621,7 +620,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 // setup ruleSets to run if applicable
                 List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(dataSource, studyBean, ub, ruleSetService, odmContainer);
 
-                CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
+                CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource, studyDao);
                 for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
                     boolean resetSDV = false;

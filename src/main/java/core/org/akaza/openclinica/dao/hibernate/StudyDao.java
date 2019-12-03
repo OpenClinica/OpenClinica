@@ -8,6 +8,8 @@ import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyEnvEnum;
+import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
 import org.hibernate.transform.Transformers;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -471,5 +474,22 @@ public class StudyDao extends AbstractDomainDao<Study> {
         Query query = getCurrentSession().createNativeQuery("SELECT DISTINCT schema_name FROM public.study");
         List<String> result = (List<String>) query.getResultList();
         return result;
+    }
+    public Study getPublicStudy(int id) {
+        HttpServletRequest request = StudyBuildServiceImpl.getRequest();
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
+        Study study = (Study) findByPK(id);
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(schema) && request != null)
+            request.setAttribute("requestSchema", schema);
+        return study;
     }
 }

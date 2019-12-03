@@ -296,6 +296,7 @@ public class RuleController {
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(coreResources);
+        report.setStudyDao(studyDao);
         // report.setRulesDataMap(rdc.getOdmRulesDataMap());
         report.setOdmBean(mdc.getODMBean());
         report.setODMVersion("oc1.3");

@@ -28,8 +28,6 @@ import java.util.Locale;
  */
 public class AdminSystemServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
 
     // < ResourceBundleresword,resexception;

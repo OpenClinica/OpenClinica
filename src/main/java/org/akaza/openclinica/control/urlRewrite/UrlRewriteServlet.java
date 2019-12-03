@@ -43,8 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UrlRewriteServlet extends CoreSecureController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    @Autowired
-    private StudyDao studyDao;
 
 //    StudyBean study = null;
 //    StudySubjectBean subject = null;

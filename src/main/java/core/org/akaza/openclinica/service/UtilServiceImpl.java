@@ -78,7 +78,7 @@ public class UtilServiceImpl implements UtilService {
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
         }
         return restfulServiceHelper;
     }

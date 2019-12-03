@@ -62,8 +62,6 @@ import javax.servlet.http.HttpServletResponse;
 public class PrintDataEntryServlet extends DataEntryServlet {
 
     Locale locale;
-    @Autowired
-    private StudyDao studyDao;
     // < ResourceBundleresword, resworkflow, respage,resexception;
 
     /**
@@ -146,11 +144,11 @@ public class PrintDataEntryServlet extends DataEntryServlet {
                 age = Utils.getInstacne().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
             }
             // Get the study then the parent study
-            Study study = (Study) studyDao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
             if (study.isSite()) {
                 // this is a site,find parent
-                Study parentStudy = (Study) studyDao.findByPK(study.checkAndGetParentStudyId());
+                Study parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
                 request.setAttribute("studyTitle", parentStudy.getName() + " - " + study.getName());
             } else {
                 request.setAttribute("studyTitle", study.getName());
@@ -188,7 +186,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
 
             handler.setCrfVersionId(crfVersionId);
             handler.setEventCRFId(eventCRFId);
-            List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
+            List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans(getStudyDao());
 
             CRFVersionDAO crfVersionDAO = new CRFVersionDAO(getDataSource());
             CRFDAO crfDao = new CRFDAO(getDataSource());

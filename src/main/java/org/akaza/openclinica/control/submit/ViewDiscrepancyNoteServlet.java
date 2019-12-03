@@ -68,8 +68,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
     Locale locale;
     // < ResourceBundleresexception,respage;
-    @Autowired
-    private StudyDao studyDao;
     public static final String ENTITY_ID = "id";
     public static final String PARENT_ID = "parentId";
     public static final String ENTITY_TYPE = "name";

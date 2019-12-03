@@ -52,8 +52,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RemoveEventCRFServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      * 
      */

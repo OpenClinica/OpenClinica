@@ -31,8 +31,6 @@ import java.util.Date;
  * Preferences - Java - Code Style - Code Templates
  */
 public class SetStudyUserRoleServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

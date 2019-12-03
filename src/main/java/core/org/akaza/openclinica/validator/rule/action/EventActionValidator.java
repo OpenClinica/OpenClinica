@@ -29,7 +29,6 @@ import javax.sql.DataSource;
 
 public class EventActionValidator implements Validator {
 
-    @Autowired
     private StudyDao studyDao;
     DataSource dataSource;
 	ExpressionService expressionService;
@@ -40,8 +39,9 @@ public class EventActionValidator implements Validator {
     public static final String BRACKETS_AND_CONTENTS = ".*\\[(END|ALL|[1-9]\\d*)\\]";
     private final String REPEATING = ".*\\[(END|ALL|[1-9]\\d*)\\]";
 
-	public EventActionValidator(DataSource dataSource) {
+	public EventActionValidator(DataSource dataSource, StudyDao studyDao) {
         this.dataSource = dataSource;
+        this.studyDao = studyDao;
     }
 
     /**

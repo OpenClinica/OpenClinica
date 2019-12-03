@@ -30,8 +30,6 @@ import java.util.ArrayList;
  * Views details of a Subject Group Class
  */
 public class ViewSubjectGroupClassServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     @Override
     public void mayProceed() throws InsufficientPermissionException {
         if (ub.isSysAdmin()) {

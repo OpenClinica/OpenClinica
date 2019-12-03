@@ -57,8 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *         parameters of a sub study.
  */
 public class CreateSubStudyServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
 
     public static final String INPUT_VER_DATE = "protocolDateVerification";

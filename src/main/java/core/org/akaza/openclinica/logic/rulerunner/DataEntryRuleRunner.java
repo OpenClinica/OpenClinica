@@ -4,6 +4,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -35,8 +36,8 @@ public class DataEntryRuleRunner extends RuleRunner {
     
     EventCRFBean ecb;
 
-    public DataEntryRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, EventCRFBean ecb) {
-        super(ds, requestURLMinusServletPath, contextPath, mailSender);
+    public DataEntryRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, EventCRFBean ecb, StudyDao studyDao) {
+        super(ds, requestURLMinusServletPath, contextPath, mailSender, studyDao);
         this.ecb = ecb;
     }
 

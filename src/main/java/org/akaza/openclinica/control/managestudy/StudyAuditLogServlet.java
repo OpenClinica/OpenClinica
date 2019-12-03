@@ -33,8 +33,6 @@ import java.util.Locale;
  */
 public class StudyAuditLogServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
 
     // <ResourceBundle resword,resexception,respage;

@@ -194,7 +194,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	public Collection findAllStudySiteFiltered(Study studyBean, String[] permissionTags) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyBean.getStudy().getStudyId()));
+        variables.put(new Integer(1), new Integer(studyBean.checkAndGetParentStudyId()));
         variables.put(new Integer(2), new Integer(studyBean.getStudyId()));
         variables.put(new Integer(3), new Integer(studyBean.getStudyId()));
 

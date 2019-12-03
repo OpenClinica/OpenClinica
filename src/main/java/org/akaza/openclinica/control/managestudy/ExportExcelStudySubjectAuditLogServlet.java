@@ -68,9 +68,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @SuppressWarnings("serial")
 public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
-    
-    @Autowired
-    private StudyDao studyDao;
+
     /**
      * Checks whether the user has the right permission to proceed function
      */

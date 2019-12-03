@@ -71,8 +71,6 @@ public class EditUserAccountServlet extends SecureController {
     public static final String BUTTON_BACK_VALUE = "Back";
 
     public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
-    @Autowired
-    private StudyDao studyDao;
     private ArrayList getAllStudies() {
         return (ArrayList) getStudyDao().findAll();
     }

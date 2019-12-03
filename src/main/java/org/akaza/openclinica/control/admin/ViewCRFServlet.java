@@ -53,9 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ViewCRFServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
-
     private static String CRF_ID = "crfId";
     private static String CRF = "crf";
     private RuleSetServiceInterface ruleSetService;
@@ -242,7 +239,7 @@ public class ViewCRFServlet extends SecureController {
      */
     private List<Study> findStudiesForCRFId(int crfId) {
         List<Study> studyBeans = new ArrayList<Study>();
-        if (crfId == 0 || studyDao == null) {
+        if (crfId == 0 || getStudyDao() == null) {
             return studyBeans;
         }
 

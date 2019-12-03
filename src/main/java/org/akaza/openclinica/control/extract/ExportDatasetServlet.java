@@ -85,8 +85,6 @@ public class ExportDatasetServlet extends SecureController {
     public String CSVFilePath;
     public ArrayList fileList;
 
-    @Autowired
-    private StudyDao studyDao;
     public Study getPublicStudy(String uniqueId) {
         String studySchema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");

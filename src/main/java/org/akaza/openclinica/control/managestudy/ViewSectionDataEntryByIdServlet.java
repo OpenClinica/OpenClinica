@@ -25,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ViewSectionDataEntryByIdServlet extends ViewSectionDataEntryServlet {
 
-    @Autowired
-    private StudyDao studyDao;
     private static final long serialVersionUID = 1L;
 
     /*

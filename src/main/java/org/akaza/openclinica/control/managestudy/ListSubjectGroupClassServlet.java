@@ -36,8 +36,6 @@ import java.util.Locale;
 public class ListSubjectGroupClassServlet extends SecureController {
 
     Locale locale;
-    @Autowired
-    private StudyDao studyDao;
     // < ResourceBundleresexception,respage,resword;
 
     /**

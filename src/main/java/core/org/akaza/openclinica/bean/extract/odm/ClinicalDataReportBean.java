@@ -45,7 +45,6 @@ import java.util.List;
  */
 
 public class ClinicalDataReportBean extends OdmXmlReportBean {
-    @Autowired
     private StudyDao studyDao;
     private OdmClinicalDataBean clinicalData;
     private DataSource dataSource;
@@ -54,9 +53,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     private final String COMMON = "common";
     private String[] permissionTagsStringArray;
     private ODMFilterDTO odmFilter;
-
-    @Autowired
-    private StudyBuildService studyBuildService;
 
     public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean , ODMFilterDTO odmFilter, String[] permissionTagsStringArray) {
         super();
@@ -91,14 +87,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         Role role = null; // OpenClinica:
         StudyUserRoleBean userRole = null;
-        Study publicStudyBean = studyBuildService.getPublicStudy(userBean.getActiveStudyId());
+        Study publicStudyBean = studyDao.getPublicStudy(userBean.getActiveStudyId());
              userRole = userBean.getRoleByStudy(publicStudyBean.getStudyId());
             if (userRole == null || !userRole.isActive())
                 userRole = userBean.getRoleByStudy(publicStudyBean.checkAndGetParentStudyId());
 
             role = userRole.getRole();
 
-        Study userRoleStudy = studyBuildService.getPublicStudy(userRole.getStudyId());
+        Study userRoleStudy = studyDao.getPublicStudy(userRole.getStudyId());
         setRoleDescription(role, userRoleStudy);
 
         if (odmFilter.isCrossForm()) {
@@ -1036,5 +1032,13 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         return auditLogEventTypes;
     }
 
+    @Override
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
 
+    @Override
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

@@ -32,8 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ViewJobServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     private static String SCHEDULER = "schedulerFactoryBean";
     private StdScheduler scheduler;
 

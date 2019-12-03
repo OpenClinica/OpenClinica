@@ -116,6 +116,7 @@ public class MetadataCollectorResource {
         adc.collectFileData();
 
         FullReportBean report = new FullReportBean();
+        report.setStudyDao(studyDaoHib);
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(getCoreResources());
@@ -174,6 +175,7 @@ public class MetadataCollectorResource {
         adc.collectFileData();
 
         FullReportBean report = new FullReportBean();
+        report.setStudyDao(studyDaoHib);
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(getCoreResources());
@@ -187,6 +189,7 @@ public class MetadataCollectorResource {
     public FullReportBean collectODMMetadataForClinicalData(Study studyBean, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
                                                              boolean showArchived , String permissionTagsString, boolean includeMetadata) {
         FullReportBean report = new FullReportBean();
+        report.setStudyDao(studyDaoHib);
             if (studyBean != null)
                 studyBean = populateStudyBean(studyBean);
             MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived, permissionTagsString, studyDaoHib);

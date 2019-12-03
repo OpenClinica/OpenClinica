@@ -52,9 +52,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
     private DataSource dataSource;
 
-    @Autowired
-    private StudyDao studyDao;
-
     @Transactional
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })

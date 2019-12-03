@@ -47,8 +47,6 @@ import java.util.Locale;
  *
  */
 public class CreateStudyServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     public static final String INPUT_START_DATE = "startDate";
 
     public static final String INPUT_END_DATE = "endDate";

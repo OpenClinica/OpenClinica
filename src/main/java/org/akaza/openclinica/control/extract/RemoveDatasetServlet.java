@@ -34,8 +34,6 @@ import java.util.Locale;
  */
 public class RemoveDatasetServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
 
     // < ResourceBundle resmessage,restext,respage,resexception,resword;

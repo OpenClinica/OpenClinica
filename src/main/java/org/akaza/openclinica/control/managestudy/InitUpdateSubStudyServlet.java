@@ -44,8 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *          jxu $
  */
 public class InitUpdateSubStudyServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
 
     /**

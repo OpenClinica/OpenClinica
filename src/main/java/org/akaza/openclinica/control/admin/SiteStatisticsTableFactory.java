@@ -28,7 +28,6 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletResponse;
 
 public class SiteStatisticsTableFactory extends AbstractTableFactory {
-    @Autowired
     private StudyDao studyDao;
     private StudySubjectDAO studySubjectDao;
     private Study currentStudy;

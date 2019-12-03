@@ -27,8 +27,6 @@ import java.util.Set;
 
 public class UpdateJobImportServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     private static String SCHEDULER = "schedulerFactoryBean";
     private static String TRIGGER_IMPORT_GROUP = "importTrigger";
     private StdScheduler scheduler;

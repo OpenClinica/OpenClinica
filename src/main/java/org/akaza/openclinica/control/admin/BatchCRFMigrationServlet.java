@@ -36,8 +36,6 @@ public class BatchCRFMigrationServlet extends SecureController {
     private static String CRF_ID = "crfId";
     private static String CRF = "crf";
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

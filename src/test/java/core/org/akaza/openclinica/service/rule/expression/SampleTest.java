@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Ignore
 public class SampleTest extends HibernateOcDbTestCase {
     private CoreResources coreResources;
-    @Autowired
     private StudyDao studyDao;
     public SampleTest() {
         super();
         coreResources = (CoreResources) getContext().getBean("coreResources");
+        studyDao = (StudyDao) getContext().getBean("studyDaoDomain");
 
     }
 

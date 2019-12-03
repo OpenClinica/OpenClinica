@@ -69,8 +69,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServlet {
 
-    @Autowired
-    private StudyDao studyDao;
     private static final Logger LOGGER = LoggerFactory.getLogger(ViewSectionDataEntryServlet.class);
 
     @Override

@@ -126,7 +126,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource());
         itemDataDao.setFormatDates(false);
         EventCRFDAO eventCrfDao = new EventCRFDAO(sm.getDataSource());
-        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource());
+        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource(), getStudyDao());
         String action = request.getParameter("action");
 
         FormProcessor fp = new FormProcessor(request);

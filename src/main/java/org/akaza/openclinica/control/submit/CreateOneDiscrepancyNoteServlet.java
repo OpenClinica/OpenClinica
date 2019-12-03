@@ -71,8 +71,6 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     public static final String EMAIL_USER_ACCOUNT = "sendEmail";
     public static final String BOX_DN_MAP = "boxDNMap";
     public static final String BOX_TO_SHOW = "boxToShow";
-    @Autowired
-    private StudyDao studyDao;
 
     /*
      * (non-Javadoc)

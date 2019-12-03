@@ -45,8 +45,6 @@ public class SelectItemsServlet extends SecureController {
     // < ResourceBundlerestext,resexception,respage;
 
     public static String CURRENT_DEF_ID = "currentDefId";
-    @Autowired
-    private StudyDao studyDao;
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 

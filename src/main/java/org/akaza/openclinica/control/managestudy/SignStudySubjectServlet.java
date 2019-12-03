@@ -69,8 +69,6 @@ public class SignStudySubjectServlet extends SecureController {
     private WebApplicationContext ctx = null;
     public static final String ORIGINATING_PAGE = "originatingPage";
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      * Checks whether the user has the right permission to proceed function
      */
@@ -391,7 +389,7 @@ public class SignStudySubjectServlet extends SecureController {
         ArrayList groupMaps = (ArrayList) sgmdao.findAllByStudySubject(studySubId);
         request.setAttribute("groups", groupMaps);
 
-        AuditEventDAO aedao = new AuditEventDAO(sm.getDataSource());
+        AuditEventDAO aedao = new AuditEventDAO(sm.getDataSource(), getStudyDao());
         ArrayList logs = aedao.findEventStatusLogByStudySubject(studySubId);
 
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

@@ -48,8 +48,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *         Restores a removed study event and all its data
  */
 public class RestoreStudyEventServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

@@ -119,9 +119,6 @@ public class TableOfContentsServlet extends SecureController {
     private EventCRFBean ecb;
 
     private String action;
-    
-    @Autowired
-    private StudyDao studyDao;
 
     private void getEventCRFAndAction() {
         ecdao = new EventCRFDAO(sm.getDataSource());

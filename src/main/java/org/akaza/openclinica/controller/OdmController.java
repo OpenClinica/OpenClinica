@@ -1,6 +1,8 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.*;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.springframework.http.HttpHeaders;
@@ -16,10 +18,6 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.service.ParticipantService;
-import core.org.akaza.openclinica.service.ParticipateService;
-import core.org.akaza.openclinica.service.UserStatus;
-import core.org.akaza.openclinica.service.UtilService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.cdisc.ns.odm.v130.ODM;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -67,6 +65,12 @@ public class OdmController {
     @Autowired
     @Qualifier( "dataSource" )
     private BasicDataSource dataSource;
+
+    @Autowired
+    private StudyBuildService studyBuildService;
+
+    @Autowired
+    private StudyDao studyDao;
 
     private RestfulServiceHelper restfulServiceHelper;
 
@@ -303,7 +307,7 @@ public class OdmController {
     
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
         }
         return restfulServiceHelper;
     }

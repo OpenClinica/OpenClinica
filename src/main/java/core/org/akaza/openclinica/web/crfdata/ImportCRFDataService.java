@@ -2440,7 +2440,7 @@ public class ImportCRFDataService {
 
 	public PipeDelimitedDataHelper getPipeDelimitedDataHelper() {
 		if(pipeDelimitedDataHelper == null) {
-			pipeDelimitedDataHelper = new PipeDelimitedDataHelper(this.ds);
+			pipeDelimitedDataHelper = new PipeDelimitedDataHelper(this.ds, studyBuildService, studyDao);
 		}
 		return pipeDelimitedDataHelper;
 	}
@@ -2451,7 +2451,7 @@ public class ImportCRFDataService {
 
 	public RestfulServiceHelper getRestfulServiceHelper() {
 		if(restfulServiceHelper == null) {
-			restfulServiceHelper = new RestfulServiceHelper(ds);
+			restfulServiceHelper = new RestfulServiceHelper(ds, studyBuildService, studyDao);
 		}
 		return restfulServiceHelper;
 	}

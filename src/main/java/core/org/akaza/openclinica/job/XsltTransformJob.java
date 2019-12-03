@@ -96,9 +96,8 @@ public class XsltTransformJob extends QuartzJobBean {
     private ArchivedDatasetFileDAO archivedDatasetFileDao;
     private AuditEventDAO auditEventDAO;
     private DatasetDAO datasetDao;
-
-    @Autowired
     private StudyDao studyDao;
+
     @Autowired
     private PermissionService permissionService;
 
@@ -593,6 +592,7 @@ public class XsltTransformJob extends QuartzJobBean {
         try {
             ApplicationContext ctx = (ApplicationContext) scheduler.getContext().get("applicationContext");
             DataSource dataSource = ctx.getBean(DataSource.class);
+            studyDao = (StudyDao) ctx.getBean("studyDaoDomain");
             if (StringUtils.isEmpty(dataMap.getString(TENANT_SCHEMA))) CoreResources.tenantSchema.set(scheduler.getSchedulerName());
             else CoreResources.tenantSchema.set(dataMap.getString(TENANT_SCHEMA));
             mailSender = ctx.getBean(OpenClinicaMailSender.class);

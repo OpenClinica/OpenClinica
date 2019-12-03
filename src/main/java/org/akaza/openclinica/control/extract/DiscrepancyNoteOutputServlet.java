@@ -82,8 +82,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
     private StudyEventDefinitionDao studyEventDefinitionDao;
 
-    @Autowired
-    private StudyDao studyDao;
     /* Handle the HTTP Get or Post request. */
     @Override
     protected void processRequest() throws Exception {

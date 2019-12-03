@@ -61,7 +61,6 @@ public class RuleRunner {
     protected DynamicsMetadataService dynamicsMetadataService;
     protected RuleActionRunLogDao ruleActionRunLogDao;
     DataSource ds;
-    @Autowired
     private StudyDao studyDao;
     String requestURLMinusServletPath;
     String contextPath;
@@ -71,11 +70,12 @@ public class RuleRunner {
     };
 
 
-    public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
+    public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, StudyDao studyDao) {
         this.ds = ds;
         this.requestURLMinusServletPath = requestURLMinusServletPath;
         this.contextPath = contextPath;
         this.mailSender = mailSender;
+        this.studyDao = studyDao;
     }
 
 
@@ -264,5 +264,11 @@ public class RuleRunner {
         this.ruleActionRunLogDao = ruleActionRunLogDao;
     }
 
-    
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

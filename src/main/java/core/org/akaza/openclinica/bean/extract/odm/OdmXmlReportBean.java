@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import core.org.akaza.openclinica.bean.extract.ODMSASFormatNameValidator;
 import core.org.akaza.openclinica.bean.extract.SasNameValidator;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ public abstract class OdmXmlReportBean {
     private String xmlHeading;
     private ODMBean odmbean;
 
+    private StudyDao studyDao;
     private String indent;
     private SasNameValidator sasNameValidator;
     private ODMSASFormatNameValidator sasFormatValidator;
@@ -151,5 +153,13 @@ public abstract class OdmXmlReportBean {
 
     public String getODMVersion() {
         return this.ODMVersion;
+    }
+
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
     }
 }

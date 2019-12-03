@@ -32,8 +32,6 @@ public class UserAccountBean extends AuditableEntityBean {
     /**
      * LDAP/Active Directory users are identified by having this password stored in the database
      */
-    @Autowired
-    private StudyDao studyDao;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public static final String LDAP_PASSWORD = "*";

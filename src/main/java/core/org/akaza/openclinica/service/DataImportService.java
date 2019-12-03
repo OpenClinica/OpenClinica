@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -74,6 +75,8 @@ public class DataImportService {
 
     Locale locales;
 
+    @Autowired
+    private StudyDao studyDao;
     @Autowired
     private ImportCRFDataService importCRFDataService;
 
@@ -258,7 +261,7 @@ public class DataImportService {
         ArrayList<Integer> eventCrfInts;
         ItemDataBean itemDataBean;
 
-        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
+        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource, studyDao);
         for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
             boolean resetSDV = false;
 

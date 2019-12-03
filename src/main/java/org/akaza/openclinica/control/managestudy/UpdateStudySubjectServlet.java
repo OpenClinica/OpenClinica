@@ -40,8 +40,6 @@ import java.util.*;
  */
 public class UpdateStudySubjectServlet extends SecureController {
 
-    @Autowired
-    StudyDao studyDao;
     SimpleDateFormat yformat = new SimpleDateFormat("yyyy");
 
     StudySubjectBean studySub;

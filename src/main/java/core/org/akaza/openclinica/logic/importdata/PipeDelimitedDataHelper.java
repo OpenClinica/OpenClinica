@@ -61,14 +61,13 @@ import org.w3c.dom.Element;
 public class PipeDelimitedDataHelper extends ImportDataHelper {
 
 	private final DataSource ds;
-	@Autowired
 	private StudyDao studyDao;
-
-	@Autowired
 	private StudyBuildService studyBuildService;
-	public PipeDelimitedDataHelper(DataSource ds) {
+	public PipeDelimitedDataHelper(DataSource ds, StudyBuildService studyBuildService, StudyDao studyDao) {
 		super();
 		this.ds = ds;
+		this.studyBuildService = studyBuildService;
+		this.studyDao = studyDao;
 	}
 	/**
 	 * 

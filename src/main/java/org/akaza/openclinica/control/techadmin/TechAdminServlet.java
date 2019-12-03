@@ -24,8 +24,6 @@ import java.util.ArrayList;
  */
 public class TechAdminServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /*
      * (non-Javadoc)
      *

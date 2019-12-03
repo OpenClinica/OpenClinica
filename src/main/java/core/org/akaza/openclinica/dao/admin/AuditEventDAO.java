@@ -38,12 +38,12 @@ import javax.sql.DataSource;
  */
 public class AuditEventDAO extends AuditableEntityDAO {
 
-    @Autowired
     private StudyDao studyDao;
     // private DAODigester digester;
 
-    public AuditEventDAO(DataSource ds) {
+    public AuditEventDAO(DataSource ds, StudyDao studyDao) {
         super(ds);
+        this.studyDao = studyDao;
     }
 
     public AuditEventDAO(DataSource ds, DAODigester digester) {
@@ -668,4 +668,11 @@ public class AuditEventDAO extends AuditableEntityDAO {
         return al;
     }
 
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

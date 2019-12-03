@@ -100,6 +100,9 @@ public class StudyParticipantController {
 	@Autowired
 	PermissionService permissionService;
 
+	@Autowired
+	private StudyBuildService studyBuildService;
+
 	private RestfulServiceHelper serviceHelper;
 	private String dateFormat;
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -487,7 +490,7 @@ public class StudyParticipantController {
 	}
 
 	public  RestfulServiceHelper getRestfulServiceHelper() {
-		serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource);
+		serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource, studyBuildService, studyDao);
 		return serviceHelper;
 	}
 	public String startBulkAddParticipantJob(MultipartFile file, String schema, String studyOid, String siteOid,UserAccountBean userAccountBean, String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {

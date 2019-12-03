@@ -28,8 +28,7 @@ import java.util.Locale;
  * @author ssachs
  */
 public class ManageStudyServlet extends SecureController {
-    @Autowired
-    private StudyDao studyDao;
+
     Locale locale;
     public final List<String> INSTRUCTIONS = new ArrayList<String>();
 

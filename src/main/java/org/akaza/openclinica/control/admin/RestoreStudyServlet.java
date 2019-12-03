@@ -49,8 +49,6 @@ import java.util.Date;
  */
 public class RestoreStudyServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

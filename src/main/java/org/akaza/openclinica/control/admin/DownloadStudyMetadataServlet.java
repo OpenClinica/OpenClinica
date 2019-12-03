@@ -62,6 +62,7 @@ public class DownloadStudyMetadataServlet extends SecureController {
         adc.collectFileData();
 
         FullReportBean report = new FullReportBean();
+        report.setStudyDao(getStudyDao());
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(getCoreResources());

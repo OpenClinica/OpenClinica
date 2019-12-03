@@ -39,9 +39,7 @@ import java.util.Locale;
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class EditSelectedServlet extends SecureController {
-    
-    @Autowired
-    private StudyDao studyDao;
+
     Locale locale;
 
     // < ResourceBundlerespage,resexception;

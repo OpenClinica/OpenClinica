@@ -5,6 +5,8 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -13,6 +15,7 @@ import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -55,19 +58,20 @@ public class RestfulServiceHelper {
 	private static final String ParticipantID_header = "ParticipantID";
 
 
-	private DataSource dataSource;	
-	@Autowired
+	private DataSource dataSource;
 	private StudyDao studyDao;
+	private StudyBuildService studyBuildService;
 	private UserAccountDAO userAccountDAO;
 	private PipeDelimitedDataHelper importDataHelper;
 	private MessageLogger messageLogger;
 
-	
-	public RestfulServiceHelper(DataSource dataSource2) {
-		dataSource = dataSource2;
+	public RestfulServiceHelper(DataSource dataSource, StudyBuildService studyBuildService, StudyDao studyDao) {
+		this.dataSource = dataSource;
+		this.studyBuildService = studyBuildService;
+		this.studyDao = studyDao;
 	}
-	
-	 /**
+
+	/**
 	  * 
 	  * @param studyOid
 	  * @param request
@@ -658,7 +662,7 @@ public class RestfulServiceHelper {
 
 	    public PipeDelimitedDataHelper getImportDataHelper() {
 			if(importDataHelper == null) {
-				importDataHelper = new PipeDelimitedDataHelper(this.dataSource);
+				importDataHelper = new PipeDelimitedDataHelper(this.dataSource, studyBuildService, studyDao);
 			}
 			return importDataHelper;
 		}

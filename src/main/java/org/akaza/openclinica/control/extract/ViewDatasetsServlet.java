@@ -46,8 +46,6 @@ import java.util.Locale;
  */
 public class ViewDatasetsServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
 
     // < ResourceBundleresword,restext,respage,resexception;

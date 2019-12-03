@@ -39,8 +39,6 @@ import java.util.Set;
  */
 public class AssignUserToStudyServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

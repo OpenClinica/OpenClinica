@@ -56,8 +56,6 @@ public class ViewNoteServlet extends SecureController {
     public static final String NOTE_ID = "id";
 
     public static final String DIS_NOTE = "singleNote";
-    @Autowired
-    private StudyDao studyDao;
     /*
      * (non-Javadoc)
      *

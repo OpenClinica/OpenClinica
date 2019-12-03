@@ -133,8 +133,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 public abstract class DataEntryServlet extends CoreSecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     private static final Logger LOGGER = LoggerFactory.getLogger(DataEntryServlet.class);
 
     Locale locale;

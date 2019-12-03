@@ -60,8 +60,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * preview of a crf before the crfversion is inserted into the database.
  */
 public class ViewSectionDataEntryPreview extends DataEntryServlet {
-    @Autowired
-    private StudyDao studyDao;
     private static final Logger LOGGER = LoggerFactory.getLogger(ViewSectionDataEntryPreview.class);
 
     public static String SECTION_TITLE = "section_title";

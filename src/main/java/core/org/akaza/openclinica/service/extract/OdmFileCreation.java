@@ -196,6 +196,7 @@ public class OdmFileCreation {
                 cdata.collectOdmClinicalData();
 
                 FullReportBean report = new FullReportBean();
+                report.setStudyDao(studyDao);
                 report.setClinicalData(cdata.getOdmClinicalData());
                 report.setOdmStudyMap(mdc.getOdmStudyMap());
                 report.setODMVersion(odmVersion);

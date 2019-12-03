@@ -566,7 +566,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (serviceHelper == null) {
-            serviceHelper = new RestfulServiceHelper(this.dataSource);
+            serviceHelper = new RestfulServiceHelper(this.dataSource, this, studyDao);
         }
         return serviceHelper;
     }

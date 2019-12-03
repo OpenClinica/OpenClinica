@@ -23,15 +23,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ParticipantEventService {
 
     private DataSource dataSource = null;
-    @Autowired
     private StudyDao studyDao;
     private StudyEventDAO studyEventDAO = null;
     private EventCRFDAO eventCRFDAO = null;
     private EventDefinitionCRFDAO eventDefCRFDAO = null;
     private FormLayoutDAO formLayoutDAO = null;
 
-    public ParticipantEventService(DataSource dataSource) { 
+    public ParticipantEventService(DataSource dataSource, StudyDao studyDao) {
         this.dataSource = dataSource;
+        this.studyDao = studyDao;
     }
     
     public StudyEventBean getNextParticipantEvent(StudySubjectBean studySubject) {

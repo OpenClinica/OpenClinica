@@ -68,8 +68,6 @@ public class QueryServiceImpl implements QueryService {
     @Autowired
     private EventCrfDao eventCrfDao;
     @Autowired
-    private StudyDao studyDao;
-    @Autowired
     private OpenRosaService openRosaService;
     @Autowired
     private BeanFactory beanFactory;

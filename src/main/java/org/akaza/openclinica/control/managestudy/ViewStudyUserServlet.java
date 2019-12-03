@@ -28,8 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ViewStudyUserServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      *
      */

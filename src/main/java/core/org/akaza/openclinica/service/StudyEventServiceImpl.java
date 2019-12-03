@@ -78,6 +78,9 @@ public class StudyEventServiceImpl implements StudyEventService {
     @Autowired
     private CSVService csvService;
 
+    @Autowired
+    private StudyBuildService studyBuildService;
+
     private RestfulServiceHelper restfulServiceHelper;
 
 
@@ -567,7 +570,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
         }
         return restfulServiceHelper;
     }

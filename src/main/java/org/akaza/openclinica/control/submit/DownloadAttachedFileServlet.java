@@ -30,8 +30,6 @@ import javax.servlet.ServletOutputStream;
  */
 public class DownloadAttachedFileServlet extends SecureController {
 
-    @Autowired
-    private StudyDao studyDao;
     /**
      * Checks whether the user has the correct privilege
      */

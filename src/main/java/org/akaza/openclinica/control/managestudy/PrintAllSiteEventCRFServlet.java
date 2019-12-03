@@ -48,8 +48,6 @@ import javax.servlet.http.HttpServletResponse;
   * Date: Dec 15, 2009
  */
 public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
-    @Autowired
-    private StudyDao studyDao;
     Locale locale;
 
     /**
@@ -167,7 +165,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
                     DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(), getServletContext());
                     handler.setCrfVersionId(crfVersionBean.getId());
                     //handler.setEventCRFId(eventCRFId);
-                    List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
+                    List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans(getStudyDao());
 
                     request.setAttribute("listOfDisplaySectionBeans", displaySectionBeans);
                     // Make available the CRF names and versions for

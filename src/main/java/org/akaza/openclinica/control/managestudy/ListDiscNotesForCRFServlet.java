@@ -50,8 +50,6 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     private DiscrepancyNoteDAO discrepancyNoteDAO;
     private CRFDAO crfDAO;
 
-    @Autowired
-    private StudyDao studyDao;
     // < ResourceBundleresword;
     /*
      * (non-Javadoc)
@@ -164,6 +162,7 @@ public class ListDiscNotesForCRFServlet extends SecureController {
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
         factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyDao(getStudyDao());
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());

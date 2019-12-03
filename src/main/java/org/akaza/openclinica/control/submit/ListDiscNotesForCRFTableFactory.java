@@ -64,7 +64,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 
 public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
-    @Autowired
     private StudyDao studyDao;
     private StudyEventDefinitionDAO studyEventDefinitionDao;
     private StudySubjectDAO studySubjectDAO;
@@ -441,6 +440,14 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
 
     public void setSubjectDAO(SubjectDAO subjectDAO) {
         this.subjectDAO = subjectDAO;
+    }
+
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
     }
 
     public StudyEventDAO getStudyEventDAO() {

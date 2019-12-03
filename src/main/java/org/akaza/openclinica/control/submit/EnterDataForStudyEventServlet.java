@@ -57,8 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EnterDataForStudyEventServlet extends SecureController {
 
     Locale locale;
-    @Autowired
-    private StudyDao studyDao;
     // < ResourceBundleresexception,respage;
 
     public static final String INPUT_EVENT_ID = "eventId";

@@ -54,8 +54,6 @@ public class CreateJobImportServlet extends SecureController {
     // private SimpleTrigger trigger;
     // private JobDataMap jobDataMap;
 
-    @Autowired
-    StudyDao studyDao;
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         if (ub.isSysAdmin() || ub.isTechAdmin()) {
