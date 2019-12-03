@@ -16,6 +16,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
@@ -58,6 +59,8 @@ public class EventCrf extends DataMapDomainObject {
     private Integer sdvUpdateId;
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
+    
+    private Integer ordinal;
 
     public EventCrf() {
     }
@@ -356,5 +359,14 @@ public class EventCrf extends DataMapDomainObject {
     public void setFormLayout(FormLayout formLayout) {
         this.formLayout = formLayout;
     }
+
+    @Transient
+	public Integer getOrdinal() {
+		return ordinal;
+	}
+
+	public void setOrdinal(Integer ordinal) {
+		this.ordinal = ordinal;
+	}
 
 }

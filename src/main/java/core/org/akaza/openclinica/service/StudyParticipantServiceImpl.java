@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -49,6 +51,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.CrfBean;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.FormLayout;
@@ -461,6 +464,29 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    for(StudyEvent studyEvent : subjectStudyEvents) {
 			    	List<EventCrf> eventCRFs = studyEvent.getEventCrfs();
 			    	
+			    	/*
+			    	 * OC-11782
+			    	 * check the CRF ordinal and reorder by the ordinal 
+			    	 */
+			    	List<EventDefinitionCrf> edfcs = studyEvent.getStudyEventDefinition().getEventDefinitionCrfs();
+			    	for(EventCrf eventCrf : eventCRFs) {
+			    		for(EventDefinitionCrf edfc:edfcs) {
+			    			CrfBean crf = edfc.getCrf();
+			    			
+			    			if(eventCrf.getCrfVersion().getCrf().getCrfId() == crf.getCrfId()) {
+			    				eventCrf.setOrdinal(edfc.getOrdinal());
+			    			}
+			    		}			    		
+			    	}
+			    	
+			    	Comparator<EventCrf> compareByOrinal = new Comparator<EventCrf>() {
+			    	    @Override
+			    	    public int compare(EventCrf o1, EventCrf o2) {
+			    	        return o1.getOrdinal().compareTo(o2.getOrdinal());
+			    	    }
+			    	};
+			    	Collections.sort(eventCRFs, compareByOrinal);
+			    	
 			    	for(EventCrf eventCrf : eventCRFs) {
 			    		formLayoutOID = eventCrf.getFormLayout().getOcOid();
 			    		
@@ -518,6 +544,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			
 		}
   
+    
     /**
      * 
      * @param msg
