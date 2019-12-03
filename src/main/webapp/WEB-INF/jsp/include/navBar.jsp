@@ -505,9 +505,6 @@
                     <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
-                <c:if test="${enableEmbeddedReports}">
-                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
-                </c:if>
            </div>
             <div class="taskRightColumn">
                 <c:if test="${!study.status.frozen && !study.status.locked}">
@@ -520,6 +517,13 @@
                 <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
+            <c:if test="${enableEmbeddedReports}">
+                <div class="taskGroup"><fmt:message key="nav_manage_data" bundle="${resword}"/></div>
+                <div class="taskLeftColumn">
+                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
+                </div>
+                <br clear="all">
+            </c:if>
         </c:if>
         <c:if test="${userRole.investigator}">
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
@@ -529,9 +533,6 @@
                     <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
-                <c:if test="${enableEmbeddedReports}">
-                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
-                </c:if>
             </div>
             <div class="taskRightColumn">
                 <c:if test="${!study.status.frozen && !study.status.locked}">
@@ -552,6 +553,13 @@
                 <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
+            <c:if test="${enableEmbeddedReports}">
+                <div class="taskGroup"><fmt:message key="nav_manage_data" bundle="${resword}"/></div>
+                <div class="taskLeftColumn">
+                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
+                </div>
+                <br clear="all">
+            </c:if>
         </c:if>
         <c:if test="${userRole.coordinator || userRole.director}">
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
