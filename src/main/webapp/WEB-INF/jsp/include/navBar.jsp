@@ -472,7 +472,7 @@
 <!-- End Main Navigation -->
 <div id="subnav_Tasks" class="dropdown">
     <div class="dropdown_BG">
-        <c:if test="${userRole.monitor }">
+        <c:if test="${userRole.monitor}">
             <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
@@ -505,7 +505,10 @@
                     <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
-            </div>
+                <c:if test="${enableEmbeddedReports}">
+                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
+                </c:if>
+           </div>
             <div class="taskRightColumn">
                 <c:if test="${!study.status.frozen && !study.status.locked}">
                     <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
@@ -526,6 +529,9 @@
                     <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
+                <c:if test="${enableEmbeddedReports}">
+                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
+                </c:if>
             </div>
             <div class="taskRightColumn">
                 <c:if test="${!study.status.frozen && !study.status.locked}">
