@@ -1,6 +1,5 @@
 package org.akaza.openclinica.view.form;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.DisplaySectionBean;
@@ -10,6 +9,7 @@ import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import core.org.akaza.openclinica.bean.submit.ResponseSetBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.managestudy.BeanFactory;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -40,7 +40,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
     // The sections that make up the print version of the form
     private List<DisplaySectionBean> displaySectionBeans = new ArrayList<DisplaySectionBean>();
 
-    private StudyBean studyBean;
+    private Study studyBean;
     private EventCRFBean eventCRFbean;
     // Does the HTTP request originate from a print data entry servlet?
     private boolean involvesDataEntry;
@@ -178,8 +178,8 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 
             // Should discrepancy note icons be displayed
             boolean hasDiscrepancyMgt = false;
-            StudyBean studBean = this.getStudyBean();
-            if (studBean != null && studBean.getStudyParameterConfig().getDiscrepancyManagement().equalsIgnoreCase("true")) {
+            Study studBean = this.getStudyBean();
+            if (studBean != null && studBean.getDiscrepancyManagement().equalsIgnoreCase("true")) {
 
                 hasDiscrepancyMgt = true;
             }
@@ -541,8 +541,8 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 
             // Should discrepancy note icons be displayed
             boolean hasDiscrepancyMgt = false;
-            StudyBean studBean = this.getStudyBean();
-            if (studBean != null && studBean.getStudyParameterConfig().getDiscrepancyManagement().equalsIgnoreCase("true")) {
+            Study studBean = this.getStudyBean();
+            if (studBean != null && studBean.getDiscrepancyManagement().equalsIgnoreCase("true")) {
 
                 hasDiscrepancyMgt = true;
             }
@@ -1054,11 +1054,11 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
         this.eventCRFbean = eventCRFbean;
     }
 
-    public StudyBean getStudyBean() {
+    public Study getStudyBean() {
         return studyBean;
     }
 
-    public void setStudyBean(StudyBean studyBean) {
+    public void setStudyBean(Study studyBean) {
         this.studyBean = studyBean;
     }
 

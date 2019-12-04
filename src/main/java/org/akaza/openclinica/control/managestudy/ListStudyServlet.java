@@ -8,15 +8,16 @@
 package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.admin.DisplayStudyBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudyRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,15 +61,14 @@ public class ListStudyServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        ArrayList studies = (ArrayList) sdao.findAll();
+        ArrayList studies = (ArrayList) getStudyDao().findAll();
         // find all parent studies
-        ArrayList parents = (ArrayList) sdao.findAllParents();
+        ArrayList parents = (ArrayList) getStudyDao().findAllParents();
         ArrayList displayStudies = new ArrayList();
 
         for (int i = 0; i < parents.size(); i++) {
-            StudyBean parent = (StudyBean) parents.get(i);
-            ArrayList children = (ArrayList) sdao.findAllByParent(parent.getId());
+            Study parent = (Study) parents.get(i);
+            ArrayList children = (ArrayList) getStudyDao().findAllByParent(parent.getStudyId());
             DisplayStudyBean displayStudy = new DisplayStudyBean();
             displayStudy.setParent(parent);
             displayStudy.setChildren(children);

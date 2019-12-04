@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 public class Utils {
@@ -210,17 +210,17 @@ public class Utils {
         return age;
     }
 
-    public static String getAttachedFilePath(StudyBean study) {
+    public static String getAttachedFilePath(Study study) {
         String attachedFilePath = CoreResources.getField("attached_file_location");
         // @pgawade 15-April-2011: issue #8682
         if (attachedFilePath == null || attachedFilePath.length() <= 0) {
             // attachedFilePath = CoreResources.getField("filePath") +
             // "attached_files" + File.separator + study.getIdentifier() +
             // File.separator;
-            attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + study.getOid() + File.separator;
+            attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + study.getOc_oid() + File.separator;
         } else {
             // attachedFilePath += study.getIdentifier() + File.separator;
-            attachedFilePath += study.getOid() + File.separator;
+            attachedFilePath += study.getOc_oid() + File.separator;
         }
         return attachedFilePath;
     }

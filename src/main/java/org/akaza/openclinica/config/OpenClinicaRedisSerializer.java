@@ -3,10 +3,10 @@ package org.akaza.openclinica.config;
 import java.util.List;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 
 public class OpenClinicaRedisSerializer extends JdkSerializationRedisSerializer {
@@ -49,10 +49,10 @@ public class OpenClinicaRedisSerializer extends JdkSerializationRedisSerializer 
                 }
             }
         }
-        if (obj instanceof StudyBean) {
-            StudyBean study = (StudyBean) obj;
+        if (obj instanceof Study) {
+            Study study = (Study) obj;
             if (study.getStatus() != null) {
-                Integer statusId = study.getStatus().getId();
+                Integer statusId = study.getStatus().getCode();
                 switch (statusId) {
                     case 0: study.setStatus(Status.INVALID); break;
                     case 1: study.setStatus(Status.AVAILABLE); break;

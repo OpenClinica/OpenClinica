@@ -1,18 +1,18 @@
 package core.org.akaza.openclinica.web.restful;
 
 import com.sun.jersey.api.view.Viewable;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
 import core.org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
 import core.org.akaza.openclinica.service.PermissionService;
@@ -62,6 +62,8 @@ public class ODMClinicaDataResource {
     private PermissionService permissionService;
     @Autowired
     private StudyEventDao studyEventDao;
+    @Autowired
+    private StudyDao studyDao;
 
     public MetadataCollectorResource getMetadataCollectorResource() {
         return metadataCollectorResource;
@@ -118,8 +120,7 @@ public class ODMClinicaDataResource {
         ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData, links);
 
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
-        StudyDAO sdao = new StudyDAO(getDataSource());
-        StudyBean studyBean = sdao.findByOid(studyOID);
+        Study studyBean = studyDao.findByOcOID(studyOID);
         String permissionTagsString = "";
         String[] permissionTagsStringArray;
 
@@ -142,7 +143,7 @@ public class ODMClinicaDataResource {
         }
 
         XMLSerializer xmlSerializer = new XMLSerializer();
-             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
+             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyBean, formVersionOID,clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray, odmFilter);
         xmlSerializer.setTypeHintsEnabled(true);
@@ -262,8 +263,7 @@ public class ODMClinicaDataResource {
             userBean = (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
         }
 
-        StudyDAO sdao = new StudyDAO(getDataSource());
-        StudyBean studyBean = sdao.findByOid(studyOID);
+        Study studyBean = studyDao.findByOcOID(studyOID);
         String permissionTagsString = "";
         String[] permissionTagsStringArray;
         if (odmFilter.isCrossForm()) {
@@ -285,7 +285,7 @@ public class ODMClinicaDataResource {
             clinicalDataBeans = null;
         }
 
-        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyBean, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray, odmFilter);
         LOGGER.debug(report.getXmlOutput().toString().trim());
@@ -314,8 +314,7 @@ public class ODMClinicaDataResource {
             userBean = (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
             userId = userBean.getId();
         }
-        StudyDAO sdao = new StudyDAO(getDataSource());
-        StudyBean studyBean = sdao.findByOid(studyOID);
+        Study studyBean = studyDao.findByOcOID(studyOID);
         String permissionTagsString = "";
         String[] permissionTagsStringArray;
 
@@ -337,7 +336,7 @@ public class ODMClinicaDataResource {
             clinicalDataBeans = null;
         }
 
-        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyBean, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         if (report.getClinicalDataMap() == null){
             LOGGER.info("ClinicalData Map is returning null in ODMClinicalDataResource");
@@ -360,8 +359,7 @@ public class ODMClinicaDataResource {
         if (subjectIdentifier.equals("*") || (studySubject != null && studySubject.getOid() != null))
             return subjectIdentifier;
         else {
-            StudyDAO studyDAO = new StudyDAO(getDataSource());
-            StudyBean study = studyDAO.findByOid(studyOID);
+            Study study = studyDao.findByOcOID(studyOID);
             studySubject = studySubjectDAO.findByLabelAndStudy(subjectIdentifier, study);
             if (studySubject != null && studySubject.getOid() != null)
                 return studySubject.getOid();

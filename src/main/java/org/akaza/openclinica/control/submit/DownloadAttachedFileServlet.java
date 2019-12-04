@@ -8,13 +8,14 @@
 package org.akaza.openclinica.control.submit;
 
 import core.org.akaza.openclinica.bean.core.Utils;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -70,25 +71,25 @@ public class DownloadAttachedFileServlet extends SecureController {
         String fileName = fp.getString("fileName");
         File f = new File(fileName);
         if (fileName != null && fileName.length() > 0) {
-            int parentStudyId = currentStudy.getParentStudyId();
+            int parentStudyId = currentStudy.checkAndGetParentStudyId();
             String testPath = Utils.getAttachedFileRootPath();
             String tail = File.separator + f.getName();
-            String testName = testPath + currentStudy.getOid() + tail;
+            String testName = testPath + currentStudy.getOc_oid() + tail;
             File temp = new File(testName);
             if (temp.exists()) {
                 filePathName = testName;
                 logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
             } else {
-                if (currentStudy.isSite(parentStudyId)) {
-                    testName = testPath + ((StudyBean) new StudyDAO(sm.getDataSource()).findByPK(parentStudyId)).getOid() + tail;
+                if (currentStudy.isSite()) {
+                    testName = testPath + ((Study) getStudyDao().findByPK(parentStudyId)).getOc_oid() + tail;
                     temp = new File(testName);
                     if (temp.exists()) {
                         filePathName = testName;
                         logger.info("parent existing filePathName=" + filePathName);
                     }
                 } else {
-                    ArrayList<StudyBean> sites = (ArrayList<StudyBean>) new StudyDAO(sm.getDataSource()).findAllByParent(currentStudy.getId());
-                    for (StudyBean s : sites) {
+                    ArrayList<Study> sites = (ArrayList<Study>) getStudyDao().findAllByParent(currentStudy.getStudyId());
+                    for (Study s : sites) {
                         testPath = Utils.getAttachedFilePath(s);
                         testName = testPath + tail;//+ s.getIdentifier() + tail;
                         File test = new File(testName);

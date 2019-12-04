@@ -1,9 +1,9 @@
 package org.akaza.openclinica.controller.helper;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,9 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
     private DataSource dataSource;
     @Autowired
     private StudyParameterValueDao studyParameterValueDao;
-
+    
+    @Autowired
+    private StudyDao studyDao;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Override
@@ -43,13 +45,10 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
         return true;
     }
 
-    private boolean isEnrollmentCapEnforced(HttpServletRequest httpServletRequest, StudyBean currentStudy) {
-        String enrollmentCapStatus = "false";
-        int currentId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-
-        StudyParameterValue enrollmentCap = studyParameterValueDao.findByStudyIdParameter(currentId, "enforceEnrollmentCap");
-        if (enrollmentCap != null)
-            enrollmentCapStatus = enrollmentCap.getValue();
+    private boolean isEnrollmentCapEnforced(HttpServletRequest httpServletRequest, Study currentStudy) {
+        String enrollmentCapStatus = currentStudy.getEnforceEnrollmentCap();
+        if (enrollmentCapStatus == null)
+            enrollmentCapStatus = "false";
 
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         return capEnforced;
@@ -59,22 +58,22 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
 
         boolean capIsOn;
         HttpSession session = httpServletRequest.getSession();
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
+        Study currentStudy = (Study) session.getAttribute("study");
 
-        if (currentStudy != null && currentStudy.getId() != 0) {
+        if (currentStudy != null && currentStudy.getStudyId() != 0) {
             if (currentStudy.getStatus() != null && currentStudy.getStatus().isAvailable()) {
-                capIsOn = isEnrollmentCapEnforced(httpServletRequest, currentStudy);
+
 
                 StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
                 int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
 
-                StudyDAO studyDAO = new StudyDAO(dataSource);
-                StudyBean sb;
-                if (currentStudy.getParentStudyId() != 0) {
-                    sb = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
+                Study sb;
+                if (currentStudy.isSite()) {
+                    sb = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
                 } else {
-                    sb = (StudyBean) studyDAO.findByPK(currentStudy.getId());
+                    sb = (Study) studyDao.findByPK(currentStudy.getStudyId());
                 }
+                capIsOn = isEnrollmentCapEnforced(httpServletRequest, sb);
                 int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
                 if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)

@@ -1,10 +1,10 @@
 package core.org.akaza.openclinica.dao.hibernate;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.hibernate.query.Query;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,18 +19,18 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
     }
 
     @SuppressWarnings("unchecked")
-    public RuleSetBean findById(Integer id, StudyBean study) {
+    public RuleSetBean findById(Integer id, Study study) {
         String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.id = :id and ruleSet.studyId = :studyId ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("id", id);
-        q.setInteger("studyId", study.getId());
+        q.setInteger("studyId", study.getStudyId());
         return (RuleSetBean) q.uniqueResult();
     }
 
-    public Long count(StudyBean study) {
+    public Long count(Study study) {
         String query = "select count(*) from " + domainClass().getName() + " ruleSet where ruleSet.studyId = :studyId " + " AND ruleSet.status != :status ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyId", study.getId());
+        q.setInteger("studyId", study.getStudyId());
         q.setParameter("status", Status.DELETED);
         return (Long) q.uniqueResult();
 
@@ -74,7 +74,7 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
     @SuppressWarnings("unchecked")
     @Transactional
-    public ArrayList<RuleSetBean> findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(CRFVersionBean crfVersion, CRFBean crfBean, StudyBean currentStudy,
+    public ArrayList<RuleSetBean> findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(CRFVersionBean crfVersion, CRFBean crfBean, Study currentStudy,
             StudyEventDefinitionBean sed) {
         // Using a sql query because we are referencing objects not managed by hibernate
         String query =
@@ -85,7 +85,7 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
         q.setInteger("crfVersionId", crfVersion.getId());
         q.setInteger("crfId", crfBean.getId());
-        q.setInteger("studyId", currentStudy.getParentStudyId() != 0 ? currentStudy.getParentStudyId() : currentStudy.getId());
+        q.setInteger("studyId", currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId());
         q.setInteger("studyEventDefinitionId", sed.getId());
         q.setCacheable(true);
 
@@ -93,17 +93,17 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
     }
 
     @SuppressWarnings("unchecked")
-    public ArrayList<RuleSetBean> findAllByStudy(StudyBean currentStudy) {
+    public ArrayList<RuleSetBean> findAllByStudy(Study currentStudy) {
         String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.studyId = :studyId  ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyId", currentStudy.getId());
+        q.setInteger("studyId", currentStudy.getStudyId());
         return (ArrayList<RuleSetBean>) q.list();
     }
     
    
 
     @SuppressWarnings("unchecked")
-    public ArrayList<RuleSetBean> findByCrf(CRFBean crfBean, StudyBean currentStudy) {
+    public ArrayList<RuleSetBean> findByCrf(CRFBean crfBean, Study currentStudy) {
         String query =
             " select rs.* from rule_set rs where rs.study_id = :studyId "
                 + " AND rs.item_id in ( select distinct(item_id) from item_form_metadata ifm,crf_version cv "
@@ -111,7 +111,7 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         // Using a sql query because we are referencing objects not managed by hibernate
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
         q.setInteger("crfId", crfBean.getId());
-        q.setInteger("studyId", currentStudy.getId());
+        q.setInteger("studyId", currentStudy.getStudyId());
         return (ArrayList<RuleSetBean>) q.list();
     }
 
@@ -134,10 +134,10 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         return (RuleSetBean) q.uniqueResult();
     }
 
-    public Long getCountByStudy(StudyBean currentStudy) {
+    public Long getCountByStudy(Study currentStudy) {
         String query = "select count(*) from " + getDomainClassName() + " ruleSet  where ruleSet.studyId = :studyId and ruleSet.status = :status ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyId", currentStudy.getId());
+        q.setInteger("studyId", currentStudy.getStudyId());
         q.setParameter("status", core.org.akaza.openclinica.domain.Status.AVAILABLE);
         return (Long) q.uniqueResult();
     }
@@ -148,10 +148,10 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         q.setInteger("studyEventDefId", sed.getId());
         return (ArrayList<RuleSetBean>) q.list();
     }
-    public ArrayList<RuleSetBean> findAllEventActions(StudyBean currentStudy){
+    public ArrayList<RuleSetBean> findAllEventActions(Study currentStudy){
     	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.originalTarget.value LIKE '%.STARTDATE%' or ruleSet.originalTarget.value LIKE '%.STATUS%' and ruleSet.studyId = :studyId ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyId", currentStudy.getId());
+        q.setInteger("studyId", currentStudy.getStudyId());
         return (ArrayList<RuleSetBean>) q.list();
     }
 

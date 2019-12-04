@@ -10,7 +10,7 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean' />
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study' />
 <jsp:useBean scope='session' id='userRole' class='core.org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 
 <jsp:useBean scope='request' id='sites' class='java.util.ArrayList' />
@@ -186,7 +186,7 @@
 						<td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td> 
 					</tr>
 					<c:choose>
-					 <c:when test="${study.parentStudyId>0}">
+					 <c:when test="${study.study != null && study.study.studyId>0}">
 					  <tr valign="top"><td class="table_cell" colspan="3"><fmt:message key="site_itself_cannot_have_sites" bundle="${restext}"/></td></tr>
 					  
 					 </c:when>
@@ -211,7 +211,7 @@
 					</c:forEach>
 					</c:otherwise>
 					</c:choose>
-					 <c:if test="${study.parentStudyId==0}">
+					 <c:if test="${study.study == null || study.study.studyId == 0}">
 					  <tr valign="top">
 					   <td class="table_cell" align="right" colspan="3">
 					    <c:if test="${sitesCount>0}">
@@ -253,7 +253,7 @@
 						<td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td> 
 					</tr>
 					<c:choose>
-					  <c:when test="${study.parentStudyId>0}">
+					  <c:when test="${study.study != null && study.study.studyId>0}">
 					    <tr valign="top"><td class="table_cell" colspan="3"><fmt:message key="site_itself_cannot_have_definitions" bundle="${restext}"/></td></tr>
 					  </c:when>
 					  <c:otherwise>
@@ -276,7 +276,7 @@
 					  </c:otherwise>
 					</c:choose>
 					
-					 <c:if test="${study.parentStudyId==0}">
+					 <c:if test="${study.study == null || study.study.studyId==0}">
 					   <tr valign="top">
 					    <td class="table_cell" align="right" colspan="3">
 					     <c:if test="${sedsCount>0}">					  

@@ -237,7 +237,7 @@ public class AddCRFToDefinitionServlet extends SecureController {
                 EventDefinitionCRFBean edcBean = new EventDefinitionCRFBean();
                 edcBean.setCrfId(crf.getId());
                 edcBean.setCrfName(crf.getName());
-                edcBean.setStudyId(currentStudy.getId());
+                edcBean.setStudyId(currentStudy.getStudyId());
                 edcBean.setStatus(Status.AVAILABLE);
                 edcBean.setStudyEventDefinitionId(sed.getId());
                 edcBean.setSourceDataVerification(SourceDataVerification.NOTREQUIRED);

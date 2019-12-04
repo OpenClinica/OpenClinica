@@ -8,13 +8,14 @@
 package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Prepares to process request of updating a study object
@@ -23,7 +24,6 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
  * @version CVS: $Id: InitUpdateStudyServlet.java 13689 2009-12-16 21:10:37Z kkrumlian $
  */
 public class InitUpdateStudyServlet extends SecureController {
-
     /**
      *
      */
@@ -44,7 +44,6 @@ public class InitUpdateStudyServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         String idString = request.getParameter("id");
         logger.info("study id:" + idString);
         if (StringUtil.isBlank(idString)) {
@@ -52,11 +51,9 @@ public class InitUpdateStudyServlet extends SecureController {
             forwardPage(Page.ERROR);
         } else {
             int studyId = Integer.valueOf(idString.trim()).intValue();
-            StudyBean study = (StudyBean) sdao.findByPK(studyId);
-            StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-            study = scs.setParametersForStudy(study);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
-            logger.info("date created:" + study.getCreatedDate());
+            logger.info("date created:" + study.getDateCreated());
             logger.info("protocol Type:" + study.getProtocolType());
 
             session.setAttribute("newStudy", study);

@@ -2,8 +2,8 @@ package core.org.akaza.openclinica.web.rest.client.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.OCUserDTO;
 import core.org.akaza.openclinica.web.rest.client.dto.CustomerDTO;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class CustomerServiceClientImpl {
         objectMapper.registerModule(new JavaTimeModule());
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
-        StudyBean studyBean = null;
+        Study studyBean = null;
         HttpEntity entity = new HttpEntity<OCUserDTO>(headers);
         ResponseEntity<CustomerDTO> response = null;
         try {

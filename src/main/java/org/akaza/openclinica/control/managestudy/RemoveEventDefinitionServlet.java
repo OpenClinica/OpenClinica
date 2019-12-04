@@ -72,7 +72,7 @@ public class RemoveEventDefinitionServlet extends SecureController {
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
 
 //        checkRoleByUserAndStudy(ub.getName(), sed.getStudyId(), 0);
-        if (currentStudy.getId() != sed.getStudyId()) {
+        if (currentStudy.getStudyId() != sed.getStudyId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));
             forwardPage(Page.MENU_SERVLET);

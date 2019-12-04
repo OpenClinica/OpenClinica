@@ -4,10 +4,10 @@ import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +163,7 @@ public class HideCRFManager {
      *            EventDefinitionCRFDAO.
      * @return An ArrayList of CRFBeans containing only "unhidden" CRFs.
      */
-    public ArrayList<CRFBean> removeHiddenCRFBeans(StudyBean study, StudyEventDefinitionBean studyEventBean, ArrayList<CRFBean> crfBeans, DataSource dataSource) {
+    public ArrayList<CRFBean> removeHiddenCRFBeans(Study study, StudyEventDefinitionBean studyEventBean, ArrayList<CRFBean> crfBeans, DataSource dataSource) {
 
         ArrayList<CRFBean> newBeans = new ArrayList<CRFBean>();
         if (crfBeans == null || crfBeans.isEmpty()) {

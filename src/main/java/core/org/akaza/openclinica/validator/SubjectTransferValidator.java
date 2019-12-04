@@ -3,12 +3,13 @@ package core.org.akaza.openclinica.validator;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -21,7 +22,8 @@ import javax.sql.DataSource;
 public class SubjectTransferValidator implements Validator {
 
     DataSource dataSource;
-    StudyDAO studyDAO;
+    @Autowired
+    StudyDao studyDao;
     StudySubjectDAO studySubjectDAO;
     StudyParameterValueDAO studyParameterValueDAO;
 
@@ -36,7 +38,7 @@ public class SubjectTransferValidator implements Validator {
     public void validate(Object obj, Errors e) {
         SubjectTransferBean subjectTransferBean = (SubjectTransferBean) obj;
 
-        StudyBean study = getStudyDAO().findByUniqueIdentifier(subjectTransferBean.getStudyOid());
+        Study study = studyDao.findByUniqueId(subjectTransferBean.getStudyOid());
         if (study == null) {
             e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { subjectTransferBean.getStudyOid() }, "Study identifier you specified "
                 + subjectTransferBean.getStudyOid() + " does not correspond to a valid study.");
@@ -51,7 +53,7 @@ public class SubjectTransferValidator implements Validator {
         }
 
         if (subjectTransferBean.getSiteIdentifier() != null) {
-            study = getStudyDAO().findSiteByUniqueIdentifier(subjectTransferBean.getStudyOid(), subjectTransferBean.getSiteIdentifier());
+            study = studyDao.findSiteByUniqueIdentifier(subjectTransferBean.getStudyOid(), subjectTransferBean.getSiteIdentifier());
         }
         subjectTransferBean.setStudy(study);
         if (study == null) {
@@ -59,7 +61,7 @@ public class SubjectTransferValidator implements Validator {
                     "Site identifier you specified does not correspond to a valid site.");
             return;
         }
-        int handleStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
+        int handleStudyId = study.isSite() ? study.getStudy().getStudyId() : study.getStudyId();
         StudyParameterValueBean studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectPersonIdRequired");
         String personId = subjectTransferBean.getPersonId();
         if ("required".equals(studyParameter.getValue()) && (personId == null || personId.length() < 1)) {
@@ -140,10 +142,6 @@ public class SubjectTransferValidator implements Validator {
                 return;
             }
         }
-    }
-
-    public StudyDAO getStudyDAO() {
-        return this.studyDAO != null ? studyDAO : new StudyDAO(dataSource);
     }
 
     public StudySubjectDAO getStudySubjectDAO() {

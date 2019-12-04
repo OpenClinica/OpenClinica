@@ -9,12 +9,12 @@ package core.org.akaza.openclinica.dao.managestudy;
 
 import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.core.GroupClassType;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -112,7 +112,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
     }
 
     @Override
-    public ArrayList findAllByStudy(StudyBean study) {
+    public ArrayList findAllByStudy(Study study) {
         ArrayList answer = new ArrayList();
 
         this.setTypesExpected();
@@ -120,8 +120,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
         this.setTypeExpected(12, TypeNames.STRING);
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(study.getId()));
-        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(new Integer(1), new Integer(study.getStudyId()));
+        variables.put(new Integer(2), new Integer(study.getStudyId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllByStudy"), variables);
 
@@ -139,7 +139,7 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
     }
 
     @Override
-    public ArrayList findAllActiveByStudy(StudyBean study) {
+    public ArrayList findAllActiveByStudy(Study study) {
         ArrayList answer = new ArrayList();
 
         this.setTypesExpected();
@@ -147,8 +147,8 @@ public class StudyGroupClassDAO extends AuditableEntityDAO {
         this.setTypeExpected(12, TypeNames.STRING);
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(study.getId()));
-        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(new Integer(1), new Integer(study.getStudyId()));
+        variables.put(new Integer(2), new Integer(study.getStudyId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllActiveByStudy"), variables);
 

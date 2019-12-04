@@ -13,9 +13,9 @@ public class FormDataBean {
     private String formOID;
     private String EventCRFStatus;
     private String reasonForChangeForCompleteForms;
-  
 
-	private String formLayoutName;
+
+    private String formLayoutName;
     private Date createdDate;
     private Date updatedDate;
     private String createdBy;
@@ -106,13 +106,13 @@ public class FormDataBean {
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
-    
-    public String getReasonForChangeForCompleteForms() {
-  		return reasonForChangeForCompleteForms;
-  	}
 
-  	public void setReasonForChangeForCompleteForms(String reasonForChangeForCompleteForms) {
-  		this.reasonForChangeForCompleteForms = reasonForChangeForCompleteForms;
-  	}
+    public String getReasonForChangeForCompleteForms() {
+        return reasonForChangeForCompleteForms;
+    }
+
+    public void setReasonForChangeForCompleteForms(String reasonForChangeForCompleteForms) {
+        this.reasonForChangeForCompleteForms = reasonForChangeForCompleteForms;
+    }
 
 }

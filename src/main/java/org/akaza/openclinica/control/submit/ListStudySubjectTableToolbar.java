@@ -1,8 +1,8 @@
 package org.akaza.openclinica.control.submit;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.DefaultToolbar;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.PermissionService;
@@ -30,11 +30,11 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
     private final String ENABLED = "enabled";
     private ViewStudySubjectService viewStudySubjectService;
     private PermissionService permissionService;
-    private StudyBean studyBean;
+    private Study studyBean;
     private HttpServletRequest request;
 
     public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
-            boolean addSubjectLinkShow, boolean showMoreLink , String participateModuleStatus,ViewStudySubjectService viewStudySubjectService,PermissionService permissionService,StudyBean studyBean,HttpServletRequest request) {
+                                        boolean addSubjectLinkShow, boolean showMoreLink , String participateModuleStatus, ViewStudySubjectService viewStudySubjectService, PermissionService permissionService, Study studyBean, HttpServletRequest request) {
         super();
         this.studyEventDefinitions = studyEventDefinitions;
         this.studyGroupClasses = studyGroupClasses;
@@ -149,7 +149,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
         public String enabled() {
             String js =
                 "var selectedValue = document.getElementById('sedDropDown').options[document.getElementById('sedDropDown').selectedIndex].value; "
-                    + " var maxrows = jQuery('select[name=maxRows]').val();"
+                    + " var maxrows = $('select[name=maxRows]').val();"
                     + " if (selectedValue != null  ) { " + "window.location='ListEventsForSubjects?module=submit&defId=' + selectedValue + '&listEventsForSubject_mr_=' + maxrows;" + " } ";
             HtmlBuilder html = new HtmlBuilder();
             html.select().id("sedDropDown").onchange(js).close();

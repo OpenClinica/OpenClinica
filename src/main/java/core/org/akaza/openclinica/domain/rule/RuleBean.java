@@ -19,10 +19,10 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.oid.GenericOidGenerator;
 import core.org.akaza.openclinica.bean.oid.OidGenerator;
 import core.org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -44,7 +44,7 @@ public class RuleBean extends AbstractAuditableMutableDomainObject implements Se
     private String type;
     private String description;
     private boolean enabled;
-    private StudyBean study;
+    private Study study;
 
     private ExpressionBean expression;
     private List<RuleSetRuleBean> ruleSetRules;
@@ -135,13 +135,13 @@ public class RuleBean extends AbstractAuditableMutableDomainObject implements Se
     }
 
     @Transient
-    public StudyBean getStudy() {
+    public Study getStudy() {
         return study;
     }
 
-    public void setStudy(StudyBean study) {
-        if (study.getId() > 0) {
-            this.studyId = study.getId();
+    public void setStudy(Study study) {
+        if (study != null && study.getStudyId() > 0) {
+            this.studyId = study.getStudyId();
         }
         this.study = study;
     }

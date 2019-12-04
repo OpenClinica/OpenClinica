@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.action.EventActionBean;
@@ -21,6 +21,7 @@ import core.org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -28,6 +29,7 @@ import javax.sql.DataSource;
 
 public class EventActionValidator implements Validator {
 
+    private StudyDao studyDao;
     DataSource dataSource;
 	ExpressionService expressionService;
     AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper;
@@ -37,8 +39,9 @@ public class EventActionValidator implements Validator {
     public static final String BRACKETS_AND_CONTENTS = ".*\\[(END|ALL|[1-9]\\d*)\\]";
     private final String REPEATING = ".*\\[(END|ALL|[1-9]\\d*)\\]";
 
-	public EventActionValidator(DataSource dataSource) {
+	public EventActionValidator(DataSource dataSource, StudyDao studyDao) {
         this.dataSource = dataSource;
+        this.studyDao = studyDao;
     }
 
     /**
@@ -96,8 +99,7 @@ public class EventActionValidator implements Validator {
 
     private boolean isEventActionValueExpressionValid(PropertyBean property, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
 
-        StudyDAO studyDAO =  new StudyDAO<String, ArrayList>(getDataSource());
-        StudyBean study = (StudyBean) studyDAO.findByPK(ruleSetBeanWrapper.getAuditableBean().getStudyId());
+        Study study = (Study) studyDao.findByPK(ruleSetBeanWrapper.getAuditableBean().getStudyId());
                
         ExpressionBean expressionBean = isExpressionValid(property.getValueExpression(), ruleSetBeanWrapper);
         ExpressionObjectWrapper eow = new ExpressionObjectWrapper(dataSource,study, expressionBean, ruleSetBeanWrapper.getAuditableBean(),

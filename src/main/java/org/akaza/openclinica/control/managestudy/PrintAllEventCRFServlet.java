@@ -6,7 +6,6 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.PrintCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -16,6 +15,8 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
@@ -23,7 +24,6 @@ import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
@@ -32,6 +32,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,7 +50,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class PrintAllEventCRFServlet extends DataEntryServlet {
     Locale locale;
-
     /**
      * Checks whether the user has the correct privilege
      */
@@ -82,8 +82,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
 
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         seds = sedao.findAllByStudy(currentStudy);
@@ -162,7 +161,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
                     DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(), getServletContext());
                     handler.setCrfVersionId(crfVersionBean.getId());
                     //handler.setEventCRFId(eventCRFId);
-                    List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
+                    List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans(getStudyDao());
 
                     request.setAttribute("listOfDisplaySectionBeans", displaySectionBeans);
                     // Make available the CRF names and versions for
@@ -364,4 +363,13 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         return false; //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
 }

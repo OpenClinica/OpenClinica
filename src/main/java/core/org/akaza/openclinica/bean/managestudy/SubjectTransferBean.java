@@ -9,6 +9,7 @@ package core.org.akaza.openclinica.bean.managestudy;
 
 import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.util.Date;
 
@@ -18,7 +19,7 @@ import java.util.Date;
 public class SubjectTransferBean extends EntityBean {
 
     private static final long serialVersionUID = 2270466335721404526L;
-    private StudyBean study;
+    private Study study;
     private String personId;
     private String studySubjectId;
     private Date dateOfBirth;
@@ -30,7 +31,7 @@ public class SubjectTransferBean extends EntityBean {
     private Date enrollmentDate;
     private String secondaryId;
     private String siteIdentifier;
-    private StudyBean siteStudy;
+    private Study siteStudy;
     private String firstName;
     private String lastName;
     private String identifier;
@@ -150,19 +151,19 @@ public class SubjectTransferBean extends EntityBean {
         this.siteIdentifier = siteIdentifier;
     }
 
-    public StudyBean getStudy() {
+    public Study getStudy() {
         return study;
     }
 
-    public void setStudy(StudyBean study) {
+    public void setStudy(Study study) {
         this.study = study;
     }
 
-	public StudyBean getSiteStudy() {
+	public Study getSiteStudy() {
 		return siteStudy;
 	}
 
-	public void setSiteStudy(StudyBean siteStudy) {
+	public void setSiteStudy(Study siteStudy) {
 		this.siteStudy = siteStudy;
 	}
 

@@ -33,16 +33,16 @@
  	<c:if test="${panel.studyInfoShown}">
 
  	<c:choose>
- 	<c:when test="${study.status.name != 'removed' && study.status.name != 'auto-removed'}">
+ 	<c:when test="${study.status.description != 'removed' && study.status.description != 'auto-removed'}">
 
 	<c:choose>
-	<c:when test="${study.parentStudyId>0}">
+	<c:when test="${study.study != null && study.study.studyId > 0}">
 	<b><fmt:message key="site" bundle="${resword}"/>:</b>&nbsp;
-	 <a href="ViewSite?id=<c:out value="${study.id}"/>">
+	 <a href="ViewSite?id=<c:out value="${study.studyId}"/>">
 	</c:when>
 	<c:otherwise>
 	<b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
-	 <a href="ViewStudy?id=<c:out value="${study.id}"/>&viewFull=yes">
+	 <a href="ViewStudy?id=<c:out value="${study.studyId}"/>&viewFull=yes">
 	</c:otherwise>
 	</c:choose>
 	<c:out value="${study.name}"/></a>
@@ -84,10 +84,10 @@
 
 	<b><fmt:message key="collect_subject" bundle="${resword}"/></b>&nbsp;
 	<c:choose>
-    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+    <c:when test="${study.collectDob == '1'}">
      <fmt:message key="yes" bundle="${resword}"/>
     </c:when>
-    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
+    <c:when test="${study.collectDob == '2'}">
      <fmt:message key="only_year_of_birth" bundle="${resword}"/>
     </c:when>
     <c:otherwise>

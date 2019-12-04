@@ -45,7 +45,7 @@
     </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
-<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='userRolesToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToView' class='java.util.ArrayList'/>
@@ -73,7 +73,7 @@
 
 <h1><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1></br>
 
-<a style="text-decoration:none" href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"><fmt:message key="download_study_meta" bundle="${restext}"/></a>.
+<a style="text-decoration:none" href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.studyId}"/>');"><fmt:message key="download_study_meta" bundle="${restext}"/></a>.
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
 <a style="text-decoration:none" href="ListStudySubjects"><fmt:message key="subject_matrix" bundle="${restext}"/></a>.
 
@@ -92,10 +92,10 @@
   <c:out value="${studyToView.name}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><a style="text-decoration:none" href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></a>:</td><td class="table_cell">
-  <c:out value="${studyToView.identifier}"/>
+  <c:out value="${studyToView.uniqueIdentifier}"/>
   </td></tr>
    <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.oid}"/>
+  <c:out value="${studyToView.oc_oid}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.principalInvestigator}"/>
@@ -105,10 +105,10 @@
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="owner" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.owner.name}"/>
+  <c:out value="${studyToView.userAccount.userName}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${studyToView.createdDate}" pattern="${dteFormat}"/>
+  <fmt:formatDate value="${studyToView.dateCreated}" pattern="${dteFormat}"/>
   </td></tr>
  </table>
 
@@ -133,7 +133,7 @@
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></a>:</td><td class="table_cell">
-  <c:out value="${studyToView.identifier}"/>
+  <c:out value="${studyToView.uniqueIdentifier}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
@@ -186,7 +186,7 @@
   </td></tr>
 
     <c:choose>
-     <c:when test="${studyToView.parentStudyId == 0}">
+     <c:when test="${studyToView.study == null || studyToView.study.studyId == 0}">
         <c:set var="key" value="study_system_status"/>
      </c:when>
      <c:otherwise>
@@ -198,16 +198,16 @@
 
   <c:choose>
     <c:when test="${studyToView.status.locked}">
-        <strong><c:out value="${studyToView.status.name}"/></strong>
+        <strong><c:out value="${studyToView.status.description}"/></strong>
     </c:when>
     <c:otherwise>
-        <c:out value="${studyToView.status.name}"/>
+        <c:out value="${studyToView.status.description}"/>
     </c:otherwise>
   </c:choose>
    </td></tr>
 
   <c:choose>
-  <c:when test="${studyToView.protocolTypeKey=='interventional'}">
+  <c:when test="${studyToView.protocolType=='interventional'}">
   </c:when>
   <c:otherwise>
   </c:otherwise>
@@ -233,7 +233,7 @@
     <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_cap_enforced" bundle="${resword}"/>:</td><td class="table_cell">
 
        <c:choose>
-       <c:when test="${studyToView.studyParameterConfig.enforceEnrollmentCap == 'false'}">
+       <c:when test="${studyToView.enforceEnrollmentCap == 'false'}">
        <fmt:message key="no" bundle="${resword}"/>
        </c:when>
        <c:otherwise>
@@ -303,10 +303,10 @@
   <!-- <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '1'}">
+   <c:when test="${studyToView.collectDob == '1'}">
   <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '2'}">
+   <c:when test="${studyToView.collectDob == '2'}">
      <fmt:message key="only_year_of_birth" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -320,7 +320,7 @@
     <td class="table_header_column"><fmt:message key="method_of_creation" bundle="${resword}"/></td>
     <td class="table_cell">
       <c:choose>
-        <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'manual'}">
+        <c:when test="${studyToView.subjectIdGeneration == 'manual'}">
           <fmt:message key="manual_entry" bundle="${resword}"/>
         </c:when>
         <c:otherwise>
@@ -333,17 +333,17 @@
   <tr valign="top">
     <td class="table_header_column"><fmt:message key="id_template" bundle="${resword}"/></td>
     <td class="table_cell">
-      <c:out value="${studyToView.studyParameterConfig.participantIdTemplate}"/>
+      <c:out value="${studyToView.participantIdTemplate}"/>
     </td>
   </tr>
 
 <!--   <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-       <c:when test="${(studyToView.studyParameterConfig.subjectPersonIdRequired == 'required')
-            or ((studyToView.studyParameterConfig.subjectPersonIdRequired == 'always'))}">    <fmt:message key="required" bundle="${resword}"/>
+       <c:when test="${(studyToView.subjectPersonIdRequired == 'required')
+            or ((studyToView.subjectPersonIdRequired == 'always'))}">    <fmt:message key="required" bundle="${resword}"/>
         </c:when>
-        <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+        <c:when test="${studyToView.subjectPersonIdRequired == 'optional'}">
             <fmt:message key="optional" bundle="${resword}"/>
         </c:when>
         <c:otherwise>
@@ -357,7 +357,7 @@
    <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
+   <c:when test="${studyToView.subjectIdPrefixSuffix == 'true'}">
     Yes
    </c:when>
    <c:otherwise>
@@ -394,14 +394,14 @@
   <c:forEach var="site" items="${sitesToView}">
   <tr valign="top">
    <td class="table_cell_left"><c:out value="${site.name}"/></td>
-   <td class="table_cell"><c:out value="${site.oid}"/></td>
+   <td class="table_cell"><c:out value="${site.oc_oid}"/></td>
    <td class="table_cell">
     <c:out value="${site.principalInvestigator}"/>
    </td>
-   <td class="table_cell"><c:out value="${site.status.name}"/></td>
+   <td class="table_cell"><c:out value="${site.status.description}"/></td>
    <td class="table_cell">
      <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
-     <a href="ViewSite?id=<c:out value="${site.id}"/>"
+     <a href="ViewSite?id=<c:out value="${site.studyId}"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
       name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>

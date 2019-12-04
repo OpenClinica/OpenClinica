@@ -11,15 +11,16 @@ import core.org.akaza.openclinica.bean.core.GroupClassType;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 
@@ -56,12 +57,11 @@ public class ViewSubjectGroupClassServlet extends SecureController {
             StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
             StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
             SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
-            StudyDAO studyDao = new StudyDAO(sm.getDataSource());
 
             StudyGroupClassBean sgcb = (StudyGroupClassBean) sgcdao.findByPK(classId);
-            StudyBean study = (StudyBean)studyDao.findByPK(sgcb.getStudyId());
+            Study study = (Study)getStudyDao().findByPK(sgcb.getStudyId());
 
-            checkRoleByUserAndStudy(ub, study, studyDao);
+            checkRoleByUserAndStudy(ub, study);
 
             // YW 09-19-2007 <<
             sgcb.setGroupClassTypeName(GroupClassType.get(sgcb.getGroupClassTypeId()).getName());

@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
@@ -27,8 +26,7 @@ public class EntityBeanColumn {
     }
 
     /**
-     * @param name
-     *            The name to set.
+     * @param name The name to set.
      */
     public void setName(String name) {
         this.name = name;
@@ -42,8 +40,7 @@ public class EntityBeanColumn {
     }
 
     /**
-     * @param showLink
-     *            The showLink to set.
+     * @param showLink The showLink to set.
      */
     public void setShowLink(boolean showLink) {
         this.showLink = showLink;

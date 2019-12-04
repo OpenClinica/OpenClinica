@@ -1,6 +1,6 @@
 package org.akaza.openclinica.control.admin;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 /**
  * A bean that represents a study row in a view table.
@@ -15,17 +15,17 @@ public class StudyRowContainer {
     //An actions attribute that represents a link to a ViewStudiesDetails page
     private String actions;
 
-    private StudyBean studyBean;
+    private Study studyBean;
 
     public final static String VIEW_STUDY_DETAILS_URL = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudy?id=";
 
     public final static String VIEW_STUDY_DETAILS_SUFFIX = "&amp;viewFull=yes\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"images/bt_View.gif\" name=\"bt_View1\"/></a>";
 
-    public StudyBean getStudyBean() {
+    public Study getStudyBean() {
         return studyBean;
     }
 
-    public void setStudyBean(StudyBean studyBean) {
+    public void setStudyBean(Study studyBean) {
         this.studyBean = studyBean;
     }
 

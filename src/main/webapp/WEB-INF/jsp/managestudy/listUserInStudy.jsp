@@ -39,7 +39,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 
 <h1><span class="title_manage"><fmt:message key="manage_all_users_in" bundle="${restext}"/> <c:out value="${study.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/manage-users/manage-user-roles')"><span class=""></span></a></span></h1>
 
@@ -49,7 +49,7 @@
 <p>
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showUserInStudyRow.jsp" /></c:import>
 <p>
-<c:if test="${study.parentStudyId == 0}"><%-- is not a site --%>
+<c:if test="${study.study == null || study.study.studyId == 0}"><%-- is not a site --%>
 	<div class="homebox_bullets"><a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a></div>
 </c:if>
 <jsp:include page="../include/footer.jsp"/>

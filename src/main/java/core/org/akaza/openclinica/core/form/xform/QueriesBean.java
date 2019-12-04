@@ -1,4 +1,3 @@
-
 package core.org.akaza.openclinica.core.form.xform;
 
 import com.fasterxml.jackson.annotation.*;
@@ -13,7 +12,7 @@ import java.util.Map;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
         "queries",
-    "logs"
+        "logs"
 })
 public class QueriesBean {
 
@@ -25,7 +24,7 @@ public class QueriesBean {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
+     *
      * @return
      *     The queries
      */
@@ -35,7 +34,7 @@ public class QueriesBean {
     }
 
     /**
-     * 
+     *
      * @param queries
      *     The queries
      */
@@ -45,7 +44,7 @@ public class QueriesBean {
     }
 
     /**
-     * 
+     *
      * @return
      *     The logs
      */
@@ -55,7 +54,7 @@ public class QueriesBean {
     }
 
     /**
-     * 
+     *
      * @param logs
      *     The logs
      */

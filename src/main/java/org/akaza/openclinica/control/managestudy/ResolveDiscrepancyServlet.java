@@ -29,7 +29,6 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -40,6 +39,8 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -55,7 +56,6 @@ import core.org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import core.org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -98,6 +98,7 @@ import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author ssachs
@@ -125,7 +126,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     public static final String JINI = "jini";
     private static final String VIEW_NOTES = "ViewNotes";
     public static final String FORWARD_SLASH = "/";
-
 
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
@@ -160,7 +160,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return null;
     }
 
-    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note,
+    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, Study currentStudy, DiscrepancyNoteBean note,
                                                boolean isCompleted,
                                                String module, String flavor, String loadWarning, boolean isLocked) throws Exception {
         String entityType = note.getEntityType().toLowerCase();
@@ -275,7 +275,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setStudyEventId(String.valueOf(seb.getId()));
             subjectContext.setFormLoadMode(EDIT_MODE);
             String contextHash = cache.putSubjectContext(subjectContext);
-            StudyBean parentStudyBean = getParentStudy(currentStudy.getOid(), ds);
+            Study parentStudyBean = getParentStudy(currentStudy.getOc_oid(), ds);
             List<Bind> binds=null;
 
             String xformOutput = "";
@@ -299,7 +299,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
 
             do {
-                xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid(),QUERY_FLAVOR);
+                xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOc_oid(), studyFilePath, crf.getOid(), formLayout.getOid(),QUERY_FLAVOR);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
 
@@ -367,14 +367,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
             FormUrlObject formUrlObject = null;
             if (ecb.getId() > 0 ||  (ecb.getId() == 0 && formContainsContactData)) {
                 if (isLocked) {
-                    formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role,
+                    formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb, role,
                             EDIT_MODE, loadWarning, true,formContainsContactData,binds,ub);
                 } else
-                    formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb,
+                    formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb,
                             role, EDIT_MODE, loadWarning, false,formContainsContactData,binds,ub);
             } else {
                 String hash = formLayout.getXform();
-                formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
+                formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOc_oid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
             }
             request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
             request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
@@ -641,7 +641,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                     discrepancyNoteBean.setSubjectId(entityId);
                 } else if ("subject".equalsIgnoreCase(entityType)) {
 
-                    int studySubId = discNoteUtil.getStudySubjectIdForDiscNote(discrepancyNoteBean, sm.getDataSource(), currentStudy.getId());
+                    int studySubId = discNoteUtil.getStudySubjectIdForDiscNote(discrepancyNoteBean, sm.getDataSource(), currentStudy.getStudyId());
 
                     dispatcher = request.getRequestDispatcher("/ViewStudySubject?id=" + studySubId + "&module=" + module);
                     discrepancyNoteBean.setSubjectId(studySubId);
@@ -895,13 +895,12 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return sdf.format(date);
     }
 
-    private StudyBean getParentStudy(String studyOid, DataSource ds) {
-        StudyDAO sdao = new StudyDAO(ds);
-        StudyBean study = (StudyBean) sdao.findByOid(studyOid);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(String studyOid, DataSource ds) {
+        Study study = (Study) getStudyDao().findByOcOID(studyOid);
+        if (!study.isSite()) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
     }

@@ -23,7 +23,8 @@ import core.org.akaza.openclinica.bean.core.TermType;
 import core.org.akaza.openclinica.bean.core.UserType;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -31,7 +32,6 @@ import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.SecurityManager;
 import core.org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.domain.user.AuthoritiesBean;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.domain.user.LdapUser;
@@ -39,6 +39,7 @@ import core.org.akaza.openclinica.service.user.LdapUserService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Servlet for creating a user account.
@@ -86,14 +87,13 @@ public class CreateUserAccountServlet extends SecureController {
         request.setAttribute("requestSchema", "public");
         FormProcessor fp = new FormProcessor(request);
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         // YW 11-28-2007 << list sites under their studies
-        ArrayList<StudyBean> all = (ArrayList<StudyBean>) sdao.findAll();
-        ArrayList<StudyBean> finalList = new ArrayList<StudyBean>();
-        for (StudyBean sb : all) {
-            if (!(sb.getParentStudyId() > 0)) {
+        ArrayList<Study> all = (ArrayList<Study>) getStudyDao().findAll();
+        ArrayList<Study> finalList = new ArrayList<Study>();
+        for (Study sb : all) {
+            if (!sb.isSite()) {
                 finalList.add(sb);
-                finalList.addAll(sdao.findAllByParent(sb.getId()));
+                finalList.addAll(getStudyDao().findAllByParent(sb.getStudyId()));
             }
         }
         addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM);
@@ -120,11 +120,11 @@ public class CreateUserAccountServlet extends SecureController {
         Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request.getParameter("changeRoles"));
         int activeStudy = fp.getInt(INPUT_STUDY);
         if (changeRoles) {
-            StudyBean study = (StudyBean) sdao.findByPK(activeStudy);
+            Study study = (Study) getStudyDao().findByPK(activeStudy);
             roleMap = new LinkedHashMap();
             ResourceBundle resterm = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 
-            if (study.getParentStudyId() > 0) {
+            if (study.isSite()) {
                 for (Iterator it = getRoles().iterator(); it.hasNext();) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
@@ -219,7 +219,7 @@ public class CreateUserAccountServlet extends SecureController {
             v.addValidation(INPUT_INSTITUTION, Validator.NO_BLANKS);
             v.addValidation(INPUT_INSTITUTION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-            v.addValidation(INPUT_STUDY, Validator.ENTITY_EXISTS, sdao);
+            v.addValidation(INPUT_STUDY,Validator.HIBERNATE_ENTITY_EXISTS,getStudyDao());
             v.addValidation(INPUT_ROLE, Validator.IS_VALID_TERM, TermType.ROLE);
 
             HashMap errors = v.validate();

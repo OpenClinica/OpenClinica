@@ -55,10 +55,10 @@ public class DisplayStudyRow extends EntityBeanRow {
             answer = thisStudy.getParent().getName().toLowerCase().compareTo(argStudy.getParent().getName().toLowerCase());
             break;
         case COL_OID:
-            answer = thisStudy.getParent().getOid().toLowerCase().compareTo(argStudy.getParent().getOid().toLowerCase());
+            answer = thisStudy.getParent().getOc_oid().toLowerCase().compareTo(argStudy.getParent().getOc_oid().toLowerCase());
             break;
         case COL_UNIQUEIDENTIFIER:
-            answer = thisStudy.getParent().getIdentifier().toLowerCase().compareTo(argStudy.getParent().getIdentifier().toLowerCase());
+            answer = thisStudy.getParent().getUniqueIdentifier().toLowerCase().compareTo(argStudy.getParent().getUniqueIdentifier().toLowerCase());
             break;
         case COL_PRINCIPAL_INVESTIGATOR:
             answer = thisStudy.getParent().getPrincipalInvestigator().toLowerCase().compareTo(argStudy.getParent().getPrincipalInvestigator().toLowerCase());
@@ -67,7 +67,7 @@ public class DisplayStudyRow extends EntityBeanRow {
             answer = thisStudy.getParent().getFacilityName().toLowerCase().compareTo(argStudy.getParent().getFacilityName().toLowerCase());
             break;
         case COL_DATE_CREATED:
-            answer = compareDate(thisStudy.getParent().getCreatedDate(), argStudy.getParent().getCreatedDate());
+            answer = compareDate(thisStudy.getParent().getDateCreated(), argStudy.getParent().getDateCreated());
             break;
         case COL_STATUS:
             answer = thisStudy.getParent().getStatus().compareTo(argStudy.getParent().getStatus());
@@ -80,8 +80,8 @@ public class DisplayStudyRow extends EntityBeanRow {
     @Override
     public String getSearchString() {
         DisplayStudyBean thisStudy = (DisplayStudyBean) bean;
-        return thisStudy.getParent().getName() + " " + thisStudy.getParent().getIdentifier() + " " + thisStudy.getParent().getPrincipalInvestigator() + " "
-            + thisStudy.getParent().getFacilityName() + " " + thisStudy.getParent().getOid() + " " + thisStudy.getParent().getKeywords().replace(',', ' ')
+        return thisStudy.getParent().getName() + " " + thisStudy.getParent().getUniqueIdentifier() + " " + thisStudy.getParent().getPrincipalInvestigator() + " "
+            + thisStudy.getParent().getFacilityName() + " " + thisStudy.getParent().getOc_oid() + " " + thisStudy.getParent().getKeywords().replace(',', ' ')
             + " " + thisStudy.getParent().getSummary();
     }
 

@@ -126,7 +126,7 @@
           <input type="radio" name="gender" disabled="disabled"  <c:if test="${!(subject.gender == 109 || subject.gender == 102)}">checked</c:if> value=" "><fmt:message key="not_specified" bundle="${resword}"/>
       </td></tr>
 
-      <c:if test="${study.studyParameterConfig.collectDob=='1' || study.studyParameterConfig.collectDob=='2' }">
+      <c:if test="${study.collectDob=='1' || study.collectDob=='2' }">
       <tr valign="top"><td class="table_header_column"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td><td class="table_cell">
       <input type="text" name="localBirthDate" disabled="disabled" value="<c:out value="${localBirthDate}"/>" class="formfieldM">
       </td></tr>

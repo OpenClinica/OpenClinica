@@ -10,7 +10,6 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -84,6 +83,9 @@ public class ParticipateServiceImpl implements ParticipateService {
     @Autowired
     private RandomizationService randomizationService;
 
+    @Autowired
+    private StudyBuildService studyBuildService;
+
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
     public static final String PARTICIPATE_EDIT = "participate-edit";
@@ -91,7 +93,6 @@ public class ParticipateServiceImpl implements ParticipateService {
     public static final String PARTICIPATE_FLAVOR = "-participate";
 
 
-    StudyDAO sdao;
 
     /**
      * @api {get} /pages/odmk/studies/:studyOid/metadata Retrieve metadata
@@ -121,7 +122,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         return studyEventDefinitionBean;
     }
 
-    public ODM createOdm(StudyBean study, StudySubjectBean studySubjectBean, StudyEventBean nextEvent, List<ODMcomplexTypeDefinitionFormData> formDatas) {
+    public ODM createOdm(Study study, StudySubjectBean studySubjectBean, StudyEventBean nextEvent, List<ODMcomplexTypeDefinitionFormData> formDatas) {
         ODM odm = new ODM();
 
         ODMcomplexTypeDefinitionClinicalData clinicalData = generateClinicalData(study);
@@ -160,7 +161,6 @@ public class ParticipateServiceImpl implements ParticipateService {
         }
 
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(dataSource);
-        StudyDAO studyDAO = new StudyDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
@@ -169,13 +169,13 @@ public class ParticipateServiceImpl implements ParticipateService {
         try {
             // Retrieve crfs for next event
             StudySubjectBean studySubjectBean = studySubjectDAO.findByOid(ssoid);
-            ParticipantEventService participantEventService = new ParticipantEventService(dataSource);
+            ParticipantEventService participantEventService = new ParticipantEventService(dataSource, studyDao);
             StudyEventBean nextEvent = participantEventService.getNextParticipantEvent(studySubjectBean);
             if (nextEvent != null) {
                 logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
 
                 List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
-                StudyBean study = studyDAO.findByOid(studyOID);
+                Study study = studyDao.findByOcOID(studyOID);
 
 
                 List<EventDefinitionCRFBean> eventDefCrfs = participantEventService.getEventDefCrfsForStudyEvent(studySubjectBean, nextEvent);
@@ -246,10 +246,10 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     }
 
-    private ODMcomplexTypeDefinitionClinicalData generateClinicalData(StudyBean study) {
+    private ODMcomplexTypeDefinitionClinicalData generateClinicalData(Study study) {
         ODMcomplexTypeDefinitionClinicalData clinicalData = new ODMcomplexTypeDefinitionClinicalData();
-        clinicalData.setStudyName(getParentStudy(study.getOid()).getName());
-        clinicalData.setStudyOID(study.getOid());
+        clinicalData.setStudyName(getParentStudy(study.getOc_oid()).getName());
+        clinicalData.setStudyOID(study.getOc_oid());
         return clinicalData;
     }
 
@@ -361,24 +361,22 @@ public class ParticipateServiceImpl implements ParticipateService {
         });
     }
 
-    public StudyBean getStudyById(int id) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+    public Study getStudyById(int id) {
+        Study studyBean = (Study) studyDao.findByPK(id);
         return studyBean;
     }
 
-    public StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+    public Study getStudy(String oid) {
+        Study studyBean = (Study) studyDao.findByOcOID(oid);
         return studyBean;
     }
 
-    public StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+    public Study getParentStudy(String studyOid) {
+        Study study = getStudy(studyOid);
+        if (!study.isSite()) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
 
@@ -389,11 +387,11 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     public boolean mayProceed(String studyOid) throws Exception {
         boolean accessPermission = false;
-        StudyBean study = getStudy(studyOid);
-        StudyBean pStudy = getParentStudy(studyOid);
+        Study study = getStudy(studyOid);
+        Study pStudy = getParentStudy(studyOid);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(pStudy.getId(), "participantPortal");
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(pStudy.getStudyId(), "participantPortal");
         String participateStatus = pStatus.getValue().toString();
 
         if( participateStatus.equals(ModuleProcessor.ModuleStatus.ENABLED.getValue()) && study.getStatus().isAvailable()){
@@ -403,7 +401,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     }
 
 
-    public ODM getOdmHeader(ODM odm , StudyBean currentStudy , StudySubjectBean studySubject){
+    public ODM getOdmHeader(ODM odm , Study currentStudy , StudySubjectBean studySubject){
             odm = new ODM();
             ODMcomplexTypeDefinitionClinicalData clinicalData = generateClinicalData(currentStudy);
             if(studySubject!=null && studySubject.isActive()) {
@@ -418,7 +416,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     public void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs
             , String accessToken, String studyOid, String subjectOid) throws Exception{
         boolean completeStudyEvent = true;
-        StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(studyOid, dataSource);
+        Study parentPublicStudy = studyBuildService.getParentPublicStudy(studyOid);
         // Loop thru event CRFs and complete all that are participant events.
         for (EventDefinitionCrf eventDefCrf:eventDefCrfs) {
             boolean foundEventCrfMatch = false;

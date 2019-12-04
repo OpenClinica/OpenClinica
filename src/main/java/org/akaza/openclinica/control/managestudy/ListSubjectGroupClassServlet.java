@@ -8,11 +8,11 @@
 package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -20,6 +20,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.bean.StudyGroupClassRow;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,6 @@ import java.util.Locale;
 public class ListSubjectGroupClassServlet extends SecureController {
 
     Locale locale;
-
     // < ResourceBundleresexception,respage,resword;
 
     /**
@@ -72,11 +72,10 @@ public class ListSubjectGroupClassServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
         // YW <<
-        StudyDAO stdao = new StudyDAO(sm.getDataSource());
-        int parentStudyId = currentStudy.getParentStudyId();
+        int parentStudyId = currentStudy.checkAndGetParentStudyId();
         ArrayList groups = new ArrayList();
         if (parentStudyId > 0) {
-            StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
+            Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
             groups = sgcdao.findAllByStudy(parentStudy);
         } else {
             groups = sgcdao.findAllByStudy(currentStudy);
@@ -93,7 +92,7 @@ public class ListSubjectGroupClassServlet extends SecureController {
         }
         EntityBeanTable table = fp.getEntityBeanTable();
         ArrayList allGroupRows = StudyGroupClassRow.generateRowsFromBeans(groups);
-        boolean isParentStudy = currentStudy.getParentStudyId() > 0 ? false : true;
+        boolean isParentStudy = !currentStudy.isSite();
         request.setAttribute("isParentStudy", isParentStudy);
 
         String[] columns =

@@ -6,14 +6,14 @@ import core.org.akaza.openclinica.bean.core.UserType;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.login.UserDTO;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import core.org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
@@ -60,13 +60,14 @@ public class AccountController {
 	public static final String INPUT_EMAIL = "";
 	public static final String INPUT_INSTITUTION = "PFORM";
 	UserAccountDAO udao;
-	StudyDAO sdao;
+
 	StudySubjectDAO ssdao;
 	UserDTO uDTO;
 	AuthoritiesDao authoritiesDao;
 	ParticipantPortalRegistrar participantPortalRegistrar;
     private AuditUserLoginDao auditUserLoginDao;
 
+    private StudyDao studyDao;
 	
 	/**
 	 * @api {post} /pages/accounts/login Retrieve a user account
@@ -135,7 +136,7 @@ public class AccountController {
 			for (StudyUserRoleBean role : (List<StudyUserRoleBean>) userAccountBean.getRoles()) {
 				HashMap<String, String> map = new HashMap<String, String>();
 				map.put("roleName", role.getRoleName());
-				map.put("studyOID", ((StudyBean) studyDAO.findByPK(role.getStudyId())).getOid());
+				map.put("studyOID", ((Study) studyDAO.findByPK(role.getStudyId())).getOid());
 				rolesDTO.add(map);
 			}
 			userDTO.put("roles", rolesDTO);
@@ -181,9 +182,9 @@ public class AccountController {
 		uDTO = null;
 		logger.debug("I'm in getAccount1");
 
-		StudyBean parentStudy = getParentStudy(studyOid);
-		Integer pStudyId = parentStudy.getId();
-		String oid = parentStudy.getOid();
+		Study parentStudy = getParentStudy(studyOid);
+		Integer pStudyId = parentStudy.getStudyId();
+		String oid = parentStudy.getOc_oid();
 
 		if (isStudyASiteLevelStudy(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -208,9 +209,8 @@ public class AccountController {
 	public Boolean isCRCHasAccessToStudySubject(String studyOid, String crcUserName, String studySubjectId) {
 		uDTO = null;
 		logger.debug("I'm in getAccount4");
-		StudyBean parentStudy = getParentStudy(studyOid);
-		Integer pStudyId = parentStudy.getId();
-		String oid = parentStudy.getOid();
+		Study parentStudy = getParentStudy(studyOid);
+		String oid = parentStudy.getOc_oid();
 
 		if (isStudySubjecAndCRCRolesMatch(studySubjectId, crcUserName, studyOid))
 			return true;
@@ -254,8 +254,8 @@ public class AccountController {
 
 		accessCode = URLDecoder.decode(accessCode, "UTF-8");
 
-		StudyBean parentStudy = getParentStudy(studyOid);
-		String oid = parentStudy.getOid();
+		Study parentStudy = getParentStudy(studyOid);
+		String oid = parentStudy.getOc_oid();
 
 		if (isStudyASiteLevelStudy(studyOid))
 			return new ResponseEntity<UserDTO>(uDTO, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -327,8 +327,8 @@ public class AccountController {
 		uDTO = null;
 		logger.debug("I'm in getAccount3");
 
-		StudyBean parentStudy = getParentStudy(studyOid);
-		String oid = parentStudy.getOid();
+		Study parentStudy = getParentStudy(studyOid);
+		String oid = parentStudy.getOc_oid();
 
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
 
@@ -443,8 +443,8 @@ public class AccountController {
 		uDTO = null;
 		logger.debug("I'm in createOrUpdateAccount");
 
-		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
-		String oid = parentStudy.getOid();
+		Study parentStudy = getParentStudy(map.get("studyOid"));
+		String oid = parentStudy.getOc_oid();
 
 		String studySubjectId = map.get("studySubjectId");
 		String fName = map.get("fName");
@@ -542,8 +542,8 @@ public class AccountController {
 		uDTO = null;
 		logger.debug("I'm in update Timezone method");
 
-		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
-		String oid = parentStudy.getOid();
+		Study parentStudy = getParentStudy(map.get("studyOid"));
+		String oid = parentStudy.getOc_oid();
 
 		String studySubjectId = map.get("studySubjectId");
 		String timeZone = map.get("timeZone");
@@ -551,7 +551,7 @@ public class AccountController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		logger.debug("************** You are in the Rest Service ***************");
 
-		StudySubjectBean studySubjectBean = getStudySubjectByOidAndStudy(studySubjectId, parentStudy.getId());
+		StudySubjectBean studySubjectBean = getStudySubjectByOidAndStudy(studySubjectId, parentStudy.getStudyId());
 		HashMap<String, String> mapValues = buildParticipantUserName(studySubjectBean);
 		String pUserName = mapValues.get("pUserName"); // Participant User Name
 
@@ -590,7 +590,7 @@ public class AccountController {
 		createdUserAccountBean.setEmail(INPUT_EMAIL);
 		createdUserAccountBean.setInstitutionalAffiliation(INPUT_INSTITUTION);
 		createdUserAccountBean.setLastVisitDate(null);
-		createdUserAccountBean.setActiveStudyId(getStudy(studyOid).getId());
+		createdUserAccountBean.setActiveStudyId(getStudy(studyOid).getStudyId());
 		createdUserAccountBean.setPasswdTimestamp(null);
 		createdUserAccountBean.setPasswdChallengeQuestion("");
 		createdUserAccountBean.setPasswdChallengeAnswer("");
@@ -611,7 +611,7 @@ public class AccountController {
         createdUserAccountBean.setApiKey(apiKey);
 
 		Role r = Role.RESEARCHASSISTANT2;
-		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getId(), r, ownerUserAccount);
+		createdUserAccountBean = addActiveStudyRole(createdUserAccountBean, getStudy(studyOid).getStudyId(), r, ownerUserAccount);
 		UserType type = UserType.get(2);
 		createdUserAccountBean.addUserType(type);
 
@@ -646,7 +646,7 @@ public class AccountController {
 	}
 
 	private ArrayList<UserAccountBean> getUserAccountByStudy(String userName, ArrayList allStudies) {
-		udao = new UserAccountDAO(dataSource);
+		udao = new UserAccountDAO(dataSource,getStudyDao());
 		ArrayList<UserAccountBean> userAccountBeans = udao.findStudyByUser(userName, allStudies);
 		return userAccountBeans;
 	}
@@ -663,15 +663,13 @@ public class AccountController {
 		return userAccountBean;
 	}
 
-	private StudyBean getStudy(String oid) {
-		sdao = new StudyDAO(dataSource);
-		StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+	private Study getStudy(String oid) {
+		Study studyBean = (Study) getStudyDao().findByOcOID(oid);
 		return studyBean;
 	}
 
-	private StudyBean getStudy(Integer id) {
-		sdao = new StudyDAO(dataSource);
-		StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+	private Study getStudy(Integer id) {
+		Study studyBean = (Study) getStudyDao().findByPK(id);
 		return studyBean;
 	}
 
@@ -681,7 +679,7 @@ public class AccountController {
 		return studySubjectBean;
 	}
 
-	private StudySubjectBean getStudySubject(String label, StudyBean study) {
+	private StudySubjectBean getStudySubject(String label, Study study) {
 		ssdao = new StudySubjectDAO(dataSource);
 		StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByLabelAndStudy(label, study);
 		return studySubjectBean;
@@ -699,7 +697,7 @@ public class AccountController {
 	}
 
 	private Boolean isStudyDoesNotExist(String studyOid) {
-		StudyBean studyBean = getStudy(studyOid);
+		Study studyBean = getStudy(studyOid);
 		if (studyBean == null) {
 			logger.info("***Study  Does Not Exist ***");
 			return true;
@@ -708,8 +706,8 @@ public class AccountController {
 	}
 
 	private Boolean isStudyASiteLevelStudy(String studyOid) {
-		StudyBean studyBean = getStudy(studyOid);
-		if (studyBean.getParentStudyId() != 0) {
+		Study studyBean = getStudy(studyOid);
+		if (studyBean.isSite()) {
 			logger.info("***Study provided in the URL is a Site study***");
 			return true;
 		}
@@ -778,10 +776,10 @@ public class AccountController {
 		HashMap<String, String> map = new HashMap();
 		String studySubjectOid = studySubjectBean.getOid();
 		Integer studyId = studySubjectBean.getStudyId();
-		StudyBean study = getParentStudy(studyId);
-		Integer pStudyId = study.getId();
+		Study study = getParentStudy(studyId);
+		Integer pStudyId = study.getStudyId();
 
-		String pUserName = study.getOid() + "." + studySubjectOid;
+		String pUserName = study.getOc_oid() + "." + studySubjectOid;
 		logger.info("participate Username: {}",pUserName);
 		map.put("pUserName", pUserName);
 		map.put("pStudyId", pStudyId.toString());
@@ -794,15 +792,15 @@ public class AccountController {
 		boolean found = false;
 		ArrayList<StudyUserRoleBean> studyUserRoleBeans = (ArrayList<StudyUserRoleBean>) udao.findAllRolesByUserName(crcUserName);
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
-			StudyBean study = getParentStudy(studyUserRoleBean.getStudyId());
+			Study study = getParentStudy(studyUserRoleBean.getStudyId());
 			logger.info("---------------");
 			logger.info("Study Id to compare:{} ", studyUserRoleBean.getStudyId());
-			logger.info("parent study Id to compare: {}",study.getId());
+			logger.info("parent study Id to compare: {}",study.getStudyId());
 			logger.info("Parent Study Id   {}" ,pStudyId);
 			logger.info("Role: {}" , studyUserRoleBean.getRoleName());
 			logger.info("Status : {}" , studyUserRoleBean.getStatus().getId());
 
-			if ((study.getId() == pStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2")) && studyUserRoleBean.getStatus().isAvailable()) {
+			if ((study.getStudyId() == pStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2")) && studyUserRoleBean.getStatus().isAvailable()) {
 				found = true;
 				logger.info("if found : {}",found);
 				break;
@@ -821,8 +819,8 @@ public class AccountController {
 		for (StudyUserRoleBean studyUserRoleBean : studyUserRoleBeans) {
 			logger.info("StudySubject Study Id to compare to   {}" , subjectStudyId);
 
-			if (studyUserRoleBean.getStudyId() == getParentStudy(subjectStudyId).getId()) {
-				subjectStudyId = getParentStudy(subjectStudyId).getId();
+			if (studyUserRoleBean.getStudyId() == getParentStudy(subjectStudyId).getStudyId()) {
+				subjectStudyId = getParentStudy(subjectStudyId).getStudyId();
 				logger.info("StudySubject Parent Study Id to compare to Overwritten    " + subjectStudyId);
 			}
 			logger.info("CRC Study Id to compare to : {}" , studyUserRoleBean.getStudyId());
@@ -853,8 +851,8 @@ public class AccountController {
 		// crc is study studySubject is siteB , pass
 		// crc is study studySubject is study , pass
 
-		StudyBean parentStudy = getParentStudy(studyOid);
-		Integer studyIdFromStudyOid = parentStudy.getId();
+		Study parentStudy = getParentStudy(studyOid);
+		Integer studyIdFromStudyOid = parentStudy.getStudyId();
 		StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
 		Integer studyIdFromStudySubjectId = studySubjectBean.getStudyId();
 
@@ -867,23 +865,23 @@ public class AccountController {
 
 	}
 
-	private StudyBean getParentStudy(Integer studyId) {
-		StudyBean study = getStudy(studyId);
-		if (study.getParentStudyId() == 0) {
+	private Study getParentStudy(Integer studyId) {
+		Study study = getStudy(studyId);
+		if (!study.isSite()) {
 			return study;
 		} else {
-			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			Study parentStudy = study.getStudy();
 			return parentStudy;
 		}
 
 	}
 
-	private StudyBean getParentStudy(String studyOid) {
-		StudyBean study = getStudy(studyOid);
-		if (study.getParentStudyId() == 0) {
+	private Study getParentStudy(String studyOid) {
+		Study study = getStudy(studyOid);
+		if (!study.isSite()) {
 			return study;
 		} else {
-			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			Study parentStudy = study.getStudy();
 			return parentStudy;
 		}
 
@@ -902,12 +900,12 @@ public class AccountController {
 
 	private boolean mayProceed(String studyOid) throws Exception {
 		boolean accessPermission = false;
-		StudyBean siteStudy = getStudy(studyOid);
-		StudyBean study = getParentStudy(studyOid);
+		Study siteStudy = getStudy(studyOid);
+		Study study = getParentStudy(studyOid);
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
 		participantPortalRegistrar = new ParticipantPortalRegistrar();
-		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOid()).toString(); // ACTIVE , PENDING , INACTIVE
+		String pManageStatus = participantPortalRegistrar.getRegistrationStatus(study.getOc_oid()).toString(); // ACTIVE , PENDING , INACTIVE
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
 		String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
 		String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
@@ -925,8 +923,8 @@ public class AccountController {
 		ArrayList<UserDTO> uDTOs = null;
 		logger.debug("I'm in getAllParticipantPerStudy");
 
-		StudyBean parentStudy = getParentStudy(studyOid);
-		String oid = parentStudy.getOid();
+		Study parentStudy = getParentStudy(studyOid);
+		String oid = parentStudy.getOc_oid();
 
 		if (isStudyDoesNotExist(oid))
 			return new ResponseEntity<ArrayList<UserDTO>>(uDTOs, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -967,8 +965,8 @@ public class AccountController {
 		uDTO = null;
 		logger.debug("I'm in UpdateAccount");
 
-		StudyBean parentStudy = getParentStudy(map.get("studyOid"));
-		String oid = parentStudy.getOid();
+		Study parentStudy = getParentStudy(map.get("studyOid"));
+		String oid = parentStudy.getOc_oid();
 
 		String studySubjectId = map.get("studySubjectId");
 		String fName = map.get("fName");
@@ -1022,7 +1020,7 @@ public class AccountController {
            String studyOid = requestMap.get("studyOid");
            String studySubjectId = requestMap.get("studySubjectId");
            
-           StudyBean parentStudy = getParentStudy(studyOid);
+           Study parentStudy = getParentStudy(studyOid);
            StudySubjectBean studySubjectBean = getStudySubject(studySubjectId, parentStudy);
 
            // build UserName
@@ -1053,6 +1051,12 @@ public class AccountController {
 	                    "auditUserLoginDao");
 	        return auditUserLoginDao;
 	    }
+	    public StudyDao getStudyDao(){
+			this.studyDao =
+					this.studyDao != null ? studyDao : (StudyDao) SpringServletAccess.getApplicationContext(context).getBean(
+							"studyDaoDomain");
+			return studyDao;
+		}
 
 	
     public Boolean isApiKeyExist(String uuid) {

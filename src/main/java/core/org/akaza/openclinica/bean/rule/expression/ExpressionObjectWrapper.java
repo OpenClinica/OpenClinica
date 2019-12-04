@@ -1,30 +1,29 @@
 package core.org.akaza.openclinica.bean.rule.expression;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.rule.RuleSetBean;
-
-import java.util.HashMap;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 
 public class ExpressionObjectWrapper {
 
     DataSource ds;
-    StudyBean studyBean;
+    Study studyBean;
     ExpressionBean expressionBean;
     RuleSetBean ruleSet;
 
     // This will carry item/value pairs used in DataEntry Rule Execution
     HashMap<String, String> itemsAndTheirValues = new HashMap<String, String>();
 
-    public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean) {
+    public ExpressionObjectWrapper(DataSource ds, Study studyBean, ExpressionBean expressionBean) {
         super();
         this.ds = ds;
         this.studyBean = studyBean;
         this.expressionBean = expressionBean;
     }
 
-    public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet) {
+    public ExpressionObjectWrapper(DataSource ds, Study studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet) {
         super();
         this.ds = ds;
         this.studyBean = studyBean;
@@ -32,7 +31,7 @@ public class ExpressionObjectWrapper {
         this.ruleSet = ruleSet;
     }
 
-    public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
+    public ExpressionObjectWrapper(DataSource ds, Study studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
             HashMap<String, String> itemsAndTheirValues) {
         super();
         this.ds = ds;
@@ -75,7 +74,7 @@ public class ExpressionObjectWrapper {
     /**
      * @return the studyBean
      */
-    public StudyBean getStudyBean() {
+    public Study getStudyBean() {
         return studyBean;
     }
 
@@ -83,7 +82,7 @@ public class ExpressionObjectWrapper {
      * @param studyBean
      *            the studyBean to set
      */
-    public void setStudyBean(StudyBean studyBean) {
+    public void setStudyBean(Study studyBean) {
         this.studyBean = studyBean;
     }
 

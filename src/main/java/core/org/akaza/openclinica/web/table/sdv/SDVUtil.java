@@ -26,7 +26,6 @@ import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -34,6 +33,8 @@ import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SDVToolbar;
@@ -42,7 +43,6 @@ import core.org.akaza.openclinica.dao.EventCRFSDVFilter;
 import core.org.akaza.openclinica.dao.EventCRFSDVSort;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -73,6 +73,7 @@ import org.jmesa.view.html.editor.HtmlCellEditor;
 import org.jmesa.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 
 /**
@@ -80,6 +81,7 @@ import org.springframework.validation.BindingResult;
  */
 public class SDVUtil {
 
+    private StudyDao studyDao;
     private static final Logger logger= LoggerFactory.getLogger(SDVUtil.class);
     private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
     private final static String VIEW_ICON_FORSUBJECT_SUFFIX = "\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-serach\" name=\"bt_View1\"/></a>";
@@ -854,7 +856,6 @@ public class SDVUtil {
 
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         SubjectDAO subjectDAO = new SubjectDAO(dataSource);
-        StudyDAO studyDAO = new StudyDAO(dataSource);
         StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 
         EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
@@ -862,7 +863,7 @@ public class SDVUtil {
         StudySubjectBean studySubjectBean = null;
         SubjectBean subjectBean = null;
         StudyEventBean studyEventBean = null;
-        StudyBean studyBean = null;
+        Study studyBean = null;
         EventDefinitionCRFBean eventDefinitionCRFBean = null;
 
         Collection<SubjectSDVContainer> allRows = new ArrayList<SubjectSDVContainer>();
@@ -885,8 +886,8 @@ public class SDVUtil {
 
             subjectBean = (SubjectBean) subjectDAO.findByPK(studySubjectBean.getSubjectId());
             // find out the study's identifier
-            studyBean = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
-            tempSDVBean.setStudyIdentifier(studyBean.getIdentifier());
+            studyBean = (Study) studyDao.findByPK(studySubjectBean.getStudyId());
+            tempSDVBean.setStudyIdentifier(studyBean.getUniqueIdentifier());
 
             eventDefinitionCRFBean = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEventBean.getId(), eventCRFBean.getCRFVersionId());
             SourceDataVerification sourceData = eventDefinitionCRFBean.getSourceDataVerification();
@@ -911,7 +912,7 @@ public class SDVUtil {
                 }
                 tempSDVBean.setCrfStatus(getCRFStatusIconPath(
                     status, request, studySubjectBean.getId(), eventCRFBean.getId(), eventCRFBean.getCRFVersionId(),
-                    eventCRFBean.getFormLayoutId(), eventCRFBean.getStudyEventId(), studyBean.getId(), queryString.replaceAll("&", "%26")
+                    eventCRFBean.getFormLayoutId(), eventCRFBean.getStudyEventId(), studyBean.getStudyId(), queryString.replaceAll("&", "%26")
                 ));
             }
 
@@ -1335,7 +1336,7 @@ public class SDVUtil {
         }
     }
 
-    public void prepareSDVSelectElements(HttpServletRequest request, StudyBean studyBean) {
+    public void prepareSDVSelectElements(HttpServletRequest request, Study studyBean) {
         // Study event statuses
         List<String> studyEventStatuses = new ArrayList<String>();
         for (core.org.akaza.openclinica.domain.Status stat : core.org.akaza.openclinica.domain.Status.values()) {
@@ -1555,4 +1556,11 @@ public class SDVUtil {
         }
     }
 
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

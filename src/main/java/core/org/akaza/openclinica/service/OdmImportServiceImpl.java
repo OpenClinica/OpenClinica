@@ -15,13 +15,13 @@ import core.org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import core.org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import core.org.akaza.openclinica.service.dto.Bucket;
 import core.org.akaza.openclinica.service.dto.Form;
-import org.akaza.openclinica.service.Page;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -37,6 +37,7 @@ import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.client.RestTemplate;
+import org.akaza.openclinica.service.Page;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
@@ -53,6 +54,8 @@ import java.util.List;
 @Transactional
 public class OdmImportServiceImpl implements OdmImportService {
 
+	@Autowired
+	private StudyBuildService studyBuildService;
 	private UserAccountDao userDaoDomain;
 	private StudyUserRoleDao studyUserRoleDao;
 	private StudyEventDefinitionDao studyEventDefDao;
@@ -126,7 +129,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		DataBinder dataBinder = new DataBinder(new Study());
 		errors = dataBinder.getBindingResult();
 		printOdm(odm);
-		CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(), dataSource);
+		studyBuildService.setRequestSchemaByStudy(odm.getStudy().get(0).getOID());
 
 		UserAccount userAccount = getCurrentUser();
 

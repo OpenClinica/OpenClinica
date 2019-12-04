@@ -126,7 +126,7 @@ public class PrintCRFServlet extends DataEntryServlet {
                 DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(), getServletContext());
                 handler.setCrfVersionId(crfVersionId);
                 handler.setEventCRFId(eventCRFId);
-                List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
+                List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans(getStudyDao());
 
                 request.setAttribute("listOfDisplaySectionBeans", displaySectionBeans);
                 // Make available the CRF names and versions for
@@ -303,5 +303,15 @@ public class PrintCRFServlet extends DataEntryServlet {
     @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
     	return false;
+    }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
     }
 }

@@ -19,12 +19,14 @@ import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.EntityBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author thickerson
@@ -32,6 +34,7 @@ import core.org.akaza.openclinica.dao.core.TypeNames;
  */
 public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
 
+    private StudyDao studyDao;
     private void setQueryNames() {
         findAllByStudyName = "findAllByStudy";
         findAllActiveByStudyName = "findAllActiveByStudy";
@@ -41,6 +44,11 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
     public StudyEventDefinitionDAO(DataSource ds) {
         super(ds);
         setQueryNames();
+    }
+    public StudyEventDefinitionDAO(DataSource ds,StudyDao studyDao) {
+        super(ds);
+        setQueryNames();
+        this.studyDao = studyDao;
     }
 
     public StudyEventDefinitionDAO(DataSource ds, DAODigester digester) {
@@ -261,28 +269,25 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
     }
 
     @Override
-    public ArrayList findAllByStudy(StudyBean study) {
+    public ArrayList findAllByStudy(Study study) {
 
-        StudyDAO studyDao = new StudyDAO(this.getDs());
-
-        if (study.getParentStudyId() > 0) {
+        if (study.isSite()) {
             // If the study has a parent than it is a site, in this case we
             // should get the event definitions of the parent
-            StudyBean parentStudy = new StudyBean();
-            parentStudy = (StudyBean) studyDao.findByPK(study.getParentStudyId());
+            Study parentStudy = (Study) studyDao.findByPK(study.getStudy().getStudyId());
             return super.findAllByStudy(parentStudy);
         } else {
             return super.findAllByStudy(study);
         }
     }
 
-    public ArrayList findAllWithStudyEvent(StudyBean currentStudy) {
+    public ArrayList findAllWithStudyEvent(Study currentStudy) {
         ArrayList answer = new ArrayList();
 
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(currentStudy.getId()));
-        variables.put(new Integer(2), new Integer(currentStudy.getId()));
+        variables.put(new Integer(1), new Integer(currentStudy.getStudyId()));
+        variables.put(new Integer(2), new Integer(currentStudy.getStudyId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllWithStudyEvent"), variables);
 
