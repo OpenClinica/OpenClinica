@@ -479,9 +479,6 @@
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                         key="nav_source_data_verification" bundle="${resword}"/></a></div>
-                <c:if test="${enableEmbeddedReports}">
-                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
-                </c:if>
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
@@ -517,13 +514,6 @@
                 <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
-            <c:if test="${enableEmbeddedReports}">
-                <div class="taskGroup"><fmt:message key="nav_manage_data" bundle="${resword}"/></div>
-                <div class="taskLeftColumn">
-                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
-                </div>
-                <br clear="all">
-            </c:if>
         </c:if>
         <c:if test="${userRole.investigator}">
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
@@ -553,13 +543,6 @@
                 <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
-            <c:if test="${enableEmbeddedReports}">
-                <div class="taskGroup"><fmt:message key="nav_manage_data" bundle="${resword}"/></div>
-                <div class="taskLeftColumn">
-                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
-                </div>
-                <br clear="all">
-            </c:if>
         </c:if>
         <c:if test="${userRole.coordinator || userRole.director}">
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
@@ -595,9 +578,6 @@
                         <div class="taskLink"></div>
                     </c:otherwise>
                 </c:choose>
-                <c:if test="${enableEmbeddedReports}">
-                    <div class="taskLink"><a href="${urlPrefix}reports"><fmt:message key="reports" bundle="${resword}"/></a></div>
-                </c:if>
             </div>
             <div class="taskRightColumn">
                 <c:choose>
@@ -618,6 +598,16 @@
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+            </div>
+            <br clear="all">
+        </c:if>
+        <c:if test="${enableEmbeddedReports}">
+            <div class="taskGroup"><fmt:message key="nav_reports" bundle="${resword}"/></div>
+            <div class="taskLeftColumn">
+                <div class="taskLink"><a href="${urlPrefix}reports?/collection/root"><fmt:message key="nav_reports_view" bundle="${resword}"/></a></div>
+            </div>
+            <div class="taskRightColumn">
+                <div class="taskLink"><a href="${urlPrefix}reports?/question/new"><fmt:message key="nav_reports_edit" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
         </c:if>
