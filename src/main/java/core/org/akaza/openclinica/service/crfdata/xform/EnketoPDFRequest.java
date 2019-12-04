@@ -4,7 +4,7 @@ import org.springframework.util.LinkedMultiValueMap;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EnketoPDFRequest extends LinkedMultiValueMap {
+public class EnketoPDFRequest {
 
 	private String server_url = null;
     private String form_id = null;
@@ -24,8 +24,7 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setServer_url(String server_url) {
-		this.server_url = server_url;
-		super.add("server_url", server_url);;
+		this.server_url = server_url;		
 	}
 
 	public String getForm_id() {
@@ -33,8 +32,7 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setForm_id(String form_id) {
-		this.form_id = form_id;
-		super.add("form_id", form_id);
+		this.form_id = form_id;		
 	}
 
 	public String getInstance_id() {
@@ -42,8 +40,7 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setInstance_id(String instance_id) {
-		this.instance_id = instance_id;
-		super.add("instance_id", instance_id);
+		this.instance_id = instance_id;		
 	}
 
 	public String getReturn_url() {
@@ -51,8 +48,7 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setReturn_url(String return_url) {
-		this.return_url = return_url;
-		super.add("return_url", return_url);
+		this.return_url = return_url;		
 	}
 
 	public String getInstance() {
@@ -60,8 +56,7 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setInstance(String instance) {
-		this.instance = instance;
-		super.add("instance", instance);
+		this.instance = instance;		
 	}
 
 	public String getFormat() {
@@ -69,8 +64,7 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setFormat(String format) {
-		this.format = format;
-		super.add("format", format);
+		this.format = format;		
 	}
 
 	public String getMargin() {
@@ -78,8 +72,7 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setMargin(String margin) {
-		this.margin = margin;
-		super.add("margin", margin);
+		this.margin = margin;		
 	}
 
 	public String getLandscape() {
@@ -87,14 +80,15 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setLandscape(String landscape) {
-		this.landscape = landscape;
-		super.add("landscape", landscape);
+		this.landscape = landscape;		
 	}
 
+	@JsonProperty("instance_attachments")
 	public InstanceAttachment getInstanceAttachments() {
 		return instanceAttachments;
 	}
 
+	@JsonProperty("instance_attachments")
 	public void setInstanceAttachments(InstanceAttachment instanceAttachments) {
 		this.instanceAttachments = instanceAttachments;
 	}
@@ -104,8 +98,7 @@ public class EnketoPDFRequest extends LinkedMultiValueMap {
 	}
 
 	public void setEcid(String ecid) {
-		this.ecid = ecid;
-		super.add("ecid", ecid);
+		this.ecid = ecid;		
 	}
     
 }

@@ -724,7 +724,7 @@ public class EnketoAPI {
              * prepare request header
              */
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);           
+            headers.setContentType(MediaType.APPLICATION_JSON);           
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
          
