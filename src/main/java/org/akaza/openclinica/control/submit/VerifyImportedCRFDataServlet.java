@@ -21,7 +21,6 @@ import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
@@ -30,6 +29,7 @@ import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -79,7 +79,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
     }
 
     public static DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message, EventCRFBean eventCrfBean, DisplayItemBean displayItemBean,
-            Integer parentId, UserAccountBean uab, DataSource ds, StudyBean study) {
+            Integer parentId, UserAccountBean uab, DataSource ds, Study study) {
         // DisplayItemBean displayItemBean) {
         DiscrepancyNoteBean note = new DiscrepancyNoteBean();
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
@@ -94,7 +94,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         }
 
         note.setField(itemBean.getName());
-        note.setStudyId(study.getId());
+        note.setStudyId(study.getStudyId());
         note.setEntityName(itemBean.getName());
         note.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
         note.setEntityValue(displayItemBean.getData().getValue());
@@ -126,7 +126,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource());
         itemDataDao.setFormatDates(false);
         EventCRFDAO eventCrfDao = new EventCRFDAO(sm.getDataSource());
-        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource());
+        CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource(), getStudyDao());
         String action = request.getParameter("action");
 
         FormProcessor fp = new FormProcessor(request);
@@ -358,7 +358,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         }
         return false;
     }
-    private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
+    private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, Study studyBean, UserAccountBean userBean,
             RuleSetServiceInterface ruleSetService) {
         List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
         ODMContainer odmContainer = (ODMContainer) session.getAttribute("odmContainer");
@@ -379,7 +379,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         return containers;
     }
 
-    private List<String> runRules(StudyBean studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
+    private List<String> runRules(Study studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
             RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
         List<String> messages = new ArrayList<String>();
         if (containers != null && !containers.isEmpty()) {

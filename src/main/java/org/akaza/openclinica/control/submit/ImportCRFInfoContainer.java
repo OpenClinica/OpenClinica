@@ -11,7 +11,6 @@ import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -23,15 +22,17 @@ import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static core.org.akaza.openclinica.bean.core.DataEntryStage.INITIAL_DATA_ENTRY;
 
@@ -61,7 +62,7 @@ public class ImportCRFInfoContainer {
      * process them. 2. importCRFMap: A Map multi-layer map of Subject/Event/Form only populated when the subsequent
      * EventCRF passes the UpsertOn rules.
      */
-    public ImportCRFInfoContainer(ODMContainer odmContainer, DataSource ds) {
+    public ImportCRFInfoContainer(ODMContainer odmContainer, DataSource ds, StudyDao studyDao) {
         importCRFList = new ArrayList<ImportCRFInfo>();
 
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
@@ -69,20 +70,19 @@ public class ImportCRFInfoContainer {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyDAO studyDAO = new StudyDAO(ds);
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
         if (upsert == null)
             upsert = new UpsertOnBean();
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        StudyBean studyBean = studyDAO.findByOid(studyOID);
+        Study studyBean = studyDao.findByOcOID(studyOID);
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
 
         Map<String, Map<String, Map<String, String>>> subjectMap = new HashMap<String, Map<String, Map<String, String>>>();
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
 
             Map<String, Map<String, String>> eventMap = new HashMap<String, Map<String, String>>();
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
@@ -96,7 +96,7 @@ public class ImportCRFInfoContainer {
                 }
                 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getId(), studyBean.getParentStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
                 StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),

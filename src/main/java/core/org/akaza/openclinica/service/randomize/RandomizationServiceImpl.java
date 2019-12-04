@@ -2,7 +2,6 @@ package core.org.akaza.openclinica.service.randomize;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -234,7 +233,7 @@ public class RandomizationServiceImpl implements RandomizationService {
         log.debug("Response status:" + response.getStatusCode());
     }
 
-    private void setStratFactors(List<List<String>> stratGroups, StudyBean publicStudy, RandomizationConfiguration studyConfig, String studySubjectOID,
+    private void setStratFactors(List<List<String>> stratGroups, Study publicStudy, RandomizationConfiguration studyConfig, String studySubjectOID,
                                 List<RandomizeQueryResult> randomizeQueryResult, String accessToken) {
 
         RandomizationDTO randomizationDTO = new RandomizationDTO();
@@ -291,7 +290,7 @@ public class RandomizationServiceImpl implements RandomizationService {
 
     }
 
-    public void processRandomization(StudyBean parentPublicStudy, String accessToken, String studySubjectOID, ItemData... optionalItemData) {
+    public void processRandomization(Study parentPublicStudy, String accessToken, String studySubjectOID, ItemData... optionalItemData) {
 
         ItemData itemData = null;
         if (optionalItemData.length > 0) {

@@ -27,6 +27,8 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -35,7 +37,6 @@ import core.org.akaza.openclinica.dao.admin.AuditDAO;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -58,6 +59,7 @@ import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jsampson
@@ -111,7 +113,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        StudyDAO studydao = new StudyDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         StudySubjectBean studySubject = null;
@@ -134,17 +135,17 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             forwardPage(Page.LIST_STUDY_SUBJECTS);
         } else {
             studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
-            StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySubject.getStudyId());
             // Check if this StudySubject would be accessed from the Current Study
-            if (studySubject.getStudyId() != currentStudy.getId()) {
-                if (currentStudy.getParentStudyId() > 0) {
+            if (studySubject.getStudyId() != currentStudy.getStudyId()) {
+                if (currentStudy.isSite()) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                     forwardPage(Page.MENU_SERVLET);
                     return;
                 } else {
                     // The SubjectStudy is not belong to currentstudy and current study is not a site.
-                    Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
-                    if (!sites.contains(study.getId())) {
+                    Collection sites = getStudyDao().findOlnySiteIdsByStudy(currentStudy);
+                    if (!sites.contains(study.getStudyId())) {
                         addPageMessage(
                                 respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                         forwardPage(Page.MENU_SERVLET);

@@ -7,37 +7,37 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EnketoPDFResponse {
 
-	private File pdfFile = null;
-	private Object error = null;
-	private String statusCode;
-	    
-	public String getStatusCode() {
-		return statusCode;
-	}
+    private File pdfFile = null;
+    private Object error = null;
+    private String statusCode;
 
-	public void setStatusCode(String statusCode) {
-		this.statusCode = statusCode;
-	}
+    public String getStatusCode() {
+        return statusCode;
+    }
 
-	public File getPdfFile() {
-		return pdfFile;
-	}
+    public void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
+    }
 
-	public void setPdfFile(File pdfFile) {
-		this.pdfFile = pdfFile;
-	}
+    public File getPdfFile() {
+        return pdfFile;
+    }
 
-	public Object getError() {
-		return error;
-	}
+    public void setPdfFile(File pdfFile) {
+        this.pdfFile = pdfFile;
+    }
 
-	public void setError(Object error) {
-		this.error = error;
-	}
+    public Object getError() {
+        return error;
+    }
 
-	public EnketoPDFResponse() {		
-	}
-	
-	
+    public void setError(Object error) {
+        this.error = error;
+    }
+
+    public EnketoPDFResponse() {
+    }
+
+
 
 }

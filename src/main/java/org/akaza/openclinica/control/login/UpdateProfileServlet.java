@@ -16,7 +16,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -24,12 +25,13 @@ import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import core.org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * @author jxu
  * @version CVS: $Id: UpdateProfileServlet.java,v 1.9 2005/02/23 18:58:11 jxu
@@ -53,11 +55,10 @@ public class UpdateProfileServlet extends SecureController {
     public void processRequest() throws Exception {
 
         String action = request.getParameter("action");// action sent by user
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean userBean1 = (UserAccountBean) udao.findByUserName(ub.getName());
 
-        Collection studies = sdao.findAllByUser(ub.getName());
+        Collection studies = getStudyDao().findAllByUser(ub.getName());
 
         if (StringUtils.isBlank(action)) {
             request.setAttribute("studies", studies);
@@ -136,9 +137,8 @@ public class UpdateProfileServlet extends SecureController {
         userBean1.setPasswdChallengeAnswer(fp.getString("passwdChallengeAnswer"));
         userBean1.setPhone(fp.getString("phone"));
         userBean1.setActiveStudyId(fp.getInt("activeStudyId"));
-        StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
 
-        StudyBean newActiveStudy = (StudyBean) sdao.findByPK(userBean1.getActiveStudyId());
+        Study newActiveStudy = (Study) getStudyDao().findByPK(userBean1.getActiveStudyId());
         request.setAttribute("newActiveStudy", newActiveStudy);
 
         if (errors.isEmpty()) {

@@ -7,19 +7,19 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <c:choose>
-    <c:when test="${study.status.name != 'removed' && study.status.name != 'auto-removed'}">
+    <c:when test="${study.status.description != 'removed' && study.status.description != 'auto-removed'}">
     <c:url var="viewStudy" value="/ViewStudy"/>
     <c:choose>
-    <c:when test="${study.parentStudyId>0}">
+    <c:when test="${study.study != nll && study.study.studyId > 0}">
     <b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
-     <a href="${viewStudy}?id=<c:out value="${study.parentStudyId}"/>&viewFull=yes"><c:out value="${study.parentStudyName}"/></a>
+     <a href="${viewStudy}?id=<c:out value="${study.study.studyId}"/>&viewFull=yes"><c:out value="${study.study.name}"/></a>
      <br><br>
     <b>Site:</b>&nbsp;
-     <a href="${viewStudy}?id=<c:out value="${study.id}"/>">
+     <a href="${viewStudy}?id=<c:out value="${study.studyId}"/>">
     </c:when>
     <c:otherwise>
     <b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
-     <a href="${viewStudy}?id=<c:out value="${study.id}"/>&viewFull=yes">
+     <a href="${viewStudy}?id=<c:out value="${study.studyId}"/>&viewFull=yes">
     </c:otherwise>
     </c:choose>
     <c:out value="${study.name}"/></a>
@@ -27,7 +27,7 @@
     <br><br>  
 
     <b><fmt:message key="status" bundle="${resword}"/>:</b>&nbsp;
-    <c:out value="${study.status.name}"/>
+    <c:out value="${study.status.description}"/>
 
     <br><br>    
     <c:if test="${studySubject != null}">

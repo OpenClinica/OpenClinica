@@ -3,16 +3,19 @@ package org.akaza.openclinica.controller.helper;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -24,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,27 +58,29 @@ public class RestfulServiceHelper {
 	private static final String ParticipantID_header = "ParticipantID";
 
 
-	private DataSource dataSource;	
-	private StudyDAO studyDao; 
+	private DataSource dataSource;
+	private StudyDao studyDao;
+	private StudyBuildService studyBuildService;
 	private UserAccountDAO userAccountDAO;
 	private PipeDelimitedDataHelper importDataHelper;
 	private MessageLogger messageLogger;
 
-	
-	public RestfulServiceHelper(DataSource dataSource2) {
-		dataSource = dataSource2;
+	public RestfulServiceHelper(DataSource dataSource, StudyBuildService studyBuildService, StudyDao studyDao) {
+		this.dataSource = dataSource;
+		this.studyBuildService = studyBuildService;
+		this.studyDao = studyDao;
 	}
-	
-	 /**
+
+	/**
 	  * 
 	  * @param studyOid
 	  * @param request
 	  * @return
 	 * @throws Exception 
 	  */
-	 public StudyBean setSchema(String studyOid, HttpServletRequest request) throws OpenClinicaSystemException {
+	 public Study setSchema(String studyOid, HttpServletRequest request) throws OpenClinicaSystemException {
 		// first time, the default DB schema for restful service is public
-		 StudyBean study = getStudyDao().findByPublicOid(studyOid);
+		 Study study = studyDao.findPublicStudy(studyOid);
 
 		 Connection con;
 		 String schemaNm="";
@@ -87,7 +93,7 @@ public class RestfulServiceHelper {
 		 }
 		 request.setAttribute("requestSchema", schemaNm);
 		 // get correct study from the right DB schema
-		 study = getStudyDao().findByOid(studyOid);
+		 study = studyDao.findByOcOID(studyOid);
 
 		 return study;
 	 }
@@ -235,15 +241,6 @@ public class RestfulServiceHelper {
         
     	return new File(SpringServletAccess.getPropertiesDir(context) + fileNm);
     }
-    /**
-	 * 
-	 * @return
-	 */
-	 public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-     }
-	 
 
     public UserAccountDAO getUserAccountDAO() {
     	userAccountDAO = userAccountDAO != null ? userAccountDAO : new UserAccountDAO(dataSource);
@@ -665,7 +662,7 @@ public class RestfulServiceHelper {
 
 	    public PipeDelimitedDataHelper getImportDataHelper() {
 			if(importDataHelper == null) {
-				importDataHelper = new PipeDelimitedDataHelper(this.dataSource);
+				importDataHelper = new PipeDelimitedDataHelper(this.dataSource, studyBuildService, studyDao);
 			}
 			return importDataHelper;
 		}

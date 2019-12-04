@@ -37,7 +37,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<jsp:useBean scope='request' id='studyToRemove' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToRemove' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='request' id='sitesToRemove' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='userRolesToRemove' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToRemove' class='java.util.ArrayList'/>
@@ -165,7 +165,7 @@
 
 </div>
 
-  <form action="RemoveStudy?action=submit&id=<c:out value="${studyToRemove.id}"/>" method="POST">
+  <form action="RemoveStudy?action=submit&id=<c:out value="${studyToRemove.studyId}"/>" method="POST">
     <input type="submit" name="submit" value="<fmt:message key="remove_study" bundle="${resword}"/>" onClick='return confirm("<fmt:message key="if_you_remove_this_study" bundle="${restext}"/>");' class="button_long">
     <input type="button" value="<fmt:message key="cancel" bundle="${resword}"/>" title="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" size="50" onclick="history.back();"/>
  </form>

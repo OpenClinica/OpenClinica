@@ -1,6 +1,6 @@
-jQuery(document).ready(function() {
-    jQuery('.accessCheck').unbind().click(function (event) {
-        var href = jQuery(this).attr('href');
+$(document).ready(function() {
+    $('.accessCheck').unbind().click(function (event) {
+        var href = $(this).attr('href');
         var ecId = getParameterByName("eventCrfId", href);
         var formLayoutId = getParameterByName("formLayoutId", href);
         var studyEventId = getParameterByName("studyEventId", href);

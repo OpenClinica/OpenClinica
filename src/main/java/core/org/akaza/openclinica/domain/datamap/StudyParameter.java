@@ -3,11 +3,7 @@ package core.org.akaza.openclinica.domain.datamap;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import org.hibernate.annotations.GenericGenerator;
@@ -56,7 +52,7 @@ public class StudyParameter  extends DataMapDomainObject {
 		return this.studyParameterId;
 	}
 
-	public void setStudyParameterId(int studyParameterId) {
+	public void setStudyParameterId(Integer studyParameterId) {
 		this.studyParameterId = studyParameterId;
 	}
 
@@ -97,8 +93,8 @@ public class StudyParameter  extends DataMapDomainObject {
 	}
 
 	@Column(name = "inheritable")
-	public Boolean getInheritable() {
-		return this.inheritable;
+	public boolean isInheritable() {
+		return inheritable;
 	}
 
 	public void setInheritable(Boolean inheritable) {
@@ -106,11 +102,17 @@ public class StudyParameter  extends DataMapDomainObject {
 	}
 
 	@Column(name = "overridable")
-	public Boolean getOverridable() {
-		return this.overridable;
+	public boolean isOverridable() {
+		return overridable;
 	}
 
 	public void setOverridable(Boolean overridable) {
 		this.overridable = overridable;
 	}
+
+	/**
+	 * @return Returns the overridable.
+	 */
+
+
 }

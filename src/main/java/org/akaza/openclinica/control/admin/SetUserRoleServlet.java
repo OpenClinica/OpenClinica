@@ -11,13 +11,14 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ import java.util.ResourceBundle;
  * Preferences - Java - Code Style - Code Templates
  */
 public class SetUserRoleServlet extends SecureController {
+
     /**
      *
      */
@@ -52,7 +54,6 @@ public class SetUserRoleServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int userId = fp.getInt("userId");
         if (userId == 0) {
@@ -61,26 +62,26 @@ public class SetUserRoleServlet extends SecureController {
         } else {
             String action = request.getParameter("action");
             UserAccountBean user = (UserAccountBean) udao.findByPK(userId);
-            ArrayList studies = (ArrayList) sdao.findAll();
-            ArrayList studiesHaveRole = (ArrayList) sdao.findAllByUser(user.getName());
+            ArrayList studies = (ArrayList) getStudyDao().findAll();
+            ArrayList studiesHaveRole = (ArrayList) getStudyDao().findAllByUser(user.getName());
             studies.removeAll(studiesHaveRole);
-            HashSet<StudyBean> studiesNotHaveRole = new HashSet<StudyBean>();
-            HashSet<StudyBean> sitesNotHaveRole = new HashSet<StudyBean>();
+            HashSet<Study> studiesNotHaveRole = new HashSet<Study>();
+            HashSet<Study> sitesNotHaveRole = new HashSet<Study>();
             for (int i = 0; i < studies.size(); i++) {
-                StudyBean study1 = (StudyBean) studies.get(i);
+                Study study1 = (Study) studies.get(i);
 
                 // TODO: implement equal() according to id
                 boolean hasStudy = false;
                 for (int j = 0; j < studiesHaveRole.size(); j++) {
-                    StudyBean study2 = (StudyBean) studiesHaveRole.get(j);
-                    if (study2.getId() == study1.getId()) {
+                    Study study2 = (Study) studiesHaveRole.get(j);
+                    if (study2.getStudyId() == study1.getStudyId()) {
                         hasStudy = true;
                         break;
                     }
                 }
                 if (!hasStudy) {
                     // YW 11-19-2007 <<
-                    if (study1.getParentStudyId() > 0) {
+                    if (study1.isSite()) {
                         sitesNotHaveRole.add(study1);
                     } else {
                         studiesNotHaveRole.add(study1);
@@ -100,11 +101,11 @@ public class SetUserRoleServlet extends SecureController {
             Boolean changeRoles = request.getParameter("changeRoles") == null ? false : Boolean.parseBoolean(request.getParameter("changeRoles"));
             int studyId = fp.getInt("studyId");
             if (changeRoles) {
-                StudyBean study = (StudyBean) sdao.findByPK(studyId);
+                Study study = (Study) getStudyDao().findByPK(studyId);
                 roleMap = new LinkedHashMap();
                 ResourceBundle resterm = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
 
-                if (study.getParentStudyId() > 0) {
+                if (study.isSite()) {
                     for (Iterator it = getRoles().iterator(); it.hasNext();) {
                         Role role = (Role) it.next();
                         switch (role.getId()) {
@@ -146,7 +147,7 @@ public class SetUserRoleServlet extends SecureController {
                     }
                 }
             } else {
-                if (currentStudy.getParentStudyId() > 0) {
+                if (currentStudy.isSite()) {
                     roleMap.remove(Role.COORDINATOR.getId());
                     roleMap.remove(Role.STUDYDIRECTOR.getId());
                 }
@@ -159,12 +160,12 @@ public class SetUserRoleServlet extends SecureController {
                 ArrayList finalStudiesNotHaveRole = new ArrayList();
                 Iterator iter_study = studiesNotHaveRole.iterator();
                 while (iter_study.hasNext()) {
-                    StudyBean s = (StudyBean) iter_study.next();
+                    Study s = (Study) iter_study.next();
                     finalStudiesNotHaveRole.add(s);
                     Iterator iter_site = sitesNotHaveRole.iterator();
                     while (iter_site.hasNext()) {
-                        StudyBean site = (StudyBean) iter_site.next();
-                        if (site.getParentStudyId() == s.getId()) {
+                        Study site = (Study) iter_site.next();
+                        if (site.checkAndGetParentStudyId() == s.getStudyId()) {
                             finalStudiesNotHaveRole.add(site);
                         }
                     }
@@ -191,7 +192,7 @@ public class SetUserRoleServlet extends SecureController {
                 // set role
                 String userName = fp.getString("name");
                 studyId = fp.getInt("studyId");
-                StudyBean userStudy = (StudyBean) sdao.findByPK(studyId);
+                Study userStudy = (Study) getStudyDao().findByPK(studyId);
                 int roleId = fp.getInt("roleId");
                 // new user role
                 StudyUserRoleBean sur = new StudyUserRoleBean();

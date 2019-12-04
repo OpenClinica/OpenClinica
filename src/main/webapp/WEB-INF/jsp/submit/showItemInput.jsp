@@ -556,7 +556,7 @@ include the default value first in the select list --%>
   <td valign="top"><span class="alert">*</span></td>
 </c:if>
 
-<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+<c:if test="${study.discrepancyManagement=='true'}">
     <c:choose>
       <c:when test="${displayItem.discrepancyNoteStatus == 0}">
           <c:set var="imageFileName" value="icon_noNote" />

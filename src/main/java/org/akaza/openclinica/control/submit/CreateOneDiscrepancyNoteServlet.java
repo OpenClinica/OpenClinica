@@ -21,12 +21,13 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -34,7 +35,6 @@ import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -45,6 +45,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Create a discrepancy note
@@ -70,7 +71,6 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     public static final String EMAIL_USER_ACCOUNT = "sendEmail";
     public static final String BOX_DN_MAP = "boxDNMap";
     public static final String BOX_TO_SHOW = "boxToShow";
-   
 
     /*
      * (non-Javadoc)
@@ -171,7 +171,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             String column = fp.getString(ENTITY_COLUMN, true);
             
             dn.setOwner(ub);
-            dn.setStudyId(currentStudy.getId());
+            dn.setStudyId(currentStudy.getStudyId());
             dn.setEntityId(entityId);
             dn.setEntityType(entityType);
             dn.setColumn(column);
@@ -266,15 +266,15 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                     ItemBean item = new ItemBean();
                     ItemDataBean itemData = new ItemDataBean();
 
-                    StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                     UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(dn.getAssignedUserId());
                     String alertEmail = assignedUser.getEmail();
                     message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),assignedUser.getLastName()));
                     message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base")
-                            + "ResolveDiscrepancy?flavor=-query&noteId=" + dn.getEntityId()
+                            + "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=" + assignedUser.getName()
+                            + "&listNotes_f_entityName=" + dn.getEntityName()
                             + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
                     message.append(respage.getString("you_received_this_from"));
-                    StudyBean study = (StudyBean) studyDAO.findByPK(dn.getStudyId());
+                    Study study = (Study) getStudyDao().findByPK(dn.getStudyId());
 
                     if ("itemData".equalsIgnoreCase(entityType)) {
                         itemData = (ItemDataBean) iddao.findByPK(dn.getEntityId());

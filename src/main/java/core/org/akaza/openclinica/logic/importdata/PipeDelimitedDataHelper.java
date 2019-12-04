@@ -33,24 +33,26 @@ import javax.xml.transform.stream.StreamResult;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -59,10 +61,13 @@ import org.w3c.dom.Element;
 public class PipeDelimitedDataHelper extends ImportDataHelper {
 
 	private final DataSource ds;
-
-	public PipeDelimitedDataHelper(DataSource ds) {
+	private StudyDao studyDao;
+	private StudyBuildService studyBuildService;
+	public PipeDelimitedDataHelper(DataSource ds, StudyBuildService studyBuildService, StudyDao studyDao) {
 		super();
 		this.ds = ds;
+		this.studyBuildService = studyBuildService;
+		this.studyDao = studyDao;
 	}
 	/**
 	 * 
@@ -1044,16 +1049,15 @@ public ArrayList<ErrorObj> validateStudyMetadata(String formOIDValue,
     
     try {
     	// check 1: study
-        StudyDAO studyDAO = new StudyDAO(ds);
         String studyOid = studyOIDValue;
-        StudyBean studyBean = studyDAO.findByOid(studyOid);
+        Study studyBean = studyDao.findByOcOID(studyOid);
         if (studyBean == null) {
             mf.applyPattern(respage.getString("your_study_oid_does_not_reference_an_existing"));
             Object[] arguments = { studyOid };
             eo = new ErrorObj(ErrorConstants.ERR_STUDY_NOT_EXIST,mf.format(arguments));
             errors.add(eo); 
             
-        } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, studyOid, ds)) {
+        } else if (!studyBuildService.isPublicStudySameAsTenantStudy(studyBean, studyOid)) {
             mf.applyPattern(respage.getString("your_current_study_is_not_the_same_as"));
             Object[] arguments = { studyBean.getName() };           
             eo = new ErrorObj(ErrorConstants.ERR_STUDY_NOT_EXIST,mf.format(arguments));
@@ -1070,8 +1074,8 @@ public ArrayList<ErrorObj> validateStudyMetadata(String formOIDValue,
         EventDefinitionCRFDAO edcDAO = new EventDefinitionCRFDAO(ds);
    
         String sedOid = studyEventOIDValue;
-        StudyEventDefinitionBean studyEventDefintionBean = studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getId(),
-                    studyBean.getParentStudyId());          
+        StudyEventDefinitionBean studyEventDefintionBean = studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getStudyId(),
+                    studyBean.checkAndGetParentStudyId());
 
         if (studyEventDefintionBean == null) {
             mf.applyPattern(respage.getString("your_study_event_oid_for_study_oid"));

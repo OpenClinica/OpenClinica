@@ -14,8 +14,8 @@ import java.util.HashMap;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class OdmUnit {
         this.showArchived = showArchived;
     }
 
-    public OdmUnit(DataSource ds, StudyBean study, int category) {
+    public OdmUnit(DataSource ds, Study study, int category) {
         this.ds = ds;
         this.dataset = new DatasetBean();
         this.studyBase = new OdmStudyBase(this.ds, study);
@@ -59,12 +59,12 @@ public class OdmUnit {
         this.category = category;
     }
 
-    public OdmUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, boolean showArchived) {
+    public OdmUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, boolean showArchived) {
         this(ds, dataset, odmBean, study, category);
         this.showArchived = showArchived;
     }
 
-    public OdmUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
+    public OdmUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category) {
         this.ds = ds;
         this.dataset = dataset.getId() > 0 ? dataset : new DatasetBean();
         this.studyBase = new OdmStudyBase(this.ds, study);

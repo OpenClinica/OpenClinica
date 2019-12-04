@@ -10,18 +10,19 @@ import java.util.ArrayList;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -61,7 +62,7 @@ public class BatchCRFMigrationServlet extends SecureController {
         ArrayList<CRFVersionBean> crfVersionList = null;
         ArrayList<FormLayoutBean> formLayoutList = null;
         ArrayList<StudyEventDefinitionBean> eventList = null;
-        ArrayList<StudyBean> siteList = null;
+        ArrayList<Study> siteList = null;
 
         // checks which module the requests are from, manage or admin
         String module = fp.getString(MODULE);
@@ -94,13 +95,13 @@ public class BatchCRFMigrationServlet extends SecureController {
             // crf.setVersions(crfVersionList);
             crf.setFormLayouts(formLayoutList);
 
-            ArrayList<StudyBean> listOfSites = (ArrayList<StudyBean>) sdao().findAllByParent(currentStudy.getId());
-            siteList = new ArrayList<StudyBean>();
-            StudyBean studyBean = new StudyBean();
-            studyBean.setOid(currentStudy.getOid());
+            ArrayList<Study> listOfSites = (ArrayList<Study>) getStudyDao().findAllByParent(currentStudy.getStudyId());
+            siteList = new ArrayList<Study>();
+            Study studyBean = new Study();
+            studyBean.setOc_oid(currentStudy.getOc_oid());
             studyBean.setName(resterm.getString("Study_Level_Subjects_Only"));
             siteList.add(studyBean);
-            for (StudyBean s : listOfSites) {
+            for (Study s : listOfSites) {
                 if (s.getStatus().isAvailable()) {
                     siteList.add(s);
                 }
@@ -127,11 +128,6 @@ public class BatchCRFMigrationServlet extends SecureController {
             forwardPage(Page.BATCH_CRF_MIGRATION);
 
         }
-    }
-
-    @SuppressWarnings("rawtypes")
-    private StudyDAO sdao() {
-        return new StudyDAO(sm.getDataSource());
     }
 
     @SuppressWarnings("rawtypes")

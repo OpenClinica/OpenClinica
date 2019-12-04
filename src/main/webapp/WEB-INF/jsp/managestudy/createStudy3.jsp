@@ -38,7 +38,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope ="request" id="interPurposeMap" class="java.util.HashMap"/>
 <jsp:useBean scope ="request" id="allocationMap" class="java.util.HashMap"/>
 <jsp:useBean scope ="request" id="maskingMap" class="java.util.HashMap"/>

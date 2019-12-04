@@ -55,7 +55,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToView' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <h1><div class="title_manage"><fmt:message key="view_study_metadata" bundle="${resword}"/>
 </div></h1></br>
 
@@ -71,7 +71,7 @@
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="unique_protocol_ID" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.identifier}"/>
+  <c:out value="${studyToView.uniqueIdentifier}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
@@ -107,7 +107,7 @@
   </td></tr>
 
   <c:choose>
-   <c:when test="${studyToView.parentStudyId == 0}">
+   <c:when test="${studyToView.study == null || studyToView.study.studyId == 0}">
       <c:set var="key" value="study_system_status"/>
    </c:when>
    <c:otherwise>
@@ -116,11 +116,11 @@
   </c:choose>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.status.name}"/>
+  <c:out value="${studyToView.status.description}"/>
    </td></tr>
 
   <c:choose>
-  <c:when test="${studyToView.protocolTypeKey=='interventional'}">
+  <c:when test="${studyToView.protocolType=='interventional'}">
 
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="assignment" bundle="${resword}"/>:</td><td class="table_cell">
@@ -186,10 +186,10 @@
    <td class="table_cell">
 
    <c:choose>
-   <c:when test="${(studyToView.studyParameterConfig.collectDob == '1')}">
+   <c:when test="${(studyToView.collectDob == '1')}">
   <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '2'}">
+   <c:when test="${studyToView.collectDob == '2'}">
        <fmt:message key="only_year_of_birth" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -202,7 +202,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="gender_required" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.genderRequired == 'false'}">
+   <c:when test="${studyToView.genderRequired == 'false'}">
    <fmt:message key="no" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -215,15 +215,15 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${(studyToView.studyParameterConfig.subjectPersonIdRequired == 'required')
-        or ((studyToView.studyParameterConfig.subjectPersonIdRequired == 'always'))}">
+   <c:when test="${(studyToView.subjectPersonIdRequired == 'required')
+        or ((studyToView.subjectPersonIdRequired == 'always'))}">
     <fmt:message key="required" bundle="${resword}"/>
    </c:when>
-    <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+    <c:when test="${studyToView.subjectPersonIdRequired == 'optional'}">
     <fmt:message key="optional" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
-       <c:out value="${studyToView.studyParameterConfig.subjectPersonIdRequired}"/>
+       <c:out value="${studyToView.subjectPersonIdRequired}"/>
    </c:otherwise>
   </c:choose>
   </td>
@@ -233,7 +233,7 @@
    <tr valign="top"><td class="table_header_column">Generate Study Subject ID Automatically With Prefix/Suffix?:</td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
+   <c:when test="${studyToView.subjectIdPrefixSuffix == 'true'}">
     Yes
    </c:when>
    <c:otherwise>

@@ -9,7 +9,6 @@ package core.org.akaza.openclinica.service.rule;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.oid.GenericOidGenerator;
 import core.org.akaza.openclinica.bean.oid.OidGenerator;
@@ -17,6 +16,7 @@ import core.org.akaza.openclinica.dao.hibernate.RuleDao;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.*;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import core.org.akaza.openclinica.domain.rule.action.*;
@@ -46,7 +46,7 @@ public class RulesPostImportContainerService {
     private RuleDao ruleDao;
     private RuleSetDao ruleSetDao;
     private final OidGenerator oidGenerator;
-    private StudyBean currentStudy;
+    private Study currentStudy;
     private UserAccountBean userAccount;
 
     private RunOnSchedule runOnSchedule;
@@ -55,7 +55,7 @@ public class RulesPostImportContainerService {
     private EventActionValidator eventActionValidator;
     ResourceBundle respage;
 
-    public RulesPostImportContainerService(DataSource ds, StudyBean currentStudy) {
+    public RulesPostImportContainerService(DataSource ds, Study currentStudy) {
         oidGenerator = new GenericOidGenerator();
         this.ds = ds;
         this.currentStudy = currentStudy;
@@ -72,7 +72,7 @@ public class RulesPostImportContainerService {
         AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
         ruleSetBeanWrapper.getAuditableBean().setStudy(currentStudy);
         if (isRuleSetExpressionValid(ruleSetBeanWrapper)) {
-            RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,currentStudy.getId());
+            RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,currentStudy.getStudyId());
 
             if (persistentRuleSetBean != null) {
                 List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
@@ -122,7 +122,7 @@ public class RulesPostImportContainerService {
             AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
             ruleSetBeanWrapper.getAuditableBean().setStudy(currentStudy);
             if (isRuleSetExpressionValid(ruleSetBeanWrapper)) {
-                RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,currentStudy.getId());
+                RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,currentStudy.getStudyId());
 
                 if (persistentRuleSetBean != null) {
                     List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
@@ -724,7 +724,7 @@ public class RulesPostImportContainerService {
         boolean isValid = true;
         if (ruleBeanWrapper.getAuditableBean().getRuleSetRules().size() > 0) {
             int studyId = ruleBeanWrapper.getAuditableBean().getRuleSetRules().get(0).getRuleSetBean().getStudyId();
-            if (studyId != currentStudy.getId()) {
+            if (studyId != currentStudy.getStudyId()) {
                 ruleBeanWrapper.error(createError("OCRERR_0030"));
                 isValid = false;
             }
@@ -765,7 +765,7 @@ public class RulesPostImportContainerService {
     /**
      * @return the currentStudy
      */
-    public StudyBean getCurrentStudy() {
+    public Study getCurrentStudy() {
         return currentStudy;
     }
 
@@ -773,7 +773,7 @@ public class RulesPostImportContainerService {
      * @param currentStudy
      *            the currentStudy to set
      */
-    public void setCurrentStudy(StudyBean currentStudy) {
+    public void setCurrentStudy(Study currentStudy) {
         this.currentStudy = currentStudy;
     }
 

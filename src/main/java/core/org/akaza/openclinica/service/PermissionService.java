@@ -1,9 +1,9 @@
 package core.org.akaza.openclinica.service;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,15 +18,16 @@ public interface PermissionService {
 
     ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request);
 
-    List<String> getPermissionTagsList(StudyBean study,HttpServletRequest request);
+    List<String> getPermissionTagsList(Study study,HttpServletRequest request);
 
-    String getPermissionTagsString(StudyBean study,HttpServletRequest request);
+    String getPermissionTagsString(Study study,HttpServletRequest request);
 
-    String[] getPermissionTagsStringArray(StudyBean study ,HttpServletRequest request);
+    String[] getPermissionTagsStringArray(Study study ,HttpServletRequest request);
 
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);
-
-    boolean isUserHasPermission(String column,HttpServletRequest request,StudyBean studyBean);
     
     boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList);
+
+    boolean isUserHasPermission(String column, HttpServletRequest request, Study studyBean);
+
 }

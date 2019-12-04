@@ -96,6 +96,6 @@
 as the link is provided on Build Study page tasks -> Create Rules -> Actions  
 <span class="table_title_Admin">Build Rules</span>
 <div>&nbsp;</div>
-<div class="homebox_bullets"><a href="${designerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}">Designer</a></div><br/>
+<div class="homebox_bullets"><a href="${designerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oc_oid}&provider_user=${userBean.name}">Designer</a></div><br/>
 -->
 <jsp:include page="../include/footer.jsp"/>

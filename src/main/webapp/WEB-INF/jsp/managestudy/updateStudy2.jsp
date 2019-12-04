@@ -38,7 +38,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope ="request" id="studyPhaseMap" class="java.util.HashMap"/>
 <jsp:useBean scope ="request" id="studyTypes" class="java.util.ArrayList"/>
 <script type="text/JavaScript" language="JavaScript">
@@ -111,7 +111,7 @@
   <tr valign="top"><td class="formlabel"><fmt:message key="protocol_type" bundle="${resword}"/>:</td><td>
   <c:set var="type1" value="observational"/>
   <c:choose>
-   <c:when test="${newStudy.protocolTypeKey == type1}">
+   <c:when test="${newStudy.protocolType == type1}">
     <input type="radio" checked name="protocolType" value="observational" disabled><fmt:message key="observational" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -123,7 +123,7 @@
 
 
     <c:choose>
-     <c:when test="${newStudy.parentStudyId == 0}">
+     <c:when test="${newStudy.study == null || newStudy.study.studyId == 0}">
         <c:set var="key" value="study_system_status"/>
      </c:when>
      <c:otherwise>
@@ -133,7 +133,7 @@
 
   <tr valign="top"><td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td><td><div class="formfieldM_BG">
    <%--
-   <c:set var="status1" value="${newStudy.status.id}"/>
+   <c:set var="status1" value="${newStudy.status.code}"/>
    <select name="statusId" class="formfieldXL">
       <c:forEach var="status" items="${statuses}">
        <c:choose>

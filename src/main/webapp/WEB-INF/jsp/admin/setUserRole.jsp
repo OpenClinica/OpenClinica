@@ -65,23 +65,23 @@
         <select name="studyId" class="formfieldXL" onchange="sendUrl();">
          <c:forEach var="userStudy" items="${studies}">
            <c:choose>
-           <c:when test="${userStudy.parentStudyId > 0}">
+           <c:when test="${userStudy.study != null userStudy.study.studyId > 0}">
                 <c:choose>
-                <c:when test="${studyId==userStudy.id}">
-                   <option value="<c:out value="${userStudy.id}"/>" selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/>
+                <c:when test="${studyId==userStudy.studyId}">
+                   <option value="<c:out value="${userStudy.studyId}"/>" selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/>
                 </c:when>
                 <c:otherwise>
-                   <option value="<c:out value="${userStudy.id}"/>">&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/>
+                   <option value="<c:out value="${userStudy.studyId}"/>">&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/>
                 </c:otherwise>
                 </c:choose>
            </c:when>
            <c:otherwise>
                 <c:choose>
-                   <c:when test="${studyId==userStudy.id}">
-                       <option value="<c:out value="${userStudy.id}"/>" selected><c:out value="${userStudy.name}"/>
+                   <c:when test="${studyId==userStudy.studyId}">
+                       <option value="<c:out value="${userStudy.studyId}"/>" selected><c:out value="${userStudy.name}"/>
                    </c:when>
                    <c:otherwise>
-                       <option value="<c:out value="${userStudy.id}"/>"><c:out value="${userStudy.name}"/>
+                       <option value="<c:out value="${userStudy.studyId}"/>"><c:out value="${userStudy.name}"/>
                    </c:otherwise>
                 </c:choose>
            </c:otherwise>

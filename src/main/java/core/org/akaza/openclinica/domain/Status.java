@@ -3,9 +3,7 @@ package core.org.akaza.openclinica.domain;
 import core.org.akaza.openclinica.domain.enumsupport.CodedEnum;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /*
  * @Author Krikor Krumlian
@@ -28,6 +26,21 @@ public enum Status implements CodedEnum {
 
     private int code;
     private String description;
+    private static final Status[] members =
+            { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION, RESET, ARCHIVED };
+    private static List list = Arrays.asList(members);
+
+    private static final Status[] activeMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
+    private static List activeList = Arrays.asList(activeMembers);
+
+    private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
+    private static List studySubjectDropDownList = Arrays.asList(studySubjectDropDownMembers);
+
+    private static final Status[] subjectDropDownMembers = { AVAILABLE, DELETED };
+    private static List subjectDropDownList = Arrays.asList(subjectDropDownMembers);
+
+    private static final Status[] studyUpdateMembers = { PENDING, AVAILABLE, FROZEN, LOCKED };
+    private static List studyUpdateMembersList = Arrays.asList(studyUpdateMembers);
 
     Status() {
     }
@@ -48,7 +61,11 @@ public enum Status implements CodedEnum {
     }
 
     public static Status getByName(String name) {
-        return Status.valueOf(Status.class, name);
+        HashMap<String, Status> enumObjects = new HashMap<String, Status>();
+        for (Status theEnum : Status.values()) {
+            enumObjects.put(theEnum.getDescription(), theEnum);
+        }
+        return enumObjects.get(name.toLowerCase()   );
     }
 
     public static Status getByCode(Integer code) {
@@ -95,6 +112,65 @@ public enum Status implements CodedEnum {
 
     public String getDescription() {
         return description;
+    }
+
+    public static ArrayList toArrayList() {
+        return new ArrayList(list);
+    }
+
+    public static ArrayList toActiveArrayList() {
+        return new ArrayList(activeList);
+    }
+
+        public static ArrayList toDropDownArrayList() {
+        return new ArrayList(studySubjectDropDownList);
+    }
+
+    public static ArrayList toStudyUpdateMembersList() {
+        return new ArrayList(studyUpdateMembersList);
+    }
+    public static ArrayList toSubjectDropDownArrayList() {
+        return new ArrayList(subjectDropDownList);
+    }
+
+    public boolean isInvalid() {
+        return this == Status.INVALID;
+    }
+
+    public boolean isAvailable() {
+        return this == Status.AVAILABLE;
+    }
+
+    public boolean isPending() {
+        return this == Status.PENDING;
+    }
+
+    public boolean isPrivate() {
+        return this == Status.PRIVATE;
+    }
+
+    public boolean isUnavailable() {
+        return this == Status.UNAVAILABLE;
+    }
+
+    public boolean isDeleted() {
+        return this == Status.DELETED || this == Status.AUTO_DELETED;
+    }
+
+    public boolean isLocked() {
+        return this == Status.LOCKED;
+    }
+
+    public boolean isSigned() {
+        return this == Status.SIGNED;
+    }
+
+    public boolean isFrozen() {
+        return this == Status.FROZEN;
+    }
+
+    public boolean isArchived() {
+        return this == Status.ARCHIVED;
     }
 
 }

@@ -36,7 +36,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="statuses" class="java.util.ArrayList"/>
@@ -66,7 +66,7 @@
 <form action="UpdateStudy" method="post">
 <input type="hidden" name="action" value="next">
 <input type="hidden" name="pageNum" value="1">
-<input type="hidden" name="id" value="<c:out value="${newStudy.id}"/>">
+<input type="hidden" name="id" value="<c:out value="${newStudy.studyId}"/>">
 <!-- These DIVs define shaded box borders -->
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -74,7 +74,7 @@
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="400">
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</a></td><td><div class="formfieldXL_BG">
-  <input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>" class="formfieldXL"></div>
+  <input type="text" name="uniqueProId" value="<c:out value="${newStudy.uniqueIdentifier}"/>" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td class="formlabel">*</td></tr>
 
   <tr valign="top"><td class="formlabel"><b><fmt:message key="brief_title" bundle="${resword}"/></b>:</td><td><div class="formfieldXL_BG">

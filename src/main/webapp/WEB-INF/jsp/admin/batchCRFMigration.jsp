@@ -44,7 +44,7 @@
 <jsp:useBean scope="request" id="displayStudy"
 	class="core.org.akaza.openclinica.bean.admin.DisplayStudyBean" />
 <jsp:useBean scope="session" id="study"
-	class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
+	class="core.org.akaza.openclinica.domain.datamap.Study" />
 <jsp:useBean scope="request" id="subject"
 	class="core.org.akaza.openclinica.bean.submit.SubjectBean" />
 <jsp:useBean scope="request" id="studySub"
@@ -136,7 +136,7 @@
 <form
 	action="${pageContext.request.contextPath}/pages/api/v1/forms/migrate/run"
 	method="post">
-	<input type="hidden" name="studyOid" id="studyOid" value="${study.oid}">
+	<input type="hidden" name="studyOid" id="studyOid" value="${study.oc_oid}">
 	<input type="hidden" name="crfId" id="crfId" value="${crf.id}">
 
 

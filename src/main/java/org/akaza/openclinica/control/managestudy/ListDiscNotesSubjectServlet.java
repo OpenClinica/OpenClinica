@@ -7,13 +7,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.ListDiscNotesSubjectTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -115,7 +114,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         }
         locale = LocaleResolver.getLocale(request);
 
-        StudyBean sbean = (StudyBean) session.getAttribute("study");
+        Study sbean = (Study) session.getAttribute("study");
         //List<DiscrepancyNoteBean> allDiscNotes = discNoteUtil.getThreadedDNotesForStudy(sbean, resolutionStatusIds, sm.getDataSource(), discNoteType, true);
 
         //Map stats = discNoteUtil.generateDiscNoteSummary(allDiscNotes);
@@ -127,7 +126,6 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         // < resword =
         // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
 
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
@@ -146,9 +144,9 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         factory.setStudySubjectDAO(sdao);
         factory.setStudyEventDAO(sedao);
         factory.setStudyBean(currentStudy);
+        factory.setStudyDao(getStudyDao());
         factory.setStudyGroupClassDAO(sgcdao);
         factory.setSubjectGroupMapDAO(sgmdao);
-        factory.setStudyDAO(studyDAO);
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
         factory.setEventCRFDAO(edao);

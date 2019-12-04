@@ -2,10 +2,11 @@ package core.org.akaza.openclinica.logic.rulerunner;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -32,8 +33,8 @@ import javax.sql.DataSource;
 
 public class RuleSetBulkRuleRunner extends RuleRunner {
 
-    public RuleSetBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
-        super(ds, requestURLMinusServletPath, contextPath, mailSender);
+    public RuleSetBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, StudyDao studyDao) {
+        super(ds, requestURLMinusServletPath, contextPath, mailSender, studyDao);
     }
 
     private List<RuleSetBasedViewContainer> populateForRuleSetBasedView(List<RuleSetBasedViewContainer> theList, RuleSetBean ruleSet, RuleBean rule,
@@ -61,7 +62,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
 
     }
 
-    public List<RuleSetBasedViewContainer> runRulesBulkFromRuleSetScreenOLD(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy,
+    public List<RuleSetBasedViewContainer> runRulesBulkFromRuleSetScreenOLD(List<RuleSetBean> ruleSets, Boolean dryRun, Study currentStudy,
             HashMap<String, String> variableAndValue, UserAccountBean ub) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
@@ -131,7 +132,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
         return ruleSetBasedView;
     }
 
-    public List<RuleSetBasedViewContainer> runRulesBulkFromRuleSetScreen(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy,
+    public List<RuleSetBasedViewContainer> runRulesBulkFromRuleSetScreen(List<RuleSetBean> ruleSets, ExecutionMode executionMode, Study currentStudy,
             HashMap<String, String> variableAndValue, UserAccountBean ub) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {

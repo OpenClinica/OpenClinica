@@ -49,7 +49,7 @@
  <td class="table_cell_noborder" style="color: #789EC5"><c:out value="${studySubject.label}"/><br>
  </td>
  <c:choose>
- <c:when test="${study.studyParameterConfig.personIdShownOnCRF == 'true'}">
+ <c:when test="${study.personIdShownOnCRF == 'true'}">
    <td class="table_cell_top" style="color: #789EC5"><b><fmt:message key="person_ID" bundle="${resword}"/>:</b><br></td>
    <td class="table_cell_noborder" style="color: #789EC5"><c:out value="${subject.uniqueIdentifier}"/><br></td>
 

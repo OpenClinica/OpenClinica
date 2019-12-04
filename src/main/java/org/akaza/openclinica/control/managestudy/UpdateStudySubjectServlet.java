@@ -12,11 +12,12 @@ import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -29,6 +30,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -65,7 +67,6 @@ public class UpdateStudySubjectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        StudyDAO stdao = new StudyDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO studySubdao = new StudySubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
@@ -94,7 +95,7 @@ public class UpdateStudySubjectServlet extends SecureController {
 
             studySub = (StudySubjectBean) studySubdao.findByPK(studySubId);
             subject = (SubjectBean) sdao.findByPK(studySub.getSubjectId());
-            StudyBean study = (StudyBean) stdao.findByPK(studySub.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
 
 
             StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
@@ -112,9 +113,9 @@ public class UpdateStudySubjectServlet extends SecureController {
             ArrayList classes = new ArrayList();
             if (!"submit".equalsIgnoreCase(action)) {
                 // YW <<
-                int parentStudyId = currentStudy.getParentStudyId();
+                int parentStudyId = currentStudy.checkAndGetParentStudyId();
                 if (parentStudyId > 0) {
-                    StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
+                    Study parentStudy = (Study) getStudyDao().findByPK(parentStudyId);
                     classes = sgcdao.findAllActiveByStudy(parentStudy);
                 } else {
                     classes = sgcdao.findAllActiveByStudy(currentStudy);
@@ -163,8 +164,8 @@ public class UpdateStudySubjectServlet extends SecureController {
 
                 // TODO remove these once we clear the study parameter config
                 /*
-                if (! currentStudy.getStudyParameterConfig().getCollectDob().equals("3")){
-                    if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+                if (! currentStudy.getCollectDob().equals("3")){
+                    if ( currentStudy.getCollectDob().equals("2"))
                     {
                         String d_date = fp.getString(UpdateSubjectServlet.DATE_DOB_TO_SAVE);
                         if ( !(d_date == null || d_date.trim().length()==0)){
@@ -172,7 +173,7 @@ public class UpdateStudySubjectServlet extends SecureController {
                             sub.setDateOfBirth(date_new);
                         }
                     }
-                    if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
+                    if ( currentStudy.getCollectDob().equals("1"))
                     {
 
                         Date date_new = local_df.parse(fp.getString(UpdateSubjectServlet.DATE_DOB_TO_SAVE));
@@ -237,7 +238,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         }
     }
 
-    private void updateClosedQueriesForUpdatedStudySubjectFields(StudyBean study, SubjectBean updatedSubject, StudySubjectBean updatedStudySubject) {
+    private void updateClosedQueriesForUpdatedStudySubjectFields(Study study, SubjectBean updatedSubject, StudySubjectBean updatedStudySubject) {
         DiscrepancyNoteDAO dnDAO = new DiscrepancyNoteDAO(sm.getDataSource());
         StudySubjectDAO studySubdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
@@ -297,7 +298,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         child.setAssignedUserId(parent.getAssignedUserId());
         child.setResStatus(parent.getResStatus());
         child.setOwner(ub);
-        child.setStudyId(currentStudy.getId());
+        child.setStudyId(currentStudy.getStudyId());
         child.setEntityId(parent.getEntityId());
         child.setEntityType(parent.getEntityType());
         child.setColumn(parent.getColumn());
@@ -317,7 +318,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         int studySubId = Integer.valueOf(fp.getString("id"));
 
         // Update: allow data entry person role to edit subject on study level (https://jira.openclinica.com/browse/OC-8620)
-        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant2()) {
+        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentStudy.checkAndGetParentStudyId() > 0 && currentRole.isResearchAssistant2()) {
 
             validator.addValidation("label", Validator.NO_BLANKS);
             validator.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
@@ -326,9 +327,9 @@ public class UpdateStudySubjectServlet extends SecureController {
             if (!StringUtil.isBlank(fp.getString("label"))) {
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 
-                StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(), currentStudy.getId(), studySub.getId());
+                StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(), currentStudy.getStudyId(), studySub.getId());
                 if (sub1.getId() == 0) {
-                    sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabelInSites(fp.getString("label").trim(), currentStudy.getId(), studySub.getId());
+                    sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabelInSites(fp.getString("label").trim(), currentStudy.getStudyId(), studySub.getId());
                 }
                 if (sub1.getId() > 0) {
                     Validator.addError(manualErrors, "label", resexception.getString("subject_ID_used_by_another_choose_unique"));
@@ -382,10 +383,10 @@ public class UpdateStudySubjectServlet extends SecureController {
     private void setLocalDOB(SubjectBean subject) {
         Date birthDate = subject.getDateOfBirth();
         try {
-            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+            if (currentStudy.getCollectDob().equals("1")) {
                 String localBirthDate = local_df.format(birthDate);
                 request.setAttribute("localBirthDate", localBirthDate);
-            } else if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
+            } else if (currentStudy.getCollectDob().equals("2")) {
                 String localBirthDate = yformat.format(birthDate);
                 request.setAttribute("localBirthDate", localBirthDate);
             }
@@ -394,13 +395,13 @@ public class UpdateStudySubjectServlet extends SecureController {
         }
     }
 
-    private List<DiscrepancyNoteBean> getDiscNotesForSubjectStudySubject(StudyBean study, Integer subjectId, Integer studySubId) {
+    private List<DiscrepancyNoteBean> getDiscNotesForSubjectStudySubject(Study study, Integer subjectId, Integer studySubId) {
         // If the study subject derives from a site, and is being viewed from a parent study,
         // then the study IDs will be different. However, since each note is
         // saved with the specific study ID, then its study ID may be different than the study
         // subject's ID.
-        boolean subjectStudyIsCurrentStudy = study.getId() == currentStudy.getId();
-        boolean isParentStudy = study.getParentStudyId() < 1;
+        boolean subjectStudyIsCurrentStudy = study !=null && currentStudy != null && study.getStudyId() == currentStudy.getStudyId();
+        boolean isParentStudy = !study.isSite();
 
         // Get any disc notes for this subject : studySubId
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
@@ -412,8 +413,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(study, studySubId));
         } else {
             if (!isParentStudy) {
-                StudyDAO studydao = new StudyDAO(sm.getDataSource());
-                StudyBean stParent = (StudyBean) studydao.findByPK(study.getParentStudyId());
+                Study stParent = study.getStudy();
                 allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, study, subjectId);
                 allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent, study, studySubId));
             } else {

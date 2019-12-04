@@ -1,7 +1,6 @@
 package core.org.akaza.openclinica.logic.rulerunner;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -20,6 +19,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import core.org.akaza.openclinica.domain.rule.action.RuleActionBean;
@@ -63,11 +63,11 @@ public class ImportDataRuleRunnerContainer {
      * @param ruleSetService
      */
     @Transactional
-    public void initRuleSetsAndTargets(DataSource ds, StudyBean studyBean, SubjectDataBean subjectDataBean, RuleSetServiceInterface ruleSetService) {
+    public void initRuleSetsAndTargets(DataSource ds, Study studyBean, SubjectDataBean subjectDataBean, RuleSetServiceInterface ruleSetService) {
         this.shouldRunRules = this.shouldRunRules == null ? Boolean.FALSE : this.shouldRunRules;
         this.importDataTrueRuleSets = this.importDataTrueRuleSets == null ? new ArrayList<RuleSetBean>() : this.importDataTrueRuleSets;
         this.variableAndValue = this.variableAndValue == null ? new HashMap<String, String>() : this.variableAndValue;
-        studyOid = studyBean.getOid();
+        studyOid = studyBean.getOc_oid();
         studySubjectOid = subjectDataBean.getSubjectOID();
         StudySubjectBean studySubject =
                 new StudySubjectDAO<String, ArrayList>(ds).findByOid(studySubjectOid);

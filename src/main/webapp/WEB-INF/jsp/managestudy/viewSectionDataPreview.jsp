@@ -143,7 +143,7 @@ function getSib(theSibling){
  <td class="table_cell_noborder" ><c:out value="${studySubject.label}"/><br>
  </td>
  <c:choose>
- <c:when test="${study.studyParameterConfig.personIdShownOnCRF == 'true'}">
+ <c:when test="${study.personIdShownOnCRF == 'true'}">
 
  <td class="table_cell_top" ><b><fmt:message key="person_ID" bundle="${resword}"/>:</b><br></td>
  <td class="table_cell_noborder" ><c:out value="${subject.uniqueIdentifier}"/><br></td>

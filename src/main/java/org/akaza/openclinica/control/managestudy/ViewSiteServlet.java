@@ -13,15 +13,15 @@ import java.util.ArrayList;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -37,6 +38,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
  *         Preferences - Java - Code Style - Code Templates
  */
 public class ViewSiteServlet extends SecureController {
+
     EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
 
     /**
@@ -51,7 +53,7 @@ public class ViewSiteServlet extends SecureController {
             return;
         }
         int siteId = request.getParameter("id") == null ? 0 : Integer.valueOf(request.getParameter("id"));
-        if (currentStudy.getId() == siteId) {
+        if (currentStudy.getStudyId() == siteId) {
             return;
         }
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_study_contact_sysadmin"));
@@ -62,7 +64,6 @@ public class ViewSiteServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         String idString = "";
         if (request.getAttribute("siteId") == null) {
             idString = request.getParameter("id");
@@ -75,23 +76,13 @@ public class ViewSiteServlet extends SecureController {
             forwardPage(Page.SITE_LIST_SERVLET);
         } else {
             int siteId = Integer.valueOf(idString.trim()).intValue();
-            StudyBean study = (StudyBean) sdao.findByPK(siteId);
+            Study study = (Study) getStudyDao().findByPK(siteId);
 
-            checkRoleByUserAndStudy(ub, study, sdao);
-            // if (currentStudy.getId() != study.getId()) {
-
-            ArrayList configs = new ArrayList();
-            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-            configs = spvdao.findParamConfigByStudy(study);
-            study.setStudyParameters(configs);
-
-            // }
+            checkRoleByUserAndStudy(ub, study);
 
             String parentStudyName = "";
-            if (study.getParentStudyId() > 0) {
-                StudyBean parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
-                parentStudyName = parent.getName();
-            }
+            if (study.isSite())
+                parentStudyName = study.getStudy().getName();
             request.setAttribute("parentName", parentStudyName);
             request.setAttribute("siteToView", study);
             request.setAttribute("idToSort", request.getAttribute("idToSort"));
@@ -101,10 +92,10 @@ public class ViewSiteServlet extends SecureController {
         }
     }
 
-    private void viewSiteEventDefinitions(StudyBean siteToView) throws MalformedURLException {
-        int siteId = siteToView.getId();
+    private void viewSiteEventDefinitions(Study siteToView) throws MalformedURLException {
+        int siteId = siteToView.getStudyId();
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
@@ -121,7 +112,7 @@ public class ViewSiteServlet extends SecureController {
 
             int defId = sed.getId();
             ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId,
-                    siteToView.getParentStudyId());
+                    siteToView.checkAndGetParentStudyId());
             ArrayList<EventDefinitionCRFBean> defCrfs = new ArrayList<EventDefinitionCRFBean>();
             for (EventDefinitionCRFBean edcBean : edcs) {
                 CRFBean cBean = (CRFBean) cdao.findByPK(edcBean.getCrfId());

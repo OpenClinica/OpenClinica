@@ -151,7 +151,7 @@
         <c:out value="${studySubject.label}" /><br />
     </td>
     <c:choose>
-        <c:when test="${study.studyParameterConfig.personIdShownOnCRF == 'true'}">
+        <c:when test="${study.personIdShownOnCRF == 'true'}">
             <td class="table_cell" style="color: #789EC5">
                 <b><fmt:message key="person_ID" bundle="${resword}"/>:</b><br />
             </td>
@@ -174,11 +174,11 @@
     </td>
     <td class="table_cell_noborder" style="color: #789EC5">
         <c:choose>
-        <c:when test="${study.parentStudyId>0}">
-        <a href="ViewSite?id=<c:out value="${study.id}"/>">
+        <c:when test="${study.study != null && study.study.studyId > 0}">
+        <a href="ViewSite?id=<c:out value="${study.studyId}"/>">
             </c:when>
             <c:otherwise>
-            <a href="ViewStudy?id=<c:out value="${study.id}"/>&viewFull=yes">
+            <a href="ViewStudy?id=<c:out value="${study.studyId}"/>&viewFull=yes">
                 </c:otherwise>
                 </c:choose> <c:out value="${studyTitle}" /></a><br>
     </td>
@@ -290,7 +290,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
         <c:otherwise>
             <fmt:message key="interviewer_name" bundle="${resword}"/>:
-            <c:if test="${study.studyParameterConfig.interviewerNameRequired=='true'}">
+            <c:if test="${study.interviewerNameRequired=='true'}">
                 *
             </c:if>
             &nbsp;
@@ -306,7 +306,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
                 <c:choose>
                 <c:when
-                  test="${study.studyParameterConfig.interviewerNameEditable=='true'}">
+                  test="${study.interviewerNameEditable=='true'}">
                 <c:choose>
                 <c:when test="${isInError_Int}">
                 <div class="aka_input_error">
@@ -333,7 +333,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                         </jsp:include>--%>
             </td>
             <td valign="top" nowrap>
-                <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                <c:if test="${study.discrepancyManagement=='true'}">
                     <c:if test="${! (enclosingPage eq 'viewSectionData')}">
                         <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name','spanAlert-interviewer'); return false;">
                             <c:choose>
@@ -365,7 +365,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
         </c:when>
         <c:otherwise>
             <fmt:message key="interview_date" bundle="${resword}"/>:
-            <c:if test="${study.studyParameterConfig.interviewDateRequired=='true'}">
+            <c:if test="${study.interviewDateRequired=='true'}">
                 *
             </c:if>&nbsp;<br />
             <%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%>
@@ -380,7 +380,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             <td valign="top">
                 <c:choose>
                 <c:when
-                  test="${study.studyParameterConfig.interviewDateEditable=='true'}">
+                  test="${study.interviewDateEditable=='true'}">
                 <c:choose>
                 <c:when test="${isInError_Dat}">
                 <div class="aka_input_error">
@@ -418,7 +418,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                     Calendar.setup({inputField  : "interviewDate", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "interviewDateTrigger" });
                 </script>
 
-                <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                <c:if test="${study.discrepancyManagement=='true'}">
                     <%--BWP: 2808 related>> --%>
                     <c:if test="${! (enclosingPage eq 'viewSectionData')}">
                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed','spanAlert-interviewDate'); return false;">

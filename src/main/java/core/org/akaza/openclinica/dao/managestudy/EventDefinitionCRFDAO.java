@@ -9,7 +9,6 @@ package core.org.akaza.openclinica.dao.managestudy;
 
 import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
@@ -17,8 +16,11 @@ import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -30,6 +32,7 @@ import java.util.*;
  */
 public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	// private DAODigester digester;
+
 
 	private void setQueryNames() {
 		getCurrentPKName = "getCurrentPK";
@@ -160,8 +163,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * @param definitionId
 	 * @return
 	 */
-	public Collection findAllByDefinition(StudyBean study, int definitionId) {
-		return study.isSite(study.getParentStudyId()) ? findAllByDefinitionAndSiteIdAndParentStudyId(definitionId, study.getId(), study.getParentStudyId())
+	public Collection findAllByDefinition(Study study, int definitionId) {
+		return study.isSite() ? findAllByDefinitionAndSiteIdAndParentStudyId(definitionId, study.getStudyId(), study.getStudy().getStudyId())
 				: findAllParentsByDefinition(definitionId);
 	}
 
@@ -188,12 +191,12 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public Collection findAllStudySiteFiltered(StudyBean studyBean, String[] permissionTags) {
+	public Collection findAllStudySiteFiltered(Study studyBean, String[] permissionTags) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyBean.getParentStudyId()));
-        variables.put(new Integer(2), new Integer(studyBean.getId()));
-        variables.put(new Integer(3), new Integer(studyBean.getId()));
+        variables.put(new Integer(1), new Integer(studyBean.checkAndGetParentStudyId()));
+        variables.put(new Integer(2), new Integer(studyBean.getStudyId()));
+        variables.put(new Integer(3), new Integer(studyBean.getStudyId()));
 
 		String sql = "";
 		if(permissionTags ==null || permissionTags.length==0) {
@@ -511,9 +514,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * @param eventDefinitionId
 	 * @return
 	 */
-	public Collection findAllByEventDefinitionId(StudyBean study, int eventDefinitionId) {
-		return study.isSite(study.getParentStudyId())
-				? findAllByEventDefinitionIdAndSiteIdAndParentStudyId(eventDefinitionId, study.getId(), study.getParentStudyId())
+	public Collection findAllByEventDefinitionId(Study study, int eventDefinitionId) {
+		return study.isSite()
+				? findAllByEventDefinitionIdAndSiteIdAndParentStudyId(eventDefinitionId, study.getStudyId(), study.getStudy().getStudyId())
 				: findAllParentsByEventDefinitionId(eventDefinitionId);
 	}
 
@@ -568,9 +571,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * @param eventDefinitionId
 	 * @return
 	 */
-	public Collection findAllActiveByEventDefinitionId(StudyBean study, int eventDefinitionId) {
-		if (study.isSite(study.getParentStudyId())) {
-			return findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId(eventDefinitionId, study.getId(), study.getParentStudyId());
+	public Collection findAllActiveByEventDefinitionId(Study study, int eventDefinitionId) {
+		if (study.isSite()) {
+			return findAllActiveByEventDefinitionIdAndSiteIdAndParentStudyId(eventDefinitionId, study.getStudyId(), study.getStudy().getStudyId());
 		} else {
 			return findAllActiveParentsByEventDefinitionId(eventDefinitionId);
 		}
@@ -657,13 +660,13 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public Collection findAllActiveNonHiddenByEventDefinitionIdAndStudy(int definitionId, StudyBean study) {
+	public Collection findAllActiveNonHiddenByEventDefinitionIdAndStudy(int definitionId, Study study) {
 		ArrayList al = new ArrayList();
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		if (study.getParentStudyId() > 0) {
+		if (study.isSite()) {
 			variables.put(new Integer(1), new Integer(definitionId));
-			variables.put(new Integer(2), new Integer(study.getId()));
+			variables.put(new Integer(2), new Integer(study.getStudyId()));
 			variables.put(new Integer(3), new Integer(definitionId));
 
 			String sql = digester.getQuery("findAllActiveNonHiddenByEventDefinitionIdAndSite");
@@ -683,8 +686,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * 
 	 * @return boolean to tell us if it's required or not.
 	 */
-	public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent) {
-		StudyBean study = new StudyDAO(this.ds).findByStudySubjectId(studyEvent.getStudySubjectId());
+	public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent, StudyDao studyDao) {
+		Study study = studyDao.findByStudySubjectId(studyEvent.getStudySubjectId());
 		int studyEventId = studyEvent.getId();
 
 		/*
@@ -719,18 +722,18 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 			HashMap hm = (HashMap) it.next();
 			Integer dbStudyId = (Integer) hm.get("study_id");
 			Integer parentId = (Integer) hm.get("parent_id");
-			if (dbStudyId == study.getId()) {
+			if (dbStudyId == study.getStudyId()) {
 				if (parentId != null && parentId > 0) {
 					siteR = (Boolean) hm.get("required_crf");
 					isExisted = true;
 				} else {
 					studyR = (Boolean) hm.get("required_crf");
 				}
-			} else if (dbStudyId == study.getParentStudyId()) {
+			} else if (dbStudyId == study.getStudy().getStudyId()) {
 				studyR = (Boolean) hm.get("required_crf");
 			}
 		}
-		if (study.isSite(study.getParentStudyId()) && isExisted) {
+		if (study.isSite() && isExisted) {
 			answer = siteR;
 		} else {
 			answer = studyR;
@@ -746,22 +749,22 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * @param crfVersionId
 	 * @return
 	 */
-	public EventDefinitionCRFBean findByStudyEventIdAndCRFVersionId(StudyBean study, int studyEventId, int crfVersionId) {
+	public EventDefinitionCRFBean findByStudyEventIdAndCRFVersionId(Study study, int studyEventId, int crfVersionId) {
 		EventDefinitionCRFBean edc = new EventDefinitionCRFBean();
 
-		if (study.isSite(study.getParentStudyId())) {
-			edc = this.findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId(studyEventId, crfVersionId, study.getId(), study.getParentStudyId());
+		if (study.isSite()) {
+			edc = this.findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId(studyEventId, crfVersionId, study.getStudyId(), study.getStudy().getStudyId());
 		} else {
 			edc = this.findForStudyByStudyEventIdAndCRFVersionId(studyEventId, crfVersionId);
 		}
 		return edc;
 	}
 
-	public EventDefinitionCRFBean findByStudyEventIdAndFormLayoutId(StudyBean study, int studyEventId, int formLayoutId) {
+	public EventDefinitionCRFBean findByStudyEventIdAndFormLayoutId(Study study, int studyEventId, int formLayoutId) {
 		EventDefinitionCRFBean edc = new EventDefinitionCRFBean();
 
-		if (study.isSite(study.getParentStudyId())) {
-			edc = this.findByStudyEventIdAndFormLayoutIdAndSiteIdAndParentStudyId(studyEventId, formLayoutId, study.getId(), study.getParentStudyId());
+		if (study.isSite()) {
+			edc = this.findByStudyEventIdAndFormLayoutIdAndSiteIdAndParentStudyId(studyEventId, formLayoutId, study.getStudyId(), study.getStudy().getStudyId());
 		} else {
 			edc = this.findForStudyByStudyEventIdAndFormLayoutId(studyEventId, formLayoutId);
 		}
@@ -925,9 +928,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 	 * @param crfId
 	 * @return
 	 */
-	public EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFId(StudyBean study, int studyEventDefinitionId, int crfId) {
-		return study.isSite(study.getParentStudyId())
-				? findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(studyEventDefinitionId, crfId, study.getId(), study.getParentStudyId())
+	public EventDefinitionCRFBean findByStudyEventDefinitionIdAndCRFId(Study study, int studyEventDefinitionId, int crfId) {
+		return study.isSite()
+				? findByStudyEventDefinitionIdAndCRFIdAndSiteIdAndParentStudyId(studyEventDefinitionId, crfId, study.getStudyId(), study.getStudy().getStudyId())
 				: findForStudyByStudyEventDefinitionIdAndCRFId(studyEventDefinitionId, crfId);
 	}
 
@@ -982,14 +985,14 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return answer;
 	}
 
-	public Set<String> findHiddenCrfIdsBySite(StudyBean study) {
+	public Set<String> findHiddenCrfIdsBySite(Study study) {
 		Set<String> ids = new TreeSet<String>();
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
 		this.setTypeExpected(3, TypeNames.STRING);
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(study.getId()));
+		variables.put(new Integer(1), new Integer(study.getStudyId()));
 		String sql = digester.getQuery("findHiddenCrfIdAndNamesBySite");
 		ArrayList alist = this.select(sql, variables);
 		Iterator it = alist.iterator();
@@ -1001,14 +1004,14 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return ids;
 	}
 
-	public Set<String> findHiddenCrfNamesBySite(StudyBean study) {
+	public Set<String> findHiddenCrfNamesBySite(Study study) {
 		Set<String> names = new TreeSet<String>();
 		this.unsetTypeExpected();
 		this.setTypeExpected(1, TypeNames.INT);
 		this.setTypeExpected(2, TypeNames.INT);
 		this.setTypeExpected(3, TypeNames.STRING);
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(study.getId()));
+		variables.put(new Integer(1), new Integer(study.getStudyId()));
 		String sql = digester.getQuery("findHiddenCrfIdAndNamesBySite");
 		ArrayList alist = this.select(sql, variables);
 		Iterator it = alist.iterator();

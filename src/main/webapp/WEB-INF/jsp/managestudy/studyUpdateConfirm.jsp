@@ -40,7 +40,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='session' id='interventions' class='java.util.ArrayList'/>
 <h1><span class="title_manage">
 <fmt:message key="confirm_study_details" bundle="${resword}"/>
@@ -63,7 +63,7 @@
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td class="table_cell">
-  <c:out value="${newStudy.identifier}"/>
+  <c:out value="${newStudy.uniqueIdentifier}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b>:</td><td class="table_cell">
@@ -114,7 +114,7 @@
   </td></tr>
 
   <c:choose>
-   <c:when test="${newStudy.parentStudyId == 0}">
+   <c:when test="${newStudy.study == null || newStudy.study.studyId == 0}">
       <c:set var="key" value="study_system_status"/>
    </c:when>
    <c:otherwise>
@@ -123,7 +123,7 @@
   </c:choose>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
-   <%-- <c:out value="${newStudy.status.name}"/> --%> <c:out value="Available"/>
+   <%-- <c:out value="${newStudy.status.description}"/> --%> <c:out value="Available"/>
    </td></tr>
 
 
@@ -297,10 +297,10 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/>:</td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.collectDob == '1'}">
+   <c:when test="${newStudy.collectDob == '1'}">
    <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
-   <c:when test="${newStudy.studyParameterConfig.collectDob == '2'}">
+   <c:when test="${newStudy.collectDob == '2'}">
     <fmt:message key="only_year_of_birth" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -313,7 +313,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/>:</td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.discrepancyManagement == 'true'}">
+   <c:when test="${newStudy.discrepancyManagement == 'true'}">
     <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -326,10 +326,10 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="gender_required" bundle="${resword}"/>:</td>
   <td class="table_cell">
    <c:choose>
-    <c:when test="${newStudy.studyParameterConfig.genderRequired == 'false'}">
+    <c:when test="${newStudy.genderRequired == 'false'}">
      <fmt:message key="no" bundle="${resword}"/>
     </c:when>
-    <c:when test="${newStudy.studyParameterConfig.genderRequired == 'true'}">
+    <c:when test="${newStudy.genderRequired == 'true'}">
      <fmt:message key="yes" bundle="${resword}"/>
     </c:when>
     <c:otherwise>
@@ -342,10 +342,10 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'required'}">
+   <c:when test="${newStudy.subjectPersonIdRequired == 'required'}">
     <fmt:message key="required" bundle="${resword}"/>
    </c:when>
-    <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+    <c:when test="${newStudy.subjectPersonIdRequired == 'optional'}">
      <fmt:message key="optional" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -358,10 +358,10 @@
    <tr valign="top"><td class="table_header_column"><fmt:message key="how_to_generate_the_study_subject_ID" bundle="${resword}"/>:</td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.subjectIdGeneration == 'manual'}">
+   <c:when test="${newStudy.subjectIdGeneration == 'manual'}">
     <fmt:message key="manual_entry" bundle="${resword}"/>
    </c:when>
-    <c:when test="${newStudy.studyParameterConfig.subjectIdGeneration == 'auto editable'}">
+    <c:when test="${newStudy.subjectIdGeneration == 'auto editable'}">
     <fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -375,7 +375,7 @@
    <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/>:</td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
+   <c:when test="${newStudy.subjectIdPrefixSuffix == 'true'}">
     <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -389,7 +389,7 @@
  <tr valign="top"><td class="table_header_column"><fmt:message key="show_person_id_on_crf_header" bundle="${resword}"/>:</td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.personIdShownOnCRF == 'true'}">
+   <c:when test="${newStudy.personIdShownOnCRF == 'true'}">
     <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -401,7 +401,7 @@
    <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.interviewerNameRequired== 'true'}">
+   <c:when test="${newStudy.interviewerNameRequired== 'true'}">
    <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -414,7 +414,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.interviewerNameDefault== 'blank'}">
+   <c:when test="${newStudy.interviewerNameDefault== 'blank'}">
     <fmt:message key="blank" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -427,7 +427,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_editable" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.interviewerNameEditable== 'true'}">
+   <c:when test="${newStudy.interviewerNameEditable== 'true'}">
    <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -440,7 +440,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_date_required" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.interviewDateRequired== 'true'}">
+   <c:when test="${newStudy.interviewDateRequired== 'true'}">
    <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -453,7 +453,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_date_default_as_blank" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.interviewDateDefault== 'blank'}">
+   <c:when test="${newStudy.interviewDateDefault== 'blank'}">
     <fmt:message key="blank" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -466,7 +466,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${newStudy.studyParameterConfig.interviewDateEditable== 'true'}">
+   <c:when test="${newStudy.interviewDateEditable== 'true'}">
    <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:otherwise>

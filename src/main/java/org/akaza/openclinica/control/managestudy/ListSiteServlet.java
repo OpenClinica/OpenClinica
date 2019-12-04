@@ -13,14 +13,15 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.bean.StudyRow;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -28,7 +29,6 @@ import core.org.akaza.openclinica.web.bean.StudyRow;
  *          $
  */
 public class ListSiteServlet extends SecureController {
-
     Locale locale;
 
     // < ResourceBundle resword,respage,resexception;
@@ -67,13 +67,12 @@ public class ListSiteServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
             addPageMessage(respage.getString("no_sites_available_study_is_a_site"));
             forwardPage(Page.MENU_SERVLET);
         } else {
 
-            StudyDAO sdao = new StudyDAO(sm.getDataSource());
-            ArrayList studies = (ArrayList) sdao.findAllByParent(currentStudy.getId());
+            ArrayList studies = (ArrayList) getStudyDao().findAllByParent(currentStudy.getStudyId());
 
             EntityBeanTable table = fp.getEntityBeanTable();
             ArrayList allStudyRows = StudyRow.generateRowsFromBeans(studies);

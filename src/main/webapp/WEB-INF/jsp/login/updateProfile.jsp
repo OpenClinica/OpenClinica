@@ -40,7 +40,7 @@
 
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="mustChangePass" class="java.lang.String"/>
-<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.domain.datamap.Study"/>
 <jsp:useBean scope="session" id="userBean1" class="core.org.akaza.openclinica.bean.login.UserAccountBean"/>
 
 
@@ -81,11 +81,11 @@
       <c:if test="${activeStudy1 ==0}"><option value="">-<fmt:message key="select" bundle="${resword}"/>-</option></c:if>
        <c:forEach var="study" items="${studies}">
         <c:choose>
-         <c:when test="${activeStudy1 == study.id}">
-          <option value="<c:out value="${study.id}"/>" selected><c:out value="${study.name}"/>
+         <c:when test="${activeStudy1 == study.studyId}">
+          <option value="<c:out value="${study.studyId}"/>" selected><c:out value="${study.name}"/>
          </c:when>
          <c:otherwise>
-          <option value="<c:out value="${study.id}"/>"><c:out value="${study.name}"/>
+          <option value="<c:out value="${study.studyId}"/>"><c:out value="${study.name}"/>
          </c:otherwise>
         </c:choose>
      </c:forEach>

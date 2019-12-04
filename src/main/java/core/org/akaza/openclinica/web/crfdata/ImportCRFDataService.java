@@ -14,11 +14,9 @@ import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.ItemDataType;
 import core.org.akaza.openclinica.bean.core.NullValue;
 import core.org.akaza.openclinica.bean.core.ResponseType;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -40,6 +38,10 @@ import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
@@ -51,7 +53,6 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -82,7 +83,8 @@ public class ImportCRFDataService {
     private PipeDelimitedDataHelper pipeDelimitedDataHelper;
     private RestfulServiceHelper restfulServiceHelper;
 
-
+    @Autowired
+    private StudyBuildService studyBuildService;
     @Autowired
     private ViewStudySubjectService viewStudySubjectService;
 
@@ -92,7 +94,8 @@ public class ImportCRFDataService {
     @Autowired
     private StudyEventDao studyEventDao;
 
-
+    @Autowired
+    private StudyDao studyDao;
     public ImportCRFDataService(DataSource ds) {
         this.ds = ds;
     }
@@ -109,14 +112,13 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyDAO studyDAO = new StudyDAO(ds);
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
         if (upsert == null)
             upsert = new UpsertOnBean();
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        StudyBean studyBean = studyDAO.findByOid(studyOID);
+        Study studyBean = studyDao.findByOcOID(studyOID);
         if (studyBean.getStatus() != Status.AVAILABLE) {
             logger.error("Study status is :" + studyBean.getStatus() + ", so dataImport is not allowed.");
             return fetchEventCRFBeansResult ;
@@ -125,7 +127,7 @@ public class ImportCRFDataService {
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
 
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
             	boolean isNewStudyEvent = false;
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
@@ -133,7 +135,7 @@ public class ImportCRFDataService {
                 String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getId(), studyBean.getParentStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
 
@@ -183,7 +185,7 @@ public class ImportCRFDataService {
                         ArrayList matchCriterias = null;
                         boolean matchedAndSkip=false;
     					
-						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
+						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOc_oid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
 						if(sqlStr != null) {
 							ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
 							try {
@@ -257,7 +259,7 @@ public class ImportCRFDataService {
                              tempStudyEventBean.setUpdatedDate(today);
                              tempStudyEventBean.setStudySubjectId(studySubjectBean.getId());
                              tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-                             tempStudyEventBean.setStatus(Status.AVAILABLE);
+                             tempStudyEventBean.setStatus(core.org.akaza.openclinica.bean.core.Status.AVAILABLE);
                              tempStudyEventBean.setStudyEventDefinitionId(studyEventDefinitionBean.getId());
                              tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
                              
@@ -374,20 +376,20 @@ public class ImportCRFDataService {
     }
 
     public CommonEventContainerDTO addCommonForm(StudyEventDefinitionBean studyEventDefinition, CRFBean crf, StudySubjectBean studySubject,
-                                                 UserAccount userAccount, StudyBean study) {
+                                                 UserAccount userAccount, Study study) {
 
         final String COMMON = "common";
         EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
         EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 
-        if (study == null || study.getId() == 0) {
+        if (study == null || study.getStudyId() == 0) {
             logger.error("Study  is null");
             return null;
-        } else if (study.getParentStudyId() == 0) {
-            logger.debug("the study with Oid {} is a Parent study", study.getOid());
+        } else if (study.isSite()) {
+            logger.debug("the study with Oid {} is a Parent study", study.getOc_oid());
         } else {
-            logger.debug("the study with Oid {} is a Site study", study.getOid());
+            logger.debug("the study with Oid {} is a Site study", study.getOc_oid());
         }
 
         if (studySubject == null || studySubject.getId() == 0 ) {
@@ -407,16 +409,16 @@ public class ImportCRFDataService {
         }
 
         EventDefinitionCRFBean edc = eventDefinitionCRFDAO.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getId(),
-                crf.getId(),study.getId());
+                crf.getId(),study.getStudyId());
 
         //EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(), study.getStudyId());
         if (edc == null || edc.getId() == 0) {
             edc = eventDefinitionCRFDAO.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getId(), crf.getId(),
-                    study.getParentStudyId());
+                    study.checkAndGetParentStudyId());
         }
         if (edc == null || edc.getStatus().equals(Status.DELETED) || edc.getStatus().equals(Status.AUTO_DELETED)) {
             logger.error("EventDefinitionCrf for StudyEventDefinition Oid {},Crf Oid {} and Study Oid {}is null or has Removed Status",
-                    studyEventDefinition.getOid(), crf.getOid(), study.getOid());
+                    studyEventDefinition.getOid(), crf.getOid(), study.getOc_oid());
             return null;
         }
         FormLayoutBean formLayoutBean = null;
@@ -494,14 +496,13 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyDAO studyDAO = new StudyDAO(ds);
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
         if (upsert == null)
             upsert = new UpsertOnBean();
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        StudyBean studyBean = studyDAO.findByOid(studyOID);        
+        Study studyBean = studyDao.findByOcOID(studyOID);
         if (studyBean.getStatus() != Status.AVAILABLE) {            
             errors.add("Study status is :" + studyBean.getStatus() + ", so dataImport is not allowed.");                    
             return errors;
@@ -511,7 +512,7 @@ public class ImportCRFDataService {
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
 
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
@@ -523,7 +524,7 @@ public class ImportCRFDataService {
                 }
                 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getId(), studyBean.getParentStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
 
@@ -728,19 +729,18 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyDAO studyDAO = new StudyDAO(ds);
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
         if (upsert == null)
             upsert = new UpsertOnBean();
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        StudyBean studyBean = studyDAO.findByOid(studyOID);
+        Study studyBean = studyDao.findByOcOID(studyOID);
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
 
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
@@ -752,14 +752,14 @@ public class ImportCRFDataService {
                 }
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getId(), studyBean.getParentStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 // more detail log
                 if(studyEventDefinitionBean == null) {
-                	logger.error("studyEventDefinitionBean == null for OID:" + studyEventDataBean.getStudyEventOID() + "-StudyId:"+ studyBean.getId() + "-ParentStudyId:" + studyBean.getParentStudyId());
+                	logger.error("studyEventDefinitionBean == null for OID:" + studyEventDataBean.getStudyEventOID() + "-StudyId:"+ studyBean.getStudyId() + "-ParentStudyId:" + studyBean.checkAndGetParentStudyId());
                 }
                 if(studySubjectBean == null) {
                 	
-                	String errMsg = "The study subject " + subjectDataBean.getSubjectOID() +" can not be found in Study "+ studyBean.getOid();
+                	String errMsg = "The study subject " + subjectDataBean.getSubjectOID() +" can not be found in Study "+ studyBean.getOc_oid();
     	        	logger.info(errMsg);
     	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NO_SUBJECT_FOUND);
                 }
@@ -835,24 +835,23 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyDAO studyDAO = new StudyDAO(ds);
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        StudyBean studyBean = studyDAO.findByOid(studyOID);
+        Study studyBean = studyDao.findByOcOID(studyOID);
 
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
 
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
                 String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getId(), studyBean.getParentStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
                 StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
@@ -935,8 +934,7 @@ public class ImportCRFDataService {
         HashMap<String, String> hardValidator = new HashMap<String, String>();
 
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
-        StudyDAO studyDAO = new StudyDAO(ds);
-        StudyBean studyBean = studyDAO.findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
+        Study studyBean = studyDao.findByOcOID(odmContainer.getCrfDataPostImportContainer().getStudyOID());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
         CRFDAO crfDAO = new CRFDAO(ds);
@@ -958,11 +956,11 @@ public class ImportCRFDataService {
 
             // ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
             // to stop repeats...?
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
 
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-                int parentStudyId = studyBean.getParentStudyId();
-                StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), parentStudyId);
+                int parentStudyId = studyBean.checkAndGetParentStudyId();
+                StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getStudyId(), parentStudyId);
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
                 logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());
 
@@ -1158,7 +1156,7 @@ public class ImportCRFDataService {
                                 + hardValidator.size());
                         // check if we need to overwrite
                         DataEntryStage dataEntryStage = eventCRFBean.getStage();
-                        Status eventCRFStatus = eventCRFBean.getStatus();
+                        core.org.akaza.openclinica.bean.core.Status eventCRFStatus = eventCRFBean.getStatus();
                         boolean overwrite = false;
                         // tbh >>
                         // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
@@ -1228,7 +1226,7 @@ public class ImportCRFDataService {
         itemDataBean.setEventCRFId(eventCrfBean.getId());
         itemDataBean.setOrdinal(ordinal);
         itemDataBean.setOwner(ub);
-        itemDataBean.setStatus(Status.UNAVAILABLE);
+        itemDataBean.setStatus(core.org.akaza.openclinica.bean.core.Status.UNAVAILABLE);
         itemDataBean.setValue(value);
 
         return itemDataBean;
@@ -1480,9 +1478,8 @@ public class ImportCRFDataService {
 
         // throw new OpenClinicaException(mf.format(arguments), "");
         try {
-            StudyDAO studyDAO = new StudyDAO(ds);
             String studyOid = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-            StudyBean studyBean = studyDAO.findByOid(studyOid);
+            Study studyBean = studyDao.findByOcOID(studyOid);
             if (studyBean == null) {
                 mf.applyPattern(respage.getString("your_study_oid_does_not_reference_an_existing"));
                 Object[] arguments = { studyOid };
@@ -1497,7 +1494,7 @@ public class ImportCRFDataService {
                 throw new OpenClinicaException("Unknown Study OID", "");
 
                 // } else if (studyBean.getId() != currentStudyId) {
-            } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, studyOid, ds)) {
+            } else if (!studyBuildService.isPublicStudySameAsTenantStudy(studyBean, studyOid)) {
                 mf.applyPattern(respage.getString("your_current_study_is_not_the_same_as"));
                 Object[] arguments = { studyBean.getName() };
                 //
@@ -1524,7 +1521,7 @@ public class ImportCRFDataService {
                 // report all available errors, tbh
                 for (SubjectDataBean subjectDataBean : subjectDataBeans) {
                     String oid = subjectDataBean.getSubjectOID();
-                    StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(oid, studyBean.getId());
+                    StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(oid, studyBean.getStudyId());
                     if (studySubjectBean == null) {
                         mf.applyPattern(respage.getString("your_subject_oid_does_not_reference"));
                         Object[] arguments = { oid };
@@ -1536,8 +1533,8 @@ public class ImportCRFDataService {
                     if (studyEventDataBeans != null) {
                         for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                             String sedOid = studyEventDataBean.getStudyEventOID();
-                            StudyEventDefinitionBean studyEventDefintionBean = studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getId(),
-                                    studyBean.getParentStudyId());
+                            StudyEventDefinitionBean studyEventDefintionBean = studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getStudyId(),
+                                    studyBean.checkAndGetParentStudyId());
                             if (studyEventDefintionBean != null && studyEventDefintionBean.isTypeCommon()) {
                             	// Do nothing
                             }else if (studyEventDataBean.getStudyEventRepeatKey() == null || studyEventDataBean.getStudyEventRepeatKey().trim().isEmpty())
@@ -1690,7 +1687,7 @@ public class ImportCRFDataService {
         newEventCrfBean.setInterviewerName(ub.getName());
         newEventCrfBean.setCompletionStatusId(1);// place
         // filler
-        newEventCrfBean.setStatus(Status.AVAILABLE);
+        newEventCrfBean.setStatus(core.org.akaza.openclinica.bean.core.Status.AVAILABLE);
         newEventCrfBean.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
         return newEventCrfBean;
     }
@@ -1703,24 +1700,23 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyDAO studyDAO = new StudyDAO(ds);
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        StudyBean studyBean = studyDAO.findByOid(studyOID);
+        Study studyBean = studyDao.findByOcOID(studyOID);
 
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
 
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
                 String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
-                        studyBean.getId(), studyBean.getParentStudyId());
+                        studyBean.getStudyId(), studyBean.checkAndGetParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
                 StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
@@ -1764,8 +1760,7 @@ public class ImportCRFDataService {
         HashMap<String, String> hardValidator = new HashMap<String, String>();
 
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
-        StudyDAO studyDAO = new StudyDAO(ds);
-        StudyBean studyBean = studyDAO.findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
+        Study studyBean = studyDao.findByOcOID(odmContainer.getCrfDataPostImportContainer().getStudyOID());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
         HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
@@ -1783,18 +1778,18 @@ public class ImportCRFDataService {
 
             // ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
             // to stop repeats...?
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
 
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-                int parentStudyId = studyBean.getParentStudyId();
-                StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), parentStudyId);
+                int parentStudyId = studyBean.checkAndGetParentStudyId();
+                StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getStudyId(), parentStudyId);
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
                 logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());
                 
                 // test skip
                 ArrayList matchCriterias = null;
                 boolean matchedAndSkip=false;
-                String sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
+                String sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOc_oid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
                 ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
                 matchCriterias  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
 							
@@ -1856,7 +1851,7 @@ public class ImportCRFDataService {
                      tempStudyEventBean.setUpdatedDate(today);
                      tempStudyEventBean.setStudySubjectId(studySubjectBean.getId());
                      tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-                     tempStudyEventBean.setStatus(Status.AVAILABLE);
+                     tempStudyEventBean.setStatus(core.org.akaza.openclinica.bean.core.Status.AVAILABLE);
                      tempStudyEventBean.setStudyEventDefinitionId(sedBean.getId());
                      tempStudyEventBean.setSampleOrdinal(ordinal);                     
                    
@@ -2075,7 +2070,7 @@ public class ImportCRFDataService {
                                 + hardValidator.size());
                         // check if we need to overwrite
                         DataEntryStage dataEntryStage = eventCRFBean.getStage();
-                        Status eventCRFStatus = eventCRFBean.getStatus();
+                        core.org.akaza.openclinica.bean.core.Status eventCRFStatus = eventCRFBean.getStatus();
                         boolean overwrite = false;
                         // tbh >>
                         // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
@@ -2445,7 +2440,7 @@ public class ImportCRFDataService {
 
 	public PipeDelimitedDataHelper getPipeDelimitedDataHelper() {
 		if(pipeDelimitedDataHelper == null) {
-			pipeDelimitedDataHelper = new PipeDelimitedDataHelper(this.ds);
+			pipeDelimitedDataHelper = new PipeDelimitedDataHelper(this.ds, studyBuildService, studyDao);
 		}
 		return pipeDelimitedDataHelper;
 	}
@@ -2456,7 +2451,7 @@ public class ImportCRFDataService {
 
 	public RestfulServiceHelper getRestfulServiceHelper() {
 		if(restfulServiceHelper == null) {
-			restfulServiceHelper = new RestfulServiceHelper(ds);
+			restfulServiceHelper = new RestfulServiceHelper(ds, studyBuildService, studyDao);
 		}
 		return restfulServiceHelper;
 	}
@@ -2471,9 +2466,8 @@ public class ImportCRFDataService {
         MessageFormat mf = new MessageFormat("");
 
   
-        StudyDAO studyDAO = new StudyDAO(ds);
         String studyOid = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        StudyBean studyBean = studyDAO.findByOid(studyOid);
+        Study studyBean = studyDao.findByOcOID(studyOid);
         UserAccountBean userBean = this.getPipeDelimitedDataHelper().getUserAccount(request);
         String userName=  userBean.getName();  
         
@@ -2556,8 +2550,7 @@ public class ImportCRFDataService {
 		HashMap<String, String> hardValidator = new HashMap<String, String>();
 		
 		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
-		StudyDAO studyDAO = new StudyDAO(ds);
-		StudyBean studyBean = studyDAO.findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
+		Study studyBean = studyDao.findByOcOID(odmContainer.getCrfDataPostImportContainer().getStudyOID());
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
 		StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
 		HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
@@ -2575,11 +2568,11 @@ public class ImportCRFDataService {
 		
 		// ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
 		// to stop repeats...?
-		StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+		StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
 		
 		for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-		int parentStudyId = studyBean.getParentStudyId();
-		StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), parentStudyId);
+		int parentStudyId = studyBean.checkAndGetParentStudyId();
+		StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getStudyId(), parentStudyId);
 		ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 		logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());
 	                
@@ -2745,7 +2738,7 @@ public class ImportCRFDataService {
 			+ hardValidator.size());
 			// check if we need to overwrite
 			DataEntryStage dataEntryStage = eventCRFBean.getStage();
-			Status eventCRFStatus = eventCRFBean.getStatus();
+			core.org.akaza.openclinica.bean.core.Status eventCRFStatus = eventCRFBean.getStatus();
 			boolean overwrite = false;
 			
 			if (dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)

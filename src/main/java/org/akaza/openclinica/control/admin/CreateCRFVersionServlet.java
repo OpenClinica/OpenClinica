@@ -267,7 +267,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     } else {
                         nib1.insertToDB();
                     }
-                    request.setAttribute("queries", nib1.getQueries());
+                    request.setAttribute("core/queries", nib1.getQueries());
                     // YW << for add a link to "View CRF Version Data Entry".
                     // For this purpose, CRFVersion id is needed.
                     // So the latest CRFVersion Id of A CRF Id is it.
@@ -426,13 +426,13 @@ public class CreateCRFVersionServlet extends SecureController {
                     htab = new SpreadSheetTableRepeating(inStream, ub,
                             // SpreadSheetTable htab = new SpreadSheetTable(new
                             // FileInputStream(theDir + tempFile), ub,
-                            version.getName(), locale, currentStudy.getId());
+                            version.getName(), locale, currentStudy.getStudyId());
 
                     htab.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));
 
                     if (!htab.isRepeating()) {
                         inStreamClassic = new FileInputStream(theDir + tempFile);
-                        sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(), locale, currentStudy.getId());
+                        sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(), locale, currentStudy.getStudyId());
                         sstc.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));
                     }
                     // logger.debug("finishing with feedin file-input-stream, did

@@ -17,6 +17,7 @@ import core.org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 
 /**
@@ -31,7 +32,7 @@ public class FullReportBean extends OdmXmlReportBean {
     private LinkedHashMap<String, OdmAdminDataBean> adminDataMap;
     private OdmClinicalDataBean clinicaldata;
     private CoreResources coreResources;
-
+    private StudyDao studyDao;
     /**
      * Create one ODM XML This method is still under construction. Right now it is for Snapshot filetype only.
      */
@@ -101,9 +102,11 @@ public class FullReportBean extends OdmXmlReportBean {
 
     public void createChunkedOdmXml(boolean isDataset, boolean header, boolean footer, DataSource dataSource, UserAccountBean userBean, ODMFilterDTO odmFilter, String[] permissionTagsStringArray) {
         ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata, dataSource, userBean, odmFilter, permissionTagsStringArray);
+        data.setStudyDao(getStudyDao());
         data.setXmlOutput(this.getXmlOutput());
         data.setODMVersion(this.getODMVersion());
         data.addNodeClinicalData(header, footer);
+
     }
 
     public void addNodeStudy(OdmStudyBean odmstudy, boolean isDataset) {
@@ -125,6 +128,7 @@ public class FullReportBean extends OdmXmlReportBean {
 
     public void addNodeClinicalData(OdmClinicalDataBean clinicaldata, ODMFilterDTO odmFilter, DataSource dataSource, UserAccountBean userBean,String[] permissionTagsStringArray) {
         ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata, dataSource, userBean, odmFilter, permissionTagsStringArray);
+        data.setStudyDao(getStudyDao());
         data.setODMVersion(this.getODMVersion());
         data.setXmlOutput(this.getXmlOutput());
         data.addNodeClinicalData(true, true);
@@ -177,4 +181,13 @@ public class FullReportBean extends OdmXmlReportBean {
 
     }
 
+    @Override
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    @Override
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

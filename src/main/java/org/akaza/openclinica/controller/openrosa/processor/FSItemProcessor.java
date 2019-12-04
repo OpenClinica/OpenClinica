@@ -2,8 +2,8 @@ package org.akaza.openclinica.controller.openrosa.processor;
 
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
@@ -72,6 +73,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     @Autowired
     private RandomizationService randomizationService;
+    @Autowired
+    private StudyBuildService studyBuildService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String STUDYEVENT = "study_event";
@@ -87,7 +90,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     public static final String US_PHONE_PREFIX = "+1 ";
 	public static final String US_PHONE_PATTERN = "^[0-9]{10,10}$";
-
 
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
@@ -305,7 +307,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     }
 
     private void checkRandomization(ItemData thisItemData, SubmissionContainer container) throws Exception {
-        StudyBean parentPublicStudy = CoreResources.getParentPublicStudy(thisItemData.getEventCrf().getStudySubject().getStudy().getOc_oid(), dataSource);
+        Study parentPublicStudy = studyBuildService.getParentPublicStudy(thisItemData.getEventCrf().getStudySubject().getStudy().getOc_oid());
         Map<String, String> subjectContext =  container.getSubjectContext();
         String accessToken = subjectContext.get("accessToken");
         String studySubjectOID = container.getSubject().getOcOid();

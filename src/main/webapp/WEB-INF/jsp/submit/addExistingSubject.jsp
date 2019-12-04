@@ -37,7 +37,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.domain.datamap.Study" />
 <jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
@@ -122,7 +122,7 @@
 				<tr>
 					<td valign="top"><div class="formfieldXL_BG">
 					  <c:choose>
-						 <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+						 <c:when test="${study.subjectIdGeneration =='auto non-editable'}">
 						  <input type="text" value="<c:out value="${label}"/>" size="45" class="formfield" disabled>
 						  <input type="hidden" name="label" value="<c:out value="${label}"/>">
 						 </c:when>
@@ -187,7 +187,7 @@
                         </script>
                     </a>
 					<%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%> *
-					<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+					<c:if test="${study.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
 					<img name="flag_enrollmentDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
 					</td>
 				</tr>
@@ -199,7 +199,7 @@
 	</tr>
 
 	<c:choose>
-	<c:when test="${study.studyParameterConfig.genderRequired !='false'}">
+	<c:when test="${study.genderRequired !='false'}">
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="gender" bundle="${resword}"/>:</td>
 		<td valign="top">
@@ -234,7 +234,7 @@
 	</c:choose>
 
 	<c:choose>
-	<c:when test="${study.studyParameterConfig.collectDob == '1'}">
+	<c:when test="${study.collectDob == '1'}">
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -246,7 +246,7 @@
 						 <div class="formfieldM_BG"><input type="text" name="dob" size="15" value="<c:out value="${dob}" />" class="formfieldM" /></div>
 					    </td>
 					<td>
-					<%-- (<fmt:message key="date_format" bundle="${resword}"/>)--%> *<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+					<%-- (<fmt:message key="date_format" bundle="${resword}"/>)--%> *<c:if test="${study.discrepancyManagement=='true'}">
 					<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
 					<img name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 					</c:if></td>
@@ -282,7 +282,7 @@
 	  	</td>
 	</tr>
 	</c:when>
-	<c:when test="${study.studyParameterConfig.collectDob == '2'}">
+	<c:when test="${study.collectDob == '2'}">
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
 	  	<td valign="top">

@@ -2,9 +2,10 @@ package core.org.akaza.openclinica.logic.rulerunner;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -35,13 +36,13 @@ public class DataEntryRuleRunner extends RuleRunner {
     
     EventCRFBean ecb;
 
-    public DataEntryRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, EventCRFBean ecb) {
-        super(ds, requestURLMinusServletPath, contextPath, mailSender);
+    public DataEntryRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, EventCRFBean ecb, StudyDao studyDao) {
+        super(ds, requestURLMinusServletPath, contextPath, mailSender, studyDao);
         this.ecb = ecb;
     }
 
-    public MessageContainer runRules(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue,
-            UserAccountBean ub, Phase phase, HttpServletRequest request) {
+    public MessageContainer runRules(List<RuleSetBean> ruleSets, ExecutionMode executionMode, Study currentStudy, HashMap<String, String> variableAndValue,
+                                     UserAccountBean ub, Phase phase, HttpServletRequest request) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
             logger.warn("You must be executing Rules in Batch");

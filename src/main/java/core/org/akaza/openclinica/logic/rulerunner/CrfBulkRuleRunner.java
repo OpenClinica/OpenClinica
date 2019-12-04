@@ -2,7 +2,6 @@ package core.org.akaza.openclinica.logic.rulerunner;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -10,6 +9,8 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
@@ -39,8 +40,8 @@ import javax.sql.DataSource;
 
 public class CrfBulkRuleRunner extends RuleRunner {
 
-    public CrfBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
-        super(ds, requestURLMinusServletPath, contextPath, mailSender);
+    public CrfBulkRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, StudyDao studyDao) {
+        super(ds, requestURLMinusServletPath, contextPath, mailSender,studyDao );
     }
 
     /**
@@ -54,7 +55,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
      */
     private HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> populateForCrfBasedRulesView(
             HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> crfViewSpecificOrderedObjects, RuleSetBean ruleSet,
-            RuleBean rule, String result, StudyBean currentStudy, List<RuleActionBean> actions) {
+            RuleBean rule, String result, Study currentStudy, List<RuleActionBean> actions) {
 
         // step1
         StudyEventBean studyEvent =
@@ -101,7 +102,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
 
     @Deprecated
     public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesBulkOLD(List<RuleSetBean> ruleSets,
-            ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue, UserAccountBean ub) {
+            ExecutionMode executionMode, Study currentStudy, HashMap<String, String> variableAndValue, UserAccountBean ub) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
             logger.warn("You must be executing Rules in Batch");
@@ -176,7 +177,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
     }
 
     public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesBulk(List<RuleSetBean> ruleSets,
-            ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue, UserAccountBean ub) {
+            ExecutionMode executionMode, Study currentStudy, HashMap<String, String> variableAndValue, UserAccountBean ub) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
             logger.warn("You must be executing Rules in Batch");
