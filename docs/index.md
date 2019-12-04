@@ -1,5 +1,5 @@
 
-test documentation for LibreClinica 0.4.0 pre-release
+test documentation for LibreClinica 0.5.0 pre-release
 
 # LibreClinica test documentation {docsify-ignore}
 
