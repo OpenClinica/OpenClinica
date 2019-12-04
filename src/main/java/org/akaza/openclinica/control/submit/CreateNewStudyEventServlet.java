@@ -131,8 +131,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 
         Study studyWithEventDefinitions = currentStudy;
         if (currentStudy.isSite()) {
-            studyWithEventDefinitions = new Study();
-            studyWithEventDefinitions.setId(currentStudy.getStudy().getStudyId());
+            studyWithEventDefinitions = currentStudy.getStudy();
         }
         // find all active definitions with CRFs
         ArrayList<StudyEventDefinitionBean> eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
