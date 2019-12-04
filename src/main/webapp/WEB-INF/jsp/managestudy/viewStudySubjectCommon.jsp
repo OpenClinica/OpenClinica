@@ -140,7 +140,7 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section {{collapseOrExpand}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
+    <div class="section expanded hide" id="common-event-{{sectionNumber}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
         <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
             {{studyEvent.[@Name]}}
         </div>
@@ -409,8 +409,9 @@ $(function() {
             }, errors);
         }, errors);
 
-        if (numVisitBased)
-            showSection(1, '#subjectEvents');
+        if (numVisitBased && $('#subjectEvents').hasClass('hide')) {
+            showSection(1, '#subjectEvents');            
+        }
 
         var hideClass = 'oc-status-removed';
         $.fn.DataTable.ext.search.push(
@@ -444,9 +445,9 @@ $(function() {
                 if (studyEvent.showMe) {
                     $('#commonEvents').append(sectionTmpl({
                         sectionNumber: sectionIndex,
-                        studyEvent: studyEvent,
-                        collapseOrExpand: store.data.collapseSections[sectionIndex] === false ? 'expanded' : 'collapsed'
+                        studyEvent: studyEvent
                     }));
+                    showSection(sectionIndex, '#common-event-' + sectionIndex);
                     sectionIndex++;
                 }
             }

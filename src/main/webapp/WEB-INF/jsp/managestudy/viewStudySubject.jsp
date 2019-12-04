@@ -153,10 +153,14 @@
   }
 
   function showSection(position, selector) {
-    var $el = $(selector);
-    if (store.data.collapseSections[position])
-      $el.toggleClass('expanded collapsed').children('.section-body').hide();
-    $el.removeClass('hide');
+    var section = $(selector);
+    var shouldCollapse = store.data.collapseSections[position];
+    if (shouldCollapse === undefined)
+      shouldCollapse = position > 1;
+    if (shouldCollapse) {
+      section.children('.section-header').click();
+    }
+    section.removeClass('hide');
   }
 
   function clickAllSections(selector) {
