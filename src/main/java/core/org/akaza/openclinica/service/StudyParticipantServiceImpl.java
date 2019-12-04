@@ -430,23 +430,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    	 * check the CRF ordinal and reorder by the ordinal 
 			    	 */
 			    	List<EventDefinitionCrf> edfcs = studyEvent.getStudyEventDefinition().getEventDefinitionCrfs();
-			    	for(EventCrf eventCrf : eventCRFs) {
-			    		for(EventDefinitionCrf edfc:edfcs) {
-			    			CrfBean crf = edfc.getCrf();
-			    			
-			    			if(eventCrf.getCrfVersion().getCrf().getCrfId() == crf.getCrfId()) {
-			    				eventCrf.setOrdinal(edfc.getOrdinal());
-			    			}
-			    		}			    		
-			    	}
-			    	
-			    	Comparator<EventCrf> compareByOrinal = new Comparator<EventCrf>() {
-			    	    @Override
-			    	    public int compare(EventCrf o1, EventCrf o2) {
-			    	        return o1.getOrdinal().compareTo(o2.getOrdinal());
-			    	    }
-			    	};
-			    	Collections.sort(eventCRFs, compareByOrinal);
+			    
+			    	if(eventCRFs.size() > 1) {
+			    		Collections.sort(eventCRFs, EventCrf.getCompareByOrinal());
+			    	}			    	
 			    	
 			    	for(EventCrf eventCrf : eventCRFs) {
 			    		formLayoutOID = eventCrf.getFormLayout().getOcOid();
