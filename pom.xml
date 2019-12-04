@@ -27,7 +27,7 @@
         <spring-ws.version>2.4.0.RELEASE</spring-ws.version>
         <db.test>localhost</db.test>
         <fasterxml.jackson.version>2.10.0</fasterxml.jackson.version>
-        <version.keycloak>4.8.3.Final</version.keycloak>
+        <version.keycloak>8.0.1</version.keycloak>
         <hibernate.version>5.2.0.Final</hibernate.version>
     </properties>
     <profiles>
