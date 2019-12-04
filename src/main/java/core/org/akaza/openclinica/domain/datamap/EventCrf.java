@@ -1,6 +1,7 @@
 package core.org.akaza.openclinica.domain.datamap;
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -60,8 +61,7 @@ public class EventCrf extends DataMapDomainObject {
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
     
-    private Integer ordinal;
-
+    static Comparator<EventCrf> compareByOrinal;
     public EventCrf() {
     }
 
@@ -359,14 +359,47 @@ public class EventCrf extends DataMapDomainObject {
     public void setFormLayout(FormLayout formLayout) {
         this.formLayout = formLayout;
     }
+   
 
-    @Transient
-	public Integer getOrdinal() {
-		return ordinal;
+	public static Comparator<EventCrf> getCompareByOrinal() {
+		if(compareByOrinal != null) {
+			return compareByOrinal;
+		}else {
+			compareByOrinal = new Comparator<EventCrf>() {
+			    @Override
+			    public int compare(EventCrf o1, EventCrf o2) {
+			    	Integer o1ordinal,o2ordinal;
+			    	o1ordinal = getOrdinal(o1);
+			    	o2ordinal = getOrdinal(o2);
+			        return o1ordinal.compareTo(o1ordinal);
+			    };
+                 
+			    /**
+				 * @param ec
+				 * @return 
+				 */
+				private Integer getOrdinal(EventCrf ec) {
+					Integer ecOrdinal = null;
+					List<EventDefinitionCrf> edfcList1 = ec.getFormLayout().getCrf().getEventDefinitionCrfs();
+			    	for(EventDefinitionCrf edfc: edfcList1) {
+			    		if(edfc.getCrf().getOcOid().equals(ec.getFormLayout().getCrf().getOcOid())){
+			    			ecOrdinal = edfc.getOrdinal();
+			    			return ecOrdinal;
+			    		}
+			    	}
+					return ecOrdinal;
+				}
+			};
+		}
+		
+
+			
+		return compareByOrinal;
+		
 	}
 
-	public void setOrdinal(Integer ordinal) {
-		this.ordinal = ordinal;
+	public static void setCompareByOrinal(Comparator<EventCrf> compareByOrinal) {
+		EventCrf.compareByOrinal = compareByOrinal;
 	}
 
 }
