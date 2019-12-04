@@ -648,9 +648,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
         Study study = getPublicStudy(ocId);
         if (study.isSite()) {
-            resultBean = study;
+            resultBean = study.getStudy();
         } else {
-            Study parentStudy = study.getStudy();
+            Study parentStudy = study;
             resultBean = parentStudy;
         }
         CoreResources.setRequestSchema(schema);
