@@ -96,7 +96,7 @@ public class RestoreDatasetServlet extends SecureController {
         // datasets =
         // (ArrayList)dsdao.findAllByStudyIdAdmin(currentStudy.getId());
         // } else {
-        datasets = dsdao.findAllByStudyId(currentStudy.getId());
+        datasets = dsdao.findAllByStudyId(currentStudy.getStudyId());
         // }
 
         ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);

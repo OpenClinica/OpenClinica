@@ -30,7 +30,7 @@
 	         name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 	     </td>
 	     
-	     <c:if test="${study.parentStudyId <= 0 && readOnly != 'true' }">
+	     <c:if test="${(study.study == null || study.study.studyId <= 0) && readOnly != 'true' }">
 	     
 	     <c:choose>	  
           <c:when test="${!currRow.bean.status.deleted}">

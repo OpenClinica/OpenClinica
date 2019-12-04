@@ -1,12 +1,12 @@
 package org.akaza.openclinica.control.admin;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -16,6 +16,7 @@ import core.org.akaza.openclinica.web.job.TriggerService;
 import org.quartz.*;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 import java.io.File;
@@ -77,18 +78,17 @@ public class UpdateJobImportServlet extends SecureController {
         Date jobDate = trigger.getNextFireTime();
 
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
 
         // ArrayList studies = udao.findStudyByUser(ub.getName(), (ArrayList)
         // sdao.findAll());
         // request.setAttribute("studies", studies);
-        ArrayList<StudyBean> all = (ArrayList<StudyBean>) sdao.findAll();
-        ArrayList<StudyBean> finalList = new ArrayList<StudyBean>();
-        for (StudyBean sb : all) {
-            if (!(sb.getParentStudyId() > 0)) {
+        ArrayList<Study> all = (ArrayList<Study>) getStudyDao().findAll();
+        ArrayList<Study> finalList = new ArrayList<Study>();
+        for (Study sb : all) {
+            if (!sb.isSite()) {
                 finalList.add(sb);
                 // System.out.println("found study name: " + sb.getName());
-                finalList.addAll(sdao.findAllByParent(sb.getId()));
+                finalList.addAll(getStudyDao().findAllByParent(sb.getStudyId()));
             }
         }
         // System.out.println("found list of studies: " + finalList.toString());
@@ -135,9 +135,8 @@ public class UpdateJobImportServlet extends SecureController {
                 setUpServlet(trigger);
                 forwardPage(Page.UPDATE_JOB_IMPORT);
             } else {
-                StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                 int studyId = fp.getInt(CreateJobImportServlet.STUDY_ID);
-                StudyBean study = (StudyBean) studyDAO.findByPK(studyId);
+                Study study = (Study) getStudyDao().findByPK(studyId);
                 // in the place of a users' current study, tbh
                 Date startDate = trigger.getStartTime();
                 trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), study, startDate, LocaleResolver.getLocale(request).getLanguage());

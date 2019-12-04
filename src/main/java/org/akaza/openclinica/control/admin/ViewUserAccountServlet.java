@@ -9,15 +9,16 @@ package org.akaza.openclinica.control.admin;
 
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 
@@ -111,13 +112,12 @@ public class ViewUserAccountServlet extends SecureController {
 
     private UserAccountBean getBean(UserAccountDAO udao, int id) {
         UserAccountBean answer = (UserAccountBean) udao.findByPK(id);
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
 
         ArrayList roles = answer.getRoles();
 
         for (int i = 0; i < roles.size(); i++) {
             StudyUserRoleBean sur = (StudyUserRoleBean) roles.get(i);
-            StudyBean sb = (StudyBean) sdao.findByPK(sur.getStudyId());
+            Study sb = (Study) getStudyDao().findByPK(sur.getStudyId());
             sur.setStudyName(sb.getName());
             roles.set(i, sur);
         }

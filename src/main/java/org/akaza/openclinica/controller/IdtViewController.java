@@ -1,18 +1,8 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.datamap.*;
 import io.swagger.annotations.Api;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.dao.hibernate.EventCrfFlagDao;
-import core.org.akaza.openclinica.dao.hibernate.EventCrfFlagWorkflowDao;
-import core.org.akaza.openclinica.dao.hibernate.IdtViewDao;
-import core.org.akaza.openclinica.dao.hibernate.ItemDataFlagDao;
-import core.org.akaza.openclinica.dao.hibernate.ItemDataFlagWorkflowDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
-import core.org.akaza.openclinica.domain.datamap.EventCrfFlag;
-import core.org.akaza.openclinica.domain.datamap.EventCrfFlagWorkflow;
-import core.org.akaza.openclinica.domain.datamap.IdtView;
-import core.org.akaza.openclinica.domain.datamap.ItemDataFlag;
-import core.org.akaza.openclinica.domain.datamap.ItemDataFlagWorkflow;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -62,7 +52,8 @@ public class IdtViewController {
     EventCrfFlagDao eventCrfFlagDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    StudyDAO sdao;
+    @Autowired
+    StudyDao sdao;
 
     @RequestMapping(value = "/sdv/{filternumber}/{studyoid}/paginated", params = { "page", "per_page" }, method = RequestMethod.GET)
     public ResponseEntity<List<IdtView>> getPaginatedIdtViewData(@PathVariable("filternumber") String filterNumber, @PathVariable("studyoid") String studyOid,
@@ -75,9 +66,9 @@ public class IdtViewController {
             per_page = 30; // default to 30 records / page
         logger.debug("I'm in getPaginatedIdtViewData");
 
-        StudyBean parentStudy = getParentStudy(studyOid);
-        Integer pStudyId = parentStudy.getId();
-        Integer studyId = getStudy(studyOid).getId();
+        Study parentStudy = getParentStudy(studyOid);
+        Integer pStudyId = parentStudy.getStudyId();
+        Integer studyId = getStudy(studyOid).getStudyId();
 
         ArrayList<String> studySubjects = new ArrayList<>();
         // studySubjects.add("Sub B 101");
@@ -209,35 +200,33 @@ public class IdtViewController {
 
     }
 
-    private StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+    private Study getStudy(String oid) {
+        Study studyBean = (Study) sdao.findByOcOID(oid);
         return studyBean;
     }
 
-    private StudyBean getStudy(Integer id) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+    private Study getStudy(Integer id) {
+        Study studyBean = (Study) sdao.findByPK(id);
         return studyBean;
     }
 
-    private StudyBean getParentStudy(Integer studyId) {
-        StudyBean study = getStudy(studyId);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(Integer studyId) {
+        Study study = getStudy(studyId);
+        if (!study.isSite()) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
 
     }
 
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(String studyOid) {
+        Study study = getStudy(studyOid);
+        if (!study.isSite()) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
 

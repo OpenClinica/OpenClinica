@@ -15,10 +15,11 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import core.org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 /**
  * A class for one ODM ClinicalData Element.
@@ -31,23 +32,24 @@ public class ClinicalDataUnit extends OdmUnit {
     private String studySubjectIds;
     private String permissionTagsString;
     private Set<Integer> edcSet;
-
+    private StudyDao studyDao;
     public ClinicalDataUnit() {
     }
 
-    public ClinicalDataUnit(DataSource ds, StudyBean study, int category) {
+    public ClinicalDataUnit(DataSource ds, Study study, int category) {
         super(ds, study, category);
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, StudyDao studyDao) {
         super(ds, dataset, odmBean, study, category);
-
+        this.studyDao = studyDao;
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,String permissionTagsString , Set<Integer> edcSet) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, String studySubjectIds,String permissionTagsString , Set<Integer> edcSet, StudyDao studyDao) {
         super(ds, dataset, odmBean, study, category);
+        this.studyDao = studyDao;
         this.permissionTagsString=permissionTagsString;
         this.odmClinicalData = new OdmClinicalDataBean();
         this.studySubjectIds = studySubjectIds;
@@ -55,17 +57,17 @@ public class ClinicalDataUnit extends OdmUnit {
     }
 
     public void collectOdmClinicalData() {
-        StudyBean study = studyBase.getStudy();
-        String studyOID = study.getOid();
+        Study study = studyBase.getStudy();
+        String studyOID = study.getOc_oid();
         if (studyOID == null || studyOID.length() <= 0) {
             logger.info("Constructed studyOID using study_id because oc_oid is missing from the table - study.");
-            studyOID = "" + study.getId();
+            studyOID = "" + study.getStudyId();
         }
         odmClinicalData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds,edcSet);
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds,edcSet, studyDao);
 
-        if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
+        if (this.getCategory() == 1 && study.isSite()) {
             String mvoid = "";
             if (this.dataset != null) {
                 mvoid = this.dataset.getODMMetaDataVersionOid();

@@ -11,14 +11,15 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,7 +52,6 @@ public class SetStudyUserRoleServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         String name = request.getParameter("name");
         String studyIdString = request.getParameter("studyId");
         if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
@@ -61,7 +61,7 @@ public class SetStudyUserRoleServlet extends SecureController {
             String action = request.getParameter("action");
             FormProcessor fp = new FormProcessor(request);
             UserAccountBean user = (UserAccountBean) udao.findByUserName(name);
-            StudyBean userStudy = (StudyBean) sdao.findByPK(fp.getInt("studyId"));
+            Study userStudy = (Study) getStudyDao().findByPK(fp.getInt("studyId"));
             if ("confirm".equalsIgnoreCase(action)) {
                 int studyId = Integer.valueOf(studyIdString.trim()).intValue();
 
@@ -75,13 +75,13 @@ public class SetStudyUserRoleServlet extends SecureController {
                 roles.remove(Role.ADMIN); // admin is not a user role, only used for tomcat
                 roles.remove(Role.RESEARCHASSISTANT2);
 
-                StudyBean studyBean = (StudyBean) sdao.findByPK(uRole.getStudyId());
+                Study studyBean = (Study) getStudyDao().findByPK(uRole.getStudyId());
 
-                if (currentStudy.getParentStudyId() > 0) {
+                if (currentStudy.isSite()) {
                     roles.remove(Role.COORDINATOR);
                     roles.remove(Role.STUDYDIRECTOR);
 
-                } else if (studyBean.getParentStudyId() > 0) {
+                } else if (studyBean.isSite()) {
                     roles.remove(Role.COORDINATOR);
                     roles.remove(Role.STUDYDIRECTOR);
                     // TODO: redo this fix
@@ -139,8 +139,7 @@ public class SetStudyUserRoleServlet extends SecureController {
      */
     private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean study = (StudyBean) sdao.findByPK(sub.getStudyId());
+        Study study = (Study) getStudyDao().findByPK(sub.getStudyId());
         logger.info("Sending email...");
         String body =
             u.getFirstName() + " " + u.getLastName() + " (" + resword.getString("username") + ": " + u.getName() + ") "

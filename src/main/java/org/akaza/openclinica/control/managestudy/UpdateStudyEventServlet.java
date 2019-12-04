@@ -28,13 +28,14 @@ import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -49,7 +50,6 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -69,6 +69,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -210,9 +211,8 @@ public class UpdateStudyEventServlet extends SecureController {
          * set the event back to COMPLETED
          */
 
-        StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
-        StudyBean studyBean = (StudyBean) sdao.findByPK(ssub.getStudyId());
-        checkRoleByUserAndStudy(ub, studyBean, sdao);
+        Study studyBean = (Study) getStudyDao().findByPK(ssub.getStudyId());
+        checkRoleByUserAndStudy(ub, studyBean);
         // To remove signed status from the list
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         boolean removeSign = false;
@@ -300,7 +300,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 // only case that this will screw up is if there are no crfs
                 // whatsoever
                 // this is addressed in the if-clause above
-                if (!existingBean.getStatus().equals(Status.UNAVAILABLE) && edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent)) {
+                if (!existingBean.getStatus().equals(Status.UNAVAILABLE) && edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent, getStudyDao())) {
 
                     logger.debug("found that " + existingBean.getCrfVersion().getName() + " is required...");
                     // that is, it's not completed but required to complete
@@ -450,7 +450,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
 
-                StudyBean study = (StudyBean) sdao.findByPK(ssb.getStudyId());
+                Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
 
                 ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
@@ -611,7 +611,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
 
-                StudyBean study = (StudyBean) sdao.findByPK(ssb.getStudyId());
+                Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
 
                 ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
@@ -653,8 +653,8 @@ public class UpdateStudyEventServlet extends SecureController {
             DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
             StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
             int studyId = studySubjectBean.getStudyId();
-            boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
-            boolean isParentStudy = studyBean.getParentStudyId() < 1;
+            boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getStudyId();
+            boolean isParentStudy = !studyBean.isSite();
 
             ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
             allNotesforSubjectAndEvent = discrepancyNoteDAO.findExistingNoteForStudyEvent(studyEvent);
@@ -773,7 +773,7 @@ public class UpdateStudyEventServlet extends SecureController {
         child.setAssignedUserId(parent.getAssignedUserId());
         child.setResStatus(parent.getResStatus());
         child.setOwner(ub);
-        child.setStudyId(currentStudy.getId());
+        child.setStudyId(currentStudy.getStudyId());
         child.setEntityId(parent.getEntityId());
         child.setEntityType(parent.getEntityType());
         child.setColumn(parent.getColumn());

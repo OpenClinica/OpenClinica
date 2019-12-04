@@ -1,16 +1,12 @@
 package core.org.akaza.openclinica.job;
-  
+
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.*;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 
@@ -24,7 +20,7 @@ public class QuartzConfiguration {
     @Lazy
     public SimpleTriggerFactoryBean simpleTriggerFactoryBean(String xslFile, String xmlFile, String endFilePath,
 															 String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale, int cnt, String xsltPath,
-															 StudyBean currentPublicStudy, StudyBean currentStudy, ArchivedDatasetFileBean archivedDatasetFileBean){
+															 Study currentPublicStudy, Study currentStudy, ArchivedDatasetFileBean archivedDatasetFileBean){
 		SimpleTriggerFactoryBean triggerFactoryBean = new SimpleTriggerFactoryBean();
 
 		triggerFactoryBean.setName("Bean Name "+ System.currentTimeMillis());
@@ -46,7 +42,7 @@ public class QuartzConfiguration {
 
 		jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());
 		jobDataMap.put(USER_ID, userAccountBean.getId());
-        jobDataMap.put(STUDY_ID, currentStudy.getId());
+        jobDataMap.put(STUDY_ID, currentStudy.getStudyId());
         jobDataMap.put(TENANT_SCHEMA, currentPublicStudy.getSchemaName());
 		jobDataMap.put(LOCALE, locale);
 		jobDataMap.put(DATASET_ID, datasetId);

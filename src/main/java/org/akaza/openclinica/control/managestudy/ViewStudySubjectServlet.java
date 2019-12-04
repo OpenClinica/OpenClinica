@@ -18,6 +18,7 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -39,6 +40,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.sql.DataSource;
@@ -110,7 +112,6 @@ public class ViewStudySubjectServlet extends SecureController {
         EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
-        StudyDAO sdao = new StudyDAO(ds);
 
         ArrayList events = sedao.findAllByStudySubject(studySub);
 
@@ -123,7 +124,7 @@ public class ViewStudySubjectServlet extends SecureController {
             event.setStudyEventDefinition(sed);
 
             // find all active crfs in the definition
-            StudyBean study = (StudyBean) sdao.findByPK(studySubject.getStudyId());
+            Study study = (Study) new ViewStudySubjectServlet().getStudyDao().findByPK(studySubject.getStudyId());
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
             ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
@@ -150,7 +151,6 @@ public class ViewStudySubjectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
@@ -163,10 +163,10 @@ public class ViewStudySubjectServlet extends SecureController {
         int studySubId = fp.getInt("id", true);// studySubjectId
         String from = fp.getString("from");
 
-        int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-        StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
-        StudyParameterValue parentSPV = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "subjectIdGeneration");
-        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+        int parentStudyId = currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId();
+        if(currentStudy.isSite()){
+            currentStudy.setSubjectIdGeneration(currentStudy.getStudy().getSubjectIdGeneration());
+        }
 
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
@@ -195,18 +195,17 @@ public class ViewStudySubjectServlet extends SecureController {
             int studyId = studySub.getStudyId();
             int subjectId = studySub.getSubjectId();
 
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
-            StudyBean study = (StudyBean) studydao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
             // Check if this StudySubject would be accessed from the Current Study
-            if (studySub.getStudyId() != currentStudy.getId()) {
-                if (currentStudy.getParentStudyId() > 0) {
+            if (studySub.getStudyId() != currentStudy.getStudyId()) {
+                if (currentStudy.isSite()) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                     forwardPage(Page.MENU_SERVLET);
                     return;
                 } else {
                     // The SubjectStudy is not belong to currentstudy and current study is not a site.
-                    Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
-                    if (!sites.contains(study.getId())) {
+                    Collection sites = getStudyDao().findOlnySiteIdsByStudy(currentStudy);
+                    if (!sites.contains(study.getStudyId())) {
                         addPageMessage(
                                 respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                         forwardPage(Page.MENU_SERVLET);
@@ -220,8 +219,8 @@ public class ViewStudySubjectServlet extends SecureController {
             // saved with the specific
             // study ID, then its study ID may be different than the study
             // subject's ID.
-            boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
-            boolean isParentStudy = study.getParentStudyId() < 1;
+            boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getStudyId();
+            boolean isParentStudy = !study.isSite();
 
             // Get any disc notes for this subject : studySubId
             DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
@@ -233,7 +232,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(study, studySubId));
             } else {
                 if (!isParentStudy) {
-                    StudyBean stParent = (StudyBean) studydao.findByPK(study.getParentStudyId());
+                    Study stParent = study.getStudy();
                     allNotesforSubject = discrepancyNoteDAO.findAllSubjectByStudiesAndSubjectId(stParent, study, subjectId);
                     allNotesforSubject.addAll(discrepancyNoteDAO.findAllStudySubjectByStudiesAndStudySubjectId(stParent, study, studySubId));
                 } else {
@@ -247,7 +246,7 @@ public class ViewStudySubjectServlet extends SecureController {
             }
 
             SubjectBean subject = (SubjectBean) sdao.findByPK(subjectId);
-            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
+            if (currentStudy.getCollectDob().equals("2")) {
                 Date dob = subject.getDateOfBirth();
                 if (dob != null) {
                     Calendar cal = Calendar.getInstance();
@@ -262,25 +261,21 @@ public class ViewStudySubjectServlet extends SecureController {
             request.setAttribute("subject", subject);
 
             /*
-             * StudyDAO studydao = new StudyDAO(sm.getDataSource()); StudyBean
-             * study = (StudyBean) studydao.findByPK(studyId);
+             * StudyDAO studydao = new StudyDAO(sm.getDataSource()); Study
+             * study = (Study) studydao.findByPK(studyId);
              */
-            // YW 11-26-2007 <<
-            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             if (isParentStudy) {
-                study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
-            } else {
-                study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(study.getParentStudyId(), "collectDob").getValue());
+                study.setCollectDob(currentStudy.getCollectDob());
             }
 
             // YW >>
             request.setAttribute("subjectStudy", study);
 
-            if (study.getParentStudyId() > 0) {// this is a site,find parent
-                StudyBean parentStudy2 = (StudyBean) studydao.findByPK(study.getParentStudyId());
+            if (study.isSite()) {// this is a site,find parent
+                Study parentStudy2 = study.getStudy();
                 request.setAttribute("parentStudy", parentStudy2);
             } else {
-                request.setAttribute("parentStudy", new StudyBean());
+                request.setAttribute("parentStudy", new Study());
             }
 
             ArrayList children = (ArrayList) sdao.findAllChildrenByPK(subjectId);
@@ -292,7 +287,7 @@ public class ViewStudySubjectServlet extends SecureController {
 
             StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
                     .getBean("studySubjectService");
-            List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole);
+            List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole, study);
             List<DisplayStudyEventBean> tempList = new ArrayList<>();
             for (DisplayStudyEventBean displayEvent : displayEvents) {
                 if (!displayEvent.getStudyEvent().getStudyEventDefinition().getType().equals(COMMON)) {
@@ -309,7 +304,7 @@ public class ViewStudySubjectServlet extends SecureController {
             if(!StringUtils.isEmpty(visitBasedEventItempath)) {
                  itemPathList = Arrays.asList(visitBasedEventItempath.split("\\s*,\\s*"));
             }
-            StudyBean parentStudyBean = (StudyBean) studyDAO.findByPK(parentStudyId);
+            Study parentStudyBean = currentStudy.getStudy();
 
                 for (int i = 0; i < displayEvents.size(); i++) {
                     DisplayStudyEventBean decb = displayEvents.get(i);
@@ -324,7 +319,7 @@ public class ViewStudySubjectServlet extends SecureController {
                            givenGroupRepeat = StringUtils.substringBetween(itemPath.split(DOT_ESCAPED)[3], OPEN_BRACKET, CLOSE_BRACKET).trim();
                            givenItemOid = itemPath.split(DOT_ESCAPED)[4].trim();
                            if (
-                                   parentStudyBean.getOid().equals(givenStudyOid)
+                                   parentStudyBean.getOc_oid().equals(givenStudyOid)
                                            && sedBean.getOid().equals(givenEventOid)
                            ) {
                                List<EventCRFBean> eventCRFBeans = eventCRFDAO.findAllByStudyEvent(seBean);
@@ -351,7 +346,7 @@ public class ViewStudySubjectServlet extends SecureController {
                     }
 
             }
-            if (currentStudy.getParentStudyId() > 0) {
+            if (currentStudy.isSite()) {
                 HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
                 for (DisplayStudyEventBean displayStudyEventBean : displayEvents) {
                     hideCRFManager.removeHiddenEventCRF(displayStudyEventBean);
@@ -386,7 +381,7 @@ public class ViewStudySubjectServlet extends SecureController {
             request.setAttribute("groups", groupMaps);
 
             // find audit log for events
-            AuditEventDAO aedao = new AuditEventDAO(sm.getDataSource());
+            AuditEventDAO aedao = new AuditEventDAO(sm.getDataSource(), getStudyDao());
             ArrayList logs = aedao.findEventStatusLogByStudySubject(studySubId);
             // logger.warning("^^^ retrieved logs");
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
@@ -421,8 +416,8 @@ public class ViewStudySubjectServlet extends SecureController {
             String errorData = request.getParameter("errorData");
             if (StringUtils.isNotEmpty(errorData))
                 request.setAttribute("errorData", errorData);
-
-            request.setAttribute("participateStatus", getParticipateStatus(parentStudyId).toLowerCase());
+            Study tempParentStudy = currentStudy.isSite() ? currentStudy.getStudy() : currentStudy;
+            request.setAttribute("participateStatus", getParticipateStatus(tempParentStudy).toLowerCase());
             forwardPage(Page.VIEW_STUDY_SUBJECT);
         }
     }
@@ -438,7 +433,7 @@ public class ViewStudySubjectServlet extends SecureController {
      * @return The list of DisplayEventCRFBeans for this study event.
      */
     public static ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
-            StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
+            StudyUserRoleBean currentRole, SubjectEventStatus status, Study study) {
         ArrayList answer = new ArrayList();
 
         // HashMap definitionsById = new HashMap();
@@ -717,15 +712,15 @@ public class ViewStudySubjectServlet extends SecureController {
 
     }
 
-    private void addDiscrepancyNotesFromChildStudies(List<DiscrepancyNoteBean> discBeans, int parentStudyId, int subjectId, int studySubId, StudyDAO studyDAO,
+    private void addDiscrepancyNotesFromChildStudies(List<DiscrepancyNoteBean> discBeans, int parentStudyId, int subjectId, int studySubId,
             DiscrepancyNoteDAO discrepancyNoteDAO) {
 
-        if (discBeans == null || discBeans.isEmpty() || studyDAO == null || discrepancyNoteDAO == null) {
+        if (discBeans == null || discBeans.isEmpty() || discrepancyNoteDAO == null) {
             return;
         }
-        ArrayList<StudyBean> childStudies = (ArrayList) studyDAO.findAllByParent(parentStudyId);
+        ArrayList<Study> childStudies = (ArrayList) getStudyDao().findAllByParent(parentStudyId);
 
-        for (StudyBean studyBean : childStudies) {
+        for (Study studyBean : childStudies) {
             discBeans.addAll(discrepancyNoteDAO.findAllSubjectByStudyAndId(studyBean, subjectId));
             discBeans.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(studyBean, studySubId));
         }

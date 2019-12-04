@@ -9,12 +9,12 @@ package core.org.akaza.openclinica.bean.rule;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.rule.expression.ExpressionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class RuleSetBean extends AuditableEntityBean {
     private static final long serialVersionUID = 1L;
 
     private StudyEventDefinitionBean studyEventDefinition;
-    private StudyBean study;
+    private Study study;
     private CRFBean crf;
     private CRFVersionBean crfVersion;
 
@@ -128,11 +128,11 @@ public class RuleSetBean extends AuditableEntityBean {
         this.target = target;
     }
 
-    public StudyBean getStudy() {
+    public Study getStudy() {
         return study;
     }
 
-    public void setStudy(StudyBean study) {
+    public void setStudy(Study study) {
         this.study = study;
     }
 

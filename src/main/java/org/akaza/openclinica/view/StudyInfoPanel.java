@@ -7,38 +7,26 @@
  */
 package org.akaza.openclinica.view;
 
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractBean;
 import core.org.akaza.openclinica.bean.extract.FilterBean;
-import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * To create a flexible panel of information that will change while the user
@@ -313,7 +301,7 @@ public class StudyInfoPanel implements Serializable {
                  * We can pull things from the session and the request:
                  */
                 /*
-                 * StudyBean study = (StudyBean) request.getAttribute("study");
+                 * Study study = (Study) request.getAttribute("study");
                  * StudySubjectBean studySubject = (StudySubjectBean)
                  * request.getAttribute("studySub"); EntityBeanTable table =
                  * (EntityBeanTable) request.getAttribute("table"); EventCRFBean
@@ -338,7 +326,7 @@ public class StudyInfoPanel implements Serializable {
 
             } else if (page.equals(Page.ENTER_DATA_FOR_STUDY_EVENT) || page.equals(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET)) {
 
-                StudyBean study = (StudyBean) session.getAttribute("study");
+                Study study = (Study) session.getAttribute("study");
                 StudySubjectBean studySubject = (StudySubjectBean) request.getAttribute("studySubject");
                 ArrayList beans = (ArrayList) request.getAttribute("beans");
                 EventCRFBean ecb = (EventCRFBean) request.getAttribute("eventCRF");
@@ -360,7 +348,7 @@ public class StudyInfoPanel implements Serializable {
                  * if they are in the session already, and does not refresh.
                  * TODO refine and test
                  */
-                StudyBean study = (StudyBean) session.getAttribute("study");
+                Study study = (Study) session.getAttribute("study");
                 StudySubjectBean studySubject = (StudySubjectBean) request.getAttribute("studySubject");
                 ArrayList beans = (ArrayList) request.getAttribute("beans");
                 EventCRFBean ecb = (EventCRFBean) request.getAttribute("eventCRF");
@@ -563,7 +551,7 @@ public class StudyInfoPanel implements Serializable {
         return answer;
     }
 
-    public void addStudyEventRulesTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans, EventCRFBean ecb, boolean withLink) {
+    public void addStudyEventRulesTree(Study study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans, EventCRFBean ecb, boolean withLink) {
         // method behind madness: we want the other pages to show
         // this information, but we don't want to hit the database when we do.
         // so, we gather--and hide--the information here.
@@ -584,7 +572,7 @@ public class StudyInfoPanel implements Serializable {
         this.setUserOrderedData(displayData);
     }
 
-    public void addStudyEventTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans, EventCRFBean ecb, boolean withLink) {
+    public void addStudyEventTree(Study study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans, EventCRFBean ecb, boolean withLink) {
         // method behind madness: we want the other pages to show
         // this information, but we don't want to hit the database when we do.
         // so, we gather--and hide--the information here.

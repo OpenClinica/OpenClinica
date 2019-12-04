@@ -23,13 +23,13 @@ import javax.sql.DataSource;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -95,37 +95,37 @@ public class SDVController {
 
     @RequestMapping("/viewSubjectAggregate")
     public ModelMap viewSubjectAggregateHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId) {
-		if(!mayProceed(request)){
-            try{
+        if (!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
-                logger.error("Error while redirecting to MainMenu: ",e);
+            } catch (Exception e) {
+                logger.error("Error while redirecting to MainMenu: ", e);
             }
             return null;
         }
         ModelMap gridMap = new ModelMap();
         HttpSession session = request.getSession();
         boolean showMoreLink = false;
-        if(session.getAttribute("sSdvRestore") != null && session.getAttribute("sSdvRestore") == "false") {
+        if (session.getAttribute("sSdvRestore") != null && session.getAttribute("sSdvRestore") == "false") {
             session.setAttribute("sSdvRestore", "true");
             showMoreLink = true;
-        }else if(request.getParameter("showMoreLink")!=null){
+        } else if (request.getParameter("showMoreLink") != null) {
             showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
-        }else if(session.getAttribute("s_sdv_showMoreLink")!=null) {
-            showMoreLink = Boolean.parseBoolean(session.getAttribute("s_sdv_showMoreLink")+"");
-        }else {
+        } else if (session.getAttribute("s_sdv_showMoreLink") != null) {
+            showMoreLink = Boolean.parseBoolean(session.getAttribute("s_sdv_showMoreLink") + "");
+        } else {
             showMoreLink = true;
         }
-        request.setAttribute("showMoreLink", showMoreLink+"");
-        session.setAttribute("s_sdv_showMoreLink", showMoreLink+"");
+        request.setAttribute("showMoreLink", showMoreLink + "");
+        session.setAttribute("s_sdv_showMoreLink", showMoreLink + "");
 
         request.setAttribute("studyId", studyId);
-        String restore = (String)request.getAttribute("s_sdv_restore");
-        restore = restore != null && restore.length()>0 ? restore : "false";
+        String restore = (String) request.getAttribute("s_sdv_restore");
+        restore = restore != null && restore.length() > 0 ? restore : "false";
         request.setAttribute("s_sdv_restore", restore);
         // request.setAttribute("studySubjectId",studySubjectId);
         /*SubjectIdSDVFactory tableFactory = new SubjectIdSDVFactory();
-        * @RequestParam("studySubjectId") int studySubjectId,*/
+         * @RequestParam("studySubjectId") int studySubjectId,*/
         request.setAttribute("imagePathPrefix", "../");
 
         ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
@@ -168,22 +168,22 @@ public class SDVController {
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId,
                                           @RequestParam(value = "sdv_restore", required = false) String restore,
-                                          HttpServletResponse response ) {
+                                          HttpServletResponse response) {
 
         request.setAttribute("studyId", studyId);
         HttpSession session = request.getSession();
 
 
         String[] permissionTags = permissionService.getPermissionTagsStringArray(request);
-        if(!mayProceed(request)){
-            try{
+        if (!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
-                logger.error("Error while redirecting to MainMenu: ",e);
+            } catch (Exception e) {
+                logger.error("Error while redirecting to MainMenu: ", e);
             }
             return null;
         }
-        
+
 
         ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
         // Reseting the side info panel set by SecureControler Mantis Issue: 8680.
@@ -197,24 +197,24 @@ public class SDVController {
         //Not necessary when using old page design...
         // setUpSidebar(request);
         boolean showMoreLink = false;
-        if(session.getAttribute("tableFacadeRestore") != null && session.getAttribute("tableFacadeRestore") == "false") {
-            session.setAttribute("tableFacadeRestore","true");
+        if (session.getAttribute("tableFacadeRestore") != null && session.getAttribute("tableFacadeRestore") == "false") {
+            session.setAttribute("tableFacadeRestore", "true");
             session.setAttribute("sSdvRestore", "false");
             showMoreLink = true;
-        }else if(request.getParameter("showMoreLink")!=null){
+        } else if (request.getParameter("showMoreLink") != null) {
             showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
-        }else if(session.getAttribute("sdv_showMoreLink")!=null) {
-            showMoreLink = Boolean.parseBoolean(session.getAttribute("sdv_showMoreLink")+"");
+        } else if (session.getAttribute("sdv_showMoreLink") != null) {
+            showMoreLink = Boolean.parseBoolean(session.getAttribute("sdv_showMoreLink") + "");
         } else {
             showMoreLink = true;
         }
-        
+
         if (request.getParameter("studyJustChanged") != null)
             request.setAttribute("studyJustChanged", request.getParameter("studyJustChanged"));
-        request.setAttribute("showMoreLink", showMoreLink+"");
-        session.setAttribute("sdv_showMoreLink", showMoreLink+"");
+        request.setAttribute("showMoreLink", showMoreLink + "");
+        session.setAttribute("sdv_showMoreLink", showMoreLink + "");
         //String restore = (String)request.getAttribute("sdv_restore");
-        restore = restore != null && restore.length()>0 ? restore : "false";
+        restore = restore != null && restore.length() > 0 ? restore : "false";
         request.setAttribute("sdv_restore", restore);
         //request.setAttribute("imagePathPrefix","../");
         //We need a study subject id for the first tab;
@@ -238,7 +238,7 @@ public class SDVController {
             logger.error("Encoding exception:" + e);
         }
 
-        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "../",permissionTags);
+        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "../", permissionTags);
 
         gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
         return gridMap;
@@ -248,9 +248,6 @@ public class SDVController {
     public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId) {
 
         ModelMap gridMap = new ModelMap();
-        StudyDAO studyDAO = new StudyDAO(dataSource);
-        // StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-        StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
         String pattern = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 
@@ -260,8 +257,8 @@ public class SDVController {
 
         //set up the parameters to take part in filtering
         ServletRequestDataBinder dataBinder = new ServletRequestDataBinder(new SdvFilterDataBean());
-        dataBinder.setAllowedFields(new String[] { "study_subject_id", "studyEventDefinition", "studyEventStatus", "eventCRFStatus", "sdvRequirement",
-            "eventcrfSDVStatus", "startUpdatedDate", "endDate", "eventCRFName" });
+        dataBinder.setAllowedFields(new String[]{"study_subject_id", "studyEventDefinition", "studyEventStatus", "eventCRFStatus", "sdvRequirement",
+                "eventcrfSDVStatus", "startUpdatedDate", "endDate", "eventCRFName"});
 
         dataBinder.registerCustomEditor(java.util.Date.class, new CustomDateEditor(sdf, true));
         dataBinder.bind(request);
@@ -292,7 +289,7 @@ public class SDVController {
         }
 
         request.setAttribute("pageMessages", pageMessages);
-        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "",permissionTags);
+        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "", permissionTags);
         gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
         return gridMap;
     }
@@ -313,7 +310,7 @@ public class SDVController {
     //method = RequestMethod.POST
     @RequestMapping("/handleSDVPost")
     public String sdvAllSubjectsFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId,
-            @RequestParam("redirection") String redirection, ModelMap model) {
+                                            @RequestParam("redirection") String redirection, ModelMap model) {
 
         //The application is POSTing parameters with the name "sdvCheck_" plus the
         //Event CRF id, so the parameter is sdvCheck_534.
@@ -321,7 +318,7 @@ public class SDVController {
         Enumeration paramNames = request.getParameterNames();
         Map<String, String> parameterMap = new HashMap<String, String>();
         String tmpName = "";
-        for (; paramNames.hasMoreElements();) {
+        for (; paramNames.hasMoreElements(); ) {
             tmpName = (String) paramNames.nextElement();
             if (tmpName.contains(SDVUtil.CHECKBOX_NAME)) {
                 parameterMap.put(tmpName, request.getParameter(tmpName));
@@ -347,7 +344,7 @@ public class SDVController {
             }
         }
         if (filteredEventCRFIds.size() == 0) {
-            forwardToNoAccessPage(request, response, redirection, studyId);
+            forwardToNoAccessPage(request, response, redirection);
             return null;
         }
 
@@ -370,30 +367,28 @@ public class SDVController {
 
         //The name of the view, as in allSdvResult.jsp
         return null;
-
     }
 
     @RequestMapping("/handleSDVGet")
     public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
-            @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
+                                       @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
 
 
-			 if(!mayProceed(request)){
-            try{
+        if (!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
-                logger.error("Error while redirecting to MainMenu: ",e);
+            } catch (Exception e) {
+                logger.error("Error while redirecting to MainMenu: ", e);
             }
             return null;
         }
 
         ArrayList<String> pageMessages = new ArrayList<String>();
 
-        if (hasFormAccess(crfId ,request) != true) {
-            forwardToNoAccessPage(request,response,redirection,studyId);
+        if (hasFormAccess(crfId, request) != true) {
+            forwardToNoAccessPage(request, response, redirection);
             return null;
         }
-
 
 
         //For the messages that appear in the left column of the results page
@@ -413,29 +408,28 @@ public class SDVController {
         }
         request.setAttribute("pageMessages", pageMessages);
 
-
         //model.addAttribute("allParams",parameterMap);
         //model.addAttribute("verified",updateCRFs);
         try {
             response.sendRedirect(redirection);
         } catch (Exception e) {
-            logger.error("Error while redirecting: ",e);
+            logger.error("Error while redirecting: ", e);
         }
 
         //The name of the view, as in allSdvResult.jsp
         return null;
-
     }
 
     @RequestMapping("/handleSDVRemove")
     public String changeSDVHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
-            @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
+                                   @RequestParam("redirection") String redirection) {
 
         //For the messages that appear in the left column of the results page
-        if (hasFormAccess(crfId ,request) != true) {
-            forwardToNoAccessPage(request,response,redirection,studyId);
+        if (hasFormAccess(crfId, request) != true) {
+            forwardToNoAccessPage(request, response, redirection);
             return null;
         }
+
         ArrayList<String> pageMessages = new ArrayList<String>();
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
@@ -444,11 +438,9 @@ public class SDVController {
         if (updateCRFs) {
             pageMessages.add("The application has unset SDV for the Event CRF.");
         } else {
-
-            pageMessages
-                    .add("There was a problem with submitting the Event CRF verification to the database. Is it possible that the database system is down temporarily?");
-
+            pageMessages.add("There was a problem with submitting the Event CRF verification to the database. Is it possible that the database system is down temporarily?");
         }
+
         request.setAttribute("pageMessages", pageMessages);
         request.setAttribute("sdv_restore", "true");
 
@@ -457,17 +449,16 @@ public class SDVController {
         try {
             response.sendRedirect(redirection);
         } catch (Exception e) {
-            logger.error("Error while redirecting: ",e);
+            logger.error("Error while redirecting: ", e);
         }
 
         //The name of the view, as in allSdvResult.jsp
         return null;
-
     }
 
     @RequestMapping("/sdvStudySubject")
     public String sdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("theStudySubjectId") int studySubjectId,
-            @RequestParam("redirection") String redirection, ModelMap model) {
+                                         @RequestParam("redirection") String redirection) {
 
         //For the messages that appear in the left column of the results page
         ArrayList<String> pageMessages = new ArrayList<String>();
@@ -492,7 +483,7 @@ public class SDVController {
 
     @RequestMapping("/unSdvStudySubject")
     public String unSdvStudySubjectHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("theStudySubjectId") int studySubjectId,
-            @RequestParam("redirection") String redirection, ModelMap model) {
+                                           @RequestParam("redirection") String redirection, ModelMap model) {
 
         ArrayList<String> pageMessages = new ArrayList<String>();
         List<Integer> studySubjectIds = new ArrayList<Integer>();
@@ -510,12 +501,11 @@ public class SDVController {
         request.setAttribute("s_sdv_restore", "true");
         sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
         return null;
-
     }
 
     @RequestMapping("/sdvStudySubjects")
     public String sdvStudySubjectsHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId,
-            @RequestParam("redirection") String redirection, ModelMap model) {
+                                          @RequestParam("redirection") String redirection, ModelMap model) {
 
         //The application is POSTing parameters with the name "sdvCheck_" plus the
         //Event CRF id, so the parameter is sdvCheck_534.
@@ -523,7 +513,7 @@ public class SDVController {
         Enumeration paramNames = request.getParameterNames();
         Map<String, String> parameterMap = new HashMap<String, String>();
         String tmpName = "";
-        for (; paramNames.hasMoreElements();) {
+        for (; paramNames.hasMoreElements(); ) {
             tmpName = (String) paramNames.nextElement();
             if (tmpName.contains(SDVUtil.CHECKBOX_NAME)) {
                 parameterMap.put(tmpName, request.getParameter(tmpName));
@@ -560,7 +550,6 @@ public class SDVController {
 
         //The name of the view, as in allSdvResult.jsp
         return null;
-
     }
 
     /*
@@ -596,11 +585,11 @@ public class SDVController {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles =
-            { resourceBundle.getString("study_subject_ID"), resourceBundle.getString("person_ID"), resourceBundle.getString("secondary_ID"),
-              resourceBundle.getString("event_name"), resourceBundle.getString("event_date"), resourceBundle.getString("enrollment_date"),
-              resourceBundle.getString("subject_status"),resourceBundle.getString("CRF_name")+" / "+resourceBundle.getString("version"),
-              resourceBundle.getString("view_CRF"),resourceBundle.getString("last_updated_date"), resourceBundle.getString("last_updated_by"),
-              resourceBundle.getString("SDV_status")+" / "+resourceBundle.getString("actions") };
+                {resourceBundle.getString("study_subject_ID"), resourceBundle.getString("person_ID"), resourceBundle.getString("secondary_ID"),
+                        resourceBundle.getString("event_name"), resourceBundle.getString("event_date"), resourceBundle.getString("enrollment_date"),
+                        resourceBundle.getString("subject_status"), resourceBundle.getString("CRF_name") + " / " + resourceBundle.getString("version"),
+                        resourceBundle.getString("view_CRF"), resourceBundle.getString("last_updated_date"), resourceBundle.getString("last_updated_by"),
+                        resourceBundle.getString("SDV_status") + " / " + resourceBundle.getString("actions")};
 
         setTitles(allTitles, table);
 
@@ -617,7 +606,6 @@ public class SDVController {
             tempColumn = row.getColumn(i);
             tempColumn.setTitle(allTitles[i]);
         }
-
     }
 
     private void setUpSidebar(HttpServletRequest request) {
@@ -635,55 +623,50 @@ public class SDVController {
         if (!(sidebarInit.getEnableIconsBoxSetup() == SidebarEnumConstants.DISABLEICONS)) {
             request.setAttribute("enableIconsBoxSetup", true);
         }
-
     }
 
-    private UserAccountBean getCurrentUser (HttpServletRequest request){
-        UserAccountBean ub = (UserAccountBean)request.getSession().getAttribute("userBean");
+    private UserAccountBean getCurrentUser(HttpServletRequest request) {
+        UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
         return ub;
     }
 
     public static void main(String[] args) throws ParseException {
-
         String pattern = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 
         Date date = sdf.parse("01/01/2007");
-
     }
 
-	 private boolean mayProceed(HttpServletRequest request) {
+    private boolean mayProceed(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        StudyUserRoleBean currentRole = (StudyUserRoleBean)session.getAttribute("userRole");
+        StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
         if (currentRole == null || currentRole.getId() <= 0) {
             if (ub.getId() > 0) {
-             currentRole = ub.getRoleByStudy(ub.getActiveStudyId());
-             session.setAttribute("userRole", currentRole);
+                currentRole = ub.getRoleByStudy(ub.getActiveStudyId());
+                session.setAttribute("userRole", currentRole);
             }
         }
         if (currentRole == null || currentRole.getId() <= 0) {
-             logger.error("No role found for user:" + ub.getName());
+            logger.error("No role found for user:" + ub.getName());
         }
         Role r = currentRole.getRole();
 
         if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)) {
             return true;
         }
-
         return false;
     }
 
-    public boolean hasFormAccess(int ecId,HttpServletRequest request) {
+    public boolean hasFormAccess(int ecId, HttpServletRequest request) {
         EventCrf ec = eventCrfDao.findById(ecId);
         return permissionService.hasFormAccess(ec, ec.getFormLayout().getFormLayoutId(), ec.getStudyEvent().getStudyEventId(), request);
     }
 
-private void forwardToNoAccessPage(HttpServletRequest request,HttpServletResponse response,String redirection,int studyId){
-    Page page1 = Page.valueOf(Page.NO_ACCESS.name());
-    String temp = page1.getFileName();
-    String originatingPage = request.getContextPath() + "/pages/" + redirection+ "?sdv_restore=true&studyId=" + studyId;
-    request.setAttribute(ORIGINATING_PAGE, originatingPage);
-    sdvUtil.forwardRequestFromController(request, response, temp);
-}
+    private void forwardToNoAccessPage(HttpServletRequest request, HttpServletResponse response, String originatingPage) {
+        Page page1 = Page.valueOf(Page.NO_ACCESS.name());
+        String temp = page1.getFileName();
+        request.setAttribute(ORIGINATING_PAGE, originatingPage);
+        sdvUtil.forwardRequestFromController(request, response, temp);
+    }
 }

@@ -7,15 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.odm.FullReportBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.*;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import core.org.akaza.openclinica.service.PermissionService;
@@ -38,8 +37,6 @@ public class MetadataCollectorResource {
 
     @Autowired
     private DataSource dataSource;
-
-    private StudyDAO studyDao;
 
     @Autowired
     private RuleSetRuleDao ruleSetRuleDao;
@@ -81,14 +78,6 @@ public class MetadataCollectorResource {
         this.ruleSetRuleDao = ruleSetRuleDao;
     }
 
-    public StudyDAO getStudyDao() {
-        return new StudyDAO(dataSource);
-    }
-
-    public void setStudyDao(StudyDAO studyDao) {
-        this.studyDao = studyDao;
-    }
-
     public DataSource getDataSource() {
         return dataSource;
     }
@@ -103,10 +92,10 @@ public class MetadataCollectorResource {
 
     public String collectODMMetadata(String studyOID, HttpServletRequest request) {
 
-        StudyBean studyBean = getStudyDao().findByOid(studyOID);
+        Study studyBean = studyDaoHib.findByOcOID(studyOID);
         String permissionTagsString = permissionService.getPermissionTagsString(studyBean,request);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString);
-        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString, studyDaoHib);
+        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean, studyDaoHib);
         MetaDataCollector.setTextLength(200);
 
         ODM odm = new ODM();
@@ -127,6 +116,7 @@ public class MetadataCollectorResource {
         adc.collectFileData();
 
         FullReportBean report = new FullReportBean();
+        report.setStudyDao(studyDaoHib);
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(getCoreResources());
@@ -158,13 +148,13 @@ public class MetadataCollectorResource {
     }
 
     public String collectODMMetadataForForm(String studyOID, String formVersionOID,HttpServletRequest request) {
-        StudyBean studyBean = getStudyDao().findByOid(studyOID);
+        Study studyBean = studyDaoHib.findByOcOID(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
         String permissionTagsString = permissionService.getPermissionTagsString(studyBean,request);
 
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString);
-        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString, studyDaoHib);
+        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean, studyDaoHib);
         MetaDataCollector.setTextLength(200);
 
         ODMBean odmb = mdc.getODMBean();
@@ -185,6 +175,7 @@ public class MetadataCollectorResource {
         adc.collectFileData();
 
         FullReportBean report = new FullReportBean();
+        report.setStudyDao(studyDaoHib);
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(getCoreResources());
@@ -195,14 +186,14 @@ public class MetadataCollectorResource {
         return report.getXmlOutput().toString().trim();
     }
 
-    public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
+    public FullReportBean collectODMMetadataForClinicalData(Study studyBean, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
                                                              boolean showArchived , String permissionTagsString, boolean includeMetadata) {
         FullReportBean report = new FullReportBean();
-            StudyBean studyBean = getStudyDao().findByOid(studyOID);
+        report.setStudyDao(studyDaoHib);
             if (studyBean != null)
                 studyBean = populateStudyBean(studyBean);
-            MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived, permissionTagsString);
-            AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
+            MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived, permissionTagsString, studyDaoHib);
+            AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean, studyDaoHib);
             MetaDataCollector.setTextLength(200);
 
             ODMBean odmb = mdc.getODMBean();
@@ -237,23 +228,11 @@ public class MetadataCollectorResource {
         return report;
     }
 
-    private StudyBean populateStudyBean(StudyBean studyBean) {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(this.dataSource);
-        @SuppressWarnings("rawtypes")
-        ArrayList studyParameters = spvdao.findParamConfigByStudy(studyBean);
-
-        studyBean.setStudyParameters(studyParameters);
-        StudyConfigService scs = new StudyConfigService(this.dataSource);
-        if (studyBean.getParentStudyId() <= 0) {// top study
-            studyBean = scs.setParametersForStudy(studyBean);
-
-        } else {
-            // YW <<
-            studyBean.setParentStudyName(((StudyBean) getStudyDao().findByPK(studyBean.getParentStudyId())).getName());
-            // YW >>
-            studyBean = scs.setParametersForSite(studyBean);
+    private Study populateStudyBean(Study studyBean) {
+        if (studyBean.getStudyParameterValues() == null || studyBean.getStudyParameterValues().size() == 0) {
+            StudyConfigService scs = new StudyConfigService(this.dataSource);
+            scs.setParameterValuesForStudy(studyBean);
         }
-
         return studyBean;
     }
 

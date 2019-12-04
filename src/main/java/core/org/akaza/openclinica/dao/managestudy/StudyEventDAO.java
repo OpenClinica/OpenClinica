@@ -23,7 +23,6 @@ import javax.sql.DataSource;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -34,6 +33,7 @@ import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.ocobserver.Listener;
 import core.org.akaza.openclinica.ocobserver.Observer;
 import core.org.akaza.openclinica.ocobserver.StudyEventBeanContainer;
@@ -268,7 +268,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return al;
     }
 
-    public Integer getCountofEventsBasedOnEventStatus(StudyBean currentStudy, SubjectEventStatus subjectEventStatus) {
+    public Integer getCountofEventsBasedOnEventStatus(Study currentStudy, SubjectEventStatus subjectEventStatus) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
@@ -287,7 +287,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         }
     }
 
-    public Integer getCountofEvents(StudyBean currentStudy) {
+    public Integer getCountofEvents(Study currentStudy) {
         // StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
@@ -653,14 +653,14 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return pk;
     }
 
-    public ArrayList findAllByStudyAndStudySubjectId(StudyBean study, int studySubjectId) {
+    public ArrayList findAllByStudyAndStudySubjectId(Study study, int studySubjectId) {
         ArrayList answer = new ArrayList();
 
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getStudyId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getStudyId()));
         variables.put(Integer.valueOf(3), Integer.valueOf(studySubjectId));
 
         ArrayList alist = this.select(digester.getQuery("findAllByStudyAndStudySubjectId"), variables);
@@ -674,14 +674,14 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return answer;
     }
 
-    public ArrayList findAllByStudyAndEventDefinitionId(StudyBean study, int eventDefinitionId) {
+    public ArrayList findAllByStudyAndEventDefinitionId(Study study, int eventDefinitionId) {
         ArrayList answer = new ArrayList();
 
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
-        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getStudyId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getStudyId()));
         variables.put(Integer.valueOf(3), Integer.valueOf(eventDefinitionId));
 
         ArrayList alist = this.select(digester.getQuery("findAllByStudyAndEventDefinitionId"), variables);
@@ -732,13 +732,13 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
     }
 
     @Override
-    public ArrayList findAllByStudy(StudyBean study) {
+    public ArrayList findAllByStudy(Study study) {
         ArrayList answer = new ArrayList();
 
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getStudyId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllByStudy"), variables);
 
@@ -936,7 +936,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
      * C.crf_id = EDC.crf_id AND C.crf_id = CV.crf_id
      */
 
-    public HashMap findCRFsByStudy(StudyBean sb) {
+    public HashMap findCRFsByStudy(Study sb) {
         // SELECT DISTINCT
         // C.CRF_ID
         // , C.NAME AS CRF_NAME
@@ -962,7 +962,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         HashMap crfs = new HashMap();
         this.setNewCRFTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getStudyId()));
         ArrayList alist = this.select(digester.getQuery("findCRFsByStudy"), variables);
         // TODO make sure this other statement for eliciting crfs works, tbh
         // switched from getEventAndCRFVersionInformation
@@ -1211,7 +1211,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         }
     }
 
-    public HashMap getStudySubjectCRFData(StudyBean sb, int studySubjectId, int eventDefId, String crfVersionOID, int eventOrdinal) {
+    public HashMap getStudySubjectCRFData(Study sb, int studySubjectId, int eventDefId, String crfVersionOID, int eventOrdinal) {
         HashMap studySubjectCRFDataDetails = new HashMap();
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
@@ -1219,7 +1219,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         this.setTypeExpected(2, TypeNames.INT);
 
         HashMap variables = new HashMap();
-        variables.put(1, Integer.valueOf(sb.getId()));
+        variables.put(1, Integer.valueOf(sb.getStudyId()));
         variables.put(2, Integer.valueOf(eventOrdinal));
         variables.put(3, crfVersionOID);
         variables.put(4, Integer.valueOf(studySubjectId));

@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
@@ -102,8 +101,8 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
                 return false;
         } else if (!itemMetas.equals(other.itemMetas))
             return false;
-        
-        
+
+
         if (itemReferenceTypeId != other.itemReferenceTypeId)
             return false;
         if (oid == null) {
@@ -158,7 +157,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
     public ItemBean() {
         dataType = ItemDataType.ST;
         itemMetas = new ArrayList();
-        
+
         this.oidGenerator = new ItemOidGenerator();
     }
 
@@ -305,7 +304,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
     }
     public void addItemDataElement(ItemDataBean el) {
         if ( itemDataElements == null){
-        	itemDataElements = new ArrayList<ItemDataBean>();
+            itemDataElements = new ArrayList<ItemDataBean>();
         }
         itemDataElements.add(el);
     }
@@ -318,7 +317,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
         this.itemDataElements = itemDataElements;
     }
 
-    
+
     /**
      * @return Returns the selected.
      */
@@ -345,13 +344,13 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
             ItemFormMetadataBean m2 = (ItemFormMetadataBean) arg.getItemMetas().get(0);
             return m1.getOrdinal() - m2.getOrdinal();
         }
-        //fix here 
+        //fix here
         else if (!itemDataElements.isEmpty() && !arg.getItemDataElements().isEmpty()) {
             ItemDataBean m1 = (ItemDataBean) getItemDataElements().get(0);
             ItemDataBean m2 = (ItemDataBean) arg.getItemDataElements().get(0);
             return m1.getOrdinal() - m2.getOrdinal();
         }
-        
+
         else {
             return getName().compareTo(arg.getName());
         }

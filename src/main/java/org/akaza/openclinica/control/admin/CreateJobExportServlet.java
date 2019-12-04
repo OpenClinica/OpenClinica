@@ -23,7 +23,6 @@ import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.extract.ExtractUtils;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
@@ -157,7 +156,6 @@ public class CreateJobExportServlet extends SecureController {
             } else {
                 logger.info("found no validation errors, continuing");
 
-                StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                 DatasetDAO datasetDao = new DatasetDAO(sm.getDataSource());
 
                 UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");

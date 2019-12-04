@@ -1,10 +1,10 @@
 package core.org.akaza.openclinica.domain.rule.expression;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 
 import javax.sql.DataSource;
@@ -29,7 +29,7 @@ public class ExpressionBeanObjectWrapper {
 	}
 
 	DataSource ds;
-    StudyBean studyBean;
+    Study studyBean;
     ExpressionBean expressionBean;
     RuleSetBean ruleSet;
     EventCRFBean eventCrf; // used only in data entry based rule executions
@@ -49,14 +49,14 @@ public class ExpressionBeanObjectWrapper {
 	// This will carry item/value pairs used in DataEntry Rule Execution
     HashMap<String, String> itemsAndTheirValues = new HashMap<String, String>();
 
-    public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean) {
+    public ExpressionBeanObjectWrapper(DataSource ds, Study studyBean, ExpressionBean expressionBean) {
         super();
         this.ds = ds;
         this.studyBean = studyBean;
         this.expressionBean = expressionBean;
     }
 
-    /*public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,StudySubjectBean studySubjectBean, StudyEventDao studyEventDao, StudyEventDefinitionDao studyEventDefDao) {
+    /*public ExpressionBeanObjectWrapper(DataSource ds, Study studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,StudySubjectBean studySubjectBean, StudyEventDao studyEventDao, StudyEventDefinitionDao studyEventDefDao) {
         super();
         this.ds = ds;
         this.studyBean = studyBean;
@@ -67,7 +67,7 @@ public class ExpressionBeanObjectWrapper {
         this.studyEventDaoHib = studyEventDao;
     }*/
     
-    public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,Integer studySubjectBeanId, StudyEventDao studyEventDao, StudyEventDefinitionDao studyEventDefDao) {
+    public ExpressionBeanObjectWrapper(DataSource ds, Study studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,Integer studySubjectBeanId, StudyEventDao studyEventDao, StudyEventDefinitionDao studyEventDefDao) {
         super();
         this.ds = ds;
         this.studyBean = studyBean;
@@ -80,7 +80,7 @@ public class ExpressionBeanObjectWrapper {
    
 
 
-    public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
+    public ExpressionBeanObjectWrapper(DataSource ds, Study studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
                                        HashMap<String, String> itemsAndTheirValues) {
         super();
         this.ds = ds;
@@ -90,7 +90,7 @@ public class ExpressionBeanObjectWrapper {
         this.itemsAndTheirValues = itemsAndTheirValues;
     }
 
-    public ExpressionBeanObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
+    public ExpressionBeanObjectWrapper(DataSource ds, Study studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
                                        HashMap<String, String> itemsAndTheirValues, EventCRFBean eventCrfBean) {
         super();
         this.ds = ds;
@@ -134,7 +134,7 @@ public class ExpressionBeanObjectWrapper {
     /**
      * @return the studyBean
      */
-    public StudyBean getStudyBean() {
+    public Study getStudyBean() {
         return studyBean;
     }
 
@@ -142,7 +142,7 @@ public class ExpressionBeanObjectWrapper {
      * @param studyBean
      *            the studyBean to set
      */
-    public void setStudyBean(StudyBean studyBean) {
+    public void setStudyBean(Study studyBean) {
         this.studyBean = studyBean;
     }
 

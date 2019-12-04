@@ -12,5 +12,6 @@
   var src = window.location.origin.split('.');
   src.splice(1, 0, 'insight');
   src = src.join('.');
+  src += window.location.search.slice(1);
   $('#insight').attr('src', src);
 </script>

@@ -39,7 +39,7 @@
 
 <jsp:useBean scope="session" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="study" class="core.org.akaza.openclinica.domain.datamap.Study"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
 <h1><span class="title_manage">
 <fmt:message key="restore_subject_to_study" bundle="${resword}"/>
@@ -53,13 +53,13 @@
   <%-- <tr valign="top"><td class="table_header_column"><fmt:message key="subject_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${subject.id}"/></td></tr> --%>
   <tr valign="top"><td class="table_header_column"><fmt:message key="study_subject_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.label}"/></td></tr>
   <c:choose>
-    <c:when test='${study.parentStudyId > 0}'>
+    <c:when test='${study.study != null && study.study.studyId > 0}'>
       <tr valign="top">
         <td class="table_header_column">
           <fmt:message key="study_name" bundle="${resword}"/>:
         </td>
         <td class="table_cell">
-          <c:out value="${study.parentStudyName}"/>
+          <c:out value="${study.study.name}"/>
         </td>
       </tr>
       <tr valign="top">

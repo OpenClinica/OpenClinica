@@ -50,7 +50,8 @@ http://www.springframework.org/schema/task/spring-task-4.3.xsd"
         <bean id="jobTriggerService" class="core.org.akaza.openclinica.service.JobTriggerService" autowire="byName">
                 <constructor-arg ref="dataSource"/>
                 <constructor-arg ref="ruleSetDao"/>
-                <constructor-arg ref="ruleSetService"/>        
+                <constructor-arg ref="ruleSetService"/>
+                <constructor-arg ref="studyDaoDomain"/>
     </bean>
     
 </beans>

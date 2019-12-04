@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.internal.SessionImpl;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,4 +147,12 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         this.hibernateTemplate = hibernateTemplate;
     }
 
+    @Transactional
+    public T findByPK(int id){
+        String pkName=( (MetamodelImplementor)getSessionFactory().getMetamodel() ).entityPersister(getDomainClassName()).getIdentifierPropertyName();
+        String query ="from " + getDomainClassName() + " do where do." + pkName + "=:id";
+        Query q=getCurrentSession().createQuery(query);
+        q.setParameter("id", id);
+        return (T) q.uniqueResult();
+    }
 }

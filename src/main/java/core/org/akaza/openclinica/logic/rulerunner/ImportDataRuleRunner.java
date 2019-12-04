@@ -11,8 +11,9 @@ import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -32,8 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class ImportDataRuleRunner extends RuleRunner {
 
-    public ImportDataRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
-        super(ds, requestURLMinusServletPath, contextPath, mailSender);
+    public ImportDataRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, StudyDao studyDao) {
+        super(ds, requestURLMinusServletPath, contextPath, mailSender, studyDao);
     }
 
     /**
@@ -45,7 +46,7 @@ public class ImportDataRuleRunner extends RuleRunner {
      */
     @Transactional
     public HashMap<String, ArrayList<String>> runRules(List<ImportDataRuleRunnerContainer> containers,
-            StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
+            Study study, UserAccountBean ub, ExecutionMode executionMode) {
         HashMap<String, ArrayList<String>> messageMap = new HashMap<String, ArrayList<String>>();
 
         if(executionMode == ExecutionMode.DRY_RUN) {
@@ -65,7 +66,7 @@ public class ImportDataRuleRunner extends RuleRunner {
 
     @Transactional
     private HashMap<String, ArrayList<RuleActionContainer>> populateToBeExpected(ImportDataRuleRunnerContainer container,
-            StudyBean study, UserAccountBean ub) {
+            Study study, UserAccountBean ub) {
         //copied code for toBeExpected from DataEntryServlet runRules
         HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
         HashMap<String, String> variableAndValue = (HashMap<String, String>)container.getVariableAndValue();
@@ -152,8 +153,8 @@ public class ImportDataRuleRunner extends RuleRunner {
     }
 
     @Transactional
-    private MessageContainer runRules(StudyBean currentStudy, UserAccountBean ub, HashMap<String, String> variableAndValue,
-            HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
+    private MessageContainer runRules(Study currentStudy, UserAccountBean ub, HashMap<String, String> variableAndValue,
+                                      HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
         //Copied from DataEntryRuleRunner runRules
         MessageContainer messageContainer = new MessageContainer();
         for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {

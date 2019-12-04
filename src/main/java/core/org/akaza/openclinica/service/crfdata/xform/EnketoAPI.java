@@ -11,8 +11,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
-
 
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -24,11 +22,9 @@ import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
-import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
 import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -37,15 +33,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -674,9 +665,9 @@ public class EnketoAPI {
         EnketoFormResponse enketoFormResponse = new EnketoFormResponse(urlResponse, lockOn);
         return enketoFormResponse;
     }
-    
+
     /**
-     * 
+     *
      * @param actionUrlObject
      * @return
      * @throws Exception
@@ -691,7 +682,7 @@ public class EnketoAPI {
         String studySubjectOID = actionUrlObject.getStudySubjectOID();
         EnketoPDFResponse pdfResponse = null;
         URI finalUrl = null;
-        
+
         if (enketoURL == null)
             return null;
 
@@ -702,9 +693,9 @@ public class EnketoAPI {
             String hashString = ecid + "." + String.valueOf(cal.getTimeInMillis());
             ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
             String instanceId = encoder.encodePassword(hashString, null);
-            URL eURL = null;         
+            URL eURL = null;
             eURL = new URL(enketoURL + INSTANCE_FORM_PDF);
-            String eurlStr = eURL.toString();          
+            String eurlStr = eURL.toString();
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
 
             InstanceAttachment attachment = new InstanceAttachment();
@@ -724,16 +715,16 @@ public class EnketoAPI {
              * prepare request header
              */
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);           
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
-         
+
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(eurlStr);
             finalUrl = builder.build().toUri();
             /**
              *  prepare body
-             */                      
-            LinkedMultiValueMap<String, String>  body = new LinkedMultiValueMap<>();
+             */
+            LinkedMultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("server_url", ocURL);
             body.add("ecid", actionUrlObject.ecid);
             body.add("form_id", crfOid);
@@ -742,105 +733,105 @@ public class EnketoAPI {
             body.add("return_url", redirect);
             String format = actionUrlObject.getFormat();
             if(format == null || format.trim().length() == 0) {
-            	format = "A4";
+                format = "A4";
             }
             body.add("format", format);
-            
+
             String margin =actionUrlObject.getMargin();
             if(margin == null || margin.trim().length()==0 ) {
-            	margin =  "0.5in";
+                margin =  "0.5in";
             }
             body.add("margin", margin);
-            
+
             String landscape = actionUrlObject.getLandscape();
             if(landscape != null && landscape.equalsIgnoreCase("true")) {
-            	landscape = "true";
+                landscape = "true";
             }else {
-            	landscape = "false";
-            }            
+                landscape = "false";
+            }
             body.add("landscape", landscape);
-            
-			HttpEntity<LinkedMultiValueMap> request = new HttpEntity<LinkedMultiValueMap>(body, headers);
-			            
-            RestTemplate rest = new RestTemplate();		            
+
+            HttpEntity<LinkedMultiValueMap> request = new HttpEntity<LinkedMultiValueMap>(body, headers);
+
+            RestTemplate rest = new RestTemplate();
             ResponseEntity<byte[]> response = rest.postForEntity(eURL.toString(), request, byte[].class);
-		
-             if (response != null) {
-            	 pdfResponse = new EnketoPDFResponse();
-            	 
-            	 SimpleDateFormat sdf_pdfFile = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");            
-            	 String fileName = studySubjectOID+"_"+crfOid + "_" + sdf_pdfFile.format(new Date()) + ".pdf";          	            	
-            	 String filePath = getCaseBookFileTempPath() + File.separator +  fileName;
-            	 
-            	 Path pdfFile = Files.write(Paths.get(filePath), response.getBody());
-            	 pdfResponse.setPdfFile(pdfFile.toFile());	
-            	 pdfResponse.setStatusCode(response.getStatusCodeValue()+"");
-             }                
-             
+
+            if (response != null) {
+                pdfResponse = new EnketoPDFResponse();
+
+                SimpleDateFormat sdf_pdfFile = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");
+                String fileName = studySubjectOID+"_"+crfOid + "_" + sdf_pdfFile.format(new Date()) + ".pdf";
+                String filePath = getCaseBookFileTempPath() + File.separator +  fileName;
+
+                Path pdfFile = Files.write(Paths.get(filePath), response.getBody());
+                pdfResponse.setPdfFile(pdfFile.toFile());
+                pdfResponse.setStatusCode(response.getStatusCodeValue()+"");
+            }
+
         } catch(HttpClientErrorException ec) {
-        	String bodyStr =ec.getResponseBodyAsString();
-        	String msg = "ClientError:"+ec.getMessage();
-        	String finalUrlStr = finalUrl.toString();
-        	throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_CLIENT,msg+ ":" + bodyStr + ":" + finalUrlStr); 
-        	
+            String bodyStr =ec.getResponseBodyAsString();
+            String msg = "ClientError:"+ec.getMessage();
+            String finalUrlStr = finalUrl.toString();
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_CLIENT,msg+ ":" + bodyStr + ":" + finalUrlStr);
+
         } catch(HttpServerErrorException es) {
-        	String bodyStr =es.getResponseBodyAsString();
-        	String msg = "ServerError:" + es.getMessage();
-        	String finalUrlStr = finalUrl.toString();
-        	
+            String bodyStr =es.getResponseBodyAsString();
+            String msg = "ServerError:" + es.getMessage();
+            String finalUrlStr = finalUrl.toString();
+
             throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_SERVER,msg+ ":" + bodyStr + ":" + finalUrlStr);
-         } catch (Exception e) {           
-        	 throw e;
+        } catch (Exception e) {
+            throw e;
         }
-        
+
         return pdfResponse;
     }
-    
+
     /**
-     * 
+     *
      * @param pdfActionUrlObject
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     public EnketoPDFResponse registerAndGetFormPDF(PdfActionUrlObject pdfActionUrlObject) throws Exception {
-    	EnketoPDFResponse enketoPDFResponse = null;
-        try {            
-        	enketoPDFResponse = this.getPDFForm(pdfActionUrlObject);
+        EnketoPDFResponse enketoPDFResponse = null;
+        try {
+            enketoPDFResponse = this.getPDFForm(pdfActionUrlObject);
         } catch (Exception e) {
             if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                	enketoPDFResponse = getPDFForm(pdfActionUrlObject);
+                    enketoPDFResponse = getPDFForm(pdfActionUrlObject);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
                 }
             } else {
                 logger.error(e.getMessage());
-                logger.error(ExceptionUtils.getStackTrace(e));                
+                logger.error(ExceptionUtils.getStackTrace(e));
             }
-            
+
             throw e;
-            
-           
+
+
         }
         return enketoPDFResponse;
     }
-    
+
     /**
-     * 
+     *
      * @return
      */
     public static String getCaseBookFileTempPath() {
-    	String tempDir = System.getProperty( "java.io.tmpdir");
-    	String dirPath = tempDir+ File.separator+ PDF_CASEBOOK_DIRECTORY;
-       
+        String tempDir = System.getProperty( "java.io.tmpdir");
+        String dirPath = tempDir+ File.separator+ PDF_CASEBOOK_DIRECTORY;
+
         File directory = new File(dirPath);
         if (!directory.exists()) {
             directory.mkdirs();
         }
         return dirPath;
     }
-    
-    
+
+
 }

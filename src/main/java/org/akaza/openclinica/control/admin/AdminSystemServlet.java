@@ -7,14 +7,15 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -39,10 +40,9 @@ public class AdminSystemServlet extends SecureController {
     protected void processRequest() throws Exception {
 
         // find last 5 modifed studies
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        ArrayList studies = (ArrayList) sdao.findAllByLimit(true);
+        ArrayList studies = (ArrayList) getStudyDao().findAllByLimit(true);
         request.setAttribute("studies", studies);
-        ArrayList allStudies = (ArrayList) sdao.findAll();
+        ArrayList allStudies = (ArrayList) getStudyDao().findAll();
         request.setAttribute("allStudyNumber", new Integer(allStudies.size()));
 
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

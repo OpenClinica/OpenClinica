@@ -45,7 +45,7 @@
 	<query>
 		<name>findAllByUser</name>
 		<sql>SELECT s.* FROM study s, study_user_role sur
-           WHERE sur.user_name = ?
+           WHERE sur.user_name = :userName
            AND s.study_id=sur.study_id
          </sql>
 	</query>
@@ -95,8 +95,8 @@
         <name>findSiteByUniqueIdentifier</name>
         <sql>select site.* from study site, study study where
                 site.parent_study_id = study.study_id and
-                study.unique_identifier = ? and   
-                site.unique_identifier = ?
+                study.unique_identifier = :parentUniqueIdentifier and
+                site.unique_identifier = :uniqueIdentifier
          </sql>
     </query>
     <query>

@@ -13,14 +13,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.ListSubjectFilter;
 import core.org.akaza.openclinica.dao.submit.ListSubjectSort;
@@ -41,15 +41,17 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ListSubjectTableFactory extends AbstractTableFactory {
 
+	@Autowired
+	private StudyDao studyDao;
 	private AuditUserLoginDao auditUserLoginDao;
 	private StudySubjectDAO studySubjectDao;
 	private UserAccountDAO userAccountDao;
-	private StudyDAO studyDao;
 	private SubjectDAO subjectDao;
-	private StudyBean currentStudy;
+	private Study currentStudy;
 	private ResourceBundle resword;
 	private ResourceBundle resformat;
 
@@ -125,9 +127,9 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 			String studySubjectIdAndStudy = "";
 			List<StudySubjectBean> studySubjects = getStudySubjectDao().findAllBySubjectId(subject.getId());
 			for (StudySubjectBean studySubjectBean : studySubjects) {
-				StudyBean study = (StudyBean) getStudyDao().findByPK(studySubjectBean.getStudyId());
+				Study study = (Study) studyDao.findByPK(studySubjectBean.getStudyId());
 				studySubjectIdAndStudy += studySubjectIdAndStudy.length() == 0 ? "" : ",";
-				studySubjectIdAndStudy += study.getIdentifier() + "-" + studySubjectBean.getLabel();
+				studySubjectIdAndStudy += study.getUniqueIdentifier() + "-" + studySubjectBean.getLabel();
 
 			}
 
@@ -348,19 +350,11 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 		this.subjectDao = subjectDao;
 	}
 
-	public StudyDAO getStudyDao() {
-		return studyDao;
-	}
-
-	public void setStudyDao(StudyDAO studyDao) {
-		this.studyDao = studyDao;
-	}
-
-	public StudyBean getCurrentStudy() {
+	public Study getCurrentStudy() {
 		return currentStudy;
 	}
 
-	public void setCurrentStudy(StudyBean currentStudy) {
+	public void setCurrentStudy(Study currentStudy) {
 		this.currentStudy = currentStudy;
 	}
 

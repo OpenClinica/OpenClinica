@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 /**
  * @author jxu
@@ -93,7 +94,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private Integer threadNumber;
     private List <CustomColumn> customColumns;
 
-    private StudyBean study = new StudyBean();
+    private Study study = new Study();
 
     public String getCreatedDateString() {
         return createdDateString;
@@ -587,11 +588,11 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
         this.age = age;
     }
 
-    public StudyBean getStudy() {
+    public Study getStudy() {
         return study;
     }
 
-    public void setStudy(StudyBean study) {
+    public void setStudy(Study study) {
         this.study = study;
     }
 

@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
@@ -38,16 +37,16 @@ public class ViewNotesSortCriteria {
     public static ViewNotesSortCriteria buildFilterCriteria(List<Pair<String,String>> sorts) {
         ViewNotesSortCriteria criteria = new ViewNotesSortCriteria();
         for (Pair<String,String> p: sorts) {
-        	String
-        		sortField = SORT_BY_TABLE_COLUMN.get(p.getFirst()),
-        		sortOrder = p.getSecond();
-        	if (sortField != null) {
-        		criteria.getSorters().put(sortField, sortOrder);
-        	}
+            String
+                    sortField = SORT_BY_TABLE_COLUMN.get(p.getFirst()),
+                    sortOrder = p.getSecond();
+            if (sortField != null) {
+                criteria.getSorters().put(sortField, sortOrder);
+            }
         }
         return criteria;
     }
-    
+
     public static ViewNotesSortCriteria buildFilterCriteria(SortSet sortSet,ItemDao itemDao) {
         ViewNotesSortCriteria criteria = new ViewNotesSortCriteria();
         String sortField = "";
@@ -62,7 +61,7 @@ public class ViewNotesSortCriteria {
 
                 criteria.getSorters().put(sortField, sort.getOrder().name());
             }
-    }
+        }
         return criteria;
     }
 

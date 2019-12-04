@@ -11,14 +11,16 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.checkerframework.checker.units.qual.s;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
@@ -66,8 +68,7 @@ public class RemoveStudyUserRoleServlet extends SecureController {
                 StudyUserRoleBean uRole = udao.findRoleByUserNameAndStudyId(name, studyId);
                 request.setAttribute("uRole", uRole);
 
-                StudyDAO sdao = new StudyDAO(sm.getDataSource());
-                StudyBean study = (StudyBean) sdao.findByPK(studyId);
+                Study study = (Study) getStudyDao().findByPK(studyId);
                 request.setAttribute("uStudy", study);
                 forwardPage(Page.REMOVE_USER_ROLE_IN_STUDY);
             } else {
@@ -102,8 +103,7 @@ public class RemoveStudyUserRoleServlet extends SecureController {
      */
     private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean study = (StudyBean) sdao.findByPK(sub.getStudyId());
+        Study study = (Study) getStudyDao().findByPK(sub.getStudyId());
         logger.info("Sending email...");
         String body =
             u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": " + u.getName() + ") "

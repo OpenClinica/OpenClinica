@@ -22,11 +22,11 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
@@ -432,8 +432,8 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
         // currentStudy.setStudyParameters(studyParameters);
         // refresh study params here, tbh 06/2009
-        StudyBean currentStudy =    (StudyBean) request.getSession().getAttribute("study");
-        if (currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange().equals("true")) {
+        Study currentStudy =    (Study) request.getSession().getAttribute("study");
+        if (currentStudy.getAdminForcedReasonForChange().equals("true")) {
         	LOGGER.debug("returning true for forced reason for change");
             return true;
         } else {
@@ -441,4 +441,13 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         }
     }
 
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
+    }
 }

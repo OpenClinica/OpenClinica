@@ -11,14 +11,15 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.TermType;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -59,8 +60,7 @@ public class EditStudyUserRoleServlet extends SecureController {
         String uName = fp.getString(ARG_USER_NAME);
         StudyUserRoleBean studyUserRole = udao.findRoleByUserNameAndStudyId(uName, studyId);
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean sb = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
+        Study sb = (Study) getStudyDao().findByPK(studyUserRole.getStudyId());
         if (sb != null) {
             studyUserRole.setStudyName(sb.getName());
         }
@@ -78,8 +78,8 @@ public class EditStudyUserRoleServlet extends SecureController {
 
             roleMap = new LinkedHashMap();
             ResourceBundle resterm = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-            StudyBean study = (StudyBean) sdao.findByPK(studyUserRole.getStudyId());
-            if (study.getParentStudyId() == 0) {
+            Study study = (Study) getStudyDao().findByPK(studyUserRole.getStudyId());
+            if (!study.isSite()) {
                 for (Iterator it = getRoles().iterator(); it.hasNext();) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
@@ -121,7 +121,7 @@ public class EditStudyUserRoleServlet extends SecureController {
                 }
             }
 
-            if (study.getParentStudyId() > 0) {
+            if (study.isSite()) {
                 roleMap.remove(Role.COORDINATOR.getId());
                 roleMap.remove(Role.STUDYDIRECTOR.getId());
             }

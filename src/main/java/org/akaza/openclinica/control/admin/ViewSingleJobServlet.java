@@ -91,7 +91,7 @@ public class ViewSingleJobServlet extends SecureController {
         logger.debug("found group name: " + groupName);
           TriggerBean triggerBean = new TriggerBean();
         JobDataMap dataMap = new JobDataMap();
-        AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource());
+        AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource(), getStudyDao());
 
         try {
             triggerBean.setFullName(trigger.getKey().getName());

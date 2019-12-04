@@ -40,7 +40,7 @@
 
 <jsp:useBean scope="request" id="user" class="core.org.akaza.openclinica.bean.login.UserAccountBean"/>
 <jsp:useBean scope="request" id="uRole" class="core.org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
-<jsp:useBean scope="request" id="uStudy" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="uStudy" class="core.org.akaza.openclinica.domain.datamap.Study"/>
 <h1><span class="title_manage">
 <fmt:message key="restore_user_role" bundle="${resword}"/>
 </span></h1>

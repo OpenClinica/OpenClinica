@@ -34,7 +34,7 @@ public class ItemDefBean extends ElementOIDBean {
     private String formOIDs;
     private ItemDetailsBean itemDetails;
     private String briefDescription;
-    
+
 
     public ItemDefBean() {
         question = new QuestionBean();

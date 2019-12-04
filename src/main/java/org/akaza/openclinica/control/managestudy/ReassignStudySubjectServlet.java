@@ -10,19 +10,20 @@ package org.akaza.openclinica.control.managestudy;
 import core.org.akaza.openclinica.bean.admin.DisplayStudyBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -57,7 +58,6 @@ public class ReassignStudySubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         String action = request.getParameter("action");
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
@@ -80,15 +80,15 @@ public class ReassignStudySubjectServlet extends SecureController {
             if (StringUtil.isBlank(action)) {
                 ArrayList studies = null;
                 DisplayStudyBean displayStudy = new DisplayStudyBean();
-                StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
-                if (study.getParentStudyId() > 0) {// current in site
-                    studies = (ArrayList) sdao.findAllByParent(study.getParentStudyId());
-                    StudyBean parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
+                Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
+                if (study.isSite()) {// current in site
+                    studies = (ArrayList) getStudyDao().findAllByParent(study.getStudy().getStudyId());
+                    Study parent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                     displayStudy.setParent(parent);
                     // studies.add(parent);
                     displayStudy.setChildren(studies);
                 } else {
-                    studies = (ArrayList) sdao.findAllByParent(study.getId());
+                    studies = (ArrayList) getStudyDao().findAllByParent(study.getStudyId());
                     displayStudy.setParent(study);
                     displayStudy.setChildren(studies);
                     // studies.add(study);
@@ -103,7 +103,7 @@ public class ReassignStudySubjectServlet extends SecureController {
                     forwardPage(Page.REASSIGN_STUDY_SUBJECT);
                     return;
                 }
-                StudyBean st = (StudyBean) sdao.findByPK(studyId);
+                Study st = (Study) getStudyDao().findByPK(studyId);
                 if ("confirm".equalsIgnoreCase(action)) {
                     StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(studySub.getLabel(), studyId, studySub.getId());
                     if (sub1.getId() > 0) {
@@ -127,7 +127,7 @@ public class ReassignStudySubjectServlet extends SecureController {
                     int subjectCount = getSubjectCount(st);
 
                     st.setSubjectCount(subjectCount+1);
-                    sdao.update(st);
+                    getStudyDao().update(st);
 
                     logger.info("submit to reassign the subject");
                     studySub.setUpdatedDate(new Date());

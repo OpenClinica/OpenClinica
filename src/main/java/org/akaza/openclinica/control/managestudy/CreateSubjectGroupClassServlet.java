@@ -36,7 +36,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_locked"));
         checkStudyFrozen(Page.SUBJECT_GROUP_CLASS_LIST_SERVLET, respage.getString("current_study_frozen"));
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
             addPageMessage(respage.getString("subject_group_class_only_added_top_level") + " " + respage.getString("please_contact_sysadmin_questions"));
             throw new InsufficientPermissionException(Page.SUBJECT_GROUP_CLASS_LIST, resexception.getString("not_top_study"), "1");
         }
@@ -157,7 +157,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
         StudyGroupClassBean group = (StudyGroupClassBean) session.getAttribute("group");
         ArrayList studyGroups = (ArrayList) session.getAttribute("studyGroups");
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-        group.setStudyId(currentStudy.getId());
+        group.setStudyId(currentStudy.getStudyId());
         group.setOwner(ub);
         group.setStatus(Status.AVAILABLE);
         group = (StudyGroupClassBean) sgcdao.create(group);

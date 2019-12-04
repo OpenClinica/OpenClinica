@@ -7,12 +7,12 @@ import java.util.Set;
 
 import core.org.akaza.openclinica.bean.admin.TriggerBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -24,6 +24,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 
@@ -31,7 +32,6 @@ import org.quartz.impl.matchers.GroupMatcher;
  */
 public class ViewJobServlet extends SecureController {
 
-   
     private static String SCHEDULER = "schedulerFactoryBean";
     private StdScheduler scheduler;
 
@@ -85,7 +85,6 @@ public class ViewJobServlet extends SecureController {
             // setting: frequency, dataset name
             JobDataMap dataMap = new JobDataMap();
             DatasetDAO datasetDAO = new DatasetDAO(sm.getDataSource());
-            StudyDAO studyDao = new StudyDAO(sm.getDataSource());
             if (trigger.getJobDataMap().size() > 0) {
                 dataMap = trigger.getJobDataMap();
                 int dsId = dataMap.getInt(ExampleSpringJob.DATASET_ID);
@@ -94,7 +93,7 @@ public class ViewJobServlet extends SecureController {
                 DatasetBean dataset = (DatasetBean) datasetDAO.findByPK(dsId);
                 triggerBean.setDataset(dataset);
                 triggerBean.setDatasetName(dataset.getName());
-                StudyBean study = (StudyBean) studyDao.findByPK(dataset.getStudyId());
+                Study study = (Study) getStudyDao().findByPK(dataset.getStudyId());
                 triggerBean.setStudyName(study.getName());
             }
             logger.debug("Trigger Priority: " + trigger.getKey().getName() + " " + trigger.getPriority());

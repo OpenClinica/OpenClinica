@@ -38,6 +38,12 @@
     </td>
 </tr>
 <jsp:include page="include/sideInfo.jsp"/>
+<link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.jmesa.js"></script>
+<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery-migrate-1.4.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/permissionTagAccess.js"></script>
 
 
@@ -156,7 +162,7 @@
       }, 1);
     }
   }
-  store.key = '${study.oid}.SDVs';
+  store.key = '${study.oc_oid}.SDVs';
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     sdvChecks: {}
   };

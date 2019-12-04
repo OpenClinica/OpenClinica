@@ -6,6 +6,7 @@
  * copyright 2003-2005 Akaza Research
  */
 package core.org.akaza.openclinica.bean.service;
+import core.org.akaza.openclinica.domain.datamap.StudyParameter;
 
 import java.io.Serializable;
 

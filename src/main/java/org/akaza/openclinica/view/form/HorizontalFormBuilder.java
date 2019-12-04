@@ -1,7 +1,7 @@
 package org.akaza.openclinica.view.form;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.managestudy.BeanFactory;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -35,7 +35,7 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
     // Used for displaying the section title, subtitle, and instructions,
     // if necessary
     private SectionBean sectionBean;
-    private StudyBean studyBean;
+    private Study studyBean;
     private EventCRFBean eventCRFbean;
     // is the form a ViewSectionDataEntry form?
     private boolean isDataEntry;
@@ -114,8 +114,8 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
         // The tabindex attribute for select and input tags
         int tabindex = tabindexSeed;
         boolean hasDiscrepancyMgt = false;
-        StudyBean studBean = this.getStudyBean();
-        if (studBean != null && studBean.getStudyParameterConfig().getDiscrepancyManagement().equalsIgnoreCase("true")) {
+        Study studBean = this.getStudyBean();
+        if (studBean != null && studBean.getDiscrepancyManagement().equalsIgnoreCase("true")) {
 
             hasDiscrepancyMgt = true;
         }
@@ -507,11 +507,11 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
         this.eventCRFbean = eventCRFbean;
     }
 
-    public StudyBean getStudyBean() {
+    public Study getStudyBean() {
         return studyBean;
     }
 
-    public void setStudyBean(StudyBean studyBean) {
+    public void setStudyBean(Study studyBean) {
         this.studyBean = studyBean;
     }
 }

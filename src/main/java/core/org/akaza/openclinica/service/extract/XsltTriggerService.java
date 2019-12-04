@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -55,8 +55,8 @@ public class XsltTriggerService {
 
 
     public SimpleTrigger generateXsltTrigger(Scheduler scheduler, String xslFile, String xmlFile, String endFilePath,
-            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath, String triggerGroupName,
-            StudyBean currentPublicStudy,StudyBean currentStudy, ArchivedDatasetFileBean archivedDatasetFileBean) {
+                                             String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale, int cnt, String xsltPath, String triggerGroupName,
+                                             Study currentPublicStudy, Study currentStudy, ArchivedDatasetFileBean archivedDatasetFileBean) {
         //Date startDateTime = new Date(System.currentTimeMillis());
         String jobName =  datasetId+ "_"+epBean.getExportFileName()[0];
         if(triggerGroupName!=null)

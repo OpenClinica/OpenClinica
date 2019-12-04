@@ -27,7 +27,6 @@ import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
@@ -39,13 +38,14 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import core.org.akaza.openclinica.core.OpenClinicaMailSender;
 import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
@@ -68,6 +68,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -115,6 +116,7 @@ public class ImportSpringJob extends QuartzJobBean {
     private EventCRFDAO eventCrfDao;// = new EventCRFDAO(sm.getDataSource());
     private AuditEventDAO auditEventDAO;
     private TriggerService triggerService;
+    private StudyDao studyDao;
 
     @Override
     protected void executeInternal(final JobExecutionContext context) throws JobExecutionException {
@@ -151,10 +153,11 @@ public class ImportSpringJob extends QuartzJobBean {
             dataSource = (DataSource) appContext.getBean("dataSource");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
+            studyDao = (StudyDao) appContext.getBean("studyDaoDomain");
 
             itemDataDao = new ItemDataDAO(dataSource);
             eventCrfDao = new EventCRFDAO(dataSource);
-            auditEventDAO = new AuditEventDAO(dataSource);
+            auditEventDAO = new AuditEventDAO(dataSource, studyDao);
 
             int userId = dataMap.getInt(USER_ID);
             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
@@ -172,12 +175,11 @@ public class ImportSpringJob extends QuartzJobBean {
                 respage = ResourceBundleProvider.getPageMessagesBundle();
                 resword = ResourceBundleProvider.getWordsBundle();
             }
-            StudyDAO studyDAO = new StudyDAO(dataSource);
-            StudyBean studyBean;
+            Study studyBean;
             if (studyOid != null) {
-                studyBean = studyDAO.findByOid(studyOid);
+                studyBean = studyDao.findByOcOID(studyOid);
             } else {
-                studyBean = (StudyBean) studyDAO.findByName(studyName);
+                studyBean = (Study) studyDao.findByName(studyName);
             }
             // might also need study id here for the data service?
             File fileDirectory = new File(SQLInitServlet.getField("filePath") + DIR_PATH + File.separator);
@@ -300,7 +302,7 @@ public class ImportSpringJob extends QuartzJobBean {
      * them into the database if not, and return a message which will go to audit and to the end user.
      */
     private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage, ResourceBundle resword, UserAccountBean ub,
-            StudyBean studyBean, File destDirectory, TriggerBean triggerBean, RuleSetServiceInterface ruleSetService) throws Exception {
+            Study studyBean, File destDirectory, TriggerBean triggerBean, RuleSetServiceInterface ruleSetService) throws Exception {
         StringBuffer msg = new StringBuffer();
         StringBuffer auditMsg = new StringBuffer();
         Mapping myMap = new Mapping();
@@ -383,7 +385,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 }
             }
             // next: check, then import
-            List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId(), locale);
+            List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getStudyId(), locale);
             // this needs to be replaced with the study name from the job, since
             // the user could be in any study ...
             if (errors != null) {
@@ -427,7 +429,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 }
 
             }
-            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
+            ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource, studyDao);
             // validation errors, the same as in the ImportCRFDataServlet. DRY?
             // create a 'fake' request to generate the validation errors
             // here, tbh 05/2009
@@ -618,7 +620,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 // setup ruleSets to run if applicable
                 List<ImportDataRuleRunnerContainer> containers = this.ruleRunSetup(dataSource, studyBean, ub, ruleSetService, odmContainer);
 
-                CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
+                CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource, studyDao);
                 for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
                     boolean resetSDV = false;
@@ -734,7 +736,7 @@ public class ImportSpringJob extends QuartzJobBean {
     }
 
     public static DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message, EventCRFBean eventCrfBean, DisplayItemBean displayItemBean,
-            Integer parentId, UserAccountBean uab, DataSource ds, StudyBean study) {
+            Integer parentId, UserAccountBean uab, DataSource ds, Study study) {
         // DisplayItemBean displayItemBean) {
         DiscrepancyNoteBean note = new DiscrepancyNoteBean();
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
@@ -749,7 +751,7 @@ public class ImportSpringJob extends QuartzJobBean {
         }
 
         note.setField(itemBean.getName());
-        note.setStudyId(study.getId());
+        note.setStudyId(study.getStudyId());
         note.setEntityName(itemBean.getName());
         note.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
         note.setEntityValue(displayItemBean.getData().getValue());
@@ -816,7 +818,7 @@ public class ImportSpringJob extends QuartzJobBean {
     }
 
     @Transactional
-    private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, StudyBean studyBean, UserAccountBean userBean,
+    private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, Study studyBean, UserAccountBean userBean,
             RuleSetServiceInterface ruleSetService, ODMContainer odmContainer) {
         List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
         if (odmContainer != null) {
@@ -837,7 +839,7 @@ public class ImportSpringJob extends QuartzJobBean {
     }
 
     @Transactional
-    private StringBuffer runRules(StudyBean studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
+    private StringBuffer runRules(Study studyBean, UserAccountBean userBean, List<ImportDataRuleRunnerContainer> containers,
             RuleSetServiceInterface ruleSetService, ExecutionMode executionMode) {
         StringBuffer messages = new StringBuffer();
         if (containers != null && !containers.isEmpty()) {

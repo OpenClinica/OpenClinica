@@ -11,19 +11,19 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
@@ -33,6 +33,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,13 +66,12 @@ public class RemoveSiteServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         String idString = request.getParameter("id");
         logger.info("site id:" + idString);
 
         int siteId = Integer.valueOf(idString.trim()).intValue();
-        StudyBean study = (StudyBean) sdao.findByPK(siteId);
-        if (currentStudy.getId() != study.getParentStudyId()) {
+        Study study = (Study) getStudyDao().findByPK(siteId);
+        if (currentStudy.getStudyId() != study.checkAndGetParentStudyId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));
             forwardPage(Page.MENU_SERVLET);
@@ -87,7 +87,7 @@ public class RemoveSiteServlet extends SecureController {
         ArrayList subjects = ssdao.findAllByStudy(study);
 
         // find all events
-        StudyEventDefinitionDAO sefdao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO sefdao = new StudyEventDefinitionDAO(sm.getDataSource(),getStudyDao());
         ArrayList definitions = sefdao.findAllByStudy(study);
 
         String action = request.getParameter("action");
@@ -106,12 +106,11 @@ public class RemoveSiteServlet extends SecureController {
             } else {
                 logger.info("submit to remove the site");
                 // change all statuses to unavailable
-                StudyDAO studao = new StudyDAO(sm.getDataSource());
-                study.setOldStatus(study.getStatus());
-                study.setStatus(Status.DELETED);
+                study.setOldStatusId(study.getStatus().getCode());
+                study.setStatus(core.org.akaza.openclinica.domain.Status.DELETED);
                 study.setUpdater(ub);
-                study.setUpdatedDate(new Date());
-                studao.update(study);
+                study.setDateUpdated(new Date());
+                getStudyDao().update(study);
 
                 // remove all users and roles
                 for (int i = 0; i < userRoles.size(); i++) {
@@ -128,8 +127,8 @@ public class RemoveSiteServlet extends SecureController {
                 }
 
                 // YW << bug fix that current active study has been deleted
-                if (study.getId() == currentStudy.getId()) {
-                    currentStudy.setStatus(Status.DELETED);
+                if (study.getStudyId() == currentStudy.getStudyId()) {
+                    currentStudy.setStatus(core.org.akaza.openclinica.domain.Status.DELETED);
                     // currentRole.setRole(Role.INVALID);
                     currentRole.setStatus(Status.DELETED);
                 }
@@ -220,7 +219,7 @@ public class RemoveSiteServlet extends SecureController {
                 }// for subjects
 
                 DatasetDAO datadao = new DatasetDAO(sm.getDataSource());
-                ArrayList dataset = datadao.findAllByStudyId(study.getId());
+                ArrayList dataset = datadao.findAllByStudyId(study.getStudyId());
                 for (int i = 0; i < dataset.size(); i++) {
                     DatasetBean data = (DatasetBean) dataset.get(i);
                     if (!data.getStatus().equals(Status.DELETED)) {

@@ -15,8 +15,9 @@ import java.util.LinkedHashMap;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.job.JobTerminationMonitor;
 
 /**
@@ -33,8 +34,8 @@ import core.org.akaza.openclinica.job.JobTerminationMonitor;
 public class AdminDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap;
 
-    public AdminDataCollector(DataSource ds, StudyBean currentStudy) {
-        super(ds, currentStudy);
+    public AdminDataCollector(DataSource ds, Study currentStudy, StudyDao studyDao) {
+        super(ds, currentStudy, studyDao);
         this.odmAdminDataMap = new LinkedHashMap<String, OdmAdminDataBean>();
     }
 
@@ -43,8 +44,8 @@ public class AdminDataCollector extends OdmDataCollector {
      * @param ds
      * @param dataset
      */
-    public AdminDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy) {
-        super(ds, dataset, currentStudy);
+    public AdminDataCollector(DataSource ds, DatasetBean dataset, Study currentStudy, StudyDao studyDao) {
+        super(ds, dataset, currentStudy, studyDao);
         this.odmAdminDataMap = new LinkedHashMap<String, OdmAdminDataBean>();
     }
 
@@ -58,10 +59,10 @@ public class AdminDataCollector extends OdmDataCollector {
         while (it.hasNext()) {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
-            AdminDataUnit adata = new AdminDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
+            AdminDataUnit adata = new AdminDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory(), studyDao);
             adata.setCategory(this.getCategory());
             adata.collectOdmAdminData();
-            odmAdminDataMap.put(u.getStudy().getOid(), adata.getOdmAdminData());
+            odmAdminDataMap.put(u.getStudy().getOc_oid(), adata.getOdmAdminData());
         }
     }
 

@@ -7,8 +7,8 @@ import org.quartz.StatefulJob;
  * Establishing stateful-ness on the Java side to avoid locking
  */
 public class ImportStatefulJob
-    extends ImportSpringJob
-    implements StatefulJob {
+        extends ImportSpringJob
+        implements StatefulJob {
 
     public ImportStatefulJob() {
         super();

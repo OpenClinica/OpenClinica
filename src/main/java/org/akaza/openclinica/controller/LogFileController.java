@@ -7,10 +7,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.controller.dto.LogFileDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.service.LogFileService;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,12 @@ public class LogFileController {
 	 @Autowired
 	 @Qualifier( "dataSource" )
 	 private BasicDataSource dataSource;
+
+	 @Autowired
+	 private StudyBuildService studyBuildService;
+
+	@Autowired
+	private StudyDao studyDao;
 	  
 	 private RestfulServiceHelper restfulServiceHelper;
 	
@@ -142,7 +151,7 @@ public class LogFileController {
 	
 	 public RestfulServiceHelper getRestfulServiceHelper() {
 	        if (restfulServiceHelper == null) {
-	            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+	            restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
 	        }
 	        return restfulServiceHelper;
 	    }

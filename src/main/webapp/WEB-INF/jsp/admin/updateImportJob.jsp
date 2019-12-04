@@ -89,21 +89,21 @@
 								<c:choose>
 									<c:when test="${study_name == study.name}">
 										<c:choose>
-										<c:when test="${study.parentStudyId > 0}">
-											<option value='<c:out value="${study.id}" />' selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
+										<c:when test="${study.study != null && study.study.studyId > 0}">
+											<option value='<c:out value="${study.studyId}" />' selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
 										</c:when>
 										<c:otherwise>
-											<option value='<c:out value="${study.id}" />' selected><c:out value="${study.name}" /></option>
+											<option value='<c:out value="${study.studyId}" />' selected><c:out value="${study.name}" /></option>
 										</c:otherwise>
 										</c:choose>
 									</c:when>
 									<c:otherwise>
 										<c:choose>
-										<c:when test="${study.parentStudyId>0}">
-											<option value='<c:out value="${study.id}" />'>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
+										<c:when test="${study.study != null && study.study.studyId > 0}">
+											<option value='<c:out value="${study.studyId}" />'>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
 										</c:when>
 										<c:otherwise>
-											<option value='<c:out value="${study.id}" />'><c:out value="${study.name}" /></option>
+											<option value='<c:out value="${study.studyId}" />'><c:out value="${study.name}" /></option>
 										</c:otherwise>
 										</c:choose>
 									</c:otherwise>

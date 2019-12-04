@@ -1,10 +1,10 @@
 package org.akaza.openclinica.control.admin;
 
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.EventStatusView;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 
 public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
 
-    private StudyDAO studyDao;
+    private StudyDao studyDao;
     private StudySubjectDAO studySubjectDao;
     private StudyEventDAO studyEventDao;
-    private StudyBean currentStudy;
+    private Study currentStudy;
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
     @Override
@@ -106,11 +106,11 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
         tableFacade.setItems(theItems);
     }
 
-    public StudyDAO getStudyDao() {
+    public StudyDao getStudyDao() {
         return studyDao;
     }
 
-    public void setStudyDao(StudyDAO studyDao) {
+    public void setStudyDao(StudyDao studyDao) {
         this.studyDao = studyDao;
     }
 
@@ -122,11 +122,11 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
         this.studySubjectDao = studySubjectDao;
     }
 
-    public StudyBean getCurrentStudy() {
+    public Study getCurrentStudy() {
         return currentStudy;
     }
 
-    public void setCurrentStudy(StudyBean currentStudy) {
+    public void setCurrentStudy(Study currentStudy) {
         this.currentStudy = currentStudy;
     }
 

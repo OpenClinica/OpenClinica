@@ -35,7 +35,7 @@ public class FindSubjectsSort implements CriteriaCommand {
     public String execute(String criteria) {
         String theCriteria = "";
         for (Sort sort : sorts) {
-                theCriteria += buildCriteria(criteria, sort.getProperty(), sort.getOrder());
+            theCriteria += buildCriteria(criteria, sort.getProperty(), sort.getOrder());
         }
 
         return theCriteria;
@@ -51,7 +51,7 @@ public class FindSubjectsSort implements CriteriaCommand {
     }
 
     private String buildCriteria(String criteria, String property, String order) {
-       return customcolumnSorting(property,order);
+        return customcolumnSorting(property,order);
 
     }
 

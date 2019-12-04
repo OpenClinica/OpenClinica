@@ -30,16 +30,16 @@ import javax.naming.directory.InitialDirContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -73,7 +73,8 @@ public class SystemController {
 	private BasicDataSource dataSource;
 	@Autowired
 	private JavaMailSenderImpl mailSender;
-
+	@Autowired
+	private StudyDao studyDao;
 	@Autowired
 	private ContextSource contextSource;
 
@@ -463,9 +464,9 @@ public class SystemController {
 		session.removeAttribute("webservice");
 		session.removeAttribute("ldap");
 
-		ArrayList<StudyBean> studyList = getStudyList();
+		ArrayList<Study> studyList = getStudyList();
 
-		for (StudyBean studyBean : studyList) {
+		for (Study studyBean : studyList) {
 			ArrayList<HashMap<String, Object>> listOfModules = new ArrayList();
 			HashMap<String, Object> mapParticipantModule = getParticipateModule(studyBean);
 			listOfModules.add(mapParticipantModule);
@@ -487,7 +488,7 @@ public class SystemController {
 
 			HashMap<String, Object> mapStudy = new HashMap<>();
 			mapStudy.put("Modules", listOfModules);
-			mapStudy.put("Study Oid", studyBean.getOid());
+			mapStudy.put("Study Oid", studyBean.getOc_oid());
 
 			studyListMap.add(mapStudy);
 		}
@@ -520,14 +521,14 @@ public class SystemController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
 
-		ArrayList<StudyBean> studyList = getStudyList();
+		ArrayList<Study> studyList = getStudyList();
 
-		for (StudyBean studyBean : studyList) {
+		for (Study studyBean : studyList) {
 			HashMap<String, Object> mapParticipantModule = getParticipateModule(studyBean);
 
 			HashMap<String, Object> mapStudy = new HashMap<>();
 			mapStudy.put("Module", mapParticipantModule);
-			mapStudy.put("Study Oid", studyBean.getOid());
+			mapStudy.put("Study Oid", studyBean.getOc_oid());
 			studyListMap.add(mapStudy);
 		}
 
@@ -565,13 +566,13 @@ public class SystemController {
 		HttpSession session = request.getSession();
 		session.removeAttribute("webservice");
 
-		ArrayList<StudyBean> studyList = getStudyList();
-		for (StudyBean studyBean : studyList) {
+		ArrayList<Study> studyList = getStudyList();
+		for (Study studyBean : studyList) {
 			HashMap<String, Object> mapRuleDesignerModule = getWebServiceModuleInSession(studyBean, session);
 
 			HashMap<String, Object> mapStudy = new HashMap<>();
 			mapStudy.put("Module", mapRuleDesignerModule);
-			mapStudy.put("Study Oid", studyBean.getOid());
+			mapStudy.put("Study Oid", studyBean.getOc_oid());
 			studyListMap.add(mapStudy);
 		}
 
@@ -609,13 +610,13 @@ public class SystemController {
 		HttpSession session = request.getSession();
 		session.removeAttribute("ruledesigner");
 
-		ArrayList<StudyBean> studyList = getStudyList();
-		for (StudyBean studyBean : studyList) {
+		ArrayList<Study> studyList = getStudyList();
+		for (Study studyBean : studyList) {
 			HashMap<String, Object> mapRuleDesignerModule = getRuleDesignerModuleInSession(studyBean, session);
 
 			HashMap<String, Object> mapStudy = new HashMap<>();
 			mapStudy.put("Module", mapRuleDesignerModule);
-			mapStudy.put("Study Oid", studyBean.getOid());
+			mapStudy.put("Study Oid", studyBean.getOc_oid());
 			studyListMap.add(mapStudy);
 		}
 
@@ -664,13 +665,13 @@ public class SystemController {
 
 		ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
 
-		ArrayList<StudyBean> studyList = getStudyList();
-		for (StudyBean studyBean : studyList) {
+		ArrayList<Study> studyList = getStudyList();
+		for (Study studyBean : studyList) {
 			HashMap<String, Object> mapDatamartModule = getDatamartModuleInSession(studyBean, session);
 
 			HashMap<String, Object> mapStudy = new HashMap<>();
 			mapStudy.put("Module", mapDatamartModule);
-			mapStudy.put("Study Oid", studyBean.getOid());
+			mapStudy.put("Study Oid", studyBean.getOc_oid());
 			studyListMap.add(mapStudy);
 		}
 
@@ -708,13 +709,13 @@ public class SystemController {
 		HttpSession session = request.getSession();
 		session.removeAttribute("ldap");
 
-		ArrayList<StudyBean> studyList = getStudyList();
-		for (StudyBean studyBean : studyList) {
+		ArrayList<Study> studyList = getStudyList();
+		for (Study studyBean : studyList) {
 			HashMap<String, Object> mapRuleDesignerModule = getLdapModuleInSession(studyBean, session);
 
 			HashMap<String, Object> mapStudy = new HashMap<>();
 			mapStudy.put("Module", mapRuleDesignerModule);
-			mapStudy.put("Study Oid", studyBean.getOid());
+			mapStudy.put("Study Oid", studyBean.getOc_oid());
 			studyListMap.add(mapStudy);
 		}
 
@@ -755,12 +756,12 @@ public class SystemController {
 
 		ArrayList<HashMap<String, Object>> studyListMap = new ArrayList();
 
-		ArrayList<StudyBean> studyList = getStudyList();
-		for (StudyBean studyBean : studyList) {
+		ArrayList<Study> studyList = getStudyList();
+		for (Study studyBean : studyList) {
 			HashMap<String, Object> mapMessagingModule = getMessagingModuleInSession(studyBean, session);
 			HashMap<String, Object> mapStudy = new HashMap<>();
 			mapStudy.put("Module", mapMessagingModule);
-			mapStudy.put("Study Oid", studyBean.getOid());
+			mapStudy.put("Study Oid", studyBean.getOc_oid());
 			studyListMap.add(mapStudy);
 		}
 
@@ -1109,15 +1110,14 @@ public class SystemController {
 		return mapRole;
 	}
 
-	public ArrayList<StudyBean> getStudyList() {
-		StudyDAO sdao = new StudyDAO(dataSource);
-		ArrayList<StudyBean> sBeans = (ArrayList<StudyBean>) sdao.findAllParents();
+	public ArrayList<Study> getStudyList() {
+		ArrayList<Study> sBeans = (ArrayList<Study>) studyDao.findAllParents();
 		return sBeans;
 	}
 
-	public StudyParameterValueBean getParticipateMod(StudyBean studyBean, String value) {
+	public StudyParameterValueBean getParticipateMod(Study studyBean, String value) {
 		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(studyBean.getId(), value);
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(studyBean.getStudyId(), value);
 		return pStatus;
 	}
 
@@ -1126,7 +1126,7 @@ public class SystemController {
 
 	}
 
-	public HashMap<String, Object> getParticipateModule(StudyBean studyBean) {
+	public HashMap<String, Object> getParticipateModule(Study studyBean) {
 		String portalURL = CoreResources.getField("portalURL");
 		StudyParameterValueBean spvBean = getParticipateMod(studyBean, "participantPortal");
 		String ocParticipateStatus = "";
@@ -1137,7 +1137,7 @@ public class SystemController {
 		ParticipantPortalRegistrar participantPortalRegistrar = new ParticipantPortalRegistrar();
 		if (ocParticipateStatus.equals("enabled")) {
 			try {
-				ocuiParticipateStatus = participantPortalRegistrar.getRegistrationStatus(studyBean.getOid());
+				ocuiParticipateStatus = participantPortalRegistrar.getRegistrationStatus(studyBean.getOc_oid());
 			} catch (Exception e) {
 				logger.error("Error while accessing participant portal resigtrar: ",e);
 			}
@@ -1153,7 +1153,7 @@ public class SystemController {
 			// TODO Auto-generated catch block
 			logger.error("Portal Url is not correct: ",e);
 		}
-		Authorization pManageAuthorization = participantPortalRegistrar.getAuthorization(studyBean.getOid());
+		Authorization pManageAuthorization = participantPortalRegistrar.getAuthorization(studyBean.getOc_oid());
 		if (pManageAuthorization != null) {
 			url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
 					+ ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
@@ -1171,7 +1171,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getRuleDesignerModule(StudyBean studyBean) {
+	public HashMap<String, Object> getRuleDesignerModule(Study studyBean) {
 		String designerUrl = CoreResources.getField("designerURL");
 		String result = "";
 		HttpURLConnection huc = null;
@@ -1211,7 +1211,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getMessagingModule(StudyBean studyBean) {
+	public HashMap<String, Object> getMessagingModule(Study studyBean) {
 
 		String result = sendEmail(mailSender, "This is the Subject Of a Rest Call for Health Check", "This is the Body Of a Rest Call for Health Check");
 		String mailProtocol = CoreResources.getField("mailProtocol");
@@ -1233,7 +1233,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getDatamartModule(StudyBean studyBean) {
+	public HashMap<String, Object> getDatamartModule(Study studyBean) {
 
 		HashMap<String, String> datamartRole = new HashMap<>();
 		String username = CoreResources.getExtractField("db1.username");
@@ -1275,7 +1275,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getWebServiceModule(StudyBean studyBean) {
+	public HashMap<String, Object> getWebServiceModule(Study studyBean) {
 		String webserviceUrl = CoreResources.getField("sysURL");
 		webserviceUrl = webserviceUrl.replace("/MainMenu", "-ws");
 
@@ -1317,7 +1317,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getLdapModule(StudyBean studyBean) {
+	public HashMap<String, Object> getLdapModule(Study studyBean) {
 		String enabled = CoreResources.getField("ldap.enabled");
 		String ldapHost = CoreResources.getField("ldap.host");
 		String username = CoreResources.getField("ldap.userDn");
@@ -1354,7 +1354,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getRuleDesignerModuleInSession(StudyBean studyBean, HttpSession session) {
+	public HashMap<String, Object> getRuleDesignerModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("ruledesigner");
 		if (mapModule == null) {
@@ -1364,7 +1364,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getMessagingModuleInSession(StudyBean studyBean, HttpSession session) {
+	public HashMap<String, Object> getMessagingModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("messaging");
 		if (mapModule == null) {
@@ -1374,7 +1374,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getDatamartModuleInSession(StudyBean studyBean, HttpSession session) {
+	public HashMap<String, Object> getDatamartModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("datamart");
 		if (mapModule == null) {
@@ -1384,7 +1384,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getWebServiceModuleInSession(StudyBean studyBean, HttpSession session) {
+	public HashMap<String, Object> getWebServiceModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("webservice");
 		if (mapModule == null) {
@@ -1394,7 +1394,7 @@ public class SystemController {
 		return mapModule;
 	}
 
-	public HashMap<String, Object> getLdapModuleInSession(StudyBean studyBean, HttpSession session) {
+	public HashMap<String, Object> getLdapModuleInSession(Study studyBean, HttpSession session) {
 
 		HashMap<String, Object> mapModule = (HashMap<String, Object>) session.getAttribute("ldap");
 		if (mapModule == null) {

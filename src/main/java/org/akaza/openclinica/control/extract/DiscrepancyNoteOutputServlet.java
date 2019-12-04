@@ -23,6 +23,7 @@ import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -32,7 +33,6 @@ import core.org.akaza.openclinica.core.util.Pair;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.ListNotesFilter;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -53,6 +53,7 @@ import core.org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.service.ViewStudySubjectService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -125,7 +126,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         response.addHeader(CONTENT_DISPOSITION_HEADER, CONTENT_DISPOSITION_VALUE + fileName);
         // Are we downloading a List of discrepancy notes or just one?
         // Not needed now: boolean isList = ("y".equalsIgnoreCase(isAList));
-        StudyBean studyBean = (StudyBean) session.getAttribute("study");
+        Study studyBean = (Study) session.getAttribute("study");
 
         // Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute("resolutionStatus");
 
@@ -314,7 +315,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
         ItemDAO idao = new ItemDAO(sm.getDataSource());
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         ItemGroupMetadataDAO<String, ArrayList> igmdao = new ItemGroupMetadataDAO<String, ArrayList>(sm.getDataSource());
         ItemGroupDAO<String, ArrayList> igdao = new ItemGroupDAO<String, ArrayList>(sm.getDataSource());
 
@@ -518,7 +518,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                 }
             }
 
-            dnb.setStudy((StudyBean) studyDao.findByPK(dnb.getStudyId()));
+            dnb.setStudy((Study) getStudyDao().findByPK(dnb.getStudyId()));
             if (dnb.getParentDnId() == 0 && dnb.getChildren().size() > 0) {
                 ArrayList<DiscrepancyNoteBean> children = dnb.getChildren();
                 int childrenSize = children.size();

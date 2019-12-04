@@ -137,7 +137,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
         request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
-        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllByStudy(currentStudy);
         ArrayList tempList = new ArrayList<>();
         for (StudyEventDefinitionBean defn : definitions) {
@@ -186,7 +186,7 @@ public class ViewStudyEventsServlet extends SecureController {
         definitions = findDefinitionById(definitions, definitionId);
         // YW <<
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-        ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
+        ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getStudyId());
         // YW >>
         for (int i = 0; i < definitions.size(); i++) {
             ViewEventDefinitionBean ved = new ViewEventDefinitionBean();
@@ -324,7 +324,7 @@ public class ViewStudyEventsServlet extends SecureController {
         definitions = findDefinitionById(definitions, definitionId);
         // YW <<
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-        ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getId());
+        ArrayList studySubjects = ssdao.findAllByStudyId(currentStudy.getStudyId());
         // YW >>
         for (int i = 0; i < definitions.size(); i++) {
             ViewEventDefinitionBean ved = new ViewEventDefinitionBean();

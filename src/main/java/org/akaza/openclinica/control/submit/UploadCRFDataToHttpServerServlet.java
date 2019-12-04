@@ -1037,7 +1037,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 
 	public RestfulServiceHelper getRestfulServiceHelper() {
 		if(restfulServiceHelper == null) {
-			restfulServiceHelper = new RestfulServiceHelper(this.getSM().getDataSource());
+			restfulServiceHelper = new RestfulServiceHelper(this.getSM().getDataSource(), getStudyBuildService(), getStudyDao());
 		}
 		return restfulServiceHelper;
 	}

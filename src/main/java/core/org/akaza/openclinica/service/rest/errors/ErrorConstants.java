@@ -83,5 +83,4 @@ public class ErrorConstants {
     public static final String ERR_ENKETO_SERVER = "errorCode.enketoServer";
 
 
-
 }

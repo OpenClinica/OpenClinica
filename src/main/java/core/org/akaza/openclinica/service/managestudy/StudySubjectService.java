@@ -13,6 +13,7 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
@@ -28,6 +29,6 @@ public interface StudySubjectService {
      * @return
      */
     List<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySubject,
-            UserAccountBean userAccount, StudyUserRoleBean currentRole);
+                                                                     UserAccountBean userAccount, StudyUserRoleBean currentRole, Study study);
 
 }

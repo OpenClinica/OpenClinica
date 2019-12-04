@@ -43,7 +43,7 @@
 
 <jsp:useBean scope="request" id="user" class="core.org.akaza.openclinica.bean.login.UserAccountBean"/>
 <jsp:useBean scope="request" id="uRole" class="core.org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
-<jsp:useBean scope="request" id="uStudy" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="uStudy" class="core.org.akaza.openclinica.domain.datamap.Study"/>
 
 <h1><span class="title_manage"><fmt:message key="view_user_account" bundle="${resword}"/></span></h1>
 <div style="width: 600px">
@@ -70,10 +70,10 @@
   <tr><td class="table_header_column"><fmt:message key="date_updated" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${user.updatedDate}" type="date" pattern="${dteFormat}"/>&nbsp;</td></tr>
   <tr><td class="table_header_column"><fmt:message key="updated_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${user.updater.name}"/>&nbsp;</td></tr>
   <tr><td class="table_header_column"><fmt:message key="role" bundle="${resword}"/>:</td><td class="table_cell">
-    <c:if test="${uStudy.parentStudyId > 0}">
+    <c:if test="${uStudy.study != null && uStudy.study.studyId > 0}">
               <fmt:message key="${siteRoleMap[uRole.role.id] }" bundle="${resterm}"></fmt:message>
           </c:if>
-          <c:if test="${uStudy.parentStudyId == 0}">
+          <c:if test="${uStudy.study == null || uStudy.study.studyId == 0}">
               <c:out value="${uRole.role.description}"/>
           </c:if>
   </td></tr>

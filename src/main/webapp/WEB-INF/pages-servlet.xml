@@ -47,6 +47,9 @@
 
     <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
     	<property name="dataSource" ref="dataSource"/>
+        <property name="studyDao" ref="studyDaoDomain"></property>
+
+
     </bean>
 
     <mvc:interceptors>

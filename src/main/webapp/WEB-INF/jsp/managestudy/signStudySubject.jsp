@@ -77,7 +77,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="parentStudy" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="parentStudy" class="core.org.akaza.openclinica.domain.datamap.Study"/>
 <jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="children" class="java.util.ArrayList"/>
 <jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
@@ -279,13 +279,13 @@
                 <td class="table_cell_top"><c:out value="${subject.uniqueIdentifier}"/></td>
             </tr>
             <c:choose>
-                <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+                <c:when test="${study.collectDob == '1'}">
                     <tr>
                         <td class="table_header_column_top"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
                         <td class="table_cell_top"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></td>
                     </tr>
                 </c:when>
-                <c:when test="${study.studyParameterConfig.collectDob == '3'}">
+                <c:when test="${study.collectDob == '3'}">
                     <tr>
                         <td class="table_header_column_top"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
                         <td class="table_cell_top"><fmt:message key="not_used" bundle="${resword}"/></td>
@@ -350,7 +350,7 @@
                     <td class="table_header_column_top"><fmt:message key="study_name" bundle="${resword}"/></td>
                     <td class="table_cell_top">
                         <c:choose>
-                            <c:when test="${study.parentStudyId>0}">
+                            <c:when test="${study.study != null && study.study.studyId>0}">
                                 <c:out value="${parentStudy.name}"/>
                             </c:when>
                             <c:otherwise>
@@ -361,12 +361,12 @@
                 </tr>
                 <tr>
                     <td class="table_header_column"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></td>
-                    <td class="table_cell"><c:out value="${study.identifier}"/></td>
+                    <td class="table_cell"><c:out value="${study.uniqueIdentifier}"/></td>
                 </tr>
                 <tr>
                     <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/></td>
                     <td class="table_cell">
-                        <c:if test="${study.parentStudyId>0}">
+                        <c:if test="${study.study != null && study.study.studyId > 0}">
                             <c:out value="${study.name}"/>
                         </c:if>&nbsp;</td>
                 </tr>
@@ -888,13 +888,13 @@
                 <td class="table_divider" colspan="2">&nbsp;</td>
             </tr>
             <c:choose>
-                <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+                <c:when test="${study.collectDob == '1'}">
                     <tr>
                         <td class="table_header_column_top"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
                         <td class="table_cell_top"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></td>
                     </tr>
                 </c:when>
-                <c:when test="${study.studyParameterConfig.collectDob == '3'}">
+                <c:when test="${study.collectDob == '3'}">
                     <tr>
                         <td class="table_header_column_top"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
                         <td class="table_cell_top">&nbsp;</td>

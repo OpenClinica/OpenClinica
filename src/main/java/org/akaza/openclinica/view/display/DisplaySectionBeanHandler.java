@@ -6,19 +6,20 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.view.form.ViewPersistanceHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletContext;
 
@@ -74,7 +75,7 @@ public class DisplaySectionBeanHandler {
      * @see org.akaza.openclinica.control.managestudy.PrintCRFServlet
      * @see org.akaza.openclinica.control.managestudy.PrintDataEntryServlet
      */
-    public List<DisplaySectionBean> getDisplaySectionBeans() {
+    public List<DisplaySectionBean> getDisplaySectionBeans(StudyDao studyDao) {
         FormBeanUtil formBeanUtil;
         ViewPersistanceHandler persistanceHandler;
         ArrayList<SectionBean> allCrfSections;
@@ -107,8 +108,7 @@ public class DisplaySectionBeanHandler {
                 StudyEventBean studyEvent = (StudyEventBean) sedao.findByPK(eventCRFBean.getStudyEventId());
 
                 EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-                StudyDAO sdao = new StudyDAO(dataSource);
-                StudyBean study = sdao.findByStudySubjectId(eventCRFBean.getStudySubjectId());
+                Study study = studyDao.findByStudySubjectId(eventCRFBean.getStudySubjectId());
                 eventDefBean = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(study, studyEvent.getId(), this.crfVersionId);
             }
             eventDefBean = eventDefBean == null ? new EventDefinitionCRFBean() : eventDefBean;

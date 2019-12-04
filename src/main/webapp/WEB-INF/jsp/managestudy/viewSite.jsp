@@ -12,7 +12,7 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 
-<jsp:useBean scope='request' id='siteToView' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='siteToView' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope="request" id="parentName" class="java.lang.String"/>
 <jsp:useBean scope='session' id='fromListSite' class="java.lang.String"/>
 <jsp:useBean scope='request' id='definitions' class='java.util.ArrayList'/>
@@ -102,7 +102,7 @@
 </c:choose>
 
 <strong><fmt:message key="download_oid_in_odm_format_by_click" bundle="${restext}"/>
- <a href="DownloadStudyMetadata?studyId=<c:out value="${siteToView.id}"/>"> <fmt:message key="here" bundle="${restext}"/></a>.</strong>
+ <a href="DownloadStudyMetadata?studyId=<c:out value="${siteToView.studyId}"/>"> <fmt:message key="here" bundle="${restext}"/></a>.</strong>
 <br><br>
 
 <div class="table_title_Manage"><a href="javascript:leftnavExpand('siteProperties');">
@@ -130,11 +130,11 @@
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="site_id" bundle="${resword}"/>: </td><td class="table_cell">
-  <c:out value="${siteToView.identifier}"/>
+  <c:out value="${siteToView.uniqueIdentifier}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
-   <c:out value="${siteToView.oid}"/>
+   <c:out value="${siteToView.oc_oid}"/>
    </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
@@ -188,26 +188,26 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell">
    <c:choose>
     <c:when test="${siteToView.status.locked}">
-        <strong><c:out value="${siteToView.status.name}"/></strong>
+        <strong><c:out value="${siteToView.status.description}"/></strong>
     </c:when>
     <c:otherwise>
-        <c:out value="${siteToView.status.name}"/>
+        <c:out value="${siteToView.status.description}"/>
     </c:otherwise>
   </c:choose>
    </td></tr>
 
-  <c:forEach var="config" items="${siteToView.studyParameters}">
+  <c:forEach var="config" items="${siteToView.studyParameterValues}">
    <c:choose>
   
-  <c:when test="${config.parameter.handle=='interviewerNameRequired'}">
+  <c:when test="${config.studyParameter.handle=='interviewerNameRequired'}">
        <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data" bundle="${resword}"/></td><td class="table_cell">
        
        <c:choose>
-       <c:when test="${   config.value.value == 'yes' }">
+       <c:when test="${   config.value == 'yes' }">
        <fmt:message key="yes" bundle="${resword}"/>
 
        </c:when>
-       <c:when test="${config.value.value == 'no' }">
+       <c:when test="${config.value == 'no' }">
             <fmt:message key="no" bundle="${resword}"/>
       </c:when>
        <c:otherwise>
@@ -217,10 +217,10 @@
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='interviewerNameDefault'}">
+  <c:when test="${config.studyParameter.handle=='interviewerNameDefault'}">
       <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
        <c:choose>
-       <c:when test="${config.value.value== 'blank'}">
+       <c:when test="${config.value == 'blank'}">
         <fmt:message key="blank" bundle="${resword}"/>
 
        </c:when>
@@ -231,15 +231,15 @@
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='interviewDateRequired'}">
+  <c:when test="${config.studyParameter.handle=='interviewDateRequired'}">
       <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${resword}"/></td><td class="table_cell">
       
       <c:choose>
-       <c:when test="${  config.value.value == 'yes'}">
+       <c:when test="${  config.value == 'yes'}">
        <fmt:message key="yes" bundle="${resword}"/>
 
        </c:when>
-      <c:when test="${config.value.value == 'no'  }">
+      <c:when test="${config.value == 'no'  }">
             <fmt:message key="no" bundle="${resword}"/>
       </c:when>
        <c:otherwise>
@@ -249,10 +249,10 @@
       </td>
       </tr>
     </c:when>
-  <c:when test="${config.parameter.handle=='interviewDateDefault'}">
+  <c:when test="${config.studyParameter.handle=='interviewDateDefault'}">
       <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
        <c:choose>
-       <c:when test="${config.value.value== 'blank'}">
+       <c:when test="${config.value == 'blank'}">
        <fmt:message key="blank" bundle="${resword}"/>
 
        </c:when>
@@ -280,7 +280,7 @@
   <div class="table_title_Manage" style="width:300px;float:left"><fmt:message key="view_site_event_definitions" bundle="${resword}"/></div>
 <div style="float:left;width:8%">
 <!--
-   <a href="javascript:openDocWindow('PrintAllSiteEventCRF?siteId=<c:out value="${siteToView.id}"/>')"
+   <a href="javascript:openDocWindow('PrintAllSiteEventCRF?siteId=<c:out value="${siteToView.studyId}"/>')"
  -->
 
    </div>
