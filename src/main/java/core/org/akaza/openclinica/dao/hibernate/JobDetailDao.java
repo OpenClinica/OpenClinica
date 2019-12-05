@@ -16,24 +16,24 @@ public class JobDetailDao extends AbstractDomainDao<JobDetail> {
         return JobDetail.class;
     }
 
-    public List<JobDetail> findAllNonDeletedJobsBySite(int siteId,int userId) {
+    public List<JobDetail> findAllNonDeletedJobsBySite(int siteId, int userId) {
         String query = "from " + getDomainClassName() + "   where   site.studyId=:siteId " +
                 "and status !=:jobDeletedStatus and createdBy.userId =:userId";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("siteId", siteId);
         q.setParameter("userId", userId);
-        q.setParameter("jobDeletedStatus", JobStatus.DELETED );
+        q.setParameter("jobDeletedStatus", JobStatus.DELETED);
         return (ArrayList<JobDetail>) q.list();
     }
 
 
-    public List<JobDetail> findAllNonDeletedJobsByStudy(int studyId,int userId) {
-        String query = "from " + getDomainClassName() + "   where   study.studyId=:studyId  "+
-        "and status !=:jobDeletedStatus and createdBy.userId =:userId";
+    public List<JobDetail> findAllNonDeletedJobsByStudy(int studyId, int userId) {
+        String query = "from " + getDomainClassName() + "   where   study.studyId=:studyId  " +
+                "and status !=:jobDeletedStatus and createdBy.userId =:userId";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyId", studyId);
         q.setParameter("userId", userId);
-        q.setParameter("jobDeletedStatus", JobStatus.DELETED );
+        q.setParameter("jobDeletedStatus", JobStatus.DELETED);
         return (ArrayList<JobDetail>) q.list();
     }
 
@@ -44,5 +44,11 @@ public class JobDetailDao extends AbstractDomainDao<JobDetail> {
         return (JobDetail) q.uniqueResult();
     }
 
-
+    public List<JobDetail> findStudyIdWithStatus(int studyId, Enum status) {
+        String query = "from " + getDomainClassName() + " where study.studyId=:studyId and status=:status";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyId", studyId);
+        q.setParameter("status", status);
+        return (ArrayList<JobDetail>) q.list();
+    }
 }
