@@ -124,7 +124,8 @@ public class StudyConfigService {
         if(study.getStudyParameterValues() != null && study.getStudyParameterValues().size() != 0){
             for(StudyParameterValue spv : study.getStudyParameterValues()) {
                 if (spv.getStudyParameter().getHandle().equals(handle)) {
-                    spv.setValue(value);
+                    if(!spv.getValue().equalsIgnoreCase(value))
+                        spv.setValue(value);
                     paramIsPresent = true;
                     break;
                 }

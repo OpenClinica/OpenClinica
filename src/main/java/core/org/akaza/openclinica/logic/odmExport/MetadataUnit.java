@@ -196,7 +196,7 @@ public class MetadataUnit extends OdmUnit {
 
 
 
-        Study study = studyBase.getStudy();
+        Study study =studyDao.findByPK(studyBase.getStudy().getStudyId());
 
 
         if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0) {
