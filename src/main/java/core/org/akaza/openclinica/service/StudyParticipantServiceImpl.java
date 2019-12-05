@@ -423,16 +423,17 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    	
 			    ArrayList<StudyEvent> subjectStudyEvents = studySubjectHibDao.fetchListSEs(studySubjectOID);
 			    for(StudyEvent studyEvent : subjectStudyEvents) {
-			    	List<EventCrf> eventCRFs = studyEvent.getEventCrfs();
+			    	List<EventCrf> tmp = studyEvent.getEventCrfs();
 			    	
 			    	/*
 			    	 * OC-11782
 			    	 * check the CRF ordinal and reorder by the ordinal 
 			    	 */
 			    	List<EventDefinitionCrf> edfcs = studyEvent.getStudyEventDefinition().getEventDefinitionCrfs();
-			    
-			    	if(eventCRFs.size() > 1) {
-			    		Collections.sort(eventCRFs, EventCrf.getCompareByOrdinal());
+			    	ArrayList<EventCrf> eventCRFs = new ArrayList<EventCrf>(tmp);
+			    	
+			    	if(eventCRFs.size() > 1) {			    		
+			    		eventCRFs.sort(EventCrf.getCompareByOrdinal());
 			    	}			    	
 			    	
 			    	for(EventCrf eventCrf : eventCRFs) {

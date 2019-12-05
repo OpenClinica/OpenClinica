@@ -366,27 +366,30 @@ public class EventCrf extends DataMapDomainObject {
 			return compareByOrdinal;
 		}else {
 			compareByOrdinal = new Comparator<EventCrf>() {
-			    @Override
-			    public int compare(EventCrf o1, EventCrf o2) {
-			    	Integer o1ordinal,o2ordinal;
-			    	o1ordinal = getOrdinal(o1);
-			    	o2ordinal = getOrdinal(o2);
-			        return o1ordinal.compareTo(o1ordinal);
-			    };
-                 
-			    /**
+				@Override
+				public int compare(EventCrf o1, EventCrf o2) {
+					Integer o1ordinal,o2ordinal;
+					o1ordinal = getOrdinal(o1);
+					o2ordinal = getOrdinal(o2);
+					return o1ordinal.compareTo(o2ordinal);
+				};
+				 
+				/**
 				 * @param ec
 				 * @return 
 				 */
 				private Integer getOrdinal(EventCrf ec) {
 					Integer ecOrdinal = null;
+					StudyEventDefinition sed1 = ec.studyEvent.getStudyEventDefinition();
 					List<EventDefinitionCrf> edfcList1 = ec.getFormLayout().getCrf().getEventDefinitionCrfs();
-			    	for(EventDefinitionCrf edfc: edfcList1) {
-			    		if(edfc.getCrf().getOcOid().equals(ec.getFormLayout().getCrf().getOcOid())){
-			    			ecOrdinal = edfc.getOrdinal();
-			    			return ecOrdinal;
-			    		}
-			    	}
+					for(EventDefinitionCrf edfc: edfcList1) {
+						StudyEventDefinition sed2 = edfc.getStudyEventDefinition();
+						if(edfc.getCrf().getOcOid().equals(ec.getFormLayout().getCrf().getOcOid()) &&
+								sed1.getOc_oid().equals(sed2.getOc_oid())){
+							ecOrdinal = edfc.getOrdinal();
+							return ecOrdinal;
+						}
+					}
 					return ecOrdinal;
 				}
 			};
