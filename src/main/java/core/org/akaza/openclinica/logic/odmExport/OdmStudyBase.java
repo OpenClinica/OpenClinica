@@ -9,9 +9,9 @@
 
 package core.org.akaza.openclinica.logic.odmExport;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ import javax.sql.DataSource;
  */
 
 public class OdmStudyBase {
-    private StudyBean study;
+    private Study study;
     private List<StudyEventDefinitionBean> sedBeansInStudy;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -40,23 +40,23 @@ public class OdmStudyBase {
      * @param ds
      * @param study
      */
-    public OdmStudyBase(DataSource ds, StudyBean study) {
+    public OdmStudyBase(DataSource ds, Study study) {
         if (study == null) {
             logger.info("Study is null!");
             return;
         }
         this.study = study;
-        int parentStudyId = this.study.getParentStudyId() > 0 ? this.study.getParentStudyId() : this.study.getId();
+        int parentStudyId = this.study.isSite() ? this.study.getStudy().getStudyId() : this.study.getStudyId();
         this.sedBeansInStudy = new StudyEventDefinitionDAO(ds).findAllActiveByParentStudyId(parentStudyId);
     }
 
-    public OdmStudyBase setOdmStudyBean(DataSource ds, StudyBean study) {
+    public OdmStudyBase setOdmStudyBean(DataSource ds, Study study) {
         OdmStudyBase studyBase = new OdmStudyBase();
         if (study == null) {
             logger.info("Study is null!");
         } else {
             this.study = study;
-            int parentStudyId = this.study.getParentStudyId() > 0 ? this.study.getParentStudyId() : this.study.getId();
+            int parentStudyId = this.study.isSite() ? this.study.getStudy().getStudyId() : this.study.getStudyId();
             this.sedBeansInStudy = new StudyEventDefinitionDAO(ds).findAllActiveByParentStudyId(parentStudyId);
         }
         return studyBase;
@@ -69,22 +69,21 @@ public class OdmStudyBase {
      * @param seds
      */
     
-    public OdmStudyBase(DataSource ds, StudyBean study,List<StudyEventDefinitionBean> seds) {
+    public OdmStudyBase(DataSource ds, Study study,List<StudyEventDefinitionBean> seds) {
         if (study == null) {
             logger.info("Study is null!");
             return;
         }
         this.study = study;
-        int parentStudyId = this.study.getParentStudyId() > 0 ? this.study.getParentStudyId() : this.study.getId();
         this.sedBeansInStudy = seds;
     }
     
     
-    public void setStudy(StudyBean study) {
+    public void setStudy(Study study) {
         this.study = study;
     }
 
-    public StudyBean getStudy() {
+    public Study getStudy() {
         return this.study;
     }
 

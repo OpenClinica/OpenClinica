@@ -11,16 +11,17 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.bean.UserAccountRow;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,7 +115,7 @@ public class AssignUserToStudyServlet extends SecureController {
             request.setAttribute("table", table);
             // request.setAttribute("studyUsers", users);
             ArrayList roles = Role.toArrayList();
-            if (currentStudy.getParentStudyId() > 0) {
+            if (currentStudy.isSite()){
                 roles.remove(Role.COORDINATOR);
                 roles.remove(Role.STUDYDIRECTOR);
             }
@@ -162,7 +163,7 @@ public class AssignUserToStudyServlet extends SecureController {
 
                 StudyUserRoleBean sub = new StudyUserRoleBean();
                 sub.setRoleName(Role.get(roleId).getName());
-                sub.setStudyId(currentStudy.getId());
+                sub.setStudyId(currentStudy.getStudyId());
                 sub.setStatus(Status.AVAILABLE);
                 sub.setOwner(ub);
                if(udao.findStudyUserRole(u,sub).getName()!=null && udao.findStudyUserRole(u,sub).getName().isEmpty())//create only when it doesn't exist in database
@@ -204,7 +205,7 @@ public class AssignUserToStudyServlet extends SecureController {
 
                     StudyUserRoleBean sub = new StudyUserRoleBean();
                     sub.setRoleName(Role.get(roleId).getName());
-                    sub.setStudyId(currentStudy.getId());
+                    sub.setStudyId(currentStudy.getStudyId());
                     sub.setStatus(Status.AVAILABLE);
                     sub.setOwner(ub);
                     udao.createStudyUserRole(u, sub);
@@ -224,7 +225,7 @@ public class AssignUserToStudyServlet extends SecureController {
         ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
         session.setAttribute("pageMessages", pageMessages);
         // tbh #3936 07/2009
-        if (currentStudy.getParentStudyId() == 0) {
+        if (!currentStudy.isSite()) {
             response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
         } else {
             // you are in a site which means you should NOT access build study
@@ -246,7 +247,7 @@ public class AssignUserToStudyServlet extends SecureController {
         ArrayList userAvailable = new ArrayList();
         for (int i = 0; i < userList.size(); i++) {
             UserAccountBean u = (UserAccountBean) userList.get(i);
-            int activeStudyId = currentStudy.getId();
+            int activeStudyId = currentStudy.getStudyId();
             StudyUserRoleBean sub = udao.findRoleByUserNameAndStudyId(u.getName(), activeStudyId);
             if (!sub.isActive()) {// doesn't have a role in the current study
                 sub.setRole(Role.RESEARCHASSISTANT);
@@ -258,20 +259,19 @@ public class AssignUserToStudyServlet extends SecureController {
                 // u.getActiveStudyRole().getName());
 
                 // try to find whether this user has role in site or parent
-                if (currentStudy.getParentStudyId() > 0) {// this is a site
-                    StudyUserRoleBean subParent = udao.findRoleByUserNameAndStudyId(u.getName(), currentStudy.getParentStudyId());
+                if (currentStudy.isSite()) {// this is a site
+                    StudyUserRoleBean subParent = udao.findRoleByUserNameAndStudyId(u.getName(), currentStudy.getStudy().getStudyId());
                     if (subParent.isActive()) {
                         u.setNotes(subParent.getRole().getDescription() + " " + respage.getString("in_parent_study"));
                     }
 
                 } else {
                     // find all the sites for this top study
-                    StudyDAO sdao = new StudyDAO(sm.getDataSource());
-                    ArrayList sites = (ArrayList) sdao.findAllByParent(currentStudy.getId());
+                    ArrayList sites = (ArrayList) getStudyDao().findAllByParent(currentStudy.getStudyId());
                     String notes = "";
                     for (int j = 0; j < sites.size(); j++) {
-                        StudyBean site = (StudyBean) sites.get(j);
-                        StudyUserRoleBean subSite = udao.findRoleByUserNameAndStudyId(u.getName(), site.getId());
+                        Study site = (Study) sites.get(j);
+                        StudyUserRoleBean subSite = udao.findRoleByUserNameAndStudyId(u.getName(), site.getStudyId());
                         if (subSite.isActive()) {
                             notes = notes + subSite.getRole().getDescription() + respage.getString("in_site") + ":" + site.getName() + "; ";
                         }
@@ -299,12 +299,12 @@ public class AssignUserToStudyServlet extends SecureController {
                 + respage.getString("has_been_assigned_to_the_study") + currentStudy.getName() + " "
                 + resword.getString("as") + " \"" + sub.getRole().getDescription() + "\". ";
 
-        if (currentStudy.getParentStudyId() > 0){
+        if (currentStudy.isSite()){
             body =
                     u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": " + u.getName() + ") "
                         + respage.getString("has_been_assigned_to_the_site")
                         + currentStudy.getName()
-                        + " under the Study " + currentStudy.getParentStudyName() +" "
+                        + " under the Study " + currentStudy.getStudy().getName() +" "
                         + resword.getString("as") + " \"" + sub.getRole().getDescription() + "\". ";
         }
 //        boolean emailSent = sendEmail(u.getEmail().trim(), respage.getString("new_user_added_to_study"), body, false);

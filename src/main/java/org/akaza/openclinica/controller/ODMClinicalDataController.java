@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -35,6 +37,12 @@ public class ODMClinicalDataController {
     @Autowired
     @Qualifier("dataSource")
     private DataSource dataSource;
+
+    @Autowired
+    private StudyBuildService studyBuildService;
+
+    @Autowired
+    private StudyDao studyDao;
 
     @ApiOperation(value = "Retrieve clinical data in JSON or CDISC ODM XML format")
     @RequestMapping(value = "/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET, produces={MediaType.APPLICATION_JSON_VALUE}, headers = "Accept=application/json")
@@ -92,7 +100,7 @@ public class ODMClinicalDataController {
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (serviceHelper == null) {
-            serviceHelper = new RestfulServiceHelper(this.dataSource);
+            serviceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
         }
 
         return serviceHelper;

@@ -59,7 +59,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
                     criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != " + property.substring(4);
                     criteria += " AND (select count(*) from  study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id";
                     criteria +=
-                        " where  study_event.study_event_definition_id =" + property.substring(4) + " and ss.study_subject_id = ss1.study_subject_id) =0))";
+                            " where  study_event.study_event_definition_id =" + property.substring(4) + " and ss.study_subject_id = ss1.study_subject_id) =0))";
 
                 }
             } else if (property.startsWith("sgc_")) {
@@ -67,11 +67,11 @@ public class FindSubjectsFilter implements CriteriaCommand {
 
                 int group_id = Integer.parseInt(value.toString());
                 criteria +=
-                    "AND " + group_id + " = (" + " select distinct sgm.study_group_id"
-                        + " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s" + " WHERE " + " sgm.study_group_class_id = "
-                        + study_group_class_id + " AND sgm.study_subject_id = SS.study_subject_id" + " AND sgm.study_group_id = sg.study_group_id"
-                        + " AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)" + " AND sgm.study_group_class_id = sgc.study_group_class_id"
-                        + " ) ";
+                        "AND " + group_id + " = (" + " select distinct sgm.study_group_id"
+                                + " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s" + " WHERE " + " sgm.study_group_class_id = "
+                                + study_group_class_id + " AND sgm.study_subject_id = SS.study_subject_id" + " AND sgm.study_group_id = sg.study_group_id"
+                                + " AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)" + " AND sgm.study_group_class_id = sgc.study_group_class_id"
+                                + " ) ";
 
             }else if(property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")){
                 String sedOid = property.split("\\.")[0];
@@ -95,12 +95,12 @@ public class FindSubjectsFilter implements CriteriaCommand {
 
 
 
-        } else if (property.equals("participate.status")) {
+            } else if (property.equals("participate.status")) {
                 criteria+= " INTERSECT " + mainQuery();
-            criteria = criteria + " where ";
-            criteria = criteria  + columnMapping.get(property) + " = " + value  + " ";
+                criteria = criteria + " where ";
+                criteria = criteria  + columnMapping.get(property) + " = " + value  + " ";
 
-        }   else {
+            }   else {
                 criteria+= " INTERSECT " + mainQuery();
                 criteria = criteria + " where ";
                 criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like ('%" + ((String) value).toUpperCase() + "%')" + " ";
@@ -136,7 +136,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
     }
 
     private String mainQuery(){
-   return  " select ss.* , unique_identifier from study_subject ss JOIN study st ON st.study_id=ss.study_id ";
+        return  " select ss.* , unique_identifier from study_subject ss JOIN study st ON st.study_id=ss.study_id ";
     }
 
 }

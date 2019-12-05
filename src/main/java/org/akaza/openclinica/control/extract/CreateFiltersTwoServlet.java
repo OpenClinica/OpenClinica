@@ -12,10 +12,10 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.extract.FilterBean;
 import core.org.akaza.openclinica.bean.extract.FilterObjectBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
@@ -70,10 +70,10 @@ public class CreateFiltersTwoServlet extends SecureController {
         // generate the SQL add on for the dataset.
         String action = request.getParameter("action");
 
-        StudyBean studyWithEventDefs = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithEventDefs = new StudyBean();
-            studyWithEventDefs.setId(currentStudy.getParentStudyId());
+        Study studyWithEventDefs = currentStudy;
+        if (currentStudy.isSite()) {
+            studyWithEventDefs = new Study();
+            studyWithEventDefs.setStudyId(currentStudy.getStudy().getStudyId());
         }
 
         if (StringUtil.isBlank(action)) {

@@ -68,8 +68,6 @@ public class QueryServiceImpl implements QueryService {
     @Autowired
     private EventCrfDao eventCrfDao;
     @Autowired
-    private StudyDao studyDao;
-    @Autowired
     private OpenRosaService openRosaService;
     @Autowired
     private BeanFactory beanFactory;
@@ -333,10 +331,14 @@ public class QueryServiceImpl implements QueryService {
     private void prepareEmail(QueryServiceHelperBean helperBean) throws Exception {
         StringBuffer message = new StringBuffer();
 
+        message.append(MessageFormat.format(respage.getString("mailDNHeader"), helperBean.getUserAccount().getFirstName(), helperBean.getUserAccount().getLastName()));
         message.append(
-                MessageFormat.format(respage.getString("mailDNHeader"), helperBean.getUserAccount().getFirstName(), helperBean.getUserAccount().getLastName()));
-        message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base") + "ResolveDiscrepancy?flavor=-query&noteId=" + helperBean.getDn().getDiscrepancyNoteId() + "'>"
-                + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
+            "<A HREF='" +
+                SQLInitServlet.getField("sysURL.base") + 
+                "ViewNotes?module=submit&maxRows=50&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=50&listNotes_f_discrepancyNoteBean.disType=Query&listNotes_f_discrepancyNoteBean.threadNumber=" + 
+                helperBean.getDn().getThreadNumber() + 
+            "'>[Click Here]</A><BR/>"
+        );
         message.append(respage.getString("you_received_this_from"));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("disc_note_info"));

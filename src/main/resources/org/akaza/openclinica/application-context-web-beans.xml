@@ -12,6 +12,7 @@
     
     <bean id="sdvUtil" class="core.org.akaza.openclinica.web.table.sdv.SDVUtil" name="sdvUtil">
         <property name="dataSource" ref="dataSource"/>
+        <property name = "studyDao" ref = "studyDaoDomain"/>
     </bean>
     <bean class="org.akaza.openclinica.controller.SidebarInit" name="sidebarInit">
         <property name="alertsBoxSetup" value="OPENALERTS" />
@@ -21,6 +22,7 @@
     </bean>
     <bean name="sdvFactory" class="core.org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory">
         <property name="dataSource" ref="dataSource"/>
+        <property name="studyDao" ref="studyDaoDomain"></property>
     </bean>
     <bean name="scheduledJobTableFactory" class="core.org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory"/>
 

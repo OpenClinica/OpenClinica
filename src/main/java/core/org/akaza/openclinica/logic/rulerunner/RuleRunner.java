@@ -1,7 +1,6 @@
 package core.org.akaza.openclinica.logic.rulerunner;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -11,7 +10,7 @@ import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.rule.RuleSetDAO;
@@ -22,6 +21,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -32,6 +32,7 @@ import core.org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import core.org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.HashMap;
@@ -53,7 +54,6 @@ public class RuleRunner {
     private ExpressionService expressionService;
     private EventCRFDAO eventCrfDao;
     private StudySubjectDAO studySubjectDao;
-    private StudyDAO studyDao;
     private ItemFormMetadataDAO itemFormMetadataDao;
     private SectionDAO sectionDao;
     private JavaMailSenderImpl mailSender;
@@ -61,7 +61,7 @@ public class RuleRunner {
     protected DynamicsMetadataService dynamicsMetadataService;
     protected RuleActionRunLogDao ruleActionRunLogDao;
     DataSource ds;
-
+    private StudyDao studyDao;
     String requestURLMinusServletPath;
     String contextPath;
 
@@ -70,11 +70,12 @@ public class RuleRunner {
     };
 
 
-    public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
+    public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, StudyDao studyDao) {
         this.ds = ds;
         this.requestURLMinusServletPath = requestURLMinusServletPath;
         this.contextPath = contextPath;
         this.mailSender = mailSender;
+        this.studyDao = studyDao;
     }
 
 
@@ -85,7 +86,7 @@ public class RuleRunner {
         return ruleOid + " " + message;
     }
 
-    HashMap<String, String> prepareEmailContents(RuleSetBean ruleSet, RuleSetRuleBean ruleSetRule, StudyBean currentStudy, RuleActionBean ruleAction) {
+    HashMap<String, String> prepareEmailContents(RuleSetBean ruleSet, RuleSetRuleBean ruleSetRule, Study currentStudy, RuleActionBean ruleAction) {
 
         // get the Study Event
         StudyEventBean studyEvent =
@@ -94,14 +95,14 @@ public class RuleRunner {
         // get the Study Subject
         StudySubjectBean studySubject = (StudySubjectBean) getStudySubjectDao().findByPK(studyEvent.getStudySubjectId());
         // get Study/Site Associated with Subject
-        StudyBean theStudy = (StudyBean) getStudyDao().findByPK(studySubject.getStudyId());
+        Study theStudy = (Study) studyDao.findByPK(studySubject.getStudyId());
         String theStudyName, theSiteName = "";
-        if (theStudy.getParentStudyId() > 0) {
-            StudyBean theParentStudy = (StudyBean) getStudyDao().findByPK(theStudy.getParentStudyId());
-            theStudyName = theParentStudy.getName() + " / " + theParentStudy.getIdentifier();
-            theSiteName = theStudy.getName() + " / " + theStudy.getIdentifier();
+        if (theStudy.isSite()) {
+            Study theParentStudy = theStudy.getStudy();
+            theStudyName = theParentStudy.getName() + " / " + theParentStudy.getUniqueIdentifier();
+            theSiteName = theStudy.getName() + " / " + theStudy.getUniqueIdentifier();
         } else {
-            theStudyName = theStudy.getName() + " / " + theStudy.getIdentifier();
+            theStudyName = theStudy.getName() + " / " + theStudy.getUniqueIdentifier();
         }
 
         // get the eventCrf & subsequently the CRF Version
@@ -243,11 +244,6 @@ public class RuleRunner {
         return sectionDao;
     }
 
-    StudyDAO getStudyDao() {
-        studyDao = this.studyDao != null ? studyDao : new StudyDAO(ds);
-        return studyDao;
-    }
-
     public JavaMailSenderImpl getMailSender() {
         return mailSender;
     }
@@ -268,5 +264,11 @@ public class RuleRunner {
         this.ruleActionRunLogDao = ruleActionRunLogDao;
     }
 
-    
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

@@ -29,14 +29,15 @@ import core.org.akaza.openclinica.bean.extract.SPSSReportBean;
 import core.org.akaza.openclinica.bean.extract.SPSSVariableNameValidator;
 import core.org.akaza.openclinica.bean.extract.TabReportBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.PermissionService;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
@@ -55,20 +56,22 @@ public class GenerateExtractFileService {
     private static List<File> oldFiles = new LinkedList<File>();
     private final RuleSetRuleDao ruleSetRuleDao;
     private PermissionService permissionService;
-
+    public StudyDao studyDao;
 
     public GenerateExtractFileService(DataSource ds, HttpServletRequest request, CoreResources coreResources,
-            RuleSetRuleDao ruleSetRuleDao) {
+            RuleSetRuleDao ruleSetRuleDao, StudyDao studyDao) {
         this.ds = ds;
         this.request = request;
         this.coreResources = coreResources;
         this.ruleSetRuleDao = ruleSetRuleDao;
+        this.studyDao = studyDao;
     }
 
-    public GenerateExtractFileService(DataSource ds, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
+    public GenerateExtractFileService(DataSource ds, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao, StudyDao studyDao) {
         this.ds = ds;
         this.coreResources = coreResources;
         this.ruleSetRuleDao = ruleSetRuleDao;
+        this.studyDao = studyDao;
     }
 
     public void setUpResourceBundles() {
@@ -94,6 +97,7 @@ public class GenerateExtractFileService {
         DatasetDAO dsdao = new DatasetDAO(ds);
         // create the extract bean here, tbh
         eb = dsdao.getDatasetData(eb, activeStudyId, parentStudyId);
+        eb.setStudyDao(getStudyDao());
         eb.getMetadata();
         eb.computeReport(answer);
 
@@ -125,8 +129,8 @@ public class GenerateExtractFileService {
      * i.e. we remove the boolean zipped variable.
      */
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean,
-            StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb,
-            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, UserAccountBean userBean) {
+                                                  Study currentStudy, String generalFileDirCopy, ExtractBean eb,
+                                                  Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, UserAccountBean userBean) {
         // default zipped - true
         return createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean,
                 currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true, null, userBean);
@@ -139,7 +143,7 @@ public class GenerateExtractFileService {
      */
     @Deprecated
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean,
-            StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb,
+            Study currentStudy, String generalFileDirCopy,ExtractBean eb,
             Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean){
 
         String permissionTagsString =permissionService.getPermissionTagsString(currentStudy,request);
@@ -162,7 +166,7 @@ public class GenerateExtractFileService {
 
      * @return
      */
-    public HashMap<String, Integer> createSPSSFile(DatasetBean db, ExtractBean eb2, StudyBean currentStudy, StudyBean parentStudy, long sysTimeBegin,
+    public HashMap<String, Integer> createSPSSFile(DatasetBean db, ExtractBean eb2, Study currentStudy, Study parentStudy, long sysTimeBegin,
             String generalFileDir, SPSSReportBean answer, String generalFileDirCopy, UserAccountBean userBean) {
         setUpResourceBundles();
 
@@ -576,7 +580,7 @@ public class GenerateExtractFileService {
         return fbFinal.getId();
     }
 
-    public ExtractBean generateExtractBean(DatasetBean dsetBean, StudyBean currentStudy, StudyBean parentStudy) {
+    public ExtractBean generateExtractBean(DatasetBean dsetBean, Study currentStudy, Study parentStudy) {
         ExtractBean eb = new ExtractBean(ds);
         eb.setDataset(dsetBean);
         eb.setShowUniqueId(CoreResources.getField("show_unique_id"));
@@ -666,4 +670,11 @@ public class GenerateExtractFileService {
        // }
     }
 
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
 }

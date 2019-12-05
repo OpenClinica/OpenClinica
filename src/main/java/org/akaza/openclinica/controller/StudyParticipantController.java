@@ -19,13 +19,37 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.core.Context;
 
 import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import core.org.akaza.openclinica.bean.login.*;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.JobDetail;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.*;
+import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.service.PdfService;
-import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,47 +57,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import core.org.akaza.openclinica.bean.login.ErrorObject;
-import core.org.akaza.openclinica.bean.login.ResponseSuccessListAllParticipantsByStudyDTO;
-import core.org.akaza.openclinica.bean.login.StudyParticipantDTO;
-import core.org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
-import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
-import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.domain.datamap.JobDetail;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.domain.datamap.StudySubject;
-import core.org.akaza.openclinica.domain.enumsupport.JobType;
-import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
-import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.service.CSVService;
-import core.org.akaza.openclinica.service.ParticipantService;
-import core.org.akaza.openclinica.service.PermissionService;
-import core.org.akaza.openclinica.service.StudyParticipantService;
-import core.org.akaza.openclinica.service.UtilService;
-import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.core.Context;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
@@ -101,9 +98,9 @@ public class StudyParticipantController {
 
 	@Autowired
 	private CSVService csvService;
-	
+
 	@Autowired
-    PdfService pdfService;
+	PdfService pdfService;
 
 	@Autowired
 	private UserAccountDao uAccountDao;
@@ -113,7 +110,6 @@ public class StudyParticipantController {
 	@Autowired
 	private StudySubjectDao studySubjectDao;
 
-	private StudyDAO studyDAO;
 	private StudySubjectDAO ssDao;
 	private UserAccountDAO userAccountDao;
 
@@ -122,9 +118,12 @@ public class StudyParticipantController {
 
 	@Autowired
 	private StudyParticipantService studyParticipantService;
-		 
-    @Autowired
-    PermissionService permissionService;
+
+	@Autowired
+	PermissionService permissionService;
+
+	@Autowired
+	private StudyBuildService studyBuildService;
 
 	private RestfulServiceHelper serviceHelper;
 	private String dateFormat;
@@ -168,8 +167,7 @@ public class StudyParticipantController {
 		String accessToken = utilService.getAccessTokenFromRequest(request);
 		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 		Study tenantStudy = studyDao.findByOcOID(studyOid);
-		StudyDAO sDao = new StudyDAO(dataSource);
-		StudyBean tenantStudyBean = sDao.findByOid(studyOid);
+		Study tenantStudyBean = studyDao.findByOcOID(studyOid);
 		ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(request.getLocale());
 		AddParticipantResponseDTO result=null;
 		try {
@@ -225,8 +223,7 @@ public class StudyParticipantController {
 
 		Study site = studyDao.findByOcOID(siteOid.trim());
 		Study study = studyDao.findByOcOID(studyOid.trim());
-		StudyDAO sDao = new StudyDAO(dataSource);
-		StudyBean tenantStudyBean=sDao.findByOid(studyOid);
+		Study tenantStudyBean=studyDao.findByOcOID(studyOid);
 
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String accessToken = utilService.getAccessTokenFromRequest(request);
@@ -261,7 +258,7 @@ public class StudyParticipantController {
 
 
 
-	
+
 	@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 	public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
@@ -282,7 +279,7 @@ public class StudyParticipantController {
 		return listStudySubjects(studyOid, siteOid, request);
 	}
 
-	
+
 	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participant", method = RequestMethod.GET)
 	public ResponseEntity<Object> getStudySubjectInfo(
@@ -293,13 +290,13 @@ public class StudyParticipantController {
 			HttpServletRequest request) throws Exception {
 
 		utilService.setSchemaFromStudyOid(studyOid);
-		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);		
-		
+		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+
 		boolean includeRelatedInfo = false;
 		if(includeParticipateInfo!=null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
 			includeRelatedInfo = true;
 		}
-		
+
 		String accessToken = utilService.getAccessTokenFromRequest(request);
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
@@ -315,7 +312,7 @@ public class StudyParticipantController {
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 
-	
+
 	/**
 	 * @param studyOid
 	 * @param siteOid
@@ -328,7 +325,7 @@ public class StudyParticipantController {
 		ResponseEntity<Object> response = null;
 		try {
 
-			StudyBean study = null;
+			Study study = null;
 			try {
 				study = this.getRestfulServiceHelper().setSchema(studyOid, request);
 				study = participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
@@ -348,16 +345,16 @@ public class StudyParticipantController {
 			if(study != null) {
         ResponseSuccessListAllParticipantsByStudyDTO responseSuccess =  new ResponseSuccessListAllParticipantsByStudyDTO();
 
-        ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);            	  		 	            
+        ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);
         responseSuccess.setStudyParticipants(studyParticipantDTOs);
         responseSuccess.setSiteOID(siteOid);
         if (siteOid != null) {
-          StudyBean site = this.getStudyDAO().findByOid(siteOid);
-          responseSuccess.setSiteID(site.getIdentifier());
+          Study site = studyDao.findByOcOID(siteOid);
+          responseSuccess.setSiteID(site.getUniqueIdentifier());
           responseSuccess.setSiteName(site.getName());
-        }       	
+        }
 		 	  response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
-		  }	
+		  }
 
 		} catch (Exception eee) {
 			logger.error("Error while listing study subjects: ",eee);
@@ -374,14 +371,14 @@ public class StudyParticipantController {
 	 * @return
 	 * @throws Exception
 	 */
-	private ArrayList<StudyParticipantDTO> getStudyParticipantDTOs(String studyOid, String siteOid,StudyBean study) throws Exception {
+	private ArrayList<StudyParticipantDTO> getStudyParticipantDTOs(String studyOid, String siteOid,Study study) throws Exception {
 
-		StudyBean studyToCheck;
+		Study studyToCheck;
 		/**
 		 *  pass in site OID, so will return data in site level
 		 */
 		if(siteOid != null) {
-			studyToCheck = this.getStudyDAO().findByOid(siteOid);
+			studyToCheck = studyDao.findByOcOID(siteOid);
 		}else {
 			studyToCheck = study;
 		}
@@ -507,16 +504,6 @@ public class StudyParticipantController {
 		this.dateFormat = dateFormat;
 	}
 
-	/**
-	 *
-	 * @return
-	 */
-	public StudyDAO getStudyDAO() {
-		studyDAO = studyDAO
-				!= null ? studyDAO : new StudyDAO(dataSource);
-		return studyDAO;
-	}
-
 	public UserAccountDAO getUserAccountDao() {
 		userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
 		return userAccountDao;
@@ -528,7 +515,7 @@ public class StudyParticipantController {
 	}
 
 	public  RestfulServiceHelper getRestfulServiceHelper() {
-		serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource);
+		serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource, studyBuildService, studyDao);
 		return serviceHelper;
 	}
 		public String startBulkAddParticipantJob(MultipartFile file, String schema, String studyOid, String siteOid,UserAccountBean userAccountBean, String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
@@ -630,7 +617,7 @@ public class StudyParticipantController {
 			servletContext.setAttribute("accessToken", accessToken);
 			servletContext.setAttribute("studyID", study.getStudyId()+"");
 			Locale local = LocaleResolver.resolveLocale(request);
-			List<String> permissionTagsString =permissionService.getPermissionTagsList((StudyBean)request.getSession().getAttribute("study"),request);
+			List<String> permissionTagsString =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
 			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 				try {
 					 ResourceBundleProvider.updateLocale(local);
@@ -656,7 +643,7 @@ public class StudyParticipantController {
 	 */
 	public String getMergedPDFcasebookFileName(String studyOID, String participantId) {
 		Date now = new Date();	
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");	 	 	 	  
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");
 		String timeStamp = simpleDateFormat.format(now);
         String pathStr = pdfService.getCaseBookFileRootPath();
     	String fileName = "Participant_"+participantId+"_Casebook_"+timeStamp+".pdf";
@@ -664,5 +651,5 @@ public class StudyParticipantController {
 		return fullFinalFilePathName;
 	}
 	
-	
+
 }

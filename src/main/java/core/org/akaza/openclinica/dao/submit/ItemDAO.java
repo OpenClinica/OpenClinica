@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
@@ -39,8 +38,8 @@ import core.org.akaza.openclinica.dao.core.TypeNames;
 
 /**
  * @author thickerson
- * 
- * 
+ *
+ *
  */
 public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
     // private DAODigester digester;
@@ -469,7 +468,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
     /**
      * Finds the children of an item in a given CRF Version, sorted by
      * columnNumber in ascending order.
-     * 
+     *
      * @param parentId
      *            The id of the children's parent.
      * @param crfVersionId
@@ -667,7 +666,7 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
      * where item.item_id= item_group_metadata.item_id and item_group_metadata.item_group_id = item_group.item_group_id
      * and item_group_metadata.crf_version_id = crf_version.crf_version_id
      * and item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
-     * 
+     *
      */
     public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemGroupCRFVersionMetadataByCRFId(String crfName) {
         this.unsetTypeExpected();

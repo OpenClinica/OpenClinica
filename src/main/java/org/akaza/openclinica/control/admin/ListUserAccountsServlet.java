@@ -10,15 +10,16 @@ package org.akaza.openclinica.control.admin;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.bean.UserAccountRow;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,14 +94,13 @@ public class ListUserAccountsServlet extends SecureController {
      *            UserAccountBean.
      */
     private void setStudyNamesInStudyUserRoles(ArrayList users) {
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        ArrayList allStudies = (ArrayList) sdao.findAll();
+        ArrayList allStudies = (ArrayList) getStudyDao().findAll();
         HashMap studiesById = new HashMap();
 
         int i;
         for (i = 0; i < allStudies.size(); i++) {
-            StudyBean sb = (StudyBean) allStudies.get(i);
-            studiesById.put(new Integer(sb.getId()), sb);
+            Study sb = (Study) allStudies.get(i);
+            studiesById.put(new Integer(sb.getStudyId()), sb);
         }
 
         for (i = 0; i < users.size(); i++) {
@@ -109,10 +109,10 @@ public class ListUserAccountsServlet extends SecureController {
 
             for (int j = 0; j < roles.size(); j++) {
                 StudyUserRoleBean surb = (StudyUserRoleBean) roles.get(j);
-                StudyBean sb = (StudyBean) studiesById.get(new Integer(surb.getStudyId()));
+                Study sb = (Study) studiesById.get(new Integer(surb.getStudyId()));
                 if (sb != null) {
                     surb.setStudyName(sb.getName());
-                    surb.setParentStudyId(sb.getParentStudyId());
+                    surb.setParentStudyId(sb.checkAndGetParentStudyId());
                 }
                 roles.set(j, surb);
             }

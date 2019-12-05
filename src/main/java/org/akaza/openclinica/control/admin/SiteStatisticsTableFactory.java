@@ -1,9 +1,9 @@
 package org.akaza.openclinica.control.admin;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.StatisticsView;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.DateFilterMatcher;
@@ -15,6 +15,7 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.renderer.HtmlTableRenderer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,10 +28,9 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletResponse;
 
 public class SiteStatisticsTableFactory extends AbstractTableFactory {
-
-    private StudyDAO studyDao;
+    private StudyDao studyDao;
     private StudySubjectDAO studySubjectDao;
-    private StudyBean currentStudy;
+    private Study currentStudy;
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
     
     @Override
@@ -66,7 +66,7 @@ public class SiteStatisticsTableFactory extends AbstractTableFactory {
     public void setDataAndLimitVariables(TableFacade tableFacade) {
 
         Limit limit = tableFacade.getLimit();
-        List<StudyBean> studies = (List<StudyBean>) studyDao.findAll(currentStudy.getId());
+        List<Study> studies = (List<Study>) getStudyDao().findAll(currentStudy.getStudyId());
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
         /*
@@ -86,7 +86,7 @@ public class SiteStatisticsTableFactory extends AbstractTableFactory {
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
 
-        for (StudyBean studyBean : studies) {
+        for (Study studyBean : studies) {
             // Get number of subjects enrolled at a specific study or site
             Integer countofStudySubjectsAtStudyOrSite = studySubjectDao.getCountofStudySubjectsAtStudyOrSite(studyBean);
             Integer expectedTotalEnrollment = studyBean.getExpectedTotalEnrollment();
@@ -104,11 +104,11 @@ public class SiteStatisticsTableFactory extends AbstractTableFactory {
         tableFacade.setItems(theItems);
     }
 
-    public StudyDAO getStudyDao() {
+    public StudyDao getStudyDao() {
         return studyDao;
     }
 
-    public void setStudyDao(StudyDAO studyDao) {
+    public void setStudyDao(StudyDao studyDao) {
         this.studyDao = studyDao;
     }
 
@@ -120,11 +120,11 @@ public class SiteStatisticsTableFactory extends AbstractTableFactory {
         this.studySubjectDao = studySubjectDao;
     }
 
-    public StudyBean getCurrentStudy() {
+    public Study getCurrentStudy() {
         return currentStudy;
     }
 
-    public void setCurrentStudy(StudyBean currentStudy) {
+    public void setCurrentStudy(Study currentStudy) {
         this.currentStudy = currentStudy;
     }
 

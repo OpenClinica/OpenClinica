@@ -13,21 +13,22 @@ import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * View the details of a study event definition
@@ -37,7 +38,8 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
  */
 public class ViewEventDefinitionServlet extends SecureController {
    EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
-   
+   @Autowired
+   private StudyDao studyDao;
     /**
      * Checks whether the user has the correct privilege
      */
@@ -59,7 +61,6 @@ public class ViewEventDefinitionServlet extends SecureController {
     public void processRequest() throws Exception {
 
         StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int defId = fp.getInt("id", true);
 
@@ -69,16 +70,16 @@ public class ViewEventDefinitionServlet extends SecureController {
         } else {
             // definition id
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
-            StudyBean study = (StudyBean) studyDao.findByPK(sed.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(sed.getStudyId());
 
-            if (currentStudy.getId() != sed.getStudyId()) {
+            if (currentStudy.getStudyId() != sed.getStudyId()) {
                 addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                         + " " + respage.getString("change_active_study_or_contact"));
                 forwardPage(Page.MENU_SERVLET);
                 return;
             }
             
-            checkRoleByUserAndStudy(ub, study, studyDao);
+            checkRoleByUserAndStudy(ub, study);
 
             EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByDefinition(this.currentStudy, defId);

@@ -2,7 +2,6 @@ package core.org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
@@ -60,11 +59,11 @@ public class PermissionServiceImpl implements PermissionService {
     public List<String> getPermissionTagsList(HttpServletRequest request) {
         HttpSession session = request.getSession();
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
-        StudyBean study = (StudyBean) session.getAttribute("study");
+        Study study = (Study) session.getAttribute("study");
         return getTagList(roles, study);
     }
 
-    private List<String> getTagList(ResponseEntity<List<StudyEnvironmentRoleDTO>> roles, StudyBean study) {
+    private List<String> getTagList(ResponseEntity<List<StudyEnvironmentRoleDTO>> roles, Study study) {
         String tmpUuid = null;
         if (StringUtils.isNotEmpty(study.getStudyEnvUuid()))
             tmpUuid = study.getStudyEnvUuid();
@@ -77,7 +76,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
         Optional<StudyEnvironmentRoleDTO> dto =
                 roles.getBody().stream().filter(o -> (StringUtils.equals(o.getStudyEnvironmentUuid(), uuId) ||
-                        (StringUtils.isNotEmpty(study.getStudyEnvSiteUuid()) && checkStudyUuid(o.getStudyEnvironmentUuid(), study.getParentStudyId())))).findFirst();
+                        (StringUtils.isNotEmpty(study.getStudyEnvSiteUuid()) && checkStudyUuid(o.getStudyEnvironmentUuid(), study.getStudy().getStudyId())))).findFirst();
 
         if (!dto.isPresent()) {
             logger.error("Study:" + uuId + " not found for this user");
@@ -152,12 +151,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     public boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request) {
 
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         EventDefinitionCrf eventDefCrf = null;
         final EventCrf eventCrf = ec;
-        int studyId = currentStudy.getId();
-        if (currentStudy.getParentStudyId() != 0) {
-            studyId = currentStudy.getParentStudyId();
+        int studyId = currentStudy.getStudyId();
+        if (currentStudy.getStudy() != null && currentStudy.getStudy().getStudyId() != 0) {
+            studyId = currentStudy.getStudy().getStudyId();
         }
         if (ec == null) {
             if (formLayoutId != null && studyEventId != null) {
@@ -188,7 +187,13 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         List<String> permissionTagsList = getPermissionTagsList(request);
-        List<String> tagsForEDC = permissionTagDao.findTagsForEDC(eventDefCrf);
+
+        return this.hasFormAccess(eventDefCrf, permissionTagsList);
+        
+    }
+
+    public boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList) {
+   	 List<String> tagsForEDC = permissionTagDao.findTagsForEDC(edc);
         if (CollectionUtils.isEmpty(tagsForEDC))
             return true;
         if (CollectionUtils.isNotEmpty(tagsForEDC) && CollectionUtils.isEmpty(permissionTagsList))
@@ -200,17 +205,22 @@ public class PermissionServiceImpl implements PermissionService {
         return true;
     }
 
-    public List<String> getPermissionTagsList(StudyBean study, HttpServletRequest request) {
+    public List<String> getPermissionTagsList(Study study, HttpServletRequest request) {
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
         return getTagList(roles, study);
     }
 
-    public boolean isUserHasPermission(String column,HttpServletRequest request,StudyBean studyBean) {
+    public boolean isUserHasPermission(String column,HttpServletRequest request,Study studyBean) {
         String sedOid = column.split("\\.")[0];
         String formOid = column.split("\\.")[1];
         StudyEventDefinition sed = studyEventDefinitionDao.findByOcOID(sedOid);
         CrfBean crf = crfDao.findByOcOID(formOid);
-        EventDefinitionCrf eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getStudyEventDefinitionId(), crf.getCrfId(), studyBean.getParentStudyId()!=0 ?studyBean.getParentStudyId():studyBean.getId());
+        int studyId;
+        if(studyBean.isSite())
+            studyId = studyBean.getStudy().getStudyId();
+        else
+            studyId=studyBean.getStudyId();
+        EventDefinitionCrf eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getStudyEventDefinitionId(), crf.getCrfId(), studyId);
         List<String> tagsInEDC = permissionTagDao.findTagsForEDC(eventDefCrf);
         if (org.apache.commons.collections.CollectionUtils.isNotEmpty(tagsInEDC)) {
             List<String> list = tagsInEDC.stream().filter(getPermissionTags(request)::contains).collect(Collectors.toList());
@@ -223,11 +233,11 @@ public class PermissionServiceImpl implements PermissionService {
     private List<String> getPermissionTags(HttpServletRequest request) {
         return (List<String>) request.getSession().getAttribute("userPermissionTags");
     }
-    public String getPermissionTagsString(StudyBean study,HttpServletRequest request) {
+    public String getPermissionTagsString(Study study,HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(study ,request);
         return getTagsString(tagsList);    }
 
-    public String[] getPermissionTagsStringArray(StudyBean study,HttpServletRequest request) {
+    public String[] getPermissionTagsStringArray(Study study,HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(study,request);
         return getStringArray(tagsList);    }
 }

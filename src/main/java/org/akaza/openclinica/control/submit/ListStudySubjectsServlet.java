@@ -25,6 +25,7 @@ import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -48,7 +49,6 @@ public class ListStudySubjectsServlet extends SecureController {
     private StudyEventDAO studyEventDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
-    private StudyDAO studyDAO;
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
@@ -99,12 +99,8 @@ public class ListStudySubjectsServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         boolean showMoreLink;
 
-        int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-
-        StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
-        StudyParameterValue parentSPV = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "subjectIdGeneration");
-
-        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+        if(currentStudy.isSite())
+            currentStudy.setSubjectIdGeneration(currentStudy.getStudy().getSubjectIdGeneration());
 
         String addNewSubjectOverlay = fp.getRequest().getParameter("addNewSubject");
         if (addNewSubjectOverlay != null){
@@ -119,8 +115,8 @@ public class ListStudySubjectsServlet extends SecureController {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
         logger.info("CurrentStudy:" + currentPublicStudy.getSchemaName());
-        logger.info("StudyParameterConfig:" + currentPublicStudy.getStudyParameterConfig().toString());
-        String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+//        logger.info("StudyParameterConfig:" + currentPublicStudy.getStudyParameterConfig().toString());
+        String idSetting = currentStudy.getSubjectIdGeneration();
         logger.info("idSetting:" + idSetting);
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
@@ -166,10 +162,10 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
         factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyDAO(getStudyDao());
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
-        factory.setStudyDAO(getStudyDAO());
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
         factory.setEventCRFDAO(getEventCRFDAO());
@@ -260,11 +256,6 @@ public class ListStudySubjectsServlet extends SecureController {
         return studyEventDAO;
     }
 
-    public StudyDAO getStudyDAO() {
-        studyDAO = this.studyDAO == null ? new StudyDAO(sm.getDataSource()) : studyDAO;
-        return studyDAO;
-    }
-
     public EventCRFDAO getEventCRFDAO() {
         eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
         return eventCRFDAO;
@@ -331,5 +322,9 @@ public class ListStudySubjectsServlet extends SecureController {
     public StudyEventDefinitionDao getStudyEventDefinitionHibDao() {
         return studyEventDefinitionHibDao= (StudyEventDefinitionDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefDaoDomain");
 
+    }
+
+    public StudyDao getStudyDao() {
+        return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
     }
 }

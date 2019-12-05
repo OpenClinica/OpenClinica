@@ -56,7 +56,7 @@
 
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-	<c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
+	<c:if test="${study.subjectPersonIdRequired=='required' || study.subjectPersonIdRequired=='optional'}">
 	<tr valign="top">
 	  	<td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
 		<td class="table_cell">
@@ -81,15 +81,15 @@
         </c:choose>
 		</td>
 	</tr>
-<c:if test="${study.studyParameterConfig.collectDob=='1' || study.studyParameterConfig.collectDob=='2' }">
+<c:if test="${study.collectDob=='1' || study.collectDob=='2' }">
 	<tr valign="top">
 		<td class="table_header_column">
-		<c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:message key="date_of_birth" bundle="${resword}"/></c:if>
-		<c:if test="${study.studyParameterConfig.collectDob=='2'}"><fmt:message key="year_of_birth" bundle="${resword}"/></c:if>
+		<c:if test="${study.collectDob=='1'}"><fmt:message key="date_of_birth" bundle="${resword}"/></c:if>
+		<c:if test="${study.collectDob=='2'}"><fmt:message key="year_of_birth" bundle="${resword}"/></c:if>
 		:</td>
 	<td class="table_cell">
-	<c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:formatDate value="${subjectToUpdate.dateOfBirth}" pattern="${dteFormat}"/></c:if>
-		<c:if test="${study.studyParameterConfig.collectDob=='2'}"><c:out value="${localBirthDate}"/></c:if>
+	<c:if test="${study.collectDob=='1'}"><fmt:formatDate value="${subjectToUpdate.dateOfBirth}" pattern="${dteFormat}"/></c:if>
+		<c:if test="${study.collectDob=='2'}"><c:out value="${localBirthDate}"/></c:if>
 		</td>
 	
 	</tr>

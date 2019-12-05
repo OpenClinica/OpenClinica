@@ -1,27 +1,32 @@
 package core.org.akaza.openclinica.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.ServletContext;
-
-import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
-import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
-import org.akaza.openclinica.controller.dto.DataImportReport;
-import org.akaza.openclinica.service.ImportService;
+import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.domain.xform.dto.Bind;
+import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
+import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import core.org.akaza.openclinica.web.pform.OpenRosaServices;
+import core.org.akaza.openclinica.web.pform.PFormCache;
+import liquibase.util.StringUtils;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.controller.dto.*;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.PdfService;
-import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.akaza.openclinica.service.ImportService;
+import org.akaza.openclinica.service.UserService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,41 +37,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.submit.SubjectBean;
-import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
-import core.org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import core.org.akaza.openclinica.dao.hibernate.SubjectDao;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import core.org.akaza.openclinica.dao.submit.SubjectDAO;
-import core.org.akaza.openclinica.domain.datamap.EventCrf;
-import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import core.org.akaza.openclinica.domain.datamap.FormLayout;
-import core.org.akaza.openclinica.domain.datamap.JobDetail;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.domain.datamap.StudyEvent;
-import core.org.akaza.openclinica.domain.datamap.StudySubject;
-import core.org.akaza.openclinica.domain.datamap.StudySubjectDetail;
-import core.org.akaza.openclinica.domain.datamap.Subject;
-import core.org.akaza.openclinica.domain.enumsupport.JobType;
-import core.org.akaza.openclinica.domain.xform.dto.Bind;
-import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
-import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
-import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
-import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
-import core.org.akaza.openclinica.web.pform.OpenRosaServices;
-import core.org.akaza.openclinica.web.pform.PFormCache;
-import liquibase.util.StringUtils;
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This Service class is used with Add Participant Rest Api
@@ -119,10 +97,13 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     PdfService pdfService;
     
     @Autowired
+    PermissionService permissionService;
+    
+    @Autowired
     EventDefinitionCrfDao eventDefinitionCrfDao;
-   
 
-    private StudyDAO studyDao;
+    @Autowired
+    private StudyDao studyDao;
     private StudySubjectDAO studySubjectDao;
     private SubjectDAO subjectDao;  
 
@@ -142,10 +123,8 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         boolean createNewParticipant=false;
         Study tenantStudy = studyHibDao.findByOcOID(studyOid);
         Study tenantSite = studyHibDao.findByOcOID(siteOid);
-        StudyBean tenantStudyBean = getStudyDao().findByOid(studyOid);
-        StudyBean tenantSiteBean = getStudyDao().findByOid(siteOid);
-       
-        if (isEnrollmentCapped(tenantStudyBean,tenantSiteBean))
+
+        if (isEnrollmentCapped(tenantStudy,tenantSite))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
         
         if (StringUtils.isEmpty(addParticipantRequestDTO.getSubjectKey()))
@@ -189,11 +168,11 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
         Subject subject = null;
         StudySubject studySubject = null;
-        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getId());
+        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudy.getStudyId());
 
         StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
-        if (tenantStudyBean.getParentStudyId() > 0) {
-            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudyBean.getParentStudyId());// <
+        if (tenantStudy.isSite()) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(addParticipantRequestDTO.getSubjectKey(), tenantStudy.getStudy().getStudyId());// <
         }
         if (studySubjectBean == null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             createNewParticipant=true;
@@ -205,10 +184,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             studySubjectBean = new StudySubjectBean();
 
             studySubjectBean.setSubjectId(subjectBean.getId());
-            if (tenantSiteBean != null) {
-                studySubjectBean.setStudyId(tenantSiteBean.getId());
+            if (tenantSite != null) {
+                studySubjectBean.setStudyId(tenantSite.getStudyId());
             } else {
-                studySubjectBean.setStudyId(tenantStudyBean.getId());
+                studySubjectBean.setStudyId(tenantStudy.getStudyId());
             }
 
             studySubjectBean.setLabel(addParticipantRequestDTO.getSubjectKey());
@@ -227,9 +206,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
         if(createNewParticipant) {
                 //update at site level
-                updateStudySubjectSize(tenantSite,tenantSiteBean);
+                studyHibDao.saveOrUpdate(tenantSite);
                 // update at parent level
-                updateStudySubjectSize(tenantStudy,tenantStudyBean);
+                studyHibDao.saveOrUpdate(tenantStudy);
         }
 
         if ((register.equalsIgnoreCase("y") || register.equalsIgnoreCase("yes") ) && validateService.isParticipateActive(tenantStudy)) {
@@ -300,11 +279,6 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         return studySubjectDao;
     }
 
-    public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-    }
-
     public SubjectDAO getSubjectDao() {
         subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
         return subjectDao;
@@ -348,16 +322,15 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
     }
 
-    public int getSubjectCount(StudyBean currentStudy) {
+    public int getSubjectCount(Study currentStudy) {
         int subjectCount = 0;
-        StudyDAO sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByPK(currentStudy.getId());
+        Study studyBean = (Study) studyDao.findByPK(currentStudy.getStudyId());
         if (studyBean != null)
             subjectCount = studyBean.getSubjectCount();
 
         if (subjectCount == 0) {
             StudySubjectDAO ssdao = this.getStudySubjectDao();
-            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
+            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getStudyId());
             if (ss != null) {
                 subjectCount = ss.size();
             }
@@ -366,27 +339,18 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     }
 
 
-
-    private void updateStudySubjectSize(Study study, StudyBean currentStudy) {
-        int subjectCount = getSubjectCount(currentStudy);
-        study.setSubjectCount(subjectCount+1);
-        studyHibDao.saveOrUpdate(study);
-    }
-
-
-    private boolean isEnrollmentCapped(StudyBean currentStudy,StudyBean siteStudy){
+    private boolean isEnrollmentCapped(Study currentStudy,Study siteStudy){
 
         boolean capIsOn = isEnrollmentCapEnforced(currentStudy,siteStudy);
 
         StudySubjectDAO studySubjectDAO = this.getStudySubjectDao();
         int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
 
-        StudyDAO studyDAO = this.getStudyDao();
-        StudyBean sb = null;
-        if(currentStudy.getParentStudyId()!=0){
-            sb = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
+        Study sb = null;
+        if(currentStudy.isSite()){
+            sb = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
         }else{
-             sb = (StudyBean) studyDAO.findByPK(currentStudy.getId());
+             sb = (Study) studyDao.findByPK(currentStudy.getStudyId());
         }
         int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
@@ -400,19 +364,18 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
      * if it's site level, then also need to check study 
      * @return
      */
-    private boolean isEnrollmentCapEnforced(StudyBean currentStudy,StudyBean siteStudy){
-        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(this.dataSource);
-       
+    private boolean isEnrollmentCapEnforced(Study currentStudy,Study siteStudy){
+
         boolean capEnforcedSite = false;
         String  enrollmentCapStatusSite = null;
         
-        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
+        String enrollmentCapStatus = currentStudy.getEnforceEnrollmentCap();
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         
         // check at the site level
         if(siteStudy != null) {
-        	int siteId = siteStudy.getId();
-        	enrollmentCapStatusSite = studyParameterValueDAO.findByHandleAndStudy(siteId, "enforceEnrollmentCap").getValue();
+        	int siteId = siteStudy.getStudyId();
+        	enrollmentCapStatusSite =siteStudy.getEnforceEnrollmentCap();
         	capEnforcedSite = Boolean.valueOf(enrollmentCapStatusSite);        	
         }
         
@@ -463,7 +426,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    		
 			    		int studyEventDefinitionId = studyEvent.getStudyEventDefinition().getStudyEventDefinitionId();
 			    		EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyIdorSiteId(studyEventDefinitionId, eventCrf.getCrfVersion().getCrf().getCrfId(), studyId);
-			    	    if(edc != null && validateService.hasCRFpermissionTag(edc, permissionTags)) {
+			    	    if(edc != null && permissionService.hasFormAccess(edc, permissionTags)) {
 			    	    	PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
 				    		studyEventDefinitionID = studyEventDefinitionId + "";
 					        subjectContext.setStudyEventDefinitionId(studyEventDefinitionID);
@@ -558,8 +521,4 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
       
         return subjectContextKey;
     }
-
-
-	
-
 }

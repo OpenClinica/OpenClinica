@@ -21,13 +21,13 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -50,7 +50,7 @@ import org.hibernate.annotations.Parameter;
 public class RuleSetBean extends AbstractAuditableMutableDomainObject implements Serializable {
 
     private StudyEventDefinitionBean studyEventDefinition;
-    private StudyBean study;
+    private Study study;
     private CRFBean crf;
     private CRFVersionBean crfVersion;
     private FormLayoutBean formLayout;
@@ -209,13 +209,13 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject implements
     }
 
     @Transient
-    public StudyBean getStudy() {
+    public Study getStudy() {
         return study;
     }
 
-    public void setStudy(StudyBean study) {
-        if (study.getId() > 0) {
-            this.studyId = study.getId();
+    public void setStudy(Study study) {
+        if (study != null) {
+            this.studyId = study.getStudyId();
         }
         this.study = study;
     }

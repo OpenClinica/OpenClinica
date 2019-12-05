@@ -15,10 +15,11 @@ import java.util.LinkedHashMap;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.job.JobTerminationMonitor;
 
 /**
@@ -47,30 +48,32 @@ public class MetaDataCollector extends OdmDataCollector {
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
 
-    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived,String permissionTagsString) {
-        super(ds, study, showArchived);
+    public MetaDataCollector(DataSource ds, Study study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived, String permissionTagsString, StudyDao studyDao) {
+        super(ds, study, showArchived, studyDao);
         this.ruleSetRuleDao = ruleSetRuleDao;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
         this.permissionTagsString=permissionTagsString;
         }
 
-    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao,String permissionTagsString) {
-        super(ds, study);
+    public MetaDataCollector(DataSource ds, Study study, RuleSetRuleDao ruleSetRuleDao,String permissionTagsString, StudyDao studyDao) {
+        super(ds, study,studyDao);
         this.ruleSetRuleDao = ruleSetRuleDao;
         this.permissionTagsString=permissionTagsString;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
 
     }
 
-    public MetaDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy, RuleSetRuleDao ruleSetRuleDao , String permissionTagsString) {
-        super(ds, dataset, currentStudy);
+    public MetaDataCollector(DataSource ds, DatasetBean dataset, Study currentStudy, RuleSetRuleDao ruleSetRuleDao , String permissionTagsString, StudyDao studyDao) {
+        super(ds, dataset, currentStudy, studyDao);
         this.ruleSetRuleDao = ruleSetRuleDao;
         this.permissionTagsString=permissionTagsString;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
     }
 
-    public MetaDataCollector(DataSource ds, RuleSetRuleDao ruleSetRuleDao) {
+    public MetaDataCollector(DataSource ds, RuleSetRuleDao ruleSetRuleDao, StudyDao studyDao) {
+        super(ds,studyDao);
         this.ruleSetRuleDao = ruleSetRuleDao;
+
 
     }
 
@@ -86,11 +89,11 @@ public class MetaDataCollector extends OdmDataCollector {
         while (it.hasNext()) {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
-            StudyBean study = u.getStudy();
-            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived,permissionTagsString );
+            Study study = u.getStudy();
+            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived,permissionTagsString, studyDao );
             meta.collectOdmStudy(null);
             if (this.getCategory() == 1) {
-                if (study.isSite(study.getParentStudyId())) {
+                if (study.isSite()) {
                     meta.getOdmStudy().setParentStudyOID(meta.getParentOdmStudyOid());
                     MetaDataVersionProtocolBean p = meta.getOdmStudy().getMetaDataVersion().getProtocol();
                     if (p != null && p.getStudyEventRefs().size() > 0) {
@@ -103,7 +106,7 @@ public class MetaDataCollector extends OdmDataCollector {
 
                 }
             }
-            odmStudyMap.put(u.getStudy().getOid(), meta.getOdmStudy());
+            odmStudyMap.put(u.getStudy().getOc_oid(), meta.getOdmStudy());
         }
     }
 
@@ -113,15 +116,15 @@ public class MetaDataCollector extends OdmDataCollector {
         while (it.hasNext()) {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
-            StudyBean study = u.getStudy();
-            MetadataUnit meta = new MetadataUnit(this.ds);
+            Study study = u.getStudy();
+            MetadataUnit meta = new MetadataUnit(this.ds,studyDao);
             meta.setStudyBase(u);
             meta.setOdmStudy(new OdmStudyBean());
-            meta.setParentStudy(new StudyBean());
+            meta.setParentStudy(new Study());
 
             meta.collectOdmStudy(formVersionOID);
             if (this.getCategory() == 1) {
-                if (study.isSite(study.getParentStudyId())) {
+                if (study.isSite()) {
                     meta.getOdmStudy().setParentStudyOID(meta.getParentOdmStudyOid());
                     MetaDataVersionProtocolBean p = meta.getOdmStudy().getMetaDataVersion().getProtocol();
                     if (p != null && p.getStudyEventRefs().size() > 0) {
@@ -134,7 +137,7 @@ public class MetaDataCollector extends OdmDataCollector {
 
                 }
             }
-            odmStudyMap.put(u.getStudy().getOid(), meta.getOdmStudy());
+            odmStudyMap.put(u.getStudy().getOc_oid(), meta.getOdmStudy());
         }
     }
 

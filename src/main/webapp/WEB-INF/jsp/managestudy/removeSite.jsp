@@ -45,7 +45,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='siteToRemove' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='siteToRemove' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='request' id='userRolesToRemove' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToRemove' class='java.util.ArrayList'/>
 
@@ -147,7 +147,7 @@
  
 
 <br> 
-<form action='RemoveSite?action=submit&id=<c:out value="${siteToRemove.id}"/>' method="POST">
+<form action='RemoveSite?action=submit&id=<c:out value="${siteToRemove.studyId}"/>' method="POST">
  <input type="submit" name="submit" value="<fmt:message key="remove_site" bundle="${resword}"/>" class="button_long" onClick='return confirm("<fmt:message key="if_you_remove_this_site" bundle="${resword}"/>");'>
     &nbsp;
  <input type="button" onclick="confirmCancel('ListSite');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>

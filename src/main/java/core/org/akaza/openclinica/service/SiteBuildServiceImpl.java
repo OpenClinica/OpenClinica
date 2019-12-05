@@ -2,7 +2,8 @@ package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.controller.StudyController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,21 +25,21 @@ public class SiteBuildServiceImpl implements SiteBuildService {
     @Autowired
     private DataSource dataSource;
 
-    public void process(StudyBean parentStudy, StudyBean siteBean, UserAccountBean ownerUserAccount) throws Exception  {
+    public void process(Study parentStudy, Study siteBean, UserAccountBean ownerUserAccount, StudyDao studyDao) throws Exception  {
         String schemaName = null;
-        StudyBean site = new StudyBean();
+        Study site = new Study();
 
         try {
-            StudyController studyController = new StudyController();
+            StudyController studyController = new StudyController(studyDao);
             site.setName(siteBean.getName());
-            site.setIdentifier(siteBean.getIdentifier());
+            site.setUniqueIdentifier(siteBean.getUniqueIdentifier());
             // generate OC id
-            site.setOid(siteBean.getOid());
+            site.setOc_oid(siteBean.getOc_oid());
             site.setStatus(siteBean.getStatus());
             site.setProtocolDateVerification(siteBean.getProtocolDateVerification());
             site.setDatePlannedStart(siteBean.getDatePlannedStart());
-            site.setOwner(ownerUserAccount);
-            site.setParentStudyId(parentStudy.getId());
+            site.setUserAccount(ownerUserAccount.toUserAccount(studyDao));
+            site.setStudy(parentStudy);
             site.setPublished(parentStudy.isPublished());
             site.setStudyEnvSiteUuid(siteBean.getStudyEnvSiteUuid());
             site.setEnvType(siteBean.getEnvType());
@@ -51,8 +52,7 @@ public class SiteBuildServiceImpl implements SiteBuildService {
             site.setFacilityContactName(siteBean.getFacilityContactName());
             site.setFacilityContactPhone(siteBean.getFacilityContactPhone());
             site.setFacilityContactEmail(siteBean.getFacilityContactEmail());
-            
-            StudyBean createdSite = studyController.createStudyWithDatasource(site, dataSource);
+            Study createdSite = studyController.createStudy(site);
             StudyUserRoleBean sub = null;
         } catch (Exception e) {
             logger.error("Error while creating a site entry" + schemaName);

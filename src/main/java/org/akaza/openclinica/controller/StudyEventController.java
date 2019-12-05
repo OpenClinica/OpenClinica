@@ -97,6 +97,9 @@ public class StudyEventController {
 	@Autowired
 	private ValidateService validateService;
 
+	@Autowired
+	private StudyBuildService studyBuildService;
+
 	PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
 			new PassiveExpiringMap<>(24, TimeUnit.HOURS);
 
@@ -195,7 +198,7 @@ public class StudyEventController {
 
 	public RestfulServiceHelper getRestfulServiceHelper() {
 		if (restfulServiceHelper == null) {
-			restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+			restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
 		}
 		return restfulServiceHelper;
 	}
@@ -351,6 +354,13 @@ public class StudyEventController {
 		return null;
 	}
 
+	@ApiOperation( value = "To Update an event for participant at site level", notes = "Will read the information of StudyOID, ParticipantID, StudyEventOID, Event Repeat Key, Start Date, End Date and Event Status" )
+	@RequestMapping( value = "{studyOID}/events/check", method = RequestMethod.GET )
+	public ResponseEntity<Object> checkWorking(HttpServletRequest request,
+														 @PathVariable( "studyOID" ) String studyOid) throws Exception {
+		Study s = studyDao.findByOcOID(studyOid);
+		return null;
+	}
 
 	public String startBulkEventJob(MultipartFile file, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean) {
 		utilService.setSchemaFromStudyOid(studyOid);

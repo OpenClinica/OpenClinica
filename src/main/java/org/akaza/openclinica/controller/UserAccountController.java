@@ -3,7 +3,6 @@ package org.akaza.openclinica.controller;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ public class UserAccountController {
 	AuthoritiesDao authoritiesDao;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	StudyDAO sdao;
 	@Autowired CreateUserCoreService userCoreService;
 
 	/**

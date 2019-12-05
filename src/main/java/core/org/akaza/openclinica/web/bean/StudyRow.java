@@ -7,7 +7,8 @@
  */
 package core.org.akaza.openclinica.web.bean;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.login.StudyDTO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.util.ArrayList;
 
@@ -17,6 +18,7 @@ import java.util.ArrayList;
  */
 public class StudyRow extends EntityBeanRow {
 
+    private StudyDTO studyDTO;
     // columns:
     public static final int COL_NAME = 0;
     public static final int COL_UNIQUEIDENTIFIER = 1;
@@ -37,16 +39,16 @@ public class StudyRow extends EntityBeanRow {
             return 0;
         }
 
-        StudyBean thisStudy = (StudyBean) bean;
-        StudyBean argStudy = (StudyBean) ((StudyRow) row).bean;
+        StudyDTO thisStudy = (StudyDTO) studyDTO;
+        StudyDTO argStudy = (StudyDTO) ((StudyRow) row).studyDTO;
 
         int answer = 0;
         switch (sortingColumn) {
         case COL_NAME:
-            answer = thisStudy.getName().toLowerCase().compareTo(argStudy.getName().toLowerCase());
+            answer = thisStudy.getBriefTitle().toLowerCase().compareTo(argStudy.getBriefTitle().toLowerCase());
             break;
         case COL_UNIQUEIDENTIFIER:
-            answer = thisStudy.getIdentifier().toLowerCase().compareTo(argStudy.getIdentifier().toLowerCase());
+            answer = thisStudy.getUniqueProtocolID().toLowerCase().compareTo(argStudy.getUniqueProtocolID().toLowerCase());
             break;
         case COL_PRINCIPAL_INVESTIGATOR:
             answer = thisStudy.getPrincipalInvestigator().toLowerCase().compareTo(argStudy.getPrincipalInvestigator().toLowerCase());
@@ -67,8 +69,8 @@ public class StudyRow extends EntityBeanRow {
 
     @Override
     public String getSearchString() {
-        StudyBean thisStudy = (StudyBean) bean;
-        return thisStudy.getName() + " " + thisStudy.getIdentifier() + " " + thisStudy.getPrincipalInvestigator() + " " + thisStudy.getFacilityName();
+        StudyDTO thisStudy =  studyDTO;
+        return thisStudy.getBriefTitle() + " " + thisStudy.getUniqueProtocolID() + " " + thisStudy.getPrincipalInvestigator() + " " + thisStudy.getFacilityName();
     }
 
     /*
@@ -81,7 +83,7 @@ public class StudyRow extends EntityBeanRow {
         return StudyRow.generateRowsFromBeans(beans);
     }
 
-    public static ArrayList generateRowsFromBeans(ArrayList beans) {
+    public static ArrayList generateRowsFromBeans(ArrayList<Study> beans) {
         ArrayList answer = new ArrayList();
 
         Class[] parameters = null;
@@ -90,13 +92,23 @@ public class StudyRow extends EntityBeanRow {
         for (int i = 0; i < beans.size(); i++) {
             try {
                 StudyRow row = new StudyRow();
-                row.setBean((StudyBean) beans.get(i));
+
+                row.setStudyDTO(StudyDTO.studyToStudyDTO(beans.get(i)));
+
                 answer.add(row);
             } catch (Exception e) {
             }
         }
 
         return answer;
+    }
+
+    public StudyDTO getStudyDTO() {
+        return studyDTO;
+    }
+
+    public void setStudyDTO(StudyDTO studyDTO) {
+        this.studyDTO = studyDTO;
     }
 
 }

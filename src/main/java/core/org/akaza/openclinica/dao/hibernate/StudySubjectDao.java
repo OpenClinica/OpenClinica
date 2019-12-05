@@ -18,17 +18,19 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         // TODO Auto-generated method stub
         return StudySubject.class;
     }
-
     @SuppressWarnings("unchecked")
     @Transactional
-    public List<StudySubject> findAllByStudy(Integer studyId) {
-        String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid";
+    public List<StudySubject> findAllByStudy(Integer studyId,int pageNumber, int pageSize) {
+        String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid and status_id = :statusid  order by do.dateCreated ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("statusid",1);
         q.setInteger("studyid", studyId);
+        q.setFirstResult  ((pageNumber-1)*pageSize);
+        q.setMaxResults(pageSize);
         return (List<StudySubject>) q.list();
-      
+
     }
-    
+
     public StudySubject findByOcOID(String OCOID) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.ocOid = :OCOID";
@@ -131,7 +133,7 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
 
     }
     public String getValidOid(StudySubject studySubject, ArrayList<String> oidList) {
-    OidGenerator oidGenerator = new StudySubjectOidGenerator();
+        OidGenerator oidGenerator = new StudySubjectOidGenerator();
         String oid = getOid(studySubject);
         String oidPreRandomization = oid;
         while (findByOcOID(oid) != null || oidList.contains(oid)) {
@@ -152,7 +154,7 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
     }
     public int findTheGreatestLabel() {
         List<StudySubject> allStudySubjects = super.findAll();
-        
+
         int greatestLabel = 0;
         for (StudySubject subject:allStudySubjects) {
             int labelInt = 0;

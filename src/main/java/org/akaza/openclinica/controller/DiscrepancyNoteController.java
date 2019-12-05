@@ -9,18 +9,18 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -53,7 +53,8 @@ public class DiscrepancyNoteController {
     public static final String FORM_CONTEXT = "ecid";
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    StudyDAO sdao;
+    @Autowired
+    StudyDao sdao;
     DiscrepancyNoteDAO dnDao;
 
     @RequestMapping(value = "/dnote", method = RequestMethod.POST)
@@ -85,7 +86,7 @@ public class DiscrepancyNoteController {
         UserAccountBean ownerBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         StudySubjectBean ssBean = ssdao.findByOid(studySubjectOid);
         StudyEventDefinitionBean sedBean = seddao.findByOid(se_oid);
-        StudyBean studyBean = getStudy(sedBean.getStudyId());
+        Study studyBean = getStudy(sedBean.getStudyId());
         StudyEventBean seBean = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(ssBean.getId(), sedBean.getId(), Integer.valueOf(ordinal));
         String entityType = "studyEvent";
 
@@ -108,37 +109,35 @@ public class DiscrepancyNoteController {
         return new ResponseEntity(httpStatus);
     }
 
-    private StudyBean getParentStudy(Integer studyId) {
-        StudyBean study = getStudy(studyId);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(Integer studyId) {
+        Study study = getStudy(studyId);
+        if (!study.isSite()){
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
 
     }
 
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(String studyOid) {
+        Study study = getStudy(studyOid);
+        if (!study.isSite()) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
 
     }
 
-    private StudyBean getStudy(Integer id) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+    private Study getStudy(Integer id) {
+        Study studyBean = (Study) sdao.findByPK(id);
         return studyBean;
     }
 
-    private StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+    private Study getStudy(String oid) {
+        Study studyBean = (Study) sdao.findByOcOID(oid);
         return studyBean;
     }
 
@@ -153,7 +152,7 @@ public class DiscrepancyNoteController {
 
     }
 
-    public void saveFieldNotes(String description, String detailedNotes, int entityId, String entityType, StudyBean sb, UserAccountBean ownerBean,
+    public void saveFieldNotes(String description, String detailedNotes, int entityId, String entityType, Study sb, UserAccountBean ownerBean,
             UserAccountBean assignedUserBean, String resolutionStatus, String noteType, String entityName) {
 
         // Create a new thread each time
@@ -164,14 +163,14 @@ public class DiscrepancyNoteController {
 
     }
 
-    private DiscrepancyNoteBean createDiscrepancyNoteBean(String description, String detailedNotes, int entityId, String entityType, StudyBean sb,
+    private DiscrepancyNoteBean createDiscrepancyNoteBean(String description, String detailedNotes, int entityId, String entityType, Study sb,
             UserAccountBean ownerBean, UserAccountBean assignedUserBean, Integer parentId, String resolutionStatus, String noteType, String entityName) {
         DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
 
         dnb.setResStatus(ResolutionStatus.getByName(resolutionStatus));
 
         dnb.setEntityId(entityId);
-        dnb.setStudyId(sb.getId());
+        dnb.setStudyId(sb.getStudyId());
         dnb.setEntityType(entityType);
         dnb.setDescription(description);
         dnb.setDetailedNotes(detailedNotes);

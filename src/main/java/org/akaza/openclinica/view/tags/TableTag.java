@@ -1,7 +1,7 @@
 package org.akaza.openclinica.view.tags;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.view.form.HorizontalFormBuilder;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class TableTag extends SimpleTagSupport {
         JspWriter tagWriter = context.getOut();
         boolean isViewData = datacontext != null && datacontext.equalsIgnoreCase(VIEW_DATA_ENTRY);
         DisplaySectionBean dBean = (DisplaySectionBean) context.findAttribute("section");
-        StudyBean studyBean = (StudyBean) context.findAttribute("study");
+        Study studyBean = (Study) context.findAttribute("study");
 
         // tabId is used to seed the tabindex attributes of the form's input
         // elements,

@@ -4,7 +4,7 @@
 package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +23,7 @@ public interface UtilService {
 
 	UserAccountBean getUserAccountFromRequest(HttpServletRequest request);
 
-    boolean isParticipantIDSystemGenerated(StudyBean tenantStudy);
+    boolean isParticipantIDSystemGenerated(Study tenantStudy);
 
     boolean isParticipantUniqueToSite(String siteOID , String studySubjectId);
 

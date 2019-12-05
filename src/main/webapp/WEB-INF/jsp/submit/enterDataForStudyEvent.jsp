@@ -11,6 +11,9 @@
 
 <jsp:include page="../include/submit-header.jsp"/>
 <link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/permissionTagAccess.js"></script>
 <script type="text/javascript" language="javascript">
     function checkCRFLocked(ecId, url){
@@ -134,7 +137,7 @@
                     <tr>
                         <td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/></td>
                         <td class="table_cell"><span style="float:left"><fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/></span>
-                         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                         <c:if test="${study.discrepancyManagement=='true'}">
                                 <c:set var="isNew" value="${hasStartDateNote eq 'yes' ? 0 : 1}"/>
                                 <c:choose>
                                     <c:when test="${hasStartDateNote eq 'yes'}">
@@ -159,7 +162,7 @@
                         <td class="table_header_column"><fmt:message key="end_date_time" bundle="${resword}"/></td>
                         <td class="table_cell"><span style="float:left"><fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}"/></span>
 
-                         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                         <c:if test="${study.discrepancyManagement=='true'}">
                                 <c:set var="isNew" value="${hasEndDateNote eq 'yes' ? 0 : 1}"/>
                                 <c:choose>
                                     <c:when test="${hasEndDateNote eq 'yes'}">

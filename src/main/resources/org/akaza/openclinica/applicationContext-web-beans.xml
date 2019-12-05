@@ -12,6 +12,8 @@
     
     <bean id="sdvUtil" class="core.org.akaza.openclinica.web.table.sdv.SDVUtil" name="sdvUtil">
         <property name="dataSource" ref="dataSource"/>
+        <property name = "studyDao" ref = "studyDaoDomain"/>
+
     </bean>
 
    

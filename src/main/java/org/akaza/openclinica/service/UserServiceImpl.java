@@ -9,14 +9,12 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.ParticipantDTO;
 import core.org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
@@ -132,7 +130,6 @@ public class UserServiceImpl implements UserService {
 
     private String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
 
-    StudyDAO sdao;
     private StudySubjectDAO ssDao;
 
 
@@ -331,7 +328,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo) {
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo,int pageNumber,int pageSize) {
 
         CoreResources.setRequestSchema(schema);
 
@@ -342,7 +339,7 @@ public class UserServiceImpl implements UserService {
                 + Thread.currentThread().getName());
 
         // Get all list of StudySubjects by studyId
-        List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId());
+        List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId(),pageNumber, pageSize);
         List<OCUserDTO> userDTOS = new ArrayList<>();
         sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
         String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
@@ -552,7 +549,6 @@ public class UserServiceImpl implements UserService {
         objectMapper.registerModule(new JavaTimeModule());
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
-        StudyBean studyBean = null;
         HttpEntity entity = new HttpEntity<OCUserDTO>(headers);
         ResponseEntity<List<OCUserDTO>> userResponse = null;
         try {
@@ -805,12 +801,6 @@ public class UserServiceImpl implements UserService {
         } finally {
             closeFile(writer);
         }
-        StringBuilder body = new StringBuilder();
-
-
-        logger.info(body.toString());
-
-
     }
 
 

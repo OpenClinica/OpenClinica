@@ -8,28 +8,30 @@ import javax.sql.DataSource;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ParticipantEventService {
 
     private DataSource dataSource = null;
-    private StudyDAO studyDAO = null;
+    private StudyDao studyDao;
     private StudyEventDAO studyEventDAO = null;
     private EventCRFDAO eventCRFDAO = null;
     private EventDefinitionCRFDAO eventDefCRFDAO = null;
     private FormLayoutDAO formLayoutDAO = null;
 
-    public ParticipantEventService(DataSource dataSource) { 
+    public ParticipantEventService(DataSource dataSource, StudyDao studyDao) {
         this.dataSource = dataSource;
+        this.studyDao = studyDao;
     }
     
     public StudyEventBean getNextParticipantEvent(StudySubjectBean studySubject) {
@@ -90,17 +92,17 @@ public class ParticipantEventService {
     }
     public List<EventDefinitionCRFBean> getEventDefCrfsForStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent) {
         Integer studyId = studySubject.getStudyId();
-        StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(studyId);
+        Study studyBean = (Study) studyDao.findByPK(studyId);
         ArrayList<EventDefinitionCRFBean> eventDefCrfs = null;
         ArrayList<EventDefinitionCRFBean> parentEventDefCrfs = new ArrayList<EventDefinitionCRFBean>();
         ArrayList<EventDefinitionCRFBean> netEventDefinitionCrfs = new ArrayList<EventDefinitionCRFBean>();
 
         eventDefCrfs = (ArrayList<EventDefinitionCRFBean>) getEventDefCRFDAO().findAllDefIdandStudyId(studyEvent.getStudyEventDefinitionId(), studyId);
 
-        StudyBean parentStudy = null;
-        if (studyBean.getParentStudyId() == 0) parentStudy = studyBean;
-        else parentStudy = (StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId());
-        parentEventDefCrfs = (ArrayList<EventDefinitionCRFBean>) getEventDefCRFDAO().findAllDefIdandStudyId(studyEvent.getStudyEventDefinitionId(), parentStudy.getId());
+        Study parentStudy = null;
+        if (!studyBean.isSite()) parentStudy = studyBean;
+        else parentStudy = (Study) studyDao.findByPK(studyBean.getStudy().getStudyId());
+        parentEventDefCrfs = (ArrayList<EventDefinitionCRFBean>) getEventDefCRFDAO().findAllDefIdandStudyId(studyEvent.getStudyEventDefinitionId(), parentStudy.getStudyId());
 
         boolean found;
         for (EventDefinitionCRFBean parentEventDefinitionCrf : parentEventDefCrfs) {
@@ -116,14 +118,6 @@ public class ParticipantEventService {
         }
 
         return netEventDefinitionCrfs;
-    }
-
-    /**
-     * @return the StudyDAO
-     */
-    private StudyDAO getStudyDAO() {
-        studyDAO = studyDAO != null ? studyDAO : new StudyDAO(dataSource);
-        return studyDAO;
     }
 
     /**

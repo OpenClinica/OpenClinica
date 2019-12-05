@@ -54,10 +54,10 @@
  <td class="table_header_column_top"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
  <td class="table_header_column_top">
    <c:choose>
-    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+    <c:when test="${study.collectDob == '1'}">
      <fmt:message key="date_of_birth" bundle="${resword}"/>
     </c:when>
-    <c:when test="${study.studyParameterConfig.collectDob == '3'}">
+    <c:when test="${study.collectDob == '3'}">
      <fmt:message key="date_of_birth" bundle="${resword}"/>
     </c:when>
     <c:otherwise>

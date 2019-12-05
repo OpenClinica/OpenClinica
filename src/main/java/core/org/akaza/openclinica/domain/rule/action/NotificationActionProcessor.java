@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import core.org.akaza.openclinica.bean.login.ParticipantDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -13,12 +12,13 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -31,6 +31,7 @@ import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -52,7 +53,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	EmailEngine emailEngine;
 	JavaMailSenderImpl mailSender;
 	RuleSetRuleBean ruleSetRule;
-	StudyDAO sdao;
+	@Autowired
+	StudyDao sdao;
 	StudySubjectDAO ssdao;
 	UserAccountDAO udao;
 	StudyParameterValueDAO spvdao;
@@ -62,7 +64,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	RuleActionBean ruleActionBean;
 	String email;
 	String[] listOfEmails;
-	StudyBean studyBean;
+	Study studyBean;
 	String message;
 	String url;
 	String emailSubject;
@@ -90,7 +92,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	}
 
-	public NotificationActionProcessor(String[] listOfEmails, StudySubject studySubject, StudyBean studyBean, String message, String emailSubject,
+	public NotificationActionProcessor(String[] listOfEmails, StudySubject studySubject, Study studyBean, String message, String emailSubject,
 									   JavaMailSenderImpl mailSender , String participateStatus,String accessToken,NotificationService notificationService,String userUuid) {
 		this.listOfEmails = listOfEmails;
 		this.message = message;
@@ -169,7 +171,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	}
 
 	@Override
-	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
+	public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy,
 								  UserAccountBean ub, Object... arguments) {
 		// TODO Auto-generated method stub
 		return null;
@@ -187,12 +189,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		if (eventOrdinal != 1)
 			eventName = eventName + "(" + eventOrdinal + ")";
 
-		StudyBean studyBean = getStudyBean(studySubject.getStudy().getStudyId());
-		StudyBean siteBean=null;
-		if(studyBean.getParentStudyId()!=0) {    // it is a site level study
+		Study studyBean = studySubject.getStudy();
+		Study siteBean=null;
+		if(studyBean.isSite()) {    // it is a site level study
 			siteBean = studyBean;
-			sdao = new StudyDAO(ds);
-			studyBean = (StudyBean) sdao.findByPK  (siteBean.getParentStudyId());
+			studyBean = siteBean.getStudy();
 		}
 
 		if (message==null) message="";
@@ -200,26 +201,25 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		message = message.replaceAll("\\$\\{event.name}", eventName);
 
 		message = message.replaceAll("\\$\\{study.name}",studyBean.getName());
-		message = message.replaceAll("\\$\\{study.id}", studyBean.getIdentifier());
+		message = message.replaceAll("\\$\\{study.id}", studyBean.getUniqueIdentifier());
 
 		message = message.replaceAll("\\$\\{site.name}", siteBean!=null ?siteBean.getName():"");
-		message = message.replaceAll("\\$\\{site.id}", siteBean !=null?siteBean.getIdentifier():"");
+		message = message.replaceAll("\\$\\{site.id}", siteBean !=null?siteBean.getUniqueIdentifier():"");
 
 		emailSubject = emailSubject.replaceAll("\\$\\{event.name}", eventName);
 
 		emailSubject = emailSubject.replaceAll("\\$\\{study.name}", studyBean.getName());
-		emailSubject = emailSubject.replaceAll("\\$\\{study.id}", studyBean.getIdentifier());
+		emailSubject = emailSubject.replaceAll("\\$\\{study.id}", studyBean.getUniqueIdentifier());
 
 		emailSubject = emailSubject.replaceAll("\\$\\{site.name}", siteBean!=null?siteBean.getName():"");
-		emailSubject = emailSubject.replaceAll("\\$\\{site.id}", siteBean!=null?siteBean.getIdentifier():"");
+		emailSubject = emailSubject.replaceAll("\\$\\{site.id}", siteBean!=null?siteBean.getUniqueIdentifier():"");
 
 		ParticipantDTO pDTO = null;
 		String[] listOfEmails = emailList.split(",");
-		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
+		Study parentStudyBean = getParentStudy(studyBean);
 		OCUserDTO userDTO=null;
 
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
-		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+		String participateStatus = parentStudyBean.getParticipantPortal(); // enabled , disabled
 		String accessToken = keycloakClientImpl.getSystemToken();
 
 		if(studySubject.getUserId()!=null) {
@@ -385,12 +385,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		return seBean;
 	}
 
-	private StudyBean getParentStudy(DataSource ds, StudyBean study) {
-		StudyDAO sdao = new StudyDAO(ds);
-		if (study.getParentStudyId() == 0) {
+	private Study getParentStudy( Study study) {
+		if (!study.isSite()) {
 			return study;
 		} else {
-			StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+			Study parentStudy = study.getStudy();
 			return parentStudy;
 		}
 
@@ -399,12 +398,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	public StudyEventDefinitionBean getStudyEventDefnBean(int sed_Id) {
 		StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(ds);
 		return (StudyEventDefinitionBean) sedao.findByPK(sed_Id);
-	};
-
-	public StudyBean getStudyBean(int studyId) {
-		StudyDAO sdao = new StudyDAO(ds);
-		return (StudyBean) sdao.findByPK(studyId);
-
 	}
 
 	public RuleSetService getRuleSetService() {

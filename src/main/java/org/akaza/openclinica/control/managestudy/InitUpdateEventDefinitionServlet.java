@@ -56,7 +56,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
 
         StudyEventDAO sdao = new StudyEventDAO(sm.getDataSource());
         // get current studyid
-        int studyId = currentStudy.getId();
+        int studyId = currentStudy.getStudyId();
 
         if (ub.hasRoleInStudy(studyId)) {
             Role r = ub.getRoleByStudy(studyId).getRole();
@@ -108,7 +108,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
                 baseUrl();
             request.setAttribute("participateFormStatus", participateFormStatus);
 
-            if (currentStudy.getId() != sed.getStudyId()) {
+            if (currentStudy.getStudyId() != sed.getStudyId()) {
                 addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                 forwardPage(Page.MENU_SERVLET);
                 return;

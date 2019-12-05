@@ -101,7 +101,7 @@ public class UpdateSubjectServlet extends SecureController {
             if ("show".equalsIgnoreCase(action)) {
                 
                  request.setAttribute("localBirthDate", "");//no DOB collected
-                if (!currentStudy.getStudyParameterConfig().getCollectDob().equals("3") &&
+                if (!currentStudy.getCollectDob().equals("3") &&
                         subject.getDateOfBirth() != null ){
                     setLocalDOB( subject);
                 }
@@ -121,14 +121,14 @@ public class UpdateSubjectServlet extends SecureController {
             } else {
                 String gender = fp.getString("gender");
                 subject.setGender(gender.charAt(0));
-                if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required")
-                        || currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("optional")){
+                if (currentStudy.getSubjectPersonIdRequired().equals("required")
+                        || currentStudy.getSubjectPersonIdRequired().equals("optional")){
 
                     subject.setUniqueIdentifier(fp.getString("uniqueIdentifier"));
                 }
                 subject.setUpdater(ub);
-                if (! currentStudy.getStudyParameterConfig().getCollectDob().equals("3")){
-                    if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+                if (! currentStudy.getCollectDob().equals("3")){
+                    if ( currentStudy.getCollectDob().equals("2"))
                     {
                         String d_date = fp.getString(DATE_DOB_TO_SAVE);
                         if ( !(d_date == null || d_date.trim().length()==0)){
@@ -136,7 +136,7 @@ public class UpdateSubjectServlet extends SecureController {
                             subject.setDateOfBirth(date_new);
                         }
                     }
-                    if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
+                    if ( currentStudy.getCollectDob().equals("1"))
                     {
                         Date date_new = local_df.parse(fp.getString(DATE_DOB_TO_SAVE));
                         subject.setDateOfBirth(date_new);
@@ -182,7 +182,7 @@ public class UpdateSubjectServlet extends SecureController {
 //        v.addValidation("uniqueIdentifier", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 //        v.alwaysExecuteLastValidation("uniqueIdentifier");
 
-        if (currentStudy.getStudyParameterConfig().getPersonIdShownOnCRF().equals("true")){
+        if (currentStudy.getPersonIdShownOnCRF().equals("true")){
             v.addValidation("uniqueIdentifier", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
             v.alwaysExecuteLastValidation("uniqueIdentifier");
          }
@@ -193,7 +193,7 @@ public class UpdateSubjectServlet extends SecureController {
         }
 
         
-        if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1")){
+        if ( currentStudy.getCollectDob().equals("1")){
             if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
                 v.addValidation(DATE_DOB, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(DATE_DOB);
@@ -209,7 +209,7 @@ public class UpdateSubjectServlet extends SecureController {
             
         }
         
-        else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2")){
+        else if ( currentStudy.getCollectDob().equals("2")){
             if (!StringUtils.isBlank(fp.getString(DATE_DOB))) {
                
                 // if DOB was not updated (and originally entered as a full day, post it as is
@@ -275,11 +275,11 @@ public class UpdateSubjectServlet extends SecureController {
         errors = v.validate();
 
         // uniqueIdentifier must be unique in the system
-        if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required")
-                || currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("optional")){
+        if (currentStudy.getSubjectPersonIdRequired().equals("required")
+                || currentStudy.getSubjectPersonIdRequired().equals("optional")){
 
             String uniqueIdentifier = fp.getString("uniqueIdentifier");
-            if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required") &&
+            if (currentStudy.getSubjectPersonIdRequired().equals("required") &&
                     !(subject.getUniqueIdentifier() == null || subject.getUniqueIdentifier().isEmpty() ) &&
                     (uniqueIdentifier == null || uniqueIdentifier.isEmpty())) {
                 Validator.addError(errors, "uniqueIdentifier", resexception.getString("field_not_blank"));
@@ -312,7 +312,7 @@ public class UpdateSubjectServlet extends SecureController {
         if (!StringUtil.isBlank(fp.getString("gender"))) {
             subject.setGender(fp.getString("gender").charAt(0));
         } else {
-            if (currentStudy.getStudyParameterConfig().getGenderRequired().equals("true") && subject.getGender() !=  ' '){
+            if (currentStudy.getGenderRequired().equals("true") && subject.getGender() !=  ' '){
                 Validator.addError(errors, "gender", resexception.getString("field_not_blank"));
             }
             subject.setGender(' ');
@@ -331,7 +331,7 @@ public class UpdateSubjectServlet extends SecureController {
             setInputMessages(errors);
             setDNFlag( subjectId);
             setLocalDOB( subject);
-            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+            if ( currentStudy.getCollectDob().equals("2"))
             request.setAttribute("localBirthDate", "");
             
             forwardPage(Page.UPDATE_SUBJECT);
@@ -370,12 +370,12 @@ public class UpdateSubjectServlet extends SecureController {
         
         try 
         {
-            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
+            if ( currentStudy.getCollectDob().equals("1"))
             {
                 String localBirthDate = local_df.format(birthDate);
                 request.setAttribute("localBirthDate", localBirthDate);
             }
-            else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+            else if ( currentStudy.getCollectDob().equals("2"))
             {
                 String localBirthDate = yformat.format(birthDate);
                 request.setAttribute("localBirthDate", localBirthDate);

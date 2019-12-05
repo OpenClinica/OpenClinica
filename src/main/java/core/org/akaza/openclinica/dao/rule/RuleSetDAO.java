@@ -12,7 +12,6 @@ import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.rule.RuleSetBean;
 import core.org.akaza.openclinica.bean.rule.expression.Context;
@@ -26,6 +25,7 @@ import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.rule.expression.ExpressionService;
 
 import java.sql.Types;
@@ -271,11 +271,11 @@ public class RuleSetDAO extends AuditableEntityDAO {
         return ruleSetBeanInDb;
     }
 
-    private int getStudyId(StudyBean currentStudy) {
-        return currentStudy.getParentStudyId() != 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+    private int getStudyId(Study currentStudy) {
+        return currentStudy.checkAndGetParentStudyId();
     }
 
-    public ArrayList<RuleSetBean> findByCrf(CRFBean crfBean, StudyBean currentStudy) {
+    public ArrayList<RuleSetBean> findByCrf(CRFBean crfBean, Study currentStudy) {
         ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<RuleSetBean>();
 
         this.setTypesExpected();
@@ -294,7 +294,7 @@ public class RuleSetDAO extends AuditableEntityDAO {
         return ruleSetBeans;
     }
 
-    public ArrayList<RuleSetBean> findByCrfVersionStudyAndStudyEventDefinition(CRFVersionBean crfVersionBean, StudyBean currentStudy,
+    public ArrayList<RuleSetBean> findByCrfVersionStudyAndStudyEventDefinition(CRFVersionBean crfVersionBean, Study currentStudy,
             StudyEventDefinitionBean sed) {
         ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<RuleSetBean>();
 
@@ -315,7 +315,7 @@ public class RuleSetDAO extends AuditableEntityDAO {
         return ruleSetBeans;
     }
 
-    public ArrayList<RuleSetBean> findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(CRFVersionBean crfVersion, CRFBean crfBean, StudyBean currentStudy,
+    public ArrayList<RuleSetBean> findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(CRFVersionBean crfVersion, CRFBean crfBean, Study currentStudy,
             StudyEventDefinitionBean sed) {
         ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<RuleSetBean>();
 
@@ -338,7 +338,7 @@ public class RuleSetDAO extends AuditableEntityDAO {
         return ruleSetBeans;
     }
 
-    public ArrayList<RuleSetBean> findByCrfStudyAndStudyEventDefinition(CRFBean crfBean, StudyBean currentStudy, StudyEventDefinitionBean sed) {
+    public ArrayList<RuleSetBean> findByCrfStudyAndStudyEventDefinition(CRFBean crfBean, Study currentStudy, StudyEventDefinitionBean sed) {
         ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<RuleSetBean>();
 
         this.setTypesExpected();
@@ -359,7 +359,7 @@ public class RuleSetDAO extends AuditableEntityDAO {
     }
 
     @Override
-    public ArrayList<RuleSetBean> findAllByStudy(StudyBean currentStudy) {
+    public ArrayList<RuleSetBean> findAllByStudy(Study currentStudy) {
         ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<RuleSetBean>();
 
         this.setTypesExpected();

@@ -10,16 +10,17 @@ package org.akaza.openclinica.control.extract;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DatasetRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.view.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +49,9 @@ public class RemoveDatasetServlet extends SecureController {
         DatasetDAO dsDAO = new DatasetDAO(sm.getDataSource());
         DatasetBean dataset = (DatasetBean) dsDAO.findByPK(dsId);
 
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean study = (StudyBean)sdao.findByPK(dataset.getStudyId());
-        checkRoleByUserAndStudy(ub, study, sdao);
-        if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
+        Study study = (Study)getStudyDao().findByPK(dataset.getStudyId());
+        checkRoleByUserAndStudy(ub, study);
+        if (study != null && currentStudy != null && study.getStudyId() != currentStudy.getStudyId() && study.checkAndGetParentStudyId() != currentStudy.getStudyId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));
             forwardPage(Page.MENU_SERVLET);
@@ -113,7 +113,7 @@ public class RemoveDatasetServlet extends SecureController {
         // datasets =
         // (ArrayList)dsdao.findAllByStudyIdAdmin(currentStudy.getId());
         // } else {
-        datasets = dsdao.findAllByStudyId(currentStudy.getId());
+        datasets = dsdao.findAllByStudyId(currentStudy.getStudyId());
         // }
 
         ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);

@@ -10,21 +10,22 @@ package org.akaza.openclinica.control.managestudy;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -72,8 +73,7 @@ public class DeleteStudyEventServlet extends SecureController{
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
             event.setStudyEventDefinition(sed);
 
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
-            StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
             request.setAttribute("study", study);
 
             String action = request.getParameter("action");

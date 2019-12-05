@@ -393,7 +393,7 @@ form element in red --%>
   <td valign="top"><span class="alert">*</span></td>
 </c:if>
 
-<c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+<c:if test="${study.discrepancyManagement=='true' && !study.status.locked}">
     <c:choose>
     <c:when test="${displayItem.discrepancyNoteStatus == 0}">
         <c:set var="imageFileName" value="icon_noNote" />

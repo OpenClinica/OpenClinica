@@ -26,7 +26,6 @@ import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -72,7 +71,6 @@ public class ViewNotesServlet extends SecureController {
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
     private StudyEventDefinitionDao studyEventDefinitionDao;
-
 
 
     /*
@@ -131,7 +129,6 @@ public class ViewNotesServlet extends SecureController {
         boolean isForOneSubjectsNotes = "y".equalsIgnoreCase(viewForOne);
 
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         dndao.setFetchMapping(true);
 
         int resolutionStatus = 0;
@@ -168,8 +165,6 @@ public class ViewNotesServlet extends SecureController {
         }
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
 
         UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
@@ -185,7 +180,6 @@ public class ViewNotesServlet extends SecureController {
         factory.setSubjectDao(sdao);
         factory.setStudySubjectDao(subdao);
         factory.setUserAccountDao(uadao);
-        factory.setStudyDao(studyDao);
         factory.setCurrentStudy(currentStudy);
         factory.setDiscrepancyNoteDao(dndao);
         factory.setCrfDao(getCrfDao());

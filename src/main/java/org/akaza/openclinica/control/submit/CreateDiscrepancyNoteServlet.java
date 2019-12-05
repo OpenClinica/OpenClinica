@@ -25,7 +25,6 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -35,6 +34,8 @@ import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -45,7 +46,6 @@ import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -60,6 +60,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Create a discrepancy note for a data entity
@@ -393,13 +394,12 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 dnb.setSubjectName(ssub.getName());
                 dnb.setSubjectId(ssub.getId());
                 dnb.setStudySub(ssub);
-                StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                 int parentStudyForSubject = 0;
-                StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(ssub.getStudyId());
+                Study studyBeanSub = (Study) getStudyDao().findByPK(ssub.getStudyId());
                 if (null != studyBeanSub) {
-                    parentStudyForSubject = studyBeanSub.getParentStudyId();
+                    parentStudyForSubject = studyBeanSub.checkAndGetParentStudyId();
                 }
-                if (ssub.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForSubject) {
+                if (ssub.getStudyId() != currentStudy.getStudyId() && currentStudy.getStudyId() != parentStudyForSubject) {
                     addPageMessage(noAccessMessage);
                     throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
                 }
@@ -498,7 +498,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 // solution, tbh
 
                 // adding second rule here, tbh 08/2009
-              if ((currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) && currentStudy.getId() != currentStudy.getParentStudyId()) {
+              if ((currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) && currentStudy.getStudyId() != currentStudy.checkAndGetParentStudyId()) {
                     dnb.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
                     request.setAttribute("autoView", "0");
                     // hide the panel, tbh
@@ -549,7 +549,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             request.setAttribute(USER_ACCOUNTS, userAccounts);
 
             // ideally should be only two cases
-         if ((currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) && currentStudy.getId() != currentStudy.getParentStudyId()) {             // assigning back to OP, tbh
+         if ((currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) && currentStudy.getStudyId() != currentStudy.checkAndGetParentStudyId()) {             // assigning back to OP, tbh
                 request.setAttribute(USER_ACCOUNT_ID,  Integer.valueOf(parent.getOwnerId()).toString());
                 logger.debug("assigned owner id: " + parent.getOwnerId());
             } else if (dnb.getEventCRFId() > 0) {
@@ -651,7 +651,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 note.setParentDnId(parent.getId());
             }
 
-            note.setStudyId(currentStudy.getId());
+            note.setStudyId(currentStudy.getStudyId());
 
             note = getNoteInfo(note);// populate note infos
 
@@ -775,15 +775,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         ItemDataBean itemData = new ItemDataBean();
                         SectionBean section = new SectionBean();
 
-                        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                         UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(note.getAssignedUserId());
                         String alertEmail = assignedUser.getEmail();
                         message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),assignedUser.getLastName()));
                         message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base")
-                                + "ResolveDiscrepancy?flavor=-query&noteId=" + note.getEntityId()
+                                + "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=" + assignedUser.getName()
+                                + "&listNotes_f_entityName=" + note.getEntityName()
                                 + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
                         message.append(respage.getString("you_received_this_from"));
-                        StudyBean study = (StudyBean) studyDAO.findByPK(note.getStudyId());
+                        Study study = (Study) getStudyDao().findByPK(note.getStudyId());
                         SectionDAO sectionDAO = new SectionDAO(sm.getDataSource());
 
                         if ("itemData".equalsIgnoreCase(entityType)) {
@@ -939,14 +939,13 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         CoreResources.setRequestSchema(request, "public");
 
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-        StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
+        Study subjectStudy = getStudyDao().findByStudySubjectId(subjectId);
         // study id, tbh 03/2009
         ArrayList userAccounts = new ArrayList();
-        if (currentStudy.getParentStudyId() > 0) {
-            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), subjectId);
-        } else if (subjectStudy.getParentStudyId() > 0) {
-            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(), subjectId);
+        if (currentStudy.isSite()) {
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, currentStudy.getStudy().getStudyId(), subjectId);
+        } else if (subjectStudy.isSite()) {
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(subjectStudy.getStudyId(), subjectStudy.getStudy().getStudyId(), subjectId);
         } else {
             userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, 0, subjectId);
         }

@@ -21,10 +21,10 @@ import javax.sql.DataSource;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -129,10 +129,9 @@ public class CreateNewStudyEventServlet extends SecureController {
         // TODO: make this sensitive to permissions
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 
-        StudyBean studyWithEventDefinitions = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithEventDefinitions = new StudyBean();
-            studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
+        Study studyWithEventDefinitions = currentStudy;
+        if (currentStudy.isSite()) {
+            studyWithEventDefinitions = currentStudy.getStudy();
         }
         // find all active definitions with CRFs
         ArrayList<StudyEventDefinitionBean> eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
@@ -284,7 +283,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             // v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
             v.addValidation(INPUT_STUDY_SUBJECT_LABEL, Validator.NO_BLANKS);
             v.addValidation(INPUT_LOCATION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-            if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
+            if (currentStudy.getEventLocationRequired().equalsIgnoreCase("required")) {
                 v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
             }
 
@@ -295,7 +294,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 if (!StringUtil.isBlank(fp.getString(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
                     // logger.debug("has scheduled definition******");
                     v.addValidation(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i], Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
-                    if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
+                    if (currentStudy.getEventLocationRequired().equalsIgnoreCase("required")) {
                         v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
                         v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
                                 2000);

@@ -16,12 +16,12 @@ import core.org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import core.org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -93,6 +93,7 @@ public class RuleController {
     @Autowired
     @Qualifier("dataSource")
     private BasicDataSource dataSource;
+    private StudyDao studyDao;
     private RuleSetRuleDao ruleSetRuleDao;
     private RuleSetServiceInterface ruleSetService;
     private RulesPostImportContainerService rulesPostImportContainerService;
@@ -247,17 +248,16 @@ public class RuleController {
     @RequestMapping(value = "/studies/{study}/metadata", method = RequestMethod.GET)
     public ModelAndView studyMetadata(Model model, HttpSession session, @PathVariable("study") String studyOid, HttpServletResponse response) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
+        Study currentStudy = (Study) session.getAttribute("study");
         UserAccountBean userAccount = (UserAccountBean) session.getAttribute("userBean");
 
         UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
         userAccount = (UserAccountBean) userAccountDao.findByUserName("root");
 
-        StudyDAO studyDao = new StudyDAO(dataSource);
-        currentStudy = studyDao.findByOid(studyOid);
+        currentStudy = studyDao.findByOcOID(studyOid);
 
-        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy, getRuleSetRuleDao(),null);
-        AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy, getRuleSetRuleDao(),null, studyDao);
+        AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy, studyDao);
         // RulesDataCollector rdc = new RulesDataCollector(sm.getDataSource(), currentStudy,getRuleSetRuleDao());
         MetaDataCollector.setTextLength(200);
 
@@ -296,6 +296,7 @@ public class RuleController {
         report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(coreResources);
+        report.setStudyDao(studyDao);
         // report.setRulesDataMap(rdc.getOdmRulesDataMap());
         report.setOdmBean(mdc.getODMBean());
         report.setODMVersion("oc1.3");
@@ -308,15 +309,15 @@ public class RuleController {
         return null;
     }
 
-    private StudyUserRoleBean getRole(UserAccountBean userAccount, StudyBean study) throws Exception {
+    private StudyUserRoleBean getRole(UserAccountBean userAccount, Study study) throws Exception {
         StudyUserRoleBean role = new StudyUserRoleBean();
-        if (study == null || userAccount == null || study.getId() == 0) {
+        if (study == null || userAccount == null || study.getStudyId() == 0) {
             throw new Exception();
         }
-        if (userAccount.getId() > 0 && study.getId() > 0 && !study.getStatus().getName().equals("removed")) {
-            role = userAccount.getRoleByStudy(study.getId());
-            if (study.getParentStudyId() > 0) {
-                StudyUserRoleBean roleInParent = userAccount.getRoleByStudy(study.getParentStudyId());
+        if (userAccount.getId() > 0 && study.getStudyId() > 0 && !study.getStatus().getName().equals("removed")) {
+            role = userAccount.getRoleByStudy(study.getStudyId());
+            if (study.isSite()) {
+                StudyUserRoleBean roleInParent = userAccount.getRoleByStudy(study.getStudy().getStudyId());
                 role.setRole(Role.max(role.getRole(), roleInParent.getRole()));
             }
         } else {
@@ -325,7 +326,7 @@ public class RuleController {
         return role;
     }
 
-    private void mayProceed(UserAccountBean userAccount, StudyBean study) throws Exception {
+    private void mayProceed(UserAccountBean userAccount, Study study) throws Exception {
         Role r = getRole(userAccount, study).getRole();
         if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
             return;
@@ -338,8 +339,7 @@ public class RuleController {
     public @ResponseBody org.openclinica.ns.response.v31.Response create(@RequestBody org.openclinica.ns.response.v31.Response responeType, Model model,
             HttpSession session, @PathVariable("study") String studyOid) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        StudyDAO studyDao = new StudyDAO(dataSource);
-        StudyBean currentStudy = studyDao.findByOid(studyOid);
+        Study currentStudy = studyDao.findByOcOID(studyOid);
 
         UserAccountBean userAccount = getUserAccount();
         mayProceed(userAccount, currentStudy);
@@ -359,8 +359,7 @@ public class RuleController {
             @PathVariable("study") String studyOid) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
-        StudyDAO studyDao = new StudyDAO(dataSource);
-        StudyBean currentStudy = studyDao.findByOid(studyOid);
+        Study currentStudy = studyDao.findByOcOID(studyOid);
 
         UserAccountBean userAccount = getUserAccount();
         mayProceed(userAccount, currentStudy);
@@ -396,8 +395,7 @@ public class RuleController {
             @PathVariable("study") String studyOid, @RequestParam("ignoreDuplicates") Boolean ignoreDuplicates) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
-        StudyDAO studyDao = new StudyDAO(dataSource);
-        StudyBean currentStudy = studyDao.findByOid(studyOid);
+        Study currentStudy = studyDao.findByOcOID(studyOid);
 
         UserAccountBean userAccount = getUserAccount();
         mayProceed(userAccount, currentStudy);
@@ -442,8 +440,7 @@ public class RuleController {
             HttpSession session, @PathVariable("study") String studyOid) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(ruleTest.getRules());
-        StudyDAO studyDao = new StudyDAO(dataSource);
-        StudyBean currentStudy = studyDao.findByOid(studyOid);
+        Study currentStudy = studyDao.findByOcOID(studyOid);
 
         UserAccountBean userAccount = getUserAccount();
         mayProceed(userAccount, currentStudy);
@@ -549,6 +546,14 @@ public class RuleController {
         return ruleSetRuleDao;
     }
 
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+    @Autowired
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
+
     @Autowired
     public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         this.ruleSetRuleDao = ruleSetRuleDao;
@@ -559,7 +564,7 @@ public class RuleController {
     }
 
     // TODO: fix locale
-    public RulesPostImportContainerService getRulePostImportContainerService(StudyBean currentStudy, UserAccountBean userAccount) {
+    public RulesPostImportContainerService getRulePostImportContainerService(Study currentStudy, UserAccountBean userAccount) {
         Locale l = new Locale("en_US");
         this.rulesPostImportContainerService.setCurrentStudy(currentStudy);
         this.rulesPostImportContainerService.setRespage(ResourceBundleProvider.getPageMessagesBundle(l));

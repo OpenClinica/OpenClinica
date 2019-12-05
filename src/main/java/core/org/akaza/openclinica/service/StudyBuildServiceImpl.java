@@ -6,7 +6,6 @@ import net.sf.json.util.JSONUtils;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
@@ -19,7 +18,6 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyUserRole;
 import core.org.akaza.openclinica.domain.datamap.StudyUserRoleId;
@@ -42,9 +40,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -77,7 +78,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     @Autowired
     private ParticipateService participateService;
-
 
     @Autowired
     private RestfulServiceHelper serviceHelper;
@@ -187,19 +187,18 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         updateStudyUserRoles(request, ub, userActiveStudyId, studyEnvUuid, false);
 
-        StudyDAO studyDAO = new StudyDAO(dataSource);
-        StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        Study currentPublicStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
         Study userStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
         if (currentPublicStudy == null) {
             return studyEnvUuidProcessed;
         }
 
-        int parentStudyId = currentPublicStudy.getParentStudyId() > 0 ? currentPublicStudy.getParentStudyId() : currentPublicStudy.getId();
+        int parentStudyId = currentPublicStudy.isSite() ? currentPublicStudy.getStudy().getStudyId() : currentPublicStudy.getStudyId();
         if (ub.getActiveStudy() != null && ub.getActiveStudy().getStudyId() == parentStudyId)
             return studyEnvUuidProcessed;
 
         // check to see if the user has a role for this study
-        ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(ub, currentPublicStudy.getId());
+        ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(ub, currentPublicStudy.getStudyId());
         if (userRoles.isEmpty()) {
             logger.error("Sorry you do not have a user role for this study:" + currentPublicStudy.getStudyEnvUuid());
             studyEnvUuidProcessed = true;
@@ -313,7 +312,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             if (siteFlag) {
                 // see if the parent is in this list. If found, assign the custom role of the parent
                 parentExists = checkIfParentExists(request, study, userRoles.getBody());
-            } else if (activeStudy != null && activeStudy.getStudy() != null && activeStudy.getStudy().getStudyId() > 0) {
+            } else if (activeStudy != null && activeStudy.isSite()) {
                 parentExists = activeStudy.getStudy().getStudyId() == study.getStudyId();
             }
             if (StringUtils.isNotEmpty(altStudyEnvUuid)) {
@@ -447,14 +446,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
     }
 
-    public void processAllModules(String accessToken, String studyOid) {
-        Study study = getModuleStudy(studyOid);
-        List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
-        Stream.of(ModuleProcessor.Modules.values()).forEach(module -> {
-            processSingleModule(study, moduleConfigDTOs, module, accessToken);
-        });
-    }
-
     private void processSingleModule(Study study, List<ModuleConfigDTO> moduleConfigDTOs, ModuleProcessor.Modules module, String accessToken) {
         String moduleEnabled = isModuleEnabled(moduleConfigDTOs, study, module);
         ModuleProcessor moduleProcessor = null;
@@ -472,21 +463,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             moduleProcessor.processModule(study, moduleEnabled, accessToken);
     }
 
-    public void processModule(String accessToken, String studyOid, ModuleProcessor.Modules module) {
-        Study study = getModuleStudy(studyOid);
+    public void processModule(String accessToken, Study study, ModuleProcessor.Modules module) {
+        if(study.getStudy() != null)
+            study = study.getStudy();
         List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
         processSingleModule(study, moduleConfigDTOs, module, accessToken);
     }
-
-
-    private Study getModuleStudy(String studyOid) {
-        utilService.setSchemaFromStudyOid(studyOid);
-        Study study = studyDao.findByOcOID(studyOid);
-        if (study.getStudy() != null)
-            study = study.getStudy();
-        return study;
-    }
-
 
     public String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
         for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
@@ -584,7 +566,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (serviceHelper == null) {
-            serviceHelper = new RestfulServiceHelper(this.dataSource);
+            serviceHelper = new RestfulServiceHelper(this.dataSource, this, studyDao);
         }
         return serviceHelper;
     }
@@ -631,4 +613,85 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         existingStudyUserRoles.forEach(studyToDelete -> studyUserRoleDao.getCurrentSession().delete(studyToDelete));
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Study getPublicStudy(String ocId) {
+        HttpServletRequest request = getRequest();
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
+        Study study = studyDao.findByOid(ocId);
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(schema) && request != null)
+            request.setAttribute("requestSchema", schema);
+        return study;
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Study getParentPublicStudy(String ocId) {
+        Study resultBean;
+        HttpServletRequest request = getRequest();
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
+        Study study = getPublicStudy(ocId);
+        if (study.isSite()) {
+            resultBean = study.getStudy();
+        } else {
+            Study parentStudy = study;
+            resultBean = parentStudy;
+        }
+        CoreResources.setRequestSchema(schema);
+        return resultBean;
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Study getPublicStudy(int id) {
+        HttpServletRequest request = getRequest();
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
+        Study study = (Study) studyDao.findByPK(id);
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(schema) && request != null)
+            request.setAttribute("requestSchema", schema);
+        return study;
+    }
+    public static HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
+    }
+
+    public Boolean isPublicStudySameAsTenantStudy(Study tenantStudy, String publicStudyOID) {
+        Study publicStudy = getPublicStudy(tenantStudy.getOc_oid());
+        return publicStudy.getOc_oid().equals(publicStudyOID);
+    }
+
+    public void setRequestSchemaByStudy(String ocId) {
+        Study studyBean = getPublicStudy(ocId);
+        if (studyBean != null)
+            CoreResources.setRequestSchema(studyBean.getSchemaName());
+    }
 }

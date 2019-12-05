@@ -3,11 +3,12 @@ package core.org.akaza.openclinica.web.table.sdv;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.controller.helper.table.SDVToolbarSubject;
@@ -16,7 +17,6 @@ import core.org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import core.org.akaza.openclinica.dao.StudySubjectSDVSort;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -38,6 +38,7 @@ import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +57,7 @@ import javax.sql.DataSource;
 public class SubjectIdSDVFactory extends AbstractTableFactory {
 
     private DataSource dataSource;
-
+    private StudyDao studyDao;
     private int studyId;
     private String contextPath;
     private ResourceBundle resword;
@@ -72,6 +73,14 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public StudyDao getStudyDao() {
+        return studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao) {
+        this.studyDao = studyDao;
     }
 
     @Override
@@ -251,7 +260,6 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
     private SubjectAggregateContainer getRow(StudySubjectBean studySubjectBean) {
         SubjectAggregateContainer row = new SubjectAggregateContainer();
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-        StudyDAO studyDAO = new StudyDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         StudyGroupDAO studyGroupDAO = new StudyGroupDAO(dataSource);
 
@@ -261,8 +269,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         int numberEventCRFs = eventCRFDAO.countEventCRFsByStudySubject(studySubjectBean.getId(), studySubjectBean.getStudyId(), studySubjectBean.getStudyId());
         row.setTotalEventCRF(numberEventCRFs + "");
 
-        StudyBean studyBean = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
-        row.setSiteId(studyBean.getIdentifier());
+        Study studyBean = (Study) studyDao.findByPK(studySubjectBean.getStudyId());
+        row.setSiteId(studyBean.getUniqueIdentifier());
 
         List<EventCRFBean> eventCRFBeans =
             eventCRFDAO.getEventCRFsByStudySubject(studySubjectBean.getId(), studySubjectBean.getStudyId(), studySubjectBean.getStudyId());

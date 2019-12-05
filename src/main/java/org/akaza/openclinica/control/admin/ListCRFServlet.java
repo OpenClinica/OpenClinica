@@ -74,7 +74,7 @@ public class ListCRFServlet extends SecureController {
      */
     @Override
     public void processRequest() throws Exception {
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
             addPageMessage(respage.getString("no_crf_available_study_is_a_site"));
             forwardPage(Page.MENU_SERVLET);
             return;

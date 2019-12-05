@@ -6,13 +6,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -47,8 +47,8 @@ public class OdmStudySubjectController {
 
     @Autowired
     AccountController accountController;
-
-    StudyDAO sdao;
+    @Autowired
+    StudyDao sdao;
     ParticipantPortalRegistrar participantPortalRegistrar;
     public static final String FORM_CONTEXT = "ecid";
 
@@ -73,13 +73,12 @@ public class OdmStudySubjectController {
 
     private ODM getODM(String studyOID, String studySubjectLabel, String crcUserName) {
 
-        StudyDAO studyDAO = new StudyDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-        StudyBean studyBean = null;
+        Study studyBean = null;
         StudySubjectBean studySubjectBean = null;
         try {
             // Retrieve crfs for next event
-            studyBean = studyDAO.findByOid(studyOID);
+            studyBean = sdao.findByOcOID(studyOID);
             if (studyBean != null) {
                 studySubjectBean = (StudySubjectBean) studySubjectDAO.findByLabelAndStudy(studySubjectLabel, studyBean);
                 if (!mayProceed(studyOID, studySubjectBean))
@@ -106,7 +105,7 @@ public class OdmStudySubjectController {
 
     }
 
-    private ODM createOdm(StudyBean studyBean, StudySubjectBean studySubjectBean) {
+    private ODM createOdm(Study studyBean, StudySubjectBean studySubjectBean) {
         ODM odm = new ODM();
         ODMcomplexTypeDefinitionClinicalData clinicalData = null;
         if (studyBean != null) {
@@ -121,10 +120,10 @@ public class OdmStudySubjectController {
         return odm;
     }
 
-    private ODMcomplexTypeDefinitionClinicalData generateClinicalData(StudyBean study) {
+    private ODMcomplexTypeDefinitionClinicalData generateClinicalData(Study study) {
         ODMcomplexTypeDefinitionClinicalData clinicalData = new ODMcomplexTypeDefinitionClinicalData();
         clinicalData.setStudyName(study.getName());
-        clinicalData.setStudyOID(study.getOid());
+        clinicalData.setStudyOID(study.getOc_oid());
         return clinicalData;
     }
 
@@ -153,18 +152,17 @@ public class OdmStudySubjectController {
         this.messageSource = messageSource;
     }
 
-    private StudyBean getStudy(String oid) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
+    private Study getStudy(String oid) {
+        Study studyBean = (Study) sdao.findByOcOID(oid);
         return studyBean;
     }
 
-    private StudyBean getParentStudy(String studyOid) {
-        StudyBean study = getStudy(studyOid);
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(String studyOid) {
+        Study study = getStudy(studyOid);
+        if (!study.isSite()) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
 
@@ -172,9 +170,9 @@ public class OdmStudySubjectController {
 
     private boolean mayProceed(String studyOid, StudySubjectBean ssBean) throws Exception {
         boolean accessPermission = false;
-        StudyBean study = getParentStudy(studyOid);
+        Study study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
         String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
                                                                                                       // PENDING ,

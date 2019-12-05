@@ -1,8 +1,8 @@
 package core.org.akaza.openclinica.domain.rule.action;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import core.org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
@@ -23,7 +23,7 @@ public class HideActionProcessor implements ActionProcessor {
     }
 
     public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean,
-            String itemData, StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
+                                  String itemData, Study currentStudy, UserAccountBean ub, Object... arguments) {
 
         switch (executionMode) {
         case DRY_RUN: {
@@ -47,18 +47,18 @@ public class HideActionProcessor implements ActionProcessor {
         }
     }
 
-    private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+    private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy, UserAccountBean ub) {
         getDynamicsMetadataService().hideNew(itemDataBean.getId(), ((HideActionBean) ruleAction).getProperties(), ub, ruleSet);
         return ruleAction;
     }
 
-    private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
+    private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy,
             UserAccountBean ub) {
         getDynamicsMetadataService().hideNew(itemDataBean.getId(), ((HideActionBean) ruleAction).getProperties(), ub, ruleSet);
         return ruleAction;
     }
 
-    private RuleActionBean dryRun(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+    private RuleActionBean dryRun(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, Study currentStudy, UserAccountBean ub) {
         return ruleAction;
     }
 
