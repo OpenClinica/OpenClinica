@@ -61,7 +61,7 @@ public class EventCrf extends DataMapDomainObject {
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
     
-    static Comparator<EventCrf> compareByOrinal;
+    static Comparator<EventCrf> compareByOrdinal;
     public EventCrf() {
     }
 
@@ -361,11 +361,11 @@ public class EventCrf extends DataMapDomainObject {
     }
    
 
-	public static Comparator<EventCrf> getCompareByOrinal() {
-		if(compareByOrinal != null) {
-			return compareByOrinal;
+	public static Comparator<EventCrf> getCompareByOrdinal() {
+		if(compareByOrdinal != null) {
+			return compareByOrdinal;
 		}else {
-			compareByOrinal = new Comparator<EventCrf>() {
+			compareByOrdinal = new Comparator<EventCrf>() {
 			    @Override
 			    public int compare(EventCrf o1, EventCrf o2) {
 			    	Integer o1ordinal,o2ordinal;
@@ -394,12 +394,12 @@ public class EventCrf extends DataMapDomainObject {
 		
 
 			
-		return compareByOrinal;
+		return compareByOrdinal;
 		
 	}
 
-	public static void setCompareByOrinal(Comparator<EventCrf> compareByOrinal) {
-		EventCrf.compareByOrinal = compareByOrinal;
+	public static void setCompareByOrdinal(Comparator<EventCrf> compareByOrdinal) {
+		EventCrf.compareByOrdinal = compareByOrdinal;
 	}
 
 }

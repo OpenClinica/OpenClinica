@@ -432,7 +432,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    	List<EventDefinitionCrf> edfcs = studyEvent.getStudyEventDefinition().getEventDefinitionCrfs();
 			    
 			    	if(eventCRFs.size() > 1) {
-			    		Collections.sort(eventCRFs, EventCrf.getCompareByOrinal());
+			    		Collections.sort(eventCRFs, EventCrf.getCompareByOrdinal());
 			    	}			    	
 			    	
 			    	for(EventCrf eventCrf : eventCRFs) {
