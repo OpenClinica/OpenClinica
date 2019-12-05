@@ -715,7 +715,8 @@ public class EnketoAPI {
              * prepare request header
              */
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.setContentType(MediaType.APPLICATION_JSON);           
+
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
 
@@ -723,37 +724,39 @@ public class EnketoAPI {
             finalUrl = builder.build().toUri();
             /**
              *  prepare body
-             */
-            LinkedMultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-            body.add("server_url", ocURL);
-            body.add("ecid", actionUrlObject.ecid);
-            body.add("form_id", crfOid);
-            body.add("instance", instance);
-            body.add("instance_id", instanceId);
-            body.add("return_url", redirect);
+             */                      
+            EnketoPDFRequest  body = new EnketoPDFRequest();
+            body.setServer_url(ocURL);
+            body.setEcid(ecid);
+            body.setForm_id(crfOid);
+            body.setInstance(instance);
+            body.setInstance_id(instanceId);
+            body.setReturn_url(redirect);
+            body.setInstanceAttachments(attachment);
+
             String format = actionUrlObject.getFormat();
             if(format == null || format.trim().length() == 0) {
                 format = "A4";
             }
-            body.add("format", format);
+            body.setFormat(format);            
 
             String margin =actionUrlObject.getMargin();
             if(margin == null || margin.trim().length()==0 ) {
                 margin =  "0.5in";
             }
-            body.add("margin", margin);
-
+            body.setMargin(margin);
+            
             String landscape = actionUrlObject.getLandscape();
             if(landscape != null && landscape.equalsIgnoreCase("true")) {
                 landscape = "true";
             }else {
-                landscape = "false";
-            }
-            body.add("landscape", landscape);
-
-            HttpEntity<LinkedMultiValueMap> request = new HttpEntity<LinkedMultiValueMap>(body, headers);
-
-            RestTemplate rest = new RestTemplate();
+            	landscape = "false";
+            }            
+            body.setLandscape(landscape);
+            
+			HttpEntity<EnketoPDFRequest> request = new HttpEntity<EnketoPDFRequest>(body, headers);
+			            
+            RestTemplate rest = new RestTemplate();		            
             ResponseEntity<byte[]> response = rest.postForEntity(eURL.toString(), request, byte[].class);
 
             if (response != null) {
