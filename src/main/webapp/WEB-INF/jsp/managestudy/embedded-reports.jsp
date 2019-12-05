@@ -10,7 +10,10 @@
 <iframe id="insight" style="width:100%; height:800px;"></iframe>
 <script>
   var src = window.location.origin.split('.');
-  src.splice(1, 0, 'insight');
+  if (src.length < 4)
+    src.splice(1, 0, 'insight');
+  else
+    src[1] = 'insight';
   src = src.join('.');
   src += window.location.search.slice(1);
   $('#insight').attr('src', src);
