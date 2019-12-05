@@ -106,7 +106,7 @@ public class ViewStudySubjectServlet extends SecureController {
     }
 
     public static ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub, DataSource ds, UserAccountBean ub,
-            StudyUserRoleBean currentRole) {
+            StudyUserRoleBean currentRole, StudyDao studyDao) {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
         StudyEventDAO sedao = new StudyEventDAO(ds);
         EventCRFDAO ecdao = new EventCRFDAO(ds);
@@ -124,7 +124,7 @@ public class ViewStudySubjectServlet extends SecureController {
             event.setStudyEventDefinition(sed);
 
             // find all active crfs in the definition
-            Study study = (Study) new ViewStudySubjectServlet().getStudyDao().findByPK(studySubject.getStudyId());
+            Study study = (Study) studyDao.findByPK(studySubject.getStudyId());
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
             ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 

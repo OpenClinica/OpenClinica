@@ -412,7 +412,7 @@ public class TableOfContentsServlet extends SecureController {
         // this is for generating side info panel
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
         StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
-        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, sm.getDataSource(), ub, currentRole);
+        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, sm.getDataSource(), ub, currentRole, getStudyDao());
         request.setAttribute("studySubject", ssb);
         request.setAttribute("beans", beans);
         request.setAttribute("eventCRF", ecb);
