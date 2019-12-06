@@ -1,5 +1,6 @@
 package core.org.akaza.openclinica.service;
 
+
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -22,6 +23,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+
 import org.akaza.openclinica.service.PdfService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  * This Service class is used with Add Participant Rest Api
@@ -419,7 +423,18 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    	
 			    ArrayList<StudyEvent> subjectStudyEvents = studySubjectHibDao.fetchListSEs(studySubjectOID);
 			    for(StudyEvent studyEvent : subjectStudyEvents) {
-			    	List<EventCrf> eventCRFs = studyEvent.getEventCrfs();
+			    	List<EventCrf> tmp = studyEvent.getEventCrfs();
+			    	
+			    	/*
+			    	 * OC-11782
+			    	 * check the CRF ordinal and reorder by the ordinal 
+			    	 */
+			    	List<EventDefinitionCrf> edfcs = studyEvent.getStudyEventDefinition().getEventDefinitionCrfs();
+			    	ArrayList<EventCrf> eventCRFs = new ArrayList<EventCrf>(tmp);
+			    	
+			    	if(eventCRFs.size() > 1) {			    		
+			    		eventCRFs.sort(EventCrf.getCompareByOrdinal());
+			    	}			    	
 			    	
 			    	for(EventCrf eventCrf : eventCRFs) {
 			    		formLayoutOID = eventCrf.getFormLayout().getOcOid();
@@ -478,6 +493,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			
 		}
   
+    
     /**
      * 
      * @param msg
