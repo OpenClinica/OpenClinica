@@ -94,6 +94,7 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="coreResources" ref="coreResources"/>
         <property name="ruleSetRuleDao" ref="ruleSetRuleDao"/>
+        <property name="studyDao" ref="studyDaoDomain"/>
 
     </bean>
 
