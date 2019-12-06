@@ -603,10 +603,10 @@
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
         </c:if>
@@ -616,7 +616,7 @@
                 <div class="taskLink"><a href="${urlPrefix}reports?/collection/root"><fmt:message key="nav_reports_view" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}reports?/question/new"><fmt:message key="nav_reports_edit" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}reports?/question/new"><fmt:message key="nav_reports_create" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
         </c:if>
