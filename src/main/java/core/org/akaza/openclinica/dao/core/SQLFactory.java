@@ -137,15 +137,15 @@ public class SQLFactory {
         // key is the public static final sting used above; value is the actual
         // filename
         HashMap fileList = new HashMap();
-        CacheManager cacheManager = new CacheManager();
+        CacheManager cacheManager =null;
 
         try {
-            if (resourceLoader != null && cacheManager != null)
-                cacheManager = cacheManager.create(resourceLoader.getResource("classpath:/core/ehcache.xml").getInputStream());
+        	URL url = getClass().getResource("/core/ehcache.xml");
+        	cacheManager = CacheManager.create(url);           
         } catch (CacheException e) {
 
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         EhCacheWrapper ehCache = new EhCacheWrapper("com.akaza.openclinica.dao.core.DAOCache", cacheManager);
