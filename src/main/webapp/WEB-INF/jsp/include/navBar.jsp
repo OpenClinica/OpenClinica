@@ -613,10 +613,10 @@
         <c:if test="${enableEmbeddedReports}">
             <div class="taskGroup"><fmt:message key="nav_reports" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}reports?/question/new"><fmt:message key="nav_reports_create" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}reports?/collection/root"><fmt:message key="nav_reports_view" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}reports?/collection/root"><fmt:message key="nav_reports_view" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}reports?/question/new"><fmt:message key="nav_reports_create" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
         </c:if>
