@@ -67,11 +67,11 @@
     <select name="studyId" class="formfieldXL">
        <c:forEach var="study" items="${studies}">
         <c:choose>
-         <c:when test="${studyId1 == study.id}">
-          <option value="<c:out value="${study.id}"/>" selected><c:out value="${study.name}"/>
+         <c:when test="${studyId1 == study.studyId}">
+          <option value="<c:out value="${study.studyId}"/>" selected><c:out value="${study.name}"/>
          </c:when>
          <c:otherwise>
-          <option value="<c:out value="${study.id}"/>"><c:out value="${study.name}"/>
+          <option value="<c:out value="${study.studyId}"/>"><c:out value="${study.name}"/>
          </c:otherwise>
         </c:choose>
      </c:forEach>
