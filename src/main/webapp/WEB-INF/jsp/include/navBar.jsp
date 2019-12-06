@@ -261,7 +261,7 @@
                       <b><a href="${urlPrefix}ViewStudy?id=${study.study.studyId}&viewFull=yes"
                           title="<c:out value='${study.study.name}'/>"
                           alt="<c:out value='${study.study.name}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
-                          :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                          :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.studyId}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                   </c:when>
                   <c:otherwise>
                       <b><a href="${urlPrefix}ViewStudy?id=${study.studyId}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>

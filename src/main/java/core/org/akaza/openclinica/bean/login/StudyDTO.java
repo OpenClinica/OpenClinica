@@ -225,7 +225,10 @@ public class StudyDTO {
 			sDTO.setBriefSummary(s.getSummary());
 			sDTO.setSponsor(s.getSponsor());
 			sDTO.setProtocolType(s.getProtocolType());
-			sDTO.setStartDate((s.getDatePlannedStart()).toString());
+			if(s.getDatePlannedStart() != null)
+				sDTO.setStartDate((s.getDatePlannedStart()).toString());
+			else
+				sDTO.setStartDate(null);
 			sDTO.setExpectedTotalEnrollment(s.getExpectedTotalEnrollment().toString());
 			sDTO.setStatus(s.getStatus().getName());
 			sDTO.setStudyOid(s.getOc_oid());
