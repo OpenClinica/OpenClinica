@@ -217,7 +217,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
         // @pgawade 31-Aug-2012 fix for issue #15315: Reverting to set the request variable "beans" back
         // this is for generating side info panel
-        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySubjectBean, sm.getDataSource(), ub, currentRole);
+        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySubjectBean, sm.getDataSource(), ub, currentRole, getStudyDao());
         request.setAttribute("beans", beans);
         EventCRFBean ecb = new EventCRFBean();
         ecb.setStudyEventId(eventId);

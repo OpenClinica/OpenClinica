@@ -2198,7 +2198,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         // added to allow sections shown on this page
         DisplayTableOfContentsBean displayBean = new DisplayTableOfContentsBean();
-        displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy);
+        displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy, getStudyDao());
         // escape apostrophe in event name
         displayBean.getStudyEventDefinition().setName(StringEscapeUtils.escapeJavaScript(displayBean.getStudyEventDefinition().getName()));
         request.setAttribute(TOC_DISPLAY, displayBean);

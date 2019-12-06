@@ -73,7 +73,7 @@ public class EditSelectedServlet extends SecureController {
         ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
         if (sgclasses == null || sgclasses.size() == 0) {
             StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-            Study theStudy = (Study) getStudyDao().findByPK(sm.getUserBean().getActiveStudyId());
+            Study theStudy = getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
             sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
         }
         session.setAttribute("allSelectedGroups", sgclasses);
@@ -150,7 +150,7 @@ public class EditSelectedServlet extends SecureController {
             //
             ArrayList newsgclasses = new ArrayList();
             StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-            Study theStudy = (Study) getStudyDao().findByPK(sm.getUserBean().getActiveStudyId());
+            Study theStudy = getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
             sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
             for (int i = 0; i < sgclasses.size(); i++) {
                 StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclasses.get(i);

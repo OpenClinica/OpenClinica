@@ -131,12 +131,12 @@ public class SignStudySubjectServlet extends SecureController {
         return displayEvents;
     }
 
-    public static boolean permitSign(StudySubjectBean studySub, DataSource ds) {
+    public static boolean permitSign(StudySubjectBean studySub, DataSource ds, StudyDao sdao) {
         boolean sign = true;
         StudyEventDAO sedao = new StudyEventDAO(ds);
         EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-        Study studyBean = (Study) new SignStudySubjectServlet().getStudyDao().findByPK(studySub.getStudyId());
+        Study studyBean = (Study) sdao.findByPK(studySub.getStudyId());
         // DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(ds);
         ArrayList studyEvents = sedao.findAllByStudySubject(studySub);
         for (int l = 0; l < studyEvents.size(); l++) {
@@ -218,7 +218,7 @@ public class SignStudySubjectServlet extends SecureController {
         StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
         request.setAttribute("studySub", studySub);
 
-        if (!permitSign(studySub, sm.getDataSource())) {
+        if (!permitSign(studySub, sm.getDataSource(), getStudyDao())) {
             addPageMessage(respage.getString("subject_event_cannot_signed"));
             // forwardPage(Page.SUBMIT_DATA_SERVLET);
             forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
