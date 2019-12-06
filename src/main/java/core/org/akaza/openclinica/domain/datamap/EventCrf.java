@@ -1,6 +1,7 @@
 package core.org.akaza.openclinica.domain.datamap;
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
@@ -58,7 +60,8 @@ public class EventCrf extends DataMapDomainObject {
     private Integer sdvUpdateId;
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
-
+    
+    static Comparator<EventCrf> compareByOrdinal;
     public EventCrf() {
     }
 
@@ -356,5 +359,50 @@ public class EventCrf extends DataMapDomainObject {
     public void setFormLayout(FormLayout formLayout) {
         this.formLayout = formLayout;
     }
+   
+
+	public static Comparator<EventCrf> getCompareByOrdinal() {
+		if(compareByOrdinal != null) {
+			return compareByOrdinal;
+		}else {
+			compareByOrdinal = new Comparator<EventCrf>() {
+				@Override
+				public int compare(EventCrf o1, EventCrf o2) {
+					Integer o1ordinal,o2ordinal;
+					o1ordinal = getOrdinal(o1);
+					o2ordinal = getOrdinal(o2);
+					return o1ordinal.compareTo(o2ordinal);
+				};
+				 
+				/**
+				 * @param ec
+				 * @return 
+				 */
+				private Integer getOrdinal(EventCrf ec) {
+					Integer ecOrdinal = null;
+					StudyEventDefinition sed1 = ec.studyEvent.getStudyEventDefinition();
+					List<EventDefinitionCrf> edfcList1 = ec.getFormLayout().getCrf().getEventDefinitionCrfs();
+					for(EventDefinitionCrf edfc: edfcList1) {
+						StudyEventDefinition sed2 = edfc.getStudyEventDefinition();
+						if(edfc.getCrf().getOcOid().equals(ec.getFormLayout().getCrf().getOcOid()) &&
+								sed1.getOc_oid().equals(sed2.getOc_oid())){
+							ecOrdinal = edfc.getOrdinal();
+							return ecOrdinal;
+						}
+					}
+					return ecOrdinal;
+				}
+			};
+		}
+		
+
+			
+		return compareByOrdinal;
+		
+	}
+
+	public static void setCompareByOrdinal(Comparator<EventCrf> compareByOrdinal) {
+		EventCrf.compareByOrdinal = compareByOrdinal;
+	}
 
 }
