@@ -126,7 +126,7 @@ public class CreateDatasetServlet extends SecureController {
 
     public ArrayList setUpStudyGroups() {
         StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-        Study theStudy = (Study) getStudyDao().findByPK(sm.getUserBean().getActiveStudyId());
+        Study theStudy = (Study) getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
         ArrayList sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
         // StudyGroupClassBean sgclass = (StudyGroupClassBean)sgclasses.get(0);
         // get the first one and test its name

@@ -293,7 +293,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
             request.setAttribute("resolvedNum", resolvedNum + "");
             request.setAttribute("notAppNum", notAppNum + "");
 
-            DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy);
+            DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy, getStudyDao());
             // Make sure that the interviewDate in the eventCRF is properly
             // formatted
             // for viewSectionDataEntry.jsp --> interviewer.jsp
