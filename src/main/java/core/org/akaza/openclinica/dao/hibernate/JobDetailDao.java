@@ -44,7 +44,7 @@ public class JobDetailDao extends AbstractDomainDao<JobDetail> {
         return (JobDetail) q.uniqueResult();
     }
 
-    public List<JobDetail> findStudyIdWithStatus(int studyId, Enum status) {
+    public List<JobDetail> findByStudyIdAndStatus(int studyId, Enum status) {
         String query = "from " + getDomainClassName() + " where study.studyId=:studyId and status=:status";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyId", studyId);

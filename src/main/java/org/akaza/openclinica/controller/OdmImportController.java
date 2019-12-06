@@ -96,8 +96,11 @@ public class OdmImportController {
             throws Exception {
 
         String accessToken = (String) request.getSession().getAttribute("accessToken");
+        // The first study is pulled from the public schema, so we can find out the oc_oid.
         Study study = studyDao.findByStudyEnvUuid(studyEnvUuid);
         String studyOid = study.getOc_oid();
+        // Then we switch to tenant schema and re-retrieve the study from the tenant schema
+        // so we have the correct study id from the tenant schema
         utilService.setSchemaFromStudyOid(studyOid);
         study = studyDao.findByStudyEnvUuid(studyEnvUuid);
         Study site = studyDao.findByOcOID(studyOid);
@@ -106,7 +109,7 @@ public class OdmImportController {
         String fileName = study.getName();
 
         //check publish status of study so no 2 processes can occur at the same time
-        if (!jobDetailDao.findStudyIdWithStatus(study.getStudyId(), JobStatus.IN_PROGRESS).isEmpty()) {
+        if (!jobDetailDao.findByStudyIdAndStatus(study.getStudyId(), JobStatus.IN_PROGRESS).isEmpty()) {
             return new ResponseEntity(ErrorConstants.ERROR_OTHER_PROCESS_IN_PROGRESS, HttpStatus.OK);
         }
 
@@ -120,14 +123,12 @@ public class OdmImportController {
                 CoreResources.tenantSchema.set("public");
                 map = odmImportService.importOdm(odm, pages, publishDTO.getBoardId(), accessToken);
             } catch (Exception e) {
-                utilService.setSchemaFromStudyOid(studyOid);
                 userService.persistJobFailed(jobDetail, fileName);
                 throw new CompletionException(e);
             }
             Study publicStudy = studyDao.findPublicStudy(studyOid);
             odmImportService.updatePublicStudyPublishedFlag(publicStudy);
             odmImportService.setPublishedVersionsInFM(map, accessToken);
-            utilService.setSchemaFromStudyOid(studyOid);
             userService.persistJobCompleted(jobDetail, fileName);
             return new ResponseEntity<>(null, HttpStatus.OK);
         });
