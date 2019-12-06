@@ -144,7 +144,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                 }
                             }
                             request.getSession().setAttribute("userBean",ub);
-                            request.getSession().setAttribute("studyOid",publicStudyBean.getOc_oid());
+                            request.getSession().setAttribute("studyOid", publicStudyBean !=null ? publicStudyBean.getOc_oid() : null);
                         } else {
                             unauthorized(response, "Invalid authentication token");
                             return;

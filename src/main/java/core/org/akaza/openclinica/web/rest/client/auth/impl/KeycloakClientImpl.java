@@ -61,8 +61,7 @@ public class KeycloakClientImpl {
     @Autowired
     private Keycloak keycloak;
 
-    public void resetParticipateUserAccessCode(String accessToken, String email, String username, String accessCode,String studyEnvironment,String customerUuid) {
-        String realm = getRealmName(accessToken, customerUuid);
+    public void resetParticipateUserAccessCode(String accessToken, String email, String username, String accessCode,String studyEnvironment,String realm) {
         UserResource userResource = null;
         List<UserRepresentation> userRepresentations = keycloak
                 .realm(realm)
@@ -79,10 +78,9 @@ public class KeycloakClientImpl {
         userResource.update(userRepresentation);
     }
 
-    public String createParticipateUser(String accessToken, String email, String username, String accessCode,String studyEnvironment,String customerUuid) {
+    public String createParticipateUser(String accessToken, String email, String username, String accessCode,String studyEnvironment,String realm,String customerUuid) {
         logger.debug("Calling Keycloak to create participate user with username: {}", username);
 
-        String realm = getRealmName(accessToken, customerUuid);
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setEnabled(true);
         userRepresentation.setEmail(email);
@@ -111,27 +109,10 @@ public class KeycloakClientImpl {
         return handleKeycloakError(createUserResponse);
     }
 
-    public boolean searchAccessCodeExistsOrig(String accessToken, String accessCode,String customerUuid) {
-        logger.debug("Calling Keycloak to search for AccessCode uniqueness");
-        String realm = getRealmName(accessToken, customerUuid);
-        List<UserRepresentation> response = keycloak
-                .realm(realm)
-                .users()
-                .search(null, accessCode, null, null, 0, 100);
 
-        if (response.size() != 0) {
-            return true;
-        } else {
-            logger.debug(" AccessCode is Unique");
-            return false;
-        }
-
-    }
-
-    public String getAccessCode(String accessToken, String userUuid,String customerUuid ) {
+    public String getAccessCode(String accessToken, String userUuid,String realm ) {
         logger.debug("Calling Keycloak to get participate UserPresentation object");
 
-        String realm = getRealmName(accessToken, customerUuid);
         UserResource userResource = keycloak
                 .realm(realm)
                 .users()
@@ -140,7 +121,6 @@ public class KeycloakClientImpl {
         UserRepresentation userRepresentation = userResource.toRepresentation();
         Map<String, List<String>> attributes =  userRepresentation.getAttributes();
         List<String> accessCodes = attributes.get(ACCESS_CODE_ATTRIBUTE);
-        logger.info("Access Code : {}",accessCodes.get(0));
         return accessCodes.get(0);
     }
 
@@ -166,12 +146,10 @@ public class KeycloakClientImpl {
     }
 
 
-    public boolean searchAccessCodeExists(String accessToken, String accessCode,String customerUuid) {
+    public boolean searchAccessCodeExists(String accessToken, String accessCode,String realm) {
         logger.debug("Calling Keycloak to search for AccessCode uniqueness");
         RestTemplate restTemplate = new RestTemplate();
 
-
-        String realm = getRealmName(accessToken, customerUuid);
 
         AuthzClient authzClient = AuthzClient.create(core.org.akaza.openclinica.dao.core.CoreResources.getKeyCloakConfig());
         String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
