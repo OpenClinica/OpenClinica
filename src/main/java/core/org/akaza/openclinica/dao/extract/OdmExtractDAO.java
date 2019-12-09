@@ -26,6 +26,7 @@ import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.*;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -3347,6 +3348,8 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected void setStudyParemeterConfig(Study study) {
+        StudyConfigService studyConfig = new StudyConfigService(this.ds);
+        studyConfig.setStudyParameterValueToStudyManually(study);
         StudyParameterValueBean param = new StudyParameterValueDAO(this.ds).findByHandleAndStudy(study.getStudyId(), "collectDob");
         study.setCollectDob(param.getValue());
     }
