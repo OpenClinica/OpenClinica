@@ -1532,8 +1532,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
         this.setStudyEventAndFormMetaOC1_3TypesExpected();
         logger.debug("Begin to execute GetStudyEventAndFormMetaOC1_3Sql");
-        logger.info("getStudyEventAndFormMetaOC1_3SQl= "
-                + this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived),permissionTags));
+        logger.debug("getStudyEventAndFormMetaOC1_3SQl= {} ", this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived),permissionTags));
 
         ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived),permissionTags));
         Iterator iter = rows.iterator();
