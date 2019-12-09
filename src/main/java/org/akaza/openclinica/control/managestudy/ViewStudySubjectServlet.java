@@ -304,7 +304,11 @@ public class ViewStudySubjectServlet extends SecureController {
             if(!StringUtils.isEmpty(visitBasedEventItempath)) {
                  itemPathList = Arrays.asList(visitBasedEventItempath.split("\\s*,\\s*"));
             }
-            Study parentStudyBean = currentStudy.getStudy();
+            Study parentStudyBean = null;
+            if(currentStudy.isSite())
+                parentStudyBean = currentStudy.getStudy();
+            else
+                parentStudyBean = currentStudy;
 
                 for (int i = 0; i < displayEvents.size(); i++) {
                     DisplayStudyEventBean decb = displayEvents.get(i);
