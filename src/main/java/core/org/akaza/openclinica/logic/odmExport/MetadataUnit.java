@@ -196,13 +196,12 @@ public class MetadataUnit extends OdmUnit {
 
 
 
-        Study study = studyBase.getStudy();
-
-
+        Study study =studyBase.getStudy();
         if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0) {
             StudyConfigService studyConfig = new StudyConfigService(this.ds);
             studyConfig.setParameterValuesForStudy(study);
         }
+
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
         metadata.setStudy(study);
         String discrepancyManagementValue = null;

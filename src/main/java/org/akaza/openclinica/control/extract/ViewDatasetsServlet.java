@@ -217,7 +217,7 @@ public class ViewDatasetsServlet extends SecureController {
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
         String prevSchema = (String) request.getAttribute("requestSchema");
         request.setAttribute("requestSchema", "public");
-        Study theStudy = (Study) getStudyDao().findByPK(sm.getUserBean().getActiveStudyId());
+        Study theStudy = (Study) getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
         request.setAttribute("requestSchema", prevSchema);
         ArrayList<StudyGroupClassBean> allSelectedGroups = sgcdao.findAllActiveByStudy(theStudy);
         ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
