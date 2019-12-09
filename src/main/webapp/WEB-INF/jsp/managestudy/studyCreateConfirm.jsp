@@ -118,7 +118,7 @@
   </c:choose>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
-   <%-- <c:out value="${newStudy.status.name}"/> --%> <c:out value="Available"/>
+   <%-- <c:out value="${newStudy.status.description}"/> --%> <c:out value="Available"/>
    </td></tr>
 
 

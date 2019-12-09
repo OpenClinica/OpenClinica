@@ -284,7 +284,7 @@ function updateThis(multiSelEle, count) {
        </c:choose> 
     </c:forEach>
    </select></div> --%>
-   <input type="text" name="statusName" value="<c:out value="${study.status.name}"/>" class="formfieldL" disabled>
+   <input type="text" name="statusName" value="<c:out value="${study.status.description}"/>" class="formfieldL" disabled>
    <input type="hidden" name="statusId" value="${study.status.code}">
 
    </div>

@@ -10,19 +10,19 @@
  existing sidebar JSP--%>
 <c:if test="${panel.studyInfoShown}">
     <c:choose>
-        <c:when test="${study.status.name != 'removed' && study.status.name != 'auto-removed'}">
+        <c:when test="${study.status.description != 'removed' && study.status.description != 'auto-removed'}">
 
             <c:choose>
-                <c:when test="${study.parentStudyId>0}">
+                <c:when test="${study.study != null && study.study.getStudyId>0}">
                     <b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
-                    <a href="ViewStudy?id=${study.parentStudyId}&viewFull=yes">${study.parentStudyName}</a>
+                    <a href="ViewStudy?id=${study.study.getStudyId}&viewFull=yes">${study.study.name}</a>
                     <br><br>
                     <b>Site:</b>&nbsp;
-                    <a href="ViewSite?id=${study.id}">
+                    <a href="ViewSite?id=${study.studyId}">
                 </c:when>
                 <c:otherwise>
                     <b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
-                    <a href="ViewStudy?id=${study.id}&viewFull=yes">
+                    <a href="ViewStudy?id=${study.studyId}&viewFull=yes">
                 </c:otherwise>
             </c:choose>
             <c:out value="${study.name}"/></a>
@@ -69,10 +69,10 @@
 
             <b><fmt:message key="collect_subject" bundle="${resword}"/></b>&nbsp;
             <c:choose>
-                <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+                <c:when test="${study.collectDob == '1'}">
                     <fmt:message key="yes" bundle="${resword}"/>
                 </c:when>
-                <c:when test="${study.studyParameterConfig.collectDob == '2'}">
+                <c:when test="${study.collectDob == '2'}">
                     <fmt:message key="only_year_of_birth" bundle="${resword}"/>
                 </c:when>
                 <c:otherwise>
