@@ -261,7 +261,7 @@
                       <b><a href="${urlPrefix}ViewStudy?id=${study.study.studyId}&viewFull=yes"
                           title="<c:out value='${study.study.name}'/>"
                           alt="<c:out value='${study.study.name}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
-                          :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                          :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.studyId}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                   </c:when>
                   <c:otherwise>
                       <b><a href="${urlPrefix}ViewStudy?id=${study.studyId}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
@@ -603,20 +603,20 @@
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
         </c:if>
         <c:if test="${enableEmbeddedReports}">
             <div class="taskGroup"><fmt:message key="nav_reports" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}reports?/question/new"><fmt:message key="nav_reports_create" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}reports?/collection/root"><fmt:message key="nav_reports_view" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}reports?/collection/root"><fmt:message key="nav_reports_view" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}reports?/question/new"><fmt:message key="nav_reports_create" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
         </c:if>

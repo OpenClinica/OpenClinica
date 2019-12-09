@@ -102,7 +102,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     * @throws OpenClinicaException
     */
     public String createParticipant(SubjectTransferBean subjectTransfer,Study currentStudy,String accessToken,
-                                    String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
+                                    String realm,String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
 
 
         // create subject
@@ -184,7 +184,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             oCParticipantDTO.setIdentifier(subjectTransfer.getIdentifier());
             ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(locale);
             userService.connectParticipant(currentStudy.getOc_oid(), subjectTransfer.getPersonId(),
-                    oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
+                    oCParticipantDTO, accessToken, userAccountBean, realm,customerUuid, textsBundle);
         }
 
 
@@ -220,7 +220,7 @@ private void updateStudySubjectSize(Study currentStudy) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier", "The study identifier you provided is not valid.");
             }
 
-            
+
             StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
             if (studyLevelRole == null) {
                 throw new OpenClinicaSystemException("errorCode.noRoleSetUp",
@@ -238,13 +238,13 @@ private void updateStudySubjectSize(Study currentStudy) {
                         "The study identifier you provided is not valid.");
             }
 
-            
+
             if (site == null || site.getStudy().getStudyId() != study.getStudyId()) {
                 throw new OpenClinicaSystemException("errorCode.invalidSiteIdentifier",
                         "The site identifier you provided is not valid.");
             }
 
-            
+
             /**
              * check study level
              */

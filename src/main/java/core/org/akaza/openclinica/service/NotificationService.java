@@ -164,7 +164,6 @@ public class NotificationService  {
         UserRepresentation userRepresentation = userResource.toRepresentation();
         Map<String, List<String>> attributes =  userRepresentation.getAttributes();
         List<String> accessCodes = attributes.get(ACCESS_CODE_ATTRIBUTE);
-        logger.info("Access Code : {}",accessCodes.get(0));
         return accessCodes.get(0);
     }
 
