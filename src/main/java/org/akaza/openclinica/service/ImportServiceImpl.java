@@ -1276,9 +1276,9 @@ public class ImportServiceImpl implements ImportService {
             }
         }
         if (studySubject != null && !studySubject.getStatus().equals(Status.AVAILABLE)) {
-            //if participant has already signed, show they are not available instead of not found
+            
             if (studySubject.getStatus().equals(Status.SIGNED)) {
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_AVAILABLE);
+               ;
             } else {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
             }
