@@ -110,7 +110,7 @@ public class OdmImportController {
 
         //check publish status of study so no 2 processes can occur at the same time
         if (!jobDetailDao.findByStudyIdAndStatus(study.getStudyId(), JobStatus.IN_PROGRESS).isEmpty()) {
-            return new ResponseEntity(ErrorConstants.ERROR_OTHER_PROCESS_IN_PROGRESS, HttpStatus.OK);
+            return new ResponseEntity(ErrorConstants.ERR_OTHER_PROCESS_IN_PROGRESS, HttpStatus.NOT_ACCEPTABLE);
         }
 
         JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.PUBLISH_STUDY, fileName);
