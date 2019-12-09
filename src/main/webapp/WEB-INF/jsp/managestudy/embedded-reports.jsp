@@ -9,12 +9,7 @@
 
 <iframe id="insight" style="width:100%; height:800px;"></iframe>
 <script>
-  var src = window.location.origin.split('.');
-  if (src.length < 4)
-    src.splice(1, 0, 'insight');
-  else
-    src[1] = 'insight';
-  src = src.join('.');
+  var src = '${SBSBaseUrl}'.replace('.build.', '.insight.');
   src += window.location.search.slice(1);
   $('#insight').attr('src', src);
 </script>

@@ -482,16 +482,16 @@ public class StudyDao extends AbstractDomainDao<Study> {
         String schema = null;
         if (request == null) {
             schema = CoreResources.getRequestSchema();
+            CoreResources.setRequestSchema("public");
         } else {
-            if (request != null)
                 schema = (String) request.getAttribute("requestSchema");
+                request.setAttribute("requestSchema", "public");
         }
-        if (request != null)
-            request.setAttribute("requestSchema", "public");
-
         Study study = (Study) findByPK(id);
         if (org.apache.commons.lang.StringUtils.isNotEmpty(schema) && request != null)
             request.setAttribute("requestSchema", schema);
+        else if(org.apache.commons.lang.StringUtils.isNotEmpty(schema))
+            CoreResources.setRequestSchema(schema);
         return study;
     }
 }
