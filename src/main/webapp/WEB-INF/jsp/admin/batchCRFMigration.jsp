@@ -176,7 +176,7 @@
 						<c:out value="-All-" />&nbsp;
 					</option>
 					<c:forEach var="site" items="${siteList}">
-						<option value="<c:out value="${site.oid}"/>">&nbsp;
+						<option value="<c:out value="${site.oc_oid}"/>">&nbsp;
 							<c:out value="${site.name}"/>&nbsp;
 						</option>
 					</c:forEach>
