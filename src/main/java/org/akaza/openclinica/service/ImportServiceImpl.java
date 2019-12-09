@@ -1275,13 +1275,9 @@ public class ImportServiceImpl implements ImportService {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_IDENTIFIERS_MISMATCH);
             }
         }
-        if (studySubject != null && !studySubject.getStatus().equals(Status.AVAILABLE)) {
-            
-            if (studySubject.getStatus().equals(Status.SIGNED)) {
-               ;
-            } else {
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
-            }
+        if (studySubject != null && !(studySubject.getStatus().equals(Status.AVAILABLE)) && !(studySubject.getStatus().equals(Status.SIGNED))) {
+                       
+                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);            
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
