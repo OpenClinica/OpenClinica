@@ -74,6 +74,7 @@ import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenant
             session.setAttribute(tenantKey, tenant);
         }
         request.setAttribute("enableEmbeddedReports", CoreResources.getField("enableEmbeddedReports"));
+        request.setAttribute("SBSBaseUrl", CoreResources.getField("SBSBaseUrl"));
         
         chain.doFilter(req, response);
     }
