@@ -330,13 +330,16 @@ public class QueryServiceImpl implements QueryService {
 
     private void prepareEmail(QueryServiceHelperBean helperBean) throws Exception {
         StringBuffer message = new StringBuffer();
+        Integer threadNumber = helperBean.getDn().getThreadNumber();
+        if (null == threadNumber)
+            threadNumber = helperBean.getDn().getParentDiscrepancyNote().getThreadNumber();
 
         message.append(MessageFormat.format(respage.getString("mailDNHeader"), helperBean.getUserAccount().getFirstName(), helperBean.getUserAccount().getLastName()));
         message.append(
             "<A HREF='" +
                 SQLInitServlet.getField("sysURL.base") + 
                 "ViewNotes?module=submit&maxRows=50&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=50&listNotes_f_discrepancyNoteBean.disType=Query&listNotes_f_discrepancyNoteBean.threadNumber=" + 
-                helperBean.getDn().getThreadNumber() + 
+                threadNumber.toString() + 
             "'>[Click Here]</A><BR/>"
         );
         message.append(respage.getString("you_received_this_from"));
