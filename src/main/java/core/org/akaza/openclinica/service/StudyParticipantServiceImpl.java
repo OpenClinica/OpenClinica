@@ -123,10 +123,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
    
 
-    public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, String studyOid, String siteOid , String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
+    public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, Study tenantStudy, Study tenantSite, String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
         boolean createNewParticipant=false;
-        Study tenantStudy = studyHibDao.findByOcOID(studyOid);
-        Study tenantSite = studyHibDao.findByOcOID(siteOid);
+        String studyOid = tenantStudy.getOc_oid();
+        String siteOid = tenantSite.getOc_oid();
 
         if (isEnrollmentCapped(tenantStudy,tenantSite))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
@@ -260,7 +260,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
                 AddParticipantResponseDTO result = null;
                 DataImportReport dataImportReport = null;
                 try {
-                    result = addParticipant(addParticipantRequestDTO, userAccountBean, study.getOc_oid(), site.getOc_oid(), realm,customerUuid, textsBundle, accessToken, register);
+                    result = addParticipant(addParticipantRequestDTO, userAccountBean, study, site, realm,customerUuid, textsBundle, accessToken, register);
                     dataImportReport = new DataImportReport(participantId, ((AddParticipantResponseDTO) result).getSubjectOid(), ((AddParticipantResponseDTO) result).getStatus(), ((AddParticipantResponseDTO) result).getParticipateStatus(), SUCCESS, rowNumber);
                 } catch (OpenClinicaSystemException ose) {
                     dataImportReport = new DataImportReport(rowNumber, participantId, FAILED, ose.getMessage());
