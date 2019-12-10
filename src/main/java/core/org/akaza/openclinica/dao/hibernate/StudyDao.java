@@ -420,15 +420,17 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return null;
     }
     @Transactional
-    public Study updateSitesStatus(Study s) {
+    public void updateSitesStatus(Study s) {
         String query = "from "+ getDomainClassName() +" s WHERE s.study.studyId = :parentStudyId";
         Query q=getCurrentSession().createQuery(query);
         q.setParameter("parentStudyId", s.getStudyId());
-        Study s1 = (Study) q.uniqueResult();
-        s1.setStatus(s.getStatus());
-        s1.setOldStatusId(s.getOldStatusId());
-        getCurrentSession().update(s1);
-        return s1;
+        List<Study> slist = q.getResultList();
+        
+        for(Study s1:slist) {
+			s1.setStatus(s.getStatus());
+			s1.setOldStatusId(s.getOldStatusId());
+			getCurrentSession().update(s1);
+        }
     }
     @Transactional
     public Study updateStudyStatus(Study s) {
