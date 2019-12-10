@@ -116,7 +116,11 @@ public class ListStudySubjectsServlet extends SecureController {
         }
         logger.info("CurrentStudy:" + currentPublicStudy.getSchemaName());
 //        logger.info("StudyParameterConfig:" + currentPublicStudy.getStudyParameterConfig().toString());
-        String idSetting = currentStudy.getSubjectIdGeneration();
+        String idSetting ;
+        if(currentStudy.isSite())
+            idSetting = currentStudy.getStudy().getSubjectIdGeneration();
+        else
+            idSetting = currentStudy.getSubjectIdGeneration();
         logger.info("idSetting:" + idSetting);
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {

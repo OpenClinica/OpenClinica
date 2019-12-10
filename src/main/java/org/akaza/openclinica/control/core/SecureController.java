@@ -554,13 +554,18 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     if(currentPublicStudy != null && currentPublicStudy.getStudy() != null)
                     {
                         if(currentStudy.getStudy() == null)
-                            currentStudy.setStudy(currentPublicStudy.getStudy());
+                            currentStudy.setStudy(getStudyDao().findByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                     if (currentStudy.isSite())  {
                         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
                         scs.setParametersForSite(currentStudy);
                     }
                 }
+                session.setAttribute("study", currentStudy);
+            }
+            else if(currentStudy != null && currentStudy.getStudyId() > 0){
+                currentStudy = (Study) getStudyDao().findByPK(currentStudy.getStudyId());
+                String temp = currentStudy.getCollectDob();
                 session.setAttribute("study", currentStudy);
             }
             request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
