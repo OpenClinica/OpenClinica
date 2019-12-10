@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.submit;
 
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -98,7 +99,13 @@ public class ListStudySubjectsServlet extends SecureController {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
         FormProcessor fp = new FormProcessor(request);
         boolean showMoreLink;
-
+        if(currentStudy !=null && currentStudy.getStudyId() > 0){
+            if(( currentStudy.isSite() && currentStudy.getStudy().getStudyParameterValues().size() == 0) || currentStudy.getStudyParameterValues().size() == 0 ){
+                currentStudy = (Study) getStudyDao().findByPK(currentStudy.getStudyId());
+                String temp = currentStudy.getCollectDob();
+                session.setAttribute("study", currentStudy);
+            }
+        }
         if(currentStudy.isSite())
             currentStudy.setSubjectIdGeneration(currentStudy.getStudy().getSubjectIdGeneration());
 
