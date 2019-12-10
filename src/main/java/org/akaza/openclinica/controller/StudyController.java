@@ -236,7 +236,10 @@ public class StudyController {
         }
         CoreResources.setRequestSchema(request, tenantSchema);
         // Get Status object from requestDTO
-        Status status = getStatus((String) requestDTO.get("status"));
+        String statusValue =  (String) requestDTO.get("status");
+        if (statusValue != null)
+            statusValue = statusValue.equals("DESIGN") ? "PENDING" : statusValue;
+        Status status = getStatus(statusValue);
         // Validate status field
         if (status == null ) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "status");

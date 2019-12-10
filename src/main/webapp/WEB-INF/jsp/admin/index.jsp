@@ -201,7 +201,7 @@
 						 </c:otherwise>
 						</c:choose>
 						</td>
-						<td class="table_cell"><c:out value="${study.status.name}"/></td>
+						<td class="table_cell"><c:out value="${study.status.description}"/></td>
 					</tr>
 					</c:forEach>
 					<tr valign="top">
