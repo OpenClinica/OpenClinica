@@ -21,8 +21,6 @@ import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.config.StudyParamNames;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -778,8 +776,7 @@ public class Study extends DataMapDomainObject {
      * }
      */
 
-    @OneToMany(targetEntity=StudyParameterValue.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "study")
-    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "study")
     public List<StudyParameterValue> getStudyParameterValues() {
         return this.studyParameterValues;
     }
