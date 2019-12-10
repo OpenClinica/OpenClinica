@@ -778,7 +778,7 @@ public class Study extends DataMapDomainObject {
      * }
      */
 
-    @OneToMany(targetEntity=StudyParameterValue.class,cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "study")
+    @OneToMany(targetEntity=StudyParameterValue.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "study")
     @Fetch(value = FetchMode.SUBSELECT)
     public List<StudyParameterValue> getStudyParameterValues() {
         return this.studyParameterValues;

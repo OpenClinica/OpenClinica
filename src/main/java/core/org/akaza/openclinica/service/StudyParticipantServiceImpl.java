@@ -18,6 +18,7 @@ import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.controller.dto.*;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.*;
@@ -128,6 +129,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         String studyOid = tenantStudy.getOc_oid();
         String siteOid = tenantSite.getOc_oid();
 
+        StudyConfigService studyConfig = new StudyConfigService(this.dataSource);
+        studyConfig.setStudyParameterValueToStudyManually(tenantStudy);
+        studyConfig.setStudyParameterValueToStudyManually(tenantSite);
+        
         if (isEnrollmentCapped(tenantStudy,tenantSite))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
         
