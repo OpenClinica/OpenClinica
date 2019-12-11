@@ -30,6 +30,7 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -197,9 +198,12 @@ public class MetadataUnit extends OdmUnit {
 
 
         Study study =studyBase.getStudy();
-        if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0) {
-            StudyConfigService studyConfig = new StudyConfigService(this.ds);
-            studyConfig.setParameterValuesForStudy(study);
+        StudyConfigService studyConfig = new StudyConfigService(this.ds);
+        try{
+            if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0)
+                studyConfig.setParameterValuesForStudy(study);
+        }catch(LazyInitializationException e) {
+            studyConfig.setStudyParameterValueToStudyManually(study);
         }
 
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
