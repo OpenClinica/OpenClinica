@@ -459,6 +459,10 @@ public class StudyDao extends AbstractDomainDao<Study> {
         cq.where(predicate).orderBy(cb.asc(study.get("studyId")));
         TypedQuery query=getCurrentSession().createQuery(cq);
         query.setParameter(pParentStudyId, parentStudyId);
+        List<Study> studyList = query.getResultList();
+        int tempInvokeSpv;
+        for(Study tmpStudy: studyList)
+            tempInvokeSpv = tmpStudy.getStudyParameterValues().size();
         return (List<Study>) query.getResultList();
     }
     @Transactional

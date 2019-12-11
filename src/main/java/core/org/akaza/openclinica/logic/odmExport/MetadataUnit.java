@@ -198,12 +198,9 @@ public class MetadataUnit extends OdmUnit {
 
 
         Study study =studyBase.getStudy();
-        StudyConfigService studyConfig = new StudyConfigService(this.ds);
-        try{
-            if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0)
-                studyConfig.setParameterValuesForStudy(study);
-        }catch(LazyInitializationException e) {
-            studyConfig.setStudyParameterValueToStudyManually(study);
+        if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0) {
+            StudyConfigService studyConfig = new StudyConfigService(this.ds);
+            studyConfig.setParameterValuesForStudy(study);
         }
 
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
