@@ -306,7 +306,7 @@ public class ValidateServiceImpl implements ValidateService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
         }
 
-        if (!isUserHasAccessToStudy(userRoles, studyOid)) {
+        if (!isUserHasAccessToSite(userRoles, studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
         }
 
