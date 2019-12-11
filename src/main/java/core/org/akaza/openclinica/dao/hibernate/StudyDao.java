@@ -420,16 +420,17 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return null;
     }
     @Transactional
-    public Study updateSitesStatus(Study s) {
-        String query = "from "+ getDomainClassName() +" s WHERE s.study.studyId = :parentStudyId";
+    public void updateSitesStatus(Study s) {
+        String query = "update "+ getDomainClassName() +" s set status=:parentStatus,oldStatusId=:parentOldStatusId WHERE s.study.studyId = :parentStudyId";
         Query q=getCurrentSession().createQuery(query);
+        q.setParameter("parentStatus", s.getStatus());
+        q.setParameter("parentOldStatusId", s.getOldStatusId());
         q.setParameter("parentStudyId", s.getStudyId());
-        Study s1 = (Study) q.uniqueResult();
-        s1.setStatus(s.getStatus());
-        s1.setOldStatusId(s.getOldStatusId());
-        getCurrentSession().update(s1);
-        return s1;
+        
+        int result = q.executeUpdate();
+        
     }
+    
     @Transactional
     public Study updateStudyStatus(Study s) {
         String query = "from "+ getDomainClassName() +" s WHERE s.studyId = :studyId";
@@ -482,16 +483,16 @@ public class StudyDao extends AbstractDomainDao<Study> {
         String schema = null;
         if (request == null) {
             schema = CoreResources.getRequestSchema();
+            CoreResources.setRequestSchema("public");
         } else {
-            if (request != null)
                 schema = (String) request.getAttribute("requestSchema");
+                request.setAttribute("requestSchema", "public");
         }
-        if (request != null)
-            request.setAttribute("requestSchema", "public");
-
         Study study = (Study) findByPK(id);
         if (org.apache.commons.lang.StringUtils.isNotEmpty(schema) && request != null)
             request.setAttribute("requestSchema", schema);
+        else if(org.apache.commons.lang.StringUtils.isNotEmpty(schema))
+            CoreResources.setRequestSchema(schema);
         return study;
     }
 }

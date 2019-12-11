@@ -88,7 +88,7 @@ public class RestoreStudySubjectServlet extends SecureController {
             // find study events
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 //            ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);
-            ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
+            ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole, getStudyDao());
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
                 if (studySub.getStatus().equals(Status.AVAILABLE)) {

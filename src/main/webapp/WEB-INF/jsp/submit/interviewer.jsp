@@ -486,10 +486,10 @@ function callTip(html)
     </td>
     
     <td class="table_cell_noborder" >
-        <c:if test="${study.parentStudyId > '0'}">
+        <c:if test="${study.study != null && study.study.studyId > '0'}">
             <c:out value="${siteTitle}" /><br>
         </c:if>
-        <c:if test="${study.parentStudyId == '0'}">
+        <c:if test="${study.study == null || study.study.studyId == '0'}">
             <fmt:message key="na" bundle="${resword}"/><br>
         </c:if>
     </td>

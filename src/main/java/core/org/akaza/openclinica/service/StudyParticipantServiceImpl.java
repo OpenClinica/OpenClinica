@@ -1,5 +1,6 @@
 package core.org.akaza.openclinica.service;
 
+
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -17,11 +18,13 @@ import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.controller.dto.*;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+
 import org.akaza.openclinica.service.PdfService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -37,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  * This Service class is used with Add Participant Rest Api
@@ -119,11 +124,15 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
    
 
-    public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, String studyOid, String siteOid , String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
+    public AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, Study tenantStudy, Study tenantSite, String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register ) {
         boolean createNewParticipant=false;
-        Study tenantStudy = studyHibDao.findByOcOID(studyOid);
-        Study tenantSite = studyHibDao.findByOcOID(siteOid);
+        String studyOid = tenantStudy.getOc_oid();
+        String siteOid = tenantSite.getOc_oid();
 
+        StudyConfigService studyConfig = new StudyConfigService(this.dataSource);
+        studyConfig.setStudyParameterValueToStudyManually(tenantStudy);
+        studyConfig.setStudyParameterValueToStudyManually(tenantSite);
+        
         if (isEnrollmentCapped(tenantStudy,tenantSite))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
         
@@ -219,7 +228,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
             oCParticipantDTO.setPhoneNumber(addParticipantRequestDTO.getPhoneNumber());
             oCParticipantDTO.setIdentifier(addParticipantRequestDTO.getIdentifier());
             userService.connectParticipant(studyOid, addParticipantRequestDTO.getSubjectKey(),
-                    oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
+                    oCParticipantDTO, accessToken, userAccountBean, realm,customerUuid, textsBundle);
             studySubject=studySubjectHibDao.findById(studySubject.getStudySubjectId());
         }
 
@@ -235,7 +244,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     }
 
 
-    public void startBulkAddParticipantJob(MultipartFile file, Study study, Study site, UserAccountBean userAccountBean,  JobDetail jobDetail, String schema,String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
+    public void startBulkAddParticipantJob(MultipartFile file, Study study, Study site, UserAccountBean userAccountBean,  JobDetail jobDetail, String schema,String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
         ResponseEntity response = null;
         String logFileName = null;
         CoreResources.setRequestSchema(schema);
@@ -256,7 +265,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
                 AddParticipantResponseDTO result = null;
                 DataImportReport dataImportReport = null;
                 try {
-                    result = addParticipant(addParticipantRequestDTO, userAccountBean, study.getOc_oid(), site.getOc_oid(), customerUuid, textsBundle, accessToken, register);
+                    result = addParticipant(addParticipantRequestDTO, userAccountBean, study, site, realm,customerUuid, textsBundle, accessToken, register);
                     dataImportReport = new DataImportReport(participantId, ((AddParticipantResponseDTO) result).getSubjectOid(), ((AddParticipantResponseDTO) result).getStatus(), ((AddParticipantResponseDTO) result).getParticipateStatus(), SUCCESS, rowNumber);
                 } catch (OpenClinicaSystemException ose) {
                     dataImportReport = new DataImportReport(rowNumber, participantId, FAILED, ose.getMessage());
@@ -419,7 +428,18 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    	
 			    ArrayList<StudyEvent> subjectStudyEvents = studySubjectHibDao.fetchListSEs(studySubjectOID);
 			    for(StudyEvent studyEvent : subjectStudyEvents) {
-			    	List<EventCrf> eventCRFs = studyEvent.getEventCrfs();
+			    	List<EventCrf> tmp = studyEvent.getEventCrfs();
+			    	
+			    	/*
+			    	 * OC-11782
+			    	 * check the CRF ordinal and reorder by the ordinal 
+			    	 */
+			    	List<EventDefinitionCrf> edfcs = studyEvent.getStudyEventDefinition().getEventDefinitionCrfs();
+			    	ArrayList<EventCrf> eventCRFs = new ArrayList<EventCrf>(tmp);
+			    	
+			    	if(eventCRFs.size() > 1) {			    		
+			    		eventCRFs.sort(EventCrf.getCompareByOrdinal());
+			    	}			    	
 			    	
 			    	for(EventCrf eventCrf : eventCRFs) {
 			    		formLayoutOID = eventCrf.getFormLayout().getOcOid();
@@ -478,6 +498,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			
 		}
   
+    
     /**
      * 
      * @param msg

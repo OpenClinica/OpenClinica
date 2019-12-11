@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.dao.hibernate.StudyParameterDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyParameter;
 import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.hibernate.LazyInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,7 +125,8 @@ public class StudyConfigService {
         if(study.getStudyParameterValues() != null && study.getStudyParameterValues().size() != 0){
             for(StudyParameterValue spv : study.getStudyParameterValues()) {
                 if (spv.getStudyParameter().getHandle().equals(handle)) {
-                    spv.setValue(value);
+                    if(!spv.getValue().equalsIgnoreCase(value))
+                        spv.setValue(value);
                     paramIsPresent = true;
                     break;
                 }
@@ -143,4 +145,25 @@ public class StudyConfigService {
         }
     }
 
+    public void setStudyParameterValueToStudyManually(Study study){
+        try {
+            String s = study.getCollectDob();
+        }catch (LazyInitializationException e ){
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
+            ArrayList<StudyParameterValueBean> spvbList = (ArrayList<StudyParameterValueBean>) spvdao.findAllParameterValuesByStudy(study);
+            List<StudyParameterValue> spvList = new ArrayList<>();
+            for (StudyParameterValueBean spvb : spvbList) {
+                StudyParameterValue newSpv = new StudyParameterValue();
+                StudyParameter parameter = spvdao.findParameterByHandle(spvb.getParameter());
+                newSpv.setStudyParameterValueId(spvb.getId());
+                newSpv.setStudyParameter(parameter);
+                newSpv.setValue(spvb.getValue());
+                newSpv.setStudy(study);
+                spvList.add(newSpv);
+            }
+            study.setStudyParameterValues(spvList);
+        }
+    }
 }
+
+

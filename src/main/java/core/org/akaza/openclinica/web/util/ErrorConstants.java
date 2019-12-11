@@ -3,7 +3,6 @@ package core.org.akaza.openclinica.web.util;
 
 public final class ErrorConstants {
 
-
     public static final String ERR_INCORRECT_USER_ROLE = "error.incorrectUserRole";
     public static final String ERR_INVALID_STUDY_OID = "error.incorrectStudyOid";
     public static final String ERR_INVALID_SITE_OID = "error.incorrectSiteOid";
@@ -25,9 +24,8 @@ public final class ErrorConstants {
     public static final String ERR_NO_ROLE_SETUP = "errorCode.noRoleSetUp";
     public static final String ERR_MISSING_FILE = "errorCode.missingFile";
     public static final String ERR_UNABLE_TO_READ_FILE = "errorCode.unableToReadFile";
-
+    public static final String ERR_OTHER_PROCESS_IN_PROGRESS = "errorCode.otherProcessInProgress";
 
     private ErrorConstants() {
     }
-
 }

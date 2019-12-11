@@ -67,7 +67,7 @@
 				        <b><fmt:message key="business_administrator" bundle="${resworkflow}"/></b>
 	                </c:when>
 	                <c:otherwise>
-	                    <c:if test="${study.status.name != 'removed' && study.status.name != 'auto-removed'}">
+	                    <c:if test="${study.status.description != 'removed' && study.status.description != 'auto-removed'}">
 	                        <c:choose>
 	                            <c:when test='${study.study != null && study.study.studyId > 0}'>
 	                                <b><fmt:message key="study" bundle="${resword}"/>:</b> &nbsp; <c:out value="${study.study.name}" />
