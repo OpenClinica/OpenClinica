@@ -236,7 +236,10 @@ public class StudyController {
         }
         CoreResources.setRequestSchema(request, tenantSchema);
         // Get Status object from requestDTO
-        Status status = getStatus((String) requestDTO.get("status"));
+        String statusValue =  (String) requestDTO.get("status");
+        if (statusValue != null)
+            statusValue = statusValue.equals("DESIGN") ? "PENDING" : statusValue;
+        Status status = getStatus(statusValue);
         // Validate status field
         if (status == null ) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "status");
@@ -292,7 +295,14 @@ public class StudyController {
         String collectPersonId = (String) map.get("collectPersonId");
         Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
         String enforceEnrollmentCap =  String.valueOf(map.get("enforceEnrollmentCap"));
-
+        if (templateID != null && !StringUtils.isEmpty(templateID)) {
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "auto non-editable"));
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, templateID));
+        }
+        else {
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "manual"));
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, ""));
+        }
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.DISCREPANCY_MANAGEMENT, "true"));
 
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED, "not_used"));
@@ -302,7 +312,6 @@ public class StudyController {
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_REQUIRED, "not_used"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_DEFAULT, "blank"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_EDITABLE, "true"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "manual"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX, "true"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF, "false"));
 
@@ -310,7 +319,6 @@ public class StudyController {
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.EVENT_LOCATION_REQUIRED, "not_used"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_PORTAL, "disabled"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.RANDOMIZATION, "disabled"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, ""));
 
         if (collectBirthDate == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
@@ -720,19 +728,21 @@ public class StudyController {
     }
 
     private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, List<StudyParameterValue> newStudyParameterValues, String templateID ,Boolean enrollmentCap) {
-        List<StudyParameterValue> studyParameterValues = schemaStudy.getStudyParameterValues();
 
-        addParameterValue(studyParameterValues, templateID, schemaStudy, "participantIdTemplate");
-        addParameterValue(studyParameterValues, enrollmentCap.toString(), schemaStudy, "enforceEnrollmentCap");
+        addParameterValue( templateID, schemaStudy, StudyParamNames.PARTICIPANT_ID_TEMPLATE);
+        addParameterValue( enrollmentCap.toString(), schemaStudy, StudyParamNames.ENFORCE_ENROLLMENT_CAP);
 
         for(StudyParameterValue spv : newStudyParameterValues){
             if(spv.getStudyParameter().getHandle().equalsIgnoreCase(StudyParamNames.SUBJECT_ID_GENERATION)) {
                 if (templateID != null && !StringUtils.isEmpty(templateID))
-                    addParameterValue(studyParameterValues, "auto non-editable", schemaStudy, StudyParamNames.SUBJECT_ID_GENERATION);
+                    addParameterValue("auto non-editable", schemaStudy, StudyParamNames.SUBJECT_ID_GENERATION);
                 else
-                    addParameterValue(studyParameterValues, spv.getValue(), schemaStudy, spv.getStudyParameter().getHandle());
-            }else
-                    addParameterValue(studyParameterValues, spv.getValue(), schemaStudy, spv.getStudyParameter().getHandle());
+                    addParameterValue( spv.getValue(), schemaStudy, spv.getStudyParameter().getHandle());
+            }
+            else if(spv.getStudyParameter().getHandle().equalsIgnoreCase(StudyParamNames.PARTICIPANT_ID_TEMPLATE) || spv.getStudyParameter().getHandle().equalsIgnoreCase(StudyParamNames.ENFORCE_ENROLLMENT_CAP))
+                continue;
+            else
+                    addParameterValue( spv.getValue(), schemaStudy, spv.getStudyParameter().getHandle());
         }
         studyDao.saveOrUpdate(schemaStudy);
     }
@@ -1989,9 +1999,9 @@ public class StudyController {
     }
 
 
-    public void addParameterValue(List<StudyParameterValue> studyParameterValues , String parameter , Study schemaStudy , String handle){
+    public void addParameterValue( String parameter , Study schemaStudy , String handle){
         boolean parameterValueExist = false;
-        for (StudyParameterValue s : studyParameterValues) {
+        for (StudyParameterValue s : schemaStudy.getStudyParameterValues()) {
             if (s.getStudyParameter().getHandle().equals(handle)) {
                 s.setValue(parameter);
                 parameterValueExist = true;
@@ -2004,7 +2014,7 @@ public class StudyController {
             StudyParameterValue studyParameterValue = new StudyParameterValue();
             studyParameterValue = createStudyParameterValueWithHandleAndValue(handle, parameter);
             studyParameterValue.setStudy(schemaStudy);
-            studyParameterValues.add(studyParameterValue);
+            schemaStudy.getStudyParameterValues().add(studyParameterValue);
         }
     }
 }

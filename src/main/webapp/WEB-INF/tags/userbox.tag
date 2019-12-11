@@ -21,10 +21,10 @@
                     <br>
                     <c:choose>
                         <c:when test='${(requestScope["isAdminServlet"] == "admin" && sessionScope["userBean"].techAdmin) || (!userRole.role.active && userBean.techAdmin)}'>
-                            <c:if test="${sessionScope['study'].status != null && sessionScope['study'].status.name != 'removed' && sessionScope['study'].status.name != 'auto-removed'}">
+                            <c:if test="${sessionScope['study'].status != null && sessionScope['study'].status.description != 'removed' && sessionScope['study'].status.description != 'auto-removed'}">
                                 <c:choose>
-                                    <c:when test='${sessionScope["study"].parentStudyId > 0}'>
-                                        <b><fmt:message key="study" bundle="${resword}"/>:</b> &nbsp; <c:out value="${study.parentStudyName}" />
+                                    <c:when test='${sessionScope["study"].study != null && sessionScope["study"].study.studyId > 0}'>
+                                        <b><fmt:message key="study" bundle="${resword}"/>:</b> &nbsp; <c:out value="${study.study.name}" />
                                         <br><b><fmt:message key="current_site" bundle="${resword}"/>:</b> &nbsp; <c:out value="${study.name}" />
                                     </c:when>
                                     <c:otherwise>
@@ -42,10 +42,10 @@
                             <b><fmt:message key="business_administrator" bundle="${resworkflow}"/></b>
                         </c:when>
                         <c:otherwise>
-                            <c:if test="${sessionScope['study'].status != null && study.status.name != 'removed' && study.status.name != 'auto-removed'}">
+                            <c:if test="${sessionScope['study'].status != null && study.status.description != 'removed' && study.status.description != 'auto-removed'}">
                                 <c:choose>
-                                    <c:when test='${study.parentStudyId > 0}'>
-                                        <b><fmt:message key="study" bundle="${resword}"/>:</b> &nbsp; <c:out value="${study.parentStudyName}" />
+                                    <c:when test='${study.study != null && study.study.studyId > 0}'>
+                                        <b><fmt:message key="study" bundle="${resword}"/>:</b> &nbsp; <c:out value="${study.study.name}" />
                                         <br><b><fmt:message key="current_site" bundle="${resword}"/>:</b> &nbsp; <c:out value="${study.name}" />
                                     </c:when>
                                     <c:otherwise>
