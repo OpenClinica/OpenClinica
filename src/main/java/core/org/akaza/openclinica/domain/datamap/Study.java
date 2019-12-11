@@ -886,12 +886,19 @@ public class Study extends DataMapDomainObject {
 
     public void setIndividualStudyParameterValue(String parameterName, String value){
         for(StudyParameterValue spv: getStudyParameterValues()){
-            if(spv.getStudyParameter().getHandle().equalsIgnoreCase(parameterName))
+            if(spv.getStudyParameter().getHandle().equalsIgnoreCase(parameterName)) {
                 spv.setValue(value);
+                return;
+            }
         }
+        if(this.isSite())
+            this.getStudy().setIndividualStudyParameterValue(parameterName, value);
     }
     @Transient
     public String getIndividualStudyParameterValueOutput(String parameterName){
+        if(this.isSite())
+            return this.getStudy().getIndividualStudyParameterValueOutput(parameterName);
+
         for(StudyParameterValue spv : getStudyParameterValues()) {
             if (spv.getStudyParameter().getHandle().equalsIgnoreCase(parameterName))
                 return spv.getValue();
