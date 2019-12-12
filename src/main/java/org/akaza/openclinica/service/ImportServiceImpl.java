@@ -351,7 +351,8 @@ public class ImportServiceImpl implements ImportService {
                         if (this.isStudyEventSigned(studyEvent)) {
                             if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
                                 studyEvent.setStatusId(Status.AVAILABLE.getCode());
-                                studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                                //OC-11632
+                                studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
                                 studyEventDao.saveOrUpdate(studyEvent);
                             }
 
