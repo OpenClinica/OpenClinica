@@ -451,15 +451,13 @@ public class StudyDao extends AbstractDomainDao<Study> {
     }
     @Transactional
     public Collection findAllByParentStudyIdOrderedByIdAsc(int parentStudyId) {
-        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
-        CriteriaQuery<Study> cq = cb.createQuery(Study.class);
-        Root<Study> study = cq.from(Study.class);
-        ParameterExpression<Integer> pParentStudyId = cb.parameter(Integer.class);
-        Predicate predicate = cb.or(cb.equal(study.get("studyId"), pParentStudyId),cb.equal(study.get("study").get("studyId"), pParentStudyId));
-        cq.where(predicate).orderBy(cb.asc(study.get("studyId")));
-        TypedQuery query=getCurrentSession().createQuery(cq);
-        query.setParameter(pParentStudyId, parentStudyId);
-        return (List<Study>) query.getResultList();
+        /* This function will load the studyParamValues without lazy initialization*/
+        String query = "select s from Study s join fetch s.studyParameterValues where ( s.studyId=:studyId ) or ( s.study.studyId=:parentStudyId ) order by s.studyId asc";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyId", parentStudyId);
+        q.setParameter("parentStudyId", parentStudyId);
+        List<Study> studyList = q.getResultList();
+        return studyList;
     }
     @Transactional
     public Study updatePublicStudy(Study study) {
