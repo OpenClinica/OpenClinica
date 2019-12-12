@@ -30,7 +30,6 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
