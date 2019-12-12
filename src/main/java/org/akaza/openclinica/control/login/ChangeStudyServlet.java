@@ -204,12 +204,6 @@ public class ChangeStudyServlet extends SecureController {
         request.setAttribute("changeStudySchema", null);
 
         if (currentStudy != null) {
-            Study tempParentStudy;
-            if(currentStudy.isSite())
-                tempParentStudy = currentStudy.getStudy();
-            else
-                tempParentStudy = currentStudy;
-            newStudy.setSubjectIdGeneration(tempParentStudy.getSubjectIdGeneration());
             request.setAttribute("requestSchema", "public");
             String idSetting = newStudy.getSubjectIdGeneration();
             if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
