@@ -73,9 +73,7 @@ public class ViewDatasetsServlet extends SecureController {
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             Study studyWithEventDefinitions = currentStudy;
             if (currentStudy.isSite()) {
-                studyWithEventDefinitions = new Study();
-                studyWithEventDefinitions.setStudyId(currentStudy.getStudy().getStudyId());
-
+                studyWithEventDefinitions = currentStudy.getStudy();
             }
             ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
             CRFDAO crfdao = new CRFDAO(sm.getDataSource());

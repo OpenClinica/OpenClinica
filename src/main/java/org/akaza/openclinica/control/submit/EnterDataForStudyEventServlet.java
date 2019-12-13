@@ -87,11 +87,11 @@ public class EnterDataForStudyEventServlet extends SecureController {
     private StudyEventBean getStudyEvent(int eventId) throws Exception {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 
-        Study studyWithSED = currentStudy;
-        if (currentStudy.isSite()) {
-            studyWithSED = new Study();
-            studyWithSED.setId(currentStudy.checkAndGetParentStudyId());
-        }
+        Study studyWithSED = null;
+        if (currentStudy.isSite())
+            studyWithSED = currentStudy.getStudy();
+        else
+            studyWithSED = currentStudy;
 
         AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
 
