@@ -1457,6 +1457,11 @@ public class ImportServiceImpl implements ImportService {
             DiscrepancyNote childDN = queryService.createQuery(helperBean, queryBean, false);
             childDN.setParentDiscrepancyNote(parentDn);
             childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+            
+            // update Item data map           
+            helperBean.setDn(childDN);
+            helperBean.setParentDn(parentDn);
+            queryService.saveQueryItemDatamap(helperBean);
         } catch (Exception e) {
             eb = new ErrorObj(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
         }
