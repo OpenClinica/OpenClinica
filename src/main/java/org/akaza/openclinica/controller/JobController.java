@@ -115,7 +115,7 @@ public class JobController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-        List<JobDetailDTO> jobDetailDTOS=jobService.findAllNonDeletedJobsBySite(tenantSite,userAccountBean);
+        List<JobDetailDTO> jobDetailDTOS=jobService.findAllNonDeletedJobsBySiteExceptPublishedStudies(tenantSite,userAccountBean);
         logger.debug("REST request to get all JobDetails by site");
 
         return new ResponseEntity<List<JobDetailDTO>>(jobDetailDTOS,HttpStatus.OK);
@@ -148,7 +148,7 @@ public class JobController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-        List<JobDetailDTO> jobDetailDTOS=  jobService.findAllNonDeletedJobsByStudy(tenantStudy,userAccountBean);
+        List<JobDetailDTO> jobDetailDTOS=  jobService.findAllNonDeletedJobsByStudyExceptPublishedStudies(tenantStudy,userAccountBean);
         logger.debug("REST request to get all JobDetails By study");
 
         return new ResponseEntity<List<JobDetailDTO>>(jobDetailDTOS,HttpStatus.OK);
