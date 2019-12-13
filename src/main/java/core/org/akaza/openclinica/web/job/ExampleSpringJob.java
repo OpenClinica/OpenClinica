@@ -191,7 +191,7 @@ public class ExampleSpringJob extends QuartzJobBean {
 
                 // tbh #5796 - covers a bug when the user changes studies, 10/2010
                 Study activeStudy = (Study) studyDao.findByPK(studyId);
-                Study parentStudy = new Study();
+                Study parentStudy = null;
                 logger.debug("active study: " + studyId + " parent study: " + activeStudy.checkAndGetParentStudyId());
                 if (activeStudy.isSite()) {
                     // StudyDAO sdao = new StudyDAO(sm.getDataSource());
