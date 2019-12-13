@@ -205,15 +205,16 @@
           var actionView = '<a href="Jobs?uuid=' + logEntry.uuid + '"><span class="icon icon-search"></span></a> ';
           var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
           var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
-          if (logEntry.status === 'IN_PROGRESS') {
-            actionView = actionDownload = actionDelete = '';
-          }
           var source = logEntry.sourceFileName;
           if (logEntry.type === 'PARTICIPANT_PDF_CASEBOOK') {
             source = source.split('-')[0].split('_');
             source.splice(2, 2);
             source.splice(0, 1);
             source = source.join('_');
+            actionView = '';
+          }
+          if (logEntry.status === 'IN_PROGRESS') {
+            actionView = actionDownload = actionDelete = '';
           }
           return [
             source,
