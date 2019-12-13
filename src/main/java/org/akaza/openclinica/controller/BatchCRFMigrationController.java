@@ -115,8 +115,9 @@ public class BatchCRFMigrationController implements Runnable {
         super();
     }
 
-    public BatchCRFMigrationController(HelperObject helperObject) {
+    public BatchCRFMigrationController(HelperObject helperObject, StudyDao studyDao) {
         this.helperObject = helperObject;
+        this.studyDao = studyDao;
     }
 
     @RequestMapping(value = "/forms/migrate/{filename}/downloadLogFile")
@@ -208,7 +209,7 @@ public class BatchCRFMigrationController implements Runnable {
 
         String str = "";
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
-            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject);
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject, studyDao);
             Thread thread = new Thread(bcmController);
             thread.start();
             str = resterms.getString("Batch_CRF_version_migration_is_running_You_will_receive_an_email_once_the_process_is_complete");
@@ -238,7 +239,7 @@ public class BatchCRFMigrationController implements Runnable {
 
         String pageMessages = null;
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
-            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject);
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject, studyDao);
             Thread thread = new Thread(bcmController);
             thread.start();
 
