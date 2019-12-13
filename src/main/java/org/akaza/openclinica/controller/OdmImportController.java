@@ -7,7 +7,6 @@ import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.web.util.ErrorConstants;
 import io.swagger.annotations.Api;
@@ -33,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -106,14 +106,24 @@ public class OdmImportController {
         Study site = studyDao.findByOcOID(studyOid);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        String fileName = study.getName();
 
         //check publish status of study so no 2 processes can occur at the same time
-        if (!jobDetailDao.findByStudyIdAndStatus(study.getStudyId(), JobStatus.IN_PROGRESS).isEmpty()) {
-            return new ResponseEntity(ErrorConstants.ERR_OTHER_PROCESS_IN_PROGRESS, HttpStatus.NOT_ACCEPTABLE);
+        List<JobDetail> jobsInProgress = jobDetailDao.findByStudyIdAndStatus(study.getStudyId(), JobStatus.IN_PROGRESS);
+
+        // there are jobs in progress, look for datestamp to see if those jobs have been idle for more than 4 hours
+        if (!jobsInProgress.isEmpty()) {
+            for (JobDetail job : jobsInProgress) {
+                Calendar jobDetailsCal = Calendar.getInstance();
+                jobDetailsCal.setTime(job.getDateCreated());
+                jobDetailsCal.add(Calendar.HOUR_OF_DAY, 4);
+                Calendar now = Calendar.getInstance();
+                if (now.before(jobDetailsCal)) {
+                    return new ResponseEntity(ErrorConstants.ERR_OTHER_PROCESS_IN_PROGRESS, HttpStatus.NOT_ACCEPTABLE);
+                }
+            }
         }
 
-        JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.PUBLISH_STUDY, fileName);
+        JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.PUBLISH_STUDY, null);
 
         CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
             Map<String, Object> map;
@@ -123,13 +133,13 @@ public class OdmImportController {
                 CoreResources.tenantSchema.set("public");
                 map = odmImportService.importOdm(odm, pages, publishDTO.getBoardId(), accessToken);
             } catch (Exception e) {
-                userService.persistJobFailed(jobDetail, fileName);
+                userService.persistJobFailed(jobDetail, null);
                 throw new CompletionException(e);
             }
             Study publicStudy = studyDao.findPublicStudy(studyOid);
             odmImportService.updatePublicStudyPublishedFlag(publicStudy);
             odmImportService.setPublishedVersionsInFM(map, accessToken);
-            userService.persistJobCompleted(jobDetail, fileName);
+            userService.persistJobCompleted(jobDetail, null);
             return new ResponseEntity<>(null, HttpStatus.OK);
         });
 
