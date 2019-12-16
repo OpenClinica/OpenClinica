@@ -639,16 +639,17 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         request.setAttribute(DIS_NOTES, noteTree);
 
         // copied from CreatediscrepancyNoteServlet generateUserAccounts
+        Study subjectStudy = getStudyDao().findByStudySubjectId(subjectId);
         String currentSchema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, "public");
 
-        Study subjectStudy = getStudyDao().findByStudySubjectId(subjectId);
         int studyId = ub.getActiveStudyId();
         ArrayList<UserAccountBean> userAccounts = new ArrayList();
         if (currentStudy.isSite()) {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.checkAndGetParentStudyId(), subjectId);
         } else if (subjectStudy.isSite()) {
-            userAccounts = udao.findAllUsersByStudyOrSite(subjectStudy.getStudyId(), subjectStudy.checkAndGetParentStudyId(), subjectId);
+            Study publicSubjectStudy = getStudyDao().findByUniqueId(subjectStudy.getUniqueIdentifier());
+            userAccounts = udao.findAllUsersByStudyOrSite(publicSubjectStudy.getStudyId(), publicSubjectStudy.checkAndGetParentStudyId(), subjectId);
         } else {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, subjectId);
         }
