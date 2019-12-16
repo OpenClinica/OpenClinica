@@ -70,11 +70,11 @@ public class CreateFiltersTwoServlet extends SecureController {
         // generate the SQL add on for the dataset.
         String action = request.getParameter("action");
 
-        Study studyWithEventDefs = currentStudy;
-        if (currentStudy.isSite()) {
-            studyWithEventDefs = new Study();
-            studyWithEventDefs.setStudyId(currentStudy.getStudy().getStudyId());
-        }
+        Study studyWithEventDefs = null;
+        if (currentStudy.isSite())
+            studyWithEventDefs = currentStudy.getStudy();
+        else
+            studyWithEventDefs = currentStudy;
 
         if (StringUtil.isBlank(action)) {
             // throw an error

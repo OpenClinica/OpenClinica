@@ -27,18 +27,17 @@ import java.util.List;
 
 /**
  * This Service class is used with Bulk Jobs
- *
  * @author joekeremian
  */
 
-@Service( "jobService" )
+@Service("jobService")
 @Transactional
 @EnableAsync
 public class JobServiceImpl implements JobService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Autowired
-    @Qualifier( "dataSource" )
+    @Qualifier("dataSource")
     private BasicDataSource dataSource;
 
 
@@ -51,43 +50,36 @@ public class JobServiceImpl implements JobService {
     @Autowired
     UserService userService;
 
-    public List<JobDetailDTO> findAllNonDeletedJobsBySite(Study tenantSite,UserAccountBean userAccountBean){
+    public List<JobDetailDTO> findAllNonDeletedJobsBySiteExceptPublishedStudies(Study tenantSite, UserAccountBean userAccountBean) {
         List<JobDetailDTO> jobDetailDTOS = new ArrayList<>();
-        List<JobDetail> jobDetails = jobDetailDao.findAllNonDeletedJobsBySite(tenantSite.getStudyId(),userAccountBean.getId());
+        List<JobDetail> jobDetails = jobDetailDao.findAllNonDeletedJobsBySiteExceptPublishedStudies(tenantSite.getStudyId(), userAccountBean.getId());
         for (JobDetail jobDetail : jobDetails) {
             jobDetailDTOS.add(convertEntityToDTO(jobDetail));
         }
         return jobDetailDTOS;
     }
 
-
-    public List<JobDetailDTO> findAllNonDeletedJobsByStudy(Study tenantStudy,UserAccountBean userAccountBean){
+    public List<JobDetailDTO> findAllNonDeletedJobsByStudyExceptPublishedStudies(Study tenantStudy, UserAccountBean userAccountBean) {
         List<JobDetailDTO> jobDetailDTOS = new ArrayList<>();
-        List<JobDetail> jobDetails = jobDetailDao.findAllNonDeletedJobsByStudy(tenantStudy.getStudyId(),userAccountBean.getId());
+        List<JobDetail> jobDetails = jobDetailDao.findAllNonDeletedJobsByStudyExceptPublishedStudies(tenantStudy.getStudyId(), userAccountBean.getId());
         for (JobDetail jobDetail : jobDetails) {
             jobDetailDTOS.add(convertEntityToDTO(jobDetail));
         }
         return jobDetailDTOS;
     }
-
 
 
     public JobDetail saveOrUpdateJob(JobDetail jobDetail) {
-
-       return jobDetailDao.saveOrUpdate(jobDetail);
-
+        return jobDetailDao.saveOrUpdate(jobDetail);
     }
-
-
-
 
     private JobDetailDTO convertEntityToDTO(JobDetail jobDetail) {
         JobDetailDTO jobDetailDTO = new JobDetailDTO();
         jobDetailDTO.setUuid(jobDetail.getUuid());
-        jobDetailDTO.setSiteOid(jobDetail.getSite()!=null? jobDetail.getSite().getOc_oid():"");
+        jobDetailDTO.setSiteOid(jobDetail.getSite() != null ? jobDetail.getSite().getOc_oid() : "");
         jobDetailDTO.setStudyOid(jobDetail.getStudy().getOc_oid());
-        jobDetailDTO.setCreatedByUsername(jobDetail.getCreatedBy()!=null?  jobDetail.getCreatedBy().getUserName():null);
-        jobDetailDTO.setUpdatedByUsername(jobDetail.getUpdatedBy()!=null?  jobDetail.getUpdatedBy().getUserName():null);
+        jobDetailDTO.setCreatedByUsername(jobDetail.getCreatedBy() != null ? jobDetail.getCreatedBy().getUserName() : null);
+        jobDetailDTO.setUpdatedByUsername(jobDetail.getUpdatedBy() != null ? jobDetail.getUpdatedBy().getUserName() : null);
         jobDetailDTO.setDateCompleted(jobDetail.getDateCompleted());
         jobDetailDTO.setDateCreated(jobDetail.getDateCreated());
         jobDetailDTO.setDateUpdated(jobDetail.getDateUpdated());
@@ -97,11 +89,9 @@ public class JobServiceImpl implements JobService {
         return jobDetailDTO;
     }
 
-
     /**
-     *  Delete the  Job by id.
-     *
-     *  @param id the id of the entity
+     * Delete the  Job by id.
+     * @param id the id of the entity
      */
     public void deleteJob(JobDetail jobDetail, UserAccountBean userAccountBean) {
         UserAccount updaterUserAccount = userAccountDao.findByUserId(userAccountBean.getId());
@@ -111,13 +101,12 @@ public class JobServiceImpl implements JobService {
         jobDetail.setDateUpdated(new Date());
         logger.debug("Request to delete Job : {}", jobDetail.getUuid());
         jobDetailDao.saveOrUpdate(jobDetail);
-        String fileLocationPath = getFileLocationPath(jobDetail.getLogPath(),jobDetail.getType());
+        String fileLocationPath = getFileLocationPath(jobDetail.getLogPath(), jobDetail.getType());
         deleteFile(fileLocationPath);
     }
 
-
     private String getFileLocationPath(String fileName, JobType jobType) {
-        String fileLocation = getFilePath() + File.separator +jobType.toString().toLowerCase()+ File.separator + fileName;
+        String fileLocation = getFilePath() + File.separator + jobType.toString().toLowerCase() + File.separator + fileName;
         return fileLocation;
     }
 

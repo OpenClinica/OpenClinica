@@ -18,9 +18,9 @@ import java.util.List;
 public interface JobService {
 
 
-    List<JobDetailDTO> findAllNonDeletedJobsBySite(Study tenantSite,UserAccountBean userAccountBean);
+    List<JobDetailDTO> findAllNonDeletedJobsBySiteExceptPublishedStudies(Study tenantSite, UserAccountBean userAccountBean);
 
-    List<JobDetailDTO> findAllNonDeletedJobsByStudy(Study tenantStudy,UserAccountBean userAccountBean);
+    List<JobDetailDTO> findAllNonDeletedJobsByStudyExceptPublishedStudies(Study tenantStudy, UserAccountBean userAccountBean);
 
     JobDetail saveOrUpdateJob(JobDetail jobDetail);
 
