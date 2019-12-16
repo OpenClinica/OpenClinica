@@ -133,6 +133,7 @@ public class ImportServiceImpl implements ImportService {
     public static final String NO_CHANGE = "No Change";
     public static final String DiscrepancyNoteMessage = "import XML";
     public static final String DetailedNotes = "Update via Import";
+    public static final String NEW_CRF_TRACK = "NewCreatedViaImport";
 
     List<DataImportReport> dataImportReports = null;
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
@@ -381,6 +382,9 @@ public class ImportServiceImpl implements ImportService {
                                     eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE, null);
                                 }
 
+                            }else if (itemCountInForm.getInsertedUpdatedItemCountInForm() == 0 && eventCrf.getAnnotations().equals(NEW_CRF_TRACK)) {
+                            	// remove the new created blank Form
+                            	eventCrfDao.remove(eventCrf);
                             }
                         }
 
@@ -1319,6 +1323,7 @@ public class ImportServiceImpl implements ImportService {
             }
 
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
+            eventCrf.setAnnotations(NEW_CRF_TRACK);
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
             updateStudyEvntStatus(studyEvent, userAccount, DATA_ENTRY_STARTED);
 
