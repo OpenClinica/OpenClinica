@@ -464,10 +464,17 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
     public void processModule(String accessToken, Study study, ModuleProcessor.Modules module) {
-        if(study.getStudy() != null)
-            study = study.getStudy();
+        study =getModuleStudy(study.getOc_oid());
         List<ModuleConfigDTO> moduleConfigDTOs = getModuleConfigsFromStudyService(accessToken, study);
         processSingleModule(study, moduleConfigDTOs, module, accessToken);
+    }
+
+    private Study getModuleStudy(String studyOid) {
+        utilService.setSchemaFromStudyOid(studyOid);
+        Study study = studyDao.findByOcOID(studyOid);
+        if (study.getStudy() != null)
+            study = study.getStudy();
+        return study;
     }
 
     public String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {

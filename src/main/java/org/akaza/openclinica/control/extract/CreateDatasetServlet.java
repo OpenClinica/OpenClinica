@@ -140,11 +140,11 @@ public class CreateDatasetServlet extends SecureController {
         String action = fp.getString("action");
         if (StringUtil.isBlank(action)) resetProcess();
 
-        Study studyWithEventDefs = currentStudy;
-        if (currentStudy.isSite()) {
-            studyWithEventDefs = new Study();
-            studyWithEventDefs.setStudyId(currentStudy.getStudy().getStudyId());
-        }
+        Study studyWithEventDefs = null;
+        if (currentStudy.isSite())
+            studyWithEventDefs = currentStudy.getStudy();
+        else
+            studyWithEventDefs = currentStudy;
         if (StringUtil.isBlank(action) || "begin".equalsIgnoreCase(action)) {
             // step 2 -- select study events/crfs
 

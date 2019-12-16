@@ -167,11 +167,11 @@ public class ImportDataHelper {
 
         if (eventCrfBean == null) {
 
-            Study studyWithSED = studyBean;
-            if (studyBean.isSite()) {
-                studyWithSED = new Study();
-                studyWithSED.setStudyId(studyBean.getStudy().getStudyId());
-            }
+            Study studyWithSED = null;
+            if (studyBean.isSite())
+                studyWithSED = studyBean.getStudy();
+            else
+            	studyWithSED = studyBean;
 
             AuditableEntityBean studyEvent = studyEventDao.findByPKAndStudy(studyEventId, studyWithSED);
             // TODO need to replace

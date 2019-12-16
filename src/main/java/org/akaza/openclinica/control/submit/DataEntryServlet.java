@@ -2333,11 +2333,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         StudyEventDAO sedao = new StudyEventDAO(getDataSource());
         StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
-        Study studyWithSED = currentStudy;
+        Study studyWithSED = null;
         if (currentStudy.isSite()) {
-            studyWithSED = new Study();
-            studyWithSED.setId(currentStudy.getStudy().getStudyId());
+            studyWithSED = currentStudy.getStudy();
         }
+        else
+            studyWithSED = currentStudy;
 
         AuditableEntityBean aeb = sedao.findByPKAndStudy(studyEventId, studyWithSED);
 
