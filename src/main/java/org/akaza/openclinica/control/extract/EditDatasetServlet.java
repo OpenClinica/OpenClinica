@@ -79,9 +79,7 @@ public class EditDatasetServlet extends SecureController {
 
             Study studyWithEventDefinitions = currentStudy;
             if (currentStudy.isSite()) {
-                studyWithEventDefinitions = new Study();
-                studyWithEventDefinitions.setStudyId(currentStudy.getStudy().getStudyId());
-
+                studyWithEventDefinitions = currentStudy.getStudy();
             }
             ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
             for (int i = 0; i < seds.size(); i++) {

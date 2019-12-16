@@ -210,9 +210,9 @@
           }
           var source = logEntry.sourceFileName;
           if (logEntry.type === 'PARTICIPANT_PDF_CASEBOOK') {
-            source = source.split('-')[0].split('_');
-            source.splice(2, 2);
+            source = source.split('_');
             source.splice(0, 1);
+            source.splice(-2);
             source = source.join('_');
           }
           return [

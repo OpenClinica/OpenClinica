@@ -236,8 +236,7 @@ public class TableOfContentsServlet extends SecureController {
 
         Study studyWithSED = currentStudy;
         if (currentStudy.isSite()) {
-            studyWithSED = new Study();
-            studyWithSED.setId(currentStudy.getStudy().getStudyId());
+            studyWithSED = currentStudy.getStudy();
         }
 
         AuditableEntityBean aeb = sedao.findByPKAndStudy(studyEventId, studyWithSED);

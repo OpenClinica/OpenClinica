@@ -91,9 +91,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
         ItemDAO itemdao = new ItemDAO(sm.getDataSource());
         Study studyWithEventDefinitions = currentStudy;
         if (currentStudy.isSite()) {
-            studyWithEventDefinitions = new Study();
-            studyWithEventDefinitions.setId(currentStudy.getStudy().getStudyId());
-
+            studyWithEventDefinitions = currentStudy.getStudy();
         }
         CRFDAO crfdao = new CRFDAO(sm.getDataSource());
         ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);

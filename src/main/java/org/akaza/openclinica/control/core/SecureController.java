@@ -554,7 +554,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     if(currentPublicStudy != null && currentPublicStudy.getStudy() != null)
                     {
                         if(currentStudy.getStudy() == null)
-                            currentStudy.setStudy(currentPublicStudy.getStudy());
+                            currentStudy.setStudy(getStudyDao().findByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                     if (currentStudy.isSite())  {
                         StudyConfigService scs = new StudyConfigService(sm.getDataSource());

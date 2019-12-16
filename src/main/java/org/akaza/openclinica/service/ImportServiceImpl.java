@@ -1276,13 +1276,9 @@ public class ImportServiceImpl implements ImportService {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_IDENTIFIERS_MISMATCH);
             }
         }
-        if (studySubject != null && !studySubject.getStatus().equals(Status.AVAILABLE)) {
-            //if participant has already signed, show they are not available instead of not found
-            if (studySubject.getStatus().equals(Status.SIGNED)) {
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_AVAILABLE);
-            } else {
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
-            }
+        if (studySubject != null && !(studySubject.getStatus().equals(Status.AVAILABLE)) && !(studySubject.getStatus().equals(Status.SIGNED))) {
+                       
+                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);            
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
@@ -1462,6 +1458,11 @@ public class ImportServiceImpl implements ImportService {
             DiscrepancyNote childDN = queryService.createQuery(helperBean, queryBean, false);
             childDN.setParentDiscrepancyNote(parentDn);
             childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+            
+            // update Item data map           
+            helperBean.setDn(childDN);
+            helperBean.setParentDn(parentDn);
+            queryService.saveQueryItemDatamap(helperBean);
         } catch (Exception e) {
             eb = new ErrorObj(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
         }
