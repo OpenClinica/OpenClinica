@@ -939,9 +939,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         String currentSchema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, "public");
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-
-
-
         // study id, tbh 03/2009
         ArrayList userAccounts = new ArrayList();
         if (currentStudy.isSite()) {
