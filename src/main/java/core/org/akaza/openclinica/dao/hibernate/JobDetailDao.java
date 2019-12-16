@@ -3,6 +3,7 @@ package core.org.akaza.openclinica.dao.hibernate;
 
 import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
+import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import org.hibernate.query.Query;
 
 import java.util.ArrayList;
@@ -16,23 +17,25 @@ public class JobDetailDao extends AbstractDomainDao<JobDetail> {
         return JobDetail.class;
     }
 
-    public List<JobDetail> findAllNonDeletedJobsBySite(int siteId, int userId) {
+    public List<JobDetail> findAllNonDeletedJobsBySiteExceptPublishedStudies(int siteId, int userId) {
         String query = "from " + getDomainClassName() + "   where   site.studyId=:siteId " +
-                "and status !=:jobDeletedStatus and createdBy.userId =:userId";
+                "and status !=:jobDeletedStatus and createdBy.userId =:userId and type !=:type";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("siteId", siteId);
         q.setParameter("userId", userId);
+        q.setParameter("type", JobType.PUBLISH_STUDY);
         q.setParameter("jobDeletedStatus", JobStatus.DELETED);
         return (ArrayList<JobDetail>) q.list();
     }
 
 
-    public List<JobDetail> findAllNonDeletedJobsByStudy(int studyId, int userId) {
+    public List<JobDetail> findAllNonDeletedJobsByStudyExceptPublishedStudies(int studyId, int userId) {
         String query = "from " + getDomainClassName() + "   where   study.studyId=:studyId  " +
-                "and status !=:jobDeletedStatus and createdBy.userId =:userId";
+                "and status !=:jobDeletedStatus and createdBy.userId =:userId  and type !=:type";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyId", studyId);
         q.setParameter("userId", userId);
+        q.setParameter("type", JobType.PUBLISH_STUDY);
         q.setParameter("jobDeletedStatus", JobStatus.DELETED);
         return (ArrayList<JobDetail>) q.list();
     }
