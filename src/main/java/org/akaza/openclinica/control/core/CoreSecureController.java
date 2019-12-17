@@ -327,11 +327,6 @@ public abstract class CoreSecureController extends SecureController {
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     currentStudy = (Study) getStudyDao().findByPK(ub.getActiveStudyId());
 
-                    StudyConfigService scs = new StudyConfigService(getDataSource());
-                    if (currentStudy.isSite()) {
-                        scs.setParametersForSite(currentStudy);
-                    }
-
                     // set up the panel here, tbh
                     panel.reset();
                     /*
