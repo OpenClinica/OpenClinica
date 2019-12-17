@@ -61,7 +61,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
- * 
+ *
  *         View the detail of a discrepancy note on the data entry page
  */
 public class ViewDiscrepancyNoteServlet extends SecureController {
@@ -99,7 +99,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
@@ -126,7 +126,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
         int eventCRFId = fp.getInt(CreateDiscrepancyNoteServlet.EVENT_CRF_ID);
         request.setAttribute(CreateDiscrepancyNoteServlet.EVENT_CRF_ID, new Integer(eventCRFId));
-        
+
         request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
         if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) ||currentRole.getRole().equals(Role.RESEARCHASSISTANT2) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             ArrayList<ResolutionStatus> resStatuses = new ArrayList();
@@ -454,9 +454,9 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
         String session_key = eventCRFId+"_"+field;
         ArrayList newFieldNotes=null;
-        if (newNotes != null && (!newNotes.getNotes(field).isEmpty() || 
+        if (newNotes != null && (!newNotes.getNotes(field).isEmpty() ||
         		!newNotes.getNotes(session_key).isEmpty() ))
-        
+
         {
             newFieldNotes = newNotes.getNotes(field);
             if (newFieldNotes == null || newFieldNotes.size() == 0){
@@ -639,22 +639,23 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         request.setAttribute(DIS_NOTES, noteTree);
 
         // copied from CreatediscrepancyNoteServlet generateUserAccounts
+        Study subjectStudy = getStudyDao().findByStudySubjectId(subjectId);
         String currentSchema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, "public");
 
-        Study subjectStudy = getStudyDao().findByStudySubjectId(subjectId);
         int studyId = ub.getActiveStudyId();
         ArrayList<UserAccountBean> userAccounts = new ArrayList();
         if (currentStudy.isSite()) {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.checkAndGetParentStudyId(), subjectId);
         } else if (subjectStudy.isSite()) {
-            userAccounts = udao.findAllUsersByStudyOrSite(subjectStudy.getStudyId(), subjectStudy.checkAndGetParentStudyId(), subjectId);
+            Study publicSubjectStudy = getStudyDao().findByUniqueId(subjectStudy.getUniqueIdentifier());
+            userAccounts = udao.findAllUsersByStudyOrSite(publicSubjectStudy.getStudyId(), publicSubjectStudy.checkAndGetParentStudyId(), subjectId);
         } else {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, subjectId);
         }
         CoreResources.setRequestSchema(request,currentSchema);
-        
-        
+
+
         request.setAttribute(USER_ACCOUNTS, userAccounts);
         request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName());
 
@@ -696,7 +697,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     /**
      * Update a parent DiscrepancyNoteBean's resolution status and updated date
      * to that of the latest child DiscrepancyNoteBean.
-     * 
+     *
      * @param noteTree
      *            A HashMap of an Integer representing the DiscrepancyNoteBean,
      *            pointing to a parent DiscrepancyNoteBean.
