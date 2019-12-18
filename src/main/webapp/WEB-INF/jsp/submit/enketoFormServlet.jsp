@@ -66,6 +66,9 @@
                 if ("${originatingPage}") window.location.replace("${originatingPage}");
                 else window.close();
             }
+            else if (postMessage.enketoEvent === 'heartbeat') {
+                updateOCAppTimeout();
+            }
         }
     </script>
     <script type="text/javascript">
