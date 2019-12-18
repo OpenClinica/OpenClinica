@@ -114,17 +114,17 @@ public class ViewStudySubjectServlet extends SecureController {
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
 
         ArrayList events = sedao.findAllByStudySubject(studySub);
+        studySub = (StudySubjectBean) ssdao.findByPK(studySub.getSubjectId());
 
         ArrayList displayEvents = new ArrayList();
         for (int i = 0; i < events.size(); i++) {
             StudyEventBean event = (StudyEventBean) events.get(i);
-            StudySubjectBean studySubject = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
 
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
             event.setStudyEventDefinition(sed);
 
             // find all active crfs in the definition
-            Study study = (Study) studyDao.findByPK(studySubject.getStudyId());
+            Study study = (Study) studyDao.findByPK(studySub.getStudyId());
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
             ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
@@ -132,11 +132,11 @@ public class ViewStudySubjectServlet extends SecureController {
             DisplayStudyEventBean de = new DisplayStudyEventBean();
             de.setStudyEvent(event);
             de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole, event.getSubjectEventStatus(), study));
-            ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
+            ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus(), sed.getId());
             populateUncompletedCRFsWithCRFAndVersions(ds, al);
             de.setUncompletedCRFs(al);
 
-            de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySubject));
+            de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySub));
 
             Status status = de.getStudyEvent().getStatus();
             if (status == Status.AVAILABLE || status == Status.AUTO_DELETED)
@@ -532,67 +532,45 @@ public class ViewStudySubjectServlet extends SecureController {
      *            All of the event CRFs for this study event.
      * @return The list of event definitions for which no event CRF exists.
      */
-    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
-        int i;
-        HashMap completed = new HashMap();
-        HashMap startedButIncompleted = new HashMap();
+    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status, int studyEventId) {
+
+        HashMap<Integer, EventDefinitionCRFBean> eventDefinitionsHashMap = new HashMap();
+
+        for (Object eventDefinitionObj : eventDefinitionCRFs){
+            EventDefinitionCRFBean eventDefinitionBean = (EventDefinitionCRFBean) eventDefinitionObj;
+            eventDefinitionsHashMap.put(eventDefinitionBean.getCrfId(), eventDefinitionBean);
+        }
+
         ArrayList answer = new ArrayList();
+        EventCRFDAO ecdao = new EventCRFDAO(ds);
 
-        /**
-         * A somewhat non-standard algorithm is used here: let answer = empty;
-         * foreach event definition ED, set isCompleted(ED) = false foreach
-         * event crf EC, set isCompleted(EC.getEventDefinition()) = true foreach
-         * event definition ED, if (!isCompleted(ED)) { answer += ED; } return
-         * answer; This algorithm is guaranteed to find all the event
-         * definitions for which no event CRF exists.
-         *
-         * The motivation for using this algorithm is reducing the number of
-         * database hits.
-         *
-         * -jun-we have to add more CRFs here: the event CRF which dones't have
-         * item data yet
-         */
+        StudyEventBean studyEventBean = new StudyEventBean();
+        studyEventBean.setId(studyEventId);
+        ArrayList<EventCRFBean> listOfActiveEventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
 
-        for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-            EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-            completed.put(new Integer(edcrf.getCrfId()), Boolean.FALSE);
-            startedButIncompleted.put(new Integer(edcrf.getCrfId()), new EventCRFBean());
-        }
-
+        ArrayList<Integer> listOfCrfVersionsInUse = new ArrayList();
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
-        ItemDataDAO iddao = new ItemDataDAO(ds);
-        for (i = 0; i < eventCRFs.size(); i++) {
-            EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
-            // System.out.println("########event crf id:" + ecrf.getId());
-            int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
-            ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-            if (!idata.isEmpty()) {// this crf has data already
-                completed.put(new Integer(crfId), Boolean.TRUE);
-            } else {// event crf got created, but no data entered
-                // System.out.println("added one into startedButIncompleted" + ecrf.getId());
-                startedButIncompleted.put(new Integer(crfId), ecrf);
-            }
+        for (EventCRFBean eventCRFBean : listOfActiveEventCRFs){
+            listOfCrfVersionsInUse.add(cvdao.findByPK(eventCRFBean.getCRFVersionId()).getId());
         }
 
-        // TODO possible relation to 1689 here, tbh
-        for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-            DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
-            EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+        CRFDAO cdao = new CRFDAO(ds);
+        for (Integer crfVersionId : listOfCrfVersionsInUse){
+            eventDefinitionsHashMap.remove(cdao.findByVersionId(crfVersionId).getId());
+        }
 
-            dedc.setEdc(edcrf);
-            // below added tbh, 112007 to fix bug 1943
+        for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionsHashMap.values()){
+            DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
+            dedc.setEdc(eventDefinitionCrfBean);
+
             if (status.equals(SubjectEventStatus.LOCKED)) {
                 dedc.setStatus(Status.LOCKED);
             }
-            Boolean b = (Boolean) completed.get(new Integer(edcrf.getCrfId()));
-            EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
-            if (b == null || !b.booleanValue()) {
 
-                dedc.setEventCRF(ev);
-                answer.add(dedc);
-
-            }
+            dedc.setEventCRF(new EventCRFBean());
+            answer.add(dedc);
         }
+
         return answer;
     }
 
