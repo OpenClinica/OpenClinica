@@ -361,6 +361,7 @@ public class QueryServiceImpl implements QueryService {
                 message.append(MessageFormat.format(respage.getString("mailDNParameters4"), helperBean.getContainer().getCrfVersion().getCrf().getName()));
                 if (!"eventCrf".equalsIgnoreCase(helperBean.getDn().getEntityType())) {
                     message.append(MessageFormat.format(respage.getString("mailDNParameters6"), helperBean.getParentElementName()));
+                    message.append(MessageFormat.format(respage.getString("mailDNParameters7"), helperBean.getItemData().getItem().getBriefDescription()));
                 }
             }
         }
