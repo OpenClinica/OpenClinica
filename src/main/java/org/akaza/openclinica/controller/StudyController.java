@@ -301,13 +301,11 @@ public class StudyController {
         }
         else {
             studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "manual"));
-            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, ""));
         }
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.DISCREPANCY_MANAGEMENT, "true"));
 
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED, "not_used"));
 
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_DEFAULT, "blank"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_EDITABLE, "true"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_REQUIRED, "not_used"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_DEFAULT, "blank"));
@@ -315,10 +313,6 @@ public class StudyController {
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX, "true"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF, "false"));
 
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE, "true"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.EVENT_LOCATION_REQUIRED, "not_used"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_PORTAL, "disabled"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.RANDOMIZATION, "disabled"));
 
         if (collectBirthDate == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
