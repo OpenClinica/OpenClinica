@@ -209,11 +209,12 @@ public class StudyEventServiceImpl implements StudyEventService {
             StudyEventDefinitionDAO seddao = this.getSedDao();
             definition = seddao.findByOidAndStudy(studyEventOID,
                     currentStudy.getStudyId(), currentStudy.checkAndGetParentStudyId());
-            Study studyWithEventDefinitions = currentStudy;
-            if (currentStudy.isSite()) {
-                studyWithEventDefinitions = new Study();
-                studyWithEventDefinitions.setStudyId(currentStudy.getStudy().getStudyId());
-            }
+
+            Study studyWithEventDefinitions = null;
+            if (currentStudy.isSite())
+                studyWithEventDefinitions = currentStudy.getStudy();
+            else
+                studyWithEventDefinitions = currentStudy;
             // find all active definitions with CRFs
             if (definition == null) {
                 errMsg = "The definition of event(" + studyEventOID + ") can not be found in the study(" + studyOID + ").";
@@ -420,11 +421,11 @@ public class StudyEventServiceImpl implements StudyEventService {
             definition = seddao.findByOidAndStudy(studyEventOID,
                     currentStudy.getStudyId(), currentStudy.checkAndGetParentStudyId());
 
-            Study studyWithEventDefinitions = currentStudy;
-            if (currentStudy.isSite()) {
-                studyWithEventDefinitions = new Study();
-                studyWithEventDefinitions.setStudyId(currentStudy.getStudy().getStudyId());
-            }
+            Study studyWithEventDefinitions = null;
+            if (currentStudy.isSite())
+                studyWithEventDefinitions = currentStudy.getStudy();
+            else
+                studyWithEventDefinitions = currentStudy;
             // find all active definitions with CRFs
             if (definition == null) {
                 errMsg = "The definition of event(" + studyEventOID + ") can not be found in the study(" + studyOID + ").";

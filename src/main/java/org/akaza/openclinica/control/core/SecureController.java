@@ -554,11 +554,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     if(currentPublicStudy != null && currentPublicStudy.getStudy() != null)
                     {
                         if(currentStudy.getStudy() == null)
-                            currentStudy.setStudy(currentPublicStudy.getStudy());
-                    }
-                    if (currentStudy.isSite())  {
-                        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-                        scs.setParametersForSite(currentStudy);
+                            currentStudy.setStudy(getStudyDao().findByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
                 session.setAttribute("study", currentStudy);
@@ -1494,9 +1490,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             currentPublicStudy = tmpPublicStudy;
             CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
             currentStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
-            if (currentStudy.isSite()) {
-                currentPublicStudy.getStudy().setName(currentStudy.getStudy().getName());
-            }
 
             session.setAttribute("publicStudy", currentPublicStudy);
             session.setAttribute("study", currentStudy);

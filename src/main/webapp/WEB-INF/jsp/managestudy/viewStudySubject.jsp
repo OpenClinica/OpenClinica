@@ -355,7 +355,7 @@
         <tr id="general-actions">
           <!-- Table Tools/Actions cell -->
           <td>
-           <c:if test="${study.subjectIdGeneration=='manual' && study.status.available}">
+           <c:if test="${(study.subjectIdGeneration=='manual' || userRole.coordinator) && study.status.available}">
               <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
                 <fmt:message key="edit" bundle="${resword}"/>
               </a>
@@ -363,7 +363,7 @@
           </td>
           <td>
             <c:if test="${
-              studySub.status.name!='removed' &&
+              studySub.status.name!='Removed' &&
               (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
             }">
               <c:if test="${participateStatus=='enabled'}">
@@ -469,7 +469,7 @@
                           <div class="box_BR">
                             <div class="tablebox_center">
                               <c:if test="${
-                                studySub.status.name!='removed' &&
+                                studySub.status.name!='Removed' &&
                                 (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
                               }">
                                 <c:if test="${participateStatus=='enabled'}">
@@ -1128,7 +1128,7 @@
                                             <td valign="top">
                                                 <div class="formfieldXL_BG">
                                                     <c:choose>
-                                                        <c:when test="${study.subjectIdGeneration =='auto non-editable'}">
+                                                        <c:when test="${study.subjectIdGeneration =='auto non-editable' && !userRole.coordinator}">
                                                             <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45"
                                                                    class="formfield form-control" disabled>
                                                             <input class="form-control" type="hidden" name="label" value="<c:out value="${label}"/>">

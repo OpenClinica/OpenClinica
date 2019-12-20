@@ -211,11 +211,11 @@ public class UserController {
         if (includeParticipateInfo != null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
             incRelatedInfo = true;
         }
-
+        boolean isStudyLevelUser;
         try {
             pageNumber = validatePageNumber(pNumber);
             pageSize = validatePageSize(pSize);
-            validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean, incRelatedInfo);
+             validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean, incRelatedInfo);
 
         } catch (OpenClinicaSystemException e) {
             String errorMsg = e.getErrorCode();
@@ -227,11 +227,12 @@ public class UserController {
             return response;
         }
 
+        isStudyLevelUser = utilService.checkStudyLevelUser(userAccountBean.getRoles(), siteOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
         String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 
-        String uuid = startExtractJob(studyOid, siteOid, accessToken, realm, userAccountBean, incRelatedInfo, pageNumber, pageSize);
+        String uuid = startExtractJob(studyOid, siteOid, accessToken, realm, userAccountBean, incRelatedInfo, pageNumber, pageSize, isStudyLevelUser);
 
         logger.info("REST request to Extract Participants info ");
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -271,7 +272,7 @@ public class UserController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startExtractJob(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, boolean incRelatedInfo,int pageNumber,int pageSize) {
+    public String startExtractJob(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, boolean incRelatedInfo,int pageNumber,int pageSize, boolean isStudyLevelUser) {
         utilService.setSchemaFromStudyOid(studyOid);
         String schema = CoreResources.getRequestSchema();
 
@@ -281,7 +282,7 @@ public class UserController {
         JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE, null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             try {
-                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, realm, userAccountBean, schema, jobDetail, incRelatedInfo,pageNumber,pageSize);
+                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, realm, userAccountBean, schema, jobDetail, incRelatedInfo,pageNumber,pageSize, isStudyLevelUser);
             } catch (Exception e) {
                 logger.error("Exeception is thrown while extracting job : " + e);
             }

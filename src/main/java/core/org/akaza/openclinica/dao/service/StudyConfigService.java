@@ -104,28 +104,12 @@ public class StudyConfigService {
 
     }
 
-    public Study setParametersForSite(Study site) {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-        Study parent = site.getStudy();
-        this.setParameterValuesForStudy(parent);
-        setParentParamValuesToChildStudy(site);
-        setParameterValuesForStudy(site);
-        return site;
-    }
-    public void setParentParamValuesToChildStudy(Study study){
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-        Study parentStudy = study.getStudy();
-        for(StudyParameterValue  spv: parentStudy.getStudyParameterValues()){
-            updateOrCreateSpv(study,spv.getStudyParameter().getHandle(), spv.getValue());
-        }
-
-    }
     public void updateOrCreateSpv(Study study, String handle, String value){
         boolean paramIsPresent = false;
         if(study.getStudyParameterValues() != null && study.getStudyParameterValues().size() != 0){
             for(StudyParameterValue spv : study.getStudyParameterValues()) {
                 if (spv.getStudyParameter().getHandle().equals(handle)) {
-                    if(!spv.getValue().equalsIgnoreCase(value))
+                    if(spv.getValue() == null || !spv.getValue().equalsIgnoreCase(value))
                         spv.setValue(value);
                     paramIsPresent = true;
                     break;

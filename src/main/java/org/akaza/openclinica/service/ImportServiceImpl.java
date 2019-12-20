@@ -351,7 +351,8 @@ public class ImportServiceImpl implements ImportService {
                         if (this.isStudyEventSigned(studyEvent)) {
                             if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
                                 studyEvent.setStatusId(Status.AVAILABLE.getCode());
-                                studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                                //OC-11632
+                                studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
                                 studyEventDao.saveOrUpdate(studyEvent);
                             }
 
@@ -1016,6 +1017,8 @@ public class ImportServiceImpl implements ImportService {
         ErrorObj errorObj = null;
 
         if (studyEvent != null && (
+        		// OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet 
+        		studyEvent.getStatusId()==Status.DELETED.getCode() ||
                 studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())) {
@@ -1275,13 +1278,9 @@ public class ImportServiceImpl implements ImportService {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_IDENTIFIERS_MISMATCH);
             }
         }
-        if (studySubject != null && !studySubject.getStatus().equals(Status.AVAILABLE)) {
-            //if participant has already signed, show they are not available instead of not found
-            if (studySubject.getStatus().equals(Status.SIGNED)) {
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_AVAILABLE);
-            } else {
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
-            }
+        if (studySubject != null && !(studySubject.getStatus().equals(Status.AVAILABLE)) && !(studySubject.getStatus().equals(Status.SIGNED))) {
+                       
+                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);            
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
@@ -1461,6 +1460,11 @@ public class ImportServiceImpl implements ImportService {
             DiscrepancyNote childDN = queryService.createQuery(helperBean, queryBean, false);
             childDN.setParentDiscrepancyNote(parentDn);
             childDN = discrepancyNoteDao.saveOrUpdate(childDN);
+            
+            // update Item data map           
+            helperBean.setDn(childDN);
+            helperBean.setParentDn(parentDn);
+            queryService.saveQueryItemDatamap(helperBean);
         } catch (Exception e) {
             eb = new ErrorObj(FAILED, ErrorConstants.ERR_IMPORT_XML_QUERY_CREAT_FAILED);
         }

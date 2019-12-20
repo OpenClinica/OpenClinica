@@ -353,7 +353,7 @@ public class ValidateServiceImpl implements ValidateService {
     public void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includePII) {
 
     	Study tenantStudy = getTenantStudy(studyOid);
-        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();      
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
         if (!isStudyOidValid(studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
@@ -375,15 +375,9 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
         } else {
-        	if(includePII) {
-        		if (!isUserHas_CRC_INV_RoleInSite(userRoles, siteOid)) {
-                    throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-        		}
-            }else {
-            	if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
-    	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-    	        }
-            }           	        	
+            if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+            }
         }
         
         if (!isParticipateActive(tenantStudy)) {

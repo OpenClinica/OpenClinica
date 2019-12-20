@@ -167,6 +167,7 @@ public class StudyParticipantController {
 		String accessToken = utilService.getAccessTokenFromRequest(request);
 		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 		Study tenantStudy = studyDao.findByOcOID(studyOid);
+		Study siteStudy = studyDao.findByOcOID(siteOid);
 		Study tenantStudyBean = studyDao.findByOcOID(studyOid);
 		ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(request.getLocale());
 		AddParticipantResponseDTO result=null;
@@ -176,7 +177,7 @@ public class StudyParticipantController {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
 			if (utilService.isParticipantIDSystemGenerated(tenantStudyBean))
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_SYSTEM_GENERATED_ID_ENABLED);
-			 result = studyParticipantService.addParticipant(addParticipantRequestDTO, userAccountBean, studyOid, siteOid,realm, customerUuid, textsBundle, accessToken, register);
+			 result = studyParticipantService.addParticipant(addParticipantRequestDTO, userAccountBean, tenantStudy, siteStudy,realm, customerUuid, textsBundle, accessToken, register);
 
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
@@ -303,8 +304,9 @@ public class StudyParticipantController {
 		StudyParticipantDetailDTO result =  null;
 		
 		try {			
-			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);							
-			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,realm,userAccountBean,participantID,includeRelatedInfo);
+			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);
+			boolean isStudyLevelUser = utilService.checkStudyLevelUser(userAccountBean.getRoles(), siteOid);
+			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,realm,userAccountBean,participantID,includeRelatedInfo, isStudyLevelUser);
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
 		}

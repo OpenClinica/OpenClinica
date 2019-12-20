@@ -95,7 +95,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             role = userRole.getRole();
 
         Study userRoleStudy = studyDao.getPublicStudy(userRole.getStudyId());
-        setRoleDescription(role, userRoleStudy);
+        if(userRoleStudy != null)
+            setRoleDescription(role, userRoleStudy);
 
         if (odmFilter.isCrossForm()) {
             xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");
