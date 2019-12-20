@@ -119,7 +119,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
 
 
-        if(!validateService.isStudyAvailable(siteStudy.getOc_oid()))
+        if(!validateService.isSiteAvailable(siteStudy.getOc_oid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
 
         if(!utilService.isParticipantUniqueToSite(siteStudy.getOc_oid(),subjectTransfer.getStudySubjectId()))

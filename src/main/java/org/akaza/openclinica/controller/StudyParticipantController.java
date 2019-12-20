@@ -538,9 +538,39 @@ public class StudyParticipantController {
 		return jobDetail.getUuid();
 	}
 	
-	@ApiOperation(value = "To get PDF version casebook for one specific participant",  notes = "only work for authorized users with the right acecss permission ")
+		@ApiOperation(value = "To get PDF version casebook for one specific participant at site level",  notes = "only work for authorized users with the right acecss permission ")
+		@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/{participantId}/casebook", method = RequestMethod.POST)
+		public ResponseEntity<Object> getSiteLevelParticipantCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
+				                                       @PathVariable("siteOid") String siteOid,
+													   @PathVariable("participantId") String participantId, 
+													   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
+											           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
+											           @ApiParam( value = "optional parameter landscape whether paper orientation is landscape. Valid values are true, false. Default is false.", required = false ) @RequestParam(value="landscape",defaultValue = "false",required = false) String landscape,
+											           @Context HttpServletRequest request
+											          ) throws IOException {
+												 
+			
+			  utilService.setSchemaFromStudyOid(siteOid);	
+			  String schema = CoreResources.getRequestSchema();
+		 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+	 			 	  
+			  try {				 
+				  validateService.validateStudyAndRoles(studyOid.trim(),siteOid.trim(),userAccountBean);			 	 			 	 		 	 
+			 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
+
+				  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
+				  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+			  
+				  } catch (OpenClinicaSystemException e) {
+						return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+				}
+			 	 
+			 }
+
+		
+	@ApiOperation(value = "To get PDF version casebook for one specific participant at study level",  notes = "only work for authorized users with the right acecss permission ")
 	@RequestMapping(value = "/studies/{studyOid}/participants/{participantId}/casebook", method = RequestMethod.POST)
-	public ResponseEntity<Object> getCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
+	public ResponseEntity<Object> getStudyLevelParticipantCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
 												   @PathVariable("participantId") String participantId, 
 												   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
 										           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
@@ -552,17 +582,16 @@ public class StudyParticipantController {
 		  utilService.setSchemaFromStudyOid(studyOid);	
 		  String schema = CoreResources.getRequestSchema();
 	 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-	 	  String siteOid = null;
-	 	  
+	 	
 		  try {				 
 			  validateService.validateStudyAndRoles(studyOid.trim(),userAccountBean);			 	 			 	 		 	 
-		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
+		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,null, participantId, request, userAccountBean, format, margin, landscape);
 
 			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
 			  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
 		  
 			  } catch (OpenClinicaSystemException e) {
-					return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(validateService.getResponseForException(e, studyOid, null), HttpStatus.BAD_REQUEST);
 			}
 		 	 
 		 }
@@ -585,24 +614,23 @@ public class StudyParticipantController {
 		    	site = studyDao.findByOcOID(siteOid.trim());
 		    }
 			if(studyOid != null) {
-				study = studyDao.findByOcOID(studyOid.trim());
-				
-				if(study.getStudy() != null) {
-					site = study;
-					study = study.getStudy(); 
-				}
+				study = studyDao.findByOcOID(studyOid.trim());			
 			}
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
-			//currently studySubjectIdentifier is OID
-			StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantId.trim(), study);
+			
+			StudySubject ss = null;
+			if(siteOid !=null) {
+				ss = studySubjectDao.findByLabelAndStudy(participantId.trim(), site);
+			}else {
+				ss = studySubjectDao.findByLabelAndStudy(participantId.trim(), study);
+			}			
 			
 			if(ss == null) {
 				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
 			}
 			
-			String 	studySubjectIdentifier = ss.getOcOid();
-			
+			String 	studySubjectIdentifier = ss.getOcOid();			
 						
 			//Setting the destination file
 	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
