@@ -90,7 +90,7 @@
         sessionStorage.setItem(store.key, JSON.stringify(store.data));
         if (
           store.data.ocStatusHide !== 'oc-status-removed' ||
-          store.data.datatables.some(function(state) {return canReset(state)}) ||
+          canResetAny(store.data.datatables) ||
           $('#studySubjectRecord.collapsed, #subjectEvents.collapsed, #commonEvents>.expanded').length
         )
           $('#reset-all-filters').removeClass('invisible');
@@ -103,7 +103,7 @@
   store.key = participantKey + '${studySub.oid}';
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     collapseSections: {},
-    datatables: [],
+    datatables: {},
     ocStatusHide: 'oc-status-removed'
   };
   store.dirty = false;
@@ -115,6 +115,14 @@
         || state.search.search !== '' 
         || state.start > 0
         || state.length > defaultPageSize;
+  }
+
+  function canResetAny(states) {
+    for (var key in states) {
+      if (canReset(states[key]))
+        return true;
+    }
+    return false;
   }
 
   function resetAllFilters() {
