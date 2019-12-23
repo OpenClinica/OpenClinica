@@ -349,13 +349,6 @@ public abstract class CoreSecureController extends SecureController {
                 Study currentTenantStudy = (Study) getStudyDao().findByUniqueId(currentStudy.getUniqueIdentifier());
                 request.setAttribute("requestSchema", "public");
                 session.setAttribute("study", currentTenantStudy);
-            } else if (currentStudy.getStudyId() > 0) {
-                // YW 06-20-2007<< set site's parentstudy name when site is
-                // restored
-                if (currentStudy.isSite()) {
-                    currentStudy.getStudy().setName(((Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId())).getName());
-                }
-                // YW >>
             }
 
 

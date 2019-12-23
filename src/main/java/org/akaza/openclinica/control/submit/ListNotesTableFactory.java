@@ -56,6 +56,7 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
+import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
@@ -87,7 +88,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private ViewNotesService viewNotesService;
     private final boolean showMoreLink;
     private DiscrepancyNotesSummary notesSummary;
-    private DiscrepancyNotesSummary notesSummaryOnlyForQuery;
     private final TypeDroplistFilterEditor discrepancyNoteTypeDropdown = new TypeDroplistFilterEditor();
     private final ResolutionStatusDroplistFilterEditor resolutionStatusDropdown = new ResolutionStatusDroplistFilterEditor();
     private static final String QUERY_FLAVOR = "-query";
@@ -123,6 +123,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     List<String> permissionTagsList = null;
     private final String  PARTICIPATE_STATUS="participate.status";
     private String[] columnNames = new String[]{};
+    private ResponseSet responseSet;
 
 
     public ListNotesTableFactory(boolean showMoreLink, List<String> userTags) {
@@ -152,11 +153,22 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         if (tableColumns != null) {
             for (String column : tableColumns) {
                 if (permissionService.isUserHasPermission(column, request, currentStudy)) {
+                    String formOid = column.split("\\.")[1];
                     String itemOid = column.split("\\.")[2];
                     Item item = itemDao.findByOcOID(itemOid);
+                    CrfBean crf = crfDao.findByOcOID(formOid);
+                    ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crf.getCrfVersions().get(0).getCrfVersionId());
+                    responseSet = itemFormMetadata.getResponseSet();
+                    ResponseType responseType = responseSet.getResponseType();
                     if (item != null) {
-                        configureColumn(row.getColumn(column), item != null ? item.getName() : null, new ItemIdCellEditor(), null,true,true);
-
+                        if (responseType.getName().equals(CHECKBOX)
+                                || responseType.getName().equals(MULTI_SELECT)
+                                || responseType.getName().equals(RADIO)
+                                || responseType.getName().equals(SINGLE_SELECT)) {
+                            configureColumn(row.getColumn(column), item.getBriefDescription()!=null? item.getBriefDescription() :itemFormMetadata.getLeftItemText(), new ItemIdCellEditor(), new CustomColumnDroplistFilterEditor(),true,true);
+                        } else {
+                            configureColumn(row.getColumn(column), item.getBriefDescription()!=null? item.getBriefDescription() :itemFormMetadata.getLeftItemText(), new ItemIdCellEditor(), null,true,true);
+                        }
                     }
                 }
             }
@@ -243,7 +255,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 resolutionStatusDropdown.getDecoder());
 
         notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, false, userTags);
-        notesSummaryOnlyForQuery = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, true, userTags);
 
         int pageSize = limit.getRowSelect().getMaxRows();
         int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
@@ -451,6 +462,17 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         this.auditUserLoginDao = auditUserLoginDao;
     }
 
+    private class CustomColumnDroplistFilterEditor extends DroplistFilterEditor {
+        List<String> optionsText = Arrays.asList(responseSet.getOptionsText().split("\\s*,\\s*"));
+        @Override
+        protected List<DroplistFilterEditor.Option> getOptions() {
+            List<Option> options = new ArrayList<Option>();
+            for (String optionText : optionsText) {
+                options.add(new Option( optionText, optionText));
+            }
+            return options;
+        }
+    }
     private class ItemIdCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int rowcount) {
             Object itemValue = ItemUtils.getItemValue(item, property);

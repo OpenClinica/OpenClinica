@@ -41,7 +41,7 @@ public class Item  extends DataMapDomainObject{
 	private String name;
 	private String description;
 	private String briefDescription;
-    private String units;
+	private String units;
 	private Boolean phiStatus;
 	private Date dateCreated;
 	private Date dateUpdated;
@@ -169,13 +169,14 @@ public class Item  extends DataMapDomainObject{
 		this.description = description;
 	}
 
-    @Column(name = "brief_description")
-    public String getBriefDescription() {
-        return briefDescription;
-    }
-    public void setBriefDescription(String briefDescription) {
-        this.briefDescription = briefDescription;
-    }
+	@Column(name = "brief_description")
+	public String getBriefDescription() {
+		return this.briefDescription;
+	}
+
+	public void setBriefDescription(String briefDescription) {
+		this.briefDescription = briefDescription;
+	}
 
 	@Column(name = "units", length = 64)
 	public String getUnits() {

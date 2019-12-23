@@ -304,8 +304,9 @@ public class StudyParticipantController {
 		StudyParticipantDetailDTO result =  null;
 		
 		try {			
-			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);							
-			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,realm,userAccountBean,participantID,includeRelatedInfo);
+			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);
+			boolean isStudyLevelUser = utilService.checkStudyLevelUser(userAccountBean.getRoles(), siteOid);
+			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,realm,userAccountBean,participantID,includeRelatedInfo, isStudyLevelUser);
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
 		}

@@ -1017,6 +1017,8 @@ public class ImportServiceImpl implements ImportService {
         ErrorObj errorObj = null;
 
         if (studyEvent != null && (
+        		// OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet 
+        		studyEvent.getStatusId()==Status.DELETED.getCode() ||
                 studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())) {
