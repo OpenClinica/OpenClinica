@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class SdvItemDTO {
     private String name;
-    private String briefDesc;
+    private String briefDescription;
     private String value;
     private Date lastModifiedDate;
     private String lastModifiedBy;
@@ -17,12 +17,12 @@ public class SdvItemDTO {
         this.name = name;
     }
 
-    public String getBriefDesc() {
-        return briefDesc;
+    public String getBriefDescription() {
+        return briefDescription;
     }
 
-    public void setBriefDesc(String briefDesc) {
-        this.briefDesc = briefDesc;
+    public void setBriefDescription(String briefDescription) {
+        this.briefDescription = briefDescription;
     }
 
     public String getValue() {

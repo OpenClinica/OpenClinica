@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class SdvDTO {
-    private int participantId;
+    private String participantId;
     private String siteName;
     private String eventName;
     private Date eventStartDate;
@@ -12,14 +12,14 @@ public class SdvDTO {
     private String sdvStatus;
     private String formName;
     private String formStatus;
-    private Date itemsLastVerifiedDate;
+    private Date lastVerifiedDate;
     private List<SdvItemDTO> sdvItems;
 
-    public int getParticipantId() {
+    public String getParticipantId() {
         return participantId;
     }
 
-    public void setParticipantId(int participantId) {
+    public void setParticipantId(String participantId) {
         this.participantId = participantId;
     }
 
@@ -79,12 +79,12 @@ public class SdvDTO {
         this.formStatus = formStatus;
     }
 
-    public Date getItemsLastVerifiedDate() {
-        return itemsLastVerifiedDate;
+    public Date getLastVerifiedDate() {
+        return lastVerifiedDate;
     }
 
-    public void setItemsLastVerifiedDate(Date itemsLastVerifiedDate) {
-        this.itemsLastVerifiedDate = itemsLastVerifiedDate;
+    public void setLastVerifiedDate(Date lastVerifiedDate) {
+        this.lastVerifiedDate = lastVerifiedDate;
     }
 
     public List<SdvItemDTO> getSdvItems() {
