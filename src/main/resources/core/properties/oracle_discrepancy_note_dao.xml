@@ -1009,5 +1009,13 @@ and column_name='interviewer_name'
     	AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)
     	</sql>
     </query>
+    <query>
+        <name>findParentNotesBySubject</name>
+        <sql>SELECT dn.*, dnidm.item_data_id
+            FROM discrepancy_note dn
+            JOIN dn_item_data_map dnidm ON dn.discrepancy_note_id=dnidm.discrepancy_note_id AND dn.entity_type='itemData'
+            WHERE (dnidm.study_subject_id =? AND dn.parent_dn_id isnull AND dn.discrepancy_note_type_id = 3 AND dn.resolution_status_id in (1,2))
+        </sql>
+    </query>
 </queries>
 
