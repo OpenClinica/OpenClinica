@@ -33,6 +33,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
+import org.akaza.openclinica.controller.helper.TemplateHelper;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -515,6 +516,7 @@ public class AddNewSubjectServlet extends SecureController {
         // Adding Sample data to validate templateID
         data.put("siteId", siteId);
         data.put("siteParticipantCount", subjectCount);
+        data.put("helper", new TemplateHelper());
         StringWriter wtr = new StringWriter();
         Template template = null;
 
