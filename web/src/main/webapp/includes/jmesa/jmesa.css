@@ -72,7 +72,7 @@
     padding: 0;
     margin: 0;
     border: 1px solid #c0c0c0;
-    background-color: #efebe7;
+    background-color: var(--gray-l30);
     height: 15px;
     white-space: nowrap;
     cursor: pointer;
@@ -126,7 +126,7 @@
 
 .jmesa .header td {
     white-space: nowrap;
-    background-color: #729fcf;
+    background-color: var(--lightblue-d20);
     color: white;
     font-size: 11px;
     font-weight: bold;
@@ -149,20 +149,12 @@
     padding: 2px 3px 2px 3px;
 }
 
-.jmesa .odd td {
-    border: 1px solid #ffffff;
-}
-
-.jmesa .even td {
-    border: 1px solid #e3e3e3;
-}
-
 .jmesa .odd {
-    background-color: #ffffff;
+    background-color: white;
 }
 
 .jmesa .even {
-    background-color: #e3e3e3;
+    background-color: var(--gray-l40);
 }
 
 .jmesa .highlight td {
@@ -170,8 +162,8 @@
     font-size: 11px;
     vertical-align: top;
     line-height: 15px;
-    padding: 3px 4px 3px 4px;
-    background-color: #fdecae;
+    padding: 2px 3px 2px 3px;
+    background-color: var(--gray-l30);
 }
 
 .jmesa .highlight a {
@@ -182,7 +174,7 @@
     font-family: verdana, arial, helvetica, sans-serif;
     font-size: 11px;
     border-top: 1px solid silver;
-    background-color: #efebe7;
+    background-color: var(--gray-l30);
     padding: 2px;
 }
 
@@ -263,14 +255,14 @@
     }
 
 .jmesa .ViewSubjectsPopup td.table_header_row_left, .jmesa .highlight .ViewSubjectsPopup td.table_header_row_left { 
-	padding: 3px 1px 3px 6px;
-    border-style: solid;
-    border-width: 0px 0px 1px 0px;
-    border-color: #CCCCCC;
-    font-weight: bold;
-    color: #666666;
-    vertical-align: top;
-    }
+   padding: 3px 1px 3px 6px;
+   border-style: solid;
+   border-width: 0px 0px 1px 0px;
+   border-color: #CCCCCC;
+   font-weight: bold;
+   color: #666666;
+   vertical-align: top;
+}
 
 .jmesa .ViewSubjectsPopup td.table_header_row, .jmesa .highlight .ViewSubjectsPopup td.table_header_row { 
 	padding: 3px 1px 3px 2px;
