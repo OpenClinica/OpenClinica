@@ -301,6 +301,9 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                                 message.append(MessageFormat.format(respage.getString("mailDNParameters6"), item.getName()));
                             }
                         }
+                        else {
+                            message.append(discrepancyNoteDao.findByPK(dn.getId()).getDnStudyEventMaps().get(0).getDnStudyEventMapId().getColumnName());
+                        }
                     }
 
                     message.append(respage.getString("email_body_separator"));
