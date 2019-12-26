@@ -87,8 +87,6 @@ public class RemoveStudyEventServlet extends SecureController {
             event.setStudyEventDefinition(sed);
 
             Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
-            if (study.isSite())
-                study.getStudy().setName(((Study) getStudyDao().findByPK(study.getStudy().getStudyId())).getName());
 
             request.setAttribute("study", study);
 

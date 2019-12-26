@@ -165,13 +165,9 @@
                 <h3 class="form-name">
                     {{form.[@Name]}}
                 </h3>
-                <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
-                    {{#if form.addNew}}
-                        data-url="{{form.addNew}}"
-                    {{else}}
-                        disabled="disabled"
-                    {{/if}}
-                >
+                {{#if form.addNew}}
+                    <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>' data-url="{{form.addNew}}">
+                {{/if}}
             </div>
             <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
             <thead>
@@ -387,10 +383,14 @@ $(function() {
                 foreach(components, function(col) {
                     var item = items[col];
                     if (item) {
-                        if (item.Question)
+                        if (item['@BriefDescription']) {
+                            columnTitles.push(item['@BriefDescription']);
+                        } else if (item.Question) {
                             columnTitles.push(item.Question.TranslatedText);
-                        else
+                        }
+                        else {
                             columnTitles.push(item['@Name']);
+                        }
                     }
                     else {
                         columnTitles.push('!?' + col);
@@ -455,17 +455,19 @@ $(function() {
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
         function datatablefy($tables) {
-            $tables.each(function(i) {
+            $tables.each(function() {
                 var table = $(this);
+                var subsection = table.closest('.subsection');
+                var id = subsection.attr('id');
                 var datatable = table.DataTable({
                     stateSave: true,
                     stateSaveCallback: function(settings, state) {
                         store(function(data) {
-                            data.datatables[i] = state;
+                            data.datatables[id] = state;
                         });
                     },
                     stateLoadCallback: function(settings, callback) {
-                        var data = store.data.datatables[i];
+                        var data = store.data.datatables[id];
                         callback(data);
                         if (!data)
                             this.fnSortNeutral();

@@ -460,6 +460,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             if (item.getComment().length() > 0) {
                 xml.append(" Comment=\"" + StringEscapeUtils.escapeXml(item.getComment()) + "\"");
             }
+            if (item.getBriefDescription().length() > 0) {
+                xml.append(" BriefDescription=\"" + StringEscapeUtils.escapeXml(item.getBriefDescription()) + "\"");
+            }
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                 xml.append(" OpenClinica:FormOID=\"" + item.getFormOIDs() + "\"");
             }

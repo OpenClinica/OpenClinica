@@ -903,7 +903,7 @@ public class Study extends DataMapDomainObject {
             if (spv.getStudyParameter().getHandle().equalsIgnoreCase(parameterName))
                 return spv.getValue();
     }
-        return "";
+        return StudyParamNames.getDefaultValues(parameterName);
     }
 
     @Transient
