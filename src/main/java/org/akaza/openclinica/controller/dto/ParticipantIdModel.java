@@ -1,7 +1,7 @@
 package org.akaza.openclinica.controller.dto;
 
+import org.akaza.openclinica.controller.helper.TemplateHelper;
 import java.util.*;
-
 
 public class ParticipantIdModel {
 
@@ -37,17 +37,10 @@ public class ParticipantIdModel {
     }
 
     static {
-        ParticipantIdVariable variable1 = new ParticipantIdVariable();
-        variable1.setName("siteId");
-        variable1.setDescription("Site ID");
-        variable1.setSampleValue("SiteA");
-        variables.add(variable1);
+        variables.add(new ParticipantIdVariable("siteId","Site ID","SiteA"));
+        variables.add(new ParticipantIdVariable("siteParticipantCount","Number of participants at given site",276));
+        variables.add(new ParticipantIdVariable("helper","generate random numbers",new TemplateHelper()));
 
-        ParticipantIdVariable variable2 = new ParticipantIdVariable();
-        variable2.setName("siteParticipantCount");
-        variable2.setDescription("Number of participants at given site");
-        variable2.setSampleValue(1);
-        variables.add(variable2);
 
         ParticipantIdExample example1 = new ParticipantIdExample();
         example1.setTemplate("${siteId}-${(siteParticipantCount+1)?string[\"000\"]}");

@@ -5,6 +5,11 @@ public class ParticipantIdVariable {
     private String description;
     private Object sampleValue;
 
+    public ParticipantIdVariable(String name, String description, Object sampleValue) {
+        this.name = name;
+        this.description = description;
+        this.sampleValue = sampleValue;
+    }
 
     public String getName() {
         return name;
