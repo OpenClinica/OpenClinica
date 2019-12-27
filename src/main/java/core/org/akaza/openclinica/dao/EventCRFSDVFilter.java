@@ -3,6 +3,7 @@ package core.org.akaza.openclinica.dao;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -36,8 +37,14 @@ public class EventCRFSDVFilter implements CriteriaCommand {
 
     public String execute(String criteria) {
         String theCriteria = "";
+        boolean isSdvStatusSet = false;
         for (Filter filter : filters) {
             theCriteria += buildCriteria(criteria, filter.getProperty(), filter.getValue());
+            if(filter.property.equals("sdvStatus"))
+                isSdvStatusSet = true;
+        }
+        if(!isSdvStatusSet) {
+            theCriteria = theCriteria + " and (" + (columnMapping.get("sdvStatus") + " = " + SdvStatus.NOT_VERIFIED + " or " + (columnMapping.get("sdvStatus")) + " = " + SdvStatus.CHANGED_AFTER_VERIFIED) + " ) ";
         }
         return theCriteria;
     }
@@ -46,15 +53,18 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         value = StringEscapeUtils.escapeSql(value.toString());
         if (value != null) {
             if (property.equals("sdvStatus")) {
-                String dbType = CoreResources.getDBName();
-                String theTrue = dbType.equals("postgres") ? " true " : " 1 ";
-                String theFalse = dbType.equals("postgres") ? " false " : " 0 ";
-                if (value.equals("complete")) {
+                if (value.equals("verified")) {
                     criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = " + theTrue;
-                } else {
+                    criteria = criteria + " " + columnMapping.get(property) + " = " + SdvStatus.VERIFIED;
+                }else if (value.equals("change_since_verified")) {
                     criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = " + theFalse;
+                    criteria = criteria + " " + columnMapping.get(property) + " = " + SdvStatus.CHANGED_AFTER_VERIFIED;
+                } else if (value.equals("ready_to_verify")) {
+                    criteria = criteria + " and ";
+                    criteria = criteria + " " + columnMapping.get(property) + " = " + SdvStatus.NOT_VERIFIED;
+                }else{
+                    criteria = criteria + " and ";
+                    criteria = criteria + "  (" + (columnMapping.get(property) + " = " + SdvStatus.NOT_VERIFIED +" or "+(columnMapping.get(property)) +" = "+SdvStatus.CHANGED_AFTER_VERIFIED)+" ) ";
                 }
             } else if (property.equals("sdvRequirementDefinition")) {
                 ArrayList<Integer> reqs = new ArrayList<Integer>();
