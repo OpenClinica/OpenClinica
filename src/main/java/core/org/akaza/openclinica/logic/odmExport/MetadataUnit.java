@@ -206,7 +206,12 @@ public class MetadataUnit extends OdmUnit {
         metadata.setStudy(study);
         String discrepancyManagementValue = null;
         if(study.isSite())
-            discrepancyManagementValue = study.getStudy().getDiscrepancyManagement();
+        {
+            Study parent = study.getStudy();
+            StudyConfigService scs = new StudyConfigService(ds);
+            scs.setStudyParameterValueToStudyManually(parent);
+            discrepancyManagementValue = parent.getDiscrepancyManagement();
+        }
         else
             discrepancyManagementValue = study.getDiscrepancyManagement();
         metadata.setSoftHard(discrepancyManagementValue.equalsIgnoreCase("true") ? "Hard" : "Soft");
