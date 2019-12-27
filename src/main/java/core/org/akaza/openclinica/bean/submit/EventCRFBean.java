@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 
 /**
  * <P>
@@ -42,7 +43,7 @@ public class EventCRFBean extends AuditableEntityBean {
     private String validateString = "";
     private int studySubjectId = 0;
     private boolean electronicSignatureStatus = false;
-    private boolean sdvStatus = false;
+    private SdvStatus sdvStatus = SdvStatus.NOT_VERIFIED;
     private int sdvUpdateId = 0;
     // the following are not in the table
     private String studySubjectName = "";
@@ -83,7 +84,7 @@ public class EventCRFBean extends AuditableEntityBean {
         this.validateString = eventCRFBean.getValidateString();
         this.studySubjectId = eventCRFBean.getStudySubjectId();
         this.electronicSignatureStatus = eventCRFBean.isElectronicSignatureStatus();
-        this.sdvStatus = eventCRFBean.isSdvStatus();
+        this.sdvStatus = eventCRFBean.getSdvStatus();
         this.studySubjectName = eventCRFBean.getStudySubjectName();
         this.eventName = eventCRFBean.getEventName();
         this.studyName = eventCRFBean.getStudyName();
@@ -104,11 +105,10 @@ public class EventCRFBean extends AuditableEntityBean {
 
     }
 
-    public boolean isSdvStatus() {
+    public SdvStatus getSdvStatus(){
         return sdvStatus;
     }
-
-    public void setSdvStatus(boolean sdvStatus) {
+    public void setSdvStatus(SdvStatus sdvStatus) {
         this.sdvStatus = sdvStatus;
     }
 
