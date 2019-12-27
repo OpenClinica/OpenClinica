@@ -15,6 +15,7 @@ public class EnketoPDFRequest {
     private String format;
     private String margin;
     private String landscape;
+    private String pid = null;
     
     @JsonProperty("instance_attachments")
     private InstanceAttachment instanceAttachments;
@@ -99,6 +100,14 @@ public class EnketoPDFRequest {
 
 	public void setEcid(String ecid) {
 		this.ecid = ecid;		
+	}
+
+	public String getPid() {
+		return pid;
+	}
+
+	public void setPid(String pid) {
+		this.pid = pid;
 	}
     
 }
