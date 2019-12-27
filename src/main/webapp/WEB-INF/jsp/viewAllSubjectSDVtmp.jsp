@@ -219,6 +219,7 @@
   #sdv-details th {
     font-weight: normal;
     text-align: left;
+    padding: 5px;
   }
   #sdv-details td {
     width: 150px;
