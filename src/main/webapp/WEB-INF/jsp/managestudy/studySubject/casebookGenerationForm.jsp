@@ -87,9 +87,20 @@
     $('#casebookPdfBtn').click(function () {
         $(this).attr('disabled', 'disabled');
         $('#getPdfMessage').slideDown();
+        <c:choose>
+            <c:when test='${study.study != null && study.study.studyId > 0}'>
+                // site level
+                var url = '/studies/${study.study.oc_oid}/sites/${study.oc_oid}';
+            </c:when>
+            <c:otherwise>
+                // study level
+                var url = '/studies/${study.oc_oid}';
+            </c:otherwise>
+        </c:choose>
+        alert(url);
         jQuery.ajax({
             'type': 'POST',
-            'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${studySub.label}/casebook',
+            'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata' + url + '/participants/${studySub.label}/casebook',
             'contentType': 'application/json',
             'dataType': 'json',
             'data': {}
