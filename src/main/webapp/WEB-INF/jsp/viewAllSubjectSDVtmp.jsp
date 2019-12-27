@@ -187,3 +187,123 @@
             checkbox.removeAttr('checked');
       });
 </script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+<script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+<style>
+  #itemsdv {
+    position: relative;
+  }
+  #sdv-close-popup {
+    float: right;
+    position: absolute;
+    right: -25px;
+    top: -25px;
+  }
+  #sdv-close-popup > .icon-cancel::before {
+    border-radius: 50px;
+    color: white;
+  }
+  #sdv-show-type {
+    float: right;
+    padding: 10px;
+  }
+  #sdv-items {
+    clear: both;
+  }
+  #sdv-details {
+    padding: 10px;
+    background-color: lightgray;
+  }
+  #sdv-details th {
+    font-weight: normal;
+    text-align: left;
+  }
+  #sdv-details td {
+    width: 150px;
+    border: 1px solid gray;
+    font-weight: bold;
+  }
+  #sdv-items {
+    padding: 10px;
+  }
+  #sdv-items th {
+    font-weight: normal;
+  }
+  .blockOverlay {
+    cursor: default !important;
+  }
+  .blockUI.blockMsg.blockPage {
+    padding: 0 !important;
+  }
+</style>
+
+<div id="itemsdv" style="display:none;">
+  <a href="javascript:jQuery.unblockUI()" id="sdv-close-popup">
+    <span class="icon icon-cancel"></span>
+  </a>
+  <table id="sdv-details">
+    <tbody>
+      <tr>
+        <th>Participant ID:</th>
+        <td></td>
+        <th>Event Name:</th>
+        <td></td>
+        <th>Form Name:</th>
+        <td></td>
+        <th>SDV Requirement:</th>
+        <td></td>
+      </tr>
+      <tr>
+        <th>Site Name:</th>
+        <td></td>
+        <th>Event Start Date:</th>
+        <td></td>
+        <th>Form Status:</th>
+        <td></td>
+        <th>SDV Status:</th>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <div id="sdv-show-type">
+    <label>
+      <input name="type" type="radio" autofocus="autofocus"> Show all items
+    </label>
+    <label>
+      <input name="type" type="radio"> Show only changed since last Verified
+    </label>
+  </div>
+  <table id="sdv-items">
+    <thead>
+      <tr>
+        <th>Brief Description (Item Name)</th>
+        <th>Value</th>
+        <th>Last Verified</th>
+        <th>Open Queries</th>
+        <th>Last Modified</th>
+        <th>Modified By</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function popupSdv() {
+    jQuery.blockUI({ message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
+  }
+  jQuery('#sdv-items').DataTable({
+    dom: 't'
+  });
+</script>
