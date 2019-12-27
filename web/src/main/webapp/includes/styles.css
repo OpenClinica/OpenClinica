@@ -2013,3 +2013,7 @@ input {
    border: 1px solid var(--darkblue-l20);
    border-radius: 0;
 }
+
+input.no-border {
+   border: none;
+}
