@@ -467,7 +467,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
     @Transactional
     public Collection findAllByParentStudyIdOrderedByIdAsc(int parentStudyId) {
         /* This function will load the studyParamValues without lazy initialization*/
-        String query = "select s from Study s join fetch s.studyParameterValues where ( s.studyId=:studyId ) or ( s.study.studyId=:parentStudyId ) order by s.studyId asc";
+        String query = "select distinct s from Study s left join fetch s.studyParameterValues where ( s.studyId=:studyId ) or ( s.study.studyId=:parentStudyId ) order by s.studyId asc";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyId", parentStudyId);
         q.setParameter("parentStudyId", parentStudyId);
