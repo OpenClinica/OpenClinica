@@ -41,6 +41,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -167,7 +168,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(15), new Integer(ecb.getUpdaterId()));
         variables.put(new Integer(16), new Boolean(ecb.isElectronicSignatureStatus()));
 
-        variables.put(new Integer(17), new Boolean(ecb.isSdvStatus()));
+        variables.put(new Integer(17), ecb.getSdvStatus().toString());
         if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
             variables.put(new Integer(18), new Integer(ecb.getOldStatus().getId()));
         } else {
@@ -251,7 +252,8 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         eb.setValidatorAnnotations((String) hm.get("validator_annotations"));
         eb.setValidateString((String) hm.get("validate_string"));
         eb.setStudySubjectId(((Integer) hm.get("study_subject_id")).intValue());
-        eb.setSdvStatus((Boolean) hm.get("sdv_status"));
+        String sdvStatus = (String) hm.get("sdv_status");
+        eb.setSdvStatus((SdvStatus) SdvStatus.valueOf(sdvStatus));
         eb.setSdvUpdateId((Integer) hm.get("sdv_update_id"));
         eb.setFormLayoutId(((Integer) hm.get("form_layout_id")).intValue());
         Integer oldStatusId = (Integer) hm.get("old_status_id");
