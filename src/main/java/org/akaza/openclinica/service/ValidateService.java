@@ -29,6 +29,8 @@ public interface ValidateService {
     boolean isStudyOidValidStudyLevelOid(String studyOid);
 
     boolean isSiteOidValid(String siteOid);
+    
+    boolean isSiteAvailable(String siteOid);
 
     boolean isSiteOidValidSiteLevelOid(String siteOid);
 
