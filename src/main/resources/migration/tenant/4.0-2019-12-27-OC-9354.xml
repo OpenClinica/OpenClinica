@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-01">
+        <comment>Adding a column study_uuid to Study table</comment>
+        <addColumn tableName="event_crf">
+            <column name="sdv_status_new" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-02">
+        <sql>
+            UPDATE event_crf
+            SET sdv_status_new='VERIFIED' WHERE sdv_status ='t';
+        </sql>
+    </changeSet>
+    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-03">
+        <sql>
+            UPDATE event_crf
+            SET sdv_status_new='NOT_VERIFIED' WHERE sdv_status ='f';
+        </sql>
+    </changeSet>
+    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-01">
+        <comment>Adding a column study_uuid to Study table</comment>
+        <dropColumn tableName="event_crf">
+            <column name="sdv_status" type="BOOLEAN"/>
+        </dropColumn>
+    </changeSet>
+
+
+</databaseChangeLog>
