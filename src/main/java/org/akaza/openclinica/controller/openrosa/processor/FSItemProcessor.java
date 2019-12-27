@@ -16,6 +16,7 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -326,7 +327,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     private void resetSdvStatus(SubmissionContainer container) {
         EventCrf eventCrf = container.getEventCrf();
-        eventCrf.setSdvStatus(false);
+        if(eventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() == SdvStatus.VERIFIED)
+            eventCrf.setSdvStatus(SdvStatus.CHANGED_AFTER_VERIFIED);
         eventCrf.setSdvUpdateId(container.getUser().getUserId());
         eventCrfDao.saveOrUpdate(eventCrf);
     }

@@ -54,6 +54,7 @@ import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
@@ -949,7 +950,7 @@ public class SDVUtil {
             // "This Event CRF has been Source Data Verified. If you uncheck this box, you are removing Source Data
             // Verification for the Event CRF and you will have to repeat the process. Select OK to continue and Cancel
             // to cancel this transaction."
-            if (eventCRFBean.isSdvStatus()) {
+            if (eventCRFBean.getSdvStatus() == SdvStatus.VERIFIED) {
                 sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm,");
                 sdvStatus.append(eventCRFBean.getId());
                 sdvStatus.append(")'>");
@@ -995,7 +996,7 @@ public class SDVUtil {
 
             actions = new StringBuilder("");
             // append("<input type='hidden' name='crfId' value='").append(eventCRFBean.getId()).append("'").append("/> ")
-            if (!eventCRFBean.isSdvStatus()) {
+            if (eventCRFBean.getSdvStatus() != SdvStatus.VERIFIED) {
                 // StringBuilder jsCodeString =
                 // new StringBuilder("this.form.method='GET';
                 // this.form.action='").append(request.getContextPath()).append("/pages/handleSDVGet").append("';")
@@ -1378,97 +1379,6 @@ public class SDVUtil {
         }
         request.setAttribute("eventCRFNames", eventCRFNames);
 
-    }
-
-    public List<EventCRFBean> filterEventCRFs(List<EventCRFBean> eventCRFBeans, BindingResult bindingResult) {
-
-        /*
-         * study_subject_id=Subject+D&eventCRF=0&studyEventDefinition=0&
-         * studyEventStatus=-1&eventCRFStatus=-1&eventcrfSDVStatus=None&
-         * sdvRequirement=0&startUpdatedDate=&endDate=&submit=Apply+Filter
-         */
-        List<EventCRFBean> newList = new ArrayList<EventCRFBean>();
-
-        if (eventCRFBeans == null || eventCRFBeans.isEmpty() || bindingResult == null) {
-            return eventCRFBeans;
-        }
-
-        SdvFilterDataBean filterBean = (SdvFilterDataBean) bindingResult.getTarget();
-        StudySubjectBean studySubjectBean = null;
-        StudyEventBean studyEventBean = null;
-        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-        boolean studySub = true, studyEventDef = true, studyEventStatus = true, eventCRFStatusBool = true, eventcrfSDVStatus = true, eventCRFNameBool = true,
-                upDatedDateBool = true, sdvRequirementBool = true;
-
-        for (EventCRFBean eventCBean : eventCRFBeans) {
-            // filter study subject
-            if (filterBean.getStudy_subject_id().length() > 0) {
-                studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(eventCBean.getStudySubjectId());
-
-                studySub = filterBean.getStudy_subject_id().equalsIgnoreCase(studySubjectBean.getLabel());
-
-            }
-
-            // filter study event definition
-
-            if (filterBean.getStudyEventDefinition() > 0) {
-                studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCBean.getStudyEventId());
-
-                studyEventDef = filterBean.getStudyEventDefinition() == studyEventBean.getStudyEventDefinitionId();
-
-            }
-
-            // Event CRF status
-            if (filterBean.getStudyEventStatus() > 0) {
-
-                studyEventStatus = filterBean.getStudyEventStatus() == eventCBean.getStatus().getId();
-            }
-
-            // Event CRF subject event status
-            if (filterBean.getEventCRFStatus() > 0) {
-                studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCBean.getStudyEventId());
-
-                eventCRFStatusBool = filterBean.getEventCRFStatus() == studyEventBean.getSubjectEventStatus().getId();
-            }
-
-            // Event CRF SDV status; true or false
-            if (!filterBean.getEventcrfSDVStatus().equalsIgnoreCase("N/A")) {
-                boolean sdvBool = filterBean.getEventcrfSDVStatus().equalsIgnoreCase("complete");
-                eventcrfSDVStatus = eventCBean.isSdvStatus() == sdvBool;
-            }
-
-            // Event CRF name match
-            if (filterBean.getEventCRFName().length() > 0) {
-                String tmpName = getCRFName(eventCBean.getCRFVersionId());
-                eventCRFNameBool = tmpName.equalsIgnoreCase(filterBean.getEventCRFName());
-            }
-
-            // TODO: Event CRF SDV requirement, when the application provides a way
-            // TODO: of setting this requirement in the event definition
-
-            // event CRF updated date
-            if (eventCBean.getUpdatedDate() != null && filterBean.getStartUpdatedDate() != null && filterBean.getEndDate() != null) {
-
-                GregorianCalendar calStart = new GregorianCalendar();
-                calStart.setTime(filterBean.getStartUpdatedDate());
-
-                GregorianCalendar calendarEnd = new GregorianCalendar();
-                calendarEnd.setTime(filterBean.getEndDate());
-
-                GregorianCalendar calendarNow = new GregorianCalendar();
-                calendarNow.setTime(eventCBean.getUpdatedDate());
-
-                upDatedDateBool = calendarNow.after(calStart) && calendarNow.before(calendarEnd) || calendarNow.equals(calStart)
-                        || calendarNow.equals(calendarEnd);
-
-            }
-
-            if (upDatedDateBool && eventCRFNameBool && eventcrfSDVStatus && eventCRFStatusBool && studyEventStatus && studyEventDef && studySub) {
-                newList.add(eventCBean);
-            }
-        }
-        return newList;
     }
 
     public DataSource getDataSource() {

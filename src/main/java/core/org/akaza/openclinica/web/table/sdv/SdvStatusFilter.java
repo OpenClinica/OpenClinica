@@ -16,8 +16,10 @@ public class SdvStatusFilter extends DroplistFilterEditor {
     @Override
     protected List<Option> getOptions()  {
         List<Option> options = new ArrayList<Option>();
-        options.add(new Option("complete", "Complete"));
-        options.add(new Option("none", "None"));
+        options.add(new Option("ready_to_verify_and_change_since_verified", "Ready to verify + Change since verified"));
+        options.add(new Option("ready_to_verify","Ready to verify"));
+        options.add(new Option("change_since_verified", "Change since verified"));
+        options.add(new Option("verified", "Verified"));
         return options;
     }
 }
