@@ -994,6 +994,7 @@ public class SDVUtil {
             }
 
             actions = new StringBuilder("");
+            actions.append("<a class='icon icon-doc-text-solid' href='javascript:popupSdv()'></a> ");
             // append("<input type='hidden' name='crfId' value='").append(eventCRFBean.getId()).append("'").append("/> ")
             if (!eventCRFBean.isSdvStatus()) {
                 // StringBuilder jsCodeString =
