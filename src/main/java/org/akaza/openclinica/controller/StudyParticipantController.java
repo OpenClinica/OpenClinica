@@ -60,18 +60,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.core.Context;
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
 @RequestMapping(value ="/auth/api/clinicaldata")
@@ -610,8 +598,8 @@ public class StudyParticipantController {
 										   String landscape) {
 									 	 
 
-		    final	Study 	site = studyDao.findByOcOID(siteOid);	    			
-			final	Study	study = studyDao.findByOcOID(studyOid);						
+		    final	Study 	site = siteOid==null? null:studyDao.findByOcOID(siteOid);	    			
+			final	Study	study = studyOid==null? null:studyDao.findByOcOID(studyOid);						
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 			

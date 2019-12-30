@@ -33,6 +33,9 @@ import org.springframework.stereotype.Service;
  */
 @Service( "PdfService" )
 public class PdfServiceImpl implements PdfService {
+	
+	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}");
+	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}");
 
     /**
      *
@@ -186,10 +189,7 @@ public class PdfServiceImpl implements PdfService {
 	  
 	    String siteName = null;
 	    String studyName = null;
-	    String participantID = studySubjectIdentifier.trim();
-	    		   
-	    MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}");
-	    MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}");
+	    String participantID = studySubjectIdentifier.trim();	    		   	   
 	    		  		    
 	    if(study != null) {				
 			studyName = study.getName();		
