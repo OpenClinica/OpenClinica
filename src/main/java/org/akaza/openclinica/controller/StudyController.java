@@ -104,6 +104,12 @@ public class StudyController {
     public StudyController(StudyDao studyDao) {
         this.studyDao = studyDao;
     }
+    private final String RANDOM="random number";
+    private final String HELPER_RANDOM="helper.random";
+
+    private final String SITE_PARTICIPANT_COUNT="siteParticipantCount";
+    private final String SITE_ID="siteId";
+
 
     private enum SiteSaveCheck {
         CHECK_UNIQUE_SAVE(0), CHECK_UNIQUE_UPDATE(1), NO_CHECK(2);
@@ -301,13 +307,11 @@ public class StudyController {
         }
         else {
             studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "manual"));
-            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, ""));
         }
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.DISCREPANCY_MANAGEMENT, "true"));
 
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED, "not_used"));
 
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_DEFAULT, "blank"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_EDITABLE, "true"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_REQUIRED, "not_used"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_DEFAULT, "blank"));
@@ -315,10 +319,6 @@ public class StudyController {
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX, "true"));
         studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF, "false"));
 
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ADMIN_FORCED_REASON_FOR_CHANGE, "true"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.EVENT_LOCATION_REQUIRED, "not_used"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_PORTAL, "disabled"));
-        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.RANDOMIZATION, "disabled"));
 
         if (collectBirthDate == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
@@ -1942,7 +1942,7 @@ public class StudyController {
         return statusObj;
     }
 
-    public void verifyTemplateID(String templateID ,ArrayList<ErrorObj> errorObjects) {
+    public void verifyTemplateID(String templateID, ArrayList<ErrorObj> errorObjects) {
 
 
         Map<String, Object> data = ParticipantIdModel.getDataModel();
@@ -1954,17 +1954,20 @@ public class StudyController {
             errorObjects.add(errorObject);
         }
 
-        boolean templateIdMissingVariables = false;
-        ParticipantIdModel participantIdModel = new ParticipantIdModel();
-        for (ParticipantIdVariable variable : participantIdModel.getVariables()) {
-            if (!templateID.contains(variable.getName())) {
-                ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include both variables.", "templateID");
+        if ((templateID.contains(HELPER_RANDOM))) {
+            if (templateID.contains(SITE_PARTICIPANT_COUNT)) {
+                ErrorObj errorObject = createErrorObject("Study Object", "ID Template cannot include " + RANDOM + " and " + SITE_PARTICIPANT_COUNT + " together.", "templateID");
                 errorObjects.add(errorObject);
-                templateIdMissingVariables = true;
-                break;
+            }
+        } else {
+            if ((!templateID.contains(SITE_PARTICIPANT_COUNT) && !templateID.contains(SITE_ID)) || (templateID.contains(SITE_PARTICIPANT_COUNT) && !templateID.contains(SITE_ID))) {
+                ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include " + SITE_ID + " and " + SITE_PARTICIPANT_COUNT + " unless a " + RANDOM + " is included.", "templateID");
+                errorObjects.add(errorObject);
             }
         }
-        if (!templateIdMissingVariables){
+
+
+        if (errorObjects.size() == 0) {
             try {
                 template = new Template("template name", new StringReader(templateID), freemarkerConfiguration);
                 template.process(data, wtr);
@@ -1972,17 +1975,17 @@ public class StudyController {
 
 
             } catch (TemplateException te) {
-                logger.error("Error while instantiating template for verify template id: ",te);
+                logger.error("Error while instantiating template for verify template id: ", te);
                 ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid.", "templateID");
                 errorObjects.add(errorObject);
 
             } catch (IOException ioe) {
-                logger.error("Error while processing template: ",ioe);
+                logger.error("Error while processing template: ", ioe);
                 ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid.", "templateID");
                 errorObjects.add(errorObject);
 
             }
-    }
+        }
     }
 
     @RequestMapping( value = "/participantIdTemplate/model", method = RequestMethod.GET )

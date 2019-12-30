@@ -38,9 +38,9 @@ public interface UserService {
 
     List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken, String participantId, String firstName, String lastName, String identifier, UserAccountBean userAccountBean);
 
-    void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo,int pageNumber,int pageSize);
+    void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo,int pageNumber,int pageSize, boolean isStudyLevelUser);
 
-    StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException;
+    StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo, boolean isStudyLevelUser) throws OpenClinicaSystemException;
 
     JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy, JobType jobType, String sourceFileName);
 

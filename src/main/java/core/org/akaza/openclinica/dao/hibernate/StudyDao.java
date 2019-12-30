@@ -324,6 +324,19 @@ public class StudyDao extends AbstractDomainDao<Study> {
         Study study = (Study) q.uniqueResult();
         return study;
     }
+
+    @Transactional
+    public Study findByPKWithSpv(int ID) {
+        /* This function will load the studyParamValues without lazy initialization*/
+        String query = "select distinct s from Study s left join fetch s.studyParameterValues where s.studyId = :studyId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyId", ID);
+        List<Study> studyList = q.getResultList();
+        if(studyList != null || studyList.size() > 0)
+            return (Study) studyList.get(0);
+        return null;
+    }
+
     @Transactional
     public Study findByName(String name){
         CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
@@ -420,17 +433,18 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return null;
     }
     @Transactional
-    public void updateSitesStatus(Study s) {
-        String query = "update "+ getDomainClassName() +" s set status=:parentStatus,oldStatusId=:parentOldStatusId WHERE s.study.studyId = :parentStudyId";
+    public void updateSitesStatus(Study parent) {
+        String query = "from "+ getDomainClassName() +" s WHERE s.study.studyId = :parentStudyId";
         Query q=getCurrentSession().createQuery(query);
-        q.setParameter("parentStatus", s.getStatus());
-        q.setParameter("parentOldStatusId", s.getOldStatusId());
-        q.setParameter("parentStudyId", s.getStudyId());
-        
-        int result = q.executeUpdate();
-        
+        q.setParameter("parentStudyId", parent.getStudyId());
+        List<Study> studyList=(List<Study>) q.getResultList();
+        for(Study s: studyList){
+            s.setStatus(parent.getStatus());
+            s.setOldStatusId(parent.getOldStatusId());
+            getCurrentSession().update(s);
+        }
     }
-    
+
     @Transactional
     public Study updateStudyStatus(Study s) {
         String query = "from "+ getDomainClassName() +" s WHERE s.studyId = :studyId";
@@ -449,10 +463,11 @@ public class StudyDao extends AbstractDomainDao<Study> {
         q.setParameter("studySubjectId", studySubjectId);
         return (Study) q.uniqueResult();
     }
+
     @Transactional
     public Collection findAllByParentStudyIdOrderedByIdAsc(int parentStudyId) {
         /* This function will load the studyParamValues without lazy initialization*/
-        String query = "select s from Study s join fetch s.studyParameterValues where ( s.studyId=:studyId ) or ( s.study.studyId=:parentStudyId ) order by s.studyId asc";
+        String query = "select distinct s from Study s left join fetch s.studyParameterValues where ( s.studyId=:studyId ) or ( s.study.studyId=:parentStudyId ) order by s.studyId asc";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyId", parentStudyId);
         q.setParameter("parentStudyId", parentStudyId);

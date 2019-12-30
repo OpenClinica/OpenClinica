@@ -8,11 +8,6 @@
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>

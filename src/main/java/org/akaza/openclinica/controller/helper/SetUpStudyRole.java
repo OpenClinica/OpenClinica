@@ -55,9 +55,6 @@ public class SetUpStudyRole {
             currentStudy = (Study) studyDao.findByPK(userAccountBean.getActiveStudyId());
 
             StudyConfigService scs = new StudyConfigService(dataSource);
-            if (currentStudy.isSite()) {
-                scs.setParametersForSite(currentStudy);
-            }
 
             // set up the panel here, tbh
             panel.reset();

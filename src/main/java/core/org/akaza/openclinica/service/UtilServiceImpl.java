@@ -1,6 +1,7 @@
 package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
@@ -158,6 +159,13 @@ public class UtilServiceImpl implements UtilService {
 
     }
 
-
+    public boolean checkStudyLevelUser(ArrayList<StudyUserRoleBean> userRoles, String siteOid) {
+        Study publicSite = studyDao.findPublicStudy(siteOid);
+        for (StudyUserRoleBean userRole : userRoles) {
+            if(publicSite.getStudyId() == userRole.getStudyId())
+                return false;
+        }
+        return true;
+    }
 
 }
