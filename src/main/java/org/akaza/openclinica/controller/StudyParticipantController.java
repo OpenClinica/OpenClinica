@@ -580,13 +580,19 @@ public class StudyParticipantController {
 										   String landscape) {
 									 	 
 
+		    String siteName = null;
+		    String studyName = null;
+		    String pdfHeader =  "StudyName: SiteName - Participant ParticipantID";
+		    
 		    Study site = null;
 		    Study study = null;
 		    if(siteOid !=null) {
 		    	site = studyDao.findByOcOID(siteOid.trim());
+		    	siteName = site.getName();
 		    }
 			if(studyOid != null) {
 				study = studyDao.findByOcOID(studyOid.trim());
+				studyName = study.getName();
 				
 				if(study.getStudy() != null) {
 					site = study;
@@ -601,6 +607,17 @@ public class StudyParticipantController {
 			if(ss == null) {
 				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
 			}
+			
+			if(studyName != null) {
+				pdfHeader = pdfHeader.replaceFirst("StudyName", studyName);
+			}
+			
+			if(siteName == null) {
+				pdfHeader = pdfHeader.replaceFirst(": SiteName", "");
+			}else {
+				pdfHeader = pdfHeader.replaceFirst("SiteName", siteName);
+			}
+			pdfHeader = pdfHeader.replaceFirst("ParticipantID", participantId.trim());
 			
 			String 	studySubjectIdentifier = ss.getOcOid();
 			
@@ -617,6 +634,7 @@ public class StudyParticipantController {
 			String accessToken = (String) request.getSession().getAttribute("accessToken");
 			servletContext.setAttribute("accessToken", accessToken);
 			servletContext.setAttribute("studyID", study.getStudyId()+"");
+			servletContext.setAttribute("pdfHeader", pdfHeader);
 			Locale local = LocaleResolver.resolveLocale(request);
 			List<String> permissionTagsString =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
 			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {

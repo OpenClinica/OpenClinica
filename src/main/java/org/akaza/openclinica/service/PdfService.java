@@ -15,9 +15,9 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 public interface PdfService {
 
     File mergePDF(ArrayList<File> files,
-                  String fullFinalFilePathName) throws IOException;
+                  String fullFinalFilePathName,String pdfHeader) throws IOException;
 
     String getCaseBookFileRootPath();
 
-    int addFooter(PDDocument document, String footerMsg, int page_counter) throws IOException;
+    int addHeaderOrFooter(PDDocument document, String headerMsg,String footerMsg, int page_counter) throws IOException;
 }
