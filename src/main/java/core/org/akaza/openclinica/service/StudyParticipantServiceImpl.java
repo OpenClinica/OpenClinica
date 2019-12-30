@@ -45,6 +45,7 @@ import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -399,8 +400,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     @Transactional
     public void startCaseBookPDFJob(JobDetail jobDetail,
     		                        String schema,
-						    		String studyOID,  
-						            String studySubjectIdentifier,            
+						    		Study study,
+						    		Study site,
+						            StudySubject ss,            
 						            ServletContext servletContext,
 						            String userAccountID,                    
 						            String fullFinalFilePathName,
@@ -414,7 +416,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    File mergedPdfFile = null;
 		    String mergedPdfFileNm = null;
 		    int studyId = Integer.parseInt((String) servletContext.getAttribute("studyID"));
-		    String pdfHeader = (String) servletContext.getAttribute("pdfHeader");
+		    
+		    // prepare  pdf header
+		    String pdfHeader = this.pdfService.preparePdfHeader(study, site, ss.getLabel());
+		   
 			/**
 			 *  need to check the number of study/events/forms for this subject
 			 *  each for need a rest service call to Enketo
@@ -422,8 +427,17 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    String studyEventDefinitionID = null;
 		    String formLayoutOID = null;
 		    String studyEventID = null;
-		    String studySubjectOID = studySubjectIdentifier;
+		    String studySubjectOID = ss.getOcOid();
 		    String studyEventOrdinal = null;
+		    
+		    String studyOID = null;
+	        if(study != null) {										
+				studyOID = study.getOc_oid();
+			}
+		    if(site !=null) {		    							    	
+		    	studyOID = site.getOc_oid();
+		    }
+		    
 		   
 		    try {
 		    	
@@ -465,7 +479,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 					        FormLayout formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
 					        Role role = Role.RESEARCHASSISTANT;
 					        String mode = PFormCache.VIEW_MODE;
-					        					
+					        
 							List<Bind> binds = openRosaServices.getBinds(formLayout,EnketoAPI.QUERY_FLAVOR,studyOID);
 					        boolean formContainsContactData=false;
 					        if(openRosaServices.isFormContainsContactData(binds))

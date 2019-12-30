@@ -610,54 +610,24 @@ public class StudyParticipantController {
 										   String landscape) {
 									 	 
 
-		    String siteName = null;
-		    String studyName = null;
-		    String pdfHeader =  "StudyName: SiteName - Participant ParticipantID";
-		    
-		    Study site = null;
-		    Study study = null;
-		    if(siteOid !=null) {
-		    	site = studyDao.findByOcOID(siteOid.trim());
-		    	siteName = site.getName();
-		    }
-			if(studyOid != null) {
-				study = studyDao.findByOcOID(studyOid.trim());
-				studyName = study.getName();
-				
-				if(study.getStudy() != null) {
-					site = study;
-					study = study.getStudy(); 
-				}
-
-			}
+		    final	Study 	site = studyDao.findByOcOID(siteOid);	    			
+			final	Study	study = studyDao.findByOcOID(studyOid);						
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 			
-			StudySubject ss = null;
+			// use study or site to check subject
+			Study sTemp = null;			
 			if(siteOid !=null) {
-				ss = studySubjectDao.findByLabelAndStudy(participantId.trim(), site);
+				sTemp = site;
+				
 			}else {
-				ss = studySubjectDao.findByLabelAndStudy(participantId.trim(), study);
+				sTemp = study;
 			}			
-			
+			final StudySubject ss= studySubjectDao.findByLabelAndStudy(participantId.trim(), sTemp);			
 			if(ss == null) {
 				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
 			}
-		
-			if(studyName != null) {
-				pdfHeader = pdfHeader.replaceFirst("StudyName", studyName);
-			}
-			
-			if(siteName == null) {
-				pdfHeader = pdfHeader.replaceFirst(": SiteName", "");
-			}else {
-				pdfHeader = pdfHeader.replaceFirst("SiteName", siteName);
-			}
-			pdfHeader = pdfHeader.replaceFirst("ParticipantID", participantId.trim());
-			
-			String 	studySubjectIdentifier = ss.getOcOid();
-
-						
+				
 			//Setting the destination file
 	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
 	        int index= fullFinalFilePathName.lastIndexOf(File.separator);
@@ -669,15 +639,14 @@ public class StudyParticipantController {
 			ServletContext servletContext = request.getServletContext();
 			String accessToken = (String) request.getSession().getAttribute("accessToken");
 			servletContext.setAttribute("accessToken", accessToken);
-			servletContext.setAttribute("studyID", study.getStudyId()+"");
-			servletContext.setAttribute("pdfHeader", pdfHeader);
+			servletContext.setAttribute("studyID", study.getStudyId()+"");		
 			Locale local = LocaleResolver.resolveLocale(request);
 			List<String> permissionTagsString =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
 			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 				try {
 					 ResourceBundleProvider.updateLocale(local);
 					 String userAccountID = userAccountBean.getId() +"";
-					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,study, site,ss, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
 				 	
 					} catch (Exception e) {
 						logger.error("Exception is thrown while processing CaseBook PDF: " + e);

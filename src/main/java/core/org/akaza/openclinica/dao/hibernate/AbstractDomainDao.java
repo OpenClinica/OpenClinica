@@ -50,6 +50,9 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
 
     @SuppressWarnings("unchecked")@Transactional
     public T findByOcOID(String OCOID) {
+    	if(OCOID == null) {
+    		return null;
+    	}
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.oc_oid = :oc_oid";
         Query q = getCurrentSession().createQuery(query);

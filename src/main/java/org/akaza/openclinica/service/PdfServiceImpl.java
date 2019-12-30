@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.text.MessageFormat;
 
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -181,7 +182,32 @@ public class PdfServiceImpl implements PdfService {
     }
 
 
-
+   public String preparePdfHeader(Study study, Study site, String studySubjectIdentifier) {
+	  
+	    String siteName = null;
+	    String studyName = null;
+	    String participantID = studySubjectIdentifier.trim();
+	    		   
+	    MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}");
+	    MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}");
+	    		  		    
+	    if(study != null) {				
+			studyName = study.getName();		
+		}
+	    if(site !=null) {		    	
+	    	siteName = site.getName();	    	
+	    }
+	    Object[] headerArgs = {studyName, siteName,participantID};
+	    
+	    String pdfHeader;
+		if(siteName !=null) {
+	    	pdfHeader = pdfHeaderFormat1.format(headerArgs);
+	    }else {
+	    	pdfHeader = pdfHeaderFormat2.format(headerArgs);
+	    }
+	    
+	    return pdfHeader;
+   }
 
 
 }
