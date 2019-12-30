@@ -414,6 +414,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    File mergedPdfFile = null;
 		    String mergedPdfFileNm = null;
 		    int studyId = Integer.parseInt((String) servletContext.getAttribute("studyID"));
+		    String pdfHeader = (String) servletContext.getAttribute("pdfHeader");
 			/**
 			 *  need to check the number of study/events/forms for this subject
 			 *  each for need a rest service call to Enketo
@@ -484,7 +485,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    	}//for-loop-2	    						
 			    }//for-loop-1		   
 			    
-				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName);
+				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName,pdfHeader);
 				mergedPdfFileNm = mergedPdfFile.getName();
 				userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
 							
