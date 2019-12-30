@@ -5,6 +5,7 @@ import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -23,6 +24,13 @@ public class JobsServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+
+        String uuid = String.valueOf(request.getParameter("uuid"));
+        if (uuid != null){
+            uuid = StringEscapeUtils.escapeJavaScript(uuid);
+            request.setAttribute("uuid", uuid);
+        }
+
         int parentStudyId = currentStudy.checkAndGetParentStudyId();
         if (parentStudyId > 0) {
             request.setAttribute("atSiteLevel", true);
