@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.Locale;
 
@@ -36,7 +37,8 @@ public class NoAccessServlet extends SecureController {
      */
     @Override
     public void processRequest() throws Exception {
-        request.setAttribute(ORIGINATING_PAGE, request.getParameter(ORIGINATING_PAGE));
+        String originatingPage = StringEscapeUtils.escapeJavaScript(request.getParameter(ORIGINATING_PAGE));
+        request.setAttribute(ORIGINATING_PAGE, originatingPage);
         forwardPage(Page.NO_ACCESS);
     }
 

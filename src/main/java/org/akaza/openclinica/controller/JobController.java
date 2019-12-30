@@ -21,6 +21,7 @@ import core.org.akaza.openclinica.web.util.ErrorConstants;
 import core.org.akaza.openclinica.web.util.HeaderUtil;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,8 +163,7 @@ public class JobController {
 
     @ApiOperation( value = "To download job files ", notes = "Will download job file" )
     @RequestMapping( value = "/jobs/{uuid}/downloadFile", method = RequestMethod.GET )
-    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, @RequestParam(required = false) String open, HttpServletResponse response) throws Exception {
-        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, @RequestParam(required = false) String open, HttpServletResponse response) throws Exception { UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
         String studyOid;
         if (publicStudy.getStudy() == null) {

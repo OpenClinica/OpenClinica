@@ -40,6 +40,7 @@ import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -88,7 +89,7 @@ public class DeleteEventCRFServlet extends SecureController {
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         request.setAttribute("errorData", null);
-        String originatingPage = request.getParameter(ORIGINATING_PAGE);
+        String originatingPage = StringEscapeUtils.escapeJavaScript(request.getParameter(ORIGINATING_PAGE));
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
 
