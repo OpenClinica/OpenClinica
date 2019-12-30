@@ -316,7 +316,7 @@
     </a>
 
     <script>
-      var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/${param["uuid"]}/downloadFile?open=true';
+      var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/${uuid}/downloadFile?open=true';
       var jobResult = $.get(url, function(data) {
         var rows = data.trim().split('\n');
         var header = rows[0];
@@ -353,7 +353,7 @@
       jobs.done(function(data) {
         var logEntry;
         for (var i=0; i<data.length; i++) {
-          if (data[i].uuid === '${param["uuid"]}') {
+          if (data[i].uuid === '${uuid}') {
             logEntry = data[i];
             break;
           }
