@@ -48,7 +48,7 @@ public class PdfServiceImpl implements PdfService {
      * @throws IOException
      */
     public File mergePDF(ArrayList<File> files,
-                         String fullFinalFilePathName,String pdfHeader) throws IOException {
+                         String fullFinalFilePathName) throws IOException {
 
         //Instantiating PDFMergerUtility class
         PDFMergerUtility PDFmerger = new PDFMergerUtility();
@@ -57,23 +57,14 @@ public class PdfServiceImpl implements PdfService {
         PDFmerger.setDestinationFileName(fullFinalFilePathName);
 
         //Loading an existing PDF document   
-        int page_counter = 1;        
+        int page_counter = 1;
+        String footerMsg = "OpenClinica CaseBook ";
 
         ArrayList<PDDocument>  pDDocuments = new ArrayList<>();
-        //get all page numbers
-        int totalPageNumber = 0;
-        for(File file: files) {
-            PDDocument docTemp = PDDocument.load(file);
-            totalPageNumber += docTemp.getNumberOfPages();
-            docTemp.close();
-        }
-        String footerMsg = "Page X of " + totalPageNumber;
-        String headerMsg = pdfHeader;
-        
         for(File file: files) {
             PDDocument doc = PDDocument.load(file);
 
-            page_counter = this.addHeaderOrFooter(doc, headerMsg,footerMsg, page_counter);
+            page_counter = this.addFooter(doc, footerMsg, page_counter);
 
             // after add footer, use the new content
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -84,7 +75,7 @@ public class PdfServiceImpl implements PdfService {
             pDDocuments.add(doc);
 
             //adding the source files
-            PDFmerger.addSource(in);        
+            PDFmerger.addSource(in);
         }
 
         //Merging all PDFs
@@ -116,46 +107,35 @@ public class PdfServiceImpl implements PdfService {
         return dirPath;
     }
 
-    /**
-     * will return next available page number
-     */
-    public int addHeaderOrFooter(PDDocument document, String headerMsg,String footerMsg, int page_counter) throws IOException {
 
-        String footerMessage = null;             
+    public int addFooter(PDDocument document, String footerMsg, int page_counter) throws IOException {
+
+        String footerMessage = "Page ";
+        if(footerMsg != null && !(footerMsg.isEmpty())) {
+            footerMessage = footerMsg + "     "+ footerMessage;
+        }
+
+
         PDFont font = PDType1Font.TIMES_ROMAN;
         float fontSize = 10.0f;
 
         for( PDPage page : document.getPages() )
         {
             PDRectangle pageSize = page.getMediaBox();
-            footerMessage = footerMsg.replaceAll("X", page_counter+"");
-        
-            float footerWidth = font.getStringWidth( footerMessage )*fontSize/1000f;
+            String message = footerMessage + page_counter;
+            float stringWidth = font.getStringWidth( message )*fontSize/1000f;
             // calculate to center of the page
             int rotation = page.getRotation();
             boolean rotate = rotation == 90 || rotation == 270;
             float pageWidth = rotate ? pageSize.getHeight() : pageSize.getWidth();
             float pageHeight = rotate ? pageSize.getWidth() : pageSize.getHeight();
-            float footerCenterX = rotate ? pageHeight : (pageWidth - footerWidth - footerWidth/2);
-            float footerCenterY = rotate ? (pageWidth - footerWidth) :  10;
-            
-            float stringHeight = fontSize; 
-            float headerCenterX = rotate ? 5 : stringHeight+ 5;
-            float headerCenterY = rotate ? stringHeight+ 5 :  pageHeight - stringHeight;
+            float centerX = rotate ? pageHeight : (pageWidth - stringWidth - stringWidth/2);
+            float centerY = rotate ? (pageWidth - stringWidth) :  10;
 
             // append the content to the existing stream
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, true, true, true))
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, AppendMode.APPEND, true, true))
             {
-            	contentStream.beginText();
-            	// add header
-            	if(headerMsg != null) {            		
-                    // set font and font size
-                    contentStream.setFont( font, fontSize);
-                    contentStream.moveTextPositionByAmount(headerCenterX, headerCenterY);
-                    contentStream.drawString(headerMsg);                   
-            	}            	 
-                 
-                // add footer             
+                contentStream.beginText();
                 // set font and font size
                 contentStream.setFont( font, fontSize );
                 // set text color to red
@@ -163,13 +143,13 @@ public class PdfServiceImpl implements PdfService {
                 if (rotate)
                 {
                     // rotate the text according to the page rotation
-                    contentStream.setTextMatrix(Matrix.getRotateInstance(Math.PI / 2, footerCenterX, footerCenterY));
+                    contentStream.setTextMatrix(Matrix.getRotateInstance(Math.PI / 2, centerX, centerY));
                 }
                 else
                 {
-                    contentStream.setTextMatrix(Matrix.getTranslateInstance(footerCenterX, footerCenterY));
+                    contentStream.setTextMatrix(Matrix.getTranslateInstance(centerX, centerY));
                 }
-                contentStream.showText(footerMessage);
+                contentStream.showText(message);
                 contentStream.endText();
             }
 
