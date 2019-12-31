@@ -639,7 +639,7 @@ public class ImportServiceImpl implements ImportService {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
-        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+       
         logger.debug("Creating new Event Crf");
 
         return eventCrf;
@@ -1320,8 +1320,7 @@ public class ImportServiceImpl implements ImportService {
                     return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
             }
 
-            eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
-            eventCrf.setAnnotations(NEW_CRF_TRACK);
+            eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);            
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
             updateStudyEvntStatus(studyEvent, userAccount, DATA_ENTRY_STARTED);
 
@@ -1410,6 +1409,10 @@ public class ImportServiceImpl implements ImportService {
                 return new DataImportReport(null, null, null, null, null, null, null, null, UPDATED, sdf_logFile.format(new Date()), null);
             }
         } else {
+        	// only created new event crf once
+        	if(eventCrf.getEventCrfId() == 0) {
+        		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);	
+        	}        	
             itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
             if (isEventCrfCompleted(eventCrf)) {
                 ErrorObj eb = createQuery(userAccount, study, studySubject, itemData, reasonForChange);
