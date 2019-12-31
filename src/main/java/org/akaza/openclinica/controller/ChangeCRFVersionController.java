@@ -130,9 +130,10 @@ public class ChangeCRFVersionController {
         request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPageEscaped);
 
         ArrayList<String> pageMessages = initPageMessages(request);
-        Object errorMessage = request.getParameter("errorMessage");
+        String errorMessage = request.getParameter("errorMessage");
+        errorMessage = StringEscapeUtils.escapeHtml(errorMessage);
         if (errorMessage != null) {
-            pageMessages.add((String) errorMessage);
+            pageMessages.add(errorMessage);
         }
         // get CRF by ID with all versions
         // create List of all versions (label + value)
