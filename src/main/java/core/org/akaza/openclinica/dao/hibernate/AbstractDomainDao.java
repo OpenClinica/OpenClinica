@@ -62,12 +62,6 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         getCurrentSession().saveOrUpdate(domainObject);
         return domainObject;
     }
-    
-    @Transactional public T remove(T domainObject) {
-        getSessionFactory().getStatistics().logSummary();
-        getCurrentSession().remove(domainObject);
-        return domainObject;
-    }
 
     @Transactional public Serializable save(T domainObject) {
         getSessionFactory().getStatistics().logSummary();
