@@ -132,6 +132,7 @@ public class ChangeCRFVersionController {
         ArrayList<String> pageMessages = initPageMessages(request);
         String errorMessage = request.getParameter("errorMessage");
         errorMessage = StringEscapeUtils.escapeHtml(errorMessage);
+        errorMessage = StringEscapeUtils.escapeJavaScript(errorMessage);
         if (errorMessage != null) {
             pageMessages.add(errorMessage);
         }
