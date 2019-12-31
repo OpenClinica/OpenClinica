@@ -72,7 +72,16 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isStudyAvailable(String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);
-        if (publicStudy != null && publicStudy.getStatus().equals(Status.AVAILABLE)) {
+        if (publicStudy != null && publicStudy.getStatus().equals(Status.AVAILABLE) && !(publicStudy.isSite())) {
+            return true;
+        }
+        return false;
+    }
+
+    
+    public boolean isSiteAvailable(String siteOid) {
+        Study publicStudy = getPublicStudy(siteOid);
+        if (publicStudy != null && publicStudy.getStatus().equals(Status.AVAILABLE) && publicStudy.isSite()) {
             return true;
         }
         return false;
@@ -273,7 +282,7 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isStudyAvailable(studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
         }
-        if (siteOid != null && !isStudyAvailable(siteOid)) {
+        if (siteOid != null && !isSiteAvailable(siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
         }
         if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
@@ -289,8 +298,8 @@ public class ValidateServiceImpl implements ValidateService {
     }
 
     /**
-     *  this is used by casebook PDF process
-     *  studyOid may be at study level or site level
+     *  this is used by case book PDF process
+     *  studyOid only at study level
      */
     public void validateStudyAndRoles(String studyOid,  UserAccountBean userAccountBean) {
 
@@ -306,6 +315,7 @@ public class ValidateServiceImpl implements ValidateService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
         }
 
+        
         if (!isUserHasAccessToStudy(userRoles, studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
         }

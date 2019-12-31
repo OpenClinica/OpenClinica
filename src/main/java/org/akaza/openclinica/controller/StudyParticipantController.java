@@ -60,18 +60,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.core.Context;
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
 @RequestMapping(value ="/auth/api/clinicaldata")
@@ -540,9 +528,39 @@ public class StudyParticipantController {
 		return jobDetail.getUuid();
 	}
 	
-	@ApiOperation(value = "To get PDF version casebook for one specific participant",  notes = "only work for authorized users with the right acecss permission ")
+		@ApiOperation(value = "To get PDF version casebook for one specific participant at site level",  notes = "only work for authorized users with the right acecss permission ")
+		@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/{participantId}/casebook", method = RequestMethod.POST)
+		public ResponseEntity<Object> getSiteLevelParticipantCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
+				                                       @PathVariable("siteOid") String siteOid,
+													   @PathVariable("participantId") String participantId, 
+													   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
+											           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
+											           @ApiParam( value = "optional parameter landscape whether paper orientation is landscape. Valid values are true, false. Default is false.", required = false ) @RequestParam(value="landscape",defaultValue = "false",required = false) String landscape,
+											           @Context HttpServletRequest request
+											          ) throws IOException {
+												 
+			
+			  utilService.setSchemaFromStudyOid(siteOid);	
+			  String schema = CoreResources.getRequestSchema();
+		 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+	 			 	  
+			  try {				 
+				  validateService.validateStudyAndRoles(studyOid.trim(),siteOid.trim(),userAccountBean);			 	 			 	 		 	 
+			 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
+
+				  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
+				  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+			  
+				  } catch (OpenClinicaSystemException e) {
+						return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+				}
+			 	 
+			 }
+
+		
+	@ApiOperation(value = "To get PDF version casebook for one specific participant at study level",  notes = "only work for authorized users with the right acecss permission ")
 	@RequestMapping(value = "/studies/{studyOid}/participants/{participantId}/casebook", method = RequestMethod.POST)
-	public ResponseEntity<Object> getCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
+	public ResponseEntity<Object> getStudyLevelParticipantCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
 												   @PathVariable("participantId") String participantId, 
 												   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
 										           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
@@ -554,17 +572,16 @@ public class StudyParticipantController {
 		  utilService.setSchemaFromStudyOid(studyOid);	
 		  String schema = CoreResources.getRequestSchema();
 	 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-	 	  String siteOid = null;
-	 	  
+	 	
 		  try {				 
 			  validateService.validateStudyAndRoles(studyOid.trim(),userAccountBean);			 	 			 	 		 	 
-		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
+		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,null, participantId, request, userAccountBean, format, margin, landscape);
 
 			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
 			  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
 		  
 			  } catch (OpenClinicaSystemException e) {
-					return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+					return new ResponseEntity(validateService.getResponseForException(e, studyOid, null), HttpStatus.BAD_REQUEST);
 			}
 		 	 
 		 }
@@ -581,31 +598,24 @@ public class StudyParticipantController {
 										   String landscape) {
 									 	 
 
-		    Study site = null;
-		    Study study = null;
-		    if(siteOid !=null) {
-		    	site = studyDao.findByOcOID(siteOid.trim());
-		    }
-			if(studyOid != null) {
-				study = studyDao.findByOcOID(studyOid.trim());
-				
-				if(study.getStudy() != null) {
-					site = study;
-					study = study.getStudy(); 
-				}
-			}
+		    final	Study 	site = siteOid==null? null:studyDao.findByOcOID(siteOid);	    			
+			final	Study	study = studyOid==null? null:studyDao.findByOcOID(studyOid);						
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
-			//currently studySubjectIdentifier is OID
-			StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantId.trim(), study);
 			
+			// use study or site to check subject
+			Study sTemp = null;			
+			if(siteOid !=null) {
+				sTemp = site;
+				
+			}else {
+				sTemp = study;
+			}			
+			final StudySubject ss= studySubjectDao.findByLabelAndStudy(participantId.trim(), sTemp);			
 			if(ss == null) {
 				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
 			}
-			
-			String 	studySubjectIdentifier = ss.getOcOid();
-			
-						
+				
 			//Setting the destination file
 	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
 	        int index= fullFinalFilePathName.lastIndexOf(File.separator);
@@ -617,14 +627,14 @@ public class StudyParticipantController {
 			ServletContext servletContext = request.getServletContext();
 			String accessToken = (String) request.getSession().getAttribute("accessToken");
 			servletContext.setAttribute("accessToken", accessToken);
-			servletContext.setAttribute("studyID", study.getStudyId()+"");
+			servletContext.setAttribute("studyID", study.getStudyId()+"");		
 			Locale local = LocaleResolver.resolveLocale(request);
 			List<String> permissionTagsString =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
 			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 				try {
 					 ResourceBundleProvider.updateLocale(local);
 					 String userAccountID = userAccountBean.getId() +"";
-					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,study, site,ss, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
 				 	
 					} catch (Exception e) {
 						logger.error("Exception is thrown while processing CaseBook PDF: " + e);

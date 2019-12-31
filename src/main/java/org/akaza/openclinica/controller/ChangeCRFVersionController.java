@@ -32,6 +32,7 @@ import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.view.StudyInfoPanel;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +126,8 @@ public class ChangeCRFVersionController {
         request.setAttribute("crfName", crfName);
         request.setAttribute("formLayoutId", formLayoutId);
         request.setAttribute("formLayoutName", formLayoutName.trim());
-        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPage);
+        String originatingPageEscaped = StringEscapeUtils.escapeHtml(originatingPage);
+        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPageEscaped);
 
         ArrayList<String> pageMessages = initPageMessages(request);
         Object errorMessage = request.getParameter("errorMessage");
