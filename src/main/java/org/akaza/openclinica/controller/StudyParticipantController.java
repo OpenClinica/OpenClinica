@@ -60,18 +60,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.core.Context;
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
 @RequestMapping(value ="/auth/api/clinicaldata")
@@ -610,36 +598,25 @@ public class StudyParticipantController {
 										   String landscape) {
 									 	 
 
-		    Study site = null;
-		    Study study = null;
-		    if(siteOid !=null) {
-		    	site = studyDao.findByOcOID(siteOid.trim());
-		    }
-			if(studyOid != null) {
-				study = studyDao.findByOcOID(studyOid.trim());
-				
-				if(study.getStudy() != null) {
-					site = study;
-					study = study.getStudy(); 
-				}
 
-			}
+		    final	Study 	site = siteOid==null? null:studyDao.findByOcOID(siteOid);	    			
+			final	Study	study = studyOid==null? null:studyDao.findByOcOID(studyOid);						
 			
 			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 			
-			StudySubject ss = null;
+			// use study or site to check subject
+			Study sTemp = null;			
 			if(siteOid !=null) {
-				ss = studySubjectDao.findByLabelAndStudy(participantId.trim(), site);
+				sTemp = site;
+				
 			}else {
-				ss = studySubjectDao.findByLabelAndStudy(participantId.trim(), study);
+				sTemp = study;
 			}			
-			
+			final StudySubject ss= studySubjectDao.findByLabelAndStudy(participantId.trim(), sTemp);			
 			if(ss == null) {
 				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
 			}
-			
-			String 	studySubjectIdentifier = ss.getOcOid();
-								
+
 			//Setting the destination file
 	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
 	        int index= fullFinalFilePathName.lastIndexOf(File.separator);
@@ -651,14 +628,14 @@ public class StudyParticipantController {
 			ServletContext servletContext = request.getServletContext();
 			String accessToken = (String) request.getSession().getAttribute("accessToken");
 			servletContext.setAttribute("accessToken", accessToken);
-			servletContext.setAttribute("studyID", study.getStudyId()+"");
+			servletContext.setAttribute("studyID", study.getStudyId()+"");		
 			Locale local = LocaleResolver.resolveLocale(request);
 			List<String> permissionTagsString =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
 			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 				try {
 					 ResourceBundleProvider.updateLocale(local);
 					 String userAccountID = userAccountBean.getId() +"";
-					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,studyOid, studySubjectIdentifier, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,study, site,ss, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
 				 	
 					} catch (Exception e) {
 						logger.error("Exception is thrown while processing CaseBook PDF: " + e);

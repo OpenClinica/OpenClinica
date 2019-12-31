@@ -44,6 +44,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -119,7 +120,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         if (noteTree == null) {
             noteTree = new FormDiscrepancyNotes();
         }
-        String ypos = fp.getString("ypos"+parentId);
+        String ypos = StringEscapeUtils.escapeHtml(fp.getString("ypos"+parentId));
+        ypos = StringEscapeUtils.escapeJavaScript(ypos);
         int refresh = 0;
         String field = fp.getString(ENTITY_FIELD, true);
         
