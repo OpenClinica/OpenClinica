@@ -598,6 +598,7 @@ public class StudyParticipantController {
 										   String landscape) {
 									 	 
 
+
 		    final	Study 	site = siteOid==null? null:studyDao.findByOcOID(siteOid);	    			
 			final	Study	study = studyOid==null? null:studyDao.findByOcOID(studyOid);						
 			
@@ -615,7 +616,7 @@ public class StudyParticipantController {
 			if(ss == null) {
 				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
 			}
-				
+
 			//Setting the destination file
 	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
 	        int index= fullFinalFilePathName.lastIndexOf(File.separator);
