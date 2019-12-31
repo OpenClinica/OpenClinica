@@ -301,8 +301,9 @@
 </div>
 
 <script>
-  function popupSdv() {
+  function popupSdv(item) {
     jQuery.blockUI({ message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
+    var cols = $(item).closest('tr').children();
   }
   jQuery('#sdv-items').DataTable({
     dom: 't'
