@@ -5,29 +5,38 @@
 
 
     <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-01">
-        <comment>Adding a column study_uuid to Study table</comment>
+        <comment>Adding a columns sdv_status_new, date_last_sdv_verified  to event_crf table</comment>
         <addColumn tableName="event_crf">
-            <column name="sdv_status_new" type="VARCHAR(64)"/>
+            <column name="sdv_status_new" type="VARCHAR(64)" defaultValue="NOT_VERIFIED"/>
+            <column name="date_last_sdv_verified" type="DATE"/>
         </addColumn>
     </changeSet>
     <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-02">
+        <comment>Updating the sdv_status_new column from sdv_status on event_crf table</comment>
         <sql>
             UPDATE event_crf
             SET sdv_status_new='VERIFIED' WHERE sdv_status ='t';
         </sql>
     </changeSet>
     <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-03">
+        <comment>Updating the sdv_status_new column from sdv_status on event_crf table</comment>
         <sql>
             UPDATE event_crf
             SET sdv_status_new='NOT_VERIFIED' WHERE sdv_status ='f';
         </sql>
     </changeSet>
-    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-01">
-        <comment>Adding a column study_uuid to Study table</comment>
+    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-04">
+        <comment>Deleting the sdv_status column from event_crf table</comment>
         <dropColumn tableName="event_crf">
             <column name="sdv_status" type="BOOLEAN"/>
         </dropColumn>
     </changeSet>
-
+    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-05">
+        <comment>Renaming the sdv_status_new column to sdv_status column on event_crf table</comment>
+        <renameColumn columnDataType="DATE"
+                      newColumnName="sdv_status"
+                      oldColumnName="sdv_status_new"
+                      tableName="event_crf"/>
+    </changeSet>
 
 </databaseChangeLog>

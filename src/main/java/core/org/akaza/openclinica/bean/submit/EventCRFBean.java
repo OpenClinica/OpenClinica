@@ -50,6 +50,7 @@ public class EventCRFBean extends AuditableEntityBean {
     private String eventName = "";
     private String studyName = "";
     private int eventOrdinal = 1;
+    private Date lastSdvVerifiedDate;
 
     private StudySubjectBean studySubject;
     private StudyEventBean studyEvent;
@@ -97,6 +98,7 @@ public class EventCRFBean extends AuditableEntityBean {
         this.updaterId = eventCRFBean.getUpdaterId();
         this.formLayout = eventCRFBean.getFormLayout();
         this.formLayoutId = eventCRFBean.getFormLayoutId();
+        this.lastSdvVerifiedDate = eventCRFBean.getLastSdvVerifiedDate();
     }
 
     public EventCRFBean copy() {
@@ -548,6 +550,14 @@ public class EventCRFBean extends AuditableEntityBean {
 
     public void setFormLayout(FormLayoutBean formLayout) {
         this.formLayout = formLayout;
+    }
+
+    public Date getLastSdvVerifiedDate() {
+        return lastSdvVerifiedDate;
+    }
+
+    public void setLastSdvVerifiedDate(Date lastSdvVerifiedDate) {
+        this.lastSdvVerifiedDate = lastSdvVerifiedDate;
     }
 
     @Override
