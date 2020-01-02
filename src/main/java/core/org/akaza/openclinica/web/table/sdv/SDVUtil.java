@@ -1265,7 +1265,7 @@ public class SDVUtil {
 
     }
 
-    public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, boolean setVerification) {
+    public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, SdvStatus sdvStatus) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -1292,7 +1292,7 @@ public class SDVUtil {
                 if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
                         || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
                     try {
-                        eventCRFDAO.setSDVStatus(setVerification, userId, eventCRFBean.getId());
+                        eventCRFDAO.setSDVStatus(sdvStatus, userId, eventCRFBean.getId());
                     } catch (Exception exc) {
                         // System.out.println(exc.getMessage());
                         return false;
@@ -1305,7 +1305,7 @@ public class SDVUtil {
         return true;
     }
 
-    public boolean setSDVerified(List<Integer> eventCRFIds, int userId, boolean setVerification) {
+    public boolean setSDVerified(List<Integer> eventCRFIds, int userId, SdvStatus sdvStatus) {
 
         // If no event CRFs are offered to SDV, then the transaction has not
         // caused a problem, so return true
@@ -1317,7 +1317,7 @@ public class SDVUtil {
 
         for (Integer eventCrfId : eventCRFIds) {
             try {
-                eventCRFDAO.setSDVStatus(setVerification, userId, eventCrfId);
+                eventCRFDAO.setSDVStatus(sdvStatus, userId, eventCrfId);
             } catch (Exception exc) {
                 // System.out.println(exc.getMessage());
                 return false;
