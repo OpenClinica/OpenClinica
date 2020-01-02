@@ -44,7 +44,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                 isSdvStatusSet = true;
         }
         if(!isSdvStatusSet) {
-            theCriteria = theCriteria + " and (" + (columnMapping.get("sdvStatus") + " = " + SdvStatus.NOT_VERIFIED + " or " + (columnMapping.get("sdvStatus")) + " = " + SdvStatus.CHANGED_AFTER_VERIFIED) + " ) ";
+            theCriteria = theCriteria + " and (" + (columnMapping.get("sdvStatus") + " = '" + SdvStatus.NOT_VERIFIED + "' or " + (columnMapping.get("sdvStatus")) + " = '" + SdvStatus.CHANGED_AFTER_VERIFIED) + "' ) ";
         }
         return theCriteria;
     }
@@ -55,16 +55,16 @@ public class EventCRFSDVFilter implements CriteriaCommand {
             if (property.equals("sdvStatus")) {
                 if (value.equals("verified")) {
                     criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = " + SdvStatus.VERIFIED;
+                    criteria = criteria + " " + columnMapping.get(property) + " = '" + SdvStatus.VERIFIED + "'";
                 }else if (value.equals("change_since_verified")) {
                     criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = " + SdvStatus.CHANGED_AFTER_VERIFIED;
+                    criteria = criteria + " " + columnMapping.get(property) + " = '" + SdvStatus.CHANGED_AFTER_VERIFIED + "'";
                 } else if (value.equals("ready_to_verify")) {
                     criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = " + SdvStatus.NOT_VERIFIED;
+                    criteria = criteria + " " + columnMapping.get(property) + " = '" + SdvStatus.NOT_VERIFIED + "'";
                 }else{
                     criteria = criteria + " and ";
-                    criteria = criteria + "  (" + (columnMapping.get(property) + " = " + SdvStatus.NOT_VERIFIED +" or "+(columnMapping.get(property)) +" = "+SdvStatus.CHANGED_AFTER_VERIFIED)+" ) ";
+                    criteria = criteria + "  (" + (columnMapping.get(property) + " = '" + SdvStatus.NOT_VERIFIED +"' or "+(columnMapping.get(property)) +" = '"+ SdvStatus.CHANGED_AFTER_VERIFIED) +"' ) ";
                 }
             } else if (property.equals("sdvRequirementDefinition")) {
                 ArrayList<Integer> reqs = new ArrayList<Integer>();
