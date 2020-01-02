@@ -21,12 +21,13 @@ import java.util.TimeZone;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Prepare data for one ODM XML file.
@@ -40,6 +41,7 @@ public abstract class OdmDataCollector {
     private ODMBean odmbean;
     protected boolean showArchived;
 
+    protected StudyDao studyDao;
     // key is study/site oc_oid.
     private LinkedHashMap<String, OdmStudyBase> studyBaseMap;
     // 0: one Study Element; 1: one parent study and its sites
@@ -50,32 +52,38 @@ public abstract class OdmDataCollector {
     public OdmDataCollector() {
     }
 
-    public OdmDataCollector(DataSource ds, StudyBean study, boolean showArchived) {
-        this(ds, study);
+
+    public OdmDataCollector(DataSource ds, StudyDao studyDao) {
+        this.ds = ds;
+        this.studyDao = studyDao;
+    }
+    public OdmDataCollector(DataSource ds, Study study, boolean showArchived, StudyDao studyDao) {
+        this(ds, study, studyDao);
         this.showArchived = showArchived;
     }
 
     /**
      * Constructor for an ODM XML file containing information of the passed
-     * StudyBean. If it is a site,
+     * Study. If it is a site,
      * only contains information of this site. If it is a study,
      * contains information of this study and its sites if appliable.
      * 
      * @param ds
      * @param study
      */
-    public OdmDataCollector(DataSource ds, StudyBean study) {
+    public OdmDataCollector(DataSource ds, Study study, StudyDao studyDao) {
         this.ds = ds;
         if (this.ds == null) {
             logger.info("DataSource is null!");
             return;
         }
+        this.studyDao = studyDao;
         if (study == null)
             createFakeStudyObj();
 
         else {
 
-            if (study.getId() < 1) {
+            if (study == null || study.getStudyId() < 1) {
                 logger.info("There is no study.");
                 return;
             }
@@ -83,13 +91,12 @@ public abstract class OdmDataCollector {
             odmbean = new ODMBean();
 
             if (study != null) {
-                if (study.isSite(study.getParentStudyId())) {
+                if (study.isSite()) {
                     this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
-                    this.studyBaseMap.put(study.getOid(), new OdmStudyBase(ds, study));
+                    this.studyBaseMap.put(study.getOc_oid(), new OdmStudyBase(ds, study));
                     this.category = 0;
                 } else {
-                    int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
-                    this.studyBaseMap = populateCompletedStudyBaseMap(parentStudyId);
+                    this.studyBaseMap = populateCompletedStudyBaseMap(study.getStudyId());
                     category = 1;
                 }
             }
@@ -100,10 +107,10 @@ public abstract class OdmDataCollector {
         dataset = new DatasetBean();
         odmbean = new ODMBean();
 
-        StudyBean studyBean = new StudyBean();
+        Study studyBean = new Study();
         studyBean.setName(MetadataUnit.FAKE_STUDY_NAME);
-        studyBean.setOid(MetadataUnit.FAKE_STUDY_OID);
-        studyBean.setParentStudyId(0);
+        studyBean.setOc_oid(MetadataUnit.FAKE_STUDY_OID);
+        studyBean.setStudy(new Study());
         StudyEventDefinitionBean sedFake = new StudyEventDefinitionBean();
         sedFake.setName(MetadataUnit.FAKE_SE_NAME);
         sedFake.setOid(MetadataUnit.FAKE_STUDY_EVENT_OID);
@@ -112,7 +119,7 @@ public abstract class OdmDataCollector {
         seds.add(sedFake);
 
         LinkedHashMap<String, OdmStudyBase> Bases = new LinkedHashMap<String, OdmStudyBase>();
-        Bases.put(studyBean.getOid(), new OdmStudyBase(ds, studyBean, seds));
+        Bases.put(studyBean.getOc_oid(), new OdmStudyBase(ds, studyBean, seds));
         // this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
         this.studyBaseMap = Bases;
 
@@ -126,21 +133,22 @@ public abstract class OdmDataCollector {
      * @param ds
      * @param dataset
      */
-    public OdmDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy) {
+    public OdmDataCollector(DataSource ds, DatasetBean dataset, Study currentStudy, StudyDao studyDao) {
         this.ds = ds;
         if (this.ds == null) {
             logger.info("DataSource is null!");
             return;
         }
+        this.studyDao = studyDao;
         this.dataset = dataset;
         odmbean = new ODMBean();
-        StudyBean study = (StudyBean) new StudyDAO(ds).findByPK(dataset.getStudyId());
-        if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+        Study study = (Study) studyDao.findByPKWithSpv(dataset.getStudyId());
+        if (currentStudy.isSite()) {
             this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
-            this.studyBaseMap.put(study.getOid(), new OdmStudyBase(ds, study));
+            this.studyBaseMap.put(study.getOc_oid(), new OdmStudyBase(ds, study));
             this.category = 0;
         } else {
-            int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
+            int parentStudyId = study.isSite() ? study.getStudy().getStudyId() : study.getStudyId();
             this.studyBaseMap = populateCompletedStudyBaseMap(parentStudyId);
             category = 1;
         }
@@ -155,9 +163,8 @@ public abstract class OdmDataCollector {
      */
     public LinkedHashMap<String, OdmStudyBase> populateCompletedStudyBaseMap(int parentStudyId) {
         LinkedHashMap<String, OdmStudyBase> Bases = new LinkedHashMap<String, OdmStudyBase>();
-        StudyDAO sdao = new StudyDAO(this.ds);
-        for (StudyBean s : (ArrayList<StudyBean>) sdao.findAllByParentStudyIdOrderedByIdAsc(parentStudyId)) {
-            Bases.put(s.getOid(), new OdmStudyBase(ds, s));
+        for (Study s : (ArrayList<Study>) studyDao.findAllByParentStudyIdOrderedByIdAsc(parentStudyId)) {
+            Bases.put(s.getOc_oid(), new OdmStudyBase(ds, s));
         }
         return Bases;
     }
@@ -171,8 +178,8 @@ public abstract class OdmDataCollector {
      */
     public LinkedHashMap<String, OdmStudyBase> populateStudyBaseMap(int studyId) {
         LinkedHashMap<String, OdmStudyBase> Bases = new LinkedHashMap<String, OdmStudyBase>();
-        StudyBean study = (StudyBean) new StudyDAO(this.ds).findByPK(studyId);
-        Bases.put(study.getOid(), new OdmStudyBase(ds, study));
+        Study study = (Study) studyDao.findByPK(studyId);
+        Bases.put(study.getOc_oid(), new OdmStudyBase(ds, study));
         return Bases;
     }
 

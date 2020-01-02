@@ -2,9 +2,9 @@ package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import core.org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
@@ -45,7 +45,7 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
     private StudySubjectDAO studySubjectDao;
     private UserAccountDAO userAccountDao;
     private SubjectDAO subjectDao;
-    private StudyBean currentStudy;
+    private Study currentStudy;
     private ResourceBundle resword;
     private ResourceBundle resformat;
 
@@ -258,11 +258,11 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
         this.subjectDao = subjectDao;
     }
 
-    public StudyBean getCurrentStudy() {
+    public Study getCurrentStudy() {
         return currentStudy;
     }
 
-    public void setCurrentStudy(StudyBean currentStudy) {
+    public void setCurrentStudy(Study currentStudy) {
         this.currentStudy = currentStudy;
     }
 

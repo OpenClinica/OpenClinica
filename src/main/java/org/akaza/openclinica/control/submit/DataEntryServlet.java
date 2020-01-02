@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.beanutils.BeanUtils;
 import core.org.akaza.openclinica.bean.admin.AuditBean;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
@@ -47,7 +49,6 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -85,7 +86,6 @@ import core.org.akaza.openclinica.dao.admin.AuditDAO;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -124,6 +124,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
@@ -302,7 +303,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         HttpSession session = request.getSession();
-        StudyBean currentStudy =    (StudyBean) session.getAttribute("study");
+        Study currentStudy =    (Study) session.getAttribute("study");
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
         SectionDAO sdao =  new SectionDAO(getDataSource());
         /**
@@ -482,7 +483,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
         }
 
-        StudyBean study = (StudyBean) session.getAttribute("study");
+        Study study = (Study) session.getAttribute("study");
         // constructs the list of items used on UI
         // tbh>>
         // logger.trace("trying event def crf id: "+eventDefinitionCRFId);
@@ -570,14 +571,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // this is for generating side info panel
         // and the information panel under the Title
         SubjectDAO subjectDao = new SubjectDAO(getDataSource());
-        StudyDAO studydao = new StudyDAO(getDataSource());
         SubjectBean subject = (SubjectBean) subjectDao.findByPK(ssb.getSubjectId());
 
         // Get the study then the parent study
         logMe("Entering  Get the study then the parent study   "+System.currentTimeMillis());
-        if (study.getParentStudyId() > 0) {
+        if (study.isSite()) {
             // this is a site,find parent
-            StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
+            Study parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
             request.setAttribute("studyTitle", parentStudy.getName());
             request.setAttribute("siteTitle",study.getName());
         } else {
@@ -586,7 +586,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         logMe("Entering  Get the study then the parent study end  "+System.currentTimeMillis());
         // Let us process the age
-        if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+        if (currentStudy.getCollectDob().equals("1")) {
             // YW 11-16-2007 erollment-date is used for calculating age.
             Date enrollmentDate = ssb.getEnrollmentDate();
             age = Utils.getInstacne().processAge(enrollmentDate, subject.getDateOfBirth());
@@ -1231,11 +1231,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
             populateInstantOnChange(request.getSession(), ecb, section);
             // logger.debug("+++ try to populate notes, got count of field notes: " + discNotes.getFieldNotes().toString());
 
-            if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")) {
+            if (currentStudy.getInterviewerNameRequired().equals("yes")) {
                 v.addValidation(INPUT_INTERVIEWER, Validator.NO_BLANKS);
             }
 
-            if (currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes")) {
+            if (currentStudy.getInterviewDateRequired().equals("yes")) {
                 v.addValidation(INPUT_INTERVIEW_DATE, Validator.NO_BLANKS);
             }
 
@@ -2125,7 +2125,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected void getInputBeans(HttpServletRequest request) throws InsufficientPermissionException {
 
        HttpSession session = request.getSession();
-       StudyBean currentStudy =    (StudyBean)  session.getAttribute("study");
+       Study currentStudy =    (Study)  session.getAttribute("study");
 
         // BWP >>we should have the correct crfVersionId, in order to acquire
         // the correct
@@ -2198,7 +2198,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         // added to allow sections shown on this page
         DisplayTableOfContentsBean displayBean = new DisplayTableOfContentsBean();
-        displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy);
+        displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy, getStudyDao());
         // escape apostrophe in event name
         displayBean.getStudyEventDefinition().setName(StringEscapeUtils.escapeJavaScript(displayBean.getStudyEventDefinition().getName()));
         request.setAttribute(TOC_DISPLAY, displayBean);
@@ -2288,7 +2288,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // resexception=ResourceBundle.getBundle(
         // "core.org.akaza.openclinica.i18n.exceptions",locale);
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+        Study currentStudy =    (Study)  request.getSession().getAttribute("study");
         EventCRFBean ecb;
        EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
 
@@ -2302,7 +2302,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         LOGGER.trace("look specifically wrt event crf id: " + eventCRFId);
 
-        LOGGER.trace("Creating event CRF.  Study id: " + currentStudy.getId() + "; CRF Version id: " + crfVersionId + "; Study Event id: " + studyEventId
+        LOGGER.trace("Creating event CRF.  Study id: " + currentStudy.getStudyId() + "; CRF Version id: " + crfVersionId + "; Study Event id: " + studyEventId
             + "; Event Definition CRF id: " + eventDefinitionCRFId + "; Subject: " + subjectId);
 
         StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
@@ -2333,11 +2333,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         StudyEventDAO sedao = new StudyEventDAO(getDataSource());
         StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
-        StudyBean studyWithSED = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithSED = new StudyBean();
-            studyWithSED.setId(currentStudy.getParentStudyId());
+        Study studyWithSED = null;
+        if (currentStudy.isSite()) {
+            studyWithSED = currentStudy.getStudy();
         }
+        else
+            studyWithSED = currentStudy;
 
         AuditableEntityBean aeb = sedao.findByPKAndStudy(studyEventId, studyWithSED);
 
@@ -2357,14 +2358,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 ecb.setCreatedDate(new Date());
                 ecb.setCRFVersionId(crfVersionId);
 
-                if (currentStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+                if (currentStudy.getInterviewerNameDefault().equals("blank")) {
                     ecb.setInterviewerName("");
                 } else {
                     // default will be event's owner name
                     ecb.setInterviewerName(sEvent.getOwner().getName());
 
                 }
-                if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+                if (!currentStudy.getInterviewDateDefault().equals("blank")) {
                     if (sEvent.getDateStarted() != null) {
                         ecb.setDateInterviewed(sEvent.getDateStarted());// default
                         // date
@@ -3167,7 +3168,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected boolean writeToDB(ItemDataBean itemData, DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request) {
         ItemDataBean idb = itemData;
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+        Study currentStudy =    (Study)  request.getSession().getAttribute("study");
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         idb.setItemId(dib.getItem().getId());
         idb.setEventCRFId(ecb.getId());
@@ -3335,7 +3336,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         FormProcessor fp = new FormProcessor(request);
         HttpSession session = request.getSession();
         Locale loc = this.locale == null ? LocaleResolver.getLocale(request) : this.locale;
-        StudyBean study = (StudyBean) session.getAttribute("study");
+        Study study = (Study) session.getAttribute("study");
        SessionManager sm = (SessionManager)request.getSession().getAttribute("sm");
        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
        SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
@@ -3460,7 +3461,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         ArrayList sections = new ArrayList();
         HttpSession session = request.getSession();
-        StudyBean study = (StudyBean) session.getAttribute("study");
+        Study study = (Study) session.getAttribute("study");
       SectionDAO  sdao = new SectionDAO(getDataSource());
       ItemDataDAO iddao = new ItemDataDAO(getDataSource(), locale);
        // ALL_SECTION_BEANS
@@ -4102,7 +4103,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
         ArrayList allCRFs = ecdao.findAllByStudyEventAndStatus(seb,Status.UNAVAILABLE);
-        StudyBean study = (StudyBean) session.getAttribute("study");
+        Study study = (Study) session.getAttribute("study");
         ArrayList allEDCs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, seb.getStudyEventDefinitionId());
         CRFVersionDAO crfversionDao=  new CRFVersionDAO(getDataSource());
         boolean eventCompleted = true;
@@ -4423,7 +4424,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
      {
          EventDefinitionCRFDAO   edcdao = new EventDefinitionCRFDAO(getDataSource());
-        StudyBean study = (StudyBean) session.getAttribute("study");
+        Study study = (Study) session.getAttribute("study");
         edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
      }
     }
@@ -4818,15 +4819,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     // YW 11-12-2007
     private EventCRFBean updateECB(StudyEventBean sEvent, HttpServletRequest request) {
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+        Study currentStudy =    (Study)  request.getSession().getAttribute("study");
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        if (!currentStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")
+        if (!currentStudy.getInterviewerNameDefault().equals("blank")
             && ("".equals(ecb.getInterviewerName()) || ecb.getInterviewerName() == null)) {
             // default will be event's owner name
             ecb.setInterviewerName(sEvent.getOwner().getName());
         }
 
-        if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")
+        if (!currentStudy.getInterviewDateDefault().equals("blank")
             && ("".equals(ecb.getDateInterviewed()) || ecb.getDateInterviewed() == null)) {
             if (sEvent.getDateStarted() != null) {
                 ecb.setDateInterviewed(sEvent.getDateStarted());// default date
@@ -5244,10 +5245,10 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
     }
 
     /**
-     * @deprecated Use {@link #createAndInitializeRuleSet(StudyBean,StudyEventDefinitionBean,CRFVersionBean,StudyEventBean,EventCRFBean,Boolean,HttpServletRequest,HttpServletResponse,List)} instead
+     * @deprecated Use {@link #createAndInitializeRuleSet(Study,StudyEventDefinitionBean,CRFVersionBean,StudyEventBean,EventCRFBean,Boolean,HttpServletRequest,HttpServletResponse,List)} instead
      */
     @Deprecated
-    private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy,
+    private List<RuleSetBean> createAndInitializeRuleSet(Study currentStudy,
             StudyEventDefinitionBean studyEventDefinition,
             CRFVersionBean crfVersionBean,
             StudyEventBean studyEventBean,
@@ -5257,7 +5258,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
                         response, null);
             }
 
-    private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy,
+    private List<RuleSetBean> createAndInitializeRuleSet(Study currentStudy,
             StudyEventDefinitionBean studyEventDefinition,
             CRFVersionBean crfVersionBean,
             StudyEventBean studyEventBean,
@@ -5281,7 +5282,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
     private HashMap<String, ArrayList<String>> runRules(List<DisplayItemWithGroupBean> allItems, List<RuleSetBean> ruleSets, Boolean dryRun,
             Boolean shouldRunRules, MessageType mt, Phase phase,EventCRFBean ecb, HttpServletRequest request) {
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+        Study currentStudy =    (Study)  request.getSession().getAttribute("study");
  if (shouldRunRules) {
             Container c = new Container();
             try {

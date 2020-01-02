@@ -2,7 +2,6 @@ package core.org.akaza.openclinica.service.extract;
 
 import core.org.akaza.openclinica.bean.core.Utils;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.*;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -163,12 +162,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
 		List<String> tagIds = null;
 		if(!odmFilter.isCrossForm()) {
-			StudyBean studyBean = new StudyBean();
-			studyBean.setId(study.getStudyId());
+			Study studyBean = new Study();
+			studyBean.setStudyId(study.getStudyId());
 			studyBean.setStudyEnvUuid(study.getStudyEnvUuid());
 			studyBean.setStudyUuid(study.getStudyUuid());
 			studyBean.setStudyEnvSiteUuid(study.getStudyEnvSiteUuid());
-			studyBean.setParentStudyId(study.getStudy() != null ? study.getStudy().getStudyId() : 0);
+			if(study.isSite())
+				studyBean.setStudy(study);
 			tagIds = permissionService.getPermissionTagsList(studyBean, getRequest());
 		}
 
@@ -325,10 +325,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 					if (isActiveRoleAtSite) {
 						siteId = study.getStudyId();
-						parentStudyId = study.getStudy().getStudyId();
+						parentStudyId = study.checkAndGetParentStudyId();
 						hiddenCrfs = listOfHiddenCrfs(siteId, parentStudyId, edcs, ecrf);
 					} else {
-						parentStudyId = study.getStudy().getStudyId();
+						parentStudyId = study.checkAndGetParentStudyId();
 						hiddenCrfs = listOfHiddenCrfs(parentStudyId, parentStudyId, edcs, ecrf);
 					}
 
@@ -341,7 +341,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 					if (eventDefinitionCrf == null) {
 						eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-								se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudy().getStudyId());
+								se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.checkAndGetParentStudyId());
 					}
 
 				} else {

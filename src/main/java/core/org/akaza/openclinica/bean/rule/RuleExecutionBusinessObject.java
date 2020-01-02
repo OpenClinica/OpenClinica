@@ -1,19 +1,19 @@
 package core.org.akaza.openclinica.bean.rule;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.rule.RuleDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 /*
  * @author Krikor Krumlian
@@ -23,10 +23,10 @@ public class RuleExecutionBusinessObject {
 
     private final SessionManager sm;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    protected StudyBean currentStudy;
+    protected Study currentStudy;
     protected UserAccountBean ub;
 
-    public RuleExecutionBusinessObject(SessionManager sm, StudyBean currentStudy, UserAccountBean ub) {
+    public RuleExecutionBusinessObject(SessionManager sm, Study currentStudy, UserAccountBean ub) {
         this.sm = sm;
         this.currentStudy = currentStudy;
         this.ub = ub;
@@ -80,7 +80,7 @@ public class RuleExecutionBusinessObject {
         note.setEntityId(targetItemDataBean.getId());
         note.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
         note.setColumn("value");
-        note.setStudyId(currentStudy.getId());
+        note.setStudyId(currentStudy.getStudyId());
 
         DiscrepancyNoteDAO discrepancyNoteDao = new DiscrepancyNoteDAO(sm.getDataSource());
         note = (DiscrepancyNoteBean) discrepancyNoteDao.create(note);

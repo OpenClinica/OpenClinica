@@ -10,15 +10,15 @@ package org.akaza.openclinica.control.extract;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +45,6 @@ public class SelectItemsServlet extends SecureController {
     // < ResourceBundlerestext,resexception,respage;
 
     public static String CURRENT_DEF_ID = "currentDefId";
-
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
@@ -74,9 +74,8 @@ public class SelectItemsServlet extends SecureController {
     public void setUpStudyGroupPage() {
         ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
         if (sgclasses == null || sgclasses.size() == 0) {
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-            StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+            Study theStudy = (Study) getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
             sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
 
             StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
@@ -112,7 +111,7 @@ public class SelectItemsServlet extends SecureController {
             events = new HashMap();
         }
         request.setAttribute("eventlist", events);
-        logger.info("found dob setting: " + currentStudy.getStudyParameterConfig().getCollectDob());
+        logger.info("found dob setting: " + currentStudy.getCollectDob());
 
         if (crfId == 0) {// no crf selected
             if (eventAttr == 0 && subAttr == 0 && CRFAttr == 0 && groupAttr == 0 && discAttr == 0) {
@@ -120,13 +119,13 @@ public class SelectItemsServlet extends SecureController {
                 forwardPage(Page.CREATE_DATASET_2);
             } else if (eventAttr > 0) {
                 request.setAttribute("subjectAgeAtEvent", "1");
-                if (currentStudy.getStudyParameterConfig().getCollectDob().equals("3")) {
+                if (currentStudy.getCollectDob().equals("3")) {
                     request.setAttribute("subjectAgeAtEvent", "0");
                     logger.info("dob not collected, setting age at event to 0");
                 }
                 forwardPage(Page.CREATE_DATASET_EVENT_ATTR);
             } else if (subAttr > 0) {
-                if (currentStudy.getStudyParameterConfig().getCollectDob().equals("3")) {
+                if (currentStudy.getCollectDob().equals("3")) {
                     logger.info("dob not collected, setting age at event to 0");
                 }
                 forwardPage(Page.CREATE_DATASET_SUB_ATTR);

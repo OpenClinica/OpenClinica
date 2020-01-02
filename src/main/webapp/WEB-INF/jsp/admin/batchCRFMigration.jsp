@@ -44,7 +44,7 @@
 <jsp:useBean scope="request" id="displayStudy"
 	class="core.org.akaza.openclinica.bean.admin.DisplayStudyBean" />
 <jsp:useBean scope="session" id="study"
-	class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
+	class="core.org.akaza.openclinica.domain.datamap.Study" />
 <jsp:useBean scope="request" id="subject"
 	class="core.org.akaza.openclinica.bean.submit.SubjectBean" />
 <jsp:useBean scope="request" id="studySub"
@@ -66,8 +66,6 @@
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 </script>
@@ -136,7 +134,7 @@
 <form
 	action="${pageContext.request.contextPath}/pages/api/v1/forms/migrate/run"
 	method="post">
-	<input type="hidden" name="studyOid" id="studyOid" value="${study.oid}">
+	<input type="hidden" name="studyOid" id="studyOid" value="${study.oc_oid}">
 	<input type="hidden" name="crfId" id="crfId" value="${crf.id}">
 
 
@@ -176,7 +174,7 @@
 						<c:out value="-All-" />&nbsp;
 					</option>
 					<c:forEach var="site" items="${siteList}">
-						<option value="<c:out value="${site.oid}"/>">&nbsp;
+						<option value="<c:out value="${site.oc_oid}"/>">&nbsp;
 							<c:out value="${site.name}"/>&nbsp;
 						</option>
 					</c:forEach>

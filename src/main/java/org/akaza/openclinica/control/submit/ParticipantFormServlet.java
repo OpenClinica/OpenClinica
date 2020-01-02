@@ -57,18 +57,19 @@ public class ParticipantFormServlet extends SecureController {
 
     private EnketoCredentials getCredentials() throws Exception {
         EnketoCredentials credentials = null;
-        Map<String, EnketoCredentials> credentialsMap = (Map<String, EnketoCredentials>) session.getAttribute("EnketoCredentialsMap");
-        if (credentialsMap == null) {
-            credentialsMap = new HashMap<String, EnketoCredentials>();
-            credentials = EnketoCredentials.getInstance(currentStudy.getOid());
-            credentialsMap.put(currentStudy.getOid(), credentials);
-            session.setAttribute("EnketoCredentialsMap", credentialsMap);
-        } else if (credentialsMap.get(currentStudy.getOid()) == null) {
-            credentials = EnketoCredentials.getInstance(currentStudy.getOid());
-            credentialsMap.put(currentStudy.getOid(), credentials);
-        } else
-            credentials = credentialsMap.get(currentStudy.getOid());
-
+        if(currentStudy != null) {
+            Map<String, EnketoCredentials> credentialsMap = (Map<String, EnketoCredentials>) session.getAttribute("EnketoCredentialsMap");
+            if (credentialsMap == null) {
+                credentialsMap = new HashMap<String, EnketoCredentials>();
+                credentials = EnketoCredentials.getInstance(currentStudy.getOc_oid());
+                credentialsMap.put(currentStudy.getOc_oid(), credentials);
+                session.setAttribute("EnketoCredentialsMap", credentialsMap);
+            } else if (credentialsMap.get(currentStudy.getOc_oid()) == null) {
+                credentials = EnketoCredentials.getInstance(currentStudy.getOc_oid());
+                credentialsMap.put(currentStudy.getOc_oid(), credentials);
+            } else
+                credentials = credentialsMap.get(currentStudy.getOc_oid());
+        }
         return credentials;
     }
 }

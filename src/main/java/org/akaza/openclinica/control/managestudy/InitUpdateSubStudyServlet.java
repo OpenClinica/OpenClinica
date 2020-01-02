@@ -9,23 +9,25 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
@@ -33,6 +35,7 @@ import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -65,7 +68,6 @@ public class InitUpdateSubStudyServlet extends SecureController {
     public void processRequest() throws Exception {
         // baseUrl();
         String userName = request.getRemoteUser();
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         String idString = request.getParameter("id");
         logger.info("study id:" + idString);
         if (StringUtil.isBlank(idString)) {
@@ -73,47 +75,34 @@ public class InitUpdateSubStudyServlet extends SecureController {
             forwardPage(Page.ERROR);
         } else {
             int studyId = Integer.valueOf(idString.trim()).intValue();
-            StudyBean study = (StudyBean) sdao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
-            checkRoleByUserAndStudy(ub, study, sdao);
+            checkRoleByUserAndStudy(ub, study);
 
             String parentStudyName = "";
-            StudyBean parent = new StudyBean();
-            if (study.getParentStudyId() > 0) {
-                parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            Study parent = new Study();
+            if (study.isSite()) {
+                parent = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                 parentStudyName = parent.getName();
                 // at this time, this feature is only available for site
                 createEventDefinitions(parent);
             }
 
-            if (currentStudy.getId() != study.getId()) {
-                ArrayList parentConfigs = currentStudy.getStudyParameters();
-                // logger.info("parentConfigs size:" + parentConfigs.size());
-                ArrayList configs = new ArrayList();
-                StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-                for (int i = 0; i < parentConfigs.size(); i++) {
-                    StudyParamsConfig scg = (StudyParamsConfig) parentConfigs.get(i);
-                    if (scg != null) {
-                        // find the one that sub study can change
-                        if (scg.getValue().getId() > 0 && scg.getParameter().isOverridable()) {
-                            // logger.info("parameter:" +
-                            // scg.getParameter().getHandle());
-                            // logger.info("value:" +
-                            // scg.getValue().getValue());
-                            StudyParameterValueBean spvb = spvdao.findByHandleAndStudy(study.getId(), scg.getParameter().getHandle());
-                            if (spvb.getValue().equals("enabled"))
+            if(currentStudy.getStudyId() != study.getStudyId()){
+                if(study.getStudyParameterValues() != null && study.getStudyParameterValues().size() > 0){
+                    List<StudyParameterValue> spvList = currentStudy.getStudyParameterValues();
+                    for(StudyParameterValue currentStudySpv : spvList){
+
+                        if(currentStudySpv.getStudyParameterValueId() > 0 && currentStudySpv.getStudyParameter().isOverridable() &&
+                                study.getIndividualStudyParameterValue(currentStudySpv.getStudyParameter().getHandle()) != null){
+                            StudyParameterValue studySpv = study.getIndividualStudyParameterValue(currentStudySpv.getStudyParameter().getHandle());
+                            if(studySpv.getValue().equals("enabled"))
                                 baseUrl();
-                            if (spvb.getId() > 0) {
-                                // the sub study itself has the parameter
-                                scg.setValue(spvb);
-                            }
-                            configs.add(scg);
+                            if(studySpv.getStudyParameterValueId() > 0)
+                                currentStudySpv.setValue(studySpv.getValue());
                         }
                     }
-
                 }
-
-                study.setStudyParameters(configs);
             }
             request.setAttribute("parentStudy", parent);
             session.setAttribute("parentName", parentStudyName);
@@ -139,13 +128,13 @@ public class InitUpdateSubStudyServlet extends SecureController {
 
     }
 
-    private void createEventDefinitions(StudyBean parentStudy) throws MalformedURLException {
+    private void createEventDefinitions(Study parentStudy) throws MalformedURLException {
         FormProcessor fp = new FormProcessor(request);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 
         int siteId = Integer.valueOf(request.getParameter("id").trim());
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource(), getStudyDao());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         // CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
@@ -160,7 +149,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
 
             int defId = sed.getId();
             ArrayList<EventDefinitionCRFBean> edcs = (ArrayList<EventDefinitionCRFBean>) edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId,
-                    parentStudy.getId());
+                    parentStudy.getStudyId());
             ArrayList<EventDefinitionCRFBean> defCrfs = new ArrayList<EventDefinitionCRFBean>();
             // sed.setCrfNum(edcs.size());
             for (EventDefinitionCRFBean edcBean : edcs) {

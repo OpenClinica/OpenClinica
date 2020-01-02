@@ -14,7 +14,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <jsp:useBean scope="request" id="label" class="java.lang.String"/>
 
-<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.domain.datamap.Study" />
 <jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
@@ -31,7 +31,7 @@
     </c:if>
 </c:forEach>
 
-<form name="subjectForm" action="AddNewSubject" method="post">
+<form name="subjectForm" action="AddNewSubject" method="post" id="subjectFormID">
 <input type="hidden" name="subjectOverlay" value="true">
 
 <table border="0" cellpadding="0" align="center" style="cursor:default;">
@@ -55,7 +55,7 @@
                             <tr>
                                 <td valign="top"><div class="formfieldXL_BG">
                                 <c:choose>
-                                 <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+                                 <c:when test="${study.subjectIdGeneration =='auto non-editable'}">
                                   <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45" class="formfield form-control" disabled>
                                   <input class="form-control" type="hidden" name="label" value="<c:out value="${label}"/>">
                                  </c:when>
@@ -93,3 +93,10 @@
 </table>
 
 </form>
+
+<!-- OC-11588 Disable Add button once clicked  -->
+<script type="text/javascript">
+    jQuery('#subjectFormID').one('submit', function() {
+        jQuery(this).find('input[type="submit"]').attr({'disabled':'disabled', 'value': 'Adding...'});
+    });
+</script>

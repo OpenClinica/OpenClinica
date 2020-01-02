@@ -5,7 +5,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean' />
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study' />
 
 
 <c:choose>
@@ -21,7 +21,7 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-migrate-3.1.0.min.js"></script>
 
 
 <script type="text/javascript">

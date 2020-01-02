@@ -22,7 +22,6 @@ import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -34,8 +33,8 @@ import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -43,8 +42,10 @@ import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
@@ -68,6 +69,9 @@ public class ImportDataHelper {
     private String currentUserName;
     private int currentActiveStudyId;
 
+    @Autowired
+	private StudyDao studyDao;
+
     public void setSessionManager(SessionManager sm) {
         this.sm = sm;
     }
@@ -76,7 +80,7 @@ public class ImportDataHelper {
         this.ub = ub;
     }
 
-    public EventCRFBean createEventCRF(HashMap<String, String> importedObject) {
+    public EventCRFBean createEventCRF(HashMap<String, String> importedObject, StudyDao studyDao) {
 
         EventCRFBean eventCrfBean = null;
 
@@ -96,7 +100,6 @@ public class ImportDataHelper {
         int eventCRFId = 0;
 
         EventCRFDAO eventCrfDao = new EventCRFDAO(sm.getDataSource());
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         StudySubjectDAO studySubjectDao = new StudySubjectDAO(sm.getDataSource());
         StudyEventDefinitionDAO studyEventDefinistionDao = new StudyEventDefinitionDAO(sm.getDataSource());
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(sm.getDataSource());
@@ -105,7 +108,7 @@ public class ImportDataHelper {
         CRFDAO crfdao = new CRFDAO(sm.getDataSource());
         SubjectDAO subjectDao = new SubjectDAO(sm.getDataSource());
 
-        StudyBean studyBean = (StudyBean) studyDao.findByName(studyName);
+        Study studyBean = (Study) studyDao.findByName(studyName);
         // .findByPK(studyId);
 
         // generate the subject bean first, so that we can have the subject id
@@ -143,7 +146,7 @@ public class ImportDataHelper {
         // .findByEventDefinitionCRFId(eventDefinitionCRFId);
         // replaced by findbyname
 
-        if (studySubjectBean.getId() <= 0 && studyEventBean.getId() <= 0 && crfVersion.getId() <= 0 && studyBean.getId() <= 0
+        if (studySubjectBean.getId() <= 0 && studyEventBean.getId() <= 0 && crfVersion.getId() <= 0 && (studyBean == null || studyBean.getStudyId() <= 0)
                 && studyEventDefinitionBean.getId() <= 0) {
             logger.info("Throw an Exception, One of the provided ids is not valid");
         }
@@ -164,11 +167,11 @@ public class ImportDataHelper {
 
         if (eventCrfBean == null) {
 
-            StudyBean studyWithSED = studyBean;
-            if (studyBean.getParentStudyId() > 0) {
-                studyWithSED = new StudyBean();
-                studyWithSED.setId(studyBean.getParentStudyId());
-            }
+            Study studyWithSED = null;
+            if (studyBean.isSite())
+                studyWithSED = studyBean.getStudy();
+            else
+            	studyWithSED = studyBean;
 
             AuditableEntityBean studyEvent = studyEventDao.findByPKAndStudy(studyEventId, studyWithSED);
             // TODO need to replace
@@ -182,14 +185,14 @@ public class ImportDataHelper {
             // eventCrfBean.setCrfVersion(crfVersion);
             if (eventCRFId == 0) {// no event CRF created yet
                 // ???
-                if (studyBean.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+                if (studyBean.getInterviewerNameDefault().equals("blank")) {
                     eventCrfBean.setInterviewerName("");
                 } else {
                     // default will be event's owner name
                     eventCrfBean.setInterviewerName(studyEventBean.getOwner().getName());
                 }
 
-                if (!studyBean.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+                if (!studyBean.getInterviewDateDefault().equals("blank")) {
                     if (studyEventBean.getDateStarted() != null) {
                         eventCrfBean.setDateInterviewed(studyEventBean.getDateStarted());// default
                         // date

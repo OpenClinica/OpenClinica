@@ -43,7 +43,7 @@
 <!-- org.akaza.openclinica.bean.core.AuditableEntityBean -->
 
 <jsp:useBean scope="request" id="displayStudy" class="core.org.akaza.openclinica.bean.admin.DisplayStudyBean"/>
-<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.domain.datamap.Study"/>
 <jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
 <jsp:useBean scope="request" id="studySub" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <h1><span class="title_manage">
@@ -65,10 +65,10 @@
  </tr>
 
   <c:choose>
-    <c:when test='${study.parentStudyId > 0}'>
+    <c:when test='${study.study != null && study.study.studyId > 0}'>
       <tr valign="top">
         <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
-        <td class="table_cell"><c:out value="${study.parentStudyName}"/></td>
+        <td class="table_cell"><c:out value="${study.study.name}"/></td>
       </tr>
     </c:when>
     <c:otherwise>
@@ -121,9 +121,9 @@
    <table border="0" cellpadding="0" cellspacing="0"> 
    <tr>
     <td style="padding-left:25px;">
-      <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>" class="invisible">
+      <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.studyId}"/>" class="invisible">
       <c:out value="${displayStudy.parent.name}"/>
-      <c:if test="${displayStudy.parent.id==studySub.studyId }">
+      <c:if test="${displayStudy.parent.studyId==studySub.studyId }">
         <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
       </c:if>
       <br><br>
@@ -133,9 +133,9 @@
     <tr>
       <td style="padding-left:100px;">
         <c:choose> 	 
-          <c:when test="${child.id==studySub.studyId }">      
+          <c:when test="${child.studyId==studySub.studyId }">
             <div class="homebox_bullets">
-              <input type="radio" checked name="studyId" value="<c:out value="${child.id}"/>">
+              <input type="radio" checked name="studyId" value="<c:out value="${child.studyId}"/>">
               <c:out value="${child.name}"/>
               <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
             </div>
@@ -143,13 +143,13 @@
           <c:otherwise>          
             <c:if test="${child.status.available}"> 
               <div class="homebox_bullets">
-                <input type="radio" name="studyId" value="<c:out value="${child.id}"/>">
+                <input type="radio" name="studyId" value="<c:out value="${child.studyId}"/>">
                 <c:out value="${child.name}"/>
               </div>
             </c:if>
             <c:if test="${child.status.locked}">
               <div class="homebox_bullets">
-                <input type="radio" disabled="true" name="studyId" value="<c:out value="${child.id}"/>">
+                <input type="radio" disabled="true" name="studyId" value="<c:out value="${child.studyId}"/>">
                 <c:out value="${child.name}"/>
               </div>
             </c:if>

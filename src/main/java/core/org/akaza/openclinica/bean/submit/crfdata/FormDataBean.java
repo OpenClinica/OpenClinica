@@ -12,6 +12,9 @@ public class FormDataBean {
     private DiscrepancyNotesBean discrepancyNotes;
     private String formOID;
     private String EventCRFStatus;
+    private String reasonForChangeForCompleteForms;
+
+
     private String formLayoutName;
     private Date createdDate;
     private Date updatedDate;
@@ -102,6 +105,14 @@ public class FormDataBean {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public String getReasonForChangeForCompleteForms() {
+        return reasonForChangeForCompleteForms;
+    }
+
+    public void setReasonForChangeForCompleteForms(String reasonForChangeForCompleteForms) {
+        this.reasonForChangeForCompleteForms = reasonForChangeForCompleteForms;
     }
 
 }

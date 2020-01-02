@@ -5,19 +5,19 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyParticipantDetailDTO;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyType;
 import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.domain.datamap.StudySubjectDetail;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
@@ -58,9 +58,10 @@ public class ParticipantServiceImpl implements ParticipantService {
     private SubjectDAO subjectDao;
 	private StudyParameterValueDAO studyParameterValueDAO;		
 	private StudySubjectDAO studySubjectDao;
-	private StudyDAO studyDao;
     private StudySubjectDAO ssDao;
 
+    @Autowired
+    private StudyDao studyDao;
 
     @Autowired
 	private UserAccountDAO userAccountDao;
@@ -88,7 +89,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 	private DataSource dataSource;
 
     
-    public List<StudySubjectBean> getStudySubject(StudyBean study) {
+    public List<StudySubjectBean> getStudySubject(Study study) {
         return getStudySubjectDao().findAllByStudy(study);
 
     }
@@ -100,28 +101,28 @@ public class ParticipantServiceImpl implements ParticipantService {
     * @return
     * @throws OpenClinicaException
     */
-    public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy,String accessToken,
-                                    String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
+    public String createParticipant(SubjectTransferBean subjectTransfer,Study currentStudy,String accessToken,
+                                    String realm,String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
 
 
         // create subject
-        StudyBean siteStudy = subjectTransfer.getSiteStudy();
+        Study siteStudy = subjectTransfer.getSiteStudy();
         StudySubject studySubject=null;
 
-        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getId());
+        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getStudyId());
 
         StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
-        if (currentStudy.getParentStudyId() > 0) {
-            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getParentStudyId());
+        if (currentStudy.isSite()) {
+            studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getStudy().getStudyId());
         }
-        if(!validateService.isStudyAvailable(currentStudy.getOid()))
+        if(!validateService.isStudyAvailable(currentStudy.getOc_oid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
 
 
-        if(!validateService.isStudyAvailable(siteStudy.getOid()))
+        if(!validateService.isSiteAvailable(siteStudy.getOc_oid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
 
-        if(!utilService.isParticipantUniqueToSite(siteStudy.getOid(),subjectTransfer.getStudySubjectId()))
+        if(!utilService.isParticipantUniqueToSite(siteStudy.getOc_oid(),subjectTransfer.getStudySubjectId()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
 
 
@@ -139,9 +140,9 @@ public class ParticipantServiceImpl implements ParticipantService {
             studySubjectBean = new StudySubjectBean();
             studySubjectBean.setSubjectId(subjectBean.getId());
             if (siteStudy != null) {
-                studySubjectBean.setStudyId(siteStudy.getId());
+                studySubjectBean.setStudyId(siteStudy.getStudyId());
             } else {
-                studySubjectBean.setStudyId(subjectTransfer.getStudy().getId());
+                studySubjectBean.setStudyId(subjectTransfer.getStudy().getStudyId());
             }
 
             studySubjectBean.setLabel(subjectTransfer.getStudySubjectId());
@@ -182,8 +183,8 @@ public class ParticipantServiceImpl implements ParticipantService {
             oCParticipantDTO.setPhoneNumber(subjectTransfer.getPhoneNumber());
             oCParticipantDTO.setIdentifier(subjectTransfer.getIdentifier());
             ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(locale);
-            userService.connectParticipant(currentStudy.getOid(), subjectTransfer.getPersonId(),
-                    oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
+            userService.connectParticipant(currentStudy.getOc_oid(), subjectTransfer.getPersonId(),
+                    oCParticipantDTO, accessToken, userAccountBean, realm,customerUuid, textsBundle);
         }
 
 
@@ -193,13 +194,10 @@ public class ParticipantServiceImpl implements ParticipantService {
 /**
  * @param currentStudy
  */
-private void updateStudySubjectSize(StudyBean currentStudy) {
+private void updateStudySubjectSize(Study currentStudy) {
 	int subjectCount = getSubjectCount(currentStudy);
-
-	   StudyDAO studydao = this.getStudyDao();
 	   currentStudy.setSubjectCount(subjectCount+1);
-	   currentStudy.setType(StudyType.GENETIC);
-	   studydao.update(currentStudy);
+	   studyDao.update(currentStudy);
 }
     /**
      * Validate the listStudySubjectsInStudy request.
@@ -208,21 +206,21 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
      * @param request
      * @return
      */
-    public StudyBean validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request) throws OpenClinicaSystemException{
+    public Study validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request) throws OpenClinicaSystemException{
 
         String userName = getUserAccount(request).getName();
-        StudyBean study = null;
-        StudyBean site = null;
+        Study study = null;
+        Study site = null;
         
         if (studyOid == null && siteOid == null) {
             throw new OpenClinicaSystemException("errorCode.invalidStudyAndSiteIdentifier", "Provide a valid study/site.");
         }else if (studyOid != null && siteOid == null) {
-            study = getStudyDao().findByOid(studyOid);
+            study = studyDao.findByOcOID(studyOid);
             if (study == null) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier", "The study identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(study);
-            
+
+
             StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
             if (studyLevelRole == null) {
                 throw new OpenClinicaSystemException("errorCode.noRoleSetUp",
@@ -233,20 +231,20 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
             
             
         }else if (studyOid != null && siteOid != null) {
-            study = getStudyDao().findByOid(studyOid);
-            site = getStudyDao().findByOid(siteOid);
+            study = studyDao.findByOcOID(studyOid);
+            site = studyDao.findByOcOID(siteOid);
             if (study == null) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier",
                         "The study identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(study);
-            
-            if (site == null || site.getParentStudyId() != study.getId()) {
+
+
+            if (site == null || site.getStudy().getStudyId() != study.getStudyId()) {
                 throw new OpenClinicaSystemException("errorCode.invalidSiteIdentifier",
                         "The site identifier you provided is not valid.");
             }
-            checkStudyOrSiteStatus(site);
-            
+
+
             /**
              * check study level
              */
@@ -272,52 +270,6 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         return study;
         
     }
-
-	/**
-	  * OC-11162
-	  * AC1: When bulk add participant API is called for a study OID which is either in Design, Frozen or Locked status then 
-	  * instead of starting the process, system should return an errorcode.studyNotAvailable.
-	  * AC2: When bulk add participant API is called for a site OID which is either in Design, Frozen or Locked status then 
-	  * instead of starting the process, system should return an errorcode.siteNotAvailable.
-	 * @param study
-	 * @throws OpenClinicaSystemException
-	 */
-	private void checkStudyOrSiteStatus(StudyBean study) throws OpenClinicaSystemException {
-		
-		int parentStudyId = study.getParentStudyId();
-		String errorCode=null;
-		String msg = null;
-		boolean isNotAvailableStatus = false;
-		
-		// site
-		if(parentStudyId > 0) {
-			errorCode = "errorCode.siteNotAvailable"; 
-			msg = "The site is not available,";
-		}else {
-			errorCode = "errorCode.studyNotAvailable"; 
-			msg = "The study is not available,";
-		}
-		
-		String studyStatus = study.getStatus().getName().toString().toLowerCase();
-		if(studyStatus != null ) {
-			if(studyStatus.equals("design")) {
-				isNotAvailableStatus = true;				
-				msg = msg + "it is in design status.";
-			}else if(studyStatus.equals("locked")) {
-				isNotAvailableStatus = true;				
-				msg = msg + "it is in locked status.";
-			}else if(studyStatus.equals("frozen")) {
-				isNotAvailableStatus = true;				
-				msg = msg + "it is in frozen status.";
-			}
-			if(isNotAvailableStatus) {
-				throw new OpenClinicaSystemException(errorCode, msg);
-			}
-			
-		}
-	}
-    
-           
 
     
     /**
@@ -362,14 +314,6 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     /**
      * @return the subjectDao
      */
-    public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-    }
-
-    /**
-     * @return the subjectDao
-     */
     public StudySubjectDAO getStudySubjectDao() {
         studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
         return studySubjectDao;
@@ -398,16 +342,15 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         this.dataSource = dataSource;
     }
 
-    public int getSubjectCount(StudyBean currentStudy) {
+    public int getSubjectCount(Study currentStudy) {
         int subjectCount = 0;
-        StudyDAO sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByPK(currentStudy.getId());
+        Study studyBean = (Study) studyDao.findByPK(currentStudy.getStudyId());
         if (studyBean != null)
             subjectCount = studyBean.getSubjectCount();
 
         if(subjectCount==0) {
             StudySubjectDAO ssdao = this.getStudySubjectDao();
-            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
+            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getStudyId());
             if (ss != null) {
                 subjectCount = ss.size();
             }

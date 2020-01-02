@@ -34,7 +34,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='request' id='studyToRestore' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='request' id='studyToRestore' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='request' id='sitesToRestore' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='userRolesToRestore' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectsToRestore' class='java.util.ArrayList'/>
@@ -167,7 +167,7 @@
 
 </div>
 <br>
-<form action='RestoreStudy?action=submit&id=<c:out value="${studyToRestore.id}"/>' method="POST">
+<form action='RestoreStudy?action=submit&id=<c:out value="${studyToRestore.studyId}"/>' method="POST">
  <input type="submit" name="submit" value="<fmt:message key="restore_study" bundle="${resword}"/>" class="button_long" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_restore_this_study" bundle="${restext}"/>");'>
 </form>
 

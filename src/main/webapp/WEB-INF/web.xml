@@ -2335,4 +2335,14 @@
         <url-pattern>/Jobs</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <display-name>Reports</display-name>
+        <servlet-name>ReportsServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ReportsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReportsServlet</servlet-name>
+        <url-pattern>/reports</url-pattern>
+    </servlet-mapping>
+
 </web-app>

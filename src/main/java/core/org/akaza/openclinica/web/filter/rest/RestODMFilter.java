@@ -13,17 +13,19 @@ import javax.ws.rs.core.Response;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 
 import com.sun.jersey.server.impl.application.WebApplicationContext;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
 
@@ -40,7 +42,7 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
     private static String GlOBAL_STUDY_OID = "*";
 
     @Override
-
+    @Transactional
     public ContainerRequest filter(ContainerRequest containerRequest) {
         request.setAttribute("requestSchema", "public");
         // get tenant schema
@@ -56,13 +58,13 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
                 return containerRequest;
             }
         } else {
-            StudyBean studyBean = getStudyByOID(studyOID, getDataSource());
+            Study studyBean = getStudyByOID(studyOID);
             if (checkAuth(studyBean, userBean)) {
                 request.setAttribute("requestSchema", studyBean.getSchemaName());
                 return containerRequest;
             } else {
-                if (studyBean.getParentStudyId() != 0) {
-                    int parentStudyID = studyBean.getParentStudyId();
+                if (studyBean.isSite()) {
+                    int parentStudyID = studyBean.getStudy().getStudyId();
                     studyBean = getStudyByID(parentStudyID, getDataSource());
                     if (checkAuth(studyBean, userBean))
                         request.setAttribute("requestSchema", studyBean.getSchemaName());
@@ -92,7 +94,7 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
         return auth;
     }
 
-    private Boolean checkAuth(StudyBean studyBean, UserAccountBean userBean) {
+    private Boolean checkAuth(Study studyBean, UserAccountBean userBean) {
         Boolean auth = false;
         StudyUserRoleBean studyRole = getRoleByStudy(studyBean, getDataSource(), userBean);
         Role r = studyRole.getRole();
@@ -117,20 +119,24 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
         return (DataSource) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean("dataSource");
     }
 
-    private StudyBean getStudyByOID(String OID, DataSource ds) {
-        StudyDAO studyDAO = new StudyDAO(ds);
-        return studyDAO.findByOid(OID);
+    public StudyDao getStudyDao() {
+        return (StudyDao) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean("studyDaoDomain");
+
     }
 
-    private StudyUserRoleBean getRoleByStudy(StudyBean studyBean, DataSource ds, UserAccountBean userBean) {
+    private Study getStudyByOID(String OID) {
+        return getStudyDao().findByOcOID(OID);
+    }
+
+    private StudyUserRoleBean getRoleByStudy(Study studyBean, DataSource ds, UserAccountBean userBean) {
         UserAccountDAO userAccountDAO = new UserAccountDAO(ds);
-        return userAccountDAO.findRoleByUserNameAndStudyId(userBean.getName(), studyBean.getId());
+        return userAccountDAO.findRoleByUserNameAndStudyId(userBean.getName(), studyBean.getStudyId());
 
     }
 
-    private StudyBean getStudyByID(int id, DataSource ds) {
-        StudyDAO studyDAO = new StudyDAO(ds);
-        return (StudyBean) studyDAO.findByPK(id);
+
+    private Study getStudyByID(int id, DataSource ds) {
+        return (Study) getStudyDao().findByPK(id);
     }
 
     @Override

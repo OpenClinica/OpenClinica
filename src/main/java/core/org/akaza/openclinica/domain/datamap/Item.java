@@ -2,7 +2,6 @@
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 package core.org.akaza.openclinica.domain.datamap;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,8 +21,6 @@ import javax.persistence.UniqueConstraint;
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;

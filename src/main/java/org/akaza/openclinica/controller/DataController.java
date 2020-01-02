@@ -33,13 +33,15 @@ import core.org.akaza.openclinica.bean.login.ErrorMessage;
 import core.org.akaza.openclinica.bean.login.ImportDataResponseFailureDTO;
 import core.org.akaza.openclinica.bean.login.ImportDataResponseSuccessDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.control.submit.ImportCRFInfo;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
@@ -54,6 +56,7 @@ import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 
 import core.org.akaza.openclinica.web.restful.data.bean.BaseStudyDefinitionBean;
 import core.org.akaza.openclinica.web.restful.data.validator.CRFDataImportValidator;
+import org.checkerframework.checker.units.qual.A;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.slf4j.Logger;
@@ -104,7 +107,11 @@ public class DataController {
     @Autowired
     private CoreResources coreResources;
 
+    @Autowired
+    private StudyDao studyDao;
 
+    @Autowired
+    private StudyBuildService studyBuildService;
     private RestfulServiceHelper serviceHelper;
     protected UserAccountBean userBean;
     private ImportDataResponseSuccessDTO responseSuccessDTO;
@@ -323,7 +330,7 @@ public class DataController {
 	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
             }
 
-            CRFDataImportValidator crfDataImportValidator = new CRFDataImportValidator(dataSource);
+            CRFDataImportValidator crfDataImportValidator = new CRFDataImportValidator(dataSource, studyDao, studyBuildService);
 
             // if no error then continue to validate
             if (!errors.hasErrors()) {
@@ -333,7 +340,7 @@ public class DataController {
 
             // if no error then continue to validate
             if (!errors.hasErrors()) {
-                StudyBean studyBean = crfDataImportBean.getStudy();
+                Study studyBean = crfDataImportBean.getStudy();
 
                 List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                 HashMap<Integer, String> importedCRFStatuses = new HashMap<Integer, String>();
@@ -477,7 +484,7 @@ public class DataController {
             	msg = recordNum + "|" + studySubjectOID + "|SUCCESS|" + msg;
 	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
 	    	
-                ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
+                ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource, studyDao);
                 List<String> skippedCRFMsgs = getSkippedCRFMessages(importCrfInfo);
 
                 // add detail messages to reponseDTO
@@ -574,7 +581,7 @@ public class DataController {
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (serviceHelper == null) {
-            serviceHelper = new RestfulServiceHelper(this.dataSource);
+            serviceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
         }
 
         return serviceHelper;

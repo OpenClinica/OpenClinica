@@ -1,21 +1,21 @@
 package org.akaza.openclinica.controller;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import core.org.akaza.openclinica.dao.rule.RuleDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -62,22 +62,21 @@ import java.util.*;
     private StudyEventDefinitionDAO studyEventDefinitionDao;
     private CRFDAO crfDao;
     private StudyGroupClassDAO studyGroupClassDao;
-    private StudyDAO studyDao;
     private UserAccountDAO userDao;
     private core.org.akaza.openclinica.dao.rule.RuleDAO ruleDao;
     @Autowired private JavaMailSenderImpl mailSender;
-
+    @Autowired
+    private StudyDao studyDao;
     public StudyModuleController() {
 
     }
 
     @RequestMapping(value = "/{study}/deactivate", method = RequestMethod.GET) public String deactivateParticipate(@PathVariable("study") String studyOid,
             HttpServletRequest request) throws Exception {
-        studyDao = new StudyDAO(dataSource);
-        StudyBean study = studyDao.findByOid(studyOid);
+        Study study = studyDao.findByOcOID(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
-        spv.setStudyId(study.getId());
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+        spv.setStudyId(study.getStudyId());
         spv.setParameter("participantPortal");
         spv.setValue("disabled");
 
@@ -85,19 +84,18 @@ import java.util.*;
             spvdao.update(spv);
         else
             spvdao.create(spv);
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        currentStudy.getStudyParameterConfig().setParticipantPortal("disabled");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
+        currentStudy.setParticipantPortal("disabled");
 
         return "redirect:/pages/studymodule";
     }
 
     @RequestMapping(value = "/{study}/deactivaterandomization", method = RequestMethod.GET) public String deactivateRandomization(
             @PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
-        studyDao = new StudyDAO(dataSource);
-        StudyBean study = studyDao.findByOid(studyOid);
+        Study study = studyDao.findByOcOID(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
-        spv.setStudyId(study.getId());
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "randomization");
+        spv.setStudyId(study.getStudyId());
         spv.setParameter("randomization");
         spv.setValue("disabled");
 
@@ -105,19 +103,18 @@ import java.util.*;
             spvdao.update(spv);
         else
             spvdao.create(spv);
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        currentStudy.getStudyParameterConfig().setRandomization("disabled");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
+        currentStudy.setRandomization("disabled");
 
         return "redirect:/pages/studymodule";
     }
 
     @RequestMapping(value = "/{study}/reactivate", method = RequestMethod.GET) public String reactivateParticipate(@PathVariable("study") String studyOid,
             HttpServletRequest request) throws Exception {
-        studyDao = new StudyDAO(dataSource);
-        StudyBean study = studyDao.findByOid(studyOid);
+        Study study = studyDao.findByOcOID(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
-        spv.setStudyId(study.getId());
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+        spv.setStudyId(study.getStudyId());
         spv.setParameter("participantPortal");
         spv.setValue("enabled");
 
@@ -125,19 +122,18 @@ import java.util.*;
             spvdao.update(spv);
         else
             spvdao.create(spv);
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        currentStudy.getStudyParameterConfig().setParticipantPortal("enabled");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
+        currentStudy.setParticipantPortal("enabled");
 
         return "redirect:/pages/studymodule";
     }
 
     @RequestMapping(value = "/{study}/reactivaterandomization", method = RequestMethod.GET) public String reactivateRandomization(
             @PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
-        studyDao = new StudyDAO(dataSource);
-        StudyBean study = studyDao.findByOid(studyOid);
+        Study study = studyDao.findByOcOID(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "randomization");
-        spv.setStudyId(study.getId());
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "randomization");
+        spv.setStudyId(study.getStudyId());
         spv.setParameter("randomization");
         spv.setValue("enabled");
 
@@ -145,18 +141,17 @@ import java.util.*;
             spvdao.update(spv);
         else
             spvdao.create(spv);
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        currentStudy.getStudyParameterConfig().setRandomization("enabled");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
+        currentStudy.setRandomization("enabled");
 
         return "redirect:/pages/studymodule";
     }
 
     @RequestMapping(value = "/{study}/register", method = RequestMethod.POST) public String registerParticipate(@PathVariable("study") String studyOid,
             HttpServletRequest request) throws Exception {
-        studyDao = new StudyDAO(dataSource);
-        StudyBean study = studyDao.findByOid(studyOid);
+        Study study = studyDao.findByOcOID(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
         ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
 
         Locale locale = LocaleResolver.getLocale(request);
@@ -182,7 +177,7 @@ import java.util.*;
             return "redirect:/pages/studymodule";
         } else {
             // Returned status was 'available'. Proceed with registration.
-            status = registrar.registerStudy(study.getOid(), hostName, study.getIdentifier());
+            status = registrar.registerStudy(study.getOc_oid(), hostName, study.getUniqueIdentifier());
         }
 
         // If status == "", that indicates the request to OCUI failed. Post an error message and don't update study
@@ -191,15 +186,15 @@ import java.util.*;
             addRegMessage(request, respage.getString("participate_not_available"));
         } else {
             // Update OC Study configuration
-            spv.setStudyId(study.getId());
+            spv.setStudyId(study.getStudyId());
             spv.setParameter("participantPortal");
             spv.setValue("enabled");
             if (spv.getId() > 0)
                 spvdao.update(spv);
             else
                 spvdao.create(spv);
-            StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-            currentStudy.getStudyParameterConfig().setParticipantPortal("enabled");
+            Study currentStudy = (Study) request.getSession().getAttribute("study");
+            currentStudy.setParticipantPortal("enabled");
         }
 
         return "redirect:/pages/studymodule";
@@ -224,24 +219,23 @@ import java.util.*;
         // setUpSidebar(request);
         ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
 
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        StudyBean currentPublicStudy = (StudyBean) request.getSession().getAttribute("publicStudy");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
+        Study currentPublicStudy = (Study) request.getSession().getAttribute("publicStudy");
         eventDefinitionCRFDao = new EventDefinitionCRFDAO(dataSource);
         studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         crfDao = new CRFDAO(dataSource);
         studyGroupClassDao = new StudyGroupClassDAO(dataSource);
-        studyDao = new StudyDAO(dataSource);
         userDao = new UserAccountDAO(dataSource);
         ruleDao = new RuleDAO(dataSource);
 
-        StudyModuleStatus sms = studyModuleStatusDao.findByStudyId(currentStudy.getId());
+        StudyModuleStatus sms = studyModuleStatusDao.findByStudyId(currentStudy.getStudyId());
         if (sms == null) {
             sms = new StudyModuleStatus();
-            sms.setStudyId(currentStudy.getId());
+            sms.setStudyId(currentStudy.getStudyId());
         }
 
-        int crfCount = crfDao.findAllByStudy(currentStudy.getId()).size();
-        int crfWithEventDefinition = crfDao.findAllActiveByDefinitions(currentStudy.getId()).size();
+        int crfCount = crfDao.findAllByStudy(currentStudy.getStudyId()).size();
+        int crfWithEventDefinition = crfDao.findAllActiveByDefinitions(currentStudy.getStudyId()).size();
         int totalCrf = crfCount + crfWithEventDefinition;
         // int eventDefinitionCount = eventDefinitionCRFDao.findAllActiveByStudy(currentStudy).size();
         int eventDefinitionCount = studyEventDefinitionDao.findAllActiveByStudy(currentStudy).size();
@@ -256,12 +250,12 @@ import java.util.*;
         int siteCount = studyDao.findOlnySiteIdsByStudy(currentStudy).size();
         String tenantSchema = (String) request.getAttribute("requestSchema");
         request.setAttribute("requestSchema", "public");
-        int userCount = userDao.findAllUsersByStudy(currentPublicStudy.getId()).size();
-        Collection childStudies = studyDao.findAllByParent(currentPublicStudy.getId());
+        int userCount = userDao.findAllUsersByStudy(currentPublicStudy.getStudyId()).size();
+        Collection childStudies = studyDao.findAllByParent(currentPublicStudy.getStudyId());
         Map childStudyUserCount = new HashMap();
         for (Object sb : childStudies) {
-            StudyBean childStudy = (StudyBean) sb;
-            childStudyUserCount.put(childStudy.getName(), userDao.findAllUsersByStudy(childStudy.getId()).size());
+            Study childStudy = (Study) sb;
+            childStudyUserCount.put(childStudy.getName(), userDao.findAllUsersByStudy(childStudy.getStudyId()).size());
         }
         request.setAttribute("requestSchema", tenantSchema);
 
@@ -315,16 +309,16 @@ import java.util.*;
         map.addAttribute("siteCount", siteCount);
         map.addAttribute("userCount", userCount);
         map.addAttribute("childStudyUserCount", childStudyUserCount);
-        map.addAttribute("studyId", currentStudy.getId());
+        map.addAttribute("studyId", currentStudy.getStudyId());
         map.addAttribute("currentStudy", currentStudy);
 
         // Load Participate registration information
         String portalURL = CoreResources.getField("portalURL");
         map.addAttribute("portalURL", portalURL);
         if (portalURL != null && !portalURL.equals("")) {
-            String participateOCStatus = currentStudy.getStudyParameterConfig().getParticipantPortal();
+            String participateOCStatus = currentStudy.getParticipantPortal();
             ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-            Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+            Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOc_oid());
             String participateStatus = "";
             String url = "";
             try {
@@ -355,11 +349,11 @@ import java.util.*;
         map.addAttribute("moduleManager", moduleManager);
         if (moduleManager != null && !moduleManager.equals("")) {
 
-            String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
+            String randomizationOCStatus = currentStudy.getRandomization();
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
             SeRandomizationDTO randomization = null;
             try {
-                randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid(), true);
+                randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOc_oid(), true);
             } catch (Exception e1) {
                 // TODO Auto-generated catch block
                 logger.error("Error while accessing randomization registrar: ",e1);
@@ -383,8 +377,8 @@ import java.util.*;
         // statusMap.add(Status.PENDING);
         request.setAttribute("statusMap", statusMap);
 
-        if (currentStudy.getParentStudyId() > 0) {
-            StudyBean parentStudy = (StudyBean) studyDao.findByPK(currentStudy.getParentStudyId());
+        if (currentStudy.isSite()) {
+            Study parentStudy = (Study) studyDao.findByPK(currentStudy.getStudy().getStudyId());
             request.setAttribute("parentStudy", parentStudy);
         }
 
@@ -407,15 +401,15 @@ import java.util.*;
 
     @RequestMapping(method = RequestMethod.POST) public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus,
             BindingResult result, SessionStatus status, HttpServletRequest request) {
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         if (request.getParameter("saveStudyStatus") == null) {
             studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
             status.setComplete();
         } else {
-            currentStudy.setOldStatus(currentStudy.getStatus());
-            currentStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
+            currentStudy.setOldStatusId(currentStudy.getStatus().getCode());
+            currentStudy.setStatus(Status.getByCode(studyModuleStatus.getStudyStatus()));
             studyDao.updateStudyStatus(currentStudy);
-            ArrayList siteList = (ArrayList) studyDao.findAllByParent(currentStudy.getId());
+            ArrayList siteList = (ArrayList) studyDao.findAllByParent(currentStudy.getStudyId());
             if (siteList.size() > 0) {
                 studyDao.updateSitesStatus(currentStudy);
             }
@@ -430,7 +424,7 @@ import java.util.*;
 
     @ExceptionHandler(NullPointerException.class) public String handleNullPointerException(NullPointerException ex, HttpServletRequest request,
             HttpServletResponse response) {
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         if (currentStudy == null) {
             return "redirect:/MainMenu";
         }

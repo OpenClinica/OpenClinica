@@ -14,7 +14,6 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -29,7 +28,6 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -38,9 +36,9 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +78,9 @@ public class StudyEventServiceImpl implements StudyEventService {
     @Autowired
     private CSVService csvService;
 
+    @Autowired
+    private StudyBuildService studyBuildService;
+
     private RestfulServiceHelper restfulServiceHelper;
 
 
@@ -94,7 +95,6 @@ public class StudyEventServiceImpl implements StudyEventService {
     /**
      * DAOs
      */
-    private StudyDAO msStudyDao = null;
     private StudySubjectDAO msStudySubjectDAO = null;
     private StudyEventDefinitionDAO sedDao = null;
     private StudyEventDAO seDao = null;
@@ -114,8 +114,8 @@ public class StudyEventServiceImpl implements StudyEventService {
 
         String studySubjectKey = participantId;
         String errMsg = null;
-        StudyBean currentStudy = null;
-        StudyBean currentSiteStudy = null;
+        Study currentStudy = null;
+        Study currentSiteStudy = null;
         StudyEventDefinitionBean definition = null;
         StudySubjectBean studySubject = null;
         String startDateStr;
@@ -157,7 +157,6 @@ public class StudyEventServiceImpl implements StudyEventService {
             /**
              * Step 2: check study
              */
-            StudyDAO studyDao = this.getMsStudyDao();
 
             // check study first
             currentStudy = studyDao.findStudyByOid(studyOID);
@@ -209,12 +208,13 @@ public class StudyEventServiceImpl implements StudyEventService {
              */
             StudyEventDefinitionDAO seddao = this.getSedDao();
             definition = seddao.findByOidAndStudy(studyEventOID,
-                    currentStudy.getId(), currentStudy.getParentStudyId());
-            StudyBean studyWithEventDefinitions = currentStudy;
-            if (currentStudy.getParentStudyId() > 0) {
-                studyWithEventDefinitions = new StudyBean();
-                studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
-            }
+                    currentStudy.getStudyId(), currentStudy.checkAndGetParentStudyId());
+
+            Study studyWithEventDefinitions = null;
+            if (currentStudy.isSite())
+                studyWithEventDefinitions = currentStudy.getStudy();
+            else
+                studyWithEventDefinitions = currentStudy;
             // find all active definitions with CRFs
             if (definition == null) {
                 errMsg = "The definition of event(" + studyEventOID + ") can not be found in the study(" + studyOID + ").";
@@ -325,8 +325,8 @@ public class StudyEventServiceImpl implements StudyEventService {
 
         String studySubjectKey = participantId;
         String errMsg = null;
-        StudyBean currentStudy = null;
-        StudyBean currentSiteStudy = null;
+        Study currentStudy = null;
+        Study currentSiteStudy = null;
         StudyEventDefinitionBean definition = null;
         StudySubjectBean studySubject = null;
         String startDateStr;
@@ -368,7 +368,6 @@ public class StudyEventServiceImpl implements StudyEventService {
             /**
              * Step 2: check study
              */
-            StudyDAO studyDao = this.getMsStudyDao();
 
             // check study first
             currentStudy = studyDao.findStudyByOid(studyOID);
@@ -420,13 +419,13 @@ public class StudyEventServiceImpl implements StudyEventService {
              */
             StudyEventDefinitionDAO seddao = this.getSedDao();
             definition = seddao.findByOidAndStudy(studyEventOID,
-                    currentStudy.getId(), currentStudy.getParentStudyId());
+                    currentStudy.getStudyId(), currentStudy.checkAndGetParentStudyId());
 
-            StudyBean studyWithEventDefinitions = currentStudy;
-            if (currentStudy.getParentStudyId() > 0) {
-                studyWithEventDefinitions = new StudyBean();
-                studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
-            }
+            Study studyWithEventDefinitions = null;
+            if (currentStudy.isSite())
+                studyWithEventDefinitions = currentStudy.getStudy();
+            else
+                studyWithEventDefinitions = currentStudy;
             // find all active definitions with CRFs
             if (definition == null) {
                 errMsg = "The definition of event(" + studyEventOID + ") can not be found in the study(" + studyOID + ").";
@@ -570,24 +569,11 @@ public class StudyEventServiceImpl implements StudyEventService {
         return studySubject;
     }
 
-    public StudyDAO getMsStudyDao() {
-
-        if (msStudyDao == null) {
-            msStudyDao = new StudyDAO(dataSource);
-        }
-
-        return msStudyDao;
-    }
-
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
         }
         return restfulServiceHelper;
-    }
-
-    public void setMsStudyDao(StudyDAO msStudyDao) {
-        this.msStudyDao = msStudyDao;
     }
 
     public StudySubjectDAO getMsStudySubjectDAO() {
@@ -951,7 +937,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 
         } catch (Exception e) {
             userService.persistJobFailed(jobDetail, fileName);
-            logger.error("Error in scheduling the event: " , e);
+            logger.error("Error " + e.getMessage());
         }
 
 

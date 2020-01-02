@@ -37,8 +37,8 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study'/>
+<jsp:useBean scope='session' id='newStudy' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definitions' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='sdvOptions' class='java.util.ArrayList'/>
@@ -151,7 +151,7 @@ function updateThis(multiSelEle, count) {
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="name"/></jsp:include></td><td> *</td></tr>
   
   <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td><div class="formfieldXL_BG">
-  <input type="text" name="uniqueProId" value="<c:out value="${newStudy.identifier}"/>" class="formfieldXL"></div>
+  <input type="text" name="uniqueProId" value="<c:out value="${newStudy.uniqueIdentifier}"/>" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueProId"/></jsp:include></td><td> *</td></tr>
   
   <tr valign="top"><td class="formlabel"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b><br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>):</td><td>
@@ -261,7 +261,7 @@ function updateThis(multiSelEle, count) {
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConEmail"/></jsp:include></td></tr>  
   
    <c:choose>
-    <c:when test="${newStudy.parentStudyId == 0}">
+    <c:when test="${newStudy.study != null && newStudy.study.studyId == 0}">
        <c:set var="key" value="study_system_status"/>
     </c:when>
     <c:otherwise>
@@ -271,7 +271,7 @@ function updateThis(multiSelEle, count) {
 
    <tr valign="top"><td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
    <%--
-   <c:set var="status1" value="${newStudy.status.id}"/>   
+   <c:set var="status1" value="${newStudy.status.code}"/>
    <select name="statusId" class="formfieldXL">
       <c:forEach var="status" items="${statuses}">    
        <c:choose>
@@ -284,23 +284,23 @@ function updateThis(multiSelEle, count) {
        </c:choose> 
     </c:forEach>
    </select></div> --%>
-   <input type="text" name="statusName" value="<c:out value="${study.status.name}"/>" class="formfieldL" disabled>
-   <input type="hidden" name="statusId" value="${study.status.id}">
+   <input type="text" name="statusName" value="<c:out value="${study.status.description}"/>" class="formfieldL" disabled>
+   <input type="hidden" name="statusId" value="${study.status.code}">
 
    </div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="statusId"/></jsp:include></td><td> *</td></tr>      
      
-  <c:forEach var="config" items="${newStudy.studyParameters}">   
+  <c:forEach var="config" items="${newStudy.studyParameterValues}">
    <c:choose>
-   <c:when test="${config.parameter.handle=='collectDOB'}">
+   <c:when test="${config.studyParameter.handle=='collectDOB'}">
      <tr valign="top"><td class="formlabel"><fmt:message key="collect_subject_date_of_birth" bundle="${resword}"/>:</td><td>
        <c:choose>
-         <c:when test="${config.value.value == '1'}">
+         <c:when test="${config.value == '1'}">
            <input type="radio" checked name="collectDob" value="1"><fmt:message key="yes" bundle="${resword}"/>
            <input type="radio" name="collectDob" value="2"><fmt:message key="only_year_of_birth" bundle="${resword}"/>
            <input type="radio" name="collectDob" value="3"><fmt:message key="not_used" bundle="${resword}"/>
          </c:when>
-         <c:when test="${config.value.value == '2'}">
+         <c:when test="${config.value == '2'}">
             <input type="radio" name="collectDob" value="1"><fmt:message key="yes" bundle="${resword}"/>
             <input type="radio" checked name="collectDob" value="2"><fmt:message key="only_year_of_birth" bundle="${resword}"/>
             <input type="radio" name="collectDob" value="3"><fmt:message key="not_used" bundle="${resword}"/>
@@ -315,10 +315,10 @@ function updateThis(multiSelEle, count) {
    
    </c:when>
     
-   <c:when test="${config.parameter.handle=='discrepancyManagement'}">
+   <c:when test="${config.studyParameter.handle=='discrepancyManagement'}">
       <tr valign="top"><td class="formlabel"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/>:</td><td>
        <c:choose>
-       <c:when test="${config.value.value == 'false'}">
+       <c:when test="${config.value == 'false'}">
         <input type="radio" name="discrepancyManagement" value="true"><fmt:message key="yes" bundle="${resword}"/>
         <input type="radio" checked name="discrepancyManagement" value="false"><fmt:message key="no" bundle="${resword}"/>
        </c:when>
@@ -331,10 +331,10 @@ function updateThis(multiSelEle, count) {
       </tr>
   </c:when>
   
-  <c:when test="${config.parameter.handle=='genderRequired'}">    
+  <c:when test="${config.studyParameter.handle=='genderRequired'}">
       <tr valign="top"><td class="formlabel"><fmt:message key="gender_required" bundle="${resword}"/>:</td><td>
        <c:choose>
-       <c:when test="${config.value.value == false}">
+       <c:when test="${config.value == false}">
         <input type="radio" name="genderRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
         <input type="radio" checked name="genderRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
        </c:when>
@@ -346,15 +346,15 @@ function updateThis(multiSelEle, count) {
       </td>
       </tr>
   </c:when>   
-    <c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">   
+    <c:when test="${config.studyParameter.handle=='subjectPersonIdRequired'}">
       <tr valign="top"><td class="formlabel"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td><td>
        <c:choose>
-       <c:when test="${config.value.value == 'required'}">
+       <c:when test="${config.value == 'required'}">
         <input type="radio" checked name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
         <input type="radio" name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
         <input type="radio" name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
        </c:when>
-        <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
+        <c:when test="${newStudy.subjectPersonIdRequired == 'optional'}">
         <input type="radio" name="subjectPersonIdRequired" value="required"><fmt:message key="required" bundle="${resword}"/>
         <input type="radio" checked name="subjectPersonIdRequired" value="optional"><fmt:message key="optional" bundle="${resword}"/>
         <input type="radio" name="subjectPersonIdRequired" value="not used"><fmt:message key="not_used" bundle="${resword}"/>
@@ -368,15 +368,15 @@ function updateThis(multiSelEle, count) {
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='subjectIdGeneration'}">   
+  <c:when test="${config.studyParameter.handle=='subjectIdGeneration'}">
        <tr valign="top"><td class="formlabel"><fmt:message key="how_to_generate_the_study_subject_ID" bundle="${resword}"/>:</td><td>
        <c:choose>
-       <c:when test="${config.value.value == 'manual'}">
+       <c:when test="${config.value == 'manual'}">
         <input type="radio" checked name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
         <input type="radio" name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
         <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
        </c:when>
-        <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'auto editable'}">
+        <c:when test="${newStudy.subjectPersonIdRequired == 'auto editable'}">
         <input type="radio" name="subjectIdGeneration" value="manual"><fmt:message key="manual_entry" bundle="${resword}"/>
         <input type="radio" checked name="subjectIdGeneration" value="auto editable"><fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
         <input type="radio" name="subjectIdGeneration" value="auto non-editable"><fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
@@ -390,10 +390,10 @@ function updateThis(multiSelEle, count) {
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='subjectIdPrefixSuffix'}">   
+  <c:when test="${config.studyParameter.handle=='subjectIdPrefixSuffix'}">
        <tr valign="top"><td class="formlabel"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/>:</td><td>
        <c:choose>
-       <c:when test="${config.value.value == 'true'}">
+       <c:when test="${config.value == 'true'}">
         <input type="radio" checked name="subjectIdPrefixSuffix" value="true"><fmt:message key="yes" bundle="${resword}"/>
         <input type="radio" name="subjectIdPrefixSuffix" value="false"><fmt:message key="no" bundle="${resword}"/>
        
@@ -407,18 +407,18 @@ function updateThis(multiSelEle, count) {
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='interviewerNameRequired'}">
+  <c:when test="${config.studyParameter.handle=='interviewerNameRequired'}">
        <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'no'}">checked</c:if> name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-               <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'not_used'}">checked</c:if> name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
+               <input type="radio" <c:if test="${newStudy.interviewerNameRequired== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+               <input type="radio" <c:if test="${newStudy.interviewerNameRequired== 'no'}">checked</c:if> name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
+               <input type="radio" <c:if test="${newStudy.interviewerNameRequired== 'not_used'}">checked</c:if> name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='interviewerNameDefault'}">    
+  <c:when test="${config.studyParameter.handle=='interviewerNameDefault'}">
       <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td>
               <c:choose>
-              <c:when test="${newStudy.studyParameterConfig.interviewerNameDefault== 'blank'}">
+              <c:when test="${newStudy.interviewerNameDefault== 'blank'}">
                <input type="radio" checked name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
                <input type="radio" name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
 
@@ -431,10 +431,10 @@ function updateThis(multiSelEle, count) {
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='interviewerNameEditable'}">   
+  <c:when test="${config.studyParameter.handle=='interviewerNameEditable'}">
       <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_name_editable" bundle="${resword}"/></td><td>
        <c:choose>
-       <c:when test="${config.value.value== 'true'}">
+       <c:when test="${config.value == 'true'}">
         <input type="radio" checked name="interviewerNameEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
         <input type="radio" name="interviewerNameEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
        
@@ -447,18 +447,18 @@ function updateThis(multiSelEle, count) {
       </td>
       </tr>
   </c:when>
-  <c:when test="${config.parameter.handle=='interviewDateRequired'}">   
+  <c:when test="${config.studyParameter.handle=='interviewDateRequired'}">
       <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_required" bundle="${resword}"/></td><td>
-              <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewDateRequired== 'yes'}"> checked </c:if> name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
-              <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewDateRequired== 'no'}"> checked </c:if> name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
-              <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewDateRequired== 'not_used'}"> checked </c:if> name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
+              <input type="radio" <c:if test="${newStudy.interviewDateRequired== 'yes'}"> checked </c:if> name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+              <input type="radio" <c:if test="${newStudy.interviewDateRequired== 'no'}"> checked </c:if> name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
+              <input type="radio" <c:if test="${newStudy.interviewDateRequired== 'not_used'}"> checked </c:if> name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
       </td>
       </tr>
     </c:when>     
-  <c:when test="${config.parameter.handle=='interviewDateDefault'}">    
+  <c:when test="${config.studyParameter.handle=='interviewDateDefault'}">
       <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_default_as_blank" bundle="${resword}"/></td><td>
               <c:choose>
-              <c:when test="${newStudy.studyParameterConfig.interviewDateDefault== 'blank'}">
+              <c:when test="${newStudy.interviewDateDefault== 'blank'}">
                <input type="radio" checked name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
                <input type="radio" name="interviewDateDefault" value="pre-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
 
@@ -474,7 +474,7 @@ function updateThis(multiSelEle, count) {
    <c:otherwise>    
       <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_editable" bundle="${resword}"/></td><td>
        <c:choose>
-       <c:when test="${config.value.value== 'true'}">
+       <c:when test="${config.value== 'true'}">
         <input type="radio" checked name="interviewDateEditable" value="true"><fmt:message key="yes" bundle="${resword}"/>
         <input type="radio" name="interviewDateEditable" value="false"><fmt:message key="no" bundle="${resword}"/>
        

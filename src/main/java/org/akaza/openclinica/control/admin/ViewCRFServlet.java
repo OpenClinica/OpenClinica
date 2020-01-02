@@ -16,14 +16,14 @@ import java.util.List;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -43,6 +43,7 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -89,7 +90,7 @@ public class ViewCRFServlet extends SecureController {
         request.setAttribute(MODULE, module);
 
         int crfId = fp.getInt(CRF_ID);
-        List<StudyBean> studyBeans = null;
+        List<Study> studyBeans = null;
         if (crfId == 0) {
             addPageMessage(respage.getString("please_choose_a_CRF_to_view"));
             forwardPage(Page.CRF_LIST);
@@ -107,9 +108,7 @@ public class ViewCRFServlet extends SecureController {
 
             if ("admin".equalsIgnoreCase(module)) {
                 // BWP 3279: generate a table showing a list of studies associated with the CRF>>
-                StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-
-                studyBeans = findStudiesForCRFId(crfId, studyDAO);
+                studyBeans = findStudiesForCRFId(crfId);
                 // Create the Jmesa table for the studies associated with the CRF
                 String studyHtml = renderStudiesTable(studyBeans);
                 request.setAttribute("studiesTableHTML", studyHtml);
@@ -175,7 +174,7 @@ public class ViewCRFServlet extends SecureController {
     /*
      * Create a JMesa-based table for showing the studies associated with a CRF.
      */
-    private String renderStudiesTable(List<StudyBean> studyBeans) {
+    private String renderStudiesTable(List<Study> studyBeans) {
 
         Collection<StudyRowContainer> items = getStudyRows(studyBeans);
         TableFacade tableFacade = createTableFacade("studies", request);
@@ -213,19 +212,19 @@ public class ViewCRFServlet extends SecureController {
     }
 
     /*
-     * Generate the rows for the study table. Each row represents a StudyBean domain object.
+     * Generate the rows for the study table. Each row represents a Study domain object.
      */
-    private Collection<StudyRowContainer> getStudyRows(List<StudyBean> studyBeans) {
+    private Collection<StudyRowContainer> getStudyRows(List<Study> studyBeans) {
 
         Collection<StudyRowContainer> allRows = new ArrayList<StudyRowContainer>();
         StudyRowContainer tempBean = null;
         StringBuilder actions = new StringBuilder("");
-        for (StudyBean studBean : studyBeans) {
+        for (Study studBean : studyBeans) {
             tempBean = new StudyRowContainer();
             tempBean.setName(studBean.getName());
-            tempBean.setUniqueProtocolid(studBean.getIdentifier());
+            tempBean.setUniqueProtocolid(studBean.getUniqueIdentifier());
             tempBean.setStudyBean(studBean);
-            actions.append(StudyRowContainer.VIEW_STUDY_DETAILS_URL).append(studBean.getId()).append(StudyRowContainer.VIEW_STUDY_DETAILS_SUFFIX);
+            actions.append(StudyRowContainer.VIEW_STUDY_DETAILS_URL).append(studBean.getStudyId()).append(StudyRowContainer.VIEW_STUDY_DETAILS_SUFFIX);
             tempBean.setActions(actions.toString());
             allRows.add(tempBean);
 
@@ -238,17 +237,17 @@ public class ViewCRFServlet extends SecureController {
     /*
      * Fetch the studies associated with a CRF, via an event definition that uses the CRF.
      */
-    private List<StudyBean> findStudiesForCRFId(int crfId, StudyDAO studyDao) {
-        List<StudyBean> studyBeans = new ArrayList<StudyBean>();
-        if (crfId == 0 || studyDao == null) {
+    private List<Study> findStudiesForCRFId(int crfId) {
+        List<Study> studyBeans = new ArrayList<Study>();
+        if (crfId == 0 || getStudyDao() == null) {
             return studyBeans;
         }
 
-        ArrayList<Integer> studyIds = studyDao.getStudyIdsByCRF(crfId);
-        StudyBean tempBean = new StudyBean();
+        ArrayList<Integer> studyIds = (ArrayList<Integer>) getStudyDao().getStudyIdsByCRF(crfId);
+        Study tempBean = new Study();
 
         for (Integer id : studyIds) {
-            tempBean = (StudyBean) studyDao.findByPK(id);
+            tempBean = (Study) getStudyDao().findByPK(id);
             studyBeans.add(tempBean);
 
         }

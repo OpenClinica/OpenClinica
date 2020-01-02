@@ -23,7 +23,7 @@ public class ChooseDownloadFormat extends SecureController{
         //provide the study name or identifier
         String studyIdentifier="";
         if(this.currentStudy != null) {
-             studyIdentifier= currentStudy.getIdentifier();
+             studyIdentifier= currentStudy.getUniqueIdentifier();
         }
         request.setAttribute("studyIdentifier",studyIdentifier);
         forwardPage(Page.CHOOSE_DOWNLOAD_FORMAT);

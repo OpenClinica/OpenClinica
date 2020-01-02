@@ -1,8 +1,8 @@
 package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -55,13 +55,16 @@ public class UtilServiceImpl implements UtilService {
     @Autowired
     RestfulServiceHelper restfulServiceHelper;
 
+    @Autowired
+    StudyBuildService studyBuildService;
+
 
     public String getAccessTokenFromRequest(HttpServletRequest request) {
         return (String) request.getSession().getAttribute("accessToken");
     }
 
     public void setSchemaFromStudyOid(String studyOid) {
-        CoreResources.setRequestSchemaByStudy(studyOid,dataSource);
+        studyBuildService.setRequestSchemaByStudy(studyOid);
     }
 
     public String getCustomerUuidFromRequest(HttpServletRequest request) {
@@ -76,17 +79,18 @@ public class UtilServiceImpl implements UtilService {
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource, studyBuildService, studyDao);
         }
         return restfulServiceHelper;
     }
 
 
-    public boolean isParticipantIDSystemGenerated(StudyBean tenantStudy) {
+    public boolean isParticipantIDSystemGenerated(Study tenantStudy) {
         String idSetting = "";
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean spvBean = spvdao.findByHandleAndStudy(tenantStudy.getParentStudyId() == 0 ? tenantStudy.getId() : tenantStudy.getParentStudyId(), "subjectIdGeneration");
-        idSetting = spvBean.getValue();
+        if(tenantStudy.isSite())
+            idSetting = tenantStudy.getStudy().getSubjectIdGeneration();
+        else
+            idSetting = tenantStudy.getSubjectIdGeneration();
 
         logger.info("subject Id Generation :" + idSetting);
 
@@ -155,6 +159,13 @@ public class UtilServiceImpl implements UtilService {
 
     }
 
-
+    public boolean checkStudyLevelUser(ArrayList<StudyUserRoleBean> userRoles, String siteOid) {
+        Study publicSite = studyDao.findPublicStudy(siteOid);
+        for (StudyUserRoleBean userRole : userRoles) {
+            if(publicSite.getStudyId() == userRole.getStudyId())
+                return false;
+        }
+        return true;
+    }
 
 }

@@ -23,13 +23,17 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.domain.datamap.CrfBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
@@ -37,7 +41,6 @@ import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -49,6 +52,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author ssachs
@@ -86,11 +90,11 @@ public class EnterDataForStudyEventServlet extends SecureController {
     private StudyEventBean getStudyEvent(int eventId) throws Exception {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 
-        StudyBean studyWithSED = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithSED = new StudyBean();
-            studyWithSED.setId(currentStudy.getParentStudyId());
-        }
+        Study studyWithSED = null;
+        if (currentStudy.isSite())
+            studyWithSED = currentStudy.getStudy();
+        else
+            studyWithSED = currentStudy;
 
         AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
 
@@ -118,7 +122,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        // removeLockedCRF(ub.getId());
         getEventCrfLocker().unlockAllForUser(ub.getId());
         FormProcessor fp = new FormProcessor(request);
 
@@ -134,16 +137,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(seb.getStudySubjectId());
         int studyId = studySubjectBean.getStudyId();
 
-        StudyDAO studydao = new StudyDAO(sm.getDataSource());
-        StudyBean study = (StudyBean) studydao.findByPK(studyId);
-        // If the study subject derives from a site, and is being viewed from a
-        // parent study,
-        // then the study IDs will be different. However, since each note is
-        // saved with the specific
-        // study ID, then its study ID may be different than the study subject's
-        // ID.
-        boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
-        boolean isParentStudy = study.getParentStudyId() < 1;
+        Study study = (Study) getStudyDao().findByPK(studyId);
 
         // Get any disc notes for this study event
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
@@ -159,13 +153,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(seb);
         ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
-        RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
-
-        for (EventCRFBean eventCrfBean : eventCRFs) {
-            // Boolean result = ruleSetDao.findByEventCrf(eventCrfBean) != null
-            // ? Boolean.TRUE : Boolean.FALSE;
-            // doRuleSetsExist.add(result);
-        }
 
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, seb.getStudyEventDefinitionId());
@@ -175,7 +162,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         // let the user choose which version he will enter data for
         // However, this method seems to be returning DisplayEventDefinitionCRFs
         // that contain valid eventCRFs??
-        ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
+        ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs, seb.getId());
         populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
         // BWP 2816 << Attempt to provide the DisplayEventDefinitionCRF with a
@@ -200,7 +187,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
                 seb.getSubjectEventStatus(), study);
 
         // Issue 3212 BWP << hide certain CRFs at the site level
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
             HideCRFManager hideCRFManager = HideCRFManager.createHideCRFManager();
 
             uncompletedEventDefinitionCRFs = hideCRFManager.removeHiddenEventDefinitionCRFBeans(uncompletedEventDefinitionCRFs);
@@ -217,7 +204,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
         // @pgawade 31-Aug-2012 fix for issue #15315: Reverting to set the request variable "beans" back
         // this is for generating side info panel
-        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySubjectBean, sm.getDataSource(), ub, currentRole);
+        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySubjectBean, sm.getDataSource(), ub, currentRole, getStudyDao());
         request.setAttribute("beans", beans);
         EventCRFBean ecb = new EventCRFBean();
         ecb.setStudyEventId(eventId);
@@ -265,60 +252,44 @@ public class EnterDataForStudyEventServlet extends SecureController {
      *            All of the event CRFs for this study event.
      * @return The list of event definitions for which no event CRF exists.
      */
-    private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs) {
-        int i;
-        HashMap completed = new HashMap();
-        HashMap startedButIncompleted = new HashMap();
+    private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs, int studyEventId) {
+
+        HashMap<Integer, EventDefinitionCRFBean> eventDefinitionsHashMap = new HashMap();
+
+        for (Object eventDefinitionObj : eventDefinitionCRFs){
+            EventDefinitionCRFBean eventDefinitionBean = (EventDefinitionCRFBean) eventDefinitionObj;
+            eventDefinitionsHashMap.put(eventDefinitionBean.getCrfId(), eventDefinitionBean);
+        }
+
         ArrayList answer = new ArrayList();
+        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
-        /**
-         * A somewhat non-standard algorithm is used here: let answer = empty;
-         * foreach event definition ED, set isCompleted(ED) = false foreach
-         * event crf EC, set isCompleted(EC.getEventDefinition()) = true foreach
-         * event definition ED, if (!isCompleted(ED)) { answer += ED; } return
-         * answer; This algorithm is guaranteed to find all the event
-         * definitions for which no event CRF exists.
-         *
-         * The motivation for using this algorithm is reducing the number of
-         * database hits.
-         *
-         * -jun-we have to add more CRFs here: the event CRF which dones't have
-         * item data yet
-         */
+        StudyEventBean studyEventBean = new StudyEventBean();
+        studyEventBean.setId(studyEventId);
+        ArrayList<EventCRFBean> listOfActiveEventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
 
-        for (i = 0; i < eventDefinitionCRFs.size(); i++) {
-            EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-            completed.put(new Integer(edcrf.getCrfId()), Boolean.FALSE);
-            startedButIncompleted.put(new Integer(edcrf.getCrfId()), new EventCRFBean());
+        ArrayList<Integer> listOfCrfVersionsInUse = new ArrayList();
+        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        for (EventCRFBean eventCRFBean : listOfActiveEventCRFs){
+            listOfCrfVersionsInUse.add(cvdao.findByPK(eventCRFBean.getCRFVersionId()).getId());
         }
 
-        FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
-        ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-        for (i = 0; i < eventCRFs.size(); i++) {
-            EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
-            int crfId = fldao.getCRFIdFromFormLayoutId(ecrf.getFormLayoutId());
-            ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
-            if (!idata.isEmpty()) {// this crf has data already
-                completed.put(new Integer(crfId), Boolean.TRUE);
-            } else {// event crf got created, but no data entered
-                startedButIncompleted.put(new Integer(crfId), ecrf);
-            }
+        CRFDAO cdao = new CRFDAO(sm.getDataSource());
+        for (Integer crfVersionId : listOfCrfVersionsInUse){
+            eventDefinitionsHashMap.remove(cdao.findByVersionId(crfVersionId).getId());
         }
 
-        for (i = 0; i < eventDefinitionCRFs.size(); i++) {
+        for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionsHashMap.values()){
             DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
-            EventDefinitionCRFBean edcrf = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
-            dedc.setEdc(edcrf);
-            Boolean b = (Boolean) completed.get(new Integer(edcrf.getCrfId()));
-            EventCRFBean ev = (EventCRFBean) startedButIncompleted.get(new Integer(edcrf.getCrfId()));
-            if (b == null || !b.booleanValue()) {
-                dedc.setEventCRF(ev);
-                answer.add(dedc);
-            }
+            dedc.setEdc(eventDefinitionCrfBean);
+            dedc.setEventCRF(new EventCRFBean());
+            answer.add(dedc);
         }
 
         return answer;
     }
+
+
 
     private void populateUncompletedCRFsWithAnOwner(List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
         if (displayEventDefinitionCRFBeans == null || displayEventDefinitionCRFBeans.isEmpty()) {

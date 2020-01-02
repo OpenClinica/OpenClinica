@@ -7,19 +7,24 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import core.org.akaza.openclinica.domain.datamap.DiscrepancyNote;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -28,6 +33,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +45,7 @@ import java.util.Date;
  */
 public class RemoveStudySubjectServlet extends SecureController {
 
+    DiscrepancyNoteDAO dnDao;
 
     /**
      *
@@ -82,15 +89,14 @@ public class RemoveStudySubjectServlet extends SecureController {
 
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
-            StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-            StudyBean study = (StudyBean) studyDAO.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
-            checkRoleByUserAndStudy(ub, study, studyDAO);
+            checkRoleByUserAndStudy(ub, study);
 
             // find study events
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 //            ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);
-            ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
+            ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole, getStudyDao());
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
                 if (!studySub.getStatus().equals(Status.AVAILABLE)) {
@@ -114,6 +120,17 @@ public class RemoveStudySubjectServlet extends SecureController {
                 studySub.setUpdatedDate(new Date());
                 studySub.setUserStatus(UserStatus.INACTIVE);
                 subdao.update(studySub);
+
+                dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
+                // OC-9585 OC4 Auto close queries when a Participant is removed
+                // parentDiscrepancyNoteList is the list of the parent DNs records only
+                ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = dnDao.findParentNotesBySubject(studySubId);
+                for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
+                    String description = resword.getString("dn_auto-closed_description");
+                    String detailedNotes = resword.getString("dn_auto_closed_detailed_notes_due_to_participant");
+                    // create new DN record , new DN Map record , also update the parent record
+                    createDiscrepancyNoteBean(description, detailedNotes, parentDiscrepancyNote.getItemId(), study, ub, parentDiscrepancyNote);
+                }
 
                 // remove all study events
                 // remove all event crfs
@@ -188,5 +205,36 @@ public class RemoveStudySubjectServlet extends SecureController {
         logger.info("Sending email done..");
     }
 
+    private void createDiscrepancyNoteBean(String description, String detailedNotes, int itemDataId, Study studyBean, UserAccountBean ub,
+                                           DiscrepancyNoteBean parentDiscrepancyNote) {
+        DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+        dnb.setEntityId(itemDataId); // this is needed for DN Map object
+        dnb.setStudyId(studyBean.getStudyId());
+        dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+        dnb.setDescription(description);
+        dnb.setDetailedNotes(detailedNotes);
+        dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
+        dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed Modified
+        dnb.setColumn("value"); // this is needed for DN Map object
+        dnb.setAssignedUser(null);
+        dnb.setOwner(ub);
+        dnb.setParentDnId(parentDiscrepancyNote.getId());
+        dnb.setActivated(false);
+        dnb.setThreadUuid(parentDiscrepancyNote.getThreadUuid());
+        dnb = (DiscrepancyNoteBean) getDnDao().create(dnb); // create child DN
+        getDnDao().createMapping(dnb); // create DN mapping
+
+        DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) getDnDao().findByPK(dnb.getParentDnId());
+        itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed Modified
+        itemParentNote.setAssignedUser(null);
+        itemParentNote.setOwner(ub);
+        itemParentNote.setDetailedNotes(detailedNotes);
+        getDnDao().update(itemParentNote); // update parent DN
+        getDnDao().updateAssignedUserToNull(itemParentNote); // update parent DN assigned user
+    }
+
+    public DiscrepancyNoteDAO getDnDao() {
+        return dnDao;
+    }
 
 }

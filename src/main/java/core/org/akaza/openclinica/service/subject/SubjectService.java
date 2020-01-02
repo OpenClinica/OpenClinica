@@ -2,19 +2,20 @@ package core.org.akaza.openclinica.service.subject;
 
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.core.SessionManager;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.List;
@@ -28,18 +29,19 @@ public class SubjectService implements SubjectServiceInterface {
     StudyParameterValueDAO studyParameterValueDAO;
     StudySubjectDAO studySubjectDao;
     UserAccountDAO userAccountDao;
-    StudyDAO studyDao;
+    StudyDao studyDao;
     DataSource dataSource;
 
-    public SubjectService(DataSource dataSource) {
+    public SubjectService(DataSource dataSource, StudyDao studyDao) {
         this.dataSource = dataSource;
+        this.studyDao = studyDao;
     }
 
     public SubjectService(SessionManager sessionManager) {
         this.dataSource = sessionManager.getDataSource();
     }
 
-    public List<StudySubjectBean> getStudySubject(StudyBean study) {
+    public List<StudySubjectBean> getStudySubject(Study study) {
         return getStudySubjectDao().findAllByStudy(study);
 
     }
@@ -47,9 +49,9 @@ public class SubjectService implements SubjectServiceInterface {
     /*
      * (non-Javadoc)
      * @see core.org.akaza.openclinica.service.subject.SubjectServiceInterface#createSubject(core.org.akaza.openclinica.bean.submit.SubjectBean,
-     * core.org.akaza.openclinica.bean.managestudy.StudyBean)
+     * core.org.akaza.openclinica.bean.managestudy.Study)
      */
-    public String createSubject(SubjectBean subjectBean, StudyBean studyBean, Date enrollmentDate, String secondaryId) {
+    public String createSubject(SubjectBean subjectBean, Study studyBean, Date enrollmentDate, String secondaryId) {
         if (subjectBean.getUniqueIdentifier() != null && subjectBean.getUniqueIdentifier().trim().length()> 0 && 
         		getSubjectDao().findByUniqueIdentifier(subjectBean.getUniqueIdentifier()).getId() != 0) {
         	//we need to keep the label to transfer it to the StudySubjectBean later
@@ -66,16 +68,16 @@ public class SubjectService implements SubjectServiceInterface {
         return studySubject.getLabel();
     }
 
-    private StudySubjectBean createStudySubject(SubjectBean subject, StudyBean studyBean, Date enrollmentDate, String secondaryId) {
+    private StudySubjectBean createStudySubject(SubjectBean subject, Study studyBean, Date enrollmentDate, String secondaryId) {
         StudySubjectBean studySubject = new StudySubjectBean();
         studySubject.setSecondaryLabel(secondaryId);
         studySubject.setOwner(getUserAccount());
         studySubject.setEnrollmentDate(enrollmentDate);
         studySubject.setSubjectId(subject.getId());
-        studySubject.setStudyId(studyBean.getId());
+        studySubject.setStudyId(studyBean.getStudyId());
         studySubject.setStatus(Status.AVAILABLE);
         
-        int handleStudyId = studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId();
+        int handleStudyId = studyBean.isSite() ? studyBean.getStudy().getStudyId() : studyBean.getStudyId();
         StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
         String idSetting = subjectIdGenerationParameter.getValue();
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
@@ -119,15 +121,7 @@ public class SubjectService implements SubjectServiceInterface {
     public StudyParameterValueDAO getStudyParameterValueDAO() {
         return this.studyParameterValueDAO != null ? studyParameterValueDAO : new StudyParameterValueDAO(dataSource);
     }
-
-    /**
-     * @return the subjectDao
-     */
-    public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-    }
-
+    
     /**
      * @return the subjectDao
      */

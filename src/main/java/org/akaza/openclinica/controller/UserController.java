@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -19,6 +20,7 @@ import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +73,8 @@ public class UserController {
     private StudyDao studyDao;
     @Autowired
     UserAccountDao userAccountDao;
-
+    @Autowired
+    KeycloakClientImpl keycloakClient;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private static final String ENTITY_NAME = "UserController";
 
@@ -114,8 +117,9 @@ public class UserController {
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
         ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
+        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 
-        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid, textsBundle);
+        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, realm, customerUuid,textsBundle);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
@@ -160,8 +164,9 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 
-        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean,incldAccessCode,incldAccessCode);
+        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean,incldAccessCode,incldAccessCode);
         if (participantAccessDTO == null) {
             logger.error("REST request to GET AccessLink Object for Participant not found ");
             return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.NOT_FOUND);
@@ -188,24 +193,30 @@ public class UserController {
     @ApiOperation( value = "Retrieve all participants contact information with or without their OpenClinica participate access code.", notes = "Will extract the data in a text file" )
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractParticipantsInfo", method = RequestMethod.POST )
     public ResponseEntity<Object> extractParticipantsInfo(HttpServletRequest request,
-              @ApiParam(value = "Study OID", required = true) @PathVariable( "studyOID" ) String studyOid,
-              @ApiParam(value = "Site OID", required = true) @PathVariable( "siteOID" ) String siteOid,
-              @ApiParam(value = "Use this parameter to retrieve participant's access code for OpenClinica Participant module. Possible values - y or n.", required = false) @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo) throws InterruptedException {
+                                                          @ApiParam( value = "Study OID", required = true ) @PathVariable( "studyOID" ) String studyOid,
+                                                          @ApiParam( value = "Site OID", required = true ) @PathVariable( "siteOID" ) String siteOid,
+                                                          @ApiParam( value = "Use this parameter to retrieve participant's access code for OpenClinica Participant module. Possible values - y or n.", required = false )
+                                                          @RequestParam( value = "includeParticipateInfo", defaultValue = "n", required = false ) String includeParticipateInfo,
+                                                          @RequestParam( value = "page_number", defaultValue = "1", required = false ) String pNumber,
+                                                          @RequestParam( value = "page_size", defaultValue = "100", required = false ) String pSize) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
         ResponseEntity<Object> response = null;
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
-
+        int pageNumber = 1;
+        int pageSize = 100;
         boolean incRelatedInfo = false;
-        if(includeParticipateInfo!=null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
-        	incRelatedInfo = true;
+        if (includeParticipateInfo != null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
+            incRelatedInfo = true;
         }
-
+        boolean isStudyLevelUser;
         try {
-           validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean, incRelatedInfo);           
-           
+            pageNumber = validatePageNumber(pNumber);
+            pageSize = validatePageSize(pSize);
+             validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean, incRelatedInfo);
+
         } catch (OpenClinicaSystemException e) {
             String errorMsg = e.getErrorCode();
             HashMap<String, String> map = new HashMap<>();
@@ -216,10 +227,12 @@ public class UserController {
             return response;
         }
 
+        isStudyLevelUser = utilService.checkStudyLevelUser(userAccountBean.getRoles(), siteOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
+        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 
-        String uuid = startExtractJob(studyOid, siteOid, accessToken, customerUuid, userAccountBean, incRelatedInfo);
+        String uuid = startExtractJob(studyOid, siteOid, accessToken, realm, userAccountBean, incRelatedInfo, pageNumber, pageSize, isStudyLevelUser);
 
         logger.info("REST request to Extract Participants info ");
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -259,7 +272,7 @@ public class UserController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startExtractJob(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, boolean incRelatedInfo) {
+    public String startExtractJob(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, boolean incRelatedInfo,int pageNumber,int pageSize, boolean isStudyLevelUser) {
         utilService.setSchemaFromStudyOid(studyOid);
         String schema = CoreResources.getRequestSchema();
 
@@ -269,7 +282,7 @@ public class UserController {
         JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE, null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             try {
-                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail, incRelatedInfo);
+                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, realm, userAccountBean, schema, jobDetail, incRelatedInfo,pageNumber,pageSize, isStudyLevelUser);
             } catch (Exception e) {
                 logger.error("Exeception is thrown while extracting job : " + e);
             }
@@ -278,4 +291,31 @@ public class UserController {
         return jobDetail.getUuid();
     }
 
+    private int validatePageNumber(String pNumber) {
+        int pageNumber = 1;
+        try {
+            pageNumber = Integer.parseInt(pNumber.trim());
+        } catch (NumberFormatException nfe) {
+            logger.info("invalid Page Number Format Exception: " + nfe.getMessage());
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PAGE_NUMBER_PARAMETER);
+        }
+        if (pageNumber < 1)
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PAGE_NUMBER_PARAMETER);
+
+        return pageNumber;
+    }
+
+    private int validatePageSize(String pSize) {
+        int pageSize = 1;
+        try {
+            pageSize = Integer.parseInt(pSize.trim());
+        } catch (NumberFormatException nfe) {
+            logger.info("invalid Page Number Format Exception: " + nfe.getMessage());
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PAGE_SIZE_PARAMETER);
+        }
+        if (pageSize < 1)
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_INVALID_PAGE_SIZE_PARAMETER);
+
+        return pageSize;
+    }
 }

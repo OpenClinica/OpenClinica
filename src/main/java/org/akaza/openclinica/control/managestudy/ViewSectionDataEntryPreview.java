@@ -24,7 +24,6 @@ import core.org.akaza.openclinica.bean.core.Utils;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -38,10 +37,11 @@ import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -50,6 +50,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Bruce W. Perry
@@ -59,7 +60,6 @@ import org.slf4j.LoggerFactory;
  * preview of a crf before the crfversion is inserted into the database.
  */
 public class ViewSectionDataEntryPreview extends DataEntryServlet {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ViewSectionDataEntryPreview.class);
 
     public static String SECTION_TITLE = "section_title";
@@ -394,9 +394,9 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
         int subjectId = sub.getSubjectId();
         int studyId = sub.getStudyId();
         SubjectBean subject = (SubjectBean) subjectDao.findByPK(subjectId);
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+        Study currentStudy =    (Study)  request.getSession().getAttribute("study");
         // Let us process the age
-        if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+        if (currentStudy.getCollectDob().equals("1")) {
             StudyEventDAO sedao = new StudyEventDAO(getDataSource());
             StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
@@ -407,12 +407,11 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
             age = Utils.getInstacne().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
         }
         // Get the study then the parent study
-        StudyDAO studydao = new StudyDAO(getDataSource());
-        StudyBean study = (StudyBean) studydao.findByPK(studyId);
+        Study study = (Study) getStudyDao().findByPK(studyId);
 
-        if (study.getParentStudyId() > 0) {
+        if (study.isSite()) {
             // this is a site,find parent
-            StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
+            Study parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
             request.setAttribute("studyTitle", parentStudy.getName() + " - " + study.getName());
         } else {
             request.setAttribute("studyTitle", study.getName());
@@ -558,5 +557,15 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
     @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
         return false;
+    }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
     }
 }

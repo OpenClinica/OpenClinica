@@ -13,11 +13,12 @@ package core.org.akaza.openclinica.logic.odmExport;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.odmbeans.ODMBean;
 import core.org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import core.org.akaza.openclinica.dao.extract.OdmExtractDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A class for ODM AdminData of one study.
@@ -27,33 +28,34 @@ import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 
 public class AdminDataUnit extends OdmUnit {
     private OdmAdminDataBean odmAdminData;
-    
+
+    private StudyDao studyDao;
     public AdminDataUnit() {
     }
 
-    public AdminDataUnit(DataSource ds, StudyBean study, int category) {
+    public AdminDataUnit(DataSource ds, Study study, int category) {
         super(ds, study, category);
         this.odmAdminData = new OdmAdminDataBean();
     }
 
-    public AdminDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
+    public AdminDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, Study study, int category, StudyDao studyDao) {
         super(ds, dataset, odmBean, study, category);
+        this.studyDao = studyDao;
         this.odmAdminData = new OdmAdminDataBean();
     }
 
     public void collectOdmAdminData() {
-        StudyBean study = studyBase.getStudy();
-        String studyOID = study.getOid();
-        StudyDAO studyDAO = new StudyDAO(this.ds);
-        StudyBean publicStudy = studyDAO.getPublicStudy(studyOID);
+        Study study = studyBase.getStudy();
+        String studyOID = study.getOc_oid();
+        Study publicStudy = studyDao.findPublicStudy(studyOID);
         if (studyOID == null || studyOID.length() <= 0) {
             logger.info("Constructed studyOID using study_id because oc_oid is missing from the table - study.");
-            studyOID = "" + study.getId();
+            studyOID = "" + study.getStudyId();
         }
         odmAdminData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
-        if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds, studyDao);
+        if (this.getCategory() == 1 && study.isSite()) {
             String mvoid = "";
             if (this.dataset != null && this.dataset.getId() > 0) {
                 mvoid = this.dataset.getODMMetaDataVersionOid();

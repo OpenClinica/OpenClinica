@@ -16,7 +16,6 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -25,12 +24,13 @@ import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -40,6 +40,7 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -104,11 +105,7 @@ public class RestoreStudyEventServlet extends SecureController {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
             event.setStudyEventDefinition(sed);
 
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
-            StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
-            if (study.getParentStudyId() != 0)
-                study.setParentStudyName(((StudyBean) studydao.findByPK(study.getParentStudyId())).getName());
-
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
             request.setAttribute("study", study);
 
             String action = request.getParameter("action");
@@ -159,13 +156,13 @@ public class RestoreStudyEventServlet extends SecureController {
                     CRFBean crf = (CRFBean) cdao.findByPK(formLayout.getCrfId());
                     EventDefinitionCRFBean edc = null;
 
-                    if (study.getParentStudyId() != 0) {
-                        edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getId());
+                    if (study.isSite()) {
+                        edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getStudyId());
                         if (edc == null || !edc.isActive()) {
-                            edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getParentStudyId());
+                            edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.checkAndGetParentStudyId());
                         }
                     } else {
-                        edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getId());
+                        edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getStudyId());
                     }
                     if (edc == null || !edc.isActive()) {
                         logger.error("Event Definition Crf is null");

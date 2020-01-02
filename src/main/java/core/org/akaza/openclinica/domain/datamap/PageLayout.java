@@ -62,7 +62,7 @@ public class PageLayout extends DataMapDomainObject {
         this.name = name;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_created", length = 4, updatable = false)
     public Date getDateCreated() {
         if (dateCreated != null) {
@@ -75,7 +75,7 @@ public class PageLayout extends DataMapDomainObject {
         this.dateCreated = dateCreated;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_updated", length = 4)
     public Date getDateUpdated() {
         return this.dateUpdated;

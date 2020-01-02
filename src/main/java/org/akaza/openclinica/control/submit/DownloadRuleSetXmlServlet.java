@@ -116,11 +116,11 @@ public class DownloadRuleSetXmlServlet extends SecureController {
 
         String dir = SQLInitServlet.getField("filePath") + "rules" + File.separator;
         Long time = System.currentTimeMillis();
-        File f = new File(dir + "rules" + currentStudy.getOid() + "-" + time + ".xml");
+        File f = new File(dir + "rules" + currentStudy.getOc_oid() + "-" + time + ".xml");
         FileWriter writer = new FileWriter(f);
         handleLoadCastor(writer, prepareRulesPostImportRuleSetRuleContainer(ruleSetRuleIds));
 
-        response.setHeader("Content-disposition", "attachment; filename=\"" + "rules" + currentStudy.getOid() + "-" + time + ".xml" + "\";");
+        response.setHeader("Content-disposition", "attachment; filename=\"" + "rules" + currentStudy.getOc_oid() + "-" + time + ".xml" + "\";");
         response.setContentType("text/xml");
         response.setHeader("Pragma", "public");
 

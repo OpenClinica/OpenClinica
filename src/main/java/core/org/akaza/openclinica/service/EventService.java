@@ -9,12 +9,14 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,7 @@ public class EventService implements EventServiceInterface {
 	UserAccountDAO userAccountDao;
 	StudyEventDefinitionDAO studyEventDefinitionDao;
 	StudyEventDAO studyEventDao;
-	StudyDAO studyDao;
+
 	EventDefinitionCRFDAO eventDefinitionCRFDao;
 	EventCRFDAO eventCrfDao;
 	ItemDataDAO itemDataDao;
@@ -46,7 +48,10 @@ public class EventService implements EventServiceInterface {
 	DiscrepancyNoteDAO discrepancyNoteDao;
 	@Autowired
 	OdmImportService odmImportService;
-
+	
+	@Autowired
+	private StudyDao studyDao;
+	
 	public EventService(DataSource dataSource) {
 		super();
 		this.dataSource = dataSource;
@@ -181,7 +186,7 @@ public class EventService implements EventServiceInterface {
 	}
 
 	public void removeCrfFromEventDefinition(int eventDefnCrfId, int defId, int userId, int studyId) {
-		StudyBean study = (StudyBean) getStudyDao().findByPK(studyId);
+		Study study = (Study) studyDao.findByPK(studyId);
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
 		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().findByPK(eventDefnCrfId);
 		UserAccountBean ub = getUserAccount();
@@ -195,7 +200,7 @@ public class EventService implements EventServiceInterface {
 		restoreAllEventsItems(edc, sed, ub);
 	}
 
-	public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub, StudyBean study) {
+	public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub, Study study) {
 		logger.info("Removing All Event Crf Items.. {} - items",edc.getCrf().getName() );
 		CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
 		// Getting Study Events
@@ -237,7 +242,7 @@ public class EventService implements EventServiceInterface {
 								dnb.setThreadUuid(itemParentNote.getThreadUuid());
 							}
 							dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
-							dnb.setStudyId(study.getId());
+							dnb.setStudyId(study.getStudyId());
 							dnb.setAssignedUserId(ub.getId());
 							dnb.setOwner(ub);
 							dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
@@ -294,12 +299,12 @@ public class EventService implements EventServiceInterface {
 			String siteUniqueId, String eventDefinitionOID, String studySubjectId) throws OpenClinicaSystemException {
 
 		// Business Validation
-		StudyBean study = getStudyDao().findByUniqueIdentifier(studyUniqueId);
-		int parentStudyId = study.getId();
+		Study study = studyDao.findByUniqueId(studyUniqueId);
+		int parentStudyId = study.getStudyId();
 		if (siteUniqueId != null) {
-			study = getStudyDao().findSiteByUniqueIdentifier(studyUniqueId, siteUniqueId);
+			study = studyDao.findSiteByUniqueIdentifier(studyUniqueId, siteUniqueId);
 		}
-		StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(eventDefinitionOID, study.getId(), parentStudyId);
+		StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(eventDefinitionOID, study.getStudyId(), parentStudyId);
 		StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study);
 
 		Integer studyEventOrdinal = null;
@@ -347,14 +352,6 @@ public class EventService implements EventServiceInterface {
 	public SubjectDAO getSubjectDao() {
 		subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
 		return subjectDao;
-	}
-
-	/**
-	 * @return the subjectDao
-	 */
-	public StudyDAO getStudyDao() {
-		studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-		return studyDao;
 	}
 
 	/**

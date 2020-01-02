@@ -2,7 +2,6 @@ package org.akaza.openclinica.view.form;
 
 import core.org.akaza.openclinica.bean.core.NullValue;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
@@ -15,6 +14,7 @@ import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import core.org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -1316,8 +1316,8 @@ public class FormBeanUtil {
      *            DAO objects.
      * @return A DisplaySectionBean.
      */
-    public DisplaySectionBean createDisplaySectionWithItemGroups(StudyBean study, int sectionId, EventCRFBean eventCrfBean, int studyEventId,
-            SessionManager sm, int eventDefinitionCRFId, ServletContext context) {
+    public DisplaySectionBean createDisplaySectionWithItemGroups(Study study, int sectionId, EventCRFBean eventCrfBean, int studyEventId,
+                                                                 SessionManager sm, int eventDefinitionCRFId, ServletContext context) {
 
         DisplaySectionBean dBean = new DisplaySectionBean();
         ItemGroupDAO formGroupDAO = new ItemGroupDAO(sm.getDataSource());

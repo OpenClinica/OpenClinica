@@ -16,16 +16,17 @@ import javax.sql.DataSource;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes,
@@ -50,6 +51,9 @@ public class DiscrepancyNoteUtil {
         RESOLUTION_STATUS.put("Not Applicable", 5);
         RESOLUTION_STATUS.put("Closed-Modified", 6);
     }
+
+    @Autowired
+    private StudyDao studyDao;
 
     // These two variables are to arrange the Summary Statistics accordingly
     // Mantis Issue: 7771
@@ -428,7 +432,7 @@ public class DiscrepancyNoteUtil {
      * Acquire the DiscrepancyNoteBeans for a specific study.
      *
      * @param currentStudy
-     *            A StudyBean object.
+     *            A Study object.
      * @param resolutionStatus
      *            An int resolution status; only DiscrepancyNoteBeans will be
      *            returned if they have this resolutionStatus id.
@@ -439,7 +443,7 @@ public class DiscrepancyNoteUtil {
      *            will be returned if they have this discrepancyNoteTypeId.
      * @return A List of DiscrepancyNoteBeans.
      */
-    public List<DiscrepancyNoteBean> getDNotesForStudy(StudyBean currentStudy, int resolutionStatus, DataSource dataSource, int discNoteType) {
+    public List<DiscrepancyNoteBean> getDNotesForStudy(Study currentStudy, int resolutionStatus, DataSource dataSource, int discNoteType) {
 
         List<DiscrepancyNoteBean> allDiscNotes = new ArrayList<DiscrepancyNoteBean>();
         if (currentStudy == null)
@@ -489,7 +493,7 @@ public class DiscrepancyNoteUtil {
      * of resolution status ids, instead of a single id.
      *
      * @param currentStudy
-     *            A StudyBean object.
+     *            A Study object.
      * @param resolutionStatusIds
      *            A HashSet object consisting of resolution status ids (i.e.,
      *            1,2,3).
@@ -500,7 +504,7 @@ public class DiscrepancyNoteUtil {
      *            will be returned if they have this discrepancyNoteTypeId.
      * @return A List of DiscrepancyNoteBeans.
      */
-    public List<DiscrepancyNoteBean> getDNotesForStudy(StudyBean currentStudy, Set<Integer> resolutionStatusIds, DataSource dataSource, int discNoteType) {
+    public List<DiscrepancyNoteBean> getDNotesForStudy(Study currentStudy, Set<Integer> resolutionStatusIds, DataSource dataSource, int discNoteType) {
 
         List<DiscrepancyNoteBean> allDiscNotes = new ArrayList<DiscrepancyNoteBean>();
         if (currentStudy == null)
@@ -550,7 +554,7 @@ public class DiscrepancyNoteUtil {
      * child discrepancy notes.
      *
      * @param currentStudy
-     *            A StudyBean object.
+     *            A Study object.
      * @param resolutionStatusIds
      *            A HashSet object consisting of resolution status ids (i.e.,
      *            1,2,3).
@@ -562,7 +566,7 @@ public class DiscrepancyNoteUtil {
      * @param updateStatusOfParents
      * @return A List of DiscrepancyNoteBeans.
      */
-    public List<DiscrepancyNoteBean> getThreadedDNotesForStudy(StudyBean currentStudy, Set<Integer> resolutionStatusIds, DataSource dataSource,
+    public List<DiscrepancyNoteBean> getThreadedDNotesForStudy(Study currentStudy, Set<Integer> resolutionStatusIds, DataSource dataSource,
             int discNoteType, boolean updateStatusOfParents) {
 
         List<DiscrepancyNoteBean> allDiscNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -578,10 +582,9 @@ public class DiscrepancyNoteUtil {
         boolean filterforDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
 
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
-        StudyDAO studyDAO = new StudyDAO(dataSource);
         // what is the purpose of this data member?
         discrepancyNoteDAO.setFetchMapping(true);
-        int parentStudyId = currentStudy.getParentStudyId();
+        int parentStudyId = currentStudy.checkAndGetParentStudyId();
         Set<String> hiddenCrfNames = new TreeSet<String>();
         if (parentStudyId > 0) {
             hiddenCrfNames = new EventDefinitionCRFDAO(dataSource).findHiddenCrfNamesBySite(currentStudy);
@@ -593,9 +596,9 @@ public class DiscrepancyNoteUtil {
 
         // BWP 3167 Get all disc note for parent study as well>>
         // ArrayList parentItemDataNotes = null;
-        // StudyBean parentStudy = null;
+        // Study parentStudy = null;
         // if (parentStudyId > 0) {
-        // parentStudy = (StudyBean) studyDAO.findByPK(parentStudyId);
+        // parentStudy = (Study) studyDAO.findByPK(parentStudyId);
         // parentItemDataNotes = discrepancyNoteDAO.findAllItemDataByStudy(parentStudy, hiddenCrfNames);
         // itemDataNotes.addAll(parentItemDataNotes);
         // }
@@ -630,9 +633,9 @@ public class DiscrepancyNoteUtil {
      * @param dataSource
      *            The DataSource the DAO uses.
      * @param currentStudy
-     *            A StudyBean representing the current study.
+     *            A Study representing the current study.
      */
-    public void updateStatusOfParents(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource, StudyBean currentStudy) {
+    public void updateStatusOfParents(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource, Study currentStudy) {
         if (allDiscNotes == null || allDiscNotes.isEmpty()) {
             return;
         }
@@ -660,7 +663,7 @@ public class DiscrepancyNoteUtil {
 
     }
 
-    public List<DiscrepancyNoteThread> getDNotesForStudyAsThreads(StudyBean currentStudy, Set<Integer> resolutionStatusIds, DataSource dataSource,
+    public List<DiscrepancyNoteThread> getDNotesForStudyAsThreads(Study currentStudy, Set<Integer> resolutionStatusIds, DataSource dataSource,
             int discNoteType) {
 
         List<DiscrepancyNoteBean> allDiscNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -707,7 +710,7 @@ public class DiscrepancyNoteUtil {
         return threadedNotes;
     }
 
-    public List<DiscrepancyNoteThread> createThreadsOfParents(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource, StudyBean currentStudy,
+    public List<DiscrepancyNoteThread> createThreadsOfParents(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource, Study currentStudy,
             Set<Integer> resolutionStatusIds, int discNoteType, boolean includeEventCRFNotes) {
 
         List<DiscrepancyNoteThread> dnThreads = new ArrayList<DiscrepancyNoteThread>();
@@ -715,7 +718,7 @@ public class DiscrepancyNoteUtil {
             return dnThreads;
         }
         if (currentStudy == null) {
-            currentStudy = new StudyBean();
+            currentStudy = new Study();
         }
 
         List<DiscrepancyNoteBean> childDiscBeans = new ArrayList<DiscrepancyNoteBean>();
@@ -727,7 +730,7 @@ public class DiscrepancyNoteUtil {
 
         for (DiscrepancyNoteBean discBean : allDiscNotes) {
             tempDNThread = new DiscrepancyNoteThread();
-            tempDNThread.setStudyId(currentStudy.getId());
+            tempDNThread.setStudyId(currentStudy.getStudyId());
 
             tempDNThread.getLinkedNoteList().addFirst(discBean);
             // childDiscBeans should be empty here
@@ -959,7 +962,7 @@ public class DiscrepancyNoteUtil {
      * @return A Map mapping the name of each type of note (e.g., "Annotation")
      *         to another Map containing that type's statistics.
      */
-    public Map generateDiscNoteSummaryRefactored(DataSource ds, StudyBean currentStudy, Set<Integer> resolutionStatusIds, int discNoteType) {
+    public Map generateDiscNoteSummaryRefactored(DataSource ds, Study currentStudy, Set<Integer> resolutionStatusIds, int discNoteType) {
 
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(ds);
         boolean filterDiscNotes = checkResolutionStatus(resolutionStatusIds);
@@ -1450,7 +1453,7 @@ public class DiscrepancyNoteUtil {
                 if (bean.getStudyId() == studyId) {
                     return bean.getId();
                 } else {
-                    if (((StudyBean) new StudyDAO(dataSource).findByPK(bean.getStudyId())).getParentStudyId() == studyId) {
+                    if (((Study) studyDao.findByPK(bean.getStudyId())).checkAndGetParentStudyId() == studyId) {
                         return bean.getId();
                     }
                 }
@@ -1461,14 +1464,14 @@ public class DiscrepancyNoteUtil {
         return 0;
     }
 
-    public List<DiscrepancyNoteThread> createThreads(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource, StudyBean currentStudy) {
+    public List<DiscrepancyNoteThread> createThreads(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource, Study currentStudy) {
 
         List<DiscrepancyNoteThread> dnThreads = new ArrayList<DiscrepancyNoteThread>();
         if (allDiscNotes == null || allDiscNotes.isEmpty()) {
             return dnThreads;
         }
         if (currentStudy == null) {
-            currentStudy = new StudyBean();
+            currentStudy = new Study();
         }
 
         List<DiscrepancyNoteBean> childDiscBeans = new ArrayList<DiscrepancyNoteBean>();
@@ -1480,7 +1483,7 @@ public class DiscrepancyNoteUtil {
 
         for (DiscrepancyNoteBean discBean : allDiscNotes) {
             tempDNThread = new DiscrepancyNoteThread();
-            tempDNThread.setStudyId(currentStudy.getId());
+            tempDNThread.setStudyId(currentStudy.getStudyId());
 
             tempDNThread.getLinkedNoteList().addFirst(discBean);
             // childDiscBeans should be empty here

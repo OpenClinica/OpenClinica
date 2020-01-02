@@ -14,17 +14,19 @@ import java.util.UUID;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.UserType;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.SecurityManager;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author ssachs
@@ -69,10 +71,8 @@ public class EditUserAccountServlet extends SecureController {
     public static final String BUTTON_BACK_VALUE = "Back";
 
     public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
-
     private ArrayList getAllStudies() {
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        return (ArrayList) sdao.findAll();
+        return (ArrayList) getStudyDao().findAll();
     }
 
     public static String getLink(int userId) {

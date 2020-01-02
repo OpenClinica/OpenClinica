@@ -19,6 +19,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public class EnketoFormServlet extends SecureController {
         OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
 
         String mode = request.getParameter(MODE);
-        String originatingPage = request.getParameter(ORIGINATING_PAGE);
+        String originatingPage = StringEscapeUtils.escapeHtml(request.getParameter(ORIGINATING_PAGE));
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         int formLayoutId = Integer.valueOf(request.getParameter(FORM_LAYOUT_ID));
         int studyEventId = Integer.valueOf(request.getParameter(STUDY_EVENT_ID));
@@ -81,11 +82,11 @@ public class EnketoFormServlet extends SecureController {
         }
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(String.valueOf(ub.getId()));
-        subjectContext.setStudyOid((currentStudy.getOid()));
+        subjectContext.setStudyOid((currentStudy.getOc_oid()));
         subjectContext.setFormLoadMode(mode);
         contextHash = cache.putSubjectContext(subjectContext);
 
-        Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOid());
+        Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOc_oid());
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role role = currentRole.getRole();
         EventCrf eventCrf = null;
@@ -104,11 +105,6 @@ public class EnketoFormServlet extends SecureController {
 
         } else {
             eventCrf = eventCrfDao.findById(eventCrfId);
-            if(eventCrf!=null && !eventCrf.getFormLayout().getOcOid().equals(formLayout.getOcOid())) {
-                formLayout=eventCrf.getFormLayout();
-                subjectContext.setFormLayoutOid(eventCrf.getFormLayout().getOcOid());
-                contextHash = cache.putSubjectContext(subjectContext);
-            }
         }
         final EventCrf ec = eventCrf;
         if (eventCrfId != 0 || studyEvent != null) {

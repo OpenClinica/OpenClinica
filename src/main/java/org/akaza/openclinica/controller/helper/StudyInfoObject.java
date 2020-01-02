@@ -1,7 +1,6 @@
 package org.akaza.openclinica.controller.helper;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
 
 /**
@@ -17,9 +16,9 @@ public class StudyInfoObject {
         this.isUserUpdated = isUserUpdated;
     }
 
-    public StudyInfoObject(String schema, StudyBean study) {
+    public StudyInfoObject(String schema, Study study) {
         this.schema = schema;
-        this.studyBean = study;
+        this.study = study;
     }
 
     public String getSchema() {
@@ -38,17 +37,9 @@ public class StudyInfoObject {
         this.study = study;
     }
 
-    public StudyBean getStudyBean() {
-        return studyBean;
-    }
-
-    public void setStudyBean(StudyBean studyBean) {
-        this.studyBean = studyBean;
-    }
-
     private String schema;
     private Study study;
-    private StudyBean studyBean;
+
 
     public boolean isUserUpdated() {
         return isUserUpdated;

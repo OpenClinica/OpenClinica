@@ -25,7 +25,6 @@ import core.org.akaza.openclinica.bean.extract.ExportFormatBean;
 import core.org.akaza.openclinica.bean.extract.ExtractBean;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.ProcessingFunction;
 import core.org.akaza.openclinica.bean.service.ProcessingResultType;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -37,9 +36,10 @@ import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.hibernate.ArchivedDatasetFilePermissionTagDao;
 import core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTag;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -92,11 +92,11 @@ public class XsltTransformJob extends QuartzJobBean {
     private OpenClinicaMailSender mailSender;
     private GenerateExtractFileService generateFileService;
     private OdmFileCreation odmFileCreation;
-    private StudyDAO studyDao;
     private UserAccountDAO userAccountDao;
     private ArchivedDatasetFileDAO archivedDatasetFileDao;
     private AuditEventDAO auditEventDAO;
     private DatasetDAO datasetDao;
+    private StudyDao studyDao;
 
     @Autowired
     private PermissionService permissionService;
@@ -182,8 +182,8 @@ public class XsltTransformJob extends QuartzJobBean {
             long sysTimeBegin = System.currentTimeMillis();
             userBean = (UserAccountBean) userAccountDao.findByPK(userAccountId);
 
-            StudyBean currentStudy = (StudyBean) studyDao.findByPK(studyId);
-            StudyBean parentStudy = (StudyBean) studyDao.findByPK(currentStudy.getParentStudyId());
+            Study currentStudy = (Study) studyDao.findByPK(studyId);
+            Study parentStudy = (Study) studyDao.findByPK(currentStudy.checkAndGetParentStudyId());
             String successMsg = epBean.getSuccessMessage();
             String failureMsg = epBean.getFailureMessage();
             final long start = System.currentTimeMillis();
@@ -206,7 +206,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
             HashMap<String, Integer> answerMap =
                     odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
-                            currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
+                            currentStudy, "", eb, currentStudy.getStudyId(), currentStudy.checkAndGetParentStudyId(), "99",
                             (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType(),
                             userBean, odmFilter, permissionTagsString, permissionTagsStringArray, edcSet);
 
@@ -592,13 +592,13 @@ public class XsltTransformJob extends QuartzJobBean {
         try {
             ApplicationContext ctx = (ApplicationContext) scheduler.getContext().get("applicationContext");
             DataSource dataSource = ctx.getBean(DataSource.class);
+            studyDao = (StudyDao) ctx.getBean("studyDaoDomain");
             if (StringUtils.isEmpty(dataMap.getString(TENANT_SCHEMA))) CoreResources.tenantSchema.set(scheduler.getSchedulerName());
             else CoreResources.tenantSchema.set(dataMap.getString(TENANT_SCHEMA));
             mailSender = ctx.getBean(OpenClinicaMailSender.class);
             auditEventDAO = ctx.getBean(AuditEventDAO.class);
             datasetDao = ctx.getBean(DatasetDAO.class);
             userAccountDao = ctx.getBean(UserAccountDAO.class);
-            studyDao = new StudyDAO(dataSource);
             archivedDatasetFileDao = ctx.getBean(ArchivedDatasetFileDAO.class);
             generateFileService = ctx.getBean(GenerateExtractFileService.class);
             odmFileCreation = ctx.getBean(OdmFileCreation.class);

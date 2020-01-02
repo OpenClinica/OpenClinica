@@ -2,9 +2,9 @@ package core.org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
@@ -40,8 +40,6 @@ public class NotificationService  {
     String DB_CONNECTION_KEY = "dbConnection";
     private String sbsUrl = CoreResources.getField("SBSBaseUrl");
     @Autowired
-    private StudyDao studyDao;
-    @Autowired
     private Keycloak keycloak;
     DataSource ds;
 
@@ -51,7 +49,7 @@ public class NotificationService  {
         this.ds = ds;
     }
 
-    public ParticipantAccessDTO getAccessInfo(String accessToken, StudyBean studyBean, StudySubject studySubject,String userUuid) {
+    public ParticipantAccessDTO getAccessInfo(String accessToken, Study studyBean, StudySubject studySubject, String userUuid) {
         String accessCode = getAccessCode(accessToken,userUuid);
 
         if(accessCode==null) {
@@ -81,7 +79,7 @@ public class NotificationService  {
 
 
 
-    public List<ModuleConfigDTO> getParticipateModuleFromStudyService(String accessToken, StudyBean studyBean) {
+    public List<ModuleConfigDTO> getParticipateModuleFromStudyService(String accessToken, Study studyBean) {
         if (StringUtils.isEmpty(studyBean.getStudyUuid())) {
             // make call to study service to get study uuid
             StudyEnvironmentDTO studyEnvironmentDTO = getStudyUuidFromStudyService(accessToken, studyBean);
@@ -112,7 +110,7 @@ public class NotificationService  {
         return response.getBody();
     }
 
-    public StudyEnvironmentDTO getStudyUuidFromStudyService(String accessToken, StudyBean studyBean) {
+    public StudyEnvironmentDTO getStudyUuidFromStudyService(String accessToken, Study studyBean) {
 
         String appendUrl = "/study-service/api/study-environments/" + studyBean.getStudyEnvUuid();
         String uri = sbsUrl + appendUrl;
@@ -134,7 +132,7 @@ public class NotificationService  {
         return response.getBody();
     }
 
-    public ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, StudyBean studyBean) {
+    public ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study studyBean) {
         for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
             if (moduleConfigDTO.getStudyUuid().equals(studyBean.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(PARTICIPATE)) {
                 logger.info("ModuleConfigDTO  is :" + moduleConfigDTO);
@@ -144,7 +142,7 @@ public class NotificationService  {
         logger.info("ModuleConfigDTO  is null");
         return null;
     }
-    public ModuleConfigAttributeDTO getModuleConfigAttribute(Set<ModuleConfigAttributeDTO> moduleConfigAttributeDTOs, StudyBean studyBean) {
+    public ModuleConfigAttributeDTO getModuleConfigAttribute(Set<ModuleConfigAttributeDTO> moduleConfigAttributeDTOs, Study studyBean) {
         for (ModuleConfigAttributeDTO moduleConfigAttributeDTO : moduleConfigAttributeDTOs) {
             if (moduleConfigAttributeDTO.getStudyEnvironmentUuid().equals(studyBean.getStudyEnvUuid())) {
                 logger.info("ModuleConfigAttributeDTO  is :" + moduleConfigAttributeDTO);
@@ -166,7 +164,6 @@ public class NotificationService  {
         UserRepresentation userRepresentation = userResource.toRepresentation();
         Map<String, List<String>> attributes =  userRepresentation.getAttributes();
         List<String> accessCodes = attributes.get(ACCESS_CODE_ATTRIBUTE);
-        logger.info("Access Code : {}",accessCodes.get(0));
         return accessCodes.get(0);
     }
 
@@ -184,7 +181,7 @@ public class NotificationService  {
         objectMapper.registerModule(new JavaTimeModule());
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
-        StudyBean studyBean = null;
+        Study studyBean = null;
         HttpEntity entity = new HttpEntity<OCUserDTO>(headers);
         ResponseEntity<List<String>> response = null;
 

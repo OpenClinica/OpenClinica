@@ -8,14 +8,14 @@
 package core.org.akaza.openclinica.dao.service;
 
 import core.org.akaza.openclinica.bean.core.EntityBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
-import core.org.akaza.openclinica.bean.service.StudyParameter;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyParameter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -104,6 +104,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         // overridable bool,
         StudyParameter sp = new StudyParameter();
         // super.setEntityAuditInformation(spvb, hm);
+        sp.setStudyParameterId(((Integer) hm.get("study_parameter_id")).intValue());
         sp.setId(((Integer) hm.get("study_parameter_id")).intValue());
         sp.setHandle((String) hm.get("handle"));
         sp.setName((String) hm.get("name"));
@@ -168,7 +169,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
 
     public StudyParameter findParameterByHandle(String handle) {
         StudyParameter sp = new StudyParameter();
-        this.setTypesExpected();
+        this.setTypesExpectedForParameter();
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), handle);
@@ -178,7 +179,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {
-            sp = (StudyParameter) this.getEntityFromHashMap((HashMap) it.next());
+            sp = (StudyParameter) this.getParameterEntityFromHashMap((HashMap) it.next());
         }
         return sp;
 
@@ -202,10 +203,10 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         return al;
     }
 
-    public ArrayList findAllParameterValuesByStudy(StudyBean study) {
+    public ArrayList findAllParameterValuesByStudy(Study study) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(study.getId()));
+        variables.put(new Integer(1), new Integer(study.getStudyId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllParameterValuesByStudy"), variables);
         ArrayList al = new ArrayList();
@@ -217,7 +218,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         return al;
     }
 
-    public ArrayList findParamConfigByStudy(StudyBean study) {
+    public ArrayList findParamConfigByStudy(Study study) {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.INT);
@@ -231,7 +232,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
         this.setTypeExpected(10, TypeNames.BOOL);
         this.setTypeExpected(11, TypeNames.BOOL);
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(study.getId()));
+        variables.put(new Integer(1), new Integer(study.getStudyId()));
 
         ArrayList alist = this.select(digester.getQuery("findParamConfigByStudy"), variables);
         ArrayList al = new ArrayList();
@@ -244,6 +245,7 @@ public class StudyParameterValueDAO extends AuditableEntityDAO {
             spvb.setId(((Integer) hm.get("study_parameter_value_id")).intValue());
 
             StudyParameter sp = new StudyParameter();
+            sp.setStudyParameterId(((Integer) hm.get("study_parameter_id")).intValue());
             sp.setId(((Integer) hm.get("study_parameter_id")).intValue());
             sp.setHandle((String) hm.get("handle"));
             sp.setName((String) hm.get("name"));

@@ -5,15 +5,16 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
@@ -37,6 +38,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -63,7 +65,11 @@ import java.util.*;
  *
  * @author jnyayapathi
  */
-public abstract class CoreSecureController extends HttpServlet {
+public abstract class CoreSecureController extends SecureController {
+
+
+    @Autowired
+    private StudyBuildService studyBuildService;
 
     public static final String PAGE_MESSAGE = "pageMessages";// for showing
     public static final String INPUT_MESSAGES = "formMessages"; // for showing
@@ -280,7 +286,7 @@ public abstract class CoreSecureController extends HttpServlet {
         }
 
         UserAccountBean ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-        StudyBean currentStudy = (StudyBean) session.getAttribute("publicStudy");
+        Study currentStudy = (Study) session.getAttribute("publicStudy");
         StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
         // Set current language preferences
@@ -317,26 +323,9 @@ public abstract class CoreSecureController extends HttpServlet {
             request.getSession().setAttribute("sm", sm);
             session.setAttribute("userBean", ub);
 
-            StudyDAO sdao = new StudyDAO(getDataSource());
-            if (currentStudy == null || currentStudy.getId() <= 0) {
+            if (currentStudy == null || currentStudy.getStudyId() <= 0) {
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
-                    StudyParameterValueDAO spvdao = new StudyParameterValueDAO(getDataSource());
-                    currentStudy = (StudyBean) sdao.findByPK(ub.getActiveStudyId());
-
-                    ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
-
-                    currentStudy.setStudyParameters(studyParameters);
-
-                    StudyConfigService scs = new StudyConfigService(getDataSource());
-                    if (currentStudy.getParentStudyId() <= 0) {// top study
-                        scs.setParametersForStudy(currentStudy);
-
-                    } else {
-                        // YW <<
-                        currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
-                        // YW >>
-                        scs.setParametersForSite(currentStudy);
-                    }
+                    currentStudy = (Study) getStudyDao().findByPK(ub.getActiveStudyId());
 
                     // set up the panel here, tbh
                     panel.reset();
@@ -352,21 +341,14 @@ public abstract class CoreSecureController extends HttpServlet {
                      */
                     session.setAttribute(STUDY_INFO_PANEL, panel);
                 } else {
-                    currentStudy = new StudyBean();
+                    currentStudy = new Study();
                 }
                 session.setAttribute("publicStudy",
                         currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
                 request.setAttribute("requestSchema", currentStudy.getSchemaName());
-                StudyBean currentTenantStudy = (StudyBean) sdao.findByUniqueIdentifier(currentStudy.getIdentifier());
+                Study currentTenantStudy = (Study) getStudyDao().findByUniqueId(currentStudy.getUniqueIdentifier());
                 request.setAttribute("requestSchema", "public");
                 session.setAttribute("study", currentTenantStudy);
-            } else if (currentStudy.getId() > 0) {
-                // YW 06-20-2007<< set site's parentstudy name when site is
-                // restored
-                if (currentStudy.getParentStudyId() > 0) {
-                    currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
-                }
-                // YW >>
             }
 
 
@@ -374,12 +356,12 @@ public abstract class CoreSecureController extends HttpServlet {
                 // if (ub.getId() > 0 && currentStudy.getId() > 0) {
                 // if current study has been "removed", current role will be
                 // kept as "invalid" -- YW 06-21-2007
-                if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
-                    currentRole = ub.getRoleByStudy(currentStudy.getId());
-                    if (currentStudy.getParentStudyId() > 0) {
+                if (ub.getId() > 0 && currentStudy != null && currentStudy.getStudyId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
+                    currentRole = ub.getRoleByStudy(currentStudy.getStudyId());
+                    if (currentStudy.isSite()) {
                         // Checking if currentStudy has been removed or not will
                         // ge good enough -- YW 10-17-2007
-                        StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentStudy.getParentStudyId());
+                        StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentStudy.getStudy().getStudyId());
                         // inherited role from parent study, pick the higher
                         // role
                         currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
@@ -397,9 +379,9 @@ public abstract class CoreSecureController extends HttpServlet {
                 currentRole.setStatus(Status.DELETED);
                 session.setAttribute("userRole", currentRole);
             }
-            StudyBean userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), dataSource);
+            Study userRoleStudy = getStudyBuildService().getPublicStudy(currentRole.getStudyId());
 
-            if (userRoleStudy.getParentStudyId() > 0) {
+            if (userRoleStudy.isSite()) {
                 /*
                  * The Role decription will be set depending on whether the user
                  * logged in at study lever or site level. issue-2422
@@ -712,20 +694,19 @@ public abstract class CoreSecureController extends HttpServlet {
      * @author ywang 10-18-2007
      */
     protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao, DataSource ds) {
-        StudyDAO sdao = new StudyDAO(ds);
         HttpServletRequest request = CoreResources.getRequest();
         HttpSession session = request.getSession();
         if (session == null)
             return false;
-        StudyBean publicStudy = (StudyBean) session.getAttribute("publicStudy");
-        StudyBean schemaStudy = sdao.findByOid(publicStudy.getOid());
+        Study publicStudy = (Study) session.getAttribute("publicStudy");
+        Study schemaStudy = getStudyDao().findByOcOID(publicStudy.getOc_oid());
         if (adao.findByPKAndStudy(entityId, schemaStudy).getId() > 0) {
             return true;
         }
         // Here follow the current logic - study subjects at sites level are
         // visible to parent studies.
-        if (schemaStudy.getParentStudyId() <= 0) {
-            ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(schemaStudy.getId());
+        if (!schemaStudy.isSite()) {
+            ArrayList<Study> sites = (ArrayList<Study>) getStudyDao().findAllByParent(schemaStudy.getStudyId());
             if (sites.size() > 0) {
                 for (int j = 0; j < sites.size(); ++j) {
                     if (adao.findByPKAndStudy(entityId, sites.get(j)).getId() > 0) {
@@ -757,7 +738,7 @@ public abstract class CoreSecureController extends HttpServlet {
      * To check if the current study is LOCKED
      */
     public void checkStudyLocked(Page page, String message, HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         if (currentStudy.getStatus().equals(Status.LOCKED)) {
             addPageMessage(message, request);
             forwardPage(page, request, response);
@@ -766,7 +747,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
     public void checkStudyLocked(String url, String message, HttpServletRequest request, HttpServletResponse response) {
 
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         try {
             if (currentStudy.getStatus().equals(Status.LOCKED)) {
                 addPageMessage(message, request);
@@ -782,7 +763,7 @@ public abstract class CoreSecureController extends HttpServlet {
      */
 
     public void checkStudyFrozen(Page page, String message, HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         if (currentStudy.getStatus().equals(Status.FROZEN)) {
             addPageMessage(message, request);
             forwardPage(page, request, response);
@@ -790,7 +771,7 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     public void checkStudyFrozen(String url, String message, HttpServletRequest request, HttpServletResponse response) {
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         try {
             if (currentStudy.getStatus().equals(Status.FROZEN)) {
                 addPageMessage(message, request);
@@ -803,33 +784,29 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     public ArrayList getEventDefinitionsByCurrentStudy(HttpServletRequest request) {
-        StudyDAO studyDAO = new StudyDAO(getDataSource());
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(getDataSource());
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        int parentStudyId = currentStudy.getParentStudyId();
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         ArrayList allDefs = new ArrayList();
-        if (parentStudyId > 0) {
-            StudyBean parentStudy = (StudyBean) studyDAO.findByPK(parentStudyId);
+        if (currentStudy.isSite()) {
+            Study parentStudy = currentStudy.getStudy();
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(parentStudy);
         } else {
-            parentStudyId = currentStudy.getId();
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(currentStudy);
         }
         return allDefs;
     }
 
     public ArrayList getStudyGroupClassesByCurrentStudy(HttpServletRequest request) {
-        StudyDAO studyDAO = new StudyDAO(getDataSource());
         StudyGroupClassDAO studyGroupClassDAO = new StudyGroupClassDAO(getDataSource());
         StudyGroupDAO studyGroupDAO = new StudyGroupDAO(getDataSource());
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        int parentStudyId = currentStudy.getParentStudyId();
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
+        int parentStudyId = 0;
         ArrayList studyGroupClasses = new ArrayList();
-        if (parentStudyId > 0) {
-            StudyBean parentStudy = (StudyBean) studyDAO.findByPK(parentStudyId);
+        if (currentStudy.isSite()) {
+            Study parentStudy = currentStudy.getStudy();
             studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(parentStudy);
         } else {
-            parentStudyId = currentStudy.getId();
+            parentStudyId = currentStudy.getStudyId();
             studyGroupClasses = studyGroupClassDAO.findAllActiveByStudy(currentStudy);
         }
 

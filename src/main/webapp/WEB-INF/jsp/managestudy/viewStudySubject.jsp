@@ -8,13 +8,6 @@
 <jsp:include page="../include/submit-header.jsp"/>
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <script type="text/javascript">
   function onInvokeAction(id,action) {
       if(id.indexOf('findSubjects') == -1)  {
@@ -40,7 +33,7 @@
   });
 </script>
 <script type="text/javascript" language="javascript">
-  function studySubjectResource()  { return "${study.oid}/${studySub.oid}"; }
+  function studySubjectResource()  { return "${study.oc_oid}/${studySub.oid}"; }
   
   function checkCRFLocked(ecId, url){
       jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
@@ -64,10 +57,10 @@
   }
 </script>
 <script>
-  var studyKey = '/study.oid';
+  var studyKey = '/study.oc_oid';
   var participantKey = '/views/participants/';
 
-  if (sessionStorage.getItem(studyKey) !== '${study.oid}') {
+  if (sessionStorage.getItem(studyKey) !== '${study.oc_oid}') {
     function isParticipantData(key) {
         return key.lastIndexOf(participantKey, 0) === 0;
     }
@@ -79,7 +72,7 @@
       if (isParticipantData(key))
         sessionStorage.removeItem(key);
     });
-    sessionStorage.setItem(studyKey, '${study.oid}');
+    sessionStorage.setItem(studyKey, '${study.oc_oid}');
   }
   function store(callback) {
     if (callback)
@@ -90,7 +83,7 @@
         sessionStorage.setItem(store.key, JSON.stringify(store.data));
         if (
           store.data.ocStatusHide !== 'oc-status-removed' ||
-          store.data.datatables.some(function(state) {return canReset(state)}) ||
+          canResetAny(store.data.datatables) ||
           $('#studySubjectRecord.collapsed, #subjectEvents.collapsed, #commonEvents>.expanded').length
         )
           $('#reset-all-filters').removeClass('invisible');
@@ -103,7 +96,7 @@
   store.key = participantKey + '${studySub.oid}';
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     collapseSections: {},
-    datatables: [],
+    datatables: {},
     ocStatusHide: 'oc-status-removed'
   };
   store.dirty = false;
@@ -115,6 +108,14 @@
         || state.search.search !== '' 
         || state.start > 0
         || state.length > defaultPageSize;
+  }
+
+  function canResetAny(states) {
+    for (var key in states) {
+      if (canReset(states[key]))
+        return true;
+    }
+    return false;
   }
 
   function resetAllFilters() {
@@ -153,10 +154,14 @@
   }
 
   function showSection(position, selector) {
-    var $el = $(selector);
-    if (store.data.collapseSections[position])
-      $el.toggleClass('expanded collapsed').children('.section-body').hide();
-    $el.removeClass('hide');
+    var section = $(selector);
+    var shouldCollapse = store.data.collapseSections[position];
+    if (shouldCollapse === undefined)
+      shouldCollapse = position > 1;
+    if (shouldCollapse) {
+      section.children('.section-header').click();
+    }
+    section.removeClass('hide');
   }
 
   function clickAllSections(selector) {
@@ -351,7 +356,7 @@
         <tr id="general-actions">
           <!-- Table Tools/Actions cell -->
           <td>
-           <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
+           <c:if test="${(study.subjectIdGeneration=='manual' || userRole.coordinator) && study.status.available}">
               <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
                 <fmt:message key="edit" bundle="${resword}"/>
               </a>
@@ -418,13 +423,13 @@
                                     </td>
                                     <td class="table_cell">
                                       <c:choose>
-                                        <c:when test="${subjectStudy.parentStudyId>0}">
-                                          <a href="ViewStudy?id=<c:out value="${parentStudy.id}"/>&amp;viewFull=yes">
+                                        <c:when test="${subjectStudy.study != null && subjectStudy.study.studyId>0}">
+                                          <a href="ViewStudy?id=<c:out value="${parentStudy.studyId}"/>&amp;viewFull=yes">
                                             <c:out value="${parentStudy.name}"/>
                                           </a>
                                         </c:when>
                                         <c:otherwise>
-                                          <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>&amp;viewFull=yes">
+                                          <a href="ViewStudy?id=<c:out value="${subjectStudy.studyId}"/>&amp;viewFull=yes">
                                             <c:out value="${subjectStudy.name}"/>
                                           </a>
                                         </c:otherwise>
@@ -434,8 +439,8 @@
                                       <fmt:message key="site_name" bundle="${resword}"/>
                                     </td>
                                     <td class="table_cell">
-                                      <c:if test="${subjectStudy.parentStudyId>0}">
-                                        <a href="ViewSite?id=<c:out value="${subjectStudy.id}"/>">
+                                      <c:if test="${subjectStudy.study != null && subjectStudy.study.studyId>0}">
+                                        <a href="ViewSite?id=<c:out value="${subjectStudy.studyId}"/>">
                                           <c:out value="${subjectStudy.name}"/>
                                         </a>
                                       </c:if>
@@ -783,7 +788,7 @@
                                   <td class="table_header_row">
                                     <fmt:message key="person_ID" bundle="${resword}"/>
                                     <%-- DN for person ID goes here --%>
-                                    <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                    <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                       <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasUniqueIDNote eq 'yes'}">
@@ -819,11 +824,11 @@
                                     <c:out value="${studySub.secondaryLabel}"/>
                                   </td>
                                   <c:choose>
-                                    <c:when test="${subjectStudy.studyParameterConfig.collectDob == '1'}">
+                                    <c:when test="${subjectStudy.collectDob == '1'}">
                                       <td class="table_header_row">
                                         <fmt:message key="date_of_birth" bundle="${resword}"/>
                                         <%-- DN for DOB goes here --%>
-                                        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                        <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
@@ -851,11 +856,11 @@
                                         <fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/>
                                       </td>
                                     </c:when>
-                                    <c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
+                                    <c:when test="${subjectStudy.collectDob == '3'}">
                                       <td class="table_header_row">
                                         <fmt:message key="date_of_birth" bundle="${resword}"/>
                                         <%-- DN for DOB goes here --%>
-                                        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                        <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
@@ -887,7 +892,7 @@
                                       <td class="table_header_row">
                                         <fmt:message key="year_of_birth" bundle="${resword}"/>
                                         <%-- DN for DOB goes here --%>
-                                        <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                        <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
@@ -927,7 +932,7 @@
                                   <td class="table_header_row">
                                     <fmt:message key="gender" bundle="${resword}"/>
                                     <%-- DN for Gender goes here --%>
-                                    <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                    <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                       <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasGenderNote eq 'yes'}">
@@ -976,7 +981,7 @@
                                     <fmt:message key="enrollment_date" bundle="${resword}"/>
                                     &nbsp;
                                     <%-- DN for enrollment date goes here --%>
-                                    <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                    <c:if test="${subjectStudy.discrepancyManagement=='true' && !study.status.locked}">
                                       <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasEnrollmentNote eq 'yes'}">
@@ -1014,13 +1019,13 @@
                                   </td>
                                   <td class="table_cell_top">
                                     <c:choose>
-                                      <c:when test="${subjectStudy.parentStudyId>0}">
-                                        <a href="ViewStudy?id=<c:out value="${parentStudy.id}"/>&amp;viewFull=yes">
+                                      <c:when test="${subjectStudy.study != null && subjectStudy.study.studyId>0}">
+                                        <a href="ViewStudy?id=<c:out value="${parentStudy.studyId}"/>&amp;viewFull=yes">
                                           <c:out value="${parentStudy.name}"/>
                                         </a>
                                       </c:when>
                                       <c:otherwise>
-                                        <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>&amp;viewFull=yes">
+                                        <a href="ViewStudy?id=<c:out value="${subjectStudy.studyId}"/>&amp;viewFull=yes">
                                           <c:out value="${subjectStudy.name}"/>
                                         </a>
                                       </c:otherwise>
@@ -1030,8 +1035,8 @@
                                     <fmt:message key="site_name" bundle="${resword}"/>
                                   </td>
                                   <td class="table_cell_top">
-                                    <c:if test="${subjectStudy.parentStudyId>0}">
-                                      <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>">
+                                    <c:if test="${subjectStudy.study != null && subjectStudy.study.studyId>0}">
+                                      <a href="ViewStudy?id=<c:out value="${subjectStudy.studyId}"/>">
                                         <c:out value="${subjectStudy.name}"/>
                                       </a>
                                     </c:if>
@@ -1124,7 +1129,7 @@
                                             <td valign="top">
                                                 <div class="formfieldXL_BG">
                                                     <c:choose>
-                                                        <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+                                                        <c:when test="${study.subjectIdGeneration =='auto non-editable' && !userRole.coordinator}">
                                                             <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45"
                                                                    class="formfield form-control" disabled>
                                                             <input class="form-control" type="hidden" name="label" value="<c:out value="${label}"/>">
@@ -1737,7 +1742,7 @@
     function getAccessCode(includeAccessCode) {
         jQuery.ajax({
             type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?includeAccessCode='+includeAccessCode,
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink?includeAccessCode='+includeAccessCode,
             success: function(data) {
                 $('#access-code-input').val(data.accessCode !=null ? data.accessCode:"loading...");
                 $('#access-url').text(data.host);
@@ -1752,7 +1757,7 @@
         if ($('#contactInformation, #partid-edit').length) {
             jQuery.ajax({
                 type: 'get',
-                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${esc.escapeJavaScript(studySub.label)}',
                 success: updateParticipateInfo,
                 error: logDump
             });
@@ -1794,7 +1799,7 @@
             }
             jQuery.ajax({
                 type: 'post',
-                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(data) {

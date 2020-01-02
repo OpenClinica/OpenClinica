@@ -22,9 +22,6 @@ public class OpenRosaSubmissionService {
     private SubmissionProcessorChain submissionProcessorChain;
 
     @Autowired
-    private StudyDao studyDao;
-
-    @Autowired
     private CrfVersionDao crfVersionDao;
 
     @Transactional

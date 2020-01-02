@@ -14,11 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import core.org.akaza.openclinica.domain.Status;
 import freemarker.template.TemplateException;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.UserType;
 import core.org.akaza.openclinica.bean.login.EventDefinitionDTO;
 import core.org.akaza.openclinica.bean.login.FacilityInfo;
@@ -30,9 +30,8 @@ import core.org.akaza.openclinica.bean.login.StudyDTO;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.login.UserRole;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.dto.ParticipantIdModel;
 import org.akaza.openclinica.controller.dto.ParticipantIdVariable;
@@ -47,7 +46,6 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyParameterDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyEnvEnum;
@@ -82,7 +80,6 @@ public class StudyController {
     @Autowired
     UserAccountController userAccountController;
     UserAccountDAO udao;
-    StudyDAO sdao;
     StudyEventDefinitionDAO seddao;
     @Autowired
     @Qualifier("dataSource")
@@ -103,6 +100,16 @@ public class StudyController {
     StudyParameterDao studyParameterDao;
     @Autowired
     private Configuration freemarkerConfiguration;
+
+    public StudyController(StudyDao studyDao) {
+        this.studyDao = studyDao;
+    }
+    private final String RANDOM="random number";
+    private final String HELPER_RANDOM="helper.random";
+
+    private final String SITE_PARTICIPANT_COUNT="siteParticipantCount";
+    private final String SITE_ID="siteId";
+
 
     private enum SiteSaveCheck {
         CHECK_UNIQUE_SAVE(0), CHECK_UNIQUE_UPDATE(1), NO_CHECK(2);
@@ -207,12 +214,11 @@ public class StudyController {
             return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
         }
         // Get public study
-        StudyDAO studyDAO = new StudyDAO(dataSource);
-        StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        Study currentPublicStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
         // Get tenant study
         String tenantSchema = currentPublicStudy.getSchemaName();
         CoreResources.setRequestSchema(request, tenantSchema);
-        StudyBean currentStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        Study currentStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
         // Validate study exists
         if (currentPublicStudy == null || currentStudy == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing or invalid", "studyEnvUuid");
@@ -236,7 +242,10 @@ public class StudyController {
         }
         CoreResources.setRequestSchema(request, tenantSchema);
         // Get Status object from requestDTO
-        Status status = getStatus((String) requestDTO.get("status"));
+        String statusValue =  (String) requestDTO.get("status");
+        if (statusValue != null)
+            statusValue = statusValue.equals("DESIGN") ? "PENDING" : statusValue;
+        Status status = getStatus(statusValue);
         // Validate status field
         if (status == null ) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "status");
@@ -253,29 +262,29 @@ public class StudyController {
 
 
         // Update tenant study & sites
-        currentStudy.setOldStatus(currentStudy.getStatus());
+        currentStudy.setOldStatusId(currentStudy.getStatus().getCode());
         currentStudy.setStatus(status);
-        studyDAO.updateStudyStatus(currentStudy);
-        ArrayList siteList = (ArrayList) studyDAO.findAllByParent(currentStudy.getId());
+        studyDao.updateStudyStatus(currentStudy);
+        ArrayList siteList = (ArrayList) studyDao.findAllByParent(currentStudy.getStudyId());
         if (siteList.size() > 0) {
-            studyDAO.updateSitesStatus(currentStudy);
+            studyDao.updateSitesStatus(currentStudy);
         }
 
         // Update public study & sites
         CoreResources.setRequestSchema(request, "public");
-        currentPublicStudy.setOldStatus(currentPublicStudy.getStatus());
+        currentPublicStudy.setOldStatusId(currentPublicStudy.getStatus().getCode());
         currentPublicStudy.setStatus(status);
-        studyDAO.updateStudyStatus(currentPublicStudy);
-        ArrayList publicSiteList = (ArrayList) studyDAO.findAllByParent(currentPublicStudy.getId());
+        studyDao.updateStudyStatus(currentPublicStudy);
+        ArrayList publicSiteList = (ArrayList) studyDao.findAllByParent(currentPublicStudy.getStudyId());
         if (publicSiteList.size() > 0) {
-            studyDAO.updateSitesStatus(currentPublicStudy);
+            studyDao.updateSitesStatus(currentPublicStudy);
         }
 
         StudyEnvStatusDTO studyEnvStatusDTO = new StudyEnvStatusDTO();
         studyEnvStatusDTO.setStudyEnvUuid(currentPublicStudy.getStudyEnvUuid());
         studyEnvStatusDTO.setStatus(currentPublicStudy.getStatus().getName());
-        ArrayList updatedPublicSiteList = (ArrayList) studyDAO.findAllByParent(currentPublicStudy.getId());
-        for(StudyBean site:  (ArrayList<StudyBean>)updatedPublicSiteList){
+        ArrayList updatedPublicSiteList = (ArrayList) studyDao.findAllByParent(currentPublicStudy.getStudyId());
+        for(Study site:  (ArrayList<Study>)updatedPublicSiteList){
             SiteStatusDTO siteStatusDTO = new SiteStatusDTO();
             siteStatusDTO.setSiteUuid(site.getStudyEnvSiteUuid());
             siteStatusDTO.setStatus(site.getStatus().getName());
@@ -285,44 +294,95 @@ public class StudyController {
         return  new ResponseEntity(studyEnvStatusDTO, org.springframework.http.HttpStatus.OK);
     }
 
-    private StudyParameterConfig processStudyConfigParameters(HashMap<String, Object> map, ArrayList<ErrorObj> errorObjects , String templateID) {
-        StudyParameterConfig spc = new StudyParameterConfig();
+    private List<StudyParameterValue> processStudyParameterValues(HashMap<String, Object> map, ArrayList<ErrorObj> errorObjects , String templateID) {
+        List<StudyParameterValue> studyParameterValues = new ArrayList<>();
         String collectBirthDate = (String) map.get("collectDateOfBirth");
         Boolean collectSex = (Boolean) map.get("collectSex");
         String collectPersonId = (String) map.get("collectPersonId");
         Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
         String enforceEnrollmentCap =  String.valueOf(map.get("enforceEnrollmentCap"));
+        if (templateID != null && !StringUtils.isEmpty(templateID)) {
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "auto non-editable"));
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, templateID));
+        }
+        else {
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "manual"));
+        }
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.DISCREPANCY_MANAGEMENT, "true"));
+
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_REQUIRED, "not_used"));
+
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEWER_NAME_EDITABLE, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_REQUIRED, "not_used"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_DEFAULT, "blank"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.INTERVIEW_DATE_EDITABLE, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_PREFIX_SUFFIX, "true"));
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PERSON_ID_SHOWN_ON_CRF, "false"));
+
+
         if (collectBirthDate == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.COLLECT_DOB, "3"));
         } else {
             collectBirthDate = collectBirthDate.trim();
         }
-        spc.setCollectDob(collectBirthDate);
+        if (StringUtils.isEmpty(collectBirthDate)) {
+            collectBirthDate ="3";
+        } else {
+            switch (collectBirthDate.toLowerCase()) {
+                case "always":
+                    collectBirthDate  = "1";
+                    break;
+                case "only_the_year":
+                    collectBirthDate = "2";
+                    break;
+                default:
+                    collectBirthDate = "3";
+                    break;
+            }
+        }
+        studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.COLLECT_DOB, collectBirthDate));
+
         if (collectSex == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectSex");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.GENDER_REQUIRED, "true"));
         }
-        spc.setGenderRequired(Boolean.toString(collectSex));
+        else
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.GENDER_REQUIRED, Boolean.toString(collectSex)));
         if (collectPersonId == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectPersonId");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, "required"));
         } else {
             collectPersonId = collectPersonId.trim();
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_PERSON_ID_REQUIRED, collectPersonId));
         }
-        spc.setSubjectPersonIdRequired(collectPersonId);
+
         if (showSecondaryId == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "ShowSecondaryId");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, "false"));
         }
-        spc.setSecondaryLabelViewable(Boolean.toString(showSecondaryId));
+        else
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SECONDARY_LABEL_VIEWABLE, Boolean.toString(showSecondaryId)));
         if (enforceEnrollmentCap == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "EnforceEnrollmentCap");
             errorObjects.add(errorObject);
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, "false"));
         }
-        spc.setEnforceEnrollmentCap(enforceEnrollmentCap);
+        else
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, enforceEnrollmentCap));
 
-        return spc;
+        return studyParameterValues;
+    }
+    public StudyParameterValue createStudyParameterValueWithHandleAndValue(String handle, String parameterValue){
+        StudyParameterValue spv = new StudyParameterValue();
+        StudyParameter parameter = studyParameterDao.findByHandle(handle);
+        spv.setStudyParameter(parameter);
+        spv.setValue(parameterValue);
+        return  spv;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
@@ -355,7 +415,7 @@ public class StudyController {
         CoreResources.setRequestSchema(request, schema);
         Study schemaStudy = studyDao.findByStudyEnvUuid(existingStudy.getStudyEnvUuid());
         setChangeableStudySettings(schemaStudy, parameters);
-        updateStudyConfigParameters(request, schemaStudy, parameters.studyParameterConfig,parameters.templateID , parameters.enrollmentCap);
+        updateStudyConfigParameters(request, schemaStudy, parameters.studyParameterValues, parameters.templateID , parameters.enrollmentCap);
 
         ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
         responseSuccess.setMessage(validation_passed_message);
@@ -381,7 +441,7 @@ public class StudyController {
         Integer expectedTotalEnrollment;
         Date startDate;
         Date endDate;
-        StudyParameterConfig studyParameterConfig;
+        List<StudyParameterValue> studyParameterValues;
         core.org.akaza.openclinica.domain.Status status;
         String templateID;
         Boolean enrollmentCap;
@@ -416,7 +476,7 @@ public class StudyController {
 
             if (myStatus != null) {
                 myStatus = myStatus.equals("DESIGN") ? "PENDING" : myStatus;
-                statusObj = core.org.akaza.openclinica.domain.Status.getByName(myStatus);
+                statusObj = core.org.akaza.openclinica.domain.Status.getByName(myStatus.toLowerCase());
             }
             return statusObj;
         }
@@ -504,8 +564,7 @@ public class StudyController {
                 errorObjects.add(errorObject);
             }
 
-
-            studyParameterConfig = processStudyConfigParameters(map, errorObjects , templateID);
+            studyParameterValues = processStudyParameterValues(map, errorObjects, templateID);
             Locale locale = new Locale("en_US");
             request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
             ResourceBundleProvider.updateLocale(locale);
@@ -606,7 +665,7 @@ public class StudyController {
             return getResponseSuccess(byOidEnvType);
         }
         Study schemaStudy = createSchemaStudy(request, study, ownerUserAccount);
-        setStudyConfigParameters(request, study, schemaStudy, parameters.studyParameterConfig , parameters.templateID);
+        setStudyParameterValuesToTheStudy(request, study, schemaStudy, parameters.studyParameterValues , parameters.templateID);
         logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 
         if (errorObjects != null && errorObjects.size() != 0) {
@@ -668,75 +727,22 @@ public class StudyController {
         return schemaStudy;
     }
 
-    private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, StudyParameterConfig studyParameterConfig , String templateID ,Boolean enrollmentCap) {
-        List<StudyParameterValue> studyParameterValues = schemaStudy.getStudyParameterValues();
+    private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, List<StudyParameterValue> newStudyParameterValues, String templateID ,Boolean enrollmentCap) {
 
-        addParameterValue(studyParameterValues, templateID, schemaStudy, "participantIdTemplate");
-        addParameterValue(studyParameterValues, enrollmentCap.toString(), schemaStudy, "enforceEnrollmentCap");
+        addParameterValue( templateID, schemaStudy, StudyParamNames.PARTICIPANT_ID_TEMPLATE);
+        addParameterValue( enrollmentCap.toString(), schemaStudy, StudyParamNames.ENFORCE_ENROLLMENT_CAP);
 
-
-        for (StudyParameterValue spv : studyParameterValues) {
-            switch (spv.getStudyParameter().getHandle()) {
-                case "collectDob":
-                    String collectDobValue;
-                    if (StringUtils.isEmpty(studyParameterConfig.getCollectDob())) {
-                        collectDobValue = "3";
-                    } else {
-                        switch (studyParameterConfig.getCollectDob().toLowerCase()) {
-                            case "always":
-                                collectDobValue = "1";
-                                break;
-                            case "only_the_year":
-                                collectDobValue = "2";
-                                break;
-                            default:
-                                collectDobValue = "3";
-                                break;
-                        }
-                    }
-                    spv.setValue(collectDobValue);
-                    break;
-                case "discrepancyManagement":
-                    spv.setValue(studyParameterConfig.getDiscrepancyManagement());
-                    break;
-                case "genderRequired":
-                    spv.setValue(studyParameterConfig.getGenderRequired());
-                    break;
-                case "subjectPersonIdRequired":
-                    spv.setValue(handlePersonIdRequired(studyParameterConfig.getSubjectPersonIdRequired()));
-                    break;
-                case "interviewerNameRequired":
-                    spv.setValue(studyParameterConfig.getInterviewerNameRequired());
-                    break;
-                case "interviewerNameEditable":
-                    spv.setValue(studyParameterConfig.getInterviewerNameEditable());
-                    break;
-                case "interviewDateRequired":
-                    spv.setValue(studyParameterConfig.getInterviewDateRequired());
-                    break;
-                case "interviewDateDefault":
-                    spv.setValue(studyParameterConfig.getInterviewDateDefault());
-                    break;
-                case "interviewDateEditable":
-                    spv.setValue(studyParameterConfig.getInterviewDateEditable());
-                    break;
-                case "subjectIdGeneration":
-                    if (templateID != null && !StringUtils.isEmpty(templateID)) {
-                        spv.setValue("auto non-editable");
-                    } else {
-                        spv.setValue(studyParameterConfig.getSubjectIdGeneration());
-                    }
-                    break;
-                case "subjectIdPrefixSuffix":
-                    spv.setValue(studyParameterConfig.getSubjectIdPrefixSuffix());
-                    break;
-                case "personIdShownOnCRF":
-                    spv.setValue(studyParameterConfig.getPersonIdShownOnCRF());
-                    break;
-                case "secondaryLabelViewable":
-                    spv.setValue(studyParameterConfig.getSecondaryLabelViewable());
-                    break;
+        for(StudyParameterValue spv : newStudyParameterValues){
+            if(spv.getStudyParameter().getHandle().equalsIgnoreCase(StudyParamNames.SUBJECT_ID_GENERATION)) {
+                if (templateID != null && !StringUtils.isEmpty(templateID))
+                    addParameterValue("auto non-editable", schemaStudy, StudyParamNames.SUBJECT_ID_GENERATION);
+                else
+                    addParameterValue( spv.getValue(), schemaStudy, spv.getStudyParameter().getHandle());
             }
+            else if(spv.getStudyParameter().getHandle().equalsIgnoreCase(StudyParamNames.PARTICIPANT_ID_TEMPLATE) || spv.getStudyParameter().getHandle().equalsIgnoreCase(StudyParamNames.ENFORCE_ENROLLMENT_CAP))
+                continue;
+            else
+                    addParameterValue( spv.getValue(), schemaStudy, spv.getStudyParameter().getHandle());
         }
         studyDao.saveOrUpdate(schemaStudy);
     }
@@ -759,123 +765,14 @@ public class StudyController {
         return outputStr;
     }
 
-    private void setStudyConfigParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig, String templateID) {
+    private void setStudyParameterValuesToTheStudy(HttpServletRequest request, Study study, Study schemaStudy, List<StudyParameterValue> studyParameterValues, String templateID) {
         String schema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, study.getSchemaName());
-        List<StudyParameterValue> studyParameterValues = new ArrayList<>();
-
-        schemaStudy.setStudyParameterValues(studyParameterValues);
-        StudyParameterValue collectDobValue = new StudyParameterValue();
-        collectDobValue.setStudy(schemaStudy);
-        StudyParameter collectDob = studyParameterDao.findByHandle("collectDob");
-        collectDobValue.setStudyParameter(collectDob);
-        if (StringUtils.isEmpty(studyParameterConfig.getCollectDob())) {
-            collectDobValue.setValue("3");
-        } else {
-            switch (studyParameterConfig.getCollectDob().toLowerCase()) {
-                case "always":
-                    collectDobValue.setValue("1");
-                    break;
-                case "only_the_year":
-                    collectDobValue.setValue("2");
-                    break;
-                default:
-                    collectDobValue.setValue("3");
-                    break;
-            }
+//        List<StudyParameterValue> studyParameterValues = new ArrayList<>();
+        for(StudyParameterValue spv: studyParameterValues){
+            spv.setStudy(schemaStudy);
         }
-        studyParameterValues.add(collectDobValue);
-
-        StudyParameterValue discrepancyManagementValue = new StudyParameterValue();
-        discrepancyManagementValue.setStudy(schemaStudy);
-        StudyParameter discrepancyManagement = studyParameterDao.findByHandle("discrepancyManagement");
-        discrepancyManagementValue.setStudyParameter(discrepancyManagement);
-        discrepancyManagementValue.setValue(studyParameterConfig.getDiscrepancyManagement());
-        studyParameterValues.add(discrepancyManagementValue);
-
-        StudyParameterValue genderRequiredValue = new StudyParameterValue();
-        genderRequiredValue.setStudy(schemaStudy);
-        StudyParameter genderRequired = studyParameterDao.findByHandle("genderRequired");
-        genderRequiredValue.setStudyParameter(genderRequired);
-        genderRequiredValue.setValue(studyParameterConfig.getGenderRequired());
-        studyParameterValues.add(genderRequiredValue);
-
-        StudyParameterValue subjectPersonIdRequiredValue = new StudyParameterValue();
-        subjectPersonIdRequiredValue.setStudy(schemaStudy);
-        StudyParameter subjectPersonIdRequired = studyParameterDao.findByHandle("subjectPersonIdRequired");
-        subjectPersonIdRequiredValue.setStudyParameter(subjectPersonIdRequired);
-        subjectPersonIdRequiredValue.setValue(handlePersonIdRequired(studyParameterConfig.getSubjectPersonIdRequired()));
-        studyParameterValues.add(subjectPersonIdRequiredValue);
-
-        StudyParameterValue interviewerNameRequiredValue = new StudyParameterValue();
-        interviewerNameRequiredValue.setStudy(schemaStudy);
-        StudyParameter interviewerNameRequired = studyParameterDao.findByHandle("interviewerNameRequired");
-        interviewerNameRequiredValue.setStudyParameter(interviewerNameRequired);
-        interviewerNameRequiredValue.setValue(studyParameterConfig.getInterviewerNameRequired());
-        studyParameterValues.add(interviewerNameRequiredValue);
-
-        StudyParameterValue interviewerNameEditableValue = new StudyParameterValue();
-        interviewerNameEditableValue.setStudy(schemaStudy);
-        StudyParameter interviewerNameEditable = studyParameterDao.findByHandle("interviewerNameEditable");
-        interviewerNameEditableValue.setStudyParameter(interviewerNameEditable);
-        interviewerNameEditableValue.setValue(studyParameterConfig.getInterviewerNameEditable());
-        studyParameterValues.add(interviewerNameEditableValue);
-
-        StudyParameterValue interviewDateRequiredValue = new StudyParameterValue();
-        interviewDateRequiredValue.setStudy(schemaStudy);
-        StudyParameter interviewDateRequired = studyParameterDao.findByHandle("interviewDateRequired");
-        interviewDateRequiredValue.setStudyParameter(interviewDateRequired);
-        interviewDateRequiredValue.setValue(studyParameterConfig.getInterviewDateRequired());
-        studyParameterValues.add(interviewDateRequiredValue);
-
-        StudyParameterValue interviewDateDefaultValue = new StudyParameterValue();
-        interviewDateDefaultValue.setStudy(schemaStudy);
-        StudyParameter interviewDateDefault = studyParameterDao.findByHandle("interviewDateDefault");
-        interviewDateDefaultValue.setStudyParameter(interviewDateDefault);
-        interviewDateDefaultValue.setValue(studyParameterConfig.getInterviewDateDefault());
-        studyParameterValues.add(interviewDateDefaultValue);
-
-        StudyParameterValue interviewDateEditableValue = new StudyParameterValue();
-        interviewDateEditableValue.setStudy(schemaStudy);
-        StudyParameter interviewDateEditable = studyParameterDao.findByHandle("interviewDateEditable");
-        interviewDateEditableValue.setStudyParameter(interviewDateEditable);
-        interviewDateEditableValue.setValue(studyParameterConfig.getInterviewDateEditable());
-        studyParameterValues.add(interviewDateEditableValue);
-
-        StudyParameterValue subjectIdGenerationValue = new StudyParameterValue();
-        subjectIdGenerationValue.setStudy(schemaStudy);
-        StudyParameter subjectIdGeneration = studyParameterDao.findByHandle("subjectIdGeneration");
-        subjectIdGenerationValue.setStudyParameter(subjectIdGeneration);
-        subjectIdGenerationValue.setValue(studyParameterConfig.getSubjectIdGeneration());
-        studyParameterValues.add(subjectIdGenerationValue);
-
-        StudyParameterValue subjectIdPrefixSuffixValue = new StudyParameterValue();
-        subjectIdPrefixSuffixValue.setStudy(schemaStudy);
-        StudyParameter subjectIdPrefixSuffix = studyParameterDao.findByHandle("subjectIdPrefixSuffix");
-        subjectIdPrefixSuffixValue.setStudyParameter(subjectIdPrefixSuffix);
-        subjectIdPrefixSuffixValue.setValue(studyParameterConfig.getSubjectIdPrefixSuffix());
-        studyParameterValues.add(subjectIdPrefixSuffixValue);
-
-        StudyParameterValue personIdShownOnCRFValue = new StudyParameterValue();
-        personIdShownOnCRFValue.setStudy(schemaStudy);
-        StudyParameter personIdShownOnCRF = studyParameterDao.findByHandle("personIdShownOnCRF");
-        personIdShownOnCRFValue.setStudyParameter(personIdShownOnCRF);
-        personIdShownOnCRFValue.setValue(studyParameterConfig.getPersonIdShownOnCRF());
-        studyParameterValues.add(personIdShownOnCRFValue);
-
-        StudyParameterValue secondaryLabelViewableValue = new StudyParameterValue();
-        secondaryLabelViewableValue.setStudy(schemaStudy);
-        StudyParameter secondaryLabelViewable = studyParameterDao.findByHandle("secondaryLabelViewable");
-        secondaryLabelViewableValue.setStudyParameter(secondaryLabelViewable);
-        secondaryLabelViewableValue.setValue(studyParameterConfig.getSecondaryLabelViewable());
-        studyParameterValues.add(secondaryLabelViewableValue);
-
-        StudyParameterValue enforceEnrollmentCapValue = new StudyParameterValue();
-        enforceEnrollmentCapValue.setStudy(schemaStudy);
-        StudyParameter enforceEnrollmentCapViewable = studyParameterDao.findByHandle("enforceEnrollmentCap");
-        enforceEnrollmentCapValue.setStudyParameter(enforceEnrollmentCapViewable);
-        enforceEnrollmentCapValue.setValue(studyParameterConfig.getEnforceEnrollmentCap());
-        studyParameterValues.add(enforceEnrollmentCapValue);
+        schemaStudy.setStudyParameterValues(studyParameterValues);
 
         studyDao.saveOrUpdate(schemaStudy);
         if (StringUtils.isNotEmpty(schema))
@@ -1099,7 +996,7 @@ public class StudyController {
         String startDate;
         HashMap<String, Object> map;
         Status status;
-        StudyBean parentStudy;
+        Study parentStudy;
         String studyEnvUuid;
         UserAccountBean ownerUserAccount = null;
         Date formattedStartDate = null;
@@ -1170,8 +1067,8 @@ public class StudyController {
             } else {
                 statusStr = statusStr.toLowerCase();
             }
-            statusStr = statusStr.equalsIgnoreCase("PENDING") ? "Design" : statusStr;
-            status = Status.getByName(statusStr);
+            statusStr = statusStr.equalsIgnoreCase("Design") ? "PENDING" : statusStr;
+            status = Status.getByName(statusStr.toLowerCase());
 
             if (status == null) {
                 ErrorObj errorObject = createErrorObject("Site Object", "Missing Field", "status");
@@ -1223,7 +1120,7 @@ public class StudyController {
                 ErrorObj errorObject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Id",
                         "Study Env Uuid");
                 errorObjects.add(errorObject);
-            } else if (parentStudy.getParentStudyId() != 0) {
+            } else if (parentStudy.isSite()) {
                 ErrorObj errorObject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Study Id",
                         "Study Env Uuid");
                 errorObjects.add(errorObject);
@@ -1255,7 +1152,7 @@ public class StudyController {
                 // make sure no duplicate name sites are allowed for the same parent
                 if (parentStudy != null) {
 
-                        Study siteToVerify = studyDao.findByNameAndParent(name, parentStudy.getId());
+                        Study siteToVerify = studyDao.findByNameAndParent(name, parentStudy.getStudyId());
                         if (siteToVerify != null && siteToVerify.getStudyId() != 0) {
                             if (siteSaveCheck == SiteSaveCheck.CHECK_UNIQUE_SAVE) {
                                 ErrorObj errorObject = createErrorObject("Site Object", "Duplicate site name during creation for the same parent study is not allowed.", "name");
@@ -1389,7 +1286,7 @@ public class StudyController {
     public ResponseEntity<Object> createNewSites(HttpServletRequest request,
             @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
         logger.debug("Creating site(s) for study:" + studyEnvUuid);
-        StudyBean siteBean = null;
+        Study siteBean = null;
         ResponseEntity<Object> response = null;
 
         Locale locale = new Locale("en_US");
@@ -1414,12 +1311,12 @@ public class StudyController {
             siteBean.setSchemaName(siteParameters.parentStudy.getSchemaName());
             siteBean.setStudyEnvSiteUuid(siteParameters.studyEnvSiteUuid);
             siteBean.setEnvType(siteParameters.parentStudy.getEnvType());
-            StudyBean sBean = createStudy(siteBean, siteParameters.ownerUserAccount);
+            Study sBean = createStudy(siteBean);
             // get the schema study
             request.setAttribute("requestSchema", siteParameters.parentStudy.getSchemaName());
-            StudyBean schemaStudy = getStudyByEnvId(studyEnvUuid);
-            siteBuildService.process(schemaStudy, sBean, siteParameters.ownerUserAccount);
-            siteDTO.setSiteOid(sBean.getOid());
+            Study schemaStudy = getStudyByEnvId(studyEnvUuid);
+            siteBuildService.process(schemaStudy, sBean, siteParameters.ownerUserAccount,studyDao);
+            siteDTO.setSiteOid(sBean.getOc_oid());
             siteDTO.setMessage(validation_passed_message);
             StudyUserRoleBean sub = null;
             ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
@@ -1461,17 +1358,16 @@ public class StudyController {
             }
             response = new ResponseEntity(errorObjects, HttpStatus.BAD_REQUEST);
         } else {
-            sdao = new StudyDAO(dataSource);
-            StudyBean siteBean = sdao.findByStudyEnvUuid(siteParameters.studyEnvSiteUuid);
+            Study siteBean = studyDao.findByStudyEnvUuid(siteParameters.studyEnvSiteUuid);
             setChangeableSiteSettings(siteBean, siteParameters);
-            sdao.update(siteBean);
+            studyDao.update(siteBean);
 
             // get the schema study
             request.setAttribute("requestSchema", siteBean.getSchemaName());
-            StudyBean schemaStudy = getStudyByEnvId(siteParameters.studyEnvSiteUuid);
+            Study schemaStudy = getStudyByEnvId(siteParameters.studyEnvSiteUuid);
             setChangeableSiteSettings(schemaStudy, siteParameters);
             ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
-            sdao.update(schemaStudy);
+            studyDao.update(schemaStudy);
             siteDTO.setMessage(validation_passed_message);
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
@@ -1532,7 +1428,7 @@ public class StudyController {
     public ResponseEntity<Object> createEventDefinition(
             HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueStudyID") String uniqueStudyID) throws Exception {
         logger.debug("In Create Event Definition ");
-        StudyBean publicStudy = getStudyByUniqId(uniqueStudyID);
+        Study publicStudy = getStudyByUniqId(uniqueStudyID);
         request.setAttribute("requestSchema", publicStudy.getSchemaName());
         ArrayList<ErrorObj> errorObjects = new ArrayList();
         StudyEventDefinitionBean eventBean = null;
@@ -1600,12 +1496,12 @@ public class StudyController {
         request.setAttribute("type", type);
         request.setAttribute("repeating", repeating);
 
-        StudyBean parentStudy = getStudyByUniqId(uniqueStudyID);
+        Study parentStudy = getStudyByUniqId(uniqueStudyID);
         if (parentStudy == null) {
             ErrorObj errorObject = createErrorObject("Event Definition Object", "The Study Study Id provided in the URL is not a valid Study Id",
                     "Unique Study Study Id");
             errorObjects.add(errorObject);
-        } else if (parentStudy.getParentStudyId() != 0) {
+        } else if (parentStudy.isSite()) {
             ErrorObj errorObject = createErrorObject("Event Definition Object", "The Study Study Id provided in the URL is not a valid Study Study Id",
                     "Unique Study Study Id");
             errorObjects.add(errorObject);
@@ -1701,10 +1597,10 @@ public class StudyController {
     }
 
     public StudyEventDefinitionBean buildEventDefBean(String name, String description, String category, String type, String repeating, UserAccountBean owner,
-                                                      StudyBean parentStudy) {
+                                                      Study parentStudy) {
 
         StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
-        seddao = new StudyEventDefinitionDAO(dataSource);
+        seddao = new StudyEventDefinitionDAO(dataSource, studyDao);
         ArrayList defs = seddao.findAllByStudy(parentStudy);
         if (defs == null || defs.isEmpty()) {
             sed.setOrdinal(1);
@@ -1719,25 +1615,25 @@ public class StudyController {
         sed.setType(type.toLowerCase());
         sed.setDescription(description);
         sed.setRepeating(Boolean.valueOf(repeating));
-        sed.setStudyId(parentStudy.getId());
+        sed.setStudyId(parentStudy.getStudyId());
         sed.setOwner(owner);
-        sed.setStatus(Status.AVAILABLE);
+        sed.setStatus(core.org.akaza.openclinica.bean.core.Status.AVAILABLE);
         return sed;
     }
 
-    public StudyBean buildSiteBean(SiteParameters parameters) {
-        StudyBean study = new StudyBean();
+    public Study buildSiteBean(SiteParameters parameters) {
+        Study study = new Study();
         ResourceBundle resadmin = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
-        study.setOid(parameters.ocOid);
-        study.setIdentifier(parameters.uniqueIdentifier);
-        study.setParentStudyId(parameters.parentStudy.getId());
+        study.setOc_oid(parameters.ocOid);
+        study.setUniqueIdentifier(parameters.uniqueIdentifier);
+        study.setStudy(parameters.parentStudy);
         study.setPublished(parameters.parentStudy.isPublished());
-        study.setOwner(parameters.ownerUserAccount);
+        study.setUserAccount(parameters.ownerUserAccount.toUserAccount(studyDao));
         setChangeableSiteSettings(study, parameters);
         return study;
     }
 
-    public void setChangeableSiteSettings(StudyBean study, SiteParameters parameters) {
+    public void setChangeableSiteSettings(Study study, SiteParameters parameters) {
         study.setName(parameters.name);
         study.setPrincipalInvestigator(parameters.principalInvestigator);
         study.setExpectedTotalEnrollment(parameters.expectedTotalEnrollment);
@@ -1751,20 +1647,11 @@ public class StudyController {
         study.setFacilityContactName(parameters.facilityInfo.getFacilityContact());
         study.setFacilityContactPhone(parameters.facilityInfo.getFacilityPhone());
         study.setFacilityContactEmail(parameters.facilityInfo.getFacilityEmail());
-        study.setIdentifier(parameters.uniqueIdentifier);
+        study.setUniqueIdentifier(parameters.uniqueIdentifier);
     }
 
-    public StudyBean createStudy(StudyBean studyBean, UserAccountBean owner) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean sBean = (StudyBean) sdao.create(studyBean);
-        sBean = (StudyBean) sdao.findByPK(sBean.getId());
-        return sBean;
-    }
-
-    public StudyBean createStudyWithDatasource(StudyBean studyBean, DataSource ds) {
-        sdao = new StudyDAO(ds);
-        StudyBean sBean = (StudyBean) sdao.create(studyBean);
-        sBean = (StudyBean) sdao.findByPK(sBean.getId());
+    public Study createStudy(Study studyBean) {
+        Study sBean = (Study) studyDao.create(studyBean);
         return sBean;
     }
 
@@ -1781,15 +1668,14 @@ public class StudyController {
         return studyUserRoleBean;
     }
 
-    public StudyUserRoleBean getUserRole(UserAccountBean ownerUserAccount, StudyBean study) {
+    public StudyUserRoleBean getUserRole(UserAccountBean ownerUserAccount, Study study) {
         udao = new UserAccountDAO(dataSource);
-        StudyUserRoleBean surBean = udao.findRoleByUserNameAndStudyId(ownerUserAccount.getName(), study.getId());
+        StudyUserRoleBean surBean = udao.findRoleByUserNameAndStudyId(ownerUserAccount.getName(), study.getStudyId());
         return surBean;
     }
 
-    public StudyBean updateStudy(StudyBean studyBean, UserAccountBean owner) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean sBean = (StudyBean) sdao.update(studyBean);
+    public Study updateStudy(Study studyBean, UserAccountBean owner) {
+        Study sBean = (Study) studyDao.update(studyBean);
         return sBean;
     }
 
@@ -1808,26 +1694,24 @@ public class StudyController {
         return userAccountBean;
     }
 
-    private StudyBean getStudyByUniqId(String uniqueId) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByUniqueIdentifier(uniqueId);
+    private Study getStudyByUniqId(String uniqueId) {
+        Study studyBean = (Study) studyDao.findByUniqueId(uniqueId);
         return studyBean;
     }
 
-    private StudyBean getStudyByEnvId(String envUuid) {
-        sdao = new StudyDAO(dataSource);
-        StudyBean studyBean = (StudyBean) sdao.findByStudyEnvUuid(envUuid);
+    private Study getStudyByEnvId(String envUuid) {
+        Study studyBean = (Study) studyDao.findByStudyEnvUuid(envUuid);
         return studyBean;
     }
 
-    public Boolean roleValidForStatusChange(UserAccountBean userAccount, StudyBean currentStudy, int interations){
+    public Boolean roleValidForStatusChange(UserAccountBean userAccount, Study currentStudy, int interations){
 
         if (interations > 2)
             return false;
 
         if (logger.isDebugEnabled()) {
             logger.error("All Roles:" + userAccount.getRoles().toString());
-            logger.error("Current study Id:" + currentStudy.getId());
+            logger.error("Current study Id:" + currentStudy.getStudyId());
             for (StudyUserRoleBean userRoleBean : userAccount.getRoles()) {
                 logger.error("***************inside StudyController study: " + userRoleBean.getStudyId() + " role: " + userRoleBean.getRoleName());
             }
@@ -1835,7 +1719,7 @@ public class StudyController {
 
         long result = userAccount.getRoles()
                 .stream()
-                .filter(role -> currentStudy.getId() == (role.getStudyId())
+                .filter(role -> currentStudy.getStudyId() == (role.getStudyId())
                         && (role.getRole().equals(Role.STUDYDIRECTOR)
                                 || role.getRole().equals(Role.COORDINATOR)))
                 .count();
@@ -1848,7 +1732,7 @@ public class StudyController {
     }
 
 
-    private boolean searchOtherEnvForRole(UserAccountBean userAccount, StudyBean currentStudy, int iterations) {
+    private boolean searchOtherEnvForRole(UserAccountBean userAccount, Study currentStudy, int iterations) {
         boolean result = false;
         StudyEnvEnum altEnv;
         switch (currentStudy.getEnvType()) {
@@ -1862,10 +1746,9 @@ public class StudyController {
             altEnv = null;
             break;
         }
-        String newOcId = currentStudy.getOid().replaceFirst("\\(" + currentStudy.getEnvType() + "\\)", "(" + altEnv.toString() + ")");
+        String newOcId = currentStudy.getOc_oid().replaceFirst("\\(" + currentStudy.getEnvType() + "\\)", "(" + altEnv.toString() + ")");
         // get the new study with thus id
-        StudyDAO studyDAO = new StudyDAO(dataSource);
-        StudyBean altStudy = studyDAO.findByPublicOid(newOcId);
+        Study altStudy = studyDao.findPublicStudy(newOcId);
         return roleValidForStatusChange(userAccount, altStudy, ++iterations);
     }
 
@@ -1898,7 +1781,7 @@ public class StudyController {
         return ownerUserAccount;
     }
 
-    public UserAccountBean getSiteOwnerAccount(HttpServletRequest request, StudyBean study) {
+    public UserAccountBean getSiteOwnerAccount(HttpServletRequest request, Study study) {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
         studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ownerUserAccount)
                 , ownerUserAccount.getActiveStudyId(), null, false);
@@ -1968,10 +1851,10 @@ public class StudyController {
         return eventDefinitionDTO;
     }
 
-    public StudyBean buildStudyBean(String uniqueStudyId, String name, String briefSummary, String principalInvestigator, String sponsor,
+    public Study buildStudyBean(String uniqueStudyId, String name, String briefSummary, String principalInvestigator, String sponsor,
                                     int expectedTotalEnrollment, String studyType, String status, Date startDate, UserAccountBean owner) {
 
-        StudyBean study = new StudyBean();
+        Study study = new Study();
         ResourceBundle resadmin = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
         if (studyType.equals(resadmin.getString("interventional"))) {
             study.setProtocolType("interventional");
@@ -1984,7 +1867,7 @@ public class StudyController {
         else if (resword.getString("design").equalsIgnoreCase(status) || status.equals(""))
             study.setStatus(Status.PENDING);
 
-        study.setIdentifier(uniqueStudyId);
+        study.setUniqueIdentifier(uniqueStudyId);
         study.setName(name);
         study.setPrincipalInvestigator(principalInvestigator);
         study.setSummary(briefSummary);
@@ -1992,22 +1875,22 @@ public class StudyController {
         study.setExpectedTotalEnrollment(expectedTotalEnrollment);
         study.setDatePlannedStart(startDate);
 
-        study.setOwner(owner);
+        study.setUserAccount(owner.toUserAccount(studyDao));
 
         return study;
     }
 
-    public StudyBean buildNewStudyBean(String uniqueStudyId, String name, UserAccountBean accountBean) {
+    public Study buildNewStudyBean(String uniqueStudyId, String name, UserAccountBean accountBean) {
 
-        StudyBean study = new StudyBean();
+        Study study = new Study();
         ResourceBundle resadmin = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
 
         ResourceBundle resword = core.org.akaza.openclinica.i18n.util.ResourceBundleProvider.getWordsBundle();
         study.setStatus(Status.PENDING);
 
-        study.setIdentifier(uniqueStudyId);
+        study.setUniqueIdentifier(uniqueStudyId);
         study.setName(name);
-        study.setOwner(accountBean);
+        study.setUserAccount(accountBean.toUserAccount(studyDao));
         return study;
     }
 
@@ -2059,7 +1942,7 @@ public class StudyController {
         return statusObj;
     }
 
-    public void verifyTemplateID(String templateID ,ArrayList<ErrorObj> errorObjects) {
+    public void verifyTemplateID(String templateID, ArrayList<ErrorObj> errorObjects) {
 
 
         Map<String, Object> data = ParticipantIdModel.getDataModel();
@@ -2071,17 +1954,20 @@ public class StudyController {
             errorObjects.add(errorObject);
         }
 
-        boolean templateIdMissingVariables = false;
-        ParticipantIdModel participantIdModel = new ParticipantIdModel();
-        for (ParticipantIdVariable variable : participantIdModel.getVariables()) {
-            if (!templateID.contains(variable.getName())) {
-                ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include both variables.", "templateID");
+        if ((templateID.contains(HELPER_RANDOM))) {
+            if (templateID.contains(SITE_PARTICIPANT_COUNT)) {
+                ErrorObj errorObject = createErrorObject("Study Object", "ID Template cannot include " + RANDOM + " and " + SITE_PARTICIPANT_COUNT + " together.", "templateID");
                 errorObjects.add(errorObject);
-                templateIdMissingVariables = true;
-                break;
+            }
+        } else {
+            if ((!templateID.contains(SITE_PARTICIPANT_COUNT) && !templateID.contains(SITE_ID)) || (templateID.contains(SITE_PARTICIPANT_COUNT) && !templateID.contains(SITE_ID))) {
+                ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include " + SITE_ID + " and " + SITE_PARTICIPANT_COUNT + " unless a " + RANDOM + " is included.", "templateID");
+                errorObjects.add(errorObject);
             }
         }
-        if (!templateIdMissingVariables){
+
+
+        if (errorObjects.size() == 0) {
             try {
                 template = new Template("template name", new StringReader(templateID), freemarkerConfiguration);
                 template.process(data, wtr);
@@ -2089,17 +1975,17 @@ public class StudyController {
 
 
             } catch (TemplateException te) {
-                logger.error("Error while instantiating template for verify template id: ",te);
+                logger.error("Error while instantiating template for verify template id: ", te);
                 ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid.", "templateID");
                 errorObjects.add(errorObject);
 
             } catch (IOException ioe) {
-                logger.error("Error while processing template: ",ioe);
+                logger.error("Error while processing template: ", ioe);
                 ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid.", "templateID");
                 errorObjects.add(errorObject);
 
             }
-    }
+        }
     }
 
     @RequestMapping( value = "/participantIdTemplate/model", method = RequestMethod.GET )
@@ -2116,9 +2002,9 @@ public class StudyController {
     }
 
 
-    public void addParameterValue(List<StudyParameterValue> studyParameterValues , String parameter , Study schemaStudy , String handle){
+    public void addParameterValue( String parameter , Study schemaStudy , String handle){
         boolean parameterValueExist = false;
-        for (StudyParameterValue s : studyParameterValues) {
+        for (StudyParameterValue s : schemaStudy.getStudyParameterValues()) {
             if (s.getStudyParameter().getHandle().equals(handle)) {
                 s.setValue(parameter);
                 parameterValueExist = true;
@@ -2129,15 +2015,11 @@ public class StudyController {
 
         if (!parameterValueExist) {
             StudyParameterValue studyParameterValue = new StudyParameterValue();
+            studyParameterValue = createStudyParameterValueWithHandleAndValue(handle, parameter);
             studyParameterValue.setStudy(schemaStudy);
-            StudyParameter sp = studyParameterDao.findByHandle(handle);
-            studyParameterValue.setStudyParameter(sp);
-            studyParameterValue.setValue(parameter);
-            studyParameterValues.add(studyParameterValue);
+            schemaStudy.getStudyParameterValues().add(studyParameterValue);
         }
-
     }
-
 }
 
 

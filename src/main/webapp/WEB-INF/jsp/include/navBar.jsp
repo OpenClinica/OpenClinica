@@ -46,11 +46,15 @@
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}"/>
 <c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/includes/jmesa/jmesa.css" type="text/css">
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery-migrate-3.1.0.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.jmesa.js"></script>
+<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 <c:choose>
     <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
         <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
-        <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
-        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/icomoon-style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
@@ -69,8 +73,6 @@
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:when>
     <c:otherwise>
-        <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
-        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="includes/css/icomoon-style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
@@ -84,8 +86,6 @@
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:otherwise>
 </c:choose>
-<link href="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
-        <script src="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
 
 <script type="text/javascript">
 
@@ -163,6 +163,19 @@
     })();
 
 
+    // Walkme snippet
+    (function () {
+        var walkme = document.createElement('script');
+        walkme.type = 'text/javascript';
+        walkme.async = true;
+        walkme.src = '<c:out value="${sessionScope.walkmeURL}" />';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(walkme, s);
+        window._walkmeConfig = {
+            smartLoad: true
+        };
+    })();
+
     function confirmCancel(pageName) {
         var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
         if (confirm1) {
@@ -216,9 +229,7 @@
         sessionStorage && sessionStorage.clear();
     }
 </script>
-<!-- Help Scout -->
-<script type="text/javascript">!function(e,t,n){function a(){var e=t.getElementsByTagName("script")[0],n=t.createElement("script");n.type="text/javascript",n.async=!0,n.src="https://beacon-v2.helpscout.net",e.parentNode.insertBefore(n,e)}if(e.Beacon=n=function(t,n,a){e.Beacon.readyQueue.push({method:t,options:n,data:a})},n.readyQueue=[],"complete"===t.readyState)return a();e.attachEvent?e.attachEvent("onload",a):e.addEventListener("load",a,!1)}(window,document,window.Beacon||function(){});</script>
-<script type="text/javascript">window.Beacon('init', 'fd568fcb-41a8-40bd-bcd7-0ba9518cfc49')</script>
+
 <!-- Main Navigation -->
 <div class="oc_nav">
     <div class="nav-top-bar">
@@ -246,46 +257,46 @@
             <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo"/></a>
         </div>
 
-        <div id="StudyInfo">
-            <c:choose>
-                <c:when test='${study.parentStudyId > 0}'>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
-                        title="<c:out value='${study.parentStudyName}'/>"
-                        alt="<c:out value='${study.parentStudyName}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
-                        :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
-                </c:when>
-                <c:otherwise>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
-                </c:otherwise>
-            </c:choose>
-            (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;
-            <c:if test="${study.envType == 'PROD'}">
-                <c:if test="${study.status.pending}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="design" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.locked}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="locked" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.frozen}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="frozen" bundle="${resword}"/></span>
-                </c:if>
-            </c:if>
-            <c:if test="${study.envType == 'TEST'}">
-                <c:if test="${study.status.pending}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="design" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.locked}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="locked" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.frozen}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="frozen" bundle="${resword}"/></span>
-                </c:if>
-                <c:if test="${study.status.available}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span>
-                </c:if>
-            </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
-        </div>
+         <div id="StudyInfo">
+              <c:choose>
+                  <c:when test='${study.study != null && study.study.studyId > 0}'>
+                      <b><a href="${urlPrefix}ViewStudy?id=${study.study.studyId}&viewFull=yes"
+                          title="<c:out value='${study.study.name}'/>"
+                          alt="<c:out value='${study.study.name}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
+                          :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.studyId}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                  </c:when>
+                  <c:otherwise>
+                      <b><a href="${urlPrefix}ViewStudy?id=${study.studyId}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                  </c:otherwise>
+              </c:choose>
+              (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;
+              <c:if test="${study.envType == 'PROD'}">
+                  <c:if test="${study.status.pending}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="design" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.locked}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="locked" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.frozen}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="frozen" bundle="${resword}"/></span>
+                  </c:if>
+              </c:if>
+              <c:if test="${study.envType == 'TEST'}">
+                  <c:if test="${study.status.pending}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="design" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.locked}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="locked" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.frozen}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="frozen" bundle="${resword}"/></span>
+                  </c:if>
+                  <c:if test="${study.status.available}">
+                      <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span>
+                  </c:if>
+              </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
+              <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
+          </div>
 
         <div id="UserInfo">
             <div id="userDropdown">
@@ -405,7 +416,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <li>
-                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
+                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}"><fmt:message
                                                                                                     key="nav_sdv" bundle="${resword}"/></a></li>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
@@ -472,12 +483,12 @@
 <!-- End Main Navigation -->
 <div id="subnav_Tasks" class="dropdown">
     <div class="dropdown_BG">
-        <c:if test="${userRole.monitor }">
+        <c:if test="${userRole.monitor}">
             <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
+                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}"><fmt:message
                         key="nav_source_data_verification" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
@@ -502,7 +513,7 @@
                     <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
-            </div>
+           </div>
             <div class="taskRightColumn">
                 <c:if test="${!study.status.frozen && !study.status.locked}">
                     <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
@@ -570,10 +581,10 @@
                 <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a>
                 </div>
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                    <c:when test="${study.study != null && study.study.studyId > 0 && (userRole.coordinator || userRole.director) }">
                     </c:when>
                     <c:otherwise>
-                        <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study"
+                        <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.studyId}&viewFull=yes"><fmt:message key="nav_view_study"
                                                                                                                        bundle="${resword}"/></a></div>
                         <div class="taskLink"></div>
                     </c:otherwise>
@@ -581,12 +592,12 @@
             </div>
             <div class="taskRightColumn">
                 <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                    <c:when test="${study.study != null && study.study.studyId > 0 && (userRole.coordinator || userRole.director) }">
                     </c:when>
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
                         <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
+                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}"><fmt:message
                                 key="nav_source_data_verification" bundle="${resword}"/></a><br/></div>
                     </c:otherwise>
                 </c:choose>
@@ -594,10 +605,20 @@
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
+            </div>
+            <br clear="all">
+        </c:if>
+        <c:if test="${enableEmbeddedReports}">
+            <div class="taskGroup"><fmt:message key="nav_reports" bundle="${resword}"/></div>
+            <div class="taskLeftColumn">
+                <div class="taskLink"><a href="${urlPrefix}reports?/collection/root"><fmt:message key="nav_reports_view" bundle="${resword}"/></a></div>
+            </div>
+            <div class="taskRightColumn">
+                <div class="taskLink"><a href="${urlPrefix}reports?/question/new"><fmt:message key="nav_reports_create" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
         </c:if>

@@ -11,17 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -33,6 +33,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author pgawade Servlet to call appropriate application pages corresponding to
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
  */
 public class UrlRewriteServlet extends CoreSecureController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
 
 
 //    StudyBean study = null;
@@ -59,6 +59,16 @@ public class UrlRewriteServlet extends CoreSecureController {
 
     @Override
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+    }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
 
     }
 
@@ -219,7 +229,6 @@ public class UrlRewriteServlet extends CoreSecureController {
                 String[] tokens = URLPath.split("/");
                 if (tokens.length != 0) {
                     String URLParamValue = "";
-                    StudyDAO stdao = new StudyDAO(getDataSource());
                     StudySubjectDAO ssubdao = new StudySubjectDAO(getDataSource());
                     StudyEventDefinitionDAO sedefdao = new StudyEventDefinitionDAO(getDataSource());
                     CRFDAO crfdao = new CRFDAO(getDataSource());
@@ -228,7 +237,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                     ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());
                     StudyEventDAO sedao = new StudyEventDAO(getDataSource());
 
-                    StudyBean study = null;
+                    Study study = null;
                     StudySubjectBean subject = null;
                     StudyEventDefinitionBean sed = null;
                     CRFBean c = null;
@@ -262,7 +271,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                         if ((null != URLParamValue) && (!URLParamValue.equals(""))) {
                             switch (i) {
                             case 0: {// study OID
-                                study = stdao.findByOid(URLParamValue);
+                                study = getStudyDao().findByOcOID(URLParamValue);
                                 //validate study OID
                                 if(study == null){
                                 	openClinicaResource.setInValid(true);
@@ -272,14 +281,14 @@ public class UrlRewriteServlet extends CoreSecureController {
                                 else{
 	                                openClinicaResource.setStudyOID(URLParamValue);
 	                                if (null != study) {
-	                                    openClinicaResource.setStudyID(study.getId());
+	                                    openClinicaResource.setStudyID(study.getStudyId());
 	                                }
                                 }
                                 break;
                             }
 
                             case 1: {// StudySubjectKey
-                                subject = ssubdao.findByOidAndStudy(URLParamValue, study.getId());
+                                subject = ssubdao.findByOidAndStudy(URLParamValue, study.getStudyId());
                               //validate subject OID
                                 if(subject == null){
                                 	openClinicaResource.setInValid(true);
@@ -320,7 +329,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                                 	return openClinicaResource;
                                 }
                                 if ((null != seoid) && (null != study)) {
-                                    sed = sedefdao.findByOidAndStudy(seoid, study.getId(), study.getParentStudyId());
+                                    sed = sedefdao.findByOidAndStudy(seoid, study.getStudyId(), study.checkAndGetParentStudyId());
                                     //validate study event oid
                                     if(null == sed){
                                     	openClinicaResource.setInValid(true);

@@ -99,7 +99,7 @@
         var params = new URLSearchParams(window.location.search);
         params.delete('redirection');
         if (!params.has('studyId'))
-            params.append('studyId', '${study.id}');
+            params.append('studyId', '${study.studyId}');
         formObj.redirection.value = '${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp?' + params.toString();
     }
 
@@ -162,7 +162,7 @@
       }, 1);
     }
   }
-  store.key = '${study.oid}.SDVs';
+  store.key = '${study.oc_oid}.SDVs';
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     sdvChecks: {}
   };

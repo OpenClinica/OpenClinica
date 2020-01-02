@@ -54,7 +54,7 @@ public class ListStudyUserServlet extends SecureController {
         request.setAttribute("requestSchema", "public");
         FormProcessor fp = new FormProcessor(request);
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        ArrayList users = udao.findAllUsersByStudy(currentPublicStudy.getId());
+        ArrayList users = udao.findAllUsersByStudy(currentPublicStudy.getStudyId());
 
         EntityBeanTable table = fp.getEntityBeanTable();
         ArrayList allStudyUserRows = StudyUserRoleRow.generateRowsFromBeans(users);

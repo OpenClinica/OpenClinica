@@ -10,12 +10,13 @@ package org.akaza.openclinica.control.managestudy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Builds on top of ViewSectionDataEntryServlet, Doesn't add much other than using OIDs to get to the View Screen.
@@ -41,9 +42,8 @@ public class ViewSectionDataEntryByIdServlet extends ViewSectionDataEntryServlet
      */
     @Override
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        StudyDAO studyDao = new StudyDAO(getDataSource());
-       
-        StudyBean  currentStudy = (StudyBean) studyDao.findByPK(1);
+
+        Study currentStudy = (Study) getStudyDao().findByPK(1);
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(getDataSource());
         if (request.getParameter("id") == null) {
             forwardPage(Page.LOGIN, request, response);

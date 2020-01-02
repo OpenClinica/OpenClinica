@@ -9,7 +9,7 @@
 
 package core.org.akaza.openclinica.bean.odmbeans;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class MetaDataVersionBean extends ElementOIDBean {
     //openclinica extension
     private List<StudyGroupClassListBean> studyGroupClassLists;
     private List<MultiSelectListBean> multiSelectLists;
-    private StudyBean study;
+    private Study study;
     private List<RuleSetRuleBean> ruleSetRules;
     
     //
@@ -53,7 +53,7 @@ public class MetaDataVersionBean extends ElementOIDBean {
         codeLists = new ArrayList<CodeListBean>();
         studyGroupClassLists = new ArrayList<StudyGroupClassListBean>();
         multiSelectLists = new ArrayList<MultiSelectListBean>();
-        study = new StudyBean();
+        study = new Study();
         ruleSetRules = new ArrayList<RuleSetRuleBean>();
     }
 
@@ -169,11 +169,11 @@ public class MetaDataVersionBean extends ElementOIDBean {
         this.sectionIds = sectionIds;
     }
 
-    public StudyBean getStudy() {
+    public Study getStudy() {
         return study;
     }
 
-    public void setStudy(StudyBean study) {
+    public void setStudy(Study study) {
         this.study = study;
     }
 

@@ -18,11 +18,12 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -32,7 +33,6 @@ import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -42,6 +42,8 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Removes an Event CRF
@@ -50,6 +52,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
  * 
  */
 public class RemoveEventCRFServlet extends SecureController {
+
     /**
      * 
      */
@@ -76,12 +79,11 @@ public class RemoveEventCRFServlet extends SecureController {
         int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
-        String originatingPage = request.getParameter(ORIGINATING_PAGE);
+        String originatingPage = StringEscapeUtils.escapeJavaScript(request.getParameter(ORIGINATING_PAGE));
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
 
         if (eventCRFId == 0) {
@@ -124,7 +126,7 @@ public class RemoveEventCRFServlet extends SecureController {
 
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
-            StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
 
             DisplayEventCRFBean dec = new DisplayEventCRFBean();
@@ -203,7 +205,7 @@ public class RemoveEventCRFServlet extends SecureController {
                                 dnb.setThreadUuid(itemParentNote.getThreadUuid());
                             }
                             dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
-                            dnb.setStudyId(currentStudy.getId());
+                            dnb.setStudyId(currentStudy.getStudyId());
                             dnb.setAssignedUserId(ub.getId());
                             dnb.setOwner(ub);
                             dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);

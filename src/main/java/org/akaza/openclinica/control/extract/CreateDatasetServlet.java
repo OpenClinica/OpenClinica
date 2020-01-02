@@ -26,10 +26,11 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.TermType;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.FilterBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -38,7 +39,6 @@ import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.extract.FilterDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -50,6 +50,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.bean.FilterRow;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Creates a dataset by building a query based on study events, CRFs and items
@@ -115,8 +116,8 @@ public class CreateDatasetServlet extends SecureController {
     /*
      * public void setUpStudyGroups() { StudyDAO studydao = new
      * StudyDAO(sm.getDataSource()); StudyGroupClassDAO sgclassdao = new
-     * StudyGroupClassDAO(sm.getDataSource()); StudyBean theStudy =
-     * (StudyBean)studydao.findByPK(sm.getUserBean().getActiveStudyId());
+     * StudyGroupClassDAO(sm.getDataSource()); Study theStudy =
+     * (Study)studydao.findByPK(sm.getUserBean().getActiveStudyId());
      * ArrayList sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
      * //StudyGroupClassBean sgclass = (StudyGroupClassBean)sgclasses.get(0);
      * //get the first one and test its name //logger.info("found study class
@@ -124,9 +125,8 @@ public class CreateDatasetServlet extends SecureController {
      */
 
     public ArrayList setUpStudyGroups() {
-        StudyDAO studydao = new StudyDAO(sm.getDataSource());
         StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-        StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+        Study theStudy = (Study) getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
         ArrayList sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
         // StudyGroupClassBean sgclass = (StudyGroupClassBean)sgclasses.get(0);
         // get the first one and test its name
@@ -140,22 +140,20 @@ public class CreateDatasetServlet extends SecureController {
         String action = fp.getString("action");
         if (StringUtil.isBlank(action)) resetProcess();
 
-        StudyBean studyWithEventDefs = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithEventDefs = new StudyBean();
-            studyWithEventDefs.setId(currentStudy.getParentStudyId());
-        }
+        Study studyWithEventDefs = null;
+        if (currentStudy.isSite())
+            studyWithEventDefs = currentStudy.getStudy();
+        else
+            studyWithEventDefs = currentStudy;
         if (StringUtil.isBlank(action) || "begin".equalsIgnoreCase(action)) {
             // step 2 -- select study events/crfs
 
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            StudyBean studyWithEventDefinitions = currentStudy;
-            if (currentStudy.getParentStudyId() > 0) {
-                studyWithEventDefinitions = new StudyBean();
-                studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
-
+            Study studyWithEventDefinitions = currentStudy;
+            if (currentStudy.isSite()) {
+                studyWithEventDefinitions = currentStudy.getStudy();
             }
             ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
 
@@ -165,7 +163,7 @@ public class CreateDatasetServlet extends SecureController {
                 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
                 ArrayList<CRFBean> crfs = (ArrayList<CRFBean>) crfdao.findAllActiveByDefinition(sed);
 
-                if (currentStudy.getParentStudyId() > 0) {
+                if (currentStudy.isSite()) {
                     // sift through these CRFs and see which ones are hidden
                     HideCRFManager hideCRFs = HideCRFManager.createHideCRFManager();
                     crfs = hideCRFs.removeHiddenCRFBeans(studyWithEventDefinitions, sed, crfs, sm.getDataSource());
@@ -395,7 +393,7 @@ public class CreateDatasetServlet extends SecureController {
                 session.setAttribute("mdvPrevStudy", mdvPrevStudy);
                 session.setAttribute("mdvPrevOID", mdvPrevOID);
                 if (mdvPrevOID != null && mdvPrevOID.length() > 0 && (mdvPrevStudy == null || mdvPrevStudy.length() <= 0)) {
-                    mdvPrevStudy = currentStudy.getId() + "";
+                    mdvPrevStudy = currentStudy.getStudyId() + "";
                 }
                 DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
                 dsb.setSQLStatement(dsb.generateQuery());
@@ -440,7 +438,7 @@ public class CreateDatasetServlet extends SecureController {
                 request.setAttribute("defaultEnd", getLastDayOfMonth(2100, 12));
 
                 DatasetDAO ddao = new DatasetDAO(sm.getDataSource());
-                dsb.setStudyId(this.currentStudy.getId());
+                dsb.setStudyId(this.currentStudy.getStudyId());
 
                 dsb.setOwner(ub);
                 // dsb.setOwnerId(ub.getId());

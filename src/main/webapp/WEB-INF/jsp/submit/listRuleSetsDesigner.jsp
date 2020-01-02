@@ -31,7 +31,7 @@
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-ui-1.8.2.custom.min.js"></script>
 
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-3.1.0.min.js"></script>
 
 <script type="text/javascript">
     function onInvokeAction(id,action) {
@@ -48,7 +48,7 @@
 
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='userRole' class='core.org.akaza.openclinica.bean.login.StudyUserRoleBean' />
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 <jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.domain.EntityBeanTable'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">

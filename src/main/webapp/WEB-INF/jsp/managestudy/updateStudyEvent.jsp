@@ -123,7 +123,7 @@
       <tr>
         <c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="start"/><c:param name="count" value="1"/></c:import>
         <td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *
-                <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                <c:if test="${study.discrepancyManagement=='true'}">
                     <c:choose>
                         <c:when test="${hasStartDateNote eq 'yes'}">
                             <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg','spanAlert-start_date'); return false;"
@@ -151,7 +151,7 @@
       <tr>
         <c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="end"/><c:param name="count" value="2"/></c:import>
         <td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)
-                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                    <c:if test="${study.discrepancyManagement=='true'}">
                     <c:choose>
                         <c:when test="${hasEndDateNote eq 'yes'}">
                             <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg','spanAlert-start_date'); return false;"
@@ -173,7 +173,7 @@
   </tr>
     </c:if>
   
-    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
+    <c:if test="${study.eventLocationRequired != 'not_used'}">
     <tr valign="top"><td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
     <td>
         <table border="0" cellpadding="0" cellspacing="0">
@@ -182,7 +182,7 @@
       <input type="text" name="location" value="<c:out value="${studyEvent.location}"/>" class="formfieldXL"></div>
        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include>
       </td>
-      <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+      <td><c:if test="${study.discrepancyManagement=='true'}">
           <c:choose>
               <c:when test="${hasLocationNote eq 'yes'}">
                   <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-start_date'); return false;"

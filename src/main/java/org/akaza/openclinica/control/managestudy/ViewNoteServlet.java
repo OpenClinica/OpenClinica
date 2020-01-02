@@ -19,6 +19,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -26,7 +27,6 @@ import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -38,6 +38,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -55,7 +56,6 @@ public class ViewNoteServlet extends SecureController {
     public static final String NOTE_ID = "id";
 
     public static final String DIS_NOTE = "singleNote";
-
     /*
      * (non-Javadoc)
      *
@@ -242,9 +242,9 @@ public class ViewNoteServlet extends SecureController {
 
         //Check if this Note would be accessed from the Current Study
         // Mantis Issue 8495.
-        if(note.getStudyId() != currentStudy.getId()){
-            if(currentStudy.getParentStudyId() > 0){
-                if (currentStudy.getId() != note.getStudySub().getStudyId()) {
+        if(note.getStudyId() != currentStudy.getStudyId()){
+            if(currentStudy.isSite()){
+                if (currentStudy.getStudyId() != note.getStudySub().getStudyId()) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                             + " " + respage.getString("change_active_study_or_contact"));
                     forwardPage(Page.MENU_SERVLET);
@@ -252,9 +252,8 @@ public class ViewNoteServlet extends SecureController {
                 }
             } else {
                 // The SubjectStudy is not belong to currentstudy and current study is not a site.
-                StudyDAO studydao = new StudyDAO(sm.getDataSource());
                 Collection sites;
-                sites = studydao.findOlnySiteIdsByStudy(currentStudy);
+                sites = getStudyDao().findOlnySiteIdsByStudy(currentStudy);
                 if (!sites.contains(note.getStudySub().getStudyId())) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
                     forwardPage(Page.MENU_SERVLET);

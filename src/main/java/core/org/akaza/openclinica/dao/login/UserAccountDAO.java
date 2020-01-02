@@ -24,11 +24,12 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.UserType;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.core.*;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * <P>
@@ -48,6 +49,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
     // private DataSource ds;
     // private DAODigester digester;
 
+    @Autowired
+    private StudyDao studyDao;
     @Override
     protected void setDigesterName() {
         digesterName = SQLFactory.getInstance().DAO_USERACCOUNT;
@@ -62,7 +65,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
         super(ds);
         setQueryNames();
     }
-
+    public UserAccountDAO(DataSource ds, StudyDao studyDao) {
+        super(ds);
+        this.studyDao = studyDao;
+        setQueryNames();
+    }
     public UserAccountDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
@@ -740,19 +747,17 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
         ArrayList answer = new ArrayList();
 
-        StudyDAO sdao = new StudyDAO(ds);
-
-        HashMap childrenByParentId = sdao.getChildrenByParentIds(allStudies);
+        HashMap childrenByParentId = studyDao.getChildrenByParentIds(allStudies);
 
         for (int i = 0; i < allStudies.size(); i++) {
-            StudyBean parent = (StudyBean) allStudies.get(i);
+            Study parent = (Study) allStudies.get(i);
 
-            if (parent == null || parent.getParentStudyId() > 0) {
+            if (parent == null || parent.isSite()) {
                 continue;
             }
 
             boolean parentAdded = false;
-            Integer studyId = new Integer(parent.getId());
+            Integer studyId = new Integer(parent.getStudyId());
             StudyUserRoleBean roleInStudy;
 
             ArrayList subTreeRoles = new ArrayList();
@@ -774,8 +779,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
             }
 
             for (int j = 0; j < children.size(); j++) {
-                StudyBean child = (StudyBean) children.get(j);
-                Integer childId = new Integer(child.getId());
+                Study child = (Study) children.get(j);
+                Integer childId = new Integer(child.getStudyId());
 
                 if (allStudyUserRoleBeans.containsKey(childId)) {
                     if (!parentAdded) {
@@ -794,7 +799,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
                     subTreeRoles.add(roleInChild);
                 } else {
                     StudyUserRoleBean roleInChild = new StudyUserRoleBean();
-                    roleInChild.setStudyId(child.getId());
+                    roleInChild.setStudyId(child.getStudyId());
                     roleInChild.setStudyName(child.getName());
                     roleInChild.setEnvType(roleInStudy.getEnvType());
                     roleInChild.setRole(roleInStudy.getRole());
@@ -888,9 +893,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             HashMap hm = (HashMap) it.next();
-            StudyBean sb = new StudyBean();
+            Study sb = new Study();
             sb.setName((String) hm.get("name"));
-            sb.setId(((Integer) hm.get("study_id")).intValue());
+            sb.setStudyId(((Integer) hm.get("study_id")).intValue());
             al.add(sb);
         }
         return al;
@@ -1215,4 +1220,11 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return al;
     }
 
+    public StudyDao getStudyDao(){
+        return this.studyDao;
+    }
+
+    public void setStudyDao(StudyDao studyDao){
+        this.studyDao = studyDao;
+    }
 }

@@ -140,7 +140,7 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section {{collapseOrExpand}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
+    <div class="section expanded hide" id="common-event-{{sectionNumber}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
         <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
             {{studyEvent.[@Name]}}
         </div>
@@ -165,13 +165,9 @@
                 <h3 class="form-name">
                     {{form.[@Name]}}
                 </h3>
-                <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
-                    {{#if form.addNew}}
-                        data-url="{{form.addNew}}"
-                    {{else}}
-                        disabled="disabled"
-                    {{/if}}
-                >
+                {{#if form.addNew}}
+                    <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>' data-url="{{form.addNew}}">
+                {{/if}}
             </div>
             <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
             <thead>
@@ -283,17 +279,17 @@ $(function() {
     }
 
     $.when(
-        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n&links=y', function(data) {
+        $.get('rest/clinicaldata/json/view/${study.oc_oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n&links=y', function(data) {
             odm = data;
             var study = findone(odm.Study, function(study) {
-                return study['@OID'] === '${study.oid}';
+                return study['@OID'] === '${study.oc_oid}';
             }, errors);
 
             if (study && study.MetaDataVersion) {
                 metadata = study.MetaDataVersion;
             }
             else {
-                return logError('Unable to fetch metadata for study: ${study.oid}', study);
+                return logError('Unable to fetch metadata for study: ${study.oc_oid}', study);
             }
 
             foreach(metadata.CodeList, function(codelist) {
@@ -334,7 +330,7 @@ $(function() {
             logError('Unable to load any Common Events.', e);
         }),
 
-        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson) {
+        $.get('pages/api/studies/${study.oc_oid}/pages/view%20subject', function(pageJson) {
             foreach(pageJson.components, function(component) {
                 columns[component.name] = component.columns;
             }, errors);
@@ -359,7 +355,7 @@ $(function() {
                     studyEventOid = studyEvent['@OID'];
                     $.ajax({
                         type: "GET",
-                        url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
+                        url: 'rest/clinicaldata/json/stats/${study.oc_oid}/${studySub.oid}/' + studyEventOid,
                         async: false,
                         success: function(statData) {
                             var stats = statData;
@@ -387,10 +383,14 @@ $(function() {
                 foreach(components, function(col) {
                     var item = items[col];
                     if (item) {
-                        if (item.Question)
+                        if (item['@BriefDescription']) {
+                            columnTitles.push(item['@BriefDescription']);
+                        } else if (item.Question) {
                             columnTitles.push(item.Question.TranslatedText);
-                        else
+                        }
+                        else {
                             columnTitles.push(item['@Name']);
+                        }
                     }
                     else {
                         columnTitles.push('!?' + col);
@@ -409,8 +409,9 @@ $(function() {
             }, errors);
         }, errors);
 
-        if (numVisitBased)
-            showSection(1, '#subjectEvents');
+        if (numVisitBased && $('#subjectEvents').hasClass('hide')) {
+            showSection(1, '#subjectEvents');            
+        }
 
         var hideClass = 'oc-status-removed';
         $.fn.DataTable.ext.search.push(
@@ -444,9 +445,9 @@ $(function() {
                 if (studyEvent.showMe) {
                     $('#commonEvents').append(sectionTmpl({
                         sectionNumber: sectionIndex,
-                        studyEvent: studyEvent,
-                        collapseOrExpand: store.data.collapseSections[sectionIndex] === false ? 'expanded' : 'collapsed'
+                        studyEvent: studyEvent
                     }));
+                    showSection(sectionIndex, '#common-event-' + sectionIndex);
                     sectionIndex++;
                 }
             }
@@ -454,17 +455,19 @@ $(function() {
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
         function datatablefy($tables) {
-            $tables.each(function(i) {
+            $tables.each(function() {
                 var table = $(this);
+                var subsection = table.closest('.subsection');
+                var id = subsection.attr('id');
                 var datatable = table.DataTable({
                     stateSave: true,
                     stateSaveCallback: function(settings, state) {
                         store(function(data) {
-                            data.datatables[i] = state;
+                            data.datatables[id] = state;
                         });
                     },
                     stateLoadCallback: function(settings, callback) {
-                        var data = store.data.datatables[i];
+                        var data = store.data.datatables[id];
                         callback(data);
                         if (!data)
                             this.fnSortNeutral();
@@ -533,7 +536,7 @@ $(function() {
             var studyEventOid = sectionDiv.data('section-oid');
             var studyEvent = studyEvents[studyEventOid];
             var sectionErrors = [];
-            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n&links=y', function(data) {
+            $.get('rest/clinicaldata/json/view/${study.oc_oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n&links=y', function(data) {
                 var odm = data;
                 for (var formOid in studyEvent.forms) {
                     var form = studyEvent.forms[formOid];

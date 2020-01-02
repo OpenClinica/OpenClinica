@@ -14,7 +14,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <jsp:useBean scope="request" id="label" class="java.lang.String"/>
 
-<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.bean.managestudy.StudyBean" />
+<jsp:useBean scope="session" id="study" class="core.org.akaza.openclinica.domain.datamap.Study" />
 <jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
@@ -89,7 +89,7 @@
                 <tr>
                     <td valign="top"><div class="formfieldXL_BG">
                     <c:choose>
-                     <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+                     <c:when test="${study.subjectIdGeneration =='auto non-editable'}">
                       <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45" class="formfield" disabled>
                       <input type="hidden" name="label" value="<c:out value="${label}"/>">
                      </c:when>
@@ -108,7 +108,7 @@
         </td>
     </tr>
     <c:choose>
-    <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
+    <c:when test="${study.subjectPersonIdRequired =='required'}">
     <tr valign="top">
         <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
         <td valign="top">
@@ -124,7 +124,7 @@
         </td>
     </tr>
     </c:when>
-    <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
+    <c:when test="${study.subjectPersonIdRequired =='optional'}">
     <tr valign="top">
         <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
         <td valign="top">
@@ -178,7 +178,7 @@
     </tr>
 
     <tr valign="top">
-        <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
+        <c:if test="${study.genderRequired !='not used'}">
         <td class="formlabel" align="right"><fmt:message key="gender" bundle="${resword}"/>:</td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
@@ -208,7 +208,7 @@
                 </td>
     <td align="left">
         <c:choose>
-        <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
+        <c:when test="${study.genderRequired !='false'}">
            <span class="formlabel">&nbsp;*</span>
         </c:when>
         </c:choose>
@@ -224,7 +224,7 @@
 
 
     <c:choose>
-    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+    <c:when test="${study.collectDob == '1'}">
     <tr valign="top">
         <td class="formlabel" align="right"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
         <td valign="top">
@@ -251,7 +251,7 @@
     </tr>
 
     </c:when>
-    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
+    <c:when test="${study.collectDob == '2'}">
     <tr valign="top">
         <td class="formlabel" align="right"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
         <td valign="top">
@@ -356,7 +356,7 @@
           </td>
     </tr>
     <c:choose>
-    <c:when test="${study.studyParameterConfig.eventLocationRequired == 'required'}">
+    <c:when test="${study.eventLocationRequired == 'required'}">
     <tr valign="top">
         <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
         <td valign="top">
@@ -375,7 +375,7 @@
     </tr>
 
     </c:when>
-    <c:when test="${study.studyParameterConfig.eventLocationRequired == 'optional'}">
+    <c:when test="${study.eventLocationRequired == 'optional'}">
     <tr valign="top">
         <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
         <td valign="top">

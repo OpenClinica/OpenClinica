@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -24,7 +25,6 @@ import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.extract.ExtractUtils;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
@@ -40,6 +40,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 public class UpdateJobExportServlet extends SecureController {
@@ -154,8 +155,7 @@ public class UpdateJobExportServlet extends SecureController {
                 forwardPage(Page.UPDATE_JOB_EXPORT);
             } else {
                 // change trigger, update in database
-                StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-                StudyBean study = (StudyBean) studyDAO.findByPK(sm.getUserBean().getActiveStudyId());
+                Study study = (Study) getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
                 DatasetDAO datasetDao = new DatasetDAO(sm.getDataSource());
                 CoreResources cr =  new CoreResources();
                 UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");

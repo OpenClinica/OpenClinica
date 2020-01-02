@@ -1,6 +1,9 @@
 package core.org.akaza.openclinica.bean.login;
 
+import core.org.akaza.openclinica.domain.datamap.Study;
+
 import java.util.ArrayList;
+import java.util.Date;
 
 public class StudyDTO {
 	private String uniqueProtocolID;
@@ -17,6 +20,13 @@ public class StudyDTO {
     private String message;
     private ArrayList<UserRole> assignUserRoles;
 	private String studyCreationLink;
+	private String facilityName;
+	private String facilityCity;
+	private String facilityState;
+	private String facilityCountry;
+	private String facilityZipcode;
+	private Date createdDate;
+	private String uniqueIdentifier;
 
 	public StudyDTO() {
 		super();
@@ -149,5 +159,87 @@ public class StudyDTO {
 
 	public void setStudyCreationLink(String studyCreationLink) {
 		this.studyCreationLink = studyCreationLink;
+	}
+
+	public String getFacilityName() {
+		return facilityName;
+	}
+
+	public void setFacilityName(String facilityName) {
+		this.facilityName = facilityName;
+	}
+
+	public String getFacilityCity() {
+		return facilityCity;
+	}
+
+	public void setFacilityCity(String facilityCity) {
+		this.facilityCity = facilityCity;
+	}
+
+	public String getFacilityState() {
+		return facilityState;
+	}
+
+	public void setFacilityState(String facilityState) {
+		this.facilityState = facilityState;
+	}
+
+	public String getFacilityZipcode() {
+		return facilityZipcode;
+	}
+
+	public void setFacilityZipcode(String facilityZipcode) {
+		this.facilityZipcode = facilityZipcode;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getUniqueIdentifier() {
+		return uniqueIdentifier;
+	}
+
+	public void setUniqueIdentifier(String uniqueIdentifier) {
+		this.uniqueIdentifier = uniqueIdentifier;
+	}
+
+	public String getFacilityCountry() {
+		return facilityCountry;
+	}
+
+	public void setFacilityCountry(String facilityCountry) {
+		this.facilityCountry = facilityCountry;
+	}
+
+	public static StudyDTO studyToStudyDTO(Study s){
+		StudyDTO sDTO = new StudyDTO();
+		if(s != null) {
+			sDTO.setUniqueProtocolID(s.getStudyId() + "");
+			sDTO.setBriefTitle(s.getName());
+			sDTO.setBriefSummary(s.getSummary());
+			sDTO.setSponsor(s.getSponsor());
+			sDTO.setProtocolType(s.getProtocolType());
+			if(s.getDatePlannedStart() != null)
+				sDTO.setStartDate((s.getDatePlannedStart()).toString());
+			else
+				sDTO.setStartDate(null);
+			sDTO.setExpectedTotalEnrollment(s.getExpectedTotalEnrollment().toString());
+			sDTO.setStatus(s.getStatus().getName());
+			sDTO.setStudyOid(s.getOc_oid());
+			sDTO.setFacilityName(s.getFacilityName());
+			sDTO.setFacilityCity(s.getFacilityCity());
+			sDTO.setFacilityState(s.getFacilityState());
+			sDTO.setFacilityCountry(s.getFacilityCountry());
+			sDTO.setFacilityZipcode(s.getFacilityZip());
+			sDTO.setCreatedDate(s.getDateCreated());
+			sDTO.setUniqueIdentifier(s.getUniqueIdentifier());
+		}
+		return  sDTO;
 	}
 }

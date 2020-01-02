@@ -65,4 +65,16 @@ public class EventDefinitionCrfDao extends AbstractDomainDao<EventDefinitionCrf>
 
     }
 
+    @SuppressWarnings("unchecked")
+    public EventDefinitionCrf findByStudyEventDefinitionIdAndCRFIdAndStudyIdorSiteId(Integer studyEventDefinitionId, Integer crfId, Integer studyId) {
+        String query = "select do from " + getDomainClassName() + " do,Study s where do.studyEventDefinition.studyEventDefinitionId = :studyeventdefid "
+                + " and (do.study.studyId = :studyid or (s.studyId = :studyid and s.study.studyId=do.study.studyId)) and do.crf.crfId = :crfid";
+        Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyeventdefid", studyEventDefinitionId);
+        q.setInteger("studyid", studyId);
+        q.setInteger("crfid", crfId);
+        return (EventDefinitionCrf) q.uniqueResult();
+
+    }
+
 }

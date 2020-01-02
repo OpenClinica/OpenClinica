@@ -10,20 +10,21 @@ package org.akaza.openclinica.control.extract;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -71,9 +72,8 @@ public class EditSelectedServlet extends SecureController {
     public void setUpStudyGroups() {
         ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
         if (sgclasses == null || sgclasses.size() == 0) {
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-            StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+            Study theStudy = getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
             sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
         }
         session.setAttribute("allSelectedGroups", sgclasses);
@@ -149,9 +149,8 @@ public class EditSelectedServlet extends SecureController {
             ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
             //
             ArrayList newsgclasses = new ArrayList();
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyGroupClassDAO sgclassdao = new StudyGroupClassDAO(sm.getDataSource());
-            StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+            Study theStudy = getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
             sgclasses = sgclassdao.findAllActiveByStudy(theStudy);
             for (int i = 0; i < sgclasses.size(); i++) {
                 StudyGroupClassBean sgclass = (StudyGroupClassBean) sgclasses.get(i);

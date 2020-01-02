@@ -9,12 +9,12 @@ package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.TableOfContentsServlet;
@@ -59,11 +59,11 @@ public class ViewEventCRFContentServlet extends SecureController {
     private StudyEventBean getStudyEvent(int eventId) throws Exception {
 
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-        StudyBean studyWithSED = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithSED = new StudyBean();
-            studyWithSED.setId(currentStudy.getParentStudyId());
-        }
+        Study studyWithSED = null;
+        if (currentStudy.isSite())
+            studyWithSED = currentStudy.getStudy();
+        else
+            studyWithSED = currentStudy;
 
         AuditableEntityBean aeb = sedao.findByPKAndStudy(eventId, studyWithSED);
 
@@ -102,7 +102,7 @@ public class ViewEventCRFContentServlet extends SecureController {
 
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
-        DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(eventCRF, sm.getDataSource(), currentStudy);
+        DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(eventCRF, sm.getDataSource(), currentStudy,getStudyDao());
         request.setAttribute("toc", displayBean);
         request.getSession().setAttribute(BEAN_STUDY_EVENT, seb);
         forwardPage(Page.VIEW_EVENT_CRF_CONTENT);

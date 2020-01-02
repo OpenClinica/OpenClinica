@@ -11,9 +11,6 @@
 
 <jsp:include page="../include/submit-header.jsp"/>
 <link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/permissionTagAccess.js"></script>
 <script type="text/javascript" language="javascript">
     function checkCRFLocked(ecId, url){
@@ -137,7 +134,7 @@
                     <tr>
                         <td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/></td>
                         <td class="table_cell"><span style="float:left"><fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/></span>
-                         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                         <c:if test="${study.discrepancyManagement=='true'}">
                                 <c:set var="isNew" value="${hasStartDateNote eq 'yes' ? 0 : 1}"/>
                                 <c:choose>
                                     <c:when test="${hasStartDateNote eq 'yes'}">
@@ -162,7 +159,7 @@
                         <td class="table_header_column"><fmt:message key="end_date_time" bundle="${resword}"/></td>
                         <td class="table_cell"><span style="float:left"><fmt:formatDate value="${studyEvent.dateEnded}" pattern="${dteFormat}"/></span>
 
-                         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                         <c:if test="${study.discrepancyManagement=='true'}">
                                 <c:set var="isNew" value="${hasEndDateNote eq 'yes' ? 0 : 1}"/>
                                 <c:choose>
                                     <c:when test="${hasEndDateNote eq 'yes'}">
@@ -498,16 +495,6 @@
                    onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                   ><span name="bt_Restore<c:out value="${rowCount}"/>" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>"  hspace="2"></span></a>
            </td>
-                           <td> <a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>"
-                               onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
-                               onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
-                              ><span name="bt_Remove<c:out value="${rowCount}"/>" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"  hspace="2"></span></a>
-                              </td>
-                <td>  <a class="accessCheck" href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
-                         onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
-                         onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><span
-                        name="Reassign" class="icon icon-icon-reassign3" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></span></a>
-                </td>
             </c:if>
 
         </c:when>

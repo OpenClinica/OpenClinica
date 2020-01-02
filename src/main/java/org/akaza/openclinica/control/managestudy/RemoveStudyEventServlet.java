@@ -21,6 +21,8 @@ import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -31,6 +33,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -83,10 +86,7 @@ public class RemoveStudyEventServlet extends SecureController {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
             event.setStudyEventDefinition(sed);
 
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
-            StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
-            if (study.getParentStudyId() != 0)
-                study.setParentStudyName(((StudyBean) studydao.findByPK(study.getParentStudyId())).getName());
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
 
             request.setAttribute("study", study);
 
@@ -167,7 +167,7 @@ public class RemoveStudyEventServlet extends SecureController {
                                         dnb.setThreadUuid(itemParentNote.getThreadUuid());
                                     }
                                     dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
-                                    dnb.setStudyId(currentStudy.getId());
+                                    dnb.setStudyId(currentStudy.getStudyId());
                                     dnb.setAssignedUserId(ub.getId());
                                     dnb.setOwner(ub);
                                     dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);

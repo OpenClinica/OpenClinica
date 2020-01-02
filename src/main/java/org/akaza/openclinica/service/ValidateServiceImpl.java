@@ -53,6 +53,11 @@ public class ValidateServiceImpl implements ValidateService {
     StudyParameterValueDao studyParameterValueDao;
 
     @Autowired
+    EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
+
+
+
+    @Autowired
     private TokenService tokenService;
 
 
@@ -67,7 +72,16 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isStudyAvailable(String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);
-        if (publicStudy != null && publicStudy.getStatus().equals(Status.AVAILABLE)) {
+        if (publicStudy != null && publicStudy.getStatus().equals(Status.AVAILABLE) && !(publicStudy.isSite())) {
+            return true;
+        }
+        return false;
+    }
+
+    
+    public boolean isSiteAvailable(String siteOid) {
+        Study publicStudy = getPublicStudy(siteOid);
+        if (publicStudy != null && publicStudy.getStatus().equals(Status.AVAILABLE) && publicStudy.isSite()) {
             return true;
         }
         return false;
@@ -268,7 +282,7 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isStudyAvailable(studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
         }
-        if (siteOid != null && !isStudyAvailable(siteOid)) {
+        if (siteOid != null && !isSiteAvailable(siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
         }
         if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
@@ -282,7 +296,52 @@ public class ValidateServiceImpl implements ValidateService {
         }
 
     }
-    
+
+    /**
+     *  this is used by case book PDF process
+     *  studyOid only at study level
+     */
+    public void validateStudyAndRoles(String studyOid,  UserAccountBean userAccountBean) {
+
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+        if (studyOid != null)
+            studyOid = studyOid.toUpperCase();
+
+        if (!isStudyOidValid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+        }
+
+        if (!isStudyAvailable(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
+        }
+
+        
+        if (!isUserHasAccessToStudy(userRoles, studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        }
+
+    }
+
+    public boolean hasCRFpermissionTag(EventDefinitionCrf edc,List<String> permissionTags) {
+        boolean formIsTagged= isFormTagged(edc);
+        if(formIsTagged) {
+            List<EventDefinitionCrfPermissionTag> list = eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getEventDefinitionCrfId(), edc.getParentId() !=null ? edc.getParentId():0, permissionTags);
+
+            return (list.size() > 0 ?  true:  false) ;
+        }else {
+            return true;
+        }
+
+
+    }
+
+    private boolean isFormTagged(EventDefinitionCrf edc) {
+        logger.debug("Begin to permissionTagsLookup");
+        ArrayList list = (ArrayList) eventDefinitionCrfPermissionTagDao.findTagsForEDC(edc);
+
+        return (list.size() > 0 ?  true:  false) ;
+    }
+
     /**
      *  this method is used when get/extract participant information
      *  
@@ -294,7 +353,7 @@ public class ValidateServiceImpl implements ValidateService {
     public void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includePII) {
 
     	Study tenantStudy = getTenantStudy(studyOid);
-        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();      
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
         if (!isStudyOidValid(studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
@@ -316,15 +375,9 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
         } else {
-        	if(includePII) {
-        		if (!isUserHas_CRC_INV_RoleInSite(userRoles, siteOid)) {
-                    throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-        		}
-            }else {
-            	if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
-    	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-    	        }
-            }           	        	
+            if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+            }
         }
         
         if (!isParticipateActive(tenantStudy)) {

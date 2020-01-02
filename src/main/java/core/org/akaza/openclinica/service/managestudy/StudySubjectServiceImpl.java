@@ -27,7 +27,6 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -35,12 +34,15 @@ import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
@@ -50,14 +52,14 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
     private DataSource dataSource;
 
+    @Transactional
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySubject, UserAccountBean userAccount,
-            StudyUserRoleBean currentRole) {
+            StudyUserRoleBean currentRole, Study study) {
 
         StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
-        StudyDAO studyDao = new StudyDAO(dataSource);
         EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
         EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
         CRFDAO crfDao = new CRFDAO(dataSource);
@@ -67,14 +69,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         Map<Integer, StudyEventDefinitionBean> eventDefinitionByEvent = studyEventDefinitionDao.findByStudySubject(studySubject.getId());
 
-        StudyBean study = (StudyBean) studyDao.findByPK(studySubject.getStudyId());
-
         Map<Integer, SortedSet<EventDefinitionCRFBean>> eventDefinitionCrfByStudyEventDefinition;
-        if (study.getParentStudyId() < 1) { // Is a study
+        if (!study.isSite()) { // Is a study
             eventDefinitionCrfByStudyEventDefinition = eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinitionForStudy(studySubject.getId());
         } else { // Is a site
             eventDefinitionCrfByStudyEventDefinition = eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinition(studySubject.getId(),
-                    study.getId(), study.getParentStudyId());
+                    study.getStudyId(), study.checkAndGetParentStudyId());
         }
 
         Map<Integer, SortedSet<EventCRFBean>> eventCrfListByStudyEvent = eventCrfDao.buildEventCrfListByStudyEvent(studySubject.getId());
@@ -124,7 +124,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     }
 
     private List<DisplayEventCRFBean> getDisplayEventCRFs(List eventCRFs, UserAccountBean ub, StudyUserRoleBean currentRole, SubjectEventStatus status,
-            StudyBean study, Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById,
+            Study study, Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById,
             Integer studyEventDefinitionId, List eventDefinitionCRFs) {
         ArrayList<DisplayEventCRFBean> answer = new ArrayList<DisplayEventCRFBean>();
 

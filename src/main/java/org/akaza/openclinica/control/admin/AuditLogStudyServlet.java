@@ -7,17 +7,17 @@
 package org.akaza.openclinica.control.admin;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.AuditDAO;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public class AuditLogStudyServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        int studyId = currentStudy.getId();
+        int studyId = currentStudy.getStudyId();
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
@@ -78,7 +79,6 @@ public class AuditLogStudyServlet extends SecureController {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        StudyDAO studydao = new StudyDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 
@@ -102,7 +102,7 @@ public class AuditLogStudyServlet extends SecureController {
             // logger.info("just set a subject with a status of
             // "+subject.getStatus().getName());
             // request.setAttribute("subject"+ss, subject);
-            StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySubject.getStudyId());
             request.setAttribute("study", study);
             // hmm, repetitive work?
 

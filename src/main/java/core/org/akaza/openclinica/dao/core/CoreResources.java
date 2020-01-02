@@ -3,12 +3,12 @@ package core.org.akaza.openclinica.dao.core;
 import core.org.akaza.openclinica.bean.core.KeyCloakConfiguration;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import core.org.akaza.openclinica.bean.service.SasProcessingFunction;
 import core.org.akaza.openclinica.bean.service.SqlProcessingFunction;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -16,6 +16,7 @@ import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -38,8 +39,9 @@ import java.util.regex.Pattern;
 
 import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
-@Component
+@Component("coreResources")
 public class CoreResources implements InitializingBean {
+
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
     private static String DB_NAME;
@@ -229,7 +231,7 @@ public class CoreResources implements InitializingBean {
         setDataInfoVals();
         if (DATAINFO.getProperty("filePath") == null || DATAINFO.getProperty("filePath").length() <= 0)
             DATAINFO.setProperty("filePath", filePath);
-        DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
+        DATAINFO.setProperty("changeLogFile", "migration/master.xml");
         // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);
@@ -303,6 +305,11 @@ public class CoreResources implements InitializingBean {
         if (supportURL == null || supportURL.isEmpty())
             supportURL = "https://www.openclinica.com/support";
         DATAINFO.setProperty("supportURL", supportURL);
+
+        String walkmeURL = DATAINFO.getProperty("walkme.url");
+        if (walkmeURL == null || walkmeURL.isEmpty())
+            walkmeURL = "https://ineedawalkme.url";
+        DATAINFO.setProperty("walkmeURL", walkmeURL);
 
         String piwikURL = DATAINFO.getProperty("piwik.url");
         if (piwikURL == null || piwikURL.isEmpty())
@@ -428,85 +435,6 @@ public class CoreResources implements InitializingBean {
             return request;
         }
         return null;
-    }
-
-    public static Boolean isPublicStudySameAsTenantStudy(StudyBean tenantStudy, int publicStudyID, DataSource ds) {
-        StudyBean publicStudy = getPublicStudy(tenantStudy.getOid(), ds);
-        return publicStudy.getId() == publicStudyID;
-    }
-
-    public static Boolean isPublicStudySameAsTenantStudy(StudyBean tenantStudy, String publicStudyOID, DataSource ds) {
-        StudyBean publicStudy = getPublicStudy(tenantStudy.getOid(), ds);
-        return publicStudy.getOid().equals(publicStudyOID);
-    }
-
-    public static StudyBean getPublicStudy(String ocId, DataSource ds) {
-        StudyDAO studyDAO = new StudyDAO(ds);
-        HttpServletRequest request = getRequest();
-        String schema = null;
-        if (request == null) {
-            schema = CoreResources.getRequestSchema();
-        } else {
-            if (request != null)
-                schema = (String) request.getAttribute("requestSchema");
-        }
-        if (request != null)
-            request.setAttribute("requestSchema", "public");
-
-        StudyBean study = studyDAO.findByOid(ocId);
-        if (StringUtils.isNotEmpty(schema) && request != null)
-            request.setAttribute("requestSchema", schema);
-        return study;
-    }
-
-    public static StudyBean getParentPublicStudy(String ocId, DataSource ds) {
-        StudyDAO studyDAO = new StudyDAO(ds);
-        StudyBean resultBean;
-        HttpServletRequest request = getRequest();
-        String schema = null;
-        if (request == null) {
-            schema = CoreResources.getRequestSchema();
-        } else {
-            if (request != null)
-                schema = (String) request.getAttribute("requestSchema");
-        }
-        if (request != null)
-            request.setAttribute("requestSchema", "public");
-
-        StudyBean study = getPublicStudy(ocId, ds);
-        if (study.getParentStudyId() == 0) {
-            resultBean = study;
-        } else {
-            StudyBean parentStudy = (StudyBean) studyDAO.findByPK(study.getParentStudyId());
-            resultBean = parentStudy;
-        }
-        CoreResources.setRequestSchema(schema);
-        return resultBean;
-    }
-
-    public static StudyBean getPublicStudy(int id, DataSource ds) {
-        StudyDAO studyDAO = new StudyDAO(ds);
-        HttpServletRequest request = getRequest();
-        String schema = null;
-        if (request == null) {
-            schema = CoreResources.getRequestSchema();
-        } else {
-            if (request != null)
-                schema = (String) request.getAttribute("requestSchema");
-        }
-        if (request != null)
-            request.setAttribute("requestSchema", "public");
-
-        StudyBean study = (StudyBean) studyDAO.findByPK(id);
-        if (StringUtils.isNotEmpty(schema) && request != null)
-            request.setAttribute("requestSchema", schema);
-        return study;
-    }
-
-    public static void setRequestSchemaByStudy(String ocId, DataSource ds) {
-        StudyBean studyBean = getPublicStudy(ocId, ds);
-        if (studyBean != null)
-            setRequestSchema(studyBean.getSchemaName());
     }
 
     private static String handleMultiSchemaConnection(Connection conn) throws SQLException {
@@ -1163,7 +1091,6 @@ public class CoreResources implements InitializingBean {
     }
 
     public static Properties loadProperties(String fileProps) {
-
         Properties internalProp = null;
         InputStream inpStream;
         Properties externalProp = null;

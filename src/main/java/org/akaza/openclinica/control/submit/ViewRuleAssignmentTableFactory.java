@@ -14,10 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.OCTableFacadeImpl;
@@ -58,7 +58,7 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     private RuleSetServiceInterface ruleSetService;
-    private StudyBean currentStudy;
+    private Study currentStudy;
     private ResourceBundle resword;
     private final boolean showMoreLink;
     private final boolean isDesignerRequest;
@@ -84,7 +84,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     @Override
     public TableFacade getTableFacadeImpl(HttpServletRequest request, HttpServletResponse response) {
-        return new OCTableFacadeImpl(getTableName(), request, response, "rules" + currentStudy.getOid() + "-");
+        return new OCTableFacadeImpl(getTableName(), request, response, "rules" + currentStudy.getOc_oid() + "-");
     }
 
     @Override
@@ -201,7 +201,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         Limit limit = tableFacade.getLimit();
         ViewRuleAssignmentFilter viewRuleAssignmentFilter = getViewRuleAssignmentFilter(limit);
         ViewRuleAssignmentSort viewRuleAssignmentSort = getViewRuleAssignmentSort(limit);
-        viewRuleAssignmentFilter.addFilter("studyId", currentStudy.getId());
+        viewRuleAssignmentFilter.addFilter("studyId", currentStudy.getStudyId());
         if (viewRuleAssignmentSort.getSorts().size() == 0) {
             viewRuleAssignmentSort.addSort("itemName", "asc");
         }
@@ -357,11 +357,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         this.ruleSetService = ruleSetService;
     }
 
-    public StudyBean getCurrentStudy() {
+    public Study getCurrentStudy() {
         return currentStudy;
     }
 
-    public void setCurrentStudy(StudyBean currentStudy) {
+    public void setCurrentStudy(Study currentStudy) {
         this.currentStudy = currentStudy;
     }
 

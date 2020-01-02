@@ -9,17 +9,17 @@ package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,13 +81,11 @@ public class RestoreStudySubjectServlet extends SecureController {
 
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
-            StudyBean study = (StudyBean) studydao.findByPK(studyId);
-            study.setParentStudyName(((StudyBean) studydao.findByPK(study.getParentStudyId())).getName());
+            Study study = (Study) getStudyDao().findByPK(studyId);
             // find study events
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 //            ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);
-            ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
+            ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole, getStudyDao());
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
                 if (studySub.getStatus().equals(Status.AVAILABLE)) {

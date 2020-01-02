@@ -9,15 +9,15 @@ package org.akaza.openclinica.control.extract;
 
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -27,6 +27,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DatasetRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,11 +71,9 @@ public class ViewDatasetsServlet extends SecureController {
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            StudyBean studyWithEventDefinitions = currentStudy;
-            if (currentStudy.getParentStudyId() > 0) {
-                studyWithEventDefinitions = new StudyBean();
-                studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
-
+            Study studyWithEventDefinitions = currentStudy;
+            if (currentStudy.isSite()) {
+                studyWithEventDefinitions = currentStudy.getStudy();
             }
             ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
             CRFDAO crfdao = new CRFDAO(sm.getDataSource());
@@ -96,7 +95,7 @@ public class ViewDatasetsServlet extends SecureController {
 //            if (ub.isSysAdmin()) {
 //                datasets = dsdao.findAllByStudyIdAdmin(currentStudy.getId());
 //            } else {
-            datasets = dsdao.findAllByStudyId(currentStudy.getId());
+            datasets = dsdao.findAllByStudyId(currentStudy.getStudyId());
 //            }
 
             ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
@@ -123,7 +122,7 @@ public class ViewDatasetsServlet extends SecureController {
                 int ownerId = fp.getInt("ownerId");
                 EntityBeanTable table = fp.getEntityBeanTable();
 
-                ArrayList datasets = (ArrayList) dsdao.findByOwnerId(ownerId, currentStudy.getId());
+                ArrayList datasets = (ArrayList) dsdao.findByOwnerId(ownerId, currentStudy.getStudyId());
 
                 /*
                  * if (datasets.isEmpty()) {
@@ -153,10 +152,9 @@ public class ViewDatasetsServlet extends SecureController {
                 int datasetId = fp.getInt("datasetId");
 
                 DatasetBean db = initializeAttributes(datasetId);
-                StudyDAO sdao = new StudyDAO(sm.getDataSource());
-                StudyBean study = (StudyBean)sdao.findByPK(db.getStudyId());
+                Study study = (Study)getStudyDao().findByPK(db.getStudyId());
 
-                if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
+                if (study != null && study.getStudyId() != currentStudy.getStudyId() && study.checkAndGetParentStudyId() != currentStudy.getStudyId()) {
                     addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                             + " " + respage.getString("change_active_study_or_contact"));
                     forwardPage(Page.MENU_SERVLET);
@@ -215,8 +213,10 @@ public class ViewDatasetsServlet extends SecureController {
         session.setAttribute("allItems", db.getItemDefCrf().clone());
         session.setAttribute("allSelectedItems", db.getItemDefCrf().clone());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
-        StudyDAO studydao = new StudyDAO(sm.getDataSource());
-        StudyBean theStudy = (StudyBean) studydao.findByPK(sm.getUserBean().getActiveStudyId());
+        String prevSchema = (String) request.getAttribute("requestSchema");
+        request.setAttribute("requestSchema", "public");
+        Study theStudy = (Study) getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
+        request.setAttribute("requestSchema", prevSchema);
         ArrayList<StudyGroupClassBean> allSelectedGroups = sgcdao.findAllActiveByStudy(theStudy);
         ArrayList<Integer> selectedSubjectGroupIds = db.getSubjectGroupIds();
         if (selectedSubjectGroupIds != null && allSelectedGroups != null) {

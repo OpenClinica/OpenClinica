@@ -30,6 +30,14 @@
       .append('<fmt:message key="import_data_failed" bundle="${resword}"/>')
       .hide()
   ).append(
+    $('<div>', {id:'upload-failed-study-oid-invalid'})
+      .append('<fmt:message key="import_data_failed_study_oid_invalid" bundle="${resword}"/>')
+      .hide()
+  ).append(
+    $('<div>', {id:'upload-failed_study_oid_missing'})
+      .append('<fmt:message key="import_data_failed_study_oid_missing" bundle="${resword}"/>')
+      .hide()
+  ).append(
     $('<div>', {id:'upload-success'})
       .append('<fmt:message key="import_data_success" bundle="${resword}"/>')
       .append('<strong> <fmt:message key="import_data_success_2" bundle="${resword}"/> </strong>')
@@ -130,7 +138,7 @@
   });
 
   $('#btn-upload').click(function() {
-    $('#upload-failed, #upload-success, #btn-label-upload').hide();
+    $('#upload-failed, #upload-failed-study-oid-invalid, #upload-failed_study_oid_missing, #upload-success, #btn-label-upload').hide();
     $('#loading, #btn-label-uploading').show();
 
     var data = new FormData();
@@ -151,7 +159,13 @@
 
     function failed(r) {
       console.log('error', r);
-      $('#upload-failed, #btn-label-upload').show();
+      if (r.responseText=="errorCode.studyNotExist") {
+        $('#upload-failed-study-oid-invalid, #btn-label-upload').show();
+      } else if (r.responseText=="errorCode.studyOidMissing") {
+        $('#upload-failed_study_oid_missing, #btn-label-upload').show();
+      } else {
+        $('#upload-failed, #btn-label-upload').show();
+      }
       $('#loading, #btn-label-uploading').hide();
       if (!$('#sidebar_Alerts_open').is(':visible')) {
         leftnavExpand('sidebar_Alerts_open');

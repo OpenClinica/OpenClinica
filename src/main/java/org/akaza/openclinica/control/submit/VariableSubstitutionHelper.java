@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -19,6 +18,7 @@ import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
@@ -47,8 +47,8 @@ public class VariableSubstitutionHelper {
      * @param studySubject
      *            Subject associated with the display section.
      */
-    public static void replaceVariables(DisplaySectionBean section, StudyBean study, StudySubjectBean studySubject, StudyEventDefinitionBean eventDef,
-            StudyEventBean event, DataSource dataSource) {
+    public static void replaceVariables(DisplaySectionBean section, Study study, StudySubjectBean studySubject, StudyEventDefinitionBean eventDef,
+                                        StudyEventBean event, DataSource dataSource) {
 
         StrSubstitutor subst = new StrSubstitutor(buildTokensMap(section, studySubject, study, eventDef, event, dataSource));
 
@@ -67,7 +67,7 @@ public class VariableSubstitutionHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, String> buildTokensMap(DisplaySectionBean section, StudySubjectBean studySubject, StudyBean study,
+    private static Map<String, String> buildTokensMap(DisplaySectionBean section, StudySubjectBean studySubject, Study study,
             StudyEventDefinitionBean eventDef, StudyEventBean event, DataSource dataSource) {
 
         ItemDAO itemDAO = new ItemDAO(dataSource);

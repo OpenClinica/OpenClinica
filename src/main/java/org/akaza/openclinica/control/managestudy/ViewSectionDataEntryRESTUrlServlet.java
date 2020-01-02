@@ -23,7 +23,6 @@ import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.core.Utils;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -37,6 +36,8 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
@@ -44,7 +45,6 @@ import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -60,6 +60,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -73,7 +74,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
     @Override
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        Study currentStudy = (Study) request.getSession().getAttribute("study");
         EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
         SectionBean sb = (SectionBean) request.getAttribute(SECTION_BEAN);
@@ -132,7 +133,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
 
         EventDefinitionCRFDAO eventCrfDao = new EventDefinitionCRFDAO(getDataSource());
         edcb = (EventDefinitionCRFBean) eventCrfDao.findByPK(eventDefinitionCRFId);
-        if (eventCRFId == 0 && edcb.getStudyId() != currentStudy.getParentStudyId() && edcb.getStudyId() != currentStudy.getId()) {
+        if (eventCRFId == 0 && edcb.getStudyId() != currentStudy.checkAndGetParentStudyId() && edcb.getStudyId() != currentStudy.getStudyId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_study_contact_sysadmin"), request);
             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
         }
@@ -252,7 +253,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
             request.setAttribute("resolvedNum", resolvedNum + "");
             request.setAttribute("notAppNum", notAppNum + "");
 
-            DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy);
+            DisplayTableOfContentsBean displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy, getStudyDao());
             // Make sure that the interviewDate in the eventCRF is properly
             // formatted
             // for viewSectionDataEntry.jsp --> interviewer.jsp
@@ -319,10 +320,9 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
         if (eventCRFId == 0) {
             ecb = new EventCRFBean();
             ecb.setCRFVersionId(sb.getCRFVersionId());
-            if (currentStudy.getParentStudyId() > 0) {
+            if (currentStudy.isSite()) {
                 // this is a site,find parent
-                StudyDAO studydao = new StudyDAO(getDataSource());
-                StudyBean parentStudy = (StudyBean) studydao.findByPK(currentStudy.getParentStudyId());
+                Study parentStudy = (Study) getStudyDao().findByPK(currentStudy.checkAndGetParentStudyId());
                 request.setAttribute("studyTitle", parentStudy.getName());
                 request.setAttribute("siteTitle", currentStudy.getName());
             } else {
@@ -345,7 +345,7 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
             SubjectBean subject = (SubjectBean) subjectDao.findByPK(subjectId);
             // BWP 01/08 >> check for a null currentStudy
             // Let us process the age
-            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+            if (currentStudy.getCollectDob().equals("1")) {
                 StudyEventDAO sedao = new StudyEventDAO(getDataSource());
                 StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
                 StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
@@ -357,12 +357,11 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
                 age = Utils.getInstacne().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
             }
             // Get the study then the parent study
-            StudyDAO studydao = new StudyDAO(getDataSource());
-            StudyBean study = (StudyBean) studydao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
-            if (study.getParentStudyId() > 0) {
+            if (study.isSite()) {
                 // this is a site,find parent
-                StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
+                Study parentStudy = (Study) getStudyDao().findByPK(study.getStudy().getStudyId());
                 request.setAttribute("studyTitle", parentStudy.getName());
                 request.setAttribute("siteTitle", study.getName());
             } else {

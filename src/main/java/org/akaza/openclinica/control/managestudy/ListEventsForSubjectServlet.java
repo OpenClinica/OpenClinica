@@ -11,19 +11,19 @@ import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -36,6 +36,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudySubjectEventsRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -129,10 +130,9 @@ public class ListEventsForSubjectServlet extends SecureController {
         ArrayList allDefs = seddao.findAllActiveByStudy(currentStudy);
         boolean isASite = false;
 
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
 
-            StudyDAO stdao = new StudyDAO(sm.getDataSource());
-            StudyBean parent = (StudyBean) stdao.findByPK(currentStudy.getParentStudyId());
+            Study parent = (Study) getStudyDao().findByPK(currentStudy.getStudy().getStudyId());
 
             allDefs = seddao.findAllActiveByStudy(parent);
 
@@ -156,7 +156,7 @@ public class ListEventsForSubjectServlet extends SecureController {
         request.setAttribute("eventDefCRFs", eventDefinitionCRFs);
 
         // find all the subjects in current study
-        ArrayList subjects = sdao.findAllByStudyId(currentStudy.getId());
+        ArrayList subjects = sdao.findAllByStudyId(currentStudy.getStudyId());
 
         ArrayList displayStudySubs = new ArrayList();
         for (int i = 0; i < subjects.size(); i++) {
@@ -239,7 +239,7 @@ public class ListEventsForSubjectServlet extends SecureController {
                 }
 
                 // Issue 3212 BWP <<
-                if (currentStudy.getParentStudyId() > 0) {
+                if (currentStudy.isSite()) {
                     // check each eventDefCRFBean and set its isHidden property
                     // to true, if its
                     // persistent/database-derived hideCrf is true (domain rule:
@@ -300,7 +300,7 @@ public class ListEventsForSubjectServlet extends SecureController {
         for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
             // Issue 3212 BWP <<
-            if (!(currentStudy.getParentStudyId() > 0)) {
+            if (!(currentStudy.isSite())) {
                 columnArray.add(edc.getCrf().getName());
             } else {
                 if (!edc.isHideCrf()) {

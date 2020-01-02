@@ -13,7 +13,6 @@ import core.org.akaza.openclinica.bean.core.Utils;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -26,12 +25,13 @@ import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.DataEntryServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -44,6 +44,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,6 @@ import javax.servlet.http.HttpServletResponse;
 public class PrintDataEntryServlet extends DataEntryServlet {
 
     Locale locale;
-
     // < ResourceBundleresword, resworkflow, respage,resexception;
 
     /**
@@ -100,7 +100,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
        ArrayList<SectionBean> allSectionBeans = new ArrayList<SectionBean>();
         ArrayList sectionBeans = new ArrayList();
         String age = "";
-        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+        Study currentStudy =    (Study)  request.getSession().getAttribute("study");
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
         // Whether IE6 or IE7 is involved
         String isIE = fp.getString("ie");
@@ -139,17 +139,16 @@ public class PrintDataEntryServlet extends DataEntryServlet {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
             se.setStudyEventDefinition(sed);
             // Let us process the age
-            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
+            if (currentStudy.getCollectDob().equals("1")) {
                 // YW 11-16-2007 enrollment-date is used for computing age
                 age = Utils.getInstacne().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
             }
             // Get the study then the parent study
-            StudyDAO studydao = new StudyDAO(getDataSource());
-            StudyBean study = (StudyBean) studydao.findByPK(studyId);
+            Study study = (Study) getStudyDao().findByPK(studyId);
 
-            if (study.getParentStudyId() > 0) {
+            if (study.isSite()) {
                 // this is a site,find parent
-                StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
+                Study parentStudy = (Study) getStudyDao().findByPK(study.checkAndGetParentStudyId());
                 request.setAttribute("studyTitle", parentStudy.getName() + " - " + study.getName());
             } else {
                 request.setAttribute("studyTitle", study.getName());
@@ -187,7 +186,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
 
             handler.setCrfVersionId(crfVersionId);
             handler.setEventCRFId(eventCRFId);
-            List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
+            List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans(getStudyDao());
 
             CRFVersionDAO crfVersionDAO = new CRFVersionDAO(getDataSource());
             CRFDAO crfDao = new CRFDAO(getDataSource());
@@ -360,5 +359,15 @@ public class PrintDataEntryServlet extends DataEntryServlet {
     @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
     	return false;
+    }
+
+    @Override
+    protected void processRequest() throws Exception {
+
+    }
+
+    @Override
+    protected void mayProceed() throws InsufficientPermissionException {
+
     }
 }

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import core.org.akaza.openclinica.bean.core.ApplicationConstants;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.OCUserDTO;
 import core.org.akaza.openclinica.service.UserType;
 import core.org.akaza.openclinica.service.auth.TokenService;
@@ -50,7 +50,8 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     @Autowired CreateUserCoreService userService;
     @Autowired
     TokenService tokenService;
-
+    @Autowired
+    private StudyDao studyDao;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -99,8 +100,6 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             CoreResources.setRootUserAccountBean(request, dataSource);
                             request.getSession().setAttribute("userContextMap", userContextMap);
                             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-                            StudyDAO studyDAO = new StudyDAO(dataSource);
-
                             String ocUserUuid = null;
                             String userType = (String) userContextMap.get("userType");
                             if (userType.equals(UserType.PARTICIPATE.getName())) {
@@ -110,7 +109,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             }
 
                             UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((ocUserUuid));
-                            StudyBean publicStudyBean= (StudyBean) studyDAO.findByPK(ub.getActiveStudyId());
+                            Study publicStudyBean= (Study) studyDao.findByPK(ub.getActiveStudyId());
 
                             if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();
@@ -145,7 +144,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                 }
                             }
                             request.getSession().setAttribute("userBean",ub);
-                            request.getSession().setAttribute("studyOid",publicStudyBean.getOid());
+                            request.getSession().setAttribute("studyOid", publicStudyBean !=null ? publicStudyBean.getOc_oid() : null);
                         } else {
                             unauthorized(response, "Invalid authentication token");
                             return;

@@ -1,10 +1,9 @@
 package org.akaza.openclinica.control.admin;
 
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.StudySubjectStatusView;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.DateFilterMatcher;
@@ -28,9 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class StudySubjectStatusStatisticsTableFactory extends AbstractTableFactory {
 
-    private StudyDAO studyDao;
     private StudySubjectDAO studySubjectDao;
-    private StudyBean currentStudy;
+    private Study currentStudy;
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
     @Override
@@ -101,14 +99,6 @@ public class StudySubjectStatusStatisticsTableFactory extends AbstractTableFacto
         tableFacade.setItems(theItems);
     }
 
-    public StudyDAO getStudyDao() {
-        return studyDao;
-    }
-
-    public void setStudyDao(StudyDAO studyDao) {
-        this.studyDao = studyDao;
-    }
-
     public StudySubjectDAO getStudySubjectDao() {
         return studySubjectDao;
     }
@@ -117,11 +107,11 @@ public class StudySubjectStatusStatisticsTableFactory extends AbstractTableFacto
         this.studySubjectDao = studySubjectDao;
     }
 
-    public StudyBean getCurrentStudy() {
+    public Study getCurrentStudy() {
         return currentStudy;
     }
 
-    public void setCurrentStudy(StudyBean currentStudy) {
+    public void setCurrentStudy(Study currentStudy) {
         this.currentStudy = currentStudy;
     }
 

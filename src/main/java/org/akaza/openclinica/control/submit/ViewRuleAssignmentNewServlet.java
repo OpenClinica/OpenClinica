@@ -10,9 +10,9 @@ package org.akaza.openclinica.control.submit;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -89,11 +89,9 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ItemDAO itemdao = new ItemDAO(sm.getDataSource());
-        StudyBean studyWithEventDefinitions = currentStudy;
-        if (currentStudy.getParentStudyId() > 0) {
-            studyWithEventDefinitions = new StudyBean();
-            studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
-
+        Study studyWithEventDefinitions = currentStudy;
+        if (currentStudy.isSite()) {
+            studyWithEventDefinitions = currentStudy.getStudy();
         }
         CRFDAO crfdao = new CRFDAO(sm.getDataSource());
         ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
@@ -103,7 +101,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
             ArrayList<CRFBean> crfs = (ArrayList<CRFBean>) crfdao.findAllActiveByDefinition(sed);
 
-            if (currentStudy.getParentStudyId() > 0) {
+            if (currentStudy.isSite()) {
                 // sift through these CRFs and see which ones are hidden
                 HideCRFManager hideCRFs = HideCRFManager.createHideCRFManager();
                 crfs = hideCRFs.removeHiddenCRFBeans(studyWithEventDefinitions, sed, crfs, sm.getDataSource());

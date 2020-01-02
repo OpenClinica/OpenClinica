@@ -135,11 +135,6 @@ int selectedValue;
 
 		<div class="tablebox_center">
 
-
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
-
 <script type="text/javascript">
 jQuery.noConflict();
 
@@ -323,23 +318,23 @@ function handleUserSource() {
 
                             <c:forEach var="study" items="${studies}">
 								<c:choose>
-									<c:when test="${activeStudy == study.id}">
+									<c:when test="${activeStudy == study.studyId}">
 										<c:choose>
-										<c:when test="${study.parentStudyId>0}">
-											<option value='<c:out value="${study.id}" />' selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
+										<c:when test="${study.study != null && study.study.studyId > 0}">
+											<option value='<c:out value="${study.studyId}" />' selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
 										</c:when>
 										<c:otherwise>
-											<option value='<c:out value="${study.id}" />' selected><c:out value="${study.name}" /></option>
+											<option value='<c:out value="${study.studyId}" />' selected><c:out value="${study.name}" /></option>
 										</c:otherwise>
 										</c:choose>
 									</c:when>
 									<c:otherwise>
 										<c:choose>
-										<c:when test="${study.parentStudyId>0}">
-											<option value='<c:out value="${study.id}" />'>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
+										<c:when test="${study.study != null && study.study.studyId > 0}">
+											<option value='<c:out value="${study.studyId}" />'>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
 										</c:when>
 										<c:otherwise>
-											<option value='<c:out value="${study.id}" />'><c:out value="${study.name}" /></option>
+											<option value='<c:out value="${study.studyId}" />'><c:out value="${study.name}" /></option>
 										</c:otherwise>
 										</c:choose>
 									</c:otherwise>

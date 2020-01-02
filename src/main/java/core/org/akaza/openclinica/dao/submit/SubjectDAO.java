@@ -8,7 +8,6 @@
 package core.org.akaza.openclinica.dao.submit;
 
 import core.org.akaza.openclinica.bean.core.EntityBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -16,6 +15,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.sql.Types;
 import java.util.ArrayList;
@@ -171,13 +171,13 @@ public class SubjectDAO extends AuditableEntityDAO {
         return executeFindAllQuery("findAllMalesNotSelf", variables);
     }
 
-    public ArrayList<SubjectBean> getWithFilterAndSort(StudyBean currentStudy, ListSubjectFilter filter, ListSubjectSort sort, int rowStart, int rowEnd) {
+    public ArrayList<SubjectBean> getWithFilterAndSort(Study currentStudy, ListSubjectFilter filter, ListSubjectSort sort, int rowStart, int rowEnd) {
         ArrayList<SubjectBean> subjects = new ArrayList<SubjectBean>();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), currentStudy.getId());
-        variables.put(new Integer(2), currentStudy.getId());
+        variables.put(new Integer(1), currentStudy.getStudyId());
+        variables.put(new Integer(2), currentStudy.getStudyId());
         String sql = digester.getQuery("getWithFilterAndSort");
         sql = sql + filter.execute("");
 
@@ -200,13 +200,13 @@ public class SubjectDAO extends AuditableEntityDAO {
         return subjects;
     }
 
-    public Integer getCountWithFilter(ListSubjectFilter filter, StudyBean currentStudy) {
+    public Integer getCountWithFilter(ListSubjectFilter filter, Study currentStudy) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), currentStudy.getId());
-        variables.put(new Integer(2), currentStudy.getId());
+        variables.put(new Integer(1), currentStudy.getStudyId());
+        variables.put(new Integer(2), currentStudy.getStudyId());
         String sql = digester.getQuery("getCountWithFilter");
         sql += filter.execute("");
 

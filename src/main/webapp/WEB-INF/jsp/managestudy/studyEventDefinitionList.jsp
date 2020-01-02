@@ -50,7 +50,7 @@
     </span></h1>
 
 <div style="float:right;padding-right:6px;width:8%;clear:both">
-   <a href="javascript:processPrintCRFRequest('rest/metadata/html/print/<c:out value="${study.oid}"/>/*/*')"
+   <a href="javascript:processPrintCRFRequest('rest/metadata/html/print/<c:out value="${study.oc_oid}"/>/*/*')"
    onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
    onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><span
    name="bt_Print1" class="icon icon-print" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="left" hspace="6"></a>

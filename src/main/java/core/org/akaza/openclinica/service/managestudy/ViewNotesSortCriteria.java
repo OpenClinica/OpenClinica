@@ -1,7 +1,6 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import core.org.akaza.openclinica.core.util.Pair;
+import core.org.akaza.openclinica.dao.hibernate.ItemDao;
+import core.org.akaza.openclinica.domain.datamap.Item;
 import org.jmesa.limit.Sort;
 import org.jmesa.limit.SortSet;
 
@@ -36,21 +37,30 @@ public class ViewNotesSortCriteria {
     public static ViewNotesSortCriteria buildFilterCriteria(List<Pair<String,String>> sorts) {
         ViewNotesSortCriteria criteria = new ViewNotesSortCriteria();
         for (Pair<String,String> p: sorts) {
-        	String
-        		sortField = SORT_BY_TABLE_COLUMN.get(p.getFirst()),
-        		sortOrder = p.getSecond();
-        	if (sortField != null) {
-        		criteria.getSorters().put(sortField, sortOrder);
-        	}
+            String
+                    sortField = SORT_BY_TABLE_COLUMN.get(p.getFirst()),
+                    sortOrder = p.getSecond();
+            if (sortField != null) {
+                criteria.getSorters().put(sortField, sortOrder);
+            }
         }
         return criteria;
     }
-    
-    public static ViewNotesSortCriteria buildFilterCriteria(SortSet sortSet) {
+
+    public static ViewNotesSortCriteria buildFilterCriteria(SortSet sortSet,ItemDao itemDao) {
         ViewNotesSortCriteria criteria = new ViewNotesSortCriteria();
-        for (Sort sort : sortSet.getSorts()) {
-            String sortField = SORT_BY_TABLE_COLUMN.get(sort.getProperty());
-            criteria.getSorters().put(sortField, sort.getOrder().name());
+        String sortField = "";
+        if(sortSet!=null){
+            for (Sort sort : sortSet.getSorts()) {
+                String property = sort.getProperty();
+                if (property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) {
+                    sortField = validateProperty(property,itemDao);
+                } else {
+                    sortField = SORT_BY_TABLE_COLUMN.get(sort.getProperty());
+                }
+
+                criteria.getSorters().put(sortField, sort.getOrder().name());
+            }
         }
         return criteria;
     }
@@ -59,4 +69,14 @@ public class ViewNotesSortCriteria {
         return sorters;
     }
 
+    private static String validateProperty(String property,ItemDao itemDao) {
+        if (property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) {
+            String itemOid = property.split("\\.")[2];
+            Item item = itemDao.findByOcOID(itemOid);
+            if (item != null)
+                property = property + "." + item.getItemDataType().getName();
+        }
+        return property;
+
+    }
 }

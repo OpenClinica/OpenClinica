@@ -19,16 +19,25 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         return StudySubject.class;
     }
 
+    /**
+     * findAllByStudy(Integer studyId,int pageNumber, int pageSize), finds all the studySubjects which are available or signed.
+     *
+     * @return a list of studySubjects
+     */
     @SuppressWarnings("unchecked")
     @Transactional
-    public List<StudySubject> findAllByStudy(Integer studyId) {
-        String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyid", studyId);
+    public List<StudySubject> findAllByStudy(Integer studyId,int pageNumber, int pageSize) {
+        String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid and (status_id = :statusId or status_id = :statusId1) order by do.dateCreated ";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("statusId",1);
+        q.setParameter("statusId1", 8);
+        q.setParameter("studyid", studyId);
+        q.setFirstResult  ((pageNumber-1)*pageSize);
+        q.setMaxResults(pageSize);
         return (List<StudySubject>) q.list();
-      
+
     }
-    
+
     public StudySubject findByOcOID(String OCOID) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.ocOid = :OCOID";
@@ -131,7 +140,7 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
 
     }
     public String getValidOid(StudySubject studySubject, ArrayList<String> oidList) {
-    OidGenerator oidGenerator = new StudySubjectOidGenerator();
+        OidGenerator oidGenerator = new StudySubjectOidGenerator();
         String oid = getOid(studySubject);
         String oidPreRandomization = oid;
         while (findByOcOID(oid) != null || oidList.contains(oid)) {
@@ -152,7 +161,7 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
     }
     public int findTheGreatestLabel() {
         List<StudySubject> allStudySubjects = super.findAll();
-        
+
         int greatestLabel = 0;
         for (StudySubject subject:allStudySubjects) {
             int labelInt = 0;

@@ -37,7 +37,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.bean.managestudy.StudyBean'/>
+<jsp:useBean scope='session' id='study' class='core.org.akaza.openclinica.domain.datamap.Study'/>
 
 <h1><span class="title_manage"><fmt:message key="confirm_to_remove_a_subject_group_class"  bundle="${resword}"/></span></h1>
 <p><fmt:message key="confirm_deletion_of_this_subject_group_class"  bundle="${resword}"/> <c:out value="${study.name}"/>.</p>

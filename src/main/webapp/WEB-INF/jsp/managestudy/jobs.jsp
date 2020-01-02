@@ -7,12 +7,6 @@
 <jsp:include page="../include/submit-header.jsp"/>
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data-2012-2022.min.js"></script>
@@ -95,8 +89,8 @@
     return 'ERROR: ' + e.status + ': ' + e.statusText;
   }
 
-  var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}';
-  var siteOid = '${atSiteLevel ? theSite.oid : null}';
+  var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oc_oid}';
+  var siteOid = '${atSiteLevel ? theSite.oc_oid : null}';
   if (siteOid)
     url += '/sites/' + siteOid;
   url += '/jobs';
@@ -126,21 +120,21 @@
   // https://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript-which-contains-comma-in-data
   // Return array of string values, or NULL if CSV string not well formed.
   function CSVtoArray(text) {
-  var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-  // Return NULL if input string is not well formed CSV string.
-  var a = [];                     // Initialize array to receive values.
-  text.replace(re_value, // "Walk" the string using replace with callback.
-    function(m0, m1, m2, m3) {
-      // Remove backslash from \' in single quoted values.
-      if (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
-      // Remove backslash from \" in double quoted values.
-      else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
-      else if (m3 !== undefined) a.push(m3);
+	var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
+	// Return NULL if input string is not well formed CSV string.
+	var a = [];                     // Initialize array to receive values.
+	text.replace(re_value, // "Walk" the string using replace with callback.
+	  function(m0, m1, m2, m3) {
+	    // Remove backslash from \' in single quoted values.
+	    if (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
+	    // Remove backslash from \" in double quoted values.
+	    else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
+	    else if (m3 !== undefined) a.push(m3);
         return ''; // Return empty string.
-    });
-  // Handle special case of empty last value.
-  if (/,\s*$/.test(text)) a.push('');
-  return a;
+	  });
+	// Handle special case of empty last value.
+	if (/,\s*$/.test(text)) a.push('');
+	return a;
   };
 </script>
 
@@ -158,7 +152,7 @@
     <table id="tbl-jobs" class="datatable">
       <thead>
         <tr>
-          <th><fmt:message key="jobs_source_filename" bundle="${resword}"/></th>
+          <th><fmt:message key="source" bundle="${resword}"/></th>
           <th><fmt:message key="job_type" bundle="${resword}"/></th>
           <th><fmt:message key="site_name" bundle="${resword}"/></th>
           <th><fmt:message key="job_status" bundle="${resword}"/></th>
@@ -202,14 +196,22 @@
       });
       jobs.done(function(data) {
         datatable.rows.add(data.map(function (logEntry) {
-          var actionView = '<a href="Jobs?uuid=' + logEntry.uuid + '"><span class="icon icon-search" title="View"></span></a> ';
-          var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download" title="Download"></span></a> ';
-          var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '" title="Delete"></span>';
+          var actionView = '<a href="Jobs?uuid=' + logEntry.uuid + '"><span class="icon icon-search"></span></a> ';
+          var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
+          var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
+          var source = logEntry.sourceFileName;
+          if (logEntry.type === 'PARTICIPANT_PDF_CASEBOOK') {
+            source = source.split('_');
+            source.splice(0, 1);
+            source.splice(-2);
+            source = source.join('_');
+            actionView = '';
+          }
           if (logEntry.status === 'IN_PROGRESS') {
             actionView = actionDownload = actionDelete = '';
           }
           return [
-            logEntry.sourceFileName,
+            source,
             logEntry.type,
             logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid,
             logEntry.status,
@@ -314,7 +316,7 @@
     </a>
 
     <script>
-      var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/${param["uuid"]}/downloadFile?open=true';
+      var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/${uuid}/downloadFile?open=true';
       var jobResult = $.get(url, function(data) {
         var rows = data.trim().split('\n');
         var header = rows[0];
@@ -351,7 +353,7 @@
       jobs.done(function(data) {
         var logEntry;
         for (var i=0; i<data.length; i++) {
-          if (data[i].uuid === '${param["uuid"]}') {
+          if (data[i].uuid === '${uuid}') {
             logEntry = data[i];
             break;
           }

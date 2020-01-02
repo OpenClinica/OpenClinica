@@ -18,6 +18,7 @@
         <property name="studyEventDomainDao" ref="studyEventDaoDomain"/>
         <property name="studyEventDefDomainDao" ref="studyEventDefDaoDomain"/>
         <property name="ruleActionRunLogDao" ref="ruleActionRunLogDao"/>
+        <property name="studyDao" ref="studyDaoDomain"></property>
     </bean>
     
     <bean id="rulesPostImportContainerService" class="core.org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">
@@ -26,6 +27,7 @@
 
     <bean id="subjectService" class="core.org.akaza.openclinica.service.subject.SubjectService">
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
     <bean id="importCRFDataService" class="core.org.akaza.openclinica.web.crfdata.ImportCRFDataService">
@@ -38,6 +40,7 @@
 
     <bean id="eventActionValidator" class="core.org.akaza.openclinica.validator.rule.action.EventActionValidator">
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
     <bean id="simpleConditionalDisplayService" class="core.org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService" autowire="byName">
@@ -50,6 +53,7 @@
 
     <bean id="auditEventDao" class="core.org.akaza.openclinica.dao.admin.AuditEventDAO">
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
     
     <bean id="datasetDao" class="core.org.akaza.openclinica.dao.extract.DatasetDAO">
@@ -67,6 +71,7 @@
 
     <bean id="userAccountDAO" class="core.org.akaza.openclinica.dao.login.UserAccountDAO">
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
     <bean id="archivedDatasetFileDao" class="core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO">
@@ -82,12 +87,15 @@
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="coreResources"/>
         <constructor-arg ref="ruleSetRuleDao"/>
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
     <bean id="odmFileCreation" class="core.org.akaza.openclinica.service.extract.OdmFileCreation">
         <property name="dataSource" ref="dataSource"/>
         <property name="coreResources" ref="coreResources"/>
         <property name="ruleSetRuleDao" ref="ruleSetRuleDao"/>
+        <property name="studyDao" ref="studyDaoDomain"/>
+
     </bean>
 
     <bean id="studySubjectService" class="core.org.akaza.openclinica.service.managestudy.StudySubjectServiceImpl">
@@ -132,7 +140,8 @@
     </bean>
 
     <bean id = "enketoCredentials" class="core.org.akaza.openclinica.service.crfdata.xform.EnketoCredentials">
-        <property name="studyDao" ref="studyDaoDomain"/>
+<!--        <property name="studyDao" ref="studyDaoDomain"/>-->
+        <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
     <bean id="xformParserHelper" class="core.org.akaza.openclinica.domain.xform.XformParserHelper"/>

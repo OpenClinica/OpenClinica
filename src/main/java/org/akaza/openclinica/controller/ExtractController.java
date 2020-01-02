@@ -13,17 +13,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -67,7 +66,6 @@ public class ExtractController {
     private BasicDataSource dataSource;
 
     private DatasetDAO datasetDao;
-    private StudyDAO studyDao;
 
     @Autowired
     @Qualifier("schedulerFactoryBean")
@@ -186,9 +184,9 @@ public class ExtractController {
             logger.error("Error in receiving application context: ",e);
         }
         jobScheduler = getSchemaScheduler(request, context, jobScheduler);
-        String permissionTagsString =permissionService.getPermissionTagsString((StudyBean)request.getSession().getAttribute("study"),request);
-        String[] permissionTagsStringArray =permissionService.getPermissionTagsStringArray((StudyBean)request.getSession().getAttribute("study"),request);
-        List<String> permissionTagsList =permissionService.getPermissionTagsList((StudyBean)request.getSession().getAttribute("study"),request);
+        String permissionTagsString =permissionService.getPermissionTagsString((Study)request.getSession().getAttribute("study"),request);
+        String[] permissionTagsStringArray =permissionService.getPermissionTagsStringArray((Study)request.getSession().getAttribute("study"),request);
+        List<String> permissionTagsList =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
         ODMFilterDTO odmFilter = new ODMFilterDTO();
 
 
@@ -228,8 +226,8 @@ public class ExtractController {
                 cnt,
                 SQLInitServlet.getField("filePath") + "xslt",
                 this.TRIGGER_GROUP_NAME,
-                (StudyBean) request.getSession().getAttribute("publicStudy"),
-                (StudyBean) request.getSession().getAttribute("study"),
+                (Study) request.getSession().getAttribute("publicStudy"),
+                (Study) request.getSession().getAttribute("study"),
                 archivedDatasetFileBean);
         // System.out.println("just set locale: " + LocaleResolver.getLocale(request).getLanguage());
 

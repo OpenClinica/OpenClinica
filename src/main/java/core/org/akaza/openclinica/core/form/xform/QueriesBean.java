@@ -1,4 +1,3 @@
-
 package core.org.akaza.openclinica.core.form.xform;
 
 import com.fasterxml.jackson.annotation.*;
@@ -12,12 +11,12 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-        "core/queries",
-    "logs"
+        "queries",
+        "logs"
 })
 public class QueriesBean {
 
-    @JsonProperty("core/queries")
+    @JsonProperty("queries")
     private List<QueryBean> queries = new ArrayList<QueryBean>();
     @JsonProperty("logs")
     private List<LogBean> logs = new ArrayList<LogBean>();
@@ -25,27 +24,27 @@ public class QueriesBean {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
+     *
      * @return
      *     The queries
      */
-    @JsonProperty("core/queries")
+    @JsonProperty("queries")
     public List<QueryBean> getQueries() {
         return queries;
     }
 
     /**
-     * 
+     *
      * @param queries
      *     The queries
      */
-    @JsonProperty("core/queries")
+    @JsonProperty("queries")
     public void setQueries(List<QueryBean> queries) {
         this.queries = queries;
     }
 
     /**
-     * 
+     *
      * @return
      *     The logs
      */
@@ -55,7 +54,7 @@ public class QueriesBean {
     }
 
     /**
-     * 
+     *
      * @param logs
      *     The logs
      */

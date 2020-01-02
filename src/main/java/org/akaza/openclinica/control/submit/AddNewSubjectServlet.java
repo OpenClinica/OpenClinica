@@ -9,6 +9,8 @@ package org.akaza.openclinica.control.submit;
 
 // import core.org.akaza.openclinica.bean.core.Role;
 
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -17,6 +19,7 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -30,6 +33,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
+import org.akaza.openclinica.controller.helper.TemplateHelper;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -132,7 +136,6 @@ public class AddNewSubjectServlet extends SecureController {
         checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
 
         StudySubjectDAO ssd = new StudySubjectDAO(sm.getDataSource());
-        StudyDAO stdao = new StudyDAO(sm.getDataSource());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
         ArrayList classes = new ArrayList();
         panel.setStudyInfoShown(false);
@@ -147,25 +150,22 @@ public class AddNewSubjectServlet extends SecureController {
         // YW << update study parameters of current study.
         // "collectDob" and "genderRequired" are set as the same as the parent
         // study
-        int parentStudyId = currentStudy.getParentStudyId();
-        if (parentStudyId <= 0) {
-            parentStudyId = currentStudy.getId();
+        Study tempParentStudy = null;
+        if (!currentStudy.isSite()) {
+//            parentStudyId = currentStudy.getStudyId();
             classes = sgcdao.findAllActiveByStudy(currentStudy);
         } else {
-            StudyBean parentStudy = (StudyBean) stdao.findByPK(parentStudyId);
-            classes = sgcdao.findAllActiveByStudy(parentStudy);
+            tempParentStudy = currentStudy.getStudy();
+            classes = sgcdao.findAllActiveByStudy(tempParentStudy);
         }
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "collectDob");
-        currentStudy.getStudyParameterConfig().setCollectDob(parentSPV.getValue());
-        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "genderRequired");
-        currentStudy.getStudyParameterConfig().setGenderRequired(parentSPV.getValue());
-        // YW >>
-        // tbh
-        StudyParameterValueBean checkPersonId = spvdao.findByHandleAndStudy(parentStudyId, "subjectPersonIdRequired");
-        currentStudy.getStudyParameterConfig().setSubjectPersonIdRequired(checkPersonId.getValue());
-        // end fix for 1750, tbh 10 2007
-
+        if(currentStudy.isSite()) {
+            currentStudy.setCollectDob(tempParentStudy.getCollectDob());
+            currentStudy.setGenderRequired(tempParentStudy.getGenderRequired());
+            // YW >>
+            // tbh
+            currentStudy.setSubjectPersonIdRequired(tempParentStudy.getSubjectPersonIdRequired());
+            // end fix for 1750, tbh 10 2007
+        }
         if (!fp.isSubmitted()) {
             if (fp.getBoolean("instr")) {
                 session.removeAttribute(FORM_DISCREPANCY_NOTES_NAME);
@@ -177,11 +177,10 @@ public class AddNewSubjectServlet extends SecureController {
 
                 // YW 10-07-2007 <<
                 String idSetting = "";
-                if (currentStudy.getParentStudyId() > 0) {
-                    parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-                    currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+                if (currentStudy.isSite()) {
+                    currentStudy.setSubjectIdGeneration(tempParentStudy.getSubjectIdGeneration());
                 }
-                idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+                idSetting = currentStudy.getSubjectIdGeneration();
                 // YW >>
                 logger.info("subject id setting :" + idSetting);
                 // set up auto study subject id
@@ -200,7 +199,12 @@ public class AddNewSubjectServlet extends SecureController {
                 forwardPage(Page.ADD_NEW_SUBJECT);
 
             }
+            if(tempParentStudy != null)
+                tempParentStudy = null;
         } else {// submitted
+            if
+            (tempParentStudy != null)
+                tempParentStudy = null;
             discNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
             if (discNotes == null) {
                 discNotes = new FormDiscrepancyNotes();
@@ -215,7 +219,7 @@ public class AddNewSubjectServlet extends SecureController {
             }
             v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
 
-            String subIdSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+            String subIdSetting = currentStudy.getSubjectIdGeneration();
             if (!subIdSetting.equalsIgnoreCase("auto editable")) {
                 v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
             }
@@ -226,11 +230,11 @@ public class AddNewSubjectServlet extends SecureController {
                 Validator.addError(errors, INPUT_LABEL, resexception
                         .getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
             }
-            StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getId());
+            StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getStudyId());
 
             StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
-            if (currentStudy.getParentStudyId() > 0) {
-                subjectWithSameLabelInParent = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getParentStudyId());
+            if (currentStudy.isSite()) {
+                subjectWithSameLabelInParent = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getStudy().getStudyId());
 
             }
             if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
@@ -251,7 +255,7 @@ public class AddNewSubjectServlet extends SecureController {
                 while (studySubjectBean != null) {
                     Random rnd = new Random();
                     int n = 100000 + rnd.nextInt(900000);
-                    label = currentStudy.getOid() + "-" + n;
+                    label = currentStudy.getOc_oid() + "-" + n;
                     studySubjectBean = ssdao.findByLabel(label);
                     if (studySubjectBean != null && !studySubjectBean.isActive())
                         studySubjectBean = null;
@@ -278,10 +282,8 @@ public class AddNewSubjectServlet extends SecureController {
 
                 int subjectCount = getSubjectCount(currentStudy);
 
-                StudyDAO studydao = new StudyDAO(sm.getDataSource());
                 currentStudy.setSubjectCount(subjectCount + 1);
-                currentStudy.setType(StudyType.GENETIC);
-                studydao.update(currentStudy);
+                getStudyDao().update(currentStudy);
 
                 // no errors
                 SubjectBean subject = new SubjectBean();
@@ -295,7 +297,7 @@ public class AddNewSubjectServlet extends SecureController {
 
                 StudySubjectBean studySubject = new StudySubjectBean();
                 studySubject.setSubjectId(subject.getId());
-                studySubject.setStudyId(currentStudy.getId());
+                studySubject.setStudyId(currentStudy.getStudyId());
                 studySubject.setLabel(label);
                 studySubject.setStatus(Status.AVAILABLE);
                 studySubject.setOwner(ub);
@@ -427,14 +429,14 @@ public class AddNewSubjectServlet extends SecureController {
      * @param entityType
      * @param sb
      */
-    public static void saveFieldNotes(String field, FormDiscrepancyNotes notes, DiscrepancyNoteDAO dndao, int entityId, String entityType, StudyBean sb) {
+    public static void saveFieldNotes(String field, FormDiscrepancyNotes notes, DiscrepancyNoteDAO dndao, int entityId, String entityType, Study sb) {
 
         saveFieldNotes(field, notes, dndao, entityId, entityType, sb, -1);
 
     }
 
     public static void saveFieldNotes(String field, FormDiscrepancyNotes notes,
-                                      DiscrepancyNoteDAO dndao, int entityId, String entityType, StudyBean sb,
+                                      DiscrepancyNoteDAO dndao, int entityId, String entityType, Study sb,
                                       int event_crf_id) {
 
         if (notes == null || dndao == null || sb == null) {
@@ -450,7 +452,7 @@ public class AddNewSubjectServlet extends SecureController {
         for (int i = 0; i < fieldNotes.size(); i++) {
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNotes.get(i);
             dnb.setEntityId(entityId);
-            dnb.setStudyId(sb.getId());
+            dnb.setStudyId(sb.getStudyId());
             dnb.setEntityType(entityType);
 
             // updating exsiting note if necessary
@@ -499,53 +501,22 @@ public class AddNewSubjectServlet extends SecureController {
         }
     }
 
-    /**
-     * Find study subject id for each subject, and construct displaySubjectBean
-     *
-     * @param displayArray
-     * @param subjects
-     */
-    public static void displaySubjects(ArrayList displayArray, ArrayList subjects, StudySubjectDAO ssdao, StudyDAO stdao) {
-
-        for (int i = 0; i < subjects.size(); i++) {
-            SubjectBean subject = (SubjectBean) subjects.get(i);
-            ArrayList studySubs = ssdao.findAllBySubjectId(subject.getId());
-            String protocolSubjectIds = "";
-            for (int j = 0; j < studySubs.size(); j++) {
-                StudySubjectBean studySub = (StudySubjectBean) studySubs.get(j);
-                int studyId = studySub.getStudyId();
-                StudyBean stu = (StudyBean) stdao.findByPK(studyId);
-                String protocolId = stu.getIdentifier();
-                if (j == studySubs.size() - 1) {
-                    protocolSubjectIds = protocolId + "-" + studySub.getLabel();
-                } else {
-                    protocolSubjectIds = protocolId + "-" + studySub.getLabel() + ", ";
-                }
-            }
-            DisplaySubjectBean dsb = new DisplaySubjectBean();
-            dsb.setSubject(subject);
-            dsb.setStudySubjectIds(protocolSubjectIds);
-            displayArray.add(dsb);
-
-        }
-
-    }
-
     public String generateParticipantIdUsingTemplate() {
         Map<String, Object> data = new HashMap<String, Object>();
         String templateID = "";
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(currentStudy.getParentStudyId() == 0 ? currentStudy.getId() : currentStudy.getParentStudyId(), "participantIdTemplate");
-        if (spv != null)
-            templateID = spv.getValue();
+        if(currentStudy.isSite())
+            templateID = currentStudy.getStudy().getParticipantIdTemplate();
+        else
+            templateID = currentStudy.getParticipantIdTemplate();
 
         int subjectCount = getSubjectCount(currentStudy);
 
-        String siteId = currentStudy.getIdentifier();
+        String siteId = currentStudy.getUniqueIdentifier();
 
         // Adding Sample data to validate templateID
         data.put("siteId", siteId);
         data.put("siteParticipantCount", subjectCount);
+        data.put("helper", new TemplateHelper());
         StringWriter wtr = new StringWriter();
         Template template = null;
 

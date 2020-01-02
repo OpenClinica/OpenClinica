@@ -105,10 +105,10 @@
     <td class="table_header_row"><fmt:message key="protocol_ID_site_ID" bundle="${resword}"/></td>
     <c:if test="${dataset.showSubjectDob}">
       <c:choose>
-        <c:when test="${study.studyParameterConfig.collectDob =='1'}">
+        <c:when test="${study.collectDob =='1'}">
          <td class="table_header_row"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
         </c:when>
-        <c:when test="${study.studyParameterConfig.collectDob =='3'}">
+        <c:when test="${study.collectDob =='3'}">
          <td class="table_header_row"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
         </c:when>
         <c:otherwise>

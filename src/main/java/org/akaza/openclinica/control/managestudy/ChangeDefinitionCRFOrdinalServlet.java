@@ -9,10 +9,11 @@ package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 
@@ -37,7 +38,6 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
         int definitionId = fp.getInt("id");
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         increase(current, previous, currOrdinal, prevOrdinal, definitionId, edcdao);
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         int siteId = fp.getInt("siteId");
         if (siteId > 0) {
             request.setAttribute("idToSort", new Integer(definitionId).toString());

@@ -1,15 +1,17 @@
 package org.akaza.openclinica.controller.helper;
 
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.service.StudyConfigService;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.view.StudyInfoPanel;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
@@ -26,11 +28,12 @@ public class SetUpStudyRole {
     @Autowired
     @Qualifier("dataSource")*/
     private DataSource dataSource;
-
+    private StudyBuildService studyBuildService;
     public static final String STUDY_INFO_PANEL = "panel";
 
-    public SetUpStudyRole(DataSource dataSource) {
+    public SetUpStudyRole(DataSource dataSource, StudyBuildService studyBuildService) {
         this.dataSource = dataSource;
+        this.studyBuildService = studyBuildService;
     }
 
     public DataSource getDataSource() {
@@ -41,32 +44,17 @@ public class SetUpStudyRole {
         this.dataSource = dataSource;
     }
 
-    public void setUp(HttpSession httpSession, UserAccountBean userAccountBean){
+    public void setUp(HttpSession httpSession, UserAccountBean userAccountBean, StudyDao studyDao){
 
         StudyUserRoleBean currentRole = new StudyUserRoleBean();
-        StudyBean currentStudy = new StudyBean();
+        Study currentStudy = new Study();
         StudyInfoPanel panel = new StudyInfoPanel();
-
-        StudyDAO sdao = new StudyDAO(dataSource);
 
         if (userAccountBean.getId() > 0 && userAccountBean.getActiveStudyId() > 0) {
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-            currentStudy = (StudyBean) sdao.findByPK(userAccountBean.getActiveStudyId());
-
-            ArrayList studyParameters = spvdao.findParamConfigByStudy(currentStudy);
-
-            currentStudy.setStudyParameters(studyParameters);
+            currentStudy = (Study) studyDao.findByPK(userAccountBean.getActiveStudyId());
 
             StudyConfigService scs = new StudyConfigService(dataSource);
-            if (currentStudy.getParentStudyId() <= 0) {// top study
-                scs.setParametersForStudy(currentStudy);
-
-            } else {
-                // YW <<
-                currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
-                // YW >>
-                scs.setParametersForSite(currentStudy);
-            }
 
             // set up the panel here, tbh
             panel.reset();
@@ -82,26 +70,22 @@ public class SetUpStudyRole {
             */
             httpSession.setAttribute(STUDY_INFO_PANEL, panel);
         } else {
-            currentStudy = new StudyBean();
+            currentStudy = new Study();
         }
         httpSession.setAttribute("study", currentStudy);
         // YW 06-20-2007<< set site's parentstudy name when site is
         // restored
-        if (currentStudy.getParentStudyId() > 0) {
-            currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
-        }
-        // YW >>
 
         if (currentRole.getId() <= 0) {
             // if (ub.getId() > 0 && currentStudy.getId() > 0) {
             // if current study has been "removed", current role will be
             // kept as "invalid" -- YW 06-21-2007
-            if (userAccountBean.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
-                currentRole = userAccountBean.getRoleByStudy(currentStudy.getId());
-                if (currentStudy.getParentStudyId() > 0) {
+            if (userAccountBean.getId() > 0 && currentStudy != null && currentStudy.getStudyId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
+                currentRole = userAccountBean.getRoleByStudy(currentStudy.getStudyId());
+                if (currentStudy.isSite()) {
                     // Checking if currentStudy has been removed or not will
                     // ge good enough -- YW 10-17-2007
-                    StudyUserRoleBean roleInParent = userAccountBean.getRoleByStudy(currentStudy.getParentStudyId());
+                    StudyUserRoleBean roleInParent = userAccountBean.getRoleByStudy(currentStudy.getStudy().getStudyId());
                     // inherited role from parent study, pick the higher
                     // role
                     currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
@@ -123,9 +107,9 @@ public class SetUpStudyRole {
         }
 
 
-        StudyBean userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), dataSource);
+        Study userRoleStudy = studyBuildService.getPublicStudy(currentRole.getStudyId());
 
-        if (userRoleStudy.getParentStudyId() > 0) {
+        if (userRoleStudy.isSite()) {
             /*The Role decription will be set depending on whether the user logged in at
        study lever or site level. issue-2422*/
             List roles = Role.toArrayList();

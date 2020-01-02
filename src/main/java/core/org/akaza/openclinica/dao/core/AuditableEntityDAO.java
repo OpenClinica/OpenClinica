@@ -9,7 +9,7 @@ package core.org.akaza.openclinica.dao.core;
 
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,7 +97,7 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
      * @return An array containing all the entities which belong to
      *         <code>study</code>.
      */
-    public ArrayList findAllByStudy(StudyBean study) {
+    public ArrayList findAllByStudy(Study study) {
         ArrayList answer = new ArrayList();
 
         if (findAllByStudyName == null) {
@@ -109,10 +109,10 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
         HashMap variables = new HashMap();
 
         // study.study_id=?
-        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getStudyId()));
 
         // or study.parent_study_id=?
-        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getStudyId()));
 
         String sql = digester.getQuery(findAllByStudyName);
 
@@ -127,7 +127,7 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
         return answer;
     }
 
-    public ArrayList findAllActiveByStudy(StudyBean study) {
+    public ArrayList findAllActiveByStudy(Study study) {
         ArrayList answer = new ArrayList();
 
         if (findAllActiveByStudyName == null) {
@@ -139,10 +139,10 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
         HashMap variables = new HashMap();
 
         // study.study_id=?
-        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getStudyId()));
 
         // or study.parent_study_id=?
-        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getStudyId()));
 
         String sql = digester.getQuery(findAllActiveByStudyName);
 
@@ -168,7 +168,7 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
      * @return The entity which belong to <code>study</code> and has primary
      *         key <code>id</code>.
      */
-    public AuditableEntityBean findByPKAndStudy(int id, StudyBean study) {
+    public AuditableEntityBean findByPKAndStudy(int id, Study study) {
         AuditableEntityBean answer = new AuditableEntityBean();
 
         if (findByPKAndStudyName == null) {
@@ -182,10 +182,10 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
         variables.put(Integer.valueOf(1), Integer.valueOf(id));
 
         // study.study_id = ?
-        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getStudyId()));
 
         // study.parent_study_id = ?
-        variables.put(Integer.valueOf(3), Integer.valueOf(study.getId()));
+        variables.put(Integer.valueOf(3), Integer.valueOf(study.getStudyId()));
 
         String sql = digester.getQuery(findByPKAndStudyName);
 

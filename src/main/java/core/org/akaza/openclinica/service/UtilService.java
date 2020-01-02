@@ -3,11 +3,13 @@
  */
 package core.org.akaza.openclinica.service;
 
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 
 /**
  * @author joekeremian
@@ -23,10 +25,11 @@ public interface UtilService {
 
 	UserAccountBean getUserAccountFromRequest(HttpServletRequest request);
 
-    boolean isParticipantIDSystemGenerated(StudyBean tenantStudy);
+    boolean isParticipantIDSystemGenerated(Study tenantStudy);
 
     boolean isParticipantUniqueToSite(String siteOID , String studySubjectId);
 
     void checkFileFormat(MultipartFile file, String fileHeaderMappring);
 
+	boolean checkStudyLevelUser(ArrayList<StudyUserRoleBean> userRoles, String siteOid);
 	}

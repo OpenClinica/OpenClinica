@@ -129,7 +129,7 @@ public class CreateCRFServlet extends SecureController {
                         crf.setOwner(ub);
                         crf.setCreatedDate(new Date());
                         crf.setStatus(Status.AVAILABLE);
-                        crf.setStudyId(currentStudy.getId());
+                        crf.setStudyId(currentStudy.getStudyId());
                         cdao.create(crf);
 
                         crf = (CRFBean) cdao.findByName(crf.getName());

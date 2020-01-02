@@ -12,10 +12,10 @@
 
      <util:properties id="testInfo" location="classpath:datainfo.properties"/>
 
-      <bean id="coreResources" class="core.org.akaza.openclinica.dao.core.CoreResources">
+      <bean id="coreResources" class="core.org.akaza.openclinica.dao.core.CoreResources" autowire="byName">
 
         <property name="dataInfo" ref="testInfo"/>
-
+        <property name="studyDao" ref="studyDaoDomain"/>
 
 
         <!--  <property name="messageSource" ref="messageSource"/> -->

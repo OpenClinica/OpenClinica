@@ -18,24 +18,20 @@ import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.LockInfo;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
-import core.org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
-import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import core.org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -44,6 +40,8 @@ import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
@@ -52,6 +50,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
  *         Code Templates
  */
 public class DeleteEventCRFServlet extends SecureController {
+
     public static String STUDY_SUB_ID = "ssId";
 
     public static String EVENT_CRF_ID = "eventCrfId";
@@ -89,9 +88,8 @@ public class DeleteEventCRFServlet extends SecureController {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
         request.setAttribute("errorData", null);
-        String originatingPage = request.getParameter(ORIGINATING_PAGE);
+        String originatingPage = StringEscapeUtils.escapeJavaScript(request.getParameter(ORIGINATING_PAGE));
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
 
@@ -137,7 +135,7 @@ public class DeleteEventCRFServlet extends SecureController {
 
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
-            StudyBean study = (StudyBean) sdao.findByPK(studySub.getStudyId());
+            Study study = (Study) getStudyDao().findByPK(studySub.getStudyId());
             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
 
             DisplayEventCRFBean dec = new DisplayEventCRFBean();
@@ -258,11 +256,11 @@ public class DeleteEventCRFServlet extends SecureController {
         }
     }
 
-    private void createDiscrepancyNoteBean(String description, String detailedNotes, int itemDataId, StudyBean studyBean, UserAccountBean ub,
+    private void createDiscrepancyNoteBean(String description, String detailedNotes, int itemDataId, Study studyBean, UserAccountBean ub,
             DiscrepancyNoteBean parentDiscrepancyNote) {
         DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
         dnb.setEntityId(itemDataId); // this is needed for DN Map object
-        dnb.setStudyId(studyBean.getId());
+        dnb.setStudyId(studyBean.getStudyId());
         dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
         dnb.setDescription(description);
         dnb.setDetailedNotes(detailedNotes);

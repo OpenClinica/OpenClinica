@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.OpenClinicaMailSender;
@@ -17,6 +16,7 @@ import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import core.org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -25,7 +25,7 @@ public class HelperObject {
     FormLayoutBean sourceCrfVersionBean;
     FormLayoutBean targetCrfVersionBean;
     ReportLog reportLog;
-    StudyBean stBean;
+    Study stBean;
     CRFBean cBean;
     HttpServletRequest request;
     DataSource dataSource;
@@ -70,11 +70,11 @@ public class HelperObject {
         this.reportLog = reportLog;
     }
 
-    public StudyBean getStBean() {
+    public Study getStBean() {
         return stBean;
     }
 
-    public void setStBean(StudyBean stBean) {
+    public void setStBean(Study stBean) {
         this.stBean = stBean;
     }
 

@@ -1,9 +1,9 @@
 package core.org.akaza.openclinica.dao.rule;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.dao.hibernate.RuleDao;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.rule.RuleBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -69,8 +69,8 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
     public void testFindByCrfEmptyResultSet() {
         CRFBean crfBean = new CRFBean();
         crfBean.setId(4);
-        StudyBean studyBean = new StudyBean();
-        studyBean.setId(1);
+        Study studyBean = new Study();
+        studyBean.setStudyId(1);
        // RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
 
         crfBean.setId(4);

@@ -10,18 +10,19 @@ package org.akaza.openclinica.control.extract;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.hibernate.ArchivedDatasetFilePermissionTagDao;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTag;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +51,6 @@ public class AccessFileServlet extends SecureController {
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         DatasetDAO dsDao = new DatasetDAO(sm.getDataSource());
         ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         DatasetBean dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
 
         List<String> permissionTagsList= getPermissionTagsList();
@@ -66,16 +66,16 @@ public class AccessFileServlet extends SecureController {
         }
 
 
-        int parentId = currentStudy.getParentStudyId();
+        int parentId = currentStudy.checkAndGetParentStudyId();
         if(parentId==0)//Logged in at study level
         {
-            StudyBean studyBean = (StudyBean )studyDao.findByPK(dsBean.getStudyId());
-            parentId =  studyBean.getParentStudyId();//parent id of dataset created
+            Study studyBean = (Study)getStudyDao().findByPK(dsBean.getStudyId());
+            parentId =  studyBean.checkAndGetParentStudyId();//parent id of dataset created
 
         }
         //logic: is parentId of the dataset created not equal to currentstudy? or is current study
-        if (parentId!=currentStudy.getId() )
-if( dsBean.getStudyId() != currentStudy.getId())		{
+        if (parentId!=currentStudy.getStudyId() )
+if( dsBean.getStudyId() != currentStudy.getStudyId())		{
             addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
         }

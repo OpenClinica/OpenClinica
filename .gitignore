@@ -8,6 +8,7 @@ release.properties
 .project
 .settings/
 .DS_Store
+catalina.home_IS_UNDEFINED/
 
 # intellij idea
 .idea/

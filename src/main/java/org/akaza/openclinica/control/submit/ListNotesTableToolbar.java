@@ -5,7 +5,7 @@
         import java.util.Comparator;
         import java.util.ResourceBundle;
 
-        import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+        import core.org.akaza.openclinica.domain.datamap.Study;
         import org.akaza.openclinica.control.DefaultToolbar;
         import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
         import core.org.akaza.openclinica.service.PermissionService;
@@ -35,9 +35,9 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 
     private ViewStudySubjectService viewStudySubjectService;
     private PermissionService permissionService;
-    private StudyBean studyBean;
+    private Study studyBean;
     private HttpServletRequest request;
-    public ListNotesTableToolbar(boolean showMoreLink,ViewStudySubjectService viewStudySubjectService,PermissionService permissionService,StudyBean studyBean,HttpServletRequest request) {
+    public ListNotesTableToolbar(boolean showMoreLink,ViewStudySubjectService viewStudySubjectService,PermissionService permissionService,Study studyBean,HttpServletRequest request) {
         super();
         this.showMoreLink = showMoreLink;
 

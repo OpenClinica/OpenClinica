@@ -27,7 +27,6 @@ import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -36,6 +35,8 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -45,7 +46,6 @@ import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -57,17 +57,17 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author jxu
- * 
+ *
  *         View the detail of a discrepancy note on the data entry page
  */
 public class ViewDiscrepancyNoteServlet extends SecureController {
 
     Locale locale;
     // < ResourceBundleresexception,respage;
-
     public static final String ENTITY_ID = "id";
     public static final String PARENT_ID = "parentId";
     public static final String ENTITY_TYPE = "name";
@@ -99,7 +99,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
@@ -126,7 +126,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
         int eventCRFId = fp.getInt(CreateDiscrepancyNoteServlet.EVENT_CRF_ID);
         request.setAttribute(CreateDiscrepancyNoteServlet.EVENT_CRF_ID, new Integer(eventCRFId));
-        
+
         request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
         if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) ||currentRole.getRole().equals(Role.RESEARCHASSISTANT2) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             ArrayList<ResolutionStatus> resStatuses = new ArrayList();
@@ -428,7 +428,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             notes.get(0);
             // @pgawade 21-May-2011 Corrected the condition to throw no access
             // error
-            StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
             int parentStudyForNoteSub = 0;
             // @pgawade #9801: 07-June-2011 corrected the way to get study
             // subject id associated with discrepancy note
@@ -438,12 +437,12 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             // ssdao.findByPK(noteSubId);
 
             StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(subjectId);
-            StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(notessub.getStudyId());
+            Study studyBeanSub = (Study) getStudyDao().findByPK(notessub.getStudyId());
             if (null != studyBeanSub) {
-                parentStudyForNoteSub = studyBeanSub.getParentStudyId();
+                parentStudyForNoteSub = studyBeanSub.checkAndGetParentStudyId();
             }
 
-            if (notessub.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForNoteSub) {
+            if (notessub.getStudyId() != currentStudy.getStudyId() && currentStudy.getStudyId() != parentStudyForNoteSub) {
                 addPageMessage(noAccessMessage);
                 throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
             }
@@ -455,9 +454,9 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
         String session_key = eventCRFId+"_"+field;
         ArrayList newFieldNotes=null;
-        if (newNotes != null && (!newNotes.getNotes(field).isEmpty() || 
+        if (newNotes != null && (!newNotes.getNotes(field).isEmpty() ||
         		!newNotes.getNotes(session_key).isEmpty() ))
-        
+
         {
             newFieldNotes = newNotes.getNotes(field);
             if (newFieldNotes == null || newFieldNotes.size() == 0){
@@ -640,23 +639,23 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         request.setAttribute(DIS_NOTES, noteTree);
 
         // copied from CreatediscrepancyNoteServlet generateUserAccounts
+        Study subjectStudy = getStudyDao().findByStudySubjectId(subjectId);
         String currentSchema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, "public");
 
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-        StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
         int studyId = ub.getActiveStudyId();
         ArrayList<UserAccountBean> userAccounts = new ArrayList();
-        if (currentStudy.getParentStudyId() > 0) {
-            userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), subjectId);
-        } else if (subjectStudy.getParentStudyId() > 0) {
-            userAccounts = udao.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(), subjectId);
+        if (currentStudy.isSite()) {
+            userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.checkAndGetParentStudyId(), subjectId);
+        } else if (subjectStudy.isSite()) {
+            Study publicSubjectStudy = getStudyDao().findByUniqueId(subjectStudy.getUniqueIdentifier());
+            userAccounts = udao.findAllUsersByStudyOrSite(publicSubjectStudy.getStudyId(), publicSubjectStudy.checkAndGetParentStudyId(), subjectId);
         } else {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, subjectId);
         }
         CoreResources.setRequestSchema(request,currentSchema);
-        
-        
+
+
         request.setAttribute(USER_ACCOUNTS, userAccounts);
         request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName());
 
@@ -698,7 +697,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     /**
      * Update a parent DiscrepancyNoteBean's resolution status and updated date
      * to that of the latest child DiscrepancyNoteBean.
-     * 
+     *
      * @param noteTree
      *            A HashMap of an Integer representing the DiscrepancyNoteBean,
      *            pointing to a parent DiscrepancyNoteBean.

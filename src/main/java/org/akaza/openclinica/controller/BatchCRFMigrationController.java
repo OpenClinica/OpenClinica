@@ -21,6 +21,9 @@ import javax.sql.DataSource;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
@@ -28,7 +31,6 @@ import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -42,23 +44,14 @@ import core.org.akaza.openclinica.core.OpenClinicaMailSender;
 import core.org.akaza.openclinica.dao.admin.AuditDAO;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import core.org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.Status;
-import core.org.akaza.openclinica.domain.datamap.EventCrf;
-import core.org.akaza.openclinica.domain.datamap.FormLayout;
-import core.org.akaza.openclinica.domain.datamap.StudyEvent;
-import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
@@ -98,8 +91,11 @@ public class BatchCRFMigrationController implements Runnable {
     private StudyEventDao studyEventDao;
 
     @Autowired
+    private StudyDao studyDao;
+    @Autowired
     private SessionFactory sessionFactory;
-
+    @Autowired
+    private StudyBuildService studyBuildService;
     private HelperObject helperObject;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -109,7 +105,7 @@ public class BatchCRFMigrationController implements Runnable {
     FormLayoutBean sourceCrfVersionBean;
     FormLayoutBean targetCrfVersionBean;
     ReportLog reportLog;
-    StudyBean stBean;
+    Study stBean;
     CRFBean cBean;
     UserAccountBean userAccountBean;
     HttpServletRequest request;
@@ -119,8 +115,9 @@ public class BatchCRFMigrationController implements Runnable {
         super();
     }
 
-    public BatchCRFMigrationController(HelperObject helperObject) {
+    public BatchCRFMigrationController(HelperObject helperObject, StudyDao studyDao) {
         this.helperObject = helperObject;
+        this.studyDao = studyDao;
     }
 
     @RequestMapping(value = "/forms/migrate/{filename}/downloadLogFile")
@@ -212,7 +209,7 @@ public class BatchCRFMigrationController implements Runnable {
 
         String str = "";
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
-            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject);
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject, studyDao);
             Thread thread = new Thread(bcmController);
             thread.start();
             str = resterms.getString("Batch_CRF_version_migration_is_running_You_will_receive_an_email_once_the_process_is_complete");
@@ -242,7 +239,7 @@ public class BatchCRFMigrationController implements Runnable {
 
         String pageMessages = null;
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
-            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject);
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject, studyDao);
             Thread thread = new Thread(bcmController);
             thread.start();
 
@@ -384,15 +381,15 @@ public class BatchCRFMigrationController implements Runnable {
         FormLayoutBean sourceCrfVersionBean = fldao().findByOid(sourceCrfVersion);
         FormLayoutBean targetCrfVersionBean = fldao().findByOid(targetCrfVersion);
 
-        StudyBean stBean = sdao().findByOid(studyOid);
-        if (stBean == null || !stBean.getStatus().isAvailable() || stBean.getParentStudyId() != 0) {
+        Study stBean = studyDao.findByOcOID(studyOid);
+        if (stBean == null || !stBean.getStatus().isAvailable() || stBean.isSite()) {
             reportLog.getErrors().add(resterms.getString("The_OID_of_the_Target_Study_that_you_provided_is_invalid"));
             helperObject.setReportLog(reportLog);
             return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
         // Get public study when you want to get the roles
         StudyUserRoleBean suRole = uadao().findRoleByUserNameAndStudyId(userAccountBean.getName(),
-                CoreResources.getPublicStudy(stBean.getOid(),dataSource).getId());
+                studyBuildService.getPublicStudy(stBean.getOc_oid()).getStudyId());
 
         Role r = suRole.getRole();
         if (suRole == null || !(r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR))) {
@@ -424,17 +421,17 @@ public class BatchCRFMigrationController implements Runnable {
         CRFBean cBean = (CRFBean) cdao().findByPK(sourceCrfVersionBean.getCrfId());
 
         if (sitelist.size() == 0) {
-            ArrayList<StudyBean> listOfSites = (ArrayList<StudyBean>) sdao().findAllByParent(stBean.getId());
-            sitelist.add(stBean.getOid());
-            for (StudyBean s : listOfSites) {
+            ArrayList<Study> listOfSites = (ArrayList<Study>) studyDao.findAllByParent(stBean.getStudyId());
+            sitelist.add(stBean.getOc_oid());
+            for (Study s : listOfSites) {
                 if (s.getStatus().isAvailable()) {
-                    sitelist.add(s.getOid());
+                    sitelist.add(s.getOc_oid());
                 }
             }
         } else {
             for (String site : sitelist) {
-                StudyBean siteBean = sdao().findByOid(site.trim());
-                if (siteBean == null || getParentStudy(siteBean).getId() != stBean.getId()) {
+                Study siteBean = studyDao.findByOcOID(site.trim());
+                if (siteBean == null || getParentStudy(siteBean).getStudyId() != stBean.getStudyId()) {
                     reportLog.getErrors().add(resterms.getString("The_OID_of_the_Site_that_you_provided_is_invalid"));
                     helperObject.setReportLog(reportLog);
                     return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -455,7 +452,7 @@ public class BatchCRFMigrationController implements Runnable {
         } else {
             for (String studyEventDefn : studyEventDefnlist) {
                 StudyEventDefinitionBean sedefnBean = seddao().findByOid(studyEventDefn);
-                if (sedefnBean == null || sedefnBean.getStudyId() != stBean.getId()) {
+                if (sedefnBean == null || sedefnBean.getStudyId() != stBean.getStudyId()) {
                     reportLog.getErrors().add(resterms.getString("The_OID_of_the_Event_that_you_provided_is_invalid"));
                     helperObject.setReportLog(reportLog);
                     return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
@@ -477,7 +474,7 @@ public class BatchCRFMigrationController implements Runnable {
                 studyEventDefnlist, sitelist);
         for (EventDefinitionCRFBean crfMigrationDoesNotPerform : crfMigrationDoesNotPerformList) {
             StudyEventDefinitionBean seddBean = (StudyEventDefinitionBean) seddao().findByPK(crfMigrationDoesNotPerform.getStudyEventDefinitionId());
-            StudyBean sssBean = (StudyBean) sdao().findByPK(crfMigrationDoesNotPerform.getStudyId());
+            Study sssBean = (Study) studyDao.findByPK(crfMigrationDoesNotPerform.getStudyId());
             reportLog.getCanNotMigrate().add(resterms.getString("CRF_Version_Migration_cannot_be_performed_for") + " " + sssBean.getName() + " "
                     + seddBean.getName() + ". " + resterms.getString("Both_CRF_versions_are_not_available_at_the_Site"));
         }
@@ -497,18 +494,13 @@ public class BatchCRFMigrationController implements Runnable {
 
     }
 
-    private StudyBean getParentStudy(StudyBean study) {
-        if (study.getParentStudyId() == 0) {
+    private Study getParentStudy(Study study) {
+        if (!study.isSite()) {
             return study;
         } else {
-            StudyBean parentStudy = (StudyBean) sdao().findByPK(study.getParentStudyId());
+            Study parentStudy = study.getStudy();
             return parentStudy;
         }
-    }
-
-    @SuppressWarnings("rawtypes")
-    private StudyDAO sdao() {
-        return new StudyDAO(dataSource);
     }
 
     @SuppressWarnings("rawtypes")
@@ -608,7 +600,7 @@ public class BatchCRFMigrationController implements Runnable {
         return transferObject;
     }
 
-    public String toStringTextFormat(ReportLog reportLog, ResourceBundle resterms, StudyBean stBean, CRFBean cBean) {
+    public String toStringTextFormat(ReportLog reportLog, ResourceBundle resterms, Study stBean, CRFBean cBean) {
 
         StringBuffer text1 = new StringBuffer();
         for (String migrationPerform : reportLog.getCanNotMigrate()) {
@@ -729,7 +721,7 @@ public class BatchCRFMigrationController implements Runnable {
             }
 
             StudySubjectBean ssBean = (StudySubjectBean) ssdao().findByPK(eventCrfToMigrate.getStudySubjectId());
-            StudyBean sBean = (StudyBean) sdao().findByPK(ssBean.getStudyId());
+            Study sBean = (Study) studyDao.findByPK(ssBean.getStudyId());
             StudyEventBean seBean = (StudyEventBean) sedao().findByPK(eventCrfToMigrate.getStudyEventId());
             StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao().findByPK(seBean.getStudyEventDefinitionId());
             reportLog.getLogs()

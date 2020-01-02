@@ -1,12 +1,33 @@
 package org.akaza.openclinica.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.core.Context;
+
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import core.org.akaza.openclinica.bean.login.*;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
@@ -16,7 +37,6 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.datamap.Study;
@@ -26,6 +46,7 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.service.PdfService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.UserService;
@@ -38,12 +59,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.text.ParseException;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
@@ -73,17 +88,30 @@ public class StudyParticipantController {
 	private CSVService csvService;
 
 	@Autowired
+	PdfService pdfService;
+
+	@Autowired
 	private UserAccountDao uAccountDao;
 
 	@Autowired
 	private StudyDao studyDao;
+	@Autowired
+	private StudySubjectDao studySubjectDao;
 
-	private StudyDAO studyDAO;
 	private StudySubjectDAO ssDao;
 	private UserAccountDAO userAccountDao;
 
 	@Autowired
+	KeycloakClientImpl keycloakClient;
+
+	@Autowired
 	private StudyParticipantService studyParticipantService;
+
+	@Autowired
+	PermissionService permissionService;
+
+	@Autowired
+	private StudyBuildService studyBuildService;
 
 	private RestfulServiceHelper serviceHelper;
 	private String dateFormat;
@@ -125,9 +153,10 @@ public class StudyParticipantController {
 		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String accessToken = utilService.getAccessTokenFromRequest(request);
+		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 		Study tenantStudy = studyDao.findByOcOID(studyOid);
-		StudyDAO sDao = new StudyDAO(dataSource);
-		StudyBean tenantStudyBean = sDao.findByOid(studyOid);
+		Study siteStudy = studyDao.findByOcOID(siteOid);
+		Study tenantStudyBean = studyDao.findByOcOID(studyOid);
 		ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(request.getLocale());
 		AddParticipantResponseDTO result=null;
 		try {
@@ -136,7 +165,7 @@ public class StudyParticipantController {
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
 			if (utilService.isParticipantIDSystemGenerated(tenantStudyBean))
 				throw new OpenClinicaSystemException(ErrorConstants.ERR_SYSTEM_GENERATED_ID_ENABLED);
-			 result = studyParticipantService.addParticipant(addParticipantRequestDTO, userAccountBean, studyOid, siteOid, customerUuid, textsBundle, accessToken, register);
+			 result = studyParticipantService.addParticipant(addParticipantRequestDTO, userAccountBean, tenantStudy, siteStudy,realm, customerUuid, textsBundle, accessToken, register);
 
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
@@ -183,11 +212,11 @@ public class StudyParticipantController {
 
 		Study site = studyDao.findByOcOID(siteOid.trim());
 		Study study = studyDao.findByOcOID(studyOid.trim());
-		StudyDAO sDao = new StudyDAO(dataSource);
-		StudyBean tenantStudyBean=sDao.findByOid(studyOid);
+		Study tenantStudyBean=studyDao.findByOcOID(studyOid);
 
 		String customerUuid = utilService.getCustomerUuidFromRequest(request);
 		String accessToken = utilService.getAccessTokenFromRequest(request);
+		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 		ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(request.getLocale());
 
 		try {
@@ -206,7 +235,7 @@ public class StudyParticipantController {
 
 		}
 
-		String uuid = startBulkAddParticipantJob(file, schema, studyOid, siteOid, userAccountBean,customerUuid,textsBundle,accessToken,register);
+		String uuid = startBulkAddParticipantJob(file, schema, studyOid, siteOid, userAccountBean,realm,customerUuid,textsBundle,accessToken,register);
 
 		logger.info("REST request to Import Job uuid {} ", uuid);
 		return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -218,7 +247,7 @@ public class StudyParticipantController {
 
 
 
-	
+
 	@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 	public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
@@ -239,7 +268,7 @@ public class StudyParticipantController {
 		return listStudySubjects(studyOid, siteOid, request);
 	}
 
-	
+
 	@ApiOperation(value = "To get one participant information in study or study site",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participant", method = RequestMethod.GET)
 	public ResponseEntity<Object> getStudySubjectInfo(
@@ -250,20 +279,22 @@ public class StudyParticipantController {
 			HttpServletRequest request) throws Exception {
 
 		utilService.setSchemaFromStudyOid(studyOid);
-		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);		
-		
+		UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+
 		boolean includeRelatedInfo = false;
 		if(includeParticipateInfo!=null && includeParticipateInfo.trim().toUpperCase().equals("Y")) {
 			includeRelatedInfo = true;
 		}
-		
+
 		String accessToken = utilService.getAccessTokenFromRequest(request);
-		String customerUuid = utilService.getCustomerUuidFromRequest(request);					
+		String customerUuid = utilService.getCustomerUuidFromRequest(request);
+		String realm = keycloakClient.getRealmName(accessToken, customerUuid);
 		StudyParticipantDetailDTO result =  null;
 		
 		try {			
-			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);							
-			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,customerUuid,userAccountBean,participantID,includeRelatedInfo);
+			validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean,includeRelatedInfo);
+			boolean isStudyLevelUser = utilService.checkStudyLevelUser(userAccountBean.getRoles(), siteOid);
+			result = userService.extractParticipantInfo(studyOid,siteOid,accessToken,realm,userAccountBean,participantID,includeRelatedInfo, isStudyLevelUser);
 		} catch (OpenClinicaSystemException e) {
 			return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
 		}
@@ -271,7 +302,7 @@ public class StudyParticipantController {
 		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
 
-	
+
 	/**
 	 * @param studyOid
 	 * @param siteOid
@@ -284,7 +315,7 @@ public class StudyParticipantController {
 		ResponseEntity<Object> response = null;
 		try {
 
-			StudyBean study = null;
+			Study study = null;
 			try {
 				study = this.getRestfulServiceHelper().setSchema(studyOid, request);
 				study = participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
@@ -304,16 +335,16 @@ public class StudyParticipantController {
 			if(study != null) {
         ResponseSuccessListAllParticipantsByStudyDTO responseSuccess =  new ResponseSuccessListAllParticipantsByStudyDTO();
 
-        ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);            	  		 	            
+        ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);
         responseSuccess.setStudyParticipants(studyParticipantDTOs);
         responseSuccess.setSiteOID(siteOid);
         if (siteOid != null) {
-          StudyBean site = this.getStudyDAO().findByOid(siteOid);
-          responseSuccess.setSiteID(site.getIdentifier());
+          Study site = studyDao.findByOcOID(siteOid);
+          responseSuccess.setSiteID(site.getUniqueIdentifier());
           responseSuccess.setSiteName(site.getName());
-        }       	
+        }
 		 	  response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
-		  }	
+		  }
 
 		} catch (Exception eee) {
 			logger.error("Error while listing study subjects: ",eee);
@@ -330,14 +361,14 @@ public class StudyParticipantController {
 	 * @return
 	 * @throws Exception
 	 */
-	private ArrayList<StudyParticipantDTO> getStudyParticipantDTOs(String studyOid, String siteOid,StudyBean study) throws Exception {
+	private ArrayList<StudyParticipantDTO> getStudyParticipantDTOs(String studyOid, String siteOid,Study study) throws Exception {
 
-		StudyBean studyToCheck;
+		Study studyToCheck;
 		/**
 		 *  pass in site OID, so will return data in site level
 		 */
 		if(siteOid != null) {
-			studyToCheck = this.getStudyDAO().findByOid(siteOid);
+			studyToCheck = studyDao.findByOcOID(siteOid);
 		}else {
 			studyToCheck = study;
 		}
@@ -463,16 +494,6 @@ public class StudyParticipantController {
 		this.dateFormat = dateFormat;
 	}
 
-	/**
-	 *
-	 * @return
-	 */
-	public StudyDAO getStudyDAO() {
-		studyDAO = studyDAO
-				!= null ? studyDAO : new StudyDAO(dataSource);
-		return studyDAO;
-	}
-
 	public UserAccountDAO getUserAccountDao() {
 		userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
 		return userAccountDao;
@@ -484,10 +505,10 @@ public class StudyParticipantController {
 	}
 
 	public  RestfulServiceHelper getRestfulServiceHelper() {
-		serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource);
+		serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource, studyBuildService, studyDao);
 		return serviceHelper;
 	}
-	public String startBulkAddParticipantJob(MultipartFile file, String schema, String studyOid, String siteOid,UserAccountBean userAccountBean, String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
+		public String startBulkAddParticipantJob(MultipartFile file, String schema, String studyOid, String siteOid,UserAccountBean userAccountBean, String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register) {
 		utilService.setSchemaFromStudyOid(studyOid);
 		UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 
@@ -496,7 +517,8 @@ public class StudyParticipantController {
 		JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.BULK_ADD_PARTICIPANTS, file.getOriginalFilename());
 		CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 			try {
-				studyParticipantService.startBulkAddParticipantJob(file, study, site,userAccountBean, jobDetail, schema, customerUuid,  textsBundle, accessToken,  register);
+				studyParticipantService.startBulkAddParticipantJob(file, study, site,userAccountBean, jobDetail, schema, realm,customerUuid,  textsBundle, accessToken,  register);
+
 			} catch (Exception e) {
 				logger.error("Exception is thrown while processing dataImport: " + e);
 			}
@@ -505,4 +527,142 @@ public class StudyParticipantController {
 		});
 		return jobDetail.getUuid();
 	}
+	
+		@ApiOperation(value = "To get PDF version casebook for one specific participant at site level",  notes = "only work for authorized users with the right acecss permission ")
+		@RequestMapping(value = "/studies/{studyOid}/sites/{siteOid}/participants/{participantId}/casebook", method = RequestMethod.POST)
+		public ResponseEntity<Object> getSiteLevelParticipantCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
+				                                       @PathVariable("siteOid") String siteOid,
+													   @PathVariable("participantId") String participantId, 
+													   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
+											           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
+											           @ApiParam( value = "optional parameter landscape whether paper orientation is landscape. Valid values are true, false. Default is false.", required = false ) @RequestParam(value="landscape",defaultValue = "false",required = false) String landscape,
+											           @Context HttpServletRequest request
+											          ) throws IOException {
+												 
+			
+			  utilService.setSchemaFromStudyOid(siteOid);	
+			  String schema = CoreResources.getRequestSchema();
+		 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+	 			 	  
+			  try {				 
+				  validateService.validateStudyAndRoles(studyOid.trim(),siteOid.trim(),userAccountBean);			 	 			 	 		 	 
+			 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
+
+				  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
+				  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+			  
+				  } catch (OpenClinicaSystemException e) {
+						return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
+				}
+			 	 
+			 }
+
+		
+	@ApiOperation(value = "To get PDF version casebook for one specific participant at study level",  notes = "only work for authorized users with the right acecss permission ")
+	@RequestMapping(value = "/studies/{studyOid}/participants/{participantId}/casebook", method = RequestMethod.POST)
+	public ResponseEntity<Object> getStudyLevelParticipantCaseBookInPDF(@PathVariable("studyOid") String studyOid,		
+												   @PathVariable("participantId") String participantId, 
+												   @ApiParam( value = "optional parameter format the paper format. Valid values are: Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, and A6. Default is A4.", required = false ) @DefaultValue("A4") @RequestParam(value="format",defaultValue = "A4",required = false) String format,
+										           @ApiParam( value = "optional parameter margin the paper margin. Valid units are: in, cm, and mm. Example values are 2.1in, 2cm, 10mm. Default is 0.5in.", required = false ) @DefaultValue("0.5in") @RequestParam(value="margin",defaultValue = "0.5in",required = false) String margin,
+										           @ApiParam( value = "optional parameter landscape whether paper orientation is landscape. Valid values are true, false. Default is false.", required = false ) @RequestParam(value="landscape",defaultValue = "false",required = false) String landscape,
+										           @Context HttpServletRequest request
+										          ) throws IOException {
+											 
+		
+		  utilService.setSchemaFromStudyOid(studyOid);	
+		  String schema = CoreResources.getRequestSchema();
+	 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+	 	
+		  try {				 
+			  validateService.validateStudyAndRoles(studyOid.trim(),userAccountBean);			 	 			 	 		 	 
+		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,null, participantId, request, userAccountBean, format, margin, landscape);
+
+			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
+			  return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+		  
+			  } catch (OpenClinicaSystemException e) {
+					return new ResponseEntity(validateService.getResponseForException(e, studyOid, null), HttpStatus.BAD_REQUEST);
+			}
+		 	 
+		 }
+
+	
+	private String startBulkCaseBookPDFJob(String schema,
+										   String studyOid,
+										   String siteOid, 
+										   String participantId, 											 
+										   HttpServletRequest request,
+										   UserAccountBean userAccountBean, 
+										   String format, 
+										   String margin, 
+										   String landscape) {
+									 	 
+
+
+		    final	Study 	site = siteOid==null? null:studyDao.findByOcOID(siteOid);	    			
+			final	Study	study = studyOid==null? null:studyDao.findByOcOID(studyOid);						
+			
+			UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
+			
+			// use study or site to check subject
+			Study sTemp = null;			
+			if(siteOid !=null) {
+				sTemp = site;
+				
+			}else {
+				sTemp = study;
+			}			
+			final StudySubject ss= studySubjectDao.findByLabelAndStudy(participantId.trim(), sTemp);			
+			if(ss == null) {
+				throw new  OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND,"Bad request");
+			}
+
+			//Setting the destination file
+	        String fullFinalFilePathName = this.getMergedPDFcasebookFileName(studyOid, participantId);
+	        int index= fullFinalFilePathName.lastIndexOf(File.separator);
+	      
+	    	String fileName = fullFinalFilePathName.substring(index + 1);
+	    	
+			JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.PARTICIPANT_PDF_CASEBOOK, fileName);
+			jobDetail.setLogPath(fileName);
+			ServletContext servletContext = request.getServletContext();
+			String accessToken = (String) request.getSession().getAttribute("accessToken");
+			servletContext.setAttribute("accessToken", accessToken);
+			servletContext.setAttribute("studyID", study.getStudyId()+"");		
+			Locale local = LocaleResolver.resolveLocale(request);
+			List<String> permissionTagsString =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
+			CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+				try {
+					 ResourceBundleProvider.updateLocale(local);
+					 String userAccountID = userAccountBean.getId() +"";
+					 this.studyParticipantService.startCaseBookPDFJob(jobDetail,schema,study, site,ss, servletContext, userAccountID, fullFinalFilePathName,format, margin, landscape,permissionTagsString);
+				 	
+					} catch (Exception e) {
+						logger.error("Exception is thrown while processing CaseBook PDF: " + e);
+						return e.getMessage();
+					}
+				return null;
+
+			});
+			return jobDetail.getUuid();
+	
+	}
+	
+	
+	/**
+	 * @param studyOID
+	 * @param studySubjectIdentifier
+	 * @return
+	 */
+	public String getMergedPDFcasebookFileName(String studyOID, String participantId) {
+		Date now = new Date();	
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");
+		String timeStamp = simpleDateFormat.format(now);
+        String pathStr = pdfService.getCaseBookFileRootPath();
+    	String fileName = "Participant_"+participantId+"_Casebook_"+timeStamp+".pdf";
+    	String fullFinalFilePathName = pathStr + File.separator + fileName;
+		return fullFinalFilePathName;
+	}
+	
+
 }

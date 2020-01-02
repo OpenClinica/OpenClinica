@@ -7,8 +7,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="include/managestudy_top_pages.jsp"/>
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
 <link rel="stylesheet" href="../includes/css/icomoon-style.css">
 
 
@@ -450,19 +448,19 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 1}">
                         <a href="${createRule}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oc_oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.rule == 2}">
                         <a href="${viewRule}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createRule}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oc_oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
                         <a href="${viewRule}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createRule}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oc_oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
@@ -626,8 +624,8 @@
                       </span>
                   </td>
                   <td>
-                      <c:url var="reactivateParticipate" value="studymodule/${currentStudy.oid}/reactivate"/>
-                      <c:url var="deactivateParticipate" value="studymodule/${currentStudy.oid}/deactivate"/>
+                      <c:url var="reactivateParticipate" value="studymodule/${currentStudy.oc_oid}/reactivate"/>
+                      <c:url var="deactivateParticipate" value="studymodule/${currentStudy.oc_oid}/deactivate"/>
                       <c:choose>
                           <c:when test="${participateOCStatus == 'disabled' && !empty participateStatus}">
                               <a href="${reactivateParticipate}" id="reactivateParticipateAccess" name="reactivateParticipateAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
@@ -665,8 +663,8 @@
                     </span>
                   </td>
                   <td>
-                      <c:url var="reactivateRandomization" value="studymodule/${currentStudy.oid}/reactivaterandomization"/>
-                      <c:url var="deactivateRandomization" value="studymodule/${currentStudy.oid}/deactivaterandomization"/>
+                      <c:url var="reactivateRandomization" value="studymodule/${currentStudy.oc_oid}/reactivaterandomization"/>
+                      <c:url var="deactivateRandomization" value="studymodule/${currentStudy.oc_oid}/deactivaterandomization"/>
                       <c:choose>
                           <c:when test="${randomizationOCStatus == 'disabled' && !empty randomizationStatus}">
                               <a href="${reactivateRandomization}" id="reactivateRandomizationAccess" name="reactivateRandomizationAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
@@ -721,7 +719,7 @@
 
 <c:if test="${portalURL!= '' && portalURL!= null}">
     <div align="left" id="requestParticipateForm" class="participate-registration-div">
-        <form action="studymodule/${currentStudy.oid}/register" method="post">
+        <form action="studymodule/${currentStudy.oc_oid}/register" method="post">
             <h1>
                 <fmt:message key="participate_reg_title" bundle="${resword}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
@@ -750,7 +748,7 @@
 
  <c:if test="${moduleManager!= '' && moduleManager!= null}">
     <div align="left" id="requestRandomizationForm" class="randomization-registration-div">
-        <form action="studymodule/${currentStudy.oid}/randomize" method="post">
+        <form action="studymodule/${currentStudy.oc_oid}/randomize" method="post">
             <h1>
                 <fmt:message key="randomization_reg_title" bundle="${resword}"/>
             </h1>

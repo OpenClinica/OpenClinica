@@ -1,22 +1,22 @@
 package core.org.akaza.openclinica.web.restful.data.validator;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyDAO;
+import core.org.akaza.openclinica.domain.Status;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import org.springframework.validation.Errors;
 
 public class BaseVSValidatorImplementation implements BaseWSValidatorInterface{
 
 	
 	
-	public StudyBean verifyStudy( StudyDAO dao, String study_id, Status[] included_status,
-			 Errors errors){
+	public Study verifyStudy(StudyDao dao, String study_id, Status[] included_status,
+							 Errors errors){
 		
-		StudyBean study = dao.findByUniqueIdentifier(study_id);
+		Study study = dao.findByUniqueId(study_id);
         if (study == null) {
             errors.reject("studyEventTransferValidator.study_does_not_exist", new Object[] { study_id },
                     "Study identifier you specified " + study_id + " does not correspond to a valid study.");
@@ -39,10 +39,10 @@ public class BaseVSValidatorImplementation implements BaseWSValidatorInterface{
       
 	}
 	
-	public StudyBean verifyStudyByOID( StudyDAO dao, String study_id, Status[] included_status,
+	public Study verifyStudyByOID( StudyDao dao, String study_id, Status[] included_status,
 			 Errors errors){
 		
-		StudyBean study = dao.findByOid(study_id);
+		Study study = dao.findByOcOID(study_id);
        if (study == null) {
            errors.reject("studyEventTransferValidator.study_does_not_exist", new Object[] { study_id },
                    "Study identifier you specified " + study_id + " does not correspond to a valid study.");
@@ -65,11 +65,11 @@ public class BaseVSValidatorImplementation implements BaseWSValidatorInterface{
      
 	}
 	
-	public StudyBean verifySite( StudyDAO dao, String study_id, String site_id, Status[] included_status,
-			 Errors errors){
+	public Study verifySite(StudyDao dao, String study_id, String site_id, Status[] included_status,
+							Errors errors){
 		
 		 if ( site_id == null) return null;
-		 StudyBean site = dao.findSiteByUniqueIdentifier(study_id, site_id);
+		 Study site = dao.findSiteByUniqueIdentifier(study_id, site_id);
          // verification 
          // go from here : study should be available or in design - verify
          if ( site == null){
@@ -93,7 +93,7 @@ public class BaseVSValidatorImplementation implements BaseWSValidatorInterface{
          return site;
          
 	}
-	public StudyBean verifyStudySubject(String study_id, String subjectId, int max_length, Errors errors){
+	public Study verifyStudySubject(String study_id, String subjectId, int max_length, Errors errors){
 		//verify that subjectId is not null
 		
 		//verify that subjectid<max_length if max_length>0
@@ -157,7 +157,7 @@ public class BaseVSValidatorImplementation implements BaseWSValidatorInterface{
 		StudyUserRoleBean siteSur;
 		if ( site_id > -1){
 			   siteSur = userAccountDao.findRoleByUserNameAndStudyId(user.getName(), site_id);
-		       if (siteSur.getStatus() != Status.AVAILABLE) {
+		       if (siteSur.getStatus() != core.org.akaza.openclinica.bean.core.Status.AVAILABLE) {
 		           errors.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
 		                   "You do not have sufficient privileges to proceed with this operation.");
 		           return false;
@@ -165,7 +165,7 @@ public class BaseVSValidatorImplementation implements BaseWSValidatorInterface{
 	        
 		}
 		  siteSur = userAccountDao.findRoleByUserNameAndStudyId(user.getName(), study_id);
-	       if (siteSur.getStatus() != Status.AVAILABLE) {
+	       if (siteSur.getStatus() != core.org.akaza.openclinica.bean.core.Status.AVAILABLE) {
 	           errors.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
 	                   "You do not have sufficient privileges to proceed with this operation.");
 	           return false;

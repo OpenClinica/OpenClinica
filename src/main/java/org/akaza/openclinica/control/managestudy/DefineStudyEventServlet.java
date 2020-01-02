@@ -58,7 +58,7 @@ public class DefineStudyEventServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.LIST_DEFINITION_SERVLET, respage.getString("current_study_locked"));
 
-        if (currentStudy.getParentStudyId() > 0) {
+        if (currentStudy.isSite()) {
             addPageMessage(respage.getString("SED_may_only_added_top_level") + respage.getString("please_contact_sysadmin_questions"));
             throw new InsufficientPermissionException(Page.STUDY_EVENT_DEFINITION_LIST, resexception.getString("not_top_study"), "1");
         }
@@ -106,7 +106,7 @@ public class DefineStudyEventServlet extends SecureController {
         }
         if (StringUtil.isBlank(actionName)) {
             StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
-            sed.setStudyId(currentStudy.getId());
+            sed.setStudyId(currentStudy.getStudyId());
             session.setAttribute("definition", sed);
             session.removeAttribute("tmpCRFIdMap");
             forwardPage(Page.DEFINE_STUDY_EVENT1);
@@ -144,7 +144,7 @@ public class DefineStudyEventServlet extends SecureController {
                             logger.debug("actionName ==> 3");
                             submitDefinition();
                             StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
-                            sed.setStudyId(currentStudy.getId());
+                            sed.setStudyId(currentStudy.getStudyId());
                             session.setAttribute("definition", sed);
                             forwardPage(Page.DEFINE_STUDY_EVENT1);
                         }
@@ -176,7 +176,7 @@ public class DefineStudyEventServlet extends SecureController {
                 } else {
                     if (session.getAttribute("definition") == null) {
                         StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
-                        sed.setStudyId(currentStudy.getId());
+                        sed.setStudyId(currentStudy.getStudyId());
                         session.setAttribute("definition", sed);
                     }
                     forwardPage(Page.DEFINE_STUDY_EVENT1);
@@ -371,7 +371,7 @@ public class DefineStudyEventServlet extends SecureController {
             }
 
             edcBean.setNullValues(nullString);
-            edcBean.setStudyId(currentStudy.getId());
+            edcBean.setStudyId(currentStudy.getStudyId());
             eventDefinitionCRFs.add(edcBean);
         }
 

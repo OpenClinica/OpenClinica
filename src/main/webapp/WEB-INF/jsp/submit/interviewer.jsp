@@ -28,7 +28,7 @@
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-3.1.0.min.js"></script>
 <style type="text/css">
 
 .tooltip {
@@ -223,7 +223,7 @@ function callTip(html)
 <table border="0" cellpadding="0" cellspacing="0" onLoad="">
 
 <c:choose>
-    <c:when test="${study.studyParameterConfig.interviewerNameRequired == 'yes' || study.studyParameterConfig.interviewDateRequired == 'yes'}">
+    <c:when test="${study.interviewerNameRequired == 'yes' || study.interviewDateRequired == 'yes'}">
         <tr id="CRF_infobox_closed" style="display:none;">
             <td style="padding-top: 3px; padding-left: 6px; width: 250px;" nowrap>
                 <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
@@ -348,7 +348,7 @@ function callTip(html)
         <c:out value="${studySubject.label}" /><br />
     </td>
     <c:choose>
-        <c:when test="${study.studyParameterConfig.personIdShownOnCRF == 'true'}">
+        <c:when test="${study.personIdShownOnCRF == 'true'}">
             <td class="table_cell" style="color: #789EC5">
                 <b><fmt:message key="person_ID" bundle="${resword}"/>:</b><br />
             </td>
@@ -366,7 +366,7 @@ function callTip(html)
 --><!-- 
 <tr>
     <c:choose>
-        <c:when test="${study.studyParameterConfig.secondaryLabelViewable == 'true'}">
+        <c:when test="${study.secondaryLabelViewable == 'true'}">
             <td class="table_cell" style="color: #789EC5">
                 <b><fmt:message key="secondary_ID" bundle="${resword}"/>:</b><br />
             </td>
@@ -450,9 +450,9 @@ function callTip(html)
      <c:out value="${studyTitle}" /><br>
     </td>
     <td class="table_cell_top" >
-        <c:if test="${study.studyParameterConfig.collectDob != '3'}">
+        <c:if test="${study.collectDob != '3'}">
             <c:choose>
-                <c:when test="${study.studyParameterConfig.collectDob =='1'}">
+                <c:when test="${study.collectDob =='1'}">
                     <b><fmt:message key="date_of_birth" bundle="${resword}"/>:</b><br />
                 </c:when>
                 <c:otherwise>
@@ -462,12 +462,12 @@ function callTip(html)
         </c:if>
     </td>
      <td class="table_cell_noborder" >
-          <c:if test="${study.studyParameterConfig.collectDob != '3'}">
+          <c:if test="${study.collectDob != '3'}">
                     <%-- BWP 3105 Until the SubjectBean uses the Calendar object to represent
          the date of birth, we will have to use the Date.getYear() deprecated method.--%>
     
                 <c:choose>
-                    <c:when test="${study.studyParameterConfig.collectDob == '2' && subject.dateOfBirth.year != null}">${subject.dateOfBirth.year + 1900}</c:when>
+                    <c:when test="${study.collectDob == '2' && subject.dateOfBirth.year != null}">${subject.dateOfBirth.year + 1900}</c:when>
                     <c:otherwise> <fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" /></c:otherwise>
                 </c:choose>
                 <%-->> --%>
@@ -486,16 +486,16 @@ function callTip(html)
     </td>
     
     <td class="table_cell_noborder" >
-        <c:if test="${study.parentStudyId > '0'}">
+        <c:if test="${study.study != null && study.study.studyId > '0'}">
             <c:out value="${siteTitle}" /><br>
         </c:if>
-        <c:if test="${study.parentStudyId == '0'}">
+        <c:if test="${study.study == null || study.study.studyId == '0'}">
             <fmt:message key="na" bundle="${resword}"/><br>
         </c:if>
     </td>
     <!--person id todo -->
        <c:choose>
-        <c:when test="${study.studyParameterConfig.personIdShownOnCRF == 'true'}">
+        <c:when test="${study.personIdShownOnCRF == 'true'}">
             <td class="table_cell_top">
                 <b><fmt:message key="person_ID" bundle="${resword}"/>:</b><br />
             </td>
@@ -551,7 +551,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
 <tr>
 <td class="table_cell_left" nowrap>
-    <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
+    <c:if test="${study.interviewerNameRequired != 'not_used'}">
     <c:choose>
         <c:when test="${isInError_Int}">
             <fmt:message key="interviewer_name" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span> &nbsp;
@@ -560,7 +560,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
         <c:otherwise>
             <fmt:message key="interviewer_name" bundle="${resword}"/>:
-            <c:if test="${study.studyParameterConfig.interviewerNameRequired=='yes'}">
+            <c:if test="${study.interviewerNameRequired=='yes'}">
                 *
             </c:if>
             &nbsp;
@@ -569,7 +569,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
     </c:if>
 </td>
 <td class="table_cell_left">
-    <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
+    <c:if test="${study.interviewerNameRequired != 'not_used'}">
     <table border="0" cellpadding="0" cellspacing="0">
         <tr>
 
@@ -578,7 +578,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
                 <c:choose>
                 <c:when
-                  test="${study.studyParameterConfig.interviewerNameEditable=='true'}">
+                  test="${study.interviewerNameEditable=='true'}">
                 <c:choose>
                 <c:when test="${isInError_Int}">
                 <div class="aka_input_error">
@@ -607,7 +607,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             <td valign="top" nowrap>
                 <c:set var="isNewDN" value="${hasNameNote eq 'yes' ? 0 : 1}"/>
 
-                <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                <c:if test="${study.discrepancyManagement=='true' && !study.status.locked}">
                     <%--<c:if test="${! (enclosingPage eq 'viewSectionData')}">--%>
                 <c:choose>
                   <c:when test="${nameNoteResStatus == 0}">
@@ -659,7 +659,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 </td>
 
 <td class="table_cell" nowrap>
-    <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
+    <c:if test="${study.interviewDateRequired != 'not_used'}">
     <c:choose>
         <c:when test="${isInError_Dat}">
             <fmt:message key="interview_date" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span>&nbsp;<br />
@@ -667,7 +667,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
         </c:when>
         <c:otherwise>
             <fmt:message key="interview_date" bundle="${resword}"/>:
-            <c:if test="${study.studyParameterConfig.interviewDateRequired=='yes'}">
+            <c:if test="${study.interviewDateRequired=='yes'}">
                 *
             </c:if>&nbsp;<br />
             <%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%>
@@ -676,7 +676,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
     </c:if>
 </td><!--</a>-->
 <td class="table_cell_left"> 
-    <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
+    <c:if test="${study.interviewDateRequired != 'not_used'}">
     <table border="0" cellpadding="0" cellspacing="0">
 
         <tr>
@@ -684,7 +684,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             <td valign="top">
                 <c:choose>
                 <c:when
-                  test="${study.studyParameterConfig.interviewDateEditable=='true'}">
+                  test="${study.interviewDateEditable=='true'}">
                 <c:choose>
                 <c:when test="${isInError_Dat}">
                 <div class="aka_input_error">
@@ -722,7 +722,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                     Calendar.setup({inputField  : "interviewDate", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "interviewDateTrigger" });
                 </script>
 
-                <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                <c:if test="${study.discrepancyManagement=='true' && !study.status.locked}">
                     <%-- ViewDiscrepancyNote?writeToDB=1&subjectId=<c:out value="${discrepancyNote.subjectId}"/>&itemId=<c:out value="${item.id}"/>&id=<c:out value="${discrepancyNote.entityId}"/>&name=<c:out value="${discrepancyNote.entityType}"/>&field=<c:out value="${discrepancyNote.field}"/>&column=<c:out value="${discrepancyNote.column}"/>&enterData=<c:out value="${enterData}"/>&monitor=<c:out value="${monitor}"/>&blank=<c:out value="${blank}"/>" --%>
                     <%--BWP: 2808 related>>
                     and switched it back for 2898--%>
