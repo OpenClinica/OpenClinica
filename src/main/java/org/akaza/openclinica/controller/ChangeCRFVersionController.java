@@ -133,8 +133,7 @@ public class ChangeCRFVersionController {
         request.setAttribute("crfName", crfName);
         request.setAttribute("formLayoutId", formLayoutId);
         request.setAttribute("formLayoutName", formLayoutName.trim());
-        String originatingPageEscaped = StringEscapeUtils.escapeHtml(originatingPage);
-        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPageEscaped);
+        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPage);
 
         ArrayList<String> pageMessages = initPageMessages(request);
         String errorMessage = request.getParameter("errorMessage");
