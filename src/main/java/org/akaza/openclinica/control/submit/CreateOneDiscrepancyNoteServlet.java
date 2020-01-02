@@ -34,6 +34,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -45,7 +46,6 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Create a discrepancy note
@@ -302,7 +302,9 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                             }
                         }
                         else {
-                            message.append(discrepancyNoteDao.findByPK(dn.getId()).getDnStudyEventMaps().get(0).getDnStudyEventMapId().getColumnName());
+                            String description = getDiscrepancyNoteDao().findByPK(dn.getId()).getDnStudyEventMaps().get(0).getDnStudyEventMapId().getColumnName();
+                            description = description.equals("start_date") ? "Event Start Date" : "Event End Date";
+                            message.append(MessageFormat.format(respage.getString("mailDNParameters7"), description));
                         }
                     }
 

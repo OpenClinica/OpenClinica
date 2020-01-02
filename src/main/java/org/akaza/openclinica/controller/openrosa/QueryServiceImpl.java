@@ -364,6 +364,11 @@ public class QueryServiceImpl implements QueryService {
                     message.append(MessageFormat.format(respage.getString("mailDNParameters7"), helperBean.getItemData().getItem().getBriefDescription()));
                 }
             }
+            else {
+                String description = helperBean.getDn().getDnStudyEventMaps().get(0).getDnStudyEventMapId().getColumnName();
+                description = description.equals("start_date") ? "Event Start Date" : "Event End Date";
+                message.append(MessageFormat.format(respage.getString("mailDNParameters7"), description));
+            }
         }
 
         message.append(respage.getString("email_body_separator"));

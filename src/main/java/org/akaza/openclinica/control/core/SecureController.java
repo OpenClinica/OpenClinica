@@ -1608,6 +1608,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
     }
 
+    protected DiscrepancyNoteDao getDiscrepancyNoteDao() {
+        return (DiscrepancyNoteDao) SpringServletAccess.getApplicationContext(context).getBean("discrepancyNoteDao");
+    }
+
     protected EnketoUrlService getEnketoUrlService() {
         return (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
     }
