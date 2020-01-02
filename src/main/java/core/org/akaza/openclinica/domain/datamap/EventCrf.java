@@ -50,7 +50,7 @@ public class EventCrf extends DataMapDomainObject {
     private Integer sdvUpdateId;
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
-    
+    private Date lastSdvVerifiedDate;
     static Comparator<EventCrf> compareByOrdinal;
     public EventCrf() {
     }
@@ -68,7 +68,7 @@ public class EventCrf extends DataMapDomainObject {
             CrfVersion crfVersion, Integer statusId, Date dateInterviewed, String interviewerName, String annotations, Date dateCompleted, Integer validatorId,
             Date dateValidate, Date dateValidateCompleted, String validatorAnnotations, String validateString, Date dateCreated, Date dateUpdated,
             Integer updateId, Boolean electronicSignatureStatus, SdvStatus sdvStatus, Integer oldStatusId, Integer sdvUpdateId,
-            List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas, FormLayout formLayout) {
+            List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas, FormLayout formLayout, Date lastSdvVerifiedDate) {
         this.eventCrfId = eventCrfId;
         this.userAccount = userAccount;
         this.completionStatus = completionStatus;
@@ -95,6 +95,7 @@ public class EventCrf extends DataMapDomainObject {
         this.dnEventCrfMaps = dnEventCrfMaps;
         this.itemDatas = itemDatas;
         this.formLayout = formLayout;
+        this.lastSdvVerifiedDate = lastSdvVerifiedDate;
     }
 
     @Id
@@ -350,9 +351,18 @@ public class EventCrf extends DataMapDomainObject {
     public void setFormLayout(FormLayout formLayout) {
         this.formLayout = formLayout;
     }
-   
 
-	public static Comparator<EventCrf> getCompareByOrdinal() {
+    @Temporal(TemporalType.DATE)
+    @Column(name = "date_last_sdv_verified", length = 4)
+    public Date getLastSdvVerifiedDate() {
+        return lastSdvVerifiedDate;
+    }
+
+    public void setLastSdvVerifiedDate(Date lastSdvVerifiedDate) {
+        this.lastSdvVerifiedDate = lastSdvVerifiedDate;
+    }
+
+    public static Comparator<EventCrf> getCompareByOrdinal() {
 		if(compareByOrdinal != null) {
 			return compareByOrdinal;
 		}else {
