@@ -22,5 +22,9 @@ public interface PdfService {
     String getCaseBookFileRootPath();
 
     int addHeaderOrFooter(PDDocument document, String headerMsg,String footerMsg, int page_counter) throws IOException;
+    
     String preparePdfHeader(Study study, Study site, String studySubjectIdentifier);
+    
+    void writeToFile(String message, String fileName);
+    
 }

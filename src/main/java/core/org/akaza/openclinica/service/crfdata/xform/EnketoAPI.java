@@ -811,6 +811,7 @@ public class EnketoAPI {
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
+                    throw e1;
                 }
             } else {
                 logger.error(e.getMessage());

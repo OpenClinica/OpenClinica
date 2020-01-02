@@ -22,9 +22,8 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.util.Matrix;
-
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +32,7 @@ import org.springframework.stereotype.Service;
  */
 @Service( "PdfService" )
 public class PdfServiceImpl implements PdfService {
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
 	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}");
 	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}");
@@ -209,5 +209,41 @@ public class PdfServiceImpl implements PdfService {
 	    return pdfHeader;
    }
 
+   
+   /**
+    *  This is used to write errors to the log file in pdf format
+    * @param msg
+    * @param fileName
+    */
+   public void writeToFile(String message, String fileName) {
+    
+       PDDocument doc = new PDDocument();
+       try {
+           PDPage page = new PDPage();
+           doc.addPage(page);
+           
+           PDFont font = PDType1Font.HELVETICA_BOLD;
+
+           PDPageContentStream contents = new PDPageContentStream(doc, page);
+           contents.beginText();
+           contents.setFont(font, 10);
+           contents.newLineAtOffset(20, 700);
+           contents.showText(message);
+           contents.endText();
+           contents.close();
+           
+           doc.save(fileName);
+       }catch(IOException e) {
+    	   logger.error("Error " + e.getMessage());
+       }
+       finally {
+    	   try {
+    		   doc.close();
+    	   }catch(IOException e) {
+        	   logger.error("Error " + e.getMessage());
+           }
+           
+       } 
+   }
 
 }
