@@ -40,6 +40,7 @@ public class Item  extends DataMapDomainObject{
 	private ItemDataType itemDataType;
 	private String name;
 	private String description;
+	private String briefDescription;
 	private String units;
 	private Boolean phiStatus;
 	private Date dateCreated;
@@ -166,6 +167,15 @@ public class Item  extends DataMapDomainObject{
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Column(name = "brief_description")
+	public String getBriefDescription() {
+		return this.briefDescription;
+	}
+
+	public void setBriefDescription(String briefDescription) {
+		this.briefDescription = briefDescription;
 	}
 
 	@Column(name = "units", length = 64)

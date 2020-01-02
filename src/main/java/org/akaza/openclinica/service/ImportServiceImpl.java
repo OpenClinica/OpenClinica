@@ -593,6 +593,12 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private ItemData createItemData(EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
+    	
+    	// only created new event crf once
+    	if(eventCrf.getEventCrfId() == 0) {
+    		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);	
+    	} 
+    	
         ItemData itemData = new ItemData();
         itemData.setEventCrf(eventCrf);
         itemData.setItem(item);
@@ -639,7 +645,7 @@ public class ImportServiceImpl implements ImportService {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
-        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+       
         logger.debug("Creating new Event Crf");
 
         return eventCrf;
@@ -1017,6 +1023,8 @@ public class ImportServiceImpl implements ImportService {
         ErrorObj errorObj = null;
 
         if (studyEvent != null && (
+        		// OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet 
+        		studyEvent.getStatusId()==Status.DELETED.getCode() ||
                 studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())) {
@@ -1318,7 +1326,7 @@ public class ImportServiceImpl implements ImportService {
                     return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
             }
 
-            eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
+            eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);            
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
             updateStudyEvntStatus(studyEvent, userAccount, DATA_ENTRY_STARTED);
 
@@ -1407,6 +1415,7 @@ public class ImportServiceImpl implements ImportService {
                 return new DataImportReport(null, null, null, null, null, null, null, null, UPDATED, sdf_logFile.format(new Date()), null);
             }
         } else {
+        	       	
             itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
             if (isEventCrfCompleted(eventCrf)) {
                 ErrorObj eb = createQuery(userAccount, study, studySubject, itemData, reasonForChange);

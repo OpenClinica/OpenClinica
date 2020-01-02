@@ -8,6 +8,8 @@ import org.akaza.openclinica.controller.dto.AddParticipantRequestDTO;
 import org.akaza.openclinica.controller.dto.AddParticipantResponseDTO;
 import core.org.akaza.openclinica.domain.datamap.JobDetail;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
@@ -27,8 +29,9 @@ public interface StudyParticipantService {
   
     void startCaseBookPDFJob(JobDetail jobDetail,
                              String schema,
-                             String studyOID,
-                             String studySubjectIdentifier,
+                             Study study,
+					    	 Study site,
+                             StudySubject ss,
                              ServletContext servletContext,
                              String userAccountID,
                              String fullFinalFilePathName,

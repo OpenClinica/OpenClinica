@@ -328,7 +328,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo,int pageNumber,int pageSize) {
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo,int pageNumber,int pageSize, boolean isStudyLevelUser) {
 
         CoreResources.setRequestSchema(schema);
 
@@ -347,13 +347,13 @@ public class UserServiceImpl implements UserService {
         try {
             OCUserDTO userDTO = null;
             for (StudySubject studySubject : studySubjects) {
-                userDTO = getOCUserDTO(siteOid, accessToken, realm, userAccountBean, incRelatedInfo,studySubject);
+                userDTO = getOCUserDTO(siteOid, accessToken, realm, userAccountBean, incRelatedInfo,studySubject, isStudyLevelUser);
                 if(userDTO!=null)
                     userDTOS.add(userDTO);
             }
 
             // add a new method to write this object into text file
-            writeToFile(userDTOS, studyOid, fileName);
+            writeToFile(userDTOS, studyOid, fileName, isStudyLevelUser, incRelatedInfo);
         } catch (Exception e) {
             persistJobFailed(jobDetail, fileName);
             logger.error(" Access code Job Creation Failed ",e);
@@ -362,7 +362,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo) throws OpenClinicaSystemException
+    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo, boolean isStudyLevelUser) throws OpenClinicaSystemException
     {
 
 
@@ -386,7 +386,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             ocuserDTO = getOCUserDTO(siteOid, accessToken, realm, userAccountBean, incRelatedInfo,
-                    ss);
+                    ss, isStudyLevelUser);
 
 
             spDTO.setSubjectOid(ss.getOcOid());
@@ -404,22 +404,19 @@ public class UserServiceImpl implements UserService {
             if(ss.getDateUpdated() !=null) {
                 spDTO.setLastModified(ss.getDateUpdated().toLocaleString());
             }
-
-            if(incRelatedInfo) {
-                if(ss.getUserStatus() !=null) {
-                    spDTO.setStatus(ss.getUserStatus().getValue());
+            if(ss.getUserStatus() !=null) {
+                spDTO.setStatus(ss.getUserStatus().getValue());
+            }
+            if(!isStudyLevelUser){
+                if (ocuserDTO != null) {
+                    spDTO.setFirstName(ocuserDTO.getFirstName());
+                    spDTO.setLastName(ocuserDTO.getLastName());
+                    spDTO.setEmail(ocuserDTO.getEmail());
+                    spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());
                 }
-                spDTO.setAccessCode(ocuserDTO.getAccessCode());
+                if(incRelatedInfo)
+                    spDTO.setAccessCode(ocuserDTO.getAccessCode());
             }
-
-            if(ocuserDTO != null) {
-                spDTO.setFirstName(ocuserDTO.getFirstName());
-                spDTO.setLastName(ocuserDTO.getLastName());
-                spDTO.setEmail(ocuserDTO.getEmail());
-                spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());
-            }
-
-
         } catch (Exception e) {
 
             logger.error(" get access code Failed :", e);
@@ -439,7 +436,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     private OCUserDTO getOCUserDTO(String siteOid, String accessToken, String realm,
-                                   UserAccountBean userAccountBean, boolean incRelatedInfo, StudySubject studySubject) {
+                                   UserAccountBean userAccountBean, boolean incRelatedInfo, StudySubject studySubject, boolean isStudyLevelUser) {
 
         OCUserDTO ocuserDTO = null;
         if (!studySubject.getStatus().equals(Status.DELETED)
@@ -455,7 +452,7 @@ public class UserServiceImpl implements UserService {
 
 
                 //Get accessToken from Keycloak
-                ocuserDTO = buildOcUserDTO(studySubject,incRelatedInfo);
+                ocuserDTO = buildOcUserDTOForExtractInfo(studySubject, isStudyLevelUser);
                 ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), realm, userAccountBean,incRelatedInfo,incRelatedInfo);
 
 
@@ -770,6 +767,29 @@ public class UserServiceImpl implements UserService {
         return ocUserDTO;
     }
 
+    private OCUserDTO buildOcUserDTOForExtractInfo(StudySubject studySubject, boolean isStudyLevelUser) {
+        OCUserDTO ocUserDTO = new OCUserDTO();
+        ocUserDTO.setParticipantId(studySubject.getLabel());
+        StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
+        if (studySubjectDetail != null){
+            if(!isStudyLevelUser) {
+                ocUserDTO.setFirstName(studySubjectDetail.getFirstName() != null ? studySubjectDetail.getFirstName() : "");
+                ocUserDTO.setEmail(studySubjectDetail.getEmail() != null ? studySubjectDetail.getEmail() : "");
+                ocUserDTO.setPhoneNumber(studySubjectDetail.getPhone() != null ? studySubjectDetail.getPhone() : "");
+                ocUserDTO.setLastName(studySubjectDetail.getLastName() != null ? studySubjectDetail.getLastName() : "");
+                ocUserDTO.setIdentifier(studySubjectDetail.getIdentifier() != null ? studySubjectDetail.getIdentifier() : "");
+            }
+            ocUserDTO.setStatus(studySubject.getUserStatus());
+        } else {
+            ocUserDTO.setFirstName("");
+            ocUserDTO.setEmail("");
+            ocUserDTO.setPhoneNumber("");
+            ocUserDTO.setLastName("");
+            ocUserDTO.setIdentifier("");
+        }
+        return ocUserDTO;
+    }
+
     private StudyUserRole buildStudyUserRole(String username, Study publicStudy, int ownerId) {
         StudyUserRoleId userRoleId = new StudyUserRoleId();
         userRoleId.setStudyId(publicStudy.getStudyId());
@@ -785,7 +805,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void writeToFile(List<OCUserDTO> userDTOs, String studyOid, String fileName) {
+    private void writeToFile(List<OCUserDTO> userDTOs, String studyOid, String fileName, boolean isStudyLevelUser, boolean incRelatedInfo) {
         String filePath = getFilePath(JobType.ACCESS_CODE) + File.separator + fileName;
 
         File file = new File(filePath);
@@ -793,7 +813,7 @@ public class UserServiceImpl implements UserService {
         PrintWriter writer = null;
         try {
             writer = openFile(file);
-            writer.print(writeToTextFile(userDTOs));
+            writer.print(writeToTextFile(userDTOs, isStudyLevelUser, incRelatedInfo));
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             logger.error("Error while accessing file for writing: ",e);
         } catch (Exception exception) {
@@ -825,40 +845,48 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private String writeToTextFile(List<OCUserDTO> userDTOS) {
+    private String writeToTextFile(List<OCUserDTO> userDTOS,  boolean isStudyLevelUser, boolean incRelatedInfo) {
 
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("ParticipantId");
         stringBuffer.append(SEPERATOR);
-        stringBuffer.append("First Name");
-        stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Last Name");
-        stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Email");
-        stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Mobile");
-        stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Identifier");
-        stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Access Code");
-        stringBuffer.append(SEPERATOR);
+        if(!isStudyLevelUser) {
+            stringBuffer.append("First Name");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append("Last Name");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append("Email");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append("Mobile");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append("Identifier");
+            stringBuffer.append(SEPERATOR);
+        }
+        if(!isStudyLevelUser && incRelatedInfo) {
+            stringBuffer.append("Access Code");
+            stringBuffer.append(SEPERATOR);
+        }
         stringBuffer.append("Participate Status");
         stringBuffer.append('\n');
         for (OCUserDTO userDTO : userDTOS) {
             stringBuffer.append(userDTO.getParticipantId() != null ? userDTO.getParticipantId() : "");
             stringBuffer.append(SEPERATOR);
-            stringBuffer.append(userDTO.getFirstName() != null ? userDTO.getFirstName() : "");
-            stringBuffer.append(SEPERATOR);
-            stringBuffer.append(userDTO.getLastName() != null ? userDTO.getLastName() : "");
-            stringBuffer.append(SEPERATOR);
-            stringBuffer.append(userDTO.getEmail() != null ? userDTO.getEmail() : "");
-            stringBuffer.append(SEPERATOR);
-            stringBuffer.append(userDTO.getPhoneNumber() != null ? userDTO.getPhoneNumber() : "");
-            stringBuffer.append(SEPERATOR);
-            stringBuffer.append(userDTO.getIdentifier() != null ? userDTO.getIdentifier() : "");
-            stringBuffer.append(SEPERATOR);
-            stringBuffer.append(userDTO.getAccessCode() != null ? userDTO.getAccessCode() : "");
-            stringBuffer.append(SEPERATOR);
+            if(!isStudyLevelUser ) {
+                stringBuffer.append(userDTO.getFirstName() != null ? userDTO.getFirstName() : "");
+                stringBuffer.append(SEPERATOR);
+                stringBuffer.append(userDTO.getLastName() != null ? userDTO.getLastName() : "");
+                stringBuffer.append(SEPERATOR);
+                stringBuffer.append(userDTO.getEmail() != null ? userDTO.getEmail() : "");
+                stringBuffer.append(SEPERATOR);
+                stringBuffer.append(userDTO.getPhoneNumber() != null ? userDTO.getPhoneNumber() : "");
+                stringBuffer.append(SEPERATOR);
+                stringBuffer.append(userDTO.getIdentifier() != null ? userDTO.getIdentifier() : "");
+                stringBuffer.append(SEPERATOR);
+            }
+            if(!isStudyLevelUser && incRelatedInfo) {
+                stringBuffer.append(userDTO.getAccessCode() != null ? userDTO.getAccessCode() : "");
+                stringBuffer.append(SEPERATOR);
+            }
             stringBuffer.append(userDTO.getStatus() != null ? userDTO.getStatus() : "");
             stringBuffer.append('\n');
         }

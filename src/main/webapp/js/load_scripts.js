@@ -1,4 +1,4 @@
-head.js( app_contextPath + "/includes/jmesa/jquery-1.9.1.min.js",
+head.js( app_contextPath + "/includes/jmesa/jquery.min.js",
          app_contextPath + "/js/lib/jquery.tmpl.js",
          app_contextPath + "/js/lib/underscore-min.js",           
          app_contextPath + "/js/lib/backbone-min.js",

@@ -733,6 +733,9 @@ public class EnketoAPI {
             body.setInstance_id(instanceId);
             body.setReturn_url(redirect);
             body.setInstanceAttachments(attachment);
+                         
+            String subjectLabel = actionUrlObject.studyEvent.getStudySubject().getLabel();
+            body.setPid(subjectLabel);
 
             String format = actionUrlObject.getFormat();
             if(format == null || format.trim().length() == 0) {
