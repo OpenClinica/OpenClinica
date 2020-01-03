@@ -89,7 +89,7 @@ public class DeleteEventCRFServlet extends SecureController {
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         request.setAttribute("errorData", null);
-        String originatingPage = StringEscapeUtils.escapeJavaScript(request.getParameter(ORIGINATING_PAGE));
+        String originatingPage = request.getParameter(ORIGINATING_PAGE);
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
 
