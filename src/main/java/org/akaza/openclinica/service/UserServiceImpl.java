@@ -250,7 +250,11 @@ public class UserServiceImpl implements UserService {
     private String generateAccessCode(String accessToken, String realm) {
         String accessCode;
         do {
-            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+            // OC-11627 Update Access Codes to not include characters that can be confused for each other
+            // Exclude : digits - 0, 1, 5; lowercase letters - l, o; uppercase letters - I, O, S
+            String allowedChars = "2346789aAbBcCdDeEfFgGhHijJkKLmMnNpPqQrRstTuUvVwWxXyYzZ";
+            char[] chars = allowedChars.toCharArray();
+            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), 0, chars.length, true, true, chars);
         } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, realm));
         return accessCode;
     }
