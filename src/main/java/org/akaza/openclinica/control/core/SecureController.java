@@ -557,6 +557,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                             currentStudy.setStudy(getStudyDao().findByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
+                String tempCollectDob = currentStudy.getCollectDob(); //Initializing spv with the study before assigning in Session
                 session.setAttribute("study", currentStudy);
             }
             request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
