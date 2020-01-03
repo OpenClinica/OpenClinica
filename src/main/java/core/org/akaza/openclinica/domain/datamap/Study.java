@@ -880,6 +880,7 @@ public class Study extends DataMapDomainObject {
         return getStudy() != null && getStudy().getStudyId() > 0 ? true : false;
     }
 
+    //Parent Study is set to 0 if not present,This is done to use the same functionality of the getParentStudyId() in StudyDAO previously and 0 is handled in other places
     public int checkAndGetParentStudyId(){
         return isSite() ? this.getStudy().getStudyId() : 0;
     }
