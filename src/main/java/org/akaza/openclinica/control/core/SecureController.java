@@ -1491,6 +1491,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
             currentStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
 
+            String tempCollectDob = currentStudy.getCollectDob();  //Initializing spv with the study before assigning in Session
             session.setAttribute("publicStudy", currentPublicStudy);
             session.setAttribute("study", currentStudy);
             currentRole = role;
