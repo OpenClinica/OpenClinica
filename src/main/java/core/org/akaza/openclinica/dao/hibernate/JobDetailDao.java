@@ -47,11 +47,12 @@ public class JobDetailDao extends AbstractDomainDao<JobDetail> {
         return (JobDetail) q.uniqueResult();
     }
 
-    public List<JobDetail> findByStudyIdAndStatus(int studyId, Enum status) {
-        String query = "from " + getDomainClassName() + " where study.studyId=:studyId and status=:status";
+    public List<JobDetail> findByStudyIdAndStatusAndJobType(int studyId, Enum status, JobType jobType) {
+        String query = "from " + getDomainClassName() + " where study.studyId=:studyId and status=:status and type=:jobType";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyId", studyId);
         q.setParameter("status", status);
+        q.setParameter("jobType", jobType);
         return (ArrayList<JobDetail>) q.list();
     }
 }
