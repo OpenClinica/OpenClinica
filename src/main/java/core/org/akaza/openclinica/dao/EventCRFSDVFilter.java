@@ -43,9 +43,6 @@ public class EventCRFSDVFilter implements CriteriaCommand {
             if(filter.property.equals("sdvStatus"))
                 isSdvStatusSet = true;
         }
-        if(!isSdvStatusSet) {
-            theCriteria = theCriteria + " and (" + (columnMapping.get("sdvStatus") + " = '" + SdvStatus.NOT_VERIFIED + "' or " + (columnMapping.get("sdvStatus")) + " = '" + SdvStatus.CHANGED_AFTER_VERIFIED) + "' ) ";
-        }
         return theCriteria;
     }
 
