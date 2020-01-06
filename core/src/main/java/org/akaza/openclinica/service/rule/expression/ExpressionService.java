@@ -240,7 +240,7 @@ public class ExpressionService {
 
     public String getSSZoneId() {
         Integer subjectId = expressionWrapper.getStudySubjectId();
-        System.out.println("  subjectId  " + subjectId + "  : ");
+        logger.debug("subjectId {} : ", subjectId);
         if (subjectId == null)
             return null;
         StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
@@ -285,7 +285,7 @@ public class ExpressionService {
             String studyEventDefinitionOrdinal = getStudyEventDefinitionOidOrdinalFromExpression(expression);
             studyEventDefinitionOrdinal = studyEventDefinitionOrdinal.equals("") ? "1" : studyEventDefinitionOrdinal;
             String studySubjectId = String.valueOf(studyEvent.getStudySubjectId());
-            System.out.println("studySubjectId:  " + studySubjectId);
+            logger.debug("studySubjectId: " + studySubjectId);
             logger.debug(
                     "ruleSet studyEventId  {} , studyEventDefinitionOid {} , crfOrCrfVersionOid {} , studyEventDefinitionOrdinal {} ,studySubjectId {}",
                     new Object[] { studyEvent.getId(), studyEventDefinitionOid, crfOrCrfVersionOid,

@@ -367,10 +367,7 @@ public class SignStudySubjectServlet extends SecureController {
                     sea.setNewSubjectEventStatus(newStatus);
                 }
             } catch (NumberFormatException e) {
-
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                // logger.warning("^^^ caught NFE");
+                logger.error("Subject event status is not able to be fetched properly: ", e);
             }
             UserAccountBean updater = (UserAccountBean) udao.findByPK(avb.getUserId());
             sea.setUpdater(updater);

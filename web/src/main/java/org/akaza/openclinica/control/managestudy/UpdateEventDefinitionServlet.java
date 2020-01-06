@@ -41,6 +41,8 @@ import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,7 +59,7 @@ import java.util.ListIterator;
  */
 public class UpdateEventDefinitionServlet extends SecureController {
     EventDefinitionCrfTagService eventDefinitionCrfTagService = null;
-
+    private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     /**
      * 
@@ -152,10 +154,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
                     String allowAnonymousSubmission = fp.getString("allowAnonymousSubmission" + i);
                     String submissionUrl = fp.getString("submissionUrl" + i);
                     String offline = fp.getString("offline" + i);
-
-                    System.out.println("submission :"+ submissionUrl);
-                    
-                    
+                    logger.debug("submission: {}", submissionUrl);
                     
                     if (!StringUtil.isBlank(hideCRF) && "yes".equalsIgnoreCase(hideCRF.trim())) {
                         edcBean.setHideCrf(true);
@@ -423,41 +422,39 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
     }
 
-    public void validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v){
+    public void validateSubmissionUrl(ArrayList <EventDefinitionCRFBean> edcsInSession ,ArrayList <EventDefinitionCRFBean> eventDefCrfList ,Validator v) {
     	for (int i = 0; i < edcsInSession.size(); i++) {
-            v.addValidation("submissionUrl"+ i, Validator.NO_SPACES_ALLOWED);	
-            EventDefinitionCRFBean sessionBean=null;
+            v.addValidation("submissionUrl" + i, Validator.NO_SPACES_ALLOWED);
+            EventDefinitionCRFBean sessionBean = null;
             boolean isExist = false;
-            for (EventDefinitionCRFBean eventDef : eventDefCrfList){
-      		  sessionBean = edcsInSession.get(i);
-            	if(!sessionBean.isAllowAnonymousSubmission() || !sessionBean.isParticipantForm()){ 
-                	isExist = true;
+            for (EventDefinitionCRFBean eventDef : eventDefCrfList) {
+                sessionBean = edcsInSession.get(i);
+            	if (!sessionBean.isAllowAnonymousSubmission() || !sessionBean.isParticipantForm()) {
+                    isExist = true;
             		break;
             	}
-            		System.out.println("iter:           "+eventDef.getId()+            "--db:    "+eventDef.getSubmissionUrl()); 
-            		System.out.println("edcsInSession:  "+sessionBean.getId()  + "--session:"+sessionBean.getSubmissionUrl()); 
-            		System.out.println();
-            	if(sessionBean.getSubmissionUrl().trim().equals("") || sessionBean.getSubmissionUrl().trim() ==null){
+                logger.debug("iter:           {} --db:   {}", eventDef.getId(), eventDef.getSubmissionUrl());
+                logger.debug("edcsInSession:  {} --session: {}", sessionBean.getId(), sessionBean.getSubmissionUrl());
+            	if (sessionBean.getSubmissionUrl() == null || sessionBean.getSubmissionUrl().trim().equals("")) {
             		break;
-            	}else{
-                if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId()) ||
-                		(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId()==0)){
-                	v.addValidation("submissionUrl"+ i, Validator.SUBMISSION_URL_NOT_UNIQUE);
-                	System.out.println("Duplicate ****************************");
-                	isExist = true;
-            	   break;
-            	}else if(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId()!=0){
-                	System.out.println("Not Duplicate  ***********");
-                	isExist = true;
-            		break;
-            	}
+            	} else {
+                    if (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() != sessionBean.getId()) ||
+                            (eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId() == 0)) {
+                        v.addValidation("submissionUrl" + i, Validator.SUBMISSION_URL_NOT_UNIQUE);
+                        logger.debug("Duplicate *********************");
+                        isExist = true;
+                       break;
+                    } else if(eventDef.getSubmissionUrl().trim().equalsIgnoreCase(sessionBean.getSubmissionUrl().trim()) && (eventDef.getId() == sessionBean.getId()) && sessionBean.getId() != 0) {
+                        logger.debug("Not Duplicate ********");
+                        isExist = true;
+                        break;
+                    }
+                }
             }
+            if (!isExist) {
+                eventDefCrfList.add(sessionBean);
             }
-            	if(!isExist){ 
-            		eventDefCrfList.add(sessionBean);
-            	}
         }
-
     }
     
     public EventDefinitionCrfTagService getEventDefinitionCrfTagService() {

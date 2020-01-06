@@ -164,7 +164,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 	            // (and associated combinations of mode and format)
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in getting resource details: ", e);
         }
     }
 
@@ -260,7 +260,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                         // oID values in future.
 
                         URLParamValue = tokens[i].trim();
-                        //System.out.println("URLParamValue::"+URLParamValue);
+
                         logger.info("URLPAramValue::"+URLParamValue);
                         if ((null != URLParamValue) && (!URLParamValue.equals(""))) {
                             switch (i) {

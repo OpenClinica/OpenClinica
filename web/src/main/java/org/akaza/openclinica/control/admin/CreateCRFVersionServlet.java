@@ -131,8 +131,7 @@ public class CreateCRFVersionServlet extends SecureController {
                 return;
             } catch (Exception e) {
                 //
-                logger.warn("*** Found exception during file upload***");
-                e.printStackTrace();
+                logger.error("*** Found exception during file upload***", e);
             }
             session.setAttribute("tempFileName", tempFile);
             // YW, at this point, if there are errors, they point to no file
@@ -485,9 +484,8 @@ public class CreateCRFVersionServlet extends SecureController {
                         session.setAttribute("preview_crf", preview.createCrfMetaObject(workbook));
                     } catch (Exception exc) { // opening the stream could
                         // throw FileNotFoundException
-                        exc.printStackTrace();
                         String message = resword.getString("the_application_encountered_a_problem_uploading_CRF");
-                        logger.debug(message + ": " + exc.getMessage());
+                        logger.debug("{} : {}", message , exc.getMessage(), exc);
                         this.addPageMessage(message);
                     } finally {
                         if (inputStream != null) {

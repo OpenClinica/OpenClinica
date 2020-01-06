@@ -753,7 +753,6 @@ public class AccountController {
         UserAccountBean accessCodeAccountBean = getAccessCodeAccount(accessCode);
         if (accessCodeAccountBean.isActive()) {
             logger.info("***Access Code already Exist in the User Table ***");
-            System.out.println("***Access Code already Exist in the User Table ***");
             return true;
         }
         return false;
@@ -801,7 +800,7 @@ public class AccountController {
             if ((study.getId() == pStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))
                     && studyUserRoleBean.getStatus().isAvailable()) {
                 found = true;
-                System.out.println("if found :" + found);
+                logger.info("if found : {}", found);
                 break;
             }
         }

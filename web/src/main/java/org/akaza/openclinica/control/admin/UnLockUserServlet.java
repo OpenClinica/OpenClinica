@@ -90,7 +90,7 @@ public class UnLockUserServlet extends SecureController {
                         sendRestoreEmail(u, password);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Error_sending_user_email_regarding: ", e);
                     message += respage.getString("however_was_error_sending_user_email_regarding");
                 }
             } else {

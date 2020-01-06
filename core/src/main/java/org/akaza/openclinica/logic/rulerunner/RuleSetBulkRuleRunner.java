@@ -154,7 +154,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
 
             for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
                 ruleSet.setTarget(expressionBean);
-				System.out.println("tg expression:" + ruleSet.getTarget().getValue());
+                logger.debug("tg expression: {}", ruleSet.getTarget().getValue());
 
                 for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
                     String result = null;
@@ -164,7 +164,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
                         result = (String) oep.parseAndEvaluateExpression(rule.getExpression().getValue());
                         itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
-						System.out.println("The result: " + result);
+                        logger.debug("The result: {}", result);
 
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);
 
@@ -215,7 +215,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                             ub,
                             prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction().getRuleSetRule(), currentStudy,
                                     ruleActionContainer.getRuleAction()));
-				System.out.println(" Action Trigger: " + ap.toString());
+                logger.debug(" Action Trigger: " + ap.toString());
 
                 if (rab != null) {
                     ruleSetBasedView =

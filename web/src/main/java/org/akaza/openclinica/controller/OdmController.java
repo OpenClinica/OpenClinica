@@ -455,7 +455,6 @@ public class OdmController {
     private boolean mayProceed(String studyOid, StudySubjectBean ssBean) throws Exception {
         boolean accessPermission = false;
         logger.info("  studySubjectStatus: " + ssBean.getStatus().getName());
-        System.out.println("  studySubjectStatus: " + ssBean.getStatus().getName());
         if (mayProceed(studyOid) && ssBean.getStatus() == Status.AVAILABLE) {
             accessPermission = true;
         }
@@ -473,7 +472,6 @@ public class OdmController {
                                                                                                       // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
-        System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
         logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
         if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
             accessPermission = true;
