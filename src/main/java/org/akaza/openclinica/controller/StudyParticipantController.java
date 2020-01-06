@@ -4,12 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import javax.servlet.ServletContext;
@@ -374,27 +369,29 @@ public class StudyParticipantController {
 		}
 
 
-		List<StudySubjectBean> studySubjects = this.getStudySubjectDAO().findAllByStudy(studyToCheck);
+		List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(studyToCheck);
 
 		ArrayList studyParticipantDTOs = new ArrayList<StudyParticipantDTO>();
-
-		for(StudySubjectBean studySubject:studySubjects) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		for(StudySubject studySubject:studySubjects) {
 			StudyParticipantDTO spDTO= new StudyParticipantDTO();
 
-			spDTO.setSubjectOid(studySubject.getOid());
+			spDTO.setSubjectOid(studySubject.getOcOid());
 			spDTO.setSubjectKey(studySubject.getLabel());
 			spDTO.setStatus(studySubject.getStatus().getName());
-			if(studySubject.getOwner()!=null) {
-				spDTO.setCreatedBy(studySubject.getOwner().getName());
+			if(studySubject.getUserAccount()!=null) {
+				spDTO.setCreatedBy(studySubject.getUserAccount().getUserName());
 			}
-			if(studySubject.getCreatedDate()!=null) {
-				spDTO.setCreatedAt(studySubject.getCreatedDate().toLocaleString());
+			if(studySubject.getDateCreated()!=null) {
+
+				spDTO.setCreatedAt(sdf.format(studySubject.getDateCreated()));
 			}
-			if(studySubject.getUpdatedDate() !=null) {
-				spDTO.setLastModified(studySubject.getUpdatedDate().toLocaleString());
+			if(studySubject.getDateUpdated() !=null) {
+				spDTO.setLastModified(sdf.format(studySubject.getDateUpdated()));
 			}
-			if(studySubject.getUpdater() != null) {
-				spDTO.setLastModifiedBy(studySubject.getUpdater().getName());
+			if(studySubject.getUpdateId() != null && studySubject.getUpdateId() > 0) {
+				spDTO.setLastModifiedBy(uAccountDao.findById(studySubject.getUpdateId()).getUserName());
 			}
 
 

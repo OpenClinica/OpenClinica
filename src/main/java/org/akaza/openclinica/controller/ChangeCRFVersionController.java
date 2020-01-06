@@ -133,13 +133,14 @@ public class ChangeCRFVersionController {
         request.setAttribute("crfName", crfName);
         request.setAttribute("formLayoutId", formLayoutId);
         request.setAttribute("formLayoutName", formLayoutName.trim());
-        String originatingPageEscaped = StringEscapeUtils.escapeHtml(originatingPage);
-        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPageEscaped);
+        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPage);
 
         ArrayList<String> pageMessages = initPageMessages(request);
-        Object errorMessage = request.getParameter("errorMessage");
+        String errorMessage = request.getParameter("errorMessage");
+        errorMessage = StringEscapeUtils.escapeHtml(errorMessage);
+        errorMessage = StringEscapeUtils.escapeJavaScript(errorMessage);
         if (errorMessage != null) {
-            pageMessages.add((String) errorMessage);
+            pageMessages.add(errorMessage);
         }
         // get CRF by ID with all versions
         // create List of all versions (label + value)

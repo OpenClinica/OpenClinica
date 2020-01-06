@@ -79,7 +79,7 @@ public class RemoveEventCRFServlet extends SecureController {
         int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
-        String originatingPage = StringEscapeUtils.escapeJavaScript(request.getParameter(ORIGINATING_PAGE));
+        String originatingPage = request.getParameter(ORIGINATING_PAGE);
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());

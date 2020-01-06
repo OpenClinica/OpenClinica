@@ -557,6 +557,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                             currentStudy.setStudy(getStudyDao().findByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
+                String tempCollectDob = currentStudy.getCollectDob(); //Initializing spv with the study before assigning in Session
                 session.setAttribute("study", currentStudy);
             }
             request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
@@ -1491,6 +1492,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
             currentStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
 
+            String tempCollectDob = currentStudy.getCollectDob();  //Initializing spv with the study before assigning in Session
             session.setAttribute("publicStudy", currentPublicStudy);
             session.setAttribute("study", currentStudy);
             currentRole = role;
@@ -1606,6 +1608,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     protected StudyDao getStudyDao() {
         return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
+    }
+
+    protected DiscrepancyNoteDao getDiscrepancyNoteDao() {
+        return (DiscrepancyNoteDao) SpringServletAccess.getApplicationContext(context).getBean("discrepancyNoteDao");
     }
 
     protected EnketoUrlService getEnketoUrlService() {

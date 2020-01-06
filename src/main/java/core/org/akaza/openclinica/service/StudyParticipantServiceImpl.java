@@ -502,9 +502,14 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 				userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
 							
 				
-			} catch (Exception e) {
+			} catch (Exception e) {				
+				if(mergedPdfFileNm == null) {
+					int index= fullFinalFilePathName.lastIndexOf(File.separator);
+					mergedPdfFileNm = fullFinalFilePathName.substring(index+1);					
+				}
+				
 	            userService.persistJobFailed(jobDetail, mergedPdfFileNm);
-	            this.writeToFile(e.getMessage(), fullFinalFilePathName);
+	            this.pdfService.writeToFile(e.getMessage(), fullFinalFilePathName);
 	            throw e;
 	        }
 		    
@@ -512,28 +517,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		}
   
     
-    /**
-     * 
-     * @param msg
-     * @param fileName
-     */
-    public void writeToFile(String msg, String fileName) {
-        logger.debug("writing report to File");
-     
-        File file = new File(fileName);       
-
-        PrintWriter writer = null;
-        try {
-        	 file.createNewFile();
-        	 writer = new PrintWriter(file.getPath(), "UTF-8");
-        	 writer.print(msg);     
-        } catch (IOException e) {
-        	 logger.error("Error while accessing file to start writing: ",e);
-		} finally {                        
-            writer.close();;
-        }
-
-    }
+   
    
 	    
 	/**
