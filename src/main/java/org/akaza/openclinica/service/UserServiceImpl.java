@@ -343,7 +343,7 @@ public class UserServiceImpl implements UserService {
                 + Thread.currentThread().getName());
 
         // Get all list of StudySubjects by studyId
-        List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId(),pageNumber, pageSize);
+        List<StudySubject> studySubjects = studySubjectDao.findAllByStudyWithAvailableAndSignedStatusOnly(site.getStudyId(),pageNumber, pageSize);
         List<OCUserDTO> userDTOS = new ArrayList<>();
         sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
         String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
