@@ -165,9 +165,7 @@ public class ViewSingleJobServlet extends SecureController {
             }
 
         } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            logger.debug(" found NPE " + e.getMessage());
-            e.printStackTrace();
+            logger.error(" found NPE ", e);
         }
         // need to show the extract for which this runs, which files, etc
         // in other words the job data map

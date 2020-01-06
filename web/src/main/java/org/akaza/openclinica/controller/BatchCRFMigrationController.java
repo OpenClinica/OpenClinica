@@ -736,7 +736,7 @@ public class BatchCRFMigrationController implements Runnable {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error in creating file for logging report: ", e);
         } finally {
             writer.print(toStringTextFormat(reportLog, resterms, stBean, cBean));
             closeFile(writer);

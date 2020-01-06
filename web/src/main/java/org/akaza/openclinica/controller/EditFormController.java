@@ -288,7 +288,7 @@ public class EditFormController {
         DOMSource source = new DOMSource(doc);
         transformer.transform(source, result);
         String instance = writer.toString();
-        System.out.println("Editable instance = " + instance);
+        logger.debug("Editable instance = {}", instance);
         return instance;
     }
 
@@ -351,8 +351,6 @@ public class EditFormController {
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
         String siteStatus = siteStudy.getStatus().getName().toString(); // available , pending , frozen , locked
-        System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus
-                + "   siteStatus: " + siteStatus);
         logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus + "   siteStatus: "
                 + siteStatus);
         if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && siteStatus.equalsIgnoreCase("available")

@@ -368,10 +368,8 @@ public class ExampleSpringJob extends QuartzJobBean {
             // logger.debug("-- generated file: " + fileNameStr);
             // dataSource.
         } catch (Exception e) {
-            // TODO Auto-generated catch block -- ideally should generate a fail
-            // msg here, tbh 02/2009
-            logger.debug("-- found exception: " + e.getMessage());
-            e.printStackTrace();
+            // TODO Auto-generated catch block -- ideally should generate a fail msg here, tbh 02/2009
+            logger.debug("-- found exception: ", e);
         }
     }
 
@@ -409,9 +407,7 @@ public class ExampleSpringJob extends QuartzJobBean {
             dataSource = this.dataSource != null ? dataSource : (DataSource) context.getBean("dataSource"); // basicDataSource
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            // logger.debug("-- found an exception: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error while accessing application context: ", e);
         }
 
         return dataSource;

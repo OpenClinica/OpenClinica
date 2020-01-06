@@ -116,8 +116,7 @@ public class SystemController {
                 map.put("Database Connection", "FAIL");
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error while uBean accessing details", e);
         }
         return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
@@ -894,7 +893,7 @@ public class SystemController {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error while accessing directory contents: ", e);
         }
         return list;
     }
@@ -1140,8 +1139,7 @@ public class SystemController {
             try {
                 ocuiParticipateStatus = participantPortalRegistrar.getRegistrationStatus(studyBean.getOid());
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.error("Error while accessing participant portal registrar: ", e);
             }
         }
 
@@ -1152,8 +1150,7 @@ public class SystemController {
         try {
             pManageUrl = new URL(portalURL);
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Portal Url is not correct: ", e);
         }
         Authorization pManageAuthorization = participantPortalRegistrar.getAuthorization(studyBean.getOid());
         if (pManageAuthorization != null) {
@@ -1198,8 +1195,7 @@ public class SystemController {
         try {
             mapMetadata.put("Http Status Code", String.valueOf(huc.getResponseCode()));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error adding the status code: ", e);
         }
 
         HashMap<String, Object> mapRuleDesigner = new HashMap<>();
@@ -1304,8 +1300,7 @@ public class SystemController {
         try {
             mapMetadata.put("Http Status Code", String.valueOf(huc.getResponseCode()));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error adding the status code: ", e);
         }
 
         HashMap<String, Object> mapWebService = new HashMap<>();

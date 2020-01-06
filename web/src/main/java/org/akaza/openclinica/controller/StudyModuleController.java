@@ -241,7 +241,7 @@ public class StudyModuleController {
             try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error while redirecting to MainMenu: ", e);
             }
             return null;
         }

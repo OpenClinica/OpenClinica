@@ -397,8 +397,7 @@ public class FormProcessor {
             logger.debug("trying to parse " + fieldValue + " on the pattern " + resformat.getString("date_time_format_string"));
             result = sdf.parse(fieldValue);
         } catch (Exception fe) {
-            logger.debug("failed to parse");
-            fe.printStackTrace();
+            logger.debug("failed to parse ", fe);
             result = DEFAULT_DATE;
             logger.debug("replace with default date: " + result.toString());
         }
