@@ -239,33 +239,7 @@ public class EventCrfLayerBuilder {
                 removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
                 html.tdEnd().trEnd(0);
             }
-        } else if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY || eventCrfStatus == DataEntryStage.UNCOMPLETED) {
-            if (getStudyEvent() != null && !currentRole.isMonitor() && currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
-                if (!hiddenCrf()) {
-                    html.tr(0).valign("top").close();
-                    html.td(0).styleClass(table_cell_left).close();
-                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
-                    html.nbsp().nbsp();
-                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
-                            reswords.getString("enter_data"));
-                    html.tdEnd().trEnd(0);
-                    if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY) {
-                        html.tr(0).valign("top").close();
-                        html.td(0).styleClass(table_cell_left).close();
-                        removeEventCrf(html, eventCrfBean, studySubject);
-                        html.nbsp().nbsp();
-                        removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
-                        html.tdEnd().trEnd(0);
-                        html.tr(0).valign("top").close();
-                        html.td(0).styleClass(table_cell_left).close();
-                        deleteEventCrf(html, eventCrfBean, studySubject);
-                        html.nbsp().nbsp();
-                        deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
-                        html.tdEnd().trEnd(0);
-                    }
-                }
-            }
-
+        } else if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -293,6 +267,14 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
         } else {
+            if (!hiddenCrf()) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
+                html.nbsp().nbsp();
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
+                html.tdEnd().trEnd(0);
+            }
             if (!currentRole.isMonitor() && currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
                 if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
                     if (!hiddenCrf()) {
@@ -300,7 +282,7 @@ public class EventCrfLayerBuilder {
                         html.td(0).styleClass(table_cell_left).close();
                         doubleDataEntryLink(html, eventCrfBean);
                         html.nbsp().nbsp();
-                        doubleDataEntryLink(html, eventCrfBean, reswords.getString("enter_data"));
+                        doubleDataEntryLink(html, eventCrfBean, reswords.getString("edit"));
                         html.tdEnd().trEnd(0);
                     }
                 } else {
@@ -309,18 +291,10 @@ public class EventCrfLayerBuilder {
                         html.td(0).styleClass(table_cell_left).close();
                         initialDataEntryParameterizedLink(html, eventCrfBean);
                         html.nbsp().nbsp();
-                        initialDataEntryParameterizedLink(html, eventCrfBean, reswords.getString("enter_data"));
+                        initialDataEntryParameterizedLink(html, eventCrfBean, reswords.getString("edit"));
                         html.tdEnd().trEnd(0);
                     }
                 }
-            }
-            if (!hiddenCrf()) {
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
-                html.nbsp().nbsp();
-                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
-                html.tdEnd().trEnd(0);
             }
             if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
@@ -337,6 +311,14 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
+                html.tdEnd().trEnd(0);
+            }
+            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
+                html.nbsp().nbsp();
+                reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject, reswords.getString("reassign"));
                 html.tdEnd().trEnd(0);
             }
         }
@@ -570,6 +552,32 @@ public class EventCrfLayerBuilder {
 
     private void removeEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, String link) {
         String href = "RemoveEventCRF?action=confirm&eventCrfId=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
+        builder.append(link);
+        builder.aEnd();
+    }
+
+    private void reassignEventCrf(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf, EventCRFBean eventCrf, CRFBean crf, StudySubjectBean studySubject) {
+        int formLayoutId = 0;
+        if (eventCrf == null || eventCrf.getId() == 0) {
+            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
+        } else {
+            formLayoutId = eventCrf.getFormLayoutId();
+        }
+        String href = "pages/managestudy/chooseCRFVersion?crfId=" + crf.getId() + "&crfName=" + crf.getName() + "&formLayoutId=" + Integer.toString(formLayoutId) + "&formLayoutName=" + Integer.toString(formLayoutId) + "&studySubjectLabel=" + studySubject.getLabel() + "&studySubjectId=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId() + "&eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&originatingPage=ListStudySubjects";
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\"/>");
+        builder.aEnd();
+    }
+
+    private void reassignEventCrf(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf, EventCRFBean eventCrf, CRFBean crf, StudySubjectBean studySubject, String link) {
+        int formLayoutId = 0;
+        if (eventCrf == null || eventCrf.getId() == 0) {
+            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
+        } else {
+            formLayoutId = eventCrf.getFormLayoutId();
+        }
+        String href = "pages/managestudy/chooseCRFVersion?crfId=" + crf.getId() + "&crfName=" + crf.getName() + "&formLayoutId=" + Integer.toString(formLayoutId) + "&formLayoutName=" + Integer.toString(formLayoutId) + "&studySubjectLabel=" + studySubject.getLabel() + "&studySubjectId=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId() + "&eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&originatingPage=ListStudySubjects";
         builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
