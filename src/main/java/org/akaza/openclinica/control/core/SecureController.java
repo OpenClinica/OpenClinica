@@ -1416,7 +1416,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
 
-    private ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames){
+    private static ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames, HttpServletRequest request){
         ArrayList<String> parameters = new ArrayList<>();
         if (parameterNames.hasMoreElements()) {
             parameters = new ArrayList<>(Arrays.asList(request.getParameterNames().nextElement().split("=|&")));
@@ -1431,10 +1431,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * @param parameterName
      * @return parameter value
      */
-    protected String getParameter(HttpServletRequest request, String parameterName){
+    public static String getParameter(HttpServletRequest request, String parameterName){
         String paramValue = request.getParameter(parameterName);
         if (paramValue == null){
-            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames());
+            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames(),request);
             paramValue = parameters.indexOf(parameterName) > -1 ? parameters.get(parameters.indexOf(parameterName) + 1) : null;
         }
         logger.info("Getting parameter name: " + parameterName + " value: " + paramValue);

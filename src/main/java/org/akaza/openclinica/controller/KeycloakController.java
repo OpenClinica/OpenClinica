@@ -147,20 +147,23 @@ public class KeycloakController {
             }
             req.getSession().setAttribute(USER_BEAN_NAME, ub);
 
-            // Public study will be null if there is no active study for this user
+            Study publicStudy = null;
+            publicStudy = (Study) req.getSession().getAttribute("publicStudy");
             if (ub.getActiveStudyId() != 0) {
-
-                Study publicStudy = null;
-                publicStudy = (Study) req.getSession().getAttribute("publicStudy");
-
                 if (publicStudy == null) {
                     publicStudy = studyDao.findPublicStudyById(ub.getActiveStudyId());
                 }
-
+                SecureController.refreshUserRole(req, ub, publicStudy);
+            }
+            else if(publicStudy == null) {
+                CoreResources.setRequestSchema(req, "public");
+                String studyEnvUuid = SecureController.getParameter(req, "studyEnvUuid");
+                if(studyEnvUuid != null)
+                    publicStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
+            }
+            if(publicStudy != null) {
                 String accessToken = (String) req.getSession().getAttribute("accessToken");
                 studyBuildService.processModule(accessToken, publicStudy, ModuleProcessor.Modules.PARTICIPATE);
-
-                SecureController.refreshUserRole(req, ub, publicStudy);
             }
 
         } else {
