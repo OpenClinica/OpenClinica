@@ -288,7 +288,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             		try {
             			pathStrippedValueToCompare = (ItemDataBean) BeanUtils.cloneBean(valueToCompare);
             		} catch (Throwable e) {
-            			e.printStackTrace();
+                        LOGGER.error("Error cloning the bean for pathStrippedValueToCompare: ", e);
             			return dib;
             		}
             		// the value we want to check only has filename with no path, so we strip path from the one stored in database, and compare

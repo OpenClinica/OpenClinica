@@ -93,8 +93,7 @@ public class PauseJobServlet extends SecureController {
                 }
             }
         } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Scheduler cannot deleteJob: ", e);
         }
         // all validation done on JSP side
         // forward back to view job servlet here

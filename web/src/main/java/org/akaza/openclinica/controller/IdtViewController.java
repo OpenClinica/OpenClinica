@@ -102,12 +102,14 @@ public class IdtViewController {
             @RequestParam("page") int page, @RequestParam("per_page") int per_page) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         List<IdtView> idtDTO = null;
-        if (page == 0)
+        if (page == 0) {
             page = 1;
-        if (per_page == 0)
+        }
+        if (per_page == 0) {
             per_page = 30; // default to 30 records / page
+        }
 
-        System.out.println("I'm in getPaginatedIdtViewData");
+        logger.debug("I'm in getPaginatedIdtViewData");
 
         StudyBean parentStudy = getParentStudy(studyOid);
         Integer pStudyId = parentStudy.getId();
@@ -130,16 +132,16 @@ public class IdtViewController {
 
         if (studyId == pStudyId) {
             // parent Study
-            if (filter == 1)
+            if (filter == 1) {
                 idtDTO = getIdtViewDao().findFilter1(studyId, pStudyId, per_page, page, studySubjects, studyEventDefinitions, crfs, tagId, "OR");
-
+            }
         } else {
             // Site
-            if (filter == 1)
+            if (filter == 1) {
                 idtDTO = getIdtViewDao().findFilter1(studyId, pStudyId, per_page, page, studySubjects, studyEventDefinitions, crfs, tagId, "AND");
+            }
         }
         return new ResponseEntity<List<IdtView>>(idtDTO, HttpStatus.OK);
-
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)

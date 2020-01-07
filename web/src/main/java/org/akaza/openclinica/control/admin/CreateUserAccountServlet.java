@@ -400,7 +400,7 @@ public class CreateUserAccountServlet extends SecureController {
 
 	public String getRandom32ChApiKey() {
 		String uuid = UUID.randomUUID().toString();
-		System.out.print(uuid.replaceAll("-", ""));
+        logger.debug(uuid.replaceAll("-", ""));
 		return uuid.replaceAll("-", "");
 	}
 }

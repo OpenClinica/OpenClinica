@@ -418,9 +418,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
                         dispatcher.forward(request, response);
                     }
                 } catch (ServletException e) {
-                    e.printStackTrace();
+                    logger.error("Dispatcher is not working properly: ", e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error in dispatcher: ", e);
                 }
             }
         }

@@ -264,7 +264,7 @@ public class CreateJobExportServlet extends SecureController {
                     logger.info("== found job date: " + dateStart.toString());
                     // set a success message here
                 } catch (SchedulerException se) {
-                    se.printStackTrace();
+                    logger.error("Scheduler is not able to schedule the job correctly: ", se);
                     setUpServlet();
                     addPageMessage("Error creating Job.");
                     forwardPage(Page.VIEW_JOB_SERVLET);

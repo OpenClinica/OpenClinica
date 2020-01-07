@@ -52,11 +52,11 @@ public class XmlParser extends DefaultHandler {
             sp.parse(f, this);
 
         } catch (SAXException se) {
-            se.printStackTrace();
+            logger.error("Error in SAX instance creation", se);
         } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
+            logger.error("Error in Parsing SAX configuration", pce);
         } catch (IOException ie) {
-            ie.printStackTrace();
+            logger.error("Error  in File: ", ie);
         }
     }
 
