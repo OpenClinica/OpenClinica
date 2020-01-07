@@ -187,7 +187,8 @@ function StudyDataLoader(study, json) {
    */ 
   this.loadStudyEventDefs = function() {
     debug("loading study events", util_logDebug );
-    app_studyEventDefs = this.study["MetaDataVersion"]["StudyEventDef"];
+    app_studyEventDefs = util_ensureArray(this.study["MetaDataVersion"]["StudyEventDef"]);
+   
     if (app_studyEventDefs == undefined) { 
       app_studyEventDefs = new Array();
       if(this.study["MetaDataVersion"]["StudyEventDef"]){
