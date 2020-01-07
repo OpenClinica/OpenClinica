@@ -61,10 +61,7 @@ public class JobDetail extends DataMapDomainObject {
     @Temporal(TemporalType.TIMESTAMP)
     @Column( name = "date_created" )
     public Date getDateCreated() {
-        if (dateCreated != null) {
-            return dateCreated;
-        } else
-            return new Date();
+        return dateCreated;
     }
 
     public void setDateCreated(Date dateCreated) {
@@ -75,10 +72,7 @@ public class JobDetail extends DataMapDomainObject {
     @Temporal(TemporalType.TIMESTAMP)
     @Column( name = "date_completed" )
     public Date getDateCompleted() {
-        if (dateCompleted != null) {
-            return dateCompleted;
-        } else
-            return new Date();
+        return dateCompleted;
     }
 
 
