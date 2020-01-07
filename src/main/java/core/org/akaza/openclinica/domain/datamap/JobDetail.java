@@ -75,10 +75,7 @@ public class JobDetail extends DataMapDomainObject {
     @Temporal(TemporalType.TIMESTAMP)
     @Column( name = "date_completed" )
     public Date getDateCompleted() {
-        if (dateCompleted != null) {
-            return dateCompleted;
-        } else
-            return new Date();
+        return dateCompleted;
     }
 
 

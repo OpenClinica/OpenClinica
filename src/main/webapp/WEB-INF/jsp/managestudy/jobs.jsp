@@ -85,6 +85,12 @@
   function formatDate(date) {
     return moment(date).format(dateFormat);
   }
+  function formatDateWithNull(date){
+    if(date == null)
+        return ""
+    else
+        return moment(date).format(dateFormat);
+  }
   function formatError(e) {
     return 'ERROR: ' + e.status + ': ' + e.statusText;
   }
@@ -217,7 +223,7 @@
             logEntry.status,
             formatDate(logEntry.dateCreated),
             logEntry.createdByUsername,
-            formatDate(logEntry.dateCompleted),
+            formatDateWithNull(logEntry.dateCompleted),
             actionView + actionDownload + actionDelete
           ];
         }));
