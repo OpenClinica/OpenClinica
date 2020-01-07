@@ -367,11 +367,11 @@
               studySub.status.name!='Removed' &&
               (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
             }">
-              <c:if test="${participateStatus=='enabled' || true}">
+              <c:if test="${participateStatus=='enabled'}">
                 <a href="javascript:;" id="contactInformation">
                   <fmt:message key="party_invite" bundle="${resword}"/>
                 </a>
-                <span id="view-access-link" style="displayz:none;">
+                <span id="view-access-link" style="display:none;">
                   &nbsp;|&nbsp;
                   <a href="javascript:;" id="participateAccess">
                     <fmt:message key="view_participant_access_code" bundle="${resword}"/>
