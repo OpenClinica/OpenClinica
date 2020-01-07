@@ -558,16 +558,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void reassignEventCrf(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf, EventCRFBean eventCrf, CRFBean crf, StudySubjectBean studySubject) {
-        int formLayoutId = 0;
-        if (eventCrf == null || eventCrf.getId() == 0) {
-            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
-        } else {
-            formLayoutId = eventCrf.getFormLayoutId();
-        }
-        String href = "pages/managestudy/chooseCRFVersion?crfId=" + crf.getId() + "&crfName=" + crf.getName() + "&formLayoutId=" + Integer.toString(formLayoutId) + "&formLayoutName=" + Integer.toString(formLayoutId) + "&studySubjectLabel=" + studySubject.getLabel() + "&studySubjectId=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId() + "&eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&originatingPage=ListStudySubjects";
-        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
-        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\"/>");
-        builder.aEnd();
+        reassignEventCrf(builder, eventDefinitionCrf, eventCrf, crf, studySubject, "<span border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\"/>");
     }
 
     private void reassignEventCrf(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf, EventCRFBean eventCrf, CRFBean crf, StudySubjectBean studySubject, String link) {
