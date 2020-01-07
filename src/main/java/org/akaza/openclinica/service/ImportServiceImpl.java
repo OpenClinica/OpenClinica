@@ -596,7 +596,8 @@ public class ImportServiceImpl implements ImportService {
     	
     	// only created new event crf once
     	if(eventCrf.getEventCrfId() == 0) {
-    		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);	
+    		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);	    		
+    		updateStudyEvntStatus(eventCrf.getStudyEvent(), userAccount, DATA_ENTRY_STARTED);
     	} 
     	
         ItemData itemData = new ItemData();
@@ -1327,8 +1328,8 @@ public class ImportServiceImpl implements ImportService {
             }
 
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);            
-            logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
-            updateStudyEvntStatus(studyEvent, userAccount, DATA_ENTRY_STARTED);
+
+            logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());          
 
             logger.debug("Study Event Id {} is updated", studyEvent.getStudyEventId());
         }

@@ -176,6 +176,9 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                 for (String property : sort.getSorters().keySet()) {
                     if (property.startsWith("SE_") && property.contains(".F_") && property.contains(".I_")) {
                         filteredTerms= sortSubQuery(property,filteredTerms);
+                        filteredTerms.append(SPACE);
+                        filteredTerms.append(sort.getSorters().get(property));
+                        filteredTerms.append(SPACE);
 
                     }else {
                         filteredTerms.append(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.orderby"));
