@@ -219,7 +219,7 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
         if(flavor.equals(PARTICIPATE_FLAVOR) || flavor.equals(QUERY_FLAVOR)){
-            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds);
+            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds,false);
             crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
@@ -325,7 +325,7 @@ public class EnketoUrlService {
         return dt;
     }
 
-    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,boolean formContainsContactData, List<Bind> binds)
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,boolean formContainsContactData, List<Bind> binds,boolean includeDeleted)
             throws Exception {
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -353,14 +353,17 @@ public class EnketoUrlService {
             boolean rowDeleted = false;
             if (igms.get(0).isRepeatingGroup()) {
                 for (int i = 0; i < maxRowCount; i++) {
-                    rowDeleted = false;
-                    for (ItemGroupMetadata igm : igms) {
-                        ItemData itemData = itemDataDao.findByItemEventCrfOrdinalDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
-                        if (itemData != null) {
-                            rowDeleted = true;
-                            break;
-                        }
-                    }
+                	if(includeDeleted) {
+                		 rowDeleted = false;
+                	}else {
+                		  for (ItemGroupMetadata igm : igms) {
+                              ItemData itemData = itemDataDao.findByItemEventCrfOrdinalDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                              if (itemData != null) {
+                                  rowDeleted = true;
+                                  break;
+                              }
+                          }
+                	}                                     
 
                     if (!rowDeleted) {
                         hashMap = new HashMap<>();
@@ -369,7 +372,13 @@ public class EnketoUrlService {
                             hashMap.put("lastUsedOrdinal", maxRowCount);
                         }
                         for (ItemGroupMetadata igm : igms) {
-                            ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                        	ItemData itemData = null;
+                        	if(includeDeleted) {
+                        		 itemData = itemDataDao.findByItemEventCrfOrdinalIncludeDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                        	}else {
+                        		 itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                        	}
+                           
                             String itemValue = getItemValue(itemData, crfVersion);
                             hashMap.put(igm.getItem().getName(), itemData != null ? itemValue : "");
 
@@ -406,7 +415,7 @@ public class EnketoUrlService {
                     Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
 
                     if (flavor.equals(QUERY_FLAVOR) && responseTypeId != 8) {
-                        if (itemData != null) {
+                        if (itemData != null || includeDeleted) {
                             ObjectMapper mapper = new ObjectMapper();
                             QueriesBean queriesBean = buildQueryElement(itemData);
                             data.put(igm.getItem().getName() + QUERY_SUFFIX, queriesBean != null ? mapper.writeValueAsString(queriesBean) : "");
@@ -641,7 +650,7 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
 
-        populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds);
+        populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds,true);
         crfFlavor = flavor;
 
         crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
