@@ -45,6 +45,9 @@
    --gray-l20: #C2C5C8;
    --gray-l30: #DCDFE2;
    --gray-l40: #F5F8FB;
+
+   /* orange */
+   --orange: #E46E16;
 }
 
 /*.sdvCheck{
@@ -160,7 +163,7 @@
     font-style: normal;
     font-weight: bold;
     color:  #ff0000;
-/*color: #E46E16; */
+/*color: var(--orange); */
 }
 
 .aka_exclaim_error{
@@ -398,7 +401,7 @@ h4 { font-family: Tahoma, Arial, Helvetica, sans-serif;
     font-size: 18px;
     line-height: 24px;
     font-weight: bold;
-    color: #E46E16;
+    color: var(--orange);
 }
 
 
@@ -497,28 +500,60 @@ a:hover, a:active {
  text-align: left;
 }
 
-.box_T {
+.workflowBox .box_T {
+   background-image: url(../images/box_T.gif);
+   background-repeat: repeat-x;
+   background-position: top;
+   background-color: #FFFFFF;
 }
 
-.box_L {
+.workflowBox .box_L {
+   background-image: url(../images/box_L.gif);
+   background-repeat: repeat-y;
+   background-position: left;
+   background-color: transparent;
 }
 
-.box_R {
+.workflowBox .box_R {
+   background-image: url(../images/box_R.gif);
+   background-repeat: repeat-y;
+   background-position: right;
+   background-color: transparent;
 }
 
-.box_B {
+.workflowBox .box_B {
+   background-image: url(../images/box_B.gif);
+   background-repeat: repeat-x;
+   background-position: bottom;
+   background-color: transparent;
 }
 
-.box_TL {
+.workflowBox .box_TL {
+   background-image: url(../images/box_TL.gif);
+   background-repeat: no-repeat;
+   background-position: top left;
+   background-color: transparent;
 }
 
-.box_TR {
+.workflowBox .box_TR {
+   background-image: url(../images/box_TR.gif);
+   background-repeat: no-repeat;
+   background-position: top right;
+   background-color: transparent;
 }
 
-.box_BL {
+.workflowBox .box_BL {
+   background-image: url(../images/box_BL.gif);
+   background-repeat: no-repeat;
+   background-position: bottom left;
+   background-color: transparent;
 }
 
-.box_BR {
+.workflowBox .box_BR {
+   background-image: url(../images/box_BR.gif);
+   background-repeat: no-repeat;
+   background-position: bottom right;
+   background-color: transparent;
 }
 
 .textbox_center { padding-left: 11px;
@@ -547,13 +582,13 @@ a:hover, a:active {
  font-size: 11px;
  font-style: normal;
  font-weight: bold;
- color: #E46E16;
+ color: var(--orange);
 }
 
 .alertbox_center { padding-left: 11px;
  padding-right: 16px;
  padding-top: 4px;
- color: #E46E16;
+ color: var(--darkblue);
 }
 
 .homebox_center { padding-left: 11px;
@@ -615,7 +650,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 .breadcrumb_active { font-family: Tahoma, Arial, Helvetica, Sans-Serif;
  font-size: 11px;
  font-weight: bold;
- color: #E46E16;
+ color: var(--orange);
  background-image: url(../images/breadcrumb_a.gif);
  background-repeat: no-repeat;
  background-position: center left;
@@ -718,7 +753,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
  font-size: 14px;
  line-height: 18px;
  font-weight: bold;
- color: #66CCCC;
+ color: var(--lightblue);
  padding-bottom: 6px;
 }
 
@@ -1384,12 +1419,14 @@ color: var(--lightblue)
  background-color: #FFFFFF
 }
 
-.workflowBox { border-style: solid;
+.workflowBox {
+   border-style: solid;
 	border-color: #B4B4B2;
 	border-width: 0px 0px 0px 1px;
 	}
 
-.workflowBox_T { background-image: url(../images/workflowBox_T.gif);
+.workflowBox_T {
+   background-image: url(../images/workflowBox_T.gif);
 	background-repeat: repeat-x;
 	background-position: bottom;
 	height: 30px;
@@ -1405,20 +1442,17 @@ color: var(--lightblue)
 	padding-right: 8px;
 	padding-bottom: 4px;
 	background-color: #FFFFFF
-	}
+}
 
-.workflowBox_center { padding: 8px 30px 16px 16px; 
-	}
+.workflowBox_center { 
+   padding: 8px 30px 16px 16px; 
+}
 
-.workflowBox_B { padding-bottom: 4px;
-	}
-
-
-	
-
+.workflowBox_B {
+   padding-bottom: 4px;
+}
 
 .tooltip {
-		
 	width:170px;
 	font-size:11px;
 	color:black; 
@@ -1555,19 +1589,8 @@ color: var(--lightblue)
     color: var(--lightblue)
 }
 
-.workflowBox { border-style: solid;
-    border-color: #B4B4B2;
-    border-width: 0px 0px 0px 1px;
-}
-
-.workflowBox_T { background-image: url(../images/workflowBox_T.gif);
-    background-repeat: repeat-x;
-    background-position: bottom;
-    height: 30px;
-    padding-top: 5px;
-}
-
-.workflow_tab { background-image: url(../images/sidebar_tab.gif);
+.workflow_tab {
+   background-image: url(../images/sidebar_tab.gif);
     background-repeat: no-repeat;
     background-position: top right;
     width: 140px;
@@ -1576,12 +1599,6 @@ color: var(--lightblue)
     padding-right: 8px;
     padding-bottom: 4px;
     background-color: #FFFFFF
-}
-
-.workflowBox_center { padding: 8px 30px 16px 16px;
-}
-
-.workflowBox_B { padding-bottom: 4px;
 }
 
 .changedField
