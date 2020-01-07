@@ -38,6 +38,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
@@ -935,6 +936,7 @@ public class UserServiceImpl implements UserService {
         logger.debug("Job Id {} has completed",jobDetail.getJobDetailId());
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void persistJobFailed(JobDetail jobDetail,String fileName) {
         jobDetail.setLogPath(fileName);
         jobDetail.setDateCompleted(new Date());
