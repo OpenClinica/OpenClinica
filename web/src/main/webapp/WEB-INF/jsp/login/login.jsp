@@ -51,9 +51,9 @@
 		iev = iev.trim();
 	}
 	if(iev.length() > 1 && Double.valueOf(iev)<7) {%>
-	<div ID="OClogoIE6">&nbsp;</div>
+	<div ID="logoIE6">&nbsp;</div>
 	<%} else {%>
-    <div ID="OClogo">&nbsp;</div>
+    <div ID="logo">&nbsp;</div>
   	<%}%>
     <!-- end OpenClinica logo -->
         <table width="720 px">
