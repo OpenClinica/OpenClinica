@@ -411,12 +411,13 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		
     	    CoreResources.setRequestSchema(schema);
     	    ArrayList<File> pdfFiles = new ArrayList<File>();
+    	    ArrayList<String> pdfHeaders = new ArrayList<String>();
 		    File mergedPdfFile = null;
 		    String mergedPdfFileNm = null;
 		    int studyId = Integer.parseInt((String) servletContext.getAttribute("studyID"));
 		    
-		    // prepare  pdf header
-		    String pdfHeader = this.pdfService.preparePdfHeader(study, site, ss.getLabel());
+		    // pdf header
+		    String pdfHeader = null;
 		   
 			/**
 			 *  need to check the number of study/events/forms for this subject
@@ -441,6 +442,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    	
 			    ArrayList<StudyEvent> subjectStudyEvents = studySubjectHibDao.fetchListSEs(studySubjectOID);
 			    for(StudyEvent studyEvent : subjectStudyEvents) {
+
+			    	// prepare  pdf header
+				    pdfHeader = this.pdfService.preparePdfHeader(study, site, ss.getLabel(),studyEvent);
+				    
 			    	List<EventCrf> tmp = studyEvent.getEventCrfs();
 			    	
 			    	/*
@@ -491,13 +496,14 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 							
 							if(pdfFile !=null) {
 								pdfFiles.add(pdfFile);
+								pdfHeaders.add(pdfHeader);
 							}
 			    	    }										
 				        
 			    	}//for-loop-2	    						
 			    }//for-loop-1		   
 			    
-				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName,pdfHeader);
+				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName,pdfHeaders);
 				mergedPdfFileNm = mergedPdfFile.getName();
 				userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
 							
