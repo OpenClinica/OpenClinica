@@ -31,9 +31,10 @@
           return false;
       });
   });
-</script>
-<script type="text/javascript" language="javascript">
-  function studySubjectResource()  { return "${study.oc_oid}/${studySub.oid}"; }
+
+  function studySubjectResource()  {
+    return "${study.oc_oid}/${studySub.oid}";
+  }
   
   function checkCRFLocked(ecId, url){
       jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
@@ -55,8 +56,7 @@
           }
       });
   }
-</script>
-<script>
+
   var studyKey = '/study.oc_oid';
   var participantKey = '/views/participants/';
 
@@ -1698,6 +1698,7 @@
   </table>
 </div>
 
+<script src="js/lib/jquery.qrcode.min.js"></script>
 <script type="text/javascript">
 
     var jsAtt = '${showOverlay}';
