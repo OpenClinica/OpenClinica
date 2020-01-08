@@ -94,6 +94,7 @@ public class EventCRFBean extends AuditableEntityBean {
         this.ownerId = eventCRFBean.getOwnerId();
         this.createdDate = eventCRFBean.getCreatedDate();
         this.updaterId = eventCRFBean.getUpdaterId();
+        this.formLayout = eventCRFBean.getFormLayout();
         this.formLayoutId = eventCRFBean.getFormLayoutId();
     }
 

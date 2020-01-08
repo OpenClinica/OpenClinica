@@ -293,6 +293,11 @@
   #inviteResultAlert > table {
     width: 600px;
   }
+  #copy-result {
+    font-weight: bold;
+    font-size: 14px;
+    color: #3a6087;
+  }
   input[type=radio]:focus,input[type=checkbox]:focus {
     outline-style: solid;
   }
@@ -1620,6 +1625,18 @@
                   <span><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
                 </td>
               </tr>
+              <tr id="copy-result" style="display:none;">
+                <td></td>
+                <td colspan="2" id="copy-result-message"></td>
+              </tr>
+              <tr id="btn-copy" style="display:none;">
+                <td></td>
+                <td colspan="2">
+                  <button>
+                    <fmt:message key="copy_access_code_to_clipboard" bundle="${resword}"/>
+                  </button>
+                </td>
+              </tr>
               <tr valign="top">
                 <td></td>
                 <td valign="top" colspan="2" style="padding-top:7px;">
@@ -1711,6 +1728,7 @@
             $('tr.reset-participant-access-code').show();
         }
     }
+    
     function enableDisableControls() {
         if (!$('#email-input').length)
             return;
@@ -1765,6 +1783,20 @@
 
         jQuery('#editParticipantID').click(function () {
             jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
+        });
+
+        jQuery('#btn-copy button').click(function() {
+          var accessCode = document.getElementById('access-code-input');
+          accessCode.select();
+          accessCode.setSelectionRange(0, 99999); // for mobile devices
+          var copied = document.execCommand("copy");
+          if (copied) {
+            jQuery('#copy-result-message').text('<fmt:message key="copy_to_clipboard_success" bundle="${resword}"/>');
+          } else {
+            jQuery('#copy-result-message').text('<fmt:message key="copy_to_clipboard_failed" bundle="${resword}"/>');
+          }
+          jQuery('#copy-result').show();          
+          return false;
         });
 
         jQuery('#connect-button').click(function () {
@@ -1920,6 +1952,7 @@
             getAccessCode("Y");
             $(this).hide();
             $('#access-code-input').attr('type', 'text');
+            $("#btn-copy").show();
         });
      });
 

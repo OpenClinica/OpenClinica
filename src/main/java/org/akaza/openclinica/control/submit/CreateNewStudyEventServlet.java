@@ -512,6 +512,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 
                 studySubject = unsignSignedParticipant(studySubject);
+                studySubject.setUpdater(ub);
                 sdao.update(studySubject);
 
                 // ArrayList subjectsExistingEvents =
