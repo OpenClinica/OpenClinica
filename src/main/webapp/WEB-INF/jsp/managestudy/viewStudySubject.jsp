@@ -293,6 +293,11 @@
   #inviteResultAlert > table {
     width: 600px;
   }
+  #copy-success {
+    font-weight: bold;
+    font-size: 14px;
+    color: #3a6087;
+  }
   input[type=radio]:focus,input[type=checkbox]:focus {
     outline-style: solid;
   }
@@ -1620,6 +1625,12 @@
                   <span><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
                 </td>
               </tr>
+              <tr id="copy-success" style="display:none;">
+                <td></td>
+                <td colspan="2">
+                  <fmt:message key="copy_to_clipboard_success" bundle="${resword}"/>
+                </td>
+              </tr>
               <tr id="btn-copy" style="display:none;">
                 <td></td>
                 <td colspan="2">
@@ -1782,7 +1793,7 @@
           accessCode.setSelectionRange(0, 99999); // for mobile devices
           var copied = document.execCommand("copy");
           if (copied) {
-            alert('<fmt:message key="copy_to_clipboard_success" bundle="${resword}"/>');            
+            jQuery('#copy-success').show();          
           } else {
             alert('<fmt:message key="copy_to_clipboard_failed" bundle="${resword}"/>');            
           }
