@@ -4,6 +4,7 @@ public class Head {
 
     private String title;
     private Model model;
+    private String crossform_reference;
 
     public String getTitle() {
         return title;
@@ -19,5 +20,13 @@ public class Head {
 
     public void setModel(Model model) {
         this.model = model;
+    }
+
+    public String getCrossform_reference() {
+        return crossform_reference;
+    }
+
+    public void setCrossform_reference(String crossform_reference) {
+        this.crossform_reference = crossform_reference;
     }
 }
