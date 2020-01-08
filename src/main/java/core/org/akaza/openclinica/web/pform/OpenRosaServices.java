@@ -122,6 +122,9 @@ public class OpenRosaServices {
     public static final String DASH = "-";
     public static final String CONTACTDATA = "contactdata";
     public static final String UNSCHECDULED = "unscheduled";
+    public static final String CURRENT_EVENT = "CURRENT_EVENT";
+    public static final String OPEN_BRACKET = "[";
+    public static final String CLOSE_BRACKET = "]";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -1113,13 +1116,15 @@ public class OpenRosaServices {
         }
         String userAccountID = subjectContext.get("userAccountID");
 
+        String crossformReferenceEvents=getCrossFormReferenceEvents(formLayoutOID,studyOID,flavor,sed,studyEventRepeat);
+
         String result = null;
         // first time call
         if(!includeClinicalData) {
-            result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "no","no", "no","no","yes", "yes");
+            result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, !StringUtils.isEmpty(crossformReferenceEvents) ?crossformReferenceEvents:"*", "no", "no", request, userAccountID, "no","no", "no","no","yes", "yes");
         }else {
             // 2nd time call
-            result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "n");
+            result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, !StringUtils.isEmpty(crossformReferenceEvents)?crossformReferenceEvents:"*", "no", "no", request, userAccountID, "yes","no", "yes","no","yes", "n");
 
         }
 
@@ -1195,7 +1200,7 @@ public class OpenRosaServices {
         return builder.build();
     }
 
-    public List<Bind> getBinds(FormLayout formLayout, String flavor,String studyOid ) throws Exception {
+    public Html getHtml(FormLayout formLayout, String flavor,String studyOid ) throws Exception {
         String xformOutput = "";
         Study study =studyDao.findByOcOID(studyOid);
         Study parentStudy= study.getStudy()!=null?study.getStudy():study;
@@ -1207,6 +1212,14 @@ public class OpenRosaServices {
             studyFilePath--;
         } while (xformOutput.equals("") && studyFilePath > 0);
         Html html = xformParser.unMarshall(xformOutput);
+
+        return html;
+    }
+
+
+    public List<Bind> getBinds(FormLayout formLayout, String flavor, String studyOid) throws Exception {
+
+        Html html = getHtml(formLayout, flavor, studyOid);
         Body body = html.getBody();
         Head head = html.getHead();
         Model model = head.getModel();
@@ -1226,5 +1239,44 @@ public class OpenRosaServices {
         return formContainsContactData;
     }
 
+    private String getCrossFormReferenceEvents(String formLayoutOID, String studyOID, String flavor, StudyEventDefinition sed, String studyEventRepeat) throws Exception {
+        Html html = getHtml(getFormLayout(formLayoutOID), flavor, studyOID);
+        String crossformReferenceEvents = html.getHead().getCrossform_references();
+
+        if (crossformReferenceEvents == null || crossformReferenceEvents.equals("")) {
+            return null;
+        }
+
+        crossformReferenceEvents = crossformReferenceEvents.toUpperCase();
+        List<String> eventOids = Arrays.asList(crossformReferenceEvents.split("\\s*,\\s*"));
+
+        for (String eventOid : eventOids) {
+            if (!eventOid.equals(CURRENT_EVENT)) {
+                StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByColumnName(eventOid.toUpperCase(), "oc_oid");
+                if (studyEventDefinition == null) {
+                    LOGGER.error("Invalid event oid in crossform_references: {}",crossformReferenceEvents);
+                    return null;
+                }
+            }
+        }
+
+        if (crossformReferenceEvents.contains(CURRENT_EVENT)) {
+            boolean currentEventIsInList = false;
+            for (String eventOid : eventOids) {
+                if (eventOid.equals(sed.getOc_oid())) {
+                    currentEventIsInList = true;
+                    break;
+                }
+            }
+
+            if (currentEventIsInList) {
+                crossformReferenceEvents = crossformReferenceEvents.replaceAll("(?i)"+CURRENT_EVENT, "");
+            } else {
+                crossformReferenceEvents = crossformReferenceEvents.replaceAll("(?i)"+CURRENT_EVENT, sed.getOc_oid() + OPEN_BRACKET + studyEventRepeat + CLOSE_BRACKET);
+            }
+        }
+
+        return crossformReferenceEvents;
+    }
 
 }
