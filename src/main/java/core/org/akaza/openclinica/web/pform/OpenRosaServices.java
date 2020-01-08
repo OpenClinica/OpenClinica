@@ -1241,7 +1241,7 @@ public class OpenRosaServices {
 
     private String getCrossFormReferenceEvents(String formLayoutOID, String studyOID, String flavor, StudyEventDefinition sed, String studyEventRepeat) throws Exception {
         Html html = getHtml(getFormLayout(formLayoutOID), flavor, studyOID);
-        String crossformReferenceEvents = html.getHead().getCrossform_reference();
+        String crossformReferenceEvents = html.getHead().getCrossform_references();
 
         if (crossformReferenceEvents == null || crossformReferenceEvents.equals("")) {
             return null;
@@ -1254,7 +1254,7 @@ public class OpenRosaServices {
             if (!eventOid.equals(CURRENT_EVENT)) {
                 StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByColumnName(eventOid.toUpperCase(), "oc_oid");
                 if (studyEventDefinition == null) {
-                    LOGGER.error("Invalid event oid in crossform_reference: {}",crossformReferenceEvents);
+                    LOGGER.error("Invalid event oid in crossform_references: {}",crossformReferenceEvents);
                     return null;
                 }
             }
