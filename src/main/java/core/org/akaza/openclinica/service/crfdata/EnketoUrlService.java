@@ -408,14 +408,20 @@ public class EnketoUrlService {
 
             if (!igms.get(0).isRepeatingGroup()) {
                 for (ItemGroupMetadata igm : igms) {
-                    ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
+                   
+                    ItemData itemData = null;
+                	if(includeDeleted) {
+                		 itemData = itemDataDao.findByItemEventCrfOrdinalIncludeDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
+                	}else {
+                		 itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
+                	}
                     String itemValue = getItemValue(itemData, crfVersion);
                     data.put(igm.getItem().getName(), itemData != null ? itemValue : "");
                     ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(igm.getItem().getItemId(), crfVersion.getCrfVersionId());
                     Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
 
                     if (flavor.equals(QUERY_FLAVOR) && responseTypeId != 8) {
-                        if (itemData != null || includeDeleted) {
+                        if (itemData != null) {
                             ObjectMapper mapper = new ObjectMapper();
                             QueriesBean queriesBean = buildQueryElement(itemData);
                             data.put(igm.getItem().getName() + QUERY_SUFFIX, queriesBean != null ? mapper.writeValueAsString(queriesBean) : "");
