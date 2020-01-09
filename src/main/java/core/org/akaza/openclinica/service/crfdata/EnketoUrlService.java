@@ -662,7 +662,11 @@ public class EnketoUrlService {
         crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
 
         // Call Enketo api to get url
-        EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
+        EnketoCredentials enketoCredentials = EnketoCredentials.getInstance(studyOid);
+        if(enketoCredentials.getServerPdfUrl() != null) {
+        	enketoCredentials.setServerUrl(enketoCredentials.getServerPdfUrl());
+        }
+        EnketoAPI enketo = new EnketoAPI(enketoCredentials);
 
         // Build redirect url
         String redirectUrl = CoreResources.getField("sysURL");
