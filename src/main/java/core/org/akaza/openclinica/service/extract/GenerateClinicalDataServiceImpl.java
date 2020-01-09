@@ -995,10 +995,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				}
 			}
 		}
-		if (studyEvents.size() > 0)
 			return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID, userId);
-		else
-			return null;
 	}
 
 	public UserAccountDao getUserAccountDao() {
