@@ -227,6 +227,9 @@ public class PdfServiceImpl implements PdfService {
     */
    public void writeToFile(String message, String fileName) {
     
+	   if(message == null) {
+		   message = "null";
+	   }
        PDDocument doc = new PDDocument();
        try {
            PDPage page = new PDPage();
