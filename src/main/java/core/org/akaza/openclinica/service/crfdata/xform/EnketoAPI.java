@@ -48,8 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class EnketoAPI {
 
-    private String enketoURL = null;
-    private String enketoPdfURL = null;
+    private String enketoURL = null; 
     private String token = null;
     private String ocURL = null;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -108,8 +107,7 @@ public class EnketoAPI {
     private String userPasswdCombo;
 
     public EnketoAPI(EnketoCredentials credentials) {
-        this.enketoURL = credentials.getServerUrl();
-        this.enketoPdfURL = credentials.getServerPdfUrl();
+        this.enketoURL = credentials.getServerUrl();      
         this.token = credentials.getApiKey();
         this.ocURL = credentials.getOcInstanceUrl();
         this.userPasswdCombo = new String(Base64.encodeBase64((CoreResources.getField("ocform.adminapikey") + ":").getBytes()));
@@ -685,7 +683,7 @@ public class EnketoAPI {
         EnketoPDFResponse pdfResponse = null;
         URI finalUrl = null;
 
-        if (enketoPdfURL == null)
+        if (enketoURL == null)
             return null;
 
         try {
@@ -696,7 +694,7 @@ public class EnketoAPI {
             ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
             String instanceId = encoder.encodePassword(hashString, null);
             URL eURL = null;
-            eURL = new URL(enketoPdfURL + INSTANCE_FORM_PDF);
+            eURL = new URL(enketoURL + INSTANCE_FORM_PDF);
             String eurlStr = eURL.toString();
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
 
