@@ -206,6 +206,7 @@ public class EnketoUrlService {
             UserAccount userAccount = userAccountDao.findByUserId(ub.getId());
             eventCrf= createEventCrf(formLayout,studyEvent,subject,userAccount);
             logger.info("creating new event crf {}",eventCrf.getEventCrfId());
+            logger.info("Subject Context info *** {} *** ",subjectContext.toString());
         }
 
         CrfVersion crfVersion = eventCrf.getCrfVersion();
