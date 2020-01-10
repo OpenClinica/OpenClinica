@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<head><title>OpenClinica interview</title>
+<head><title><fmt:message key="openclinica" bundle="${resword}"/> interview</title>
    <%-- <fmt:message key="view_data_entry" bundle="${resword}"/>--%>
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>

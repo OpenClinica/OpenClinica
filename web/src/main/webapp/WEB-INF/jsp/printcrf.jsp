@@ -163,7 +163,7 @@ var app_error_print_CRF_Message_at_Loading='<oc:jsEscape key="error_print_CRF_Me
 <html>
  <head>
   <meta charset="UTF-8">
-  <title>OpenClinica - Printable Forms</title>
+  <title><fmt:message key="openclinica" bundle="${resword}"/> - Printable Forms</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/normalize.css" type="text/css"/>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css" type="text/css"/>
   <script src="${pageContext.request.contextPath}/js/lib/head.min.js"></script>

@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.dao.login;
 
@@ -34,7 +34,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 /**
  * <P>
- * UserAccountDAO, the data access object for the User_Account table in the OpenClinica 2.0 database.
+ * UserAccountDAO, the data access object for the User_Account table in the LibreClinica 2.0 database.
  *
  * @author thickerson
  *

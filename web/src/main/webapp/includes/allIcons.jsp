@@ -7,7 +7,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-<title>OpenClinica</title>
+<title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
 <link rel="stylesheet" href="../includes/styles.css" type="text/css">
 <%--<link rel="stylesheet" href="../includes/styles2.css" type="text/css">--%>

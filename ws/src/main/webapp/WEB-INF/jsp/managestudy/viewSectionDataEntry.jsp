@@ -29,7 +29,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head><title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
+<head><title><fmt:message key="openclinica" bundle="${resword}"/> <fmt:message key="view_data_entry" bundle="${resword}"/></title>
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
     <link rel="stylesheet" href="includes/styles2.css" type="text/css" media="screen">
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
@@ -108,9 +108,6 @@ margin-top:20px;margin-top:10px;document.getElementById('centralContainer').styl
 <%-- <c:param var="fromPage" value="vsde"/>
 </c:import> --%>
 <!--<br><br>-->
-<%-- provide links from viewsectiondata page
-http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId=3
- http://svn.akazaresearch.com:8080/OpenClinica-2.2/ViewCRF?module=&crfId=40 [^]--%>
 
 <c:set var="eventId" value="${eventId}"/>
 <c:set var="studySubjectId" value="${studySubjectId}"/>

@@ -27,7 +27,7 @@ function reportBug(versionNumber) {
 
 				</td>
 
-<!-- Help and OpenClinica Feedback Buttons -->
+<!-- Help and LibreClinica Feedback Buttons -->
 				<td valign="top">
 				<table border="0" cellpadding="0" cellspacing="0">
 					<tr>&nbsp;</tr>
@@ -57,7 +57,7 @@ function reportBug(versionNumber) {
 				</table>
 				</td>
 
-<!-- end Help and OpenClinica Feedback Buttons -->
+<!-- end Help and LibreClinica Feedback Buttons -->
 
 	<td valign="top" align="right">
 

@@ -346,7 +346,7 @@
     </build>
 
     <properties>
-    	<assembly.name>OpenClinica</assembly.name>
+    	<assembly.name>LibreClinica</assembly.name>
     </properties>
 
 </project>

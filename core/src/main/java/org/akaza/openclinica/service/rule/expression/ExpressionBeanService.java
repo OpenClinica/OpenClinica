@@ -1,8 +1,15 @@
 /*
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
- * For details see: http://www.openclinica.org/license
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
+/*
+ * GNU Lesser General Public License (GNU LGPL).
+ * For details see: https://libreclinica.org/license
  *
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * Copyright 2003-2008 Akaza Research
  */
 package org.akaza.openclinica.service.rule.expression;

@@ -1,4 +1,11 @@
 /*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
+/*
  * Created on Jan 21, 2005
  */
 package org.akaza.openclinica.control.submit;
