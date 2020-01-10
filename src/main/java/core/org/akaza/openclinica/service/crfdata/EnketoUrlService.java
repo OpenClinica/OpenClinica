@@ -617,13 +617,14 @@ public class EnketoUrlService {
         }
     }
 
-    public File getFormPdf(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String studySubjectOID,FormLayout formLayout, String flavor,
+    public File getFormPdf(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOID, String studySubjectOID,FormLayout formLayout, String flavor,
                            ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked , boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub,String format, String margin,String landscape) throws Exception {
 
         File pdfFile = null;
-        Study study = enketoCredentials.getParentStudy(studyOid);
-        Study site = enketoCredentials.getSiteStudy(studyOid);
-        studyOid = study.getOc_oid();
+        Study study = enketoCredentials.getParentStudy(studyOID);
+        Study site = enketoCredentials.getSiteStudy(studyOID);        
+     
+        String studyOid = study.getOc_oid();              
         int filePath = study.getFilePath();
 
         String editURL = null;
