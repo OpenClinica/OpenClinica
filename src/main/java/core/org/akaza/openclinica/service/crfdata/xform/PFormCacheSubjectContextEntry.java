@@ -138,4 +138,25 @@ public class PFormCacheSubjectContextEntry {
     public void setDiscrepancyNoteThreadUuid(String discrepancyNoteThreadUuid) {
         this.discrepancyNoteThreadUuid = discrepancyNoteThreadUuid;
     }
+
+    @Override
+    public String toString() {
+        return "PFormCacheSubjectContextEntry{" +
+                "studySubjectOid='" + studySubjectOid + '\'' +
+                ", studyEventDefinitionId='" + studyEventDefinitionId + '\'' +
+                ", studyEventId='" + studyEventId + '\'' +
+                ", ordinal='" + ordinal + '\'' +
+                ", crfVersionOid='" + crfVersionOid + '\'' +
+                ", formLayoutOid='" + formLayoutOid + '\'' +
+                ", userAccountId='" + userAccountId + '\'' +
+                ", itemName='" + itemName + '\'' +
+                ", itemRepeatOrdinalAdjusted=" + itemRepeatOrdinalAdjusted +
+                ", itemRepeatOrdinalOriginal=" + itemRepeatOrdinalOriginal +
+                ", isItemInRepeatingGroup=" + isItemInRepeatingGroup +
+                ", itemRepeatGroupName='" + itemRepeatGroupName + '\'' +
+                ", studyOid='" + studyOid + '\'' +
+                ", formLoadMode='" + formLoadMode + '\'' +
+                ", discrepancyNoteThreadUuid='" + discrepancyNoteThreadUuid + '\'' +
+                '}';
+    }
 }
