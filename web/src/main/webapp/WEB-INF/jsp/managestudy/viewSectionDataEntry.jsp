@@ -35,7 +35,7 @@
 
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 
-<title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
+<title><fmt:message key="openclinica" bundle="${resword}"/> <fmt:message key="view_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
@@ -146,9 +146,6 @@ margin-top:20px;margin-top:10px;document.getElementById('centralContainer').styl
 <%-- <c:param var="fromPage" value="vsde"/>
 </c:import> --%>
 <!--<br><br>-->
-<%-- provide links from viewsectiondata page
-http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId=3
- http://svn.akazaresearch.com:8080/OpenClinica-2.2/ViewCRF?module=&crfId=40 [^]--%>
 
 <c:set var="eventId" value="${eventId}"/>
 <c:set var="studySubjectId" value="${studySubjectId}"/>

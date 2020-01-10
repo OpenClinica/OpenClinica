@@ -28,7 +28,6 @@ import java.util.List;
 public class StudyEventDefBean extends ElementDefBean {
     private String type;
     private List<ElementRefBean> formRefs;
-    //OpenClinica extension
     private EventDefinitionDetailsBean eventDefinitionDetais;
     
     public StudyEventDefBean() {

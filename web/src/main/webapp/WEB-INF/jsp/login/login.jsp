@@ -6,12 +6,18 @@
     </c:if>
 <!-- End of 6099-->
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
-<title>OpenClinica</title>
+<title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
  <meta http-equiv="X-UA-Compatible" content="IE=8" />
@@ -27,11 +33,6 @@
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/ua-parser.min.js'/>"></script>
 </head>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-
 <%--<c:choose>--%>
     <%--<c:when test="${resword.locale == null}"><fmt:setLocale value="en" scope="session"/></c:when>--%>
     <%--<c:otherwise><fmt:setLocale value="${resword.locale}" scope="session"/></c:otherwise>--%>
@@ -41,7 +42,7 @@
     <div class="login_BG">
     <center>
 
-    <!-- OpenClinica logo -->
+    <!-- LibreClinica logo -->
 	<%String ua = request.getHeader( "User-Agent" );
 	String temp = "";
 	String iev = "";
@@ -55,7 +56,7 @@
 	<%} else {%>
     <div ID="logo">&nbsp;</div>
   	<%}%>
-    <!-- end OpenClinica logo -->
+    <!-- end LibreClinica logo -->
         <table width="720 px">
 
     <script type="text/javascript">

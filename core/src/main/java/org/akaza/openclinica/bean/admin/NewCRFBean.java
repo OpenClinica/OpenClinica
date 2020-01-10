@@ -458,7 +458,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             pe.printStackTrace();
             try {
                 con.rollback();
-                logger.debug("OpenClinica Error detected, rollback " + pe.getMessage());
+                logger.debug("LibreClinica Error detected, rollback " + pe.getMessage());
                 String msg2 = "The following error was returned from the application: " + pe.getMessage();
                 error.add(msg2);
                 this.setErrors(error);
@@ -466,13 +466,11 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
                 seq.printStackTrace();
-                logger.debug("OpenClinica Error within rollback " + seq.getMessage());
+                logger.debug("LibreClinica Error within rollback " + seq.getMessage());
                 String msg2 = "The following error was returned from the application: " + seq.getMessage();
                 error.add(msg2);
                 this.setErrors(error);
                 throw new OpenClinicaException("", "");
-                // catching OpenClinica exceptions in general is duplicating
-                // effort, maybe we should nix it?
             }
 
         } finally {
@@ -564,7 +562,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             pe.printStackTrace();
             try {
                 con.rollback();
-                logger.debug("OpenClinica Error detected, rollback " + pe.getMessage());
+                logger.debug("LibreClinica Error detected, rollback " + pe.getMessage());
                 String msg2 = "The following error was returned from the application: " + pe.getMessage();
                 error.add(msg2);
                 this.setDeleteErrors(error);
@@ -572,13 +570,11 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
                 seq.printStackTrace();
-                logger.debug("OpenClinica Error within rollback " + seq.getMessage());
+                logger.debug("LibreClinica Error within rollback " + seq.getMessage());
                 String msg2 = "The following error was returned from the application: " + seq.getMessage();
                 error.add(msg2);
                 this.setDeleteErrors(error);
                 throw new OpenClinicaException("", "");
-                // catching OpenClinica exceptions in general is duplicating
-                // effort, maybe we should nix it?
             }
 
         } finally {
@@ -708,12 +704,12 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             try {
                 error.add("The following error was returned from the application: " + pe.getMessage());
                 con.rollback();
-                logger.error("OpenClinica Error detected, rollback " + pe.getMessage());
+                logger.error("LibreClinica Error detected, rollback " + pe.getMessage());
                 throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
                 error.add("The following error was returned from the application: " + seq.getMessage());
 
-                logger.error("OpenClinica Error within rollback " + seq.getMessage());
+                logger.error("LibreClinica Error within rollback " + seq.getMessage());
                 throw new OpenClinicaException("", "");
             }
 

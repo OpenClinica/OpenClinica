@@ -24,7 +24,7 @@ import javax.persistence.Table;
 
 /**
  * <p>
- * Does not extend any Super Domain class because it does not follow OpenClinica convention. This table is managed via LiquiBase
+ * Does not extend any Super Domain class because it does not follow the convention. This table is managed via LiquiBase
  * </p>
  * 
  * @author Krikor Krumlian

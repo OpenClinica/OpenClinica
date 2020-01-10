@@ -34,7 +34,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 /**
  * <P>
- * UserAccountDAO, the data access object for the User_Account table in the OpenClinica 2.0 database.
+ * UserAccountDAO, the data access object for the User_Account table in the LibreClinica 2.0 database.
  *
  * @author thickerson
  *

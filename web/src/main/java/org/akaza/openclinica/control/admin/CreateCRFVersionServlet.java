@@ -672,7 +672,7 @@ public class CreateCRFVersionServlet extends SecureController {
     }
 
     /**
-     * When the version is added, for each non-new item OpenClinica should check the RESPONSE_OPTIONS_TEXT, and
+     * When the version is added, for each non-new item LibreClinica should check the RESPONSE_OPTIONS_TEXT, and
      * RESPONSE_VALUES used for the item in other versions of the CRF.
      * 
      * For a given RESPONSE_VALUES code, the associated RESPONSE_OPTIONS_TEXT string is different than in a previous

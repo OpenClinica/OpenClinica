@@ -55,7 +55,7 @@ public class LogUsageStatsService {
                                                                  // information
 
     // constants for event messages
-    public final static String event_msg_OC_started = "US003  OpenClinica was started";
+    public final static String event_msg_OC_started = "US003  LibreClinica was started";
     // constants for event detail parameters
     public final static String OC_start_time = "oc_start_time";
     // public final static String OC_init_complete_time = "init_complete_time";
@@ -66,7 +66,7 @@ public class LogUsageStatsService {
     public final static String OC_version = "OC Version";
 
     /**
-     * @pgawade Method to log the event - start of OpenClinica initialization
+     * @pgawade Method to log the event - start of LibreClinica initialization
      */
     public static void logEventOCStart(Map eventDetailsMap) {
         // Format the event details
@@ -79,7 +79,7 @@ public class LogUsageStatsService {
                 mapEntry = mapIter.next();
                 if (null != mapEntry) {
                     if ((mapEntry.getKey().equalsIgnoreCase(OC_last_system_start)) && (mapEntry.getValue() == null)) {
-                        bufEventDetails.append(mapEntry.getKey() + ": " + "No Last System start time available; it could be first start of OpenClinica");
+                        bufEventDetails.append(mapEntry.getKey() + ": " + "No Last System start time available; it could be first start of LibreClinica");
                     }
  else if ((mapEntry.getKey().equalsIgnoreCase(OC_last_up_time)) && (mapEntry.getValue() == null)) {
                     }

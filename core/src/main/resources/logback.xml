@@ -458,7 +458,7 @@
 			</then>
 		</if>		
 	</logger>
-	<!-- OpenClinica logs -->
+	<!-- LibreClinica logs -->
 	<logger additivity="false" name="org.akaza.openclinica">
 		<level value="${logLevel}" />	
 			<if condition='property("logLocation").equalsIgnoreCase("local") || property("logLocation").equalsIgnoreCase("both")'>

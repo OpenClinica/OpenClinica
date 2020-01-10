@@ -24,7 +24,7 @@ import org.hibernate.annotations.Parameter;
 
 /**
  * <p>
- * OpenClinica Version
+ * LibreClinica Version
  * </p>
  * 
  * @author Pradnya Gawade

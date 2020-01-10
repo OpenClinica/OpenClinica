@@ -37,7 +37,7 @@ public class MetaDataVersionBean extends ElementOIDBean {
     private List<ItemGroupDefBean> itemGroupDefs;
     private List<ItemDefBean> itemDefs;
     private List<CodeListBean> codeLists;
-    // OpenClinica system has set softhard constraint on study level
+    // LibreClinica system has set softhard constraint on study level
     private String softhard;
     
     //openclinica extension
