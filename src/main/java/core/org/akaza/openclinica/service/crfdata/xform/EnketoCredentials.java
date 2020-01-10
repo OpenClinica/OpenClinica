@@ -88,10 +88,10 @@ public class EnketoCredentials implements Serializable {
             Study study = studyDao.findByOcOID(studyOid);
         if (study.getStudy() == null) {
             logger.debug("The Study Oid: " + studyOid + " is a Study level Oid");
-            return study;
+            return null;
         } else {
             logger.debug("The Study Oid: " + studyOid + " is a Site level Oid");
-            return null;
+            return study;
         }
     }
 	

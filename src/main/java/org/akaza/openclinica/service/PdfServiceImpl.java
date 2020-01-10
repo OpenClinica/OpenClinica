@@ -36,8 +36,10 @@ import org.springframework.stereotype.Service;
 public class PdfServiceImpl implements PdfService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
-	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                        {3}") ;
-	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}                                                                                                                         {3}");
+	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                    {3}") ;
+	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}                                                                                                                     {3}");
+	 static final MessageFormat pdfHeaderFormat3 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                  {3} ({4})");
+	 static final MessageFormat pdfHeaderFormat4 =  new MessageFormat("{0} - Participant {2}                                                                                                                   {3} ({4})");  
 
     /**
      *
@@ -196,6 +198,9 @@ public class PdfServiceImpl implements PdfService {
 	    String studyName = null;
 	    String participantID = studySubjectIdentifier.trim();
 	    String eventName = null;
+	    String eventNameWith = null;
+	    String sequence = null;
+	    Boolean isRepeating = false;
 	    	    	    		  		    
 	    if(study != null) {				
 			studyName = study.getName();		
@@ -206,14 +211,29 @@ public class PdfServiceImpl implements PdfService {
 	    
 	    if(studyEvent != null) {
 	    	eventName =  studyEvent.getStudyEventDefinition().getName();
+	    	
+	    	if(studyEvent.getStudyEventDefinition().getRepeating()) {
+	    		isRepeating = true;
+	    		sequence = studyEvent.getSampleOrdinal()+"";
+	    	}
 	    }
-	    Object[] headerArgs = {studyName, siteName,participantID,eventName};
+	    Object[] headerArgs = {studyName, siteName,participantID,eventName,sequence};
 	    
 	    String pdfHeader;
 		if(siteName !=null) {
-	    	pdfHeader = pdfHeaderFormat1.format(headerArgs);
+			if(isRepeating) {
+				pdfHeader = pdfHeaderFormat3.format(headerArgs);
+			}else {
+				pdfHeader = pdfHeaderFormat1.format(headerArgs);
+			}
+	    	
 	    }else {
-	    	pdfHeader = pdfHeaderFormat2.format(headerArgs);
+			if(isRepeating) {
+				pdfHeader = pdfHeaderFormat4.format(headerArgs);			
+			}else {
+				pdfHeader = pdfHeaderFormat2.format(headerArgs);
+			}
+	    	
 	    }
 	    
 	    return pdfHeader;
