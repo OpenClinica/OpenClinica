@@ -377,7 +377,7 @@ public class EnketoAPI {
         try {
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoAccountResponse> response = rest.exchange(
-                    CoreResources.getField("form.engine.url") + "/accounts/api/v1/account" + "?server_url=" + ocURL + "&api_key=" + token, HttpMethod.GET,
+            		enketoURL + "/accounts/api/v1/account" + "?server_url=" + ocURL + "&api_key=" + token, HttpMethod.GET,
                     entity, EnketoAccountResponse.class);
             if (response.getBody().getCode() == 200)
                 accountExists = true;
@@ -778,7 +778,8 @@ public class EnketoAPI {
             String bodyStr =ec.getResponseBodyAsString();
             String msg = "ClientError:"+ec.getMessage();
             String finalUrlStr = finalUrl.toString();
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_CLIENT,msg+ ":" + bodyStr + ":" + finalUrlStr);
+            //throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_CLIENT,msg+ ":" + bodyStr + ":" + finalUrlStr);
+            throw ec;
 
         } catch(HttpServerErrorException es) {
             String bodyStr =es.getResponseBodyAsString();
@@ -816,9 +817,10 @@ public class EnketoAPI {
             } else {
                 logger.error(e.getMessage());
                 logger.error(ExceptionUtils.getStackTrace(e));
-            }
+                
 
-            throw e;
+                throw e;
+            }
 
 
         }
