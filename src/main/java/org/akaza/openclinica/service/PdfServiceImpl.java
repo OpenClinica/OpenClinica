@@ -163,7 +163,13 @@ public class PdfServiceImpl implements PdfService {
                     // set font and font size
                     contentStream.setFont( font, fontSize);
                     contentStream.moveTextPositionByAmount(headerCenterX, headerCenterY);
-                    contentStream.drawString(headerMsg);                   
+                    try {
+                    	contentStream.drawString(headerMsg);
+                    }catch(java.lang.IllegalArgumentException e) {
+                    	// not support UTF-8 at this time
+                    	contentStream.drawString("");
+                    }
+                                       
             	}            	 
                  
                 // add footer             
