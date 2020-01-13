@@ -486,8 +486,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             return false;
         }
         for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
-            if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED
-                    || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED) {
+            if (studyEventBean.getStatus() != Status.DELETED && (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED
+                    || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SCHEDULED)) {
                 isSignable = false;
                 break;
             } else {
