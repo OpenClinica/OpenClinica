@@ -177,7 +177,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		return null;
 	}
 
-	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, int eventOrdinal,NotificationService notificationService, KeycloakClientImpl keycloakClientImpl) {
+	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, Study currentStudy, int eventOrdinal,NotificationService notificationService, KeycloakClientImpl keycloakClientImpl) {
 		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
 		String message = ((NotificationActionBean) ruleActionBean).getMessage();
 		String emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
@@ -189,37 +189,35 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		if (eventOrdinal != 1)
 			eventName = eventName + "(" + eventOrdinal + ")";
 
-		Study studyBean = studySubject.getStudy();
 		Study siteBean=null;
-		if(studyBean.isSite()) {    // it is a site level study
-			siteBean = studyBean;
-			studyBean = siteBean.getStudy();
+		if(currentStudy.isSite()) {    // it is a site level study
+			siteBean = currentStudy;
+			currentStudy = siteBean.getStudy();
 		}
 
 		if (message==null) message="";
 		if (emailSubject==null) emailSubject="";
 		message = message.replaceAll("\\$\\{event.name}", eventName);
 
-		message = message.replaceAll("\\$\\{study.name}",studyBean.getName());
-		message = message.replaceAll("\\$\\{study.id}", studyBean.getUniqueIdentifier());
+		message = message.replaceAll("\\$\\{study.name}",currentStudy.getName());
+		message = message.replaceAll("\\$\\{study.id}", currentStudy.getUniqueIdentifier());
 
 		message = message.replaceAll("\\$\\{site.name}", siteBean!=null ?siteBean.getName():"");
 		message = message.replaceAll("\\$\\{site.id}", siteBean !=null?siteBean.getUniqueIdentifier():"");
 
 		emailSubject = emailSubject.replaceAll("\\$\\{event.name}", eventName);
 
-		emailSubject = emailSubject.replaceAll("\\$\\{study.name}", studyBean.getName());
-		emailSubject = emailSubject.replaceAll("\\$\\{study.id}", studyBean.getUniqueIdentifier());
+		emailSubject = emailSubject.replaceAll("\\$\\{study.name}", currentStudy.getName());
+		emailSubject = emailSubject.replaceAll("\\$\\{study.id}", currentStudy.getUniqueIdentifier());
 
 		emailSubject = emailSubject.replaceAll("\\$\\{site.name}", siteBean!=null?siteBean.getName():"");
 		emailSubject = emailSubject.replaceAll("\\$\\{site.id}", siteBean!=null?siteBean.getUniqueIdentifier():"");
 
 		ParticipantDTO pDTO = null;
 		String[] listOfEmails = emailList.split(",");
-		Study parentStudyBean = getParentStudy(studyBean);
 		OCUserDTO userDTO=null;
 
-		String participateStatus = parentStudyBean.getParticipantPortal(); // enabled , disabled
+		String participateStatus = currentStudy.getParticipantPortal(); // enabled , disabled
 		String accessToken = keycloakClientImpl.getSystemToken();
 
 		if(studySubject.getUserId()!=null) {
@@ -228,7 +226,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		}
 
 
-		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, studyBean, message, emailSubject, mailSender,participateStatus,accessToken,notificationService, userUuid));
+		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, currentStudy, message, emailSubject, mailSender,participateStatus,accessToken,notificationService, userUuid));
 		thread.start();
 
 	}
