@@ -97,7 +97,6 @@
                 var url = '/studies/${study.oc_oid}';
             </c:otherwise>
         </c:choose>
-        alert(url);
         jQuery.ajax({
             'type': 'POST',
             'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata' + url + '/participants/${studySub.label}/casebook',

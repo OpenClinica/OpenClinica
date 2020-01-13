@@ -43,16 +43,8 @@ import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
-import core.org.akaza.openclinica.domain.rule.RuleBean;
-import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
-import core.org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
-import core.org.akaza.openclinica.domain.rule.RuleSetAuditBean;
-import core.org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
-import core.org.akaza.openclinica.domain.rule.RuleSetBean;
-import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import core.org.akaza.openclinica.domain.rule.*;
 import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
-import core.org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import core.org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import core.org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import core.org.akaza.openclinica.domain.rule.expression.ExpressionBean;
@@ -71,6 +63,7 @@ import core.org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import core.org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import core.org.akaza.openclinica.service.rule.expression.ExpressionService;
 import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,14 +167,41 @@ public class RuleSetService implements RuleSetServiceInterface {
         }
 
         for (AuditableBeanWrapper<RuleSetBean> ruleBeanWrapper : rulesContainer.getValidRuleSetDefs()) {
+            ruleBeanWrapper = checkAndUpdateForExistingRuleSetDefWrapper(ruleBeanWrapper);
             loadRuleSetRuleWithPersistentRules(ruleBeanWrapper.getAuditableBean());
             saveRuleSet(ruleBeanWrapper.getAuditableBean());
         }
 
         for (AuditableBeanWrapper<RuleSetBean> ruleBeanWrapper : rulesContainer.getDuplicateRuleSetDefs()) {
+            ruleBeanWrapper = checkAndUpdateForExistingRuleSetDefWrapper(ruleBeanWrapper);
             loadRuleSetRuleWithPersistentRules(ruleBeanWrapper.getAuditableBean());
             replaceRuleSet(ruleBeanWrapper.getAuditableBean());
         }
+    }
+
+    private AuditableBeanWrapper<RuleSetBean> checkAndUpdateForExistingRuleSetDefWrapper(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
+        RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBeanWrapper.getAuditableBean(),ruleSetBeanWrapper.getAuditableBean().getStudy().getStudyId());
+        if(persistentRuleSetBean != null){
+            List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
+            RuleSetBean ruleSetBean = ruleSetBeanWrapper.getAuditableBean();
+            persistentRuleSetBean.setRunOnSchedule(ruleSetBean.getRunOnSchedule());
+            persistentRuleSetBean.setRunTime(ruleSetBean.getRunTime());
+            persistentRuleSetBean.setRunSchedule(ruleSetBean.isRunSchedule());
+            persistentRuleSetBean.setUpdaterAndDate(ruleSetBean.getUpdater());
+            ruleSetBeanWrapper.setAuditableBean(persistentRuleSetBean);
+
+            for(RuleSetRuleBean ruleSetRuleBean: importedRuleSetRules){
+                for(RuleSetRuleBean persistentRuleSetRuleBean : persistentRuleSetBean.getRuleSetRules()){
+                    if (persistentRuleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.getRuleBean() != null
+                            && ruleSetRuleBean.getRuleBean().equals(persistentRuleSetRuleBean.getRuleBean())){
+                        persistentRuleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
+                        ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
+                    }
+                }
+            }
+            ruleSetBeanWrapper.getAuditableBean().addRuleSetRules(importedRuleSetRules);
+        }
+        return ruleSetBeanWrapper;
     }
 
 

@@ -276,6 +276,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setFormLoadMode(EDIT_MODE);
             String contextHash = cache.putSubjectContext(subjectContext);
             Study parentStudyBean = getParentStudy(currentStudy.getOc_oid(), ds);
+            logger.info("Subject Context info *** {} *** ",subjectContext.toString());
             List<Bind> binds=null;
 
             String xformOutput = "";
