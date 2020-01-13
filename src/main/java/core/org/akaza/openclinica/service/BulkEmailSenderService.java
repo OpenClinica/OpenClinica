@@ -33,11 +33,13 @@ public class BulkEmailSenderService {
     private void sendEmail(){
 
         ArrayList<MimeMessagePreparator> mimeMessages = new ArrayList<MimeMessagePreparator>();
-        logger.info("Executing now..." +  mimeMessages.size() + " " + Thread.currentThread().getName() + " " + DEQUE.size());
+        logger.debug("Executing now..." +  mimeMessages.size() + " " + Thread.currentThread().getName() + " " + DEQUE.size());
+        if(DEQUE.size() > 0)
+            logger.info("Executing now..." +  mimeMessages.size() + " " + Thread.currentThread().getName() + " " + DEQUE.size());
         MimeMessagePreparator mimeMessage = DEQUE.pollFirst();
 
         if(mimeMessage == null) {
-        	logger.info("Nothing left to do getting out...");
+        	logger.debug("Nothing left to do getting out...");
             return;
         }
 

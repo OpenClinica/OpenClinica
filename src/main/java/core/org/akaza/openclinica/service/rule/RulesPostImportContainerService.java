@@ -124,7 +124,15 @@ public class RulesPostImportContainerService {
             if (isRuleSetExpressionValid(ruleSetBeanWrapper)) {
                 RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,currentStudy.getStudyId());
 
+
                 if (persistentRuleSetBean != null) {
+                    ruleSetBeanWrapper.getAuditableBean().setOwner(persistentRuleSetBean.getOwner());
+                    ruleSetBeanWrapper.getAuditableBean().setStudyEventDefinition(persistentRuleSetBean.getStudyEventDefinition());
+                    ruleSetBeanWrapper.getAuditableBean().setCrf(persistentRuleSetBean.getCrf());
+                    ruleSetBeanWrapper.getAuditableBean().setCrfVersion(persistentRuleSetBean.getCrfVersion());
+                    ruleSetBeanWrapper.getAuditableBean().setItem(persistentRuleSetBean.getItem());
+                    ruleSetBeanWrapper.getAuditableBean().setItemGroup(persistentRuleSetBean.getItemGroup());
+                    ruleSetBeanWrapper.getAuditableBean().setId(persistentRuleSetBean.getId());
                     List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
                     if (ruleSetBean.getRunTime() != null) {
                         if (ruleSetBean.getRunOnSchedule() == null) {
@@ -132,21 +140,20 @@ public class RulesPostImportContainerService {
                         }
                     }
                     if(ruleSetBean.getRunOnSchedule()!=null){
-                    	persistentRuleSetBean.setRunSchedule(true);
+                        ruleSetBeanWrapper.getAuditableBean().setRunSchedule(true);
                       if(ruleSetBean.getRunOnSchedule().getRunTime() !=null){
                      	 if(isRunTimeValid(ruleSetBeanWrapper, ruleSetBean.getRunOnSchedule().getRunTime())){
-                          persistentRuleSetBean.setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
+                     	     ruleSetBeanWrapper.getAuditableBean().setRunTime(ruleSetBean.getRunOnSchedule().getRunTime());
                      	 }
                       }else{
-                          persistentRuleSetBean.setRunTime(null);     // supposed to act like 23:00
+                          ruleSetBeanWrapper.getAuditableBean().setRunTime(null);  // supposed to act like 23:00
                       }
                     }else{
-                    	persistentRuleSetBean.setRunSchedule(false);
-                        persistentRuleSetBean.setRunTime(null);
+                        ruleSetBeanWrapper.getAuditableBean().setRunSchedule(false);
+                        ruleSetBeanWrapper.getAuditableBean().setRunTime(null);
                     }
 
-                    persistentRuleSetBean.setUpdaterAndDate(getUserAccount());
-                    ruleSetBeanWrapper.setAuditableBean(persistentRuleSetBean);
+                    ruleSetBeanWrapper.getAuditableBean().setUpdaterAndDate(getUserAccount());
                     Iterator<RuleSetRuleBean> itr = importedRuleSetRules.iterator();
                     while (itr.hasNext()) {
                         RuleSetRuleBean ruleSetRuleBean = itr.next();
@@ -154,20 +161,19 @@ public class RulesPostImportContainerService {
                         // ruleSetRuleBean.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
                         for (RuleSetRuleBean persistentruleSetRuleBean : persistentRuleSetBean.getRuleSetRules()) {
                             if (persistentruleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.equals(persistentruleSetRuleBean)) {
-                                persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
+                                ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
                                 itr.remove();
                                 break;
                             } else if (persistentruleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.getRuleBean() != null
                                 && ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
                                 // persistentruleSetRuleBean.setActions(ruleSetRuleBean.getActions());
-                                persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
+                                ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
                                 // itr.remove();
                                 break;
                             }
                             ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
                         }
                     }
-                    ruleSetBeanWrapper.getAuditableBean().addRuleSetRules(importedRuleSetRules);
                     // ruleSetBeanWrapper.getAuditableBean().setId(persistentRuleSetBean.getId());
                 } else {
                     if (importContainer.getValidRuleSetExpressionValues().contains(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue())) {

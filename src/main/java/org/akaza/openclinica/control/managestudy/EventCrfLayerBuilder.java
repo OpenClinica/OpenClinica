@@ -177,7 +177,6 @@ public class EventCrfLayerBuilder {
         html.td(0).colspan("2").close();
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
         if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
-
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -216,6 +215,14 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
+            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
+                html.nbsp().nbsp();
+                reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject, reswords.getString("reassign"));
+                html.tdEnd().trEnd(0);
+            }
         } else if (eventCrfStatus == DataEntryStage.LOCKED) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -247,6 +254,16 @@ public class EventCrfLayerBuilder {
                 html.nbsp().nbsp();
                 viewSectionDataEntryParameterized(html, eventCrfBean, eventDefinitionCrf, reswords.getString("view"), getStudyEvent());
                 html.tdEnd().trEnd(0);
+
+                if (getStudyEvent() != null && !currentRole.isMonitor() && currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
+                    html.tr(0).valign("top").close();
+                    html.td(0).styleClass(table_cell_left).close();
+                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
+                    html.nbsp().nbsp();
+                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
+                            reswords.getString("edit"));
+                    html.tdEnd().trEnd(0);
+                }
             }
         } else if (eventCrfStatus == DataEntryStage.INVALID) {
             if (!hiddenCrf()) {
