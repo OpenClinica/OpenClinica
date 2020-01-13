@@ -59,7 +59,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 
 				StudyEvent studyEvent = studyEventDaoHib.findByStudyEventId(
 						Integer.valueOf(getExpressionService().getStudyEventDefenitionOrdninalCurated(ruleSet.getTarget().getValue())));
-
+				Study currentStudyForStudySubject = getStudyDao().findStudyWithSPVByStudyId(studyEvent.getStudySubject().getStudy().getStudyId());
 				int eventOrdinal = studyEvent.getSampleOrdinal();
 				int studySubjectBeanId = studyEvent.getStudySubject().getStudySubjectId();
 
@@ -95,7 +95,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 									beanPropertyService.runAction(ruleActionBean,eow,userId,changeDetails.getRunningInTransaction());
 								}else if (ruleActionBean instanceof NotificationActionBean){
 									notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule);
-									notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(),eventOrdinal,notificationService, keycloakClientImpl);
+									notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(), currentStudyForStudySubject, eventOrdinal,notificationService, keycloakClientImpl);
 								}
 							}
 						}catch (OpenClinicaSystemException osa) {
