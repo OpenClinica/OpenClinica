@@ -32,6 +32,8 @@ public class RandomizeController {
 
     /**
      * refresh randomize configurations for all studies for which this module is enabled.
+     * If the request returns successful, but returns 400 errors for the subsequent individual studies, this usually means
+     * that the randomize module is enabled for that study but it does not have a corresponding configuration in randomize service.
      * @param request
      * @return
      */
