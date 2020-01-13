@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.text.MessageFormat;
@@ -163,12 +164,9 @@ public class PdfServiceImpl implements PdfService {
                     // set font and font size
                     contentStream.setFont( font, fontSize);
                     contentStream.moveTextPositionByAmount(headerCenterX, headerCenterY);
-                    try {
-                    	contentStream.drawString(headerMsg);
-                    }catch(java.lang.IllegalArgumentException e) {
-                    	// not support UTF-8 at this time
-                    	contentStream.drawString("");
-                    }
+                    
+                    contentStream.showText(headerMsg);
+                    
                                        
             	}            	 
                  
@@ -242,6 +240,12 @@ public class PdfServiceImpl implements PdfService {
 	    	
 	    }
 	    
+		// not support UTF-8 at this time
+		try {
+			pdfHeader = new String(pdfHeader.getBytes("ISO-8859-1"), "ISO-8859-1");
+		} catch (UnsupportedEncodingException e) {
+			;
+		}
 	    return pdfHeader;
    }
 
