@@ -1683,8 +1683,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
         builder.a().href(href1 + href2);
-        builder.onmouseover(onmouseover);
-        builder.onclick(onClick1 + onClick2 + onClick3 + onClick4);
+        builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
         builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("50").close().aEnd();
 
@@ -1704,8 +1703,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
         builder.a().href(href1 + href2);
-        builder.onmouseover(onmouseover);
-        builder.onclick(onClick1 + onClick2 + onClick3 + onClick4);
+        builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
         builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("50").close().aEnd();
 
@@ -1725,9 +1723,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String onClick1 = "layersShowOrHide('visible','Lock_all'); ";
         String onClick2 = "LockObject('Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
         builder.a().href(href1 + href2);
-        builder.onmouseover(onmouseover);
-        builder.onmouseout(onmouseout);
-        builder.onclick(onClick1 + onClick2);
+        builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
     }

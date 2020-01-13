@@ -1036,8 +1036,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         String onClick3 = "layersShowOrHide('hidden','S_Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onClick4 = "javascript:setImage('ExpandIcon_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "','images/icon_blank.gif'); ";
         builder.a().href(href1 + href2);
-        builder.onmouseover(onmouseover);
-        builder.onclick(onClick1 + onClick2 + onClick3 + onClick4);
+        builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
         builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("50").close().aEnd();
 
@@ -1058,9 +1057,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         String onClick2 = "LockObject('S_Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "',event); ";
         String href = studyEvents.size() > 1 ? href1Repeating + href2 : href1 + href2;
         builder.a().href(href);
-        builder.onmouseover(onmouseover);
-        builder.onmouseout(onmouseout);
-        builder.onclick(onClick1 + onClick2);
+        builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
     }
