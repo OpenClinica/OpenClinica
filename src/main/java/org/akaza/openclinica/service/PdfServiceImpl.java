@@ -246,6 +246,7 @@ public class PdfServiceImpl implements PdfService {
 		} catch (UnsupportedEncodingException e) {
 			;
 		}
+
 		// dynamically calculate the header length
 		while(pdfHeader.length() > 140) {
 			pdfHeader = pdfHeader.replaceFirst("  ", "");
@@ -254,6 +255,7 @@ public class PdfServiceImpl implements PdfService {
 			}
 		}
 		
+
 	    return pdfHeader;
    }
 
