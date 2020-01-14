@@ -70,7 +70,7 @@ public class OdmImportController {
             throws Exception {
 
         ODM odm = publishDTO.getOdm();
-        List<Page> pages = publishDTO.getPages();
+        List<Page> pages = getPageObjects(publishDTO);
         Instant start = Instant.now();
         String accessToken = (String) request.getSession().getAttribute("accessToken");
 
@@ -128,7 +128,7 @@ public class OdmImportController {
         CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
             Map<String, Object> map;
             ODM odm = publishDTO.getOdm();
-            List<Page> pages = publishDTO.getPages();
+            List<Page> pages = getPageObjects(publishDTO);
             try {
                 CoreResources.tenantSchema.set("public");
                 map = odmImportService.importOdm(odm, pages, publishDTO.getBoardId(), accessToken);
@@ -149,6 +149,15 @@ public class OdmImportController {
             expiringMap.put(uuid, future);
         }
         return new ResponseEntity<>(uuid, HttpStatus.OK);
+    }
+
+    private List<Page> getPageObjects(PublishDTO publishDTO) {
+        if (publishDTO.getPages() == null){
+            return new ArrayList<Page>();
+        }
+        else {
+            return publishDTO.getPages();
+        }
     }
 
     @SuppressWarnings("unchecked")

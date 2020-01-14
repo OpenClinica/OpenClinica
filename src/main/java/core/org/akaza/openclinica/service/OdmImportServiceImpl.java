@@ -772,7 +772,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	public void saveOrUpdatePageLayout(List<Page> pages, UserAccount userAccount) {
-		for(Page page:pages) {
+		for(Page page : pages) {
 			PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(page.getName());
 			if (pageLayout == null) {
 				pageLayout = new PageLayout();
