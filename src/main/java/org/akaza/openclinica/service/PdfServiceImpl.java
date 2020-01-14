@@ -248,7 +248,7 @@ public class PdfServiceImpl implements PdfService {
 		}
 
 		// dynamically calculate the header length
-		while(pdfHeader.length() > 140) {
+		while(pdfHeader.length() > 160) {
 			pdfHeader = pdfHeader.replaceFirst("  ", "");
 			if(pdfHeader.indexOf("  ") < 0) {
 				break;
