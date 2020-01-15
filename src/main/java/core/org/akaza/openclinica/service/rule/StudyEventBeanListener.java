@@ -50,7 +50,7 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 	}
 	@Override
 	public void update(Listener lstnr) {
-		
+		LOGGER.info("Checking for rules related to this StudyEvent");
 //	System.out.println("Triggering the rules based on event updates");
 		StudyEventBeanContainer studyEventBeanContainer = (StudyEventBeanContainer)lstnr;
 		

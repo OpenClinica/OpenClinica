@@ -183,6 +183,20 @@
                     </xsl:element>
                  </xsl:when>
             </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="$itemdef/@Comment!=''">
+                    <xsl:element name="DESCRIPTION">
+                        <xsl:choose>
+                            <xsl:when test="string-length($itemdef/@Comment) &gt; 255">
+                                <xsl:value-of select="substring($itemdef/@Comment, 1, 255)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$itemdef/@Comment" />
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:element>
+                </xsl:when>
+            </xsl:choose>
         </xsl:element>
     </xsl:template>
 </xsl:stylesheet>
