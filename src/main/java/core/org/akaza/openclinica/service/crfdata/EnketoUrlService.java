@@ -220,7 +220,7 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
         if(flavor.equals(PARTICIPATE_FLAVOR) || flavor.equals(QUERY_FLAVOR)){
-            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds,false);
+            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds);
             crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
@@ -484,6 +484,149 @@ public class EnketoUrlService {
         return instance;
     }
 
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,boolean formContainsContactData, List<Bind> binds)
+            throws Exception {
+
+        Map<String, Object> data = new HashMap<String, Object>();
+
+        List<ItemGroup> igs = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
+
+        for (ItemGroup ig : igs) {
+            List<HashMap<String, Object>> hashMapList = new ArrayList<HashMap<String, Object>>();
+            List<ItemGroupMetadata> igms = itemGroupMetadataDao.findByItemGroupCrfVersion(ig.getItemGroupId(), crfVersion.getCrfVersionId());
+            int maxRowCount = itemDataDao.getMaxCountByEventCrfGroup(eventCrf.getEventCrfId(), ig.getItemGroupId());
+            HashMap<String, Object> hashMap = null;
+
+            if (igms.get(0).isRepeatingGroup() && maxRowCount == 0) {
+                hashMap = new HashMap<>();
+                hashMap.put("index", 1);
+                hashMap.put("lastUsedOrdinal", 1);
+                for (ItemGroupMetadata igm : igms) {
+                    hashMap.put(igm.getItem().getName(), "");
+                    if (flavor.equals(QUERY_FLAVOR))
+                        hashMap.put(igm.getItem().getName() + QUERY_SUFFIX, "");
+                }
+                hashMapList.add(hashMap);
+                data.put(ig.getName(), hashMapList);
+            }
+            boolean rowDeleted = false;
+            if (igms.get(0).isRepeatingGroup()) {
+                for (int i = 0; i < maxRowCount; i++) {
+                    rowDeleted = false;
+                    for (ItemGroupMetadata igm : igms) {
+                        ItemData itemData = itemDataDao.findByItemEventCrfOrdinalDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                        if (itemData != null) {
+                            rowDeleted = true;
+                            break;
+                        }
+                    }
+
+                    if (!rowDeleted) {
+                        hashMap = new HashMap<>();
+                        hashMap.put("index", i + 1);
+                        if (i == 0) {
+                            hashMap.put("lastUsedOrdinal", maxRowCount);
+                        }
+                        for (ItemGroupMetadata igm : igms) {
+                            ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                            String itemValue = getItemValue(itemData, crfVersion);
+                            hashMap.put(igm.getItem().getName(), itemData != null ? itemValue : "");
+
+                            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(igm.getItem().getItemId(),
+                                    crfVersion.getCrfVersionId());
+                            Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+
+                            if (flavor.equals(QUERY_FLAVOR) && responseTypeId != 8) {
+                                if (itemData != null) {
+                                    ObjectMapper mapper = new ObjectMapper();
+                                    QueriesBean queriesBean = buildQueryElement(itemData);
+                                    hashMap.put(igm.getItem().getName() + QUERY_SUFFIX, queriesBean != null ? mapper.writeValueAsString(queriesBean) : "");
+                                } else {
+                                    hashMap.put(igm.getItem().getName() + QUERY_SUFFIX, "");
+                                }
+                            }
+                        }
+                        hashMapList.add(hashMap);
+
+                    }
+                }
+            }
+
+            if (igms.get(0).isRepeatingGroup() && maxRowCount != 0) {
+                data.put(ig.getName(), hashMapList);
+            }
+
+            if (!igms.get(0).isRepeatingGroup()) {
+                for (ItemGroupMetadata igm : igms) {
+                    ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
+                    String itemValue = getItemValue(itemData, crfVersion);
+                    data.put(igm.getItem().getName(), itemData != null ? itemValue : "");
+                    ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(igm.getItem().getItemId(), crfVersion.getCrfVersionId());
+                    Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+
+                    if (flavor.equals(QUERY_FLAVOR) && responseTypeId != 8) {
+                        if (itemData != null) {
+                            ObjectMapper mapper = new ObjectMapper();
+                            QueriesBean queriesBean = buildQueryElement(itemData);
+                            data.put(igm.getItem().getName() + QUERY_SUFFIX, queriesBean != null ? mapper.writeValueAsString(queriesBean) : "");
+                        } else {
+                            data.put(igm.getItem().getName() + QUERY_SUFFIX, "");
+                        }
+                    }
+                }
+            }
+        }
+        Study study = studyDao.findByOcOID(studyOid);
+        String templateStr = "";
+        int studyFilePath = study.getFilePath();
+        CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
+
+        do {
+            templateStr = getTemplate(studyOid, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
+            studyFilePath--;
+        } while (templateStr.equals("") && studyFilePath > 0);
+       if(complete)
+        templateStr = templateStr.replaceAll("xmlns:oc=\"http://openclinica.org/xforms\"","xmlns:oc=\"http://openclinica.org/xforms\" oc:complete=\""+complete+"\" ");
+
+        data.put("instanceID", "uuid:1234");
+        List<RepeatCount> repeatCounts = repeatCountDao.findAllByEventCrfId(eventCrf.getEventCrfId());
+        for (RepeatCount repeatCount : repeatCounts) {
+            data.put(repeatCount.getGroupName(), repeatCount.getGroupCount());
+        }
+
+        if (formContainsContactData ){
+            addContactData(binds,data,eventCrf.getStudySubject());
+        }
+
+
+
+        Template template = new Template("template name", new StringReader(templateStr), new Configuration());
+
+        StringWriter wtr = new StringWriter();
+        template.process(data, wtr);
+
+        String instance = wtr.toString();
+        StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrf.getStudyEvent().getStudyEventId());
+        if (studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.SIGNED.getId())) {
+            AuditLogEvent auditLogEvent = new AuditLogEvent();
+            auditLogEvent.setAuditTable(STUDYEVENT);
+            auditLogEvent.setEntityId(studyEvent.getStudyEventId());
+            auditLogEvent.setEntityName("Status");
+            auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
+            auditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+
+            List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
+            for (AuditLogEvent audit : ales) {
+                String signature = audit.getDetails();
+                instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
+                        + instance.substring(instance.indexOf("</meta>"));
+                break;
+            }
+        }
+        logger.debug(instance);
+        return instance;
+    }
+    
     private String getItemValue(ItemData itemData, CrfVersion crfVersion) {
         String itemValue = null;
         if (itemData != null) {
