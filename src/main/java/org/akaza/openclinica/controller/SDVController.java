@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import io.swagger.annotations.ApiParam;
 import org.akaza.openclinica.controller.dto.SdvDTO;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
@@ -50,10 +51,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -553,6 +557,30 @@ public class SDVController {
 
         //The name of the view, as in allSdvResult.jsp
         return null;
+    }
+
+//    @RequestMapping(value = "/viewSdvForm/{FormOid}/{StudyEventOid}/{StudySubjectOid}", method = RequestMethod.GET)
+//    public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request, @PathVariable("FormOid") String formOID,
+//                                                        @PathVariable("StudyEventOid") String studyEventOID,
+//                                                        @PathVariable("StudySubjectOid") String studySubjectOID,
+//                                                        @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
+        @RequestMapping(value = "/viewSdvForm", method = RequestMethod.GET)
+        public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
+                @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
+        boolean changedAfterSdvOnlyFilterFlag=true;
+        if(changedAfterSdvOnlyFilter.equals("n"))
+            changedAfterSdvOnlyFilterFlag = false;
+        SdvDTO responseDTO = null;
+        try {
+            String formOID="F_F1";
+            String studyEventOID="SE_EVENT1";
+            String studySubjectOID ="SS_P1";
+             responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectOID, changedAfterSdvOnlyFilterFlag);
+        }
+        catch(Exception e) {
+            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     /*
