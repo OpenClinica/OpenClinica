@@ -8,6 +8,7 @@ public class SdvItemDTO {
     private String value;
     private Date lastModifiedDate;
     private String lastModifiedBy;
+    private String sdvStatus;
 
     public String getName() {
         return name;
@@ -47,5 +48,13 @@ public class SdvItemDTO {
 
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getSdvStatus() {
+        return sdvStatus;
+    }
+
+    public void setSdvStatus(String sdvStatus) {
+        this.sdvStatus = sdvStatus;
     }
 }
