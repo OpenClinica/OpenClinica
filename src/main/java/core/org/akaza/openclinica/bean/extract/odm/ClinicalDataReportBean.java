@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
+import org.akaza.openclinica.service.ValidateService;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -53,6 +54,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     private final String COMMON = "common";
     private String[] permissionTagsStringArray;
     private ODMFilterDTO odmFilter;
+    @Autowired
+    private ValidateService validateService;
 
     public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean , ODMFilterDTO odmFilter, String[] permissionTagsStringArray) {
         super();
@@ -86,17 +89,22 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             xml.append(nls);
         }
         Role role = null; // OpenClinica:
-        StudyUserRoleBean userRole = null;
-        Study publicStudyBean = studyDao.getPublicStudy(userBean.getActiveStudyId());
-             userRole = userBean.getRoleByStudy(publicStudyBean.getStudyId());
+        //TODO: check for system user
+        if (userBean.getEmail().equals("openclinica-developers@openclinica.com")) {
+            role = Role.ADMIN;
+        } else {
+            StudyUserRoleBean userRole = null;
+            Study publicStudyBean = studyDao.getPublicStudy(userBean.getActiveStudyId());
+            userRole = userBean.getRoleByStudy(publicStudyBean.getStudyId());
             if (userRole == null || !userRole.isActive())
                 userRole = userBean.getRoleByStudy(publicStudyBean.checkAndGetParentStudyId());
 
             role = userRole.getRole();
 
-        Study userRoleStudy = studyDao.getPublicStudy(userRole.getStudyId());
-        if(userRoleStudy != null)
-            setRoleDescription(role, userRoleStudy);
+            Study userRoleStudy = studyDao.getPublicStudy(userRole.getStudyId());
+            if(userRoleStudy != null)
+                setRoleDescription(role, userRoleStudy);
+        }
 
         if (odmFilter.isCrossForm()) {
             xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");

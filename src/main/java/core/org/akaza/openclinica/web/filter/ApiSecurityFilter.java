@@ -256,6 +256,19 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         map.put("institution", "OC");
         return map;
     }
+    private HashMap<String, String>  createRulesEngineUserAccount() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("username", "rules.engine");
+        map.put("fName", "Rules");
+        map.put("lName", "Engine");
+        map.put("role_name", "Data Manager");
+        map.put("user_uuid", "rulesEngineSystemUserUuid");
+        map.put("user_type", core.org.akaza.openclinica.service.UserType.TECH_ADMIN.getName());
+        map.put("authorize_soap", "true");
+        map.put("email", "openclinica-developers@openclinica.com");
+        map.put("institution", "OC");
+        return map;
+    }
 
     private UserAccountBean createSystemUser(String clientId, UserAccountDAO userAccountDAO, HttpServletRequest request) {
         UserAccountBean userAccountBean = null;
@@ -269,6 +282,11 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
             userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.DICOM_USERNAME);
             if (userAccountBean.getName().isEmpty()) {
                 userAccountToCreate = createDicomUserAccount();
+            }
+        } else if (clientId.equals(ApplicationConstants.RULES_ENGINE_CLIENT)) {
+            userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.RULES_ENGINE__USERNAME);
+            if (userAccountBean.getName().isEmpty()) {
+                userAccountToCreate = createRulesEngineUserAccount();
             }
         }
 
