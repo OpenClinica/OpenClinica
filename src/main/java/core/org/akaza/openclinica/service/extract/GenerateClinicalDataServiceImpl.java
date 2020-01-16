@@ -969,7 +969,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private OdmClinicalDataBean getClinicalDatas(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID, int userId) {
-		int seOrdinal = 0;
 
 		List<String> eventOids = Arrays.asList(studyEventOID.split("\\s*,\\s*"));
 		List<StudySubject> ss = listStudySubjects(studySubjectOID);
@@ -977,6 +976,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		List<StudyEvent> studyEvents = new ArrayList<StudyEvent>();
 
 		for (String eventOid : eventOids) {
+			int seOrdinal = 0;
 
 			StudyEventDefinition studyEventDefinition = null;
 			int idx = eventOid.indexOf(OPEN_ORDINAL_DELIMITER);
