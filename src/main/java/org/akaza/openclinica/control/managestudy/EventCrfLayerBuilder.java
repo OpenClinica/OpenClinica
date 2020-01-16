@@ -188,7 +188,7 @@ public class EventCrfLayerBuilder {
 
             // if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() ||
             // currentUser.isSysAdmin())) {
-            if (!currentRole.isMonitor() && currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (!hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
@@ -207,7 +207,7 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
-            if (currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 deleteEventCrf(html, eventCrfBean, studySubject);
@@ -215,7 +215,7 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -238,7 +238,7 @@ public class EventCrfLayerBuilder {
                 viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), reswords.getString("print"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
@@ -255,7 +255,7 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntryParameterized(html, eventCrfBean, eventDefinitionCrf, reswords.getString("view"), getStudyEvent());
                 html.tdEnd().trEnd(0);
 
-                if (getStudyEvent() != null && !currentRole.isMonitor() && currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
+                if (getStudyEvent() != null && !currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
@@ -292,7 +292,7 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
             }
-            if (!currentRole.isMonitor() && currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
                     if (!hiddenCrf()) {
                         html.tr(0).valign("top").close();
@@ -313,7 +313,7 @@ public class EventCrfLayerBuilder {
                     }
                 }
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
@@ -330,7 +330,7 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
