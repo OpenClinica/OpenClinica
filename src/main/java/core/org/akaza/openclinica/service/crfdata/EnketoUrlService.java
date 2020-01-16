@@ -354,19 +354,18 @@ public class EnketoUrlService {
             boolean rowDeleted = false;
             if (igms.get(0).isRepeatingGroup()) {
                 for (int i = 0; i < maxRowCount; i++) {
-                	if(includeDeleted) {
-                		 rowDeleted = false;
-                	}else {
-                		  for (ItemGroupMetadata igm : igms) {
-                              ItemData itemData = itemDataDao.findByItemEventCrfOrdinalDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
-                              if (itemData != null) {
-                                  rowDeleted = true;
-                                  break;
-                              }
-                          }
-                	}                                     
+                	
+        		   rowDeleted = false;
+        	
+        		   for (ItemGroupMetadata igm : igms) {
+                      ItemData itemData = itemDataDao.findByItemEventCrfOrdinalDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                      if (itemData != null) {
+                          rowDeleted = true;
+                          break;
+                      }
+                    }                	                                    
 
-                    if (!rowDeleted) {
+                    if (!rowDeleted || includeDeleted) {
                         hashMap = new HashMap<>();
                         hashMap.put("index", i + 1);
                         if (i == 0) {
@@ -484,6 +483,7 @@ public class EnketoUrlService {
         return instance;
     }
 
+        
     private String getItemValue(ItemData itemData, CrfVersion crfVersion) {
         String itemValue = null;
         if (itemData != null) {
