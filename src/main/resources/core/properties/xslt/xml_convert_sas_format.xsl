@@ -4,7 +4,7 @@
 	<xsl:key name="form-name" match="odm:FormDef" use="@OID"/>
 	<xsl:template match="/">
 		<!-- Get the parent study oid, which is listed first. -->
-		<xsl:variable name="vStudyName" select="substring(concat('S',substring(//odm:Study[position()=1]/@OID, 3)),1,8)"/>
+		<xsl:variable name="vStudyName" select="substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '(')"/>
 		FILENAME <xsl:value-of select="$vStudyName"/> "~/SAS_DATA.xml";
 		FILENAME map "~/SAS_MAP.xml";
 		LIBNAME <xsl:value-of select="$vStudyName"/> xml xmlmap=map access=readonly;
