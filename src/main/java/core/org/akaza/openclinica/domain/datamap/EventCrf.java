@@ -352,8 +352,8 @@ public class EventCrf extends DataMapDomainObject {
         this.formLayout = formLayout;
     }
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "date_last_sdv_verified", length = 4)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "date_last_sdv_verified", length = 8)
     public Date getLastSdvVerifiedDate() {
         return lastSdvVerifiedDate;
     }
