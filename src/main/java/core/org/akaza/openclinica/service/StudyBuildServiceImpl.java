@@ -711,4 +711,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (studyBean != null)
             CoreResources.setRequestSchema(studyBean.getSchemaName());
     }
+    public void setRequestSchemaByStudyOrParentStudy(String ocId) {
+        Study studyBean = getPublicStudy(ocId);
+        if(studyBean != null && studyBean.isSite())
+            studyBean = studyBean.getStudy();
+        if (studyBean != null)
+            CoreResources.setRequestSchema(studyBean.getSchemaName());
+    }
+
 }
