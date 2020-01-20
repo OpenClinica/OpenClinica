@@ -50,19 +50,24 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         value = StringEscapeUtils.escapeSql(value.toString());
         if (value != null) {
             if (property.equals("sdvStatus")) {
-                if (value.equals("verified")) {
-                    criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = '" + SdvStatus.VERIFIED + "'";
-                }else if (value.equals("change_since_verified")) {
-                    criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = '" + SdvStatus.CHANGED_AFTER_VERIFIED + "'";
-                } else if (value.equals("ready_to_verify")) {
-                    criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = '" + SdvStatus.NOT_VERIFIED + "'";
-                }else{
-                    criteria = criteria + " and ";
-                    criteria = criteria + "  (" + (columnMapping.get(property) + " = '" + SdvStatus.NOT_VERIFIED +"' or "+(columnMapping.get(property)) +" = '"+ SdvStatus.CHANGED_AFTER_VERIFIED) +"' ) ";
+                ArrayList<String> sdvStatusFilterArray = new ArrayList<>();
+                String sdvStatusString = value.toString().trim();
+                if(sdvStatusString.contains("&")){
+                    for(String sdvStatus: sdvStatusString.split("&")){
+                        sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatus.trim()).toString());
+                    }
                 }
+                else
+                    sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatusString).toString());
+                criteria = criteria + " and (";
+
+                for(int i = 0 ; i < sdvStatusFilterArray.size(); i++){
+                    if(i == 0)
+                        criteria = criteria + " " + columnMapping.get(property) + " = '" + sdvStatusFilterArray.get(i) + "'";
+                    else
+                        criteria = criteria + " or " + columnMapping.get(property) + " = '" + sdvStatusFilterArray.get(i) + "'";
+                }
+                criteria = criteria +" ) ";
             } else if (property.equals("sdvRequirementDefinition")) {
                 ArrayList<Integer> reqs = new ArrayList<Integer>();
                 String sdvRequirement = value.toString().trim();
