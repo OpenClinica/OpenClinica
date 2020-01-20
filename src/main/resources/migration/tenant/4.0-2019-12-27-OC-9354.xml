@@ -38,5 +38,15 @@
                       oldColumnName="sdv_status_new"
                       tableName="event_crf"/>
     </changeSet>
+    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-06">
+        <modifyDataType columnName="date_created"
+                        newDataType="TIMESTAMP WITH TIME ZONE"
+                        tableName="item_data"/>
+    </changeSet>
+    <changeSet author="sbalasubramanian" id="2019-12-27-OC-9354-07">
+        <modifyDataType columnName="date_updated"
+                        newDataType="TIMESTAMP WITH TIME ZONE"
+                        tableName="item_data"/>
+    </changeSet>
 
 </databaseChangeLog>

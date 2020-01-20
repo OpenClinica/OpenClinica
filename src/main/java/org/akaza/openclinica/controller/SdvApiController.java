@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import io.swagger.annotations.Api;
@@ -23,36 +25,33 @@ import javax.servlet.http.HttpServletRequest;
 public class SdvApiController {
 
     @Autowired
-    private UtilService utilService;
+    private StudyBuildService studyBuildService;
 
     @Autowired
     private ValidateService validateService;
+
     @Autowired
     @Qualifier("sdvUtil")
     private SDVUtil sdvUtil;
-        @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/forms/{FormOid}/participants/{StudySubjectOid}/viewSdvForm", method = RequestMethod.GET)
+
+        @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/forms/{FormOid}/participants/{ParticipantId}/viewSdvForm", method = RequestMethod.GET)
     public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
                                                         @PathVariable("studyOid") String studyOID,
                                                         @PathVariable("FormOid") String formOID,
                                                         @PathVariable("StudyEventOid") String studyEventOID,
-                                                        @PathVariable("StudySubjectOid") String studySubjectOID,
+                                                        @PathVariable("ParticipantId") String studySubjectLabel,
                                                         @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
-//    @RequestMapping(value = "/sdv/viewSdvForm", method = RequestMethod.GET)
-//    public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
-//                                                        @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
-        utilService.setSchemaFromStudyOid(studyOID);
+        studyBuildService.setRequestSchemaByStudyOrParentStudy(studyOID);
         boolean changedAfterSdvOnlyFilterFlag=true;
         if(changedAfterSdvOnlyFilter.equals("n"))
             changedAfterSdvOnlyFilterFlag = false;
         SdvDTO responseDTO = null;
         try {
-//            String formOID="F_F1";
-//            String studyEventOID="SE_EVENT1";
-//            String studySubjectOID ="SS_P1";
-            responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectOID, changedAfterSdvOnlyFilterFlag);
+            validateService.validateAllOidsForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID);
+            responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectLabel, changedAfterSdvOnlyFilterFlag);
         }
-        catch(Exception e) {
-            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        catch(OpenClinicaSystemException e) {
+            return new ResponseEntity<>(validateService.getResponseForException(e, studyOID, ""), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
