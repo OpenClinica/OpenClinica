@@ -593,12 +593,6 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private ItemData createItemData(EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
-    	
-    	// only created new event crf once
-    	if(eventCrf.getEventCrfId() == 0) {
-    		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);	
-    	} 
-    	
         ItemData itemData = new ItemData();
         itemData.setEventCrf(eventCrf);
         itemData.setItem(item);
@@ -645,7 +639,7 @@ public class ImportServiceImpl implements ImportService {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
-       
+        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("Creating new Event Crf");
 
         return eventCrf;
@@ -1417,7 +1411,6 @@ public class ImportServiceImpl implements ImportService {
                 return new DataImportReport(null, null, null, null, null, null, null, null, UPDATED, sdf_logFile.format(new Date()), null);
             }
         } else {
-        	       	
             itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
             if (isEventCrfCompleted(eventCrf)) {
                 ErrorObj eb = createQuery(userAccount, study, studySubject, itemData, reasonForChange);
