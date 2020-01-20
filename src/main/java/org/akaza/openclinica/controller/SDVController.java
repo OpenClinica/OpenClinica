@@ -559,30 +559,6 @@ public class SDVController {
         return null;
     }
 
-//    @RequestMapping(value = "/viewSdvForm/{FormOid}/{StudyEventOid}/{StudySubjectOid}", method = RequestMethod.GET)
-//    public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request, @PathVariable("FormOid") String formOID,
-//                                                        @PathVariable("StudyEventOid") String studyEventOID,
-//                                                        @PathVariable("StudySubjectOid") String studySubjectOID,
-//                                                        @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
-        @RequestMapping(value = "/viewSdvForm", method = RequestMethod.GET)
-        public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
-                @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
-        boolean changedAfterSdvOnlyFilterFlag=true;
-        if(changedAfterSdvOnlyFilter.equals("n"))
-            changedAfterSdvOnlyFilterFlag = false;
-        SdvDTO responseDTO = null;
-        try {
-            String formOID="F_F1";
-            String studyEventOID="SE_EVENT1";
-            String studySubjectOID ="SS_P1";
-             responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectOID, changedAfterSdvOnlyFilterFlag);
-        }
-        catch(Exception e) {
-            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
-
     /*
     Create a JMesa-based table for showing the event CRFs.
     */

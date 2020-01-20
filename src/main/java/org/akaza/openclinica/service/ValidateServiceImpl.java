@@ -55,7 +55,17 @@ public class ValidateServiceImpl implements ValidateService {
     @Autowired
     EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
 
+    @Autowired
+    StudyEventDao studyEventDao;
 
+    @Autowired
+    StudyEventDefinitionDao studyEventDefinitionDao;
+
+    @Autowired
+    CrfDao crfDao;
+
+    @Autowired
+    StudySubjectDao studySubjectDao;
 
     @Autowired
     private TokenService tokenService;
@@ -406,7 +416,35 @@ public class ValidateServiceImpl implements ValidateService {
       return  new ParameterizedErrorVM(errorMsg, map);
     }
 
+    public boolean isStudySubjectPresent(String studySubjectLabel,Study study){
+        StudySubject studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectLabel, study);
+        return studySubject != null;
+    }
+    public boolean isEventPresent(String studyEventOid){
+        return studyEventDefinitionDao.findByOcOID(studyEventOid) != null;
+    }
+    public boolean isEventOidAndParticipantIdAreLinked( String studyEventOid, int studySubjectId){
+        return studyEventDao.fetchByStudyEventDefOID(studyEventOid, studySubjectId) != null;
+    }
+    public  boolean isCrfPresent(String formOid){
+        return crfDao.findByOcOID(formOid) != null;
+    }
 
+    public void validateAllOidsForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid){
+
+        if(!isStudyOidValidStudyLevelOid(studyOid))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+        Study study = studyDao.findByOid(studyOid);
+        if(!isStudySubjectPresent(studySubjectLabel, study))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
+        int studySubjectId = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectLabel, study).getStudySubjectId();
+        if(!isEventPresent(studyEventOid))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENTOID_NOT_EXIST_IN_THIS_STUDY);
+        if(!isEventOidAndParticipantIdAreLinked(studyEventOid,studySubjectId))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_DOES_NOT_HAVE_THIS_EVENT_IN_THIS_STUDY);
+        if(!isCrfPresent(formOid))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_FORMOID_NOT_EXIST_IN_THIS_STUDY);
+    }
 }
 
 
