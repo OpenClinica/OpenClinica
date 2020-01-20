@@ -1,5 +1,7 @@
 package core.org.akaza.openclinica.web.table.sdv;
 
+import core.org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
 import java.util.List;
@@ -16,10 +18,11 @@ public class SdvStatusFilter extends DroplistFilterEditor {
     @Override
     protected List<Option> getOptions()  {
         List<Option> options = new ArrayList<Option>();
-        options.add(new Option("ready_to_verify_and_change_since_verified", "Ready to verify + Change since verified"));
-        options.add(new Option("ready_to_verify","Ready to verify"));
-        options.add(new Option("change_since_verified", "Change since verified"));
-        options.add(new Option("verified", "Verified"));
+        String optionA = SdvStatus.NOT_VERIFIED.getDisplayValue() + " & " + SdvStatus.CHANGED_AFTER_VERIFIED.getDisplayValue();
+        options.add(new Option(optionA, optionA));
+        for (SdvStatus sdv : SdvStatus.values()) {
+                options.add(new Option(sdv.getDisplayValue(), sdv.getDisplayValue()));
+        }
         return options;
     }
 }
