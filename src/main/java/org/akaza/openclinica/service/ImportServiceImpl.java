@@ -312,7 +312,7 @@ public class ImportServiceImpl implements ImportService {
                                 Item item = null;
                                 Object itemObject = null;
 
-                                itemObject = validateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm, tenantStudy, studyEvent,studySubject, reasonForChange);
+                                itemObject = validateItem(itemDataBean, crf, eventCrf, itemGroupDataBean, userAccount, itemCountInForm, tenantStudy, studySubject, reasonForChange);
 
                                 if (itemObject instanceof ErrorObj) {
                                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), ((ErrorObj) itemObject).getCode(), null, ((ErrorObj) itemObject).getMessage());
@@ -592,12 +592,11 @@ public class ImportServiceImpl implements ImportService {
         return sb.toString();
     }
 
-    private ItemData createItemData(StudyEvent studyEvent,EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
+    private ItemData createItemData(EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
     	
     	// only created new event crf once
     	if(eventCrf.getEventCrfId() == 0) {
-    		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
-    		updateStudyEvntStatus(studyEvent, userAccount, DATA_ENTRY_STARTED);
+    		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);	
     	} 
     	
         ItemData itemData = new ItemData();
@@ -1329,7 +1328,9 @@ public class ImportServiceImpl implements ImportService {
 
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);            
 
-            logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());          
+            logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
+            updateStudyEvntStatus(studyEvent, userAccount, DATA_ENTRY_STARTED);
+
 
             logger.debug("Study Event Id {} is updated", studyEvent.getStudyEventId());
         }
@@ -1362,7 +1363,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private Object validateItem(ImportItemDataBean itemDataBean, CrfBean crf, EventCrf eventCrf, ImportItemGroupDataBean itemGroupDataBean, UserAccount userAccount, ItemCountInForm itemCountInForm, Study study, StudyEvent studyEvent,StudySubject studySubject, String reasonForChange) {
+    private Object validateItem(ImportItemDataBean itemDataBean, CrfBean crf, EventCrf eventCrf, ImportItemGroupDataBean itemGroupDataBean, UserAccount userAccount, ItemCountInForm itemCountInForm, Study study, StudySubject studySubject, String reasonForChange) {
         ErrorObj errorObj = null;
         if (itemDataBean.getItemOID() == null) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
@@ -1417,7 +1418,7 @@ public class ImportServiceImpl implements ImportService {
             }
         } else {
         	       	
-            itemData = createItemData(studyEvent,eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
+            itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
             if (isEventCrfCompleted(eventCrf)) {
                 ErrorObj eb = createQuery(userAccount, study, studySubject, itemData, reasonForChange);
                 if (eb != null) {
