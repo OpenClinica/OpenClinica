@@ -190,6 +190,7 @@ public class ErrorConstants {
     public static final String ERR_EVENTOID_NOT_EXIST_IN_THIS_STUDY = "errorCode.eventOIDNotAvailableInThisStudy";
     public static final String ERR_FORMOID_NOT_EXIST_IN_THIS_STUDY = "errorCode.formOIDNotAvailableInThisStudy";
     public static final String ERR_PARTICIPANT_DOES_NOT_HAVE_THIS_EVENT_IN_THIS_STUDY = "errorCode.participantDoesNotHaveThisEventInThisStudy";
+    public static final String ERR_EVENT_CRF_NOT_COMPLETED = "errorCode.eventCrfIsNotInCompleted";
 
 
 }
