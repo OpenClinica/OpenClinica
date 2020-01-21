@@ -227,7 +227,15 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
-
+    public boolean isUserHas_DM_MON_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOID){
+        Study publicStudy = getPublicStudy(studyOID);
+        for (StudyUserRoleBean userRole : userRoles) {
+             if ((userRole.getRole().equals(Role.MONITOR) && publicStudy.getStudyId() == userRole.getStudyId())
+                    || (userRole.getRole().equals(Role.COORDINATOR) && publicStudy.getStudyId() == userRole.getStudyId()))
+                return true;
+        }
+        return false;
+    }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid) {
@@ -430,10 +438,15 @@ public class ValidateServiceImpl implements ValidateService {
         return crfDao.findByOcOID(formOid) != null;
     }
 
-    public void validateAllOidsForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid){
+    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount){
 
         if(!isStudyOidValidStudyLevelOid(studyOid))
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+        if (!isStudyAvailable(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
+        }
+        if(!isUserHas_DM_MON_RoleInStudy(userAccount.getRoles(),studyOid))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         Study study = studyDao.findByOid(studyOid);
         if(!isStudySubjectPresent(studySubjectLabel, study))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
