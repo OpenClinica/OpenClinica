@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.UtilService;
@@ -7,6 +8,7 @@ import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import io.swagger.annotations.Api;
 import org.akaza.openclinica.controller.dto.SdvDTO;
 import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,9 @@ public class SdvApiController {
     @Qualifier("sdvUtil")
     private SDVUtil sdvUtil;
 
+    @Autowired
+    UtilService utilService;
+
         @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/forms/{FormOid}/participants/{ParticipantId}/viewSdvForm", method = RequestMethod.GET)
     public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
                                                         @PathVariable("studyOid") String studyOID,
@@ -42,12 +47,13 @@ public class SdvApiController {
                                                         @PathVariable("ParticipantId") String studySubjectLabel,
                                                         @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
         studyBuildService.setRequestSchemaByStudyOrParentStudy(studyOID);
+            UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         boolean changedAfterSdvOnlyFilterFlag=true;
         if(changedAfterSdvOnlyFilter.equals("n"))
             changedAfterSdvOnlyFilterFlag = false;
         SdvDTO responseDTO = null;
         try {
-            validateService.validateAllOidsForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID);
+            validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean);
             responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectLabel, changedAfterSdvOnlyFilterFlag);
         }
         catch(OpenClinicaSystemException e) {
