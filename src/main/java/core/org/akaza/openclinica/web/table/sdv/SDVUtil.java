@@ -1412,10 +1412,10 @@ public class SDVUtil {
 
     public SdvDTO getFormDetailsForSDV(String formOID, String studyEventOID, String studySubjectLabel, boolean changedAfterSdvOnlyFilter) {
 
-        ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
-
         EventCrf eventCrf = getEventCrfDao().findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOID, studySubjectLabel, formOID);
-        if(eventCrf != null) {
+        if(eventCrf != null &&  !Status.get(eventCrf.getStatusId()).equals(Status.UNAVAILABLE))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENT_CRF_NOT_COMPLETED);
+        else if(eventCrf != null) {
             SdvDTO sdvDTO = new SdvDTO();
             sdvDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
             sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
@@ -1425,12 +1425,11 @@ public class SDVUtil {
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
             core.org.akaza.openclinica.domain.Status status = core.org.akaza.openclinica.domain.Status.getByCode(eventCrf.getStatusId());
-            if(status != null) {
-                if (status.equals(core.org.akaza.openclinica.domain.Status.UNAVAILABLE))
-                    sdvDTO.setFormStatus("Completed");
-                else
-                    sdvDTO.setFormStatus(resWords.getString(status.getDescription()));
-            }
+            core.org.akaza.openclinica.domain.datamap.SubjectEventStatus eventStatus = core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.getByCode(eventCrf.getStudyEvent().getStatusId());
+            if(eventStatus.equals(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.LOCKED)) {
+                sdvDTO.setFormStatus(eventStatus.getDescription());
+            }else
+                sdvDTO.setFormStatus("completed"); //EventCrf Status is checked to be UNAVAVAILABLE (i.e. COMPLETED) at parent If Itself
             sdvDTO.setLastVerifiedDate(eventCrf.getLastSdvVerifiedDate());
             sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
             List<SdvItemDTO> sdvItemDTOS = new ArrayList<>();
