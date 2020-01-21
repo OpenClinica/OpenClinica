@@ -1927,6 +1927,7 @@
         jQuery('#participateAccess').click(function() {
             getAccessCode("N");
             $('#eye').show();
+            $('#btn-copy,#copy-result').hide();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
         });
