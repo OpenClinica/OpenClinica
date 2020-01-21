@@ -177,7 +177,6 @@ public class EventCrfLayerBuilder {
         html.td(0).colspan("2").close();
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
         if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
-
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -189,7 +188,7 @@ public class EventCrfLayerBuilder {
 
             // if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() ||
             // currentUser.isSysAdmin())) {
-            if (!currentRole.isMonitor() && currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (!hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
@@ -208,12 +207,20 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
-            if (currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 deleteEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
+                html.tdEnd().trEnd(0);
+            }
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
+                html.nbsp().nbsp();
+                reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject, reswords.getString("reassign"));
                 html.tdEnd().trEnd(0);
             }
         } else if (eventCrfStatus == DataEntryStage.LOCKED) {
@@ -231,7 +238,7 @@ public class EventCrfLayerBuilder {
                 viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), reswords.getString("print"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
@@ -247,6 +254,16 @@ public class EventCrfLayerBuilder {
                 html.nbsp().nbsp();
                 viewSectionDataEntryParameterized(html, eventCrfBean, eventDefinitionCrf, reswords.getString("view"), getStudyEvent());
                 html.tdEnd().trEnd(0);
+
+                if (getStudyEvent() != null && !currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
+                    html.tr(0).valign("top").close();
+                    html.td(0).styleClass(table_cell_left).close();
+                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
+                    html.nbsp().nbsp();
+                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
+                            reswords.getString("edit"));
+                    html.tdEnd().trEnd(0);
+                }
             }
         } else if (eventCrfStatus == DataEntryStage.INVALID) {
             if (!hiddenCrf()) {
@@ -275,7 +292,7 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
             }
-            if (!currentRole.isMonitor() && currentStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
                     if (!hiddenCrf()) {
                         html.tr(0).valign("top").close();
@@ -289,14 +306,15 @@ public class EventCrfLayerBuilder {
                     if (!hiddenCrf()) {
                         html.tr(0).valign("top").close();
                         html.td(0).styleClass(table_cell_left).close();
-                        initialDataEntryParameterizedLink(html, eventCrfBean);
+                        initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
                         html.nbsp().nbsp();
-                        initialDataEntryParameterizedLink(html, eventCrfBean, reswords.getString("edit"));
+                        initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
+                                reswords.getString("edit"));
                         html.tdEnd().trEnd(0);
                     }
                 }
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
@@ -313,7 +331,7 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -686,8 +704,7 @@ public class EventCrfLayerBuilder {
         String onClick3 = "layersShowOrHide('hidden','Lock_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "'); ";
         String onClick4 = "javascript:setImage('CRFicon_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "','" + icon + "'); ";
         builder.a().href(href1 + href2);
-        builder.onmouseover(onmouseover);
-        builder.onclick(onClick1 + onClick2 + onClick3 + onClick4);
+        builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
         builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("144").close().aEnd();
 
@@ -704,9 +721,7 @@ public class EventCrfLayerBuilder {
         String onClick1 = "layersShowOrHide('visible','Lock_all'); ";
         String onClick2 = "LockObject('Lock_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount + "',event); ";
         builder.a().href(href1 + href2);
-        builder.onmouseover(onmouseover);
-        builder.onmouseout(onmouseout);
-        builder.onclick(onClick1 + onClick2);
+        builder.onclick(onmouseover + onClick1 + onClick2);
         builder.close();
 
     }

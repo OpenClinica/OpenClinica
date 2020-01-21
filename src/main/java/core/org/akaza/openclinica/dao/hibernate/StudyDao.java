@@ -508,4 +508,17 @@ public class StudyDao extends AbstractDomainDao<Study> {
             CoreResources.setRequestSchema(schema);
         return study;
     }
+    public Study findStudyWithSPVByStudyId(int studyId)
+    {
+        /* This function will load the studyParamValues without lazy initialization*/
+        String query = "select distinct s from Study s left join fetch s.studyParameterValues where ( s.studyId=:studyId ) ";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyId", studyId);
+        Study study = (Study) q.uniqueResult();
+        if(study.isSite()) {
+            Study parentStudy = this.findStudyWithSPVByStudyId(study.getStudy().getStudyId());
+            study.setStudy(parentStudy);
+        }
+        return study;
+    }
 }

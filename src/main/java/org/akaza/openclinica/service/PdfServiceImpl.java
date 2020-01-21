@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.text.MessageFormat;
@@ -36,8 +37,10 @@ import org.springframework.stereotype.Service;
 public class PdfServiceImpl implements PdfService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
-	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                        {3}") ;
-	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}                                                                                                                         {3}");
+	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                    {3}") ;
+	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}                                                                                                                     {3}");
+	 static final MessageFormat pdfHeaderFormat3 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                  {3} ({4})");
+	 static final MessageFormat pdfHeaderFormat4 =  new MessageFormat("{0} - Participant {2}                                                                                                                   {3} ({4})");  
 
     /**
      *
@@ -161,7 +164,10 @@ public class PdfServiceImpl implements PdfService {
                     // set font and font size
                     contentStream.setFont( font, fontSize);
                     contentStream.moveTextPositionByAmount(headerCenterX, headerCenterY);
-                    contentStream.drawString(headerMsg);                   
+                    
+                    contentStream.showText(headerMsg);
+                    
+                                       
             	}            	 
                  
                 // add footer             
@@ -196,6 +202,9 @@ public class PdfServiceImpl implements PdfService {
 	    String studyName = null;
 	    String participantID = studySubjectIdentifier.trim();
 	    String eventName = null;
+	    String eventNameWith = null;
+	    String sequence = null;
+	    Boolean isRepeating = false;
 	    	    	    		  		    
 	    if(study != null) {				
 			studyName = study.getName();		
@@ -206,16 +215,47 @@ public class PdfServiceImpl implements PdfService {
 	    
 	    if(studyEvent != null) {
 	    	eventName =  studyEvent.getStudyEventDefinition().getName();
+	    	
+	    	if(studyEvent.getStudyEventDefinition().getRepeating()) {
+	    		isRepeating = true;
+	    		sequence = studyEvent.getSampleOrdinal()+"";
+	    	}
 	    }
-	    Object[] headerArgs = {studyName, siteName,participantID,eventName};
+	    Object[] headerArgs = {studyName, siteName,participantID,eventName,sequence};
 	    
 	    String pdfHeader;
 		if(siteName !=null) {
-	    	pdfHeader = pdfHeaderFormat1.format(headerArgs);
+			if(isRepeating) {
+				pdfHeader = pdfHeaderFormat3.format(headerArgs);
+			}else {
+				pdfHeader = pdfHeaderFormat1.format(headerArgs);
+			}
+	    	
 	    }else {
-	    	pdfHeader = pdfHeaderFormat2.format(headerArgs);
+			if(isRepeating) {
+				pdfHeader = pdfHeaderFormat4.format(headerArgs);			
+			}else {
+				pdfHeader = pdfHeaderFormat2.format(headerArgs);
+			}
+	    	
 	    }
 	    
+		// not support UTF-8 at this time
+		try {
+			pdfHeader = new String(pdfHeader.getBytes("ISO-8859-1"), "ISO-8859-1");
+		} catch (UnsupportedEncodingException e) {
+			;
+		}
+
+		// dynamically calculate the header length
+		while(pdfHeader.length() > 160) {
+			pdfHeader = pdfHeader.replaceFirst("  ", "");
+			if(pdfHeader.indexOf("  ") < 0) {
+				break;
+			}
+		}
+		
+
 	    return pdfHeader;
    }
 
@@ -227,6 +267,9 @@ public class PdfServiceImpl implements PdfService {
     */
    public void writeToFile(String message, String fileName) {
     
+	   if(message == null) {
+		   message = "null";
+	   }
        PDDocument doc = new PDDocument();
        try {
            PDPage page = new PDPage();
