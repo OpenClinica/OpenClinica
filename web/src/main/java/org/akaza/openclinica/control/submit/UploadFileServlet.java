@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.control.submit;
 
@@ -115,7 +115,7 @@ public class UploadFileServlet extends SecureController {
                     mf.applyPattern(respage.getString(e.getErrorCode()));
                     Object[] arguments = e.getErrorParams();
                     addPageMessage(respage.getString("file_uploading_failed_please_check_logs_and_upload_again") + mf.format(arguments));
-                    e.printStackTrace();
+                    logger.error("File upload is failed: ", e);
                 }
                 this.forwardPage(Page.FILE_UPLOAD);
             }
@@ -170,7 +170,7 @@ public class UploadFileServlet extends SecureController {
             	File newFile = File.createTempFile(prefix, suffix, directory);
             	newName = newFile.getAbsolutePath();
             } catch (Throwable e) {
-            	e.printStackTrace();
+                logger.error("Error in validating new name: ", e);
             	return null;
             }
             // >> tbh 5545 remove all html-symbol characters here

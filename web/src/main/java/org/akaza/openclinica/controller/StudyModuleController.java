@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.controller;
 
 import java.net.MalformedURLException;
@@ -241,7 +248,7 @@ public class StudyModuleController {
             try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error while redirecting to MainMenu: ", e);
             }
             return null;
         }

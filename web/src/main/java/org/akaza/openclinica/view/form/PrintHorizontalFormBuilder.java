@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.view.form;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -15,6 +22,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -33,6 +42,9 @@ import java.util.TreeMap;
  * to a Web browser by a custom JSP tag.
  */
 public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
+
+    private static final Logger logger= LoggerFactory.getLogger(PrintHorizontalFormBuilder.class);
+
     private int maxColRow = 4;
     // The sections that make up the print version of the form
     private List<DisplaySectionBean> displaySectionBeans = new ArrayList<DisplaySectionBean>();
@@ -422,7 +434,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             try {
                 outp.output(doc, writer);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Error while writing to XML:", e);
             }
             // The webPageBuilder object contains the markup for all of the
             // sections
@@ -778,7 +790,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             try {
                 outp.output(doc, writer);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Error while writing to XML: ", e);
             }
             // The webPageBuilder object contains the markup for all of the
             // sections

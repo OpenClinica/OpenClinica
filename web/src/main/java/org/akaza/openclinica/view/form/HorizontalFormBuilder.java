@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.view.form;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -8,6 +15,8 @@ import org.jdom.Element;
 import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -22,6 +31,9 @@ import javax.xml.transform.Result;
  * headers.
  */
 public class HorizontalFormBuilder extends DefaultFormBuilder {
+
+    private static final Logger logger= LoggerFactory.getLogger(HorizontalFormBuilder.class);
+    
     // The object that will provide the content for the table's headers and
     // cells.
     // This is a List of group- or matrix-type tables. The List orders the
@@ -322,7 +334,7 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
         try {
             outp.output(doc, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error while writing to XML:", e);
         }
         return writer.toString();
     }

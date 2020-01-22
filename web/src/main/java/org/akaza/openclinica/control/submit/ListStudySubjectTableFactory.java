@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.control.submit;
 
 import java.net.URLEncoder;
@@ -773,8 +780,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                             url.append(viewParticipateBuilder(studySubjectBean));
                         }
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        logger.error("Error appending StudySubject into URL: ", e);
                     }
                 }
                 value = url.toString();

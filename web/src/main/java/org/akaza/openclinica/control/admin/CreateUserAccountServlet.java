@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.control.admin;
 
@@ -400,7 +400,7 @@ public class CreateUserAccountServlet extends SecureController {
 
 	public String getRandom32ChApiKey() {
 		String uuid = UUID.randomUUID().toString();
-		System.out.print(uuid.replaceAll("-", ""));
+        logger.debug(uuid.replaceAll("-", ""));
 		return uuid.replaceAll("-", "");
 	}
 }

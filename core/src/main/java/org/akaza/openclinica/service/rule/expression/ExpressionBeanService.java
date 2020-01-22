@@ -1,8 +1,15 @@
 /*
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
- * For details see: http://www.openclinica.org/license
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
+/*
+ * GNU Lesser General Public License (GNU LGPL).
+ * For details see: https://libreclinica.org/license
  *
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * Copyright 2003-2008 Akaza Research
  */
 package org.akaza.openclinica.service.rule.expression;
@@ -100,7 +107,7 @@ public class ExpressionBeanService {
         String oid = null;
         int index = 0;
         // TODO fix this
-        System.out.println("TEST  :: " + test);
+        logger.debug("Test :: {}", test);
 
         if(checkIfForScheduling(test)){
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//TODO: get the format from data format properties.??
@@ -146,7 +153,7 @@ public class ExpressionBeanService {
     }
     public String getSSTimeZone(){
         Integer subjectId = expressionBeanWrapper.getStudySubjectBeanId();
-        System.out.print("  subjectId  " + subjectId + "  : ");
+        logger.debug(" subjectId {} : ", subjectId);
         if(subjectId ==null) return null;     
         StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
           return ssBean.getTime_zone().trim();

@@ -23,10 +23,6 @@
 	  </c:choose>
 	  </td>
       <td class="table_cell"><c:out value="${currRow.bean.auditTable}"/>&nbsp;</td>
-      
-	  <%-- <td class="table_cell"><c:out value="${currRow.bean.studyName}"/>&nbsp;</td>
-      <td class="table_cell"><c:out value="${currRow.bean.subjectName}"/>&nbsp;</td> ViewSingleJob?tname=forth_jobViewSingleJob?tname=forth_jobhttp://localhost:8080/OpenClinica-SNAPSHOT/ViewSingleJob?tname=forth_jobViewSingleJob?tname=forth_jobViewSingleJob?tname=forth_job--%>
-
       <td class="table_cell">
 	  <c:choose>
 	  <c:when test="${currRow.bean.reasonForChange == '__job_fired_success' || currRow.bean.reasonForChange == '__job_fired_fail'}">

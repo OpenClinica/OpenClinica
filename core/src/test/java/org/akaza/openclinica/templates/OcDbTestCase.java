@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.templates;
 
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -6,10 +13,11 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.File;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -17,6 +25,7 @@ import javax.sql.DataSource;
 
 public abstract class OcDbTestCase extends DataSourceBasedDBTestCase {
 
+    private static final Logger logger= LoggerFactory.getLogger(OcDbTestCase.class);
     // @pgawade 10272010 - Added the ApplicationContext attribute
     private ApplicationContext context;
 
@@ -71,7 +80,7 @@ public abstract class OcDbTestCase extends DataSourceBasedDBTestCase {
         try {
             properties.load(OcDbTestCase.class.getResourceAsStream(getPropertiesFilePath()));
         } catch (Exception ioExc) {
-            ioExc.printStackTrace();
+            logger.error("Properties does not able to load properly: ", ioExc);
         }
     }
 

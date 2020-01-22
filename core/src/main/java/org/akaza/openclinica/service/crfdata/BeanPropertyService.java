@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.service.crfdata;
 
 import java.text.DateFormat;
@@ -178,8 +185,7 @@ public class BeanPropertyService{
 				studyEvent.setDateStart(df.parse((String) result));
 
 			} catch (ParseException e) {
-				e.printStackTrace();
-				LOGGER.info(e.getMessage());
+				LOGGER.error("Date is not getting parsed properly: ", e);
 			}
             changeDetails.setRunningInTransaction(isTransaction);
 

@@ -1,8 +1,15 @@
 /*
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
- * For details see: http://www.openclinica.org/license
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
+/*
+ * GNU Lesser General Public License (GNU LGPL).
+ * For details see: https://libreclinica.org/license
  *
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * Copyright 2003-2008 Akaza Research
  */
 package org.akaza.openclinica.service.rule;
@@ -336,7 +343,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
         ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
-        System.out.println("in runRulesinBulk method");
+        logger.debug("in runRulesinBulk method");
         return ruleRunner.runRulesBulkFromRuleSetScreen(ruleSets, executionMode, currentStudy, null, ub);
         // return runRulesBulkFromRuleSetScreen(ruleSets, dryRun, currentStudy, null, ub);
     }
@@ -635,11 +642,10 @@ public class RuleSetService implements RuleSetServiceInterface {
         return shownRuleSets;
     }
 
-    private void logMe(String message){
-    //    System.out.println(message);
+    private void logMe(String message) {
         logger.debug(message);
-
     }
+    
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List)

@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.web.crfdata;
 
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -10,11 +17,15 @@ import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Helper methods will be placed in this class - DRY
  */
 public class ImportHelper {
+
+    private static final Logger logger= LoggerFactory.getLogger(ImportHelper.class);
 
     /**
      * @param dib
@@ -170,12 +181,13 @@ public class ImportHelper {
                         try {
                             customValidation = Validator.processCRFValidationFunction(customValidationString);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.error("Error while processing CRF validation function: ", e);
                         }
                     } else if (customValidationString.startsWith("regexp:")) {
                         try {
                             customValidation = Validator.processCRFValidationRegex(customValidationString);
                         } catch (Exception e) {
+                            logger.error("Error while processing CRF validation regular expression: ", e);
                         }
                     }
 

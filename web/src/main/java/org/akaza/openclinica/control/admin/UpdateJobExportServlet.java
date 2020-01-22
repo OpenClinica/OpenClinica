@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.control.admin;
 
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
@@ -253,7 +260,7 @@ public class UpdateJobExportServlet extends SecureController {
                     addPageMessage("Your job has been successfully modified.");
                     forwardPage(Page.VIEW_JOB_SERVLET);
                 } catch (SchedulerException se) {
-                    se.printStackTrace();
+                    logger.error("Job is not able to be modified: ", se);
                     // set a message here with the exception message
                     setUpServlet(trigger);
                     addPageMessage("There was an unspecified error with your creation, please contact an administrator.");

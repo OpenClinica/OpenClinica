@@ -2,23 +2,23 @@
 
 /* general style propertyies */
 
-body.login_BG { background: url(../images/login_BG2.gif) repeat-x top left #FFFFFF; }
+body.login_BG {}
 
-div.login_BG { background: url(../images/login_BG.gif) no-repeat top center; height: 100%; padding-top: 117px; }
+div.login_BG {padding-top: 117px; }
 
-#OClogo { background: url(../images/OC_login_logo.png) no-repeat top left; width: 428px; height: 112px; }
-
-#OClogoIE6 { background: url(../images/OC_login_logo.gif) no-repeat top left; width: 428px; height: 112px; }
+#logo { background: url(../images/login_logo.png) no-repeat top left; width: 428px; height: 112px; }
 
 .loginBoxes { margin-bottom: 100px; }
 
 .loginBoxes td { width: 310px; vertical-align: top; text-align: left; }
 
-.loginBox_T { background: url(../images/login_box_T.png) no-repeat top center; height: 10px; line-height: 10px; font-size: 1px; }
+.loginBox_T { }
 
-.loginBox { background: url(../images/login_box_BG.png) no-repeat bottom center; }
+.loginBox { }
 
-#loginBox, #newsBox { padding: 6px 28px 38px 28px; }
+#loginBox { padding: 10px 28px; background-color: var(--lightblue-l20); }
+
+#loginBox H1, #loginBox a { color: var(--lightblue-d20); }
 
 .loginBox form, .loginBox H1 { margin-top: 0px; }
 

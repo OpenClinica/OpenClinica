@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.controller;
 
 import java.text.ParseException;
@@ -57,7 +64,7 @@ public class DiscrepancyNoteController {
 	@RequestMapping(value = "/dnote", method = RequestMethod.POST)
 	public ResponseEntity buidDiscrepancyNote(@RequestBody HashMap<String, String> map, HttpServletRequest request) throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		System.out.println("I'm in EnketoForm DN Rest Method");
+		logger.debug("I'm in EnketoForm DN Rest Method");
 		org.springframework.http.HttpStatus httpStatus = null;
 
 		String se_oid = map.get("EntityID");
@@ -142,11 +149,10 @@ public class DiscrepancyNoteController {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 		Date date = formatter.parse(dateInString);
 
-		System.out.println(date);
-		System.out.println(formatter.format(date));
+		logger.debug("{}", date);
+		logger.debug("{}", formatter.format(date));
 
 		return date;
-
 	}
 
 	public void saveFieldNotes(String description, String detailedNotes, int entityId, String entityType, StudyBean sb, UserAccountBean ownerBean, UserAccountBean assignedUserBean,

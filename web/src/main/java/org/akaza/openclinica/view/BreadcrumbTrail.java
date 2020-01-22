@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.view;
 
@@ -11,6 +11,9 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -31,6 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 public class BreadcrumbTrail {
     private ArrayList trail = new ArrayList();
 
+    private static final Logger logger= LoggerFactory.getLogger(BreadcrumbTrail.class);
+    
     public BreadcrumbTrail() {
 
     }
@@ -808,8 +813,7 @@ public class BreadcrumbTrail {
             // trail = new ArrayList();
             // }
         } catch (IndexOutOfBoundsException ioobe) {
-            // TODO Auto-generated catch block, created to disallow errors
-            ioobe.printStackTrace();
+            logger.error("Error while generating trial: ", ioobe);
 
             trail = new ArrayList();
         }

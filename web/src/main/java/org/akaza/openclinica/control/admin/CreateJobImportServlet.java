@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -166,7 +173,7 @@ public class CreateJobImportServlet extends SecureController {
                     addPageMessage("You have successfully created a new job: " + trigger.getKey().getName() + " which is now set to run at the time you specified.");
                     forwardPage(Page.VIEW_IMPORT_JOB_SERVLET);
                 } catch (SchedulerException se) {
-                    se.printStackTrace();
+                    logger.error("Scheduler is not able to create a new job: ", se);
                     // set a message here with the exception message
                     setUpServlet();
                     addPageMessage("There was an unspecified error with your creation, please contact an administrator.");

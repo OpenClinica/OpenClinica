@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
@@ -367,10 +374,7 @@ public class SignStudySubjectServlet extends SecureController {
                     sea.setNewSubjectEventStatus(newStatus);
                 }
             } catch (NumberFormatException e) {
-
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                // logger.warning("^^^ caught NFE");
+                logger.error("Subject event status is not able to be fetched properly: ", e);
             }
             UserAccountBean updater = (UserAccountBean) udao.findByPK(avb.getUserId());
             sea.setUpdater(updater);

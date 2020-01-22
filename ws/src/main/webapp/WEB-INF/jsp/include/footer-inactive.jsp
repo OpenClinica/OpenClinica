@@ -24,13 +24,6 @@ document.write('<table border="0" cellpadding=0" cellspacing="0" width="' + docu
 </script>
 			<tr>
 				<td class="footer">
-				<!--<a href="#">About OpenClinica</a>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<a href="#">Terms of Use</a>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<a href="#">Privacy Policy</a>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				-->
 				<a href="#"><fmt:message key="openclinica_portal" bundle="${resword}"/></a>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<a href="javascript:openDocWindow('help/index.html')"><fmt:message key="help" bundle="${resword}"/></a>

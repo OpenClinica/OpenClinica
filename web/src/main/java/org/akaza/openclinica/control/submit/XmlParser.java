@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.control.submit;
 
 import org.slf4j.Logger;
@@ -52,11 +59,11 @@ public class XmlParser extends DefaultHandler {
             sp.parse(f, this);
 
         } catch (SAXException se) {
-            se.printStackTrace();
+            logger.error("Error in SAX instance creation", se);
         } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
+            logger.error("Error in Parsing SAX configuration", pce);
         } catch (IOException ie) {
-            ie.printStackTrace();
+            logger.error("Error  in File: ", ie);
         }
     }
 

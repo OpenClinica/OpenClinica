@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.control.extract;
 
@@ -113,8 +113,6 @@ public class SelectItemsServlet extends SecureController {
         }
         request.setAttribute("eventlist", events);
         logger.info("found dob setting: " + currentStudy.getStudyParameterConfig().getCollectDob());
-        // System.out.println("found dob setting: " +
-        // currentStudy.getStudyParameterConfig().getCollectDob());
 
         if (crfId == 0) {// no crf selected
             if (eventAttr == 0 && subAttr == 0 && CRFAttr == 0 && groupAttr == 0 && discAttr == 0) {

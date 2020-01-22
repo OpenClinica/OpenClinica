@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.dao.submit;
 
@@ -777,7 +777,6 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
     }
     private void logMe(String message){
         logger.debug(message);
-      //  System.out.println(message);
     }
 
     public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {

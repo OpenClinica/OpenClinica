@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.controller;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
@@ -21,6 +28,8 @@ import org.jmesa.facade.TableFacade;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -54,6 +63,8 @@ import javax.sql.DataSource;
  */
 @Controller("sdvController")
 public class SDVController {
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     public final static String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
     @Autowired
     @Qualifier("dataSource")
@@ -78,11 +89,11 @@ public class SDVController {
 
     @RequestMapping("/viewSubjectAggregate")
     public ModelMap viewSubjectAggregateHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId) {
-		if(!mayProceed(request)){
-            try{
+		if (!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Error while redirecting to MainMenu: ", e);
             }
             return null;
         }
@@ -151,11 +162,11 @@ public class SDVController {
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId, HttpServletResponse response) {
 
-        if(!mayProceed(request)){
-            try{
+        if (!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Error while redirecting to MainMenu: ", e);
             }
             return null;
         }
@@ -331,12 +342,11 @@ public class SDVController {
     public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
             @RequestParam("redirection") String redirection, ModelMap model) {
 
-
-			 if(!mayProceed(request)){
-            try{
+        if (!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Error while redirecting to MainMenu: ", e);
             }
             return null;
         }

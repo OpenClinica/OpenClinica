@@ -1,0 +1,12 @@
+LibreClinica V1.0 release notes							16-Jan-2020
+
+System requirements:
+openjdk-8
+tomcat-9
+postgres-11
+These versions are currently available in Debian 10 (Buster) Linux.
+
+Notes:
+Installing LibreClinica in as docker image is currently not supported.
+
+The SOAP API is legacy and will not be tested and maintained anymore.

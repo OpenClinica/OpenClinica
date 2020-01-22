@@ -8,7 +8,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="gwt:property" content="locale=${pageContext.request.locale}">
-    <title><decorator:title default="OpenClinica" /></title>
+    <title><decorator:title default="LibreClinica" /></title>
     <script type="text/javascript" language="javascript" src="../gwt/GwtMenu/org.akaza.openclinica.gwt.GwtMenu.nocache.js"></script>
     <script type="text/javascript" language="javascript" src="../includes/prototype.js"></script>
     <script type="text/javascript" language="javascript" src="../includes/global_functions_javascript.js"></script>

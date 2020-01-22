@@ -1,8 +1,15 @@
 /*
- * OpenClinica is distributed under the GNU Lesser General Public License (GNU
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
+/*
+ * LibreClinica is distributed under the GNU Lesser General Public License (GNU
  * LGPL).
  *
- * For details see: http://www.openclinica.org/license copyright 2003-2005 Akaza
+ * For details see: https://libreclinica.org/license copyright 2003-2005 Akaza
  * Research
  *
  */
@@ -30,7 +37,7 @@ public class MetaDataVersionBean extends ElementOIDBean {
     private List<ItemGroupDefBean> itemGroupDefs;
     private List<ItemDefBean> itemDefs;
     private List<CodeListBean> codeLists;
-    // OpenClinica system has set softhard constraint on study level
+    // LibreClinica system has set softhard constraint on study level
     private String softhard;
     
     //openclinica extension
