@@ -209,6 +209,9 @@
             source.splice(-2);
             source = source.join('_');
             actionView = '';
+            if (logEntry.status === 'FAILED') {
+				actionView = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile?display=pdfLog"><span class="icon icon-search"></span></a> ';;
+			}
           }
           if (logEntry.status === 'IN_PROGRESS') {
             actionView = actionDownload = actionDelete = '';
