@@ -7,9 +7,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 import java.text.MessageFormat;
 
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -21,6 +21,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.util.Matrix;
@@ -259,44 +260,94 @@ public class PdfServiceImpl implements PdfService {
    }
 
    
-     
    /**
-    * 
+    *  This is used to write errors to the log file in pdf format
     * @param msg
     * @param fileName
     */
-   public void writeToFile(String msg, String fileName) {
-       logger.debug("writing report to File");
-
-       File file = new File(fileName);       
-
-       PrintWriter writer = null;
+   public void writeToFile(String message, String fileName) {
+    
+	   if(message == null) {
+		   message = "null";
+	   }
+       PDDocument doc = new PDDocument();
        try {
-       	 file.createNewFile();
-       	 writer = new PrintWriter(file.getPath(), "UTF-8");
-       	 String subStr = "";
-       	 
-       	 if(msg.length() > 100) {
-       		 while(msg.length() > 100) {
-       			 int endIndex = msg.indexOf(" ", 100);
-       			 subStr =  msg.substring(0, endIndex);
-       			 writer.println(subStr); 
-       			 
-       			 msg = msg.substring(endIndex);
-       		 }
-       		// write the last line
-       		writer.println(msg);
-       		
-       	 }else {
-       		  writer.println(msg); 
-       	 }
-       	    
-       } catch (IOException e) {
-       	 logger.error("Error while accessing file to start writing: ",e);
-		} finally {                        
-           writer.close();;
-       }
+           PDPage page = new PDPage();
+           doc.addPage(page);
+           
+           PDFont pdfFont = PDType1Font.TIMES_ROMAN;
+           float fontSize = 10;
+           float leading = 1.5f * fontSize;
+           PDRectangle mediabox = page.getMediaBox();
+           float margin = 50;
+           float width = 140;
+           float startX = mediabox.getLowerLeftX() + margin;
+           float startY = mediabox.getUpperRightY() - margin;
 
+           PDPageContentStream contents = new PDPageContentStream(doc, page);
+           
+           List<String> lines = new ArrayList<String>();
+           int lastSpace = -1;
+           /**
+            * newline character cause some PDF lib methods failed
+            */
+           message = message.replace("\n", "").replace("\r", "");
+           
+           while (message.length() > 0)
+           {
+               int spaceIndex = message.indexOf(' ', lastSpace + 1);
+               if (spaceIndex < 0)
+                   spaceIndex = message.length();
+               String subString = message.substring(0, spaceIndex);
+               float size = subString.length();
+            
+               if (size > width)
+               {
+                   if (lastSpace < 0) {
+                	    lastSpace = spaceIndex;
+                   }
+                      
+                   subString = message.substring(0, lastSpace);
+                   lines.add(subString);
+                   message = message.substring(lastSpace).trim();
+                
+                   lastSpace = -1;
+               }
+               else if (spaceIndex == message.length())
+               {
+                   lines.add(message);                
+                   message = "";
+               }
+               else
+               {
+                   lastSpace = spaceIndex;
+               }
+           }
+
+           contents.beginText();
+           contents.setFont(pdfFont, fontSize);
+           contents.newLineAtOffset(startX,startY);
+           for (String line: lines)
+           {
+        	   contents.showText(line);
+        	   contents.newLineAtOffset(0, -leading);
+           }
+           contents.endText(); 
+           contents.close();
+          
+           
+           doc.save(fileName);
+       }catch(Exception e) {
+    	   logger.error("Error " + e.getMessage());
+       }
+       finally {
+    	   try {
+    		   doc.close();
+    	   }catch(IOException e) {
+        	   logger.error("Error " + e.getMessage());
+           }
+           
+       } 
    }
 
 }

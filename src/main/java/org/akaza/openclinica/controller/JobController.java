@@ -163,7 +163,7 @@ public class JobController {
 
     @ApiOperation( value = "To download job files ", notes = "Will download job file" )
     @RequestMapping( value = "/jobs/{uuid}/downloadFile", method = RequestMethod.GET )
-    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, @RequestParam(required = false) String open, @RequestParam(required = false) String display,HttpServletResponse response) throws Exception { UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, @RequestParam(required = false) String open, HttpServletResponse response) throws Exception { UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
         String studyOid;
         if (publicStudy.getStudy() == null) {
@@ -190,24 +190,15 @@ public class JobController {
             File fileToDownload = new File(logFileName);
             inputStream = new FileInputStream(fileToDownload);
             if (!"true".equals(open)) {
-            	  
+                response.setContentType("application/force-download");
                 String fileName = URLEncoder.encode(jobDetail.getLogPath(), "UTF-8").replace("+", "%20");
                 String userAgent = request.getHeader("user-agent");
 
-            	if(display != null && display.equals("pdfLog")) {
-            		 response.setContentType("text/plain");
-            		 response.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
-            		 response.setContentLength((int) fileToDownload.length());
-            	}else {
-            		 response.setContentType("application/force-download");
-            		 if (userAgent.contains("Firefox") || userAgent.contains("Safari")) {
-                         response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + fileName);
-                     } else {
-                         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-                     }
-            	}
-             
-               
+                if (userAgent.contains("Firefox") || userAgent.contains("Safari")) {
+                    response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + fileName);
+                } else {
+                    response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+                }
                 }
             IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
