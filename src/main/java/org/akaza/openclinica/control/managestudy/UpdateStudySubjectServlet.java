@@ -30,7 +30,7 @@ import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
@@ -338,7 +338,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             }
 
 
-            String label = StringEscapeUtils.escapeHtml(fp.getString("label").trim());
+            String label = StringEscapeUtils.escapeXml11(fp.getString("label").trim());
             studySub.setLabel(label);
             subject.setGender(' ');
             errors = validator.validate();
