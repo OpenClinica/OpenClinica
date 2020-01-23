@@ -26,11 +26,12 @@ public class RuleActionRunLogDao extends AbstractDomainDao<RuleActionRunLogBean>
         return k.intValue();
     }
 
-    public  void delete(int itemDataId){
-            String query = " delete from " + getDomainClassName() +  "  where itemDataId =:itemDataId ";
-            org.hibernate.Query q = getCurrentSession().createQuery(query);
-            q.setInteger("itemDataId", itemDataId);
-            q.executeUpdate();
-        }
+    @Transactional
+    public void delete(int itemDataId) {
+        String query = "delete from " + getDomainClassName() + " rarl where rarl.itemDataId = :itemDataId";
+        org.hibernate.query.Query q = getCurrentSession().createQuery(query);
+        q.setParameter("itemDataId", itemDataId);
+        q.executeUpdate();
+    }
 
 }
