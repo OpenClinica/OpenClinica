@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
+import org.springframework.transaction.annotation.Transactional;
 
 public class DynamicsItemGroupMetadataDao extends AbstractDomainDao<DynamicsItemGroupMetadataBean>{
 
@@ -64,10 +65,12 @@ public class DynamicsItemGroupMetadataDao extends AbstractDomainDao<DynamicsItem
         q.setInteger("crfVersionId", crfVersionId);
         return q.list() != null && q.list().size() > 0;
     }
-    public  void delete(int eventCrfId){
-        String query = " delete from " + getDomainClassName() +  "  where eventCrfId =:eventCrfId ";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("eventCrfId", eventCrfId);
+
+    @Transactional
+    public void delete(int eventCrfId) {
+        String query = "delete from " + getDomainClassName() + " metadata where metadata.eventCrfId = :eventCrfId";
+        org.hibernate.query.Query q = getCurrentSession().createQuery(query);
+        q.setParameter("eventCrfId", eventCrfId);
         q.executeUpdate();
     }
 
