@@ -969,28 +969,33 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private OdmClinicalDataBean getClinicalDatas(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID, int userId) {
-		int seOrdinal = 0;
-		String temp = studyEventOID;
-		List<StudyEvent> studyEvents = new ArrayList<StudyEvent>();
-		StudyEventDefinition studyEventDefinition = null;
-		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
-		List<StudySubject> ss = listStudySubjects(studySubjectOID);
-		int idx = studyEventOID.indexOf(OPEN_ORDINAL_DELIMITER);
-		LOGGER.info("study event oridinal is.." + idx);
-		if (idx > 0) {
-			studyEventOID = studyEventOID.substring(0, idx);
-			seOrdinal = new Integer(temp.substring(idx + 1, temp.indexOf(CLOSE_ORDINAL_DELIMITER))).intValue();
-		}
-		studyEventDefinition = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
-		LOGGER.info("study event ordinal.." + seOrdinal);
-		if (seOrdinal > 0) {
-			studyEvents = studyEventDao.fetchStudyEvents(seOrdinal, studyEventDefinition.getOc_oid(), studySubjectOID);
-		}
-		else {
-			studyEvents = studyEventDao.fetchStudyEvents(studyEventDefinition.getOc_oid(), studySubjectOID);
-		}
 
-		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID,userId);
+		List<String> eventOids = Arrays.asList(studyEventOID.split("\\s*,\\s*"));
+		List<StudySubject> ss = listStudySubjects(studySubjectOID);
+		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
+		List<StudyEvent> studyEvents = new ArrayList<StudyEvent>();
+
+		for (String eventOid : eventOids) {
+			int seOrdinal = 0;
+
+			StudyEventDefinition studyEventDefinition = null;
+			int idx = eventOid.indexOf(OPEN_ORDINAL_DELIMITER);
+			LOGGER.info("study event oridinal is.." + idx);
+			if (idx > 0) {
+				seOrdinal = new Integer(eventOid.substring(idx + 1, eventOid.indexOf(CLOSE_ORDINAL_DELIMITER))).intValue();
+				eventOid = eventOid.substring(0, idx);
+			}
+			studyEventDefinition = getStudyEventDefDao().findByColumnName(eventOid, "oc_oid");
+			LOGGER.info("study event ordinal.." + seOrdinal);
+			if (studyEventDefinition != null) {
+				if (seOrdinal > 0) {
+					studyEvents.addAll(studyEventDao.fetchStudyEvents(seOrdinal, studyEventDefinition.getOc_oid(), studySubjectOID));
+				} else {
+					studyEvents.addAll(studyEventDao.fetchStudyEvents(studyEventDefinition.getOc_oid(), studySubjectOID));
+				}
+			}
+		}
+			return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID, userId);
 	}
 
 	public UserAccountDao getUserAccountDao() {

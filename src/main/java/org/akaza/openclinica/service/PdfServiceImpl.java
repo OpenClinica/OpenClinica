@@ -7,11 +7,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 import java.text.MessageFormat;
 
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -34,8 +37,10 @@ import org.springframework.stereotype.Service;
 public class PdfServiceImpl implements PdfService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
-	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}");
-	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}");
+	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                    {3}") ;
+	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}                                                                                                                     {3}");
+	 static final MessageFormat pdfHeaderFormat3 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                  {3} ({4})");
+	 static final MessageFormat pdfHeaderFormat4 =  new MessageFormat("{0} - Participant {2}                                                                                                                   {3} ({4})");  
 
     /**
      *
@@ -52,7 +57,7 @@ public class PdfServiceImpl implements PdfService {
      * @throws IOException
      */
     public File mergePDF(ArrayList<File> files,
-                         String fullFinalFilePathName,String pdfHeader) throws IOException {
+                         String fullFinalFilePathName,ArrayList<String> pdfHeaders) throws IOException {
 
         //Instantiating PDFMergerUtility class
         PDFMergerUtility PDFmerger = new PDFMergerUtility();
@@ -72,11 +77,12 @@ public class PdfServiceImpl implements PdfService {
             docTemp.close();
         }
         String footerMsg = "Page X of " + totalPageNumber;
-        String headerMsg = pdfHeader;
+        String headerMsg="";
+        int file_counter = 0;
         
         for(File file: files) {
             PDDocument doc = PDDocument.load(file);
-
+            headerMsg = pdfHeaders.get(file_counter);
             page_counter = this.addHeaderOrFooter(doc, headerMsg,footerMsg, page_counter);
 
             // after add footer, use the new content
@@ -88,7 +94,9 @@ public class PdfServiceImpl implements PdfService {
             pDDocuments.add(doc);
 
             //adding the source files
-            PDFmerger.addSource(in);        
+            PDFmerger.addSource(in);  
+            
+            file_counter++;
         }
 
         //Merging all PDFs
@@ -156,7 +164,10 @@ public class PdfServiceImpl implements PdfService {
                     // set font and font size
                     contentStream.setFont( font, fontSize);
                     contentStream.moveTextPositionByAmount(headerCenterX, headerCenterY);
-                    contentStream.drawString(headerMsg);                   
+                    
+                    contentStream.showText(headerMsg);
+                    
+                                       
             	}            	 
                  
                 // add footer             
@@ -185,27 +196,66 @@ public class PdfServiceImpl implements PdfService {
     }
 
 
-   public String preparePdfHeader(Study study, Study site, String studySubjectIdentifier) {
+   public String preparePdfHeader(Study study, Study site, String studySubjectIdentifier,StudyEvent studyEvent) {
 	  
 	    String siteName = null;
 	    String studyName = null;
-	    String participantID = studySubjectIdentifier.trim();	    		   	   
-	    		  		    
+	    String participantID = studySubjectIdentifier.trim();
+	    String eventName = null;
+	    String eventNameWith = null;
+	    String sequence = null;
+	    Boolean isRepeating = false;
+	    	    	    		  		    
 	    if(study != null) {				
 			studyName = study.getName();		
 		}
 	    if(site !=null) {		    	
 	    	siteName = site.getName();	    	
 	    }
-	    Object[] headerArgs = {studyName, siteName,participantID};
+	    
+	    if(studyEvent != null) {
+	    	eventName =  studyEvent.getStudyEventDefinition().getName();
+	    	
+	    	if(studyEvent.getStudyEventDefinition().getRepeating()) {
+	    		isRepeating = true;
+	    		sequence = studyEvent.getSampleOrdinal()+"";
+	    	}
+	    }
+	    Object[] headerArgs = {studyName, siteName,participantID,eventName,sequence};
 	    
 	    String pdfHeader;
 		if(siteName !=null) {
-	    	pdfHeader = pdfHeaderFormat1.format(headerArgs);
+			if(isRepeating) {
+				pdfHeader = pdfHeaderFormat3.format(headerArgs);
+			}else {
+				pdfHeader = pdfHeaderFormat1.format(headerArgs);
+			}
+	    	
 	    }else {
-	    	pdfHeader = pdfHeaderFormat2.format(headerArgs);
+			if(isRepeating) {
+				pdfHeader = pdfHeaderFormat4.format(headerArgs);			
+			}else {
+				pdfHeader = pdfHeaderFormat2.format(headerArgs);
+			}
+	    	
 	    }
 	    
+		// not support UTF-8 at this time
+		try {
+			pdfHeader = new String(pdfHeader.getBytes("ISO-8859-1"), "ISO-8859-1");
+		} catch (UnsupportedEncodingException e) {
+			;
+		}
+
+		// dynamically calculate the header length
+		while(pdfHeader.length() > 160) {
+			pdfHeader = pdfHeader.replaceFirst("  ", "");
+			if(pdfHeader.indexOf("  ") < 0) {
+				break;
+			}
+		}
+		
+
 	    return pdfHeader;
    }
 
@@ -217,23 +267,77 @@ public class PdfServiceImpl implements PdfService {
     */
    public void writeToFile(String message, String fileName) {
     
+	   if(message == null) {
+		   message = "null";
+	   }
        PDDocument doc = new PDDocument();
        try {
            PDPage page = new PDPage();
            doc.addPage(page);
            
-           PDFont font = PDType1Font.HELVETICA_BOLD;
+           PDFont pdfFont = PDType1Font.TIMES_ROMAN;
+           float fontSize = 10;
+           float leading = 1.5f * fontSize;
+           PDRectangle mediabox = page.getMediaBox();
+           float margin = 50;
+           float width = 140;
+           float startX = mediabox.getLowerLeftX() + margin;
+           float startY = mediabox.getUpperRightY() - margin;
 
            PDPageContentStream contents = new PDPageContentStream(doc, page);
+           
+           List<String> lines = new ArrayList<String>();
+           int lastSpace = -1;
+           /**
+            * newline character cause some PDF lib methods failed
+            */
+           message = message.replace("\n", "").replace("\r", "");
+           
+           while (message.length() > 0)
+           {
+               int spaceIndex = message.indexOf(' ', lastSpace + 1);
+               if (spaceIndex < 0)
+                   spaceIndex = message.length();
+               String subString = message.substring(0, spaceIndex);
+               float size = subString.length();
+            
+               if (size > width)
+               {
+                   if (lastSpace < 0) {
+                	    lastSpace = spaceIndex;
+                   }
+                      
+                   subString = message.substring(0, lastSpace);
+                   lines.add(subString);
+                   message = message.substring(lastSpace).trim();
+                
+                   lastSpace = -1;
+               }
+               else if (spaceIndex == message.length())
+               {
+                   lines.add(message);                
+                   message = "";
+               }
+               else
+               {
+                   lastSpace = spaceIndex;
+               }
+           }
+
            contents.beginText();
-           contents.setFont(font, 10);
-           contents.newLineAtOffset(20, 700);
-           contents.showText(message);
-           contents.endText();
+           contents.setFont(pdfFont, fontSize);
+           contents.newLineAtOffset(startX,startY);
+           for (String line: lines)
+           {
+        	   contents.showText(line);
+        	   contents.newLineAtOffset(0, -leading);
+           }
+           contents.endText(); 
            contents.close();
+          
            
            doc.save(fileName);
-       }catch(IOException e) {
+       }catch(Exception e) {
     	   logger.error("Error " + e.getMessage());
        }
        finally {

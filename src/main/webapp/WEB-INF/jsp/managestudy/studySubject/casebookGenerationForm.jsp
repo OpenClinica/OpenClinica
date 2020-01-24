@@ -59,7 +59,7 @@
                            name="exit">
                     <input type="button" id="casebookPdfBtn" class="button_medium"
                            value="<fmt:message key="viewStudySubject.casebookGenerationForm.button.getPdf" bundle="${resword}"/>"
-                           name="GetPDF" disabled="disabled">
+                           name="GetPDF" style="visibility:hidden;">
                 </div>
                 <div style="display:none" id="casebookLinkDisplay"><br>
                     <fmt:message key="viewStudySubject.casebookGenerationForm.button.getLink.description"
@@ -74,14 +74,17 @@
 <script>
     $('input[type=radio][name=casebookType]').change(function() {
         if ($(this).val() === 'pdf/view') {
-            $('#casebookOptions').slideUp();
-            $('#casebookLinkBtn, #casebookOpenBtn').attr('disabled', 'disabled');
-            $('#casebookPdfBtn').removeAttr('disabled');
+            $('#casebookPdfBtn').css('visibility', 'visible');
+            $('#casebookLinkBtn, #casebookOpenBtn').css('visibility', 'hidden');
+            var checkboxes = $('#casebookOptions input[type=checkbox]');
+            checkboxes.prop('checked', true);
+            checkboxes.eq(2).removeAttr('checked');
+            checkboxes.attr('disabled', 'disabled');
         }
         else {
-            $('#casebookOptions').slideDown();
-            $('#casebookLinkBtn, #casebookOpenBtn').removeAttr('disabled');
-            $('#casebookPdfBtn').attr('disabled', 'disabled');
+            $('#casebookPdfBtn').css('visibility', 'hidden');
+            $('#casebookLinkBtn, #casebookOpenBtn').css('visibility', 'visible');
+            $('#casebookOptions input[type=checkbox]').removeAttr('disabled');
         }
     });
     $('#casebookPdfBtn').click(function () {

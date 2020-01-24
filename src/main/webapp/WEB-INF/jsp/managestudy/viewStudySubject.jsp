@@ -1643,6 +1643,18 @@
                   </button>
                 </td>
               </tr>
+              <tr id="copy-result" style="display:none;">
+                <td></td>
+                <td colspan="2" id="copy-result-message"></td>
+              </tr>
+              <tr id="btn-copy" style="display:none;">
+                <td></td>
+                <td colspan="2">
+                  <button>
+                    <fmt:message key="copy_access_code_to_clipboard" bundle="${resword}"/>
+                  </button>
+                </td>
+              </tr>
               <tr valign="top">
                 <td></td>
                 <td valign="top" colspan="2" style="padding-top:7px;">
@@ -1939,6 +1951,7 @@
         jQuery('#participateAccess').click(function() {
             getAccessCode("N");
             $('#eye').show();
+            $('#btn-copy,#copy-result').hide();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
         });
@@ -1966,6 +1979,7 @@
             $('#access-code-input').attr('type', 'text');
             $('#audit-warning').hide();
             $('#btn-copy, #qrcode').show();
+            $("#btn-copy").show();
         });
      });
 

@@ -15,6 +15,9 @@
         <field name="title" type="string">
             <bind-xml name="h:title" node="element" xmlns:h="http://www.w3.org/1999/xhtml" />
         </field>
+        <field name="crossform_references" type="string">
+            <bind-xml name="h:crossform_references" node="element" xmlns:h="http://www.w3.org/1999/xhtml" />
+        </field>
         <field name="model" type="core.org.akaza.openclinica.domain.xform.dto.Model">
             <bind-xml name="model" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>

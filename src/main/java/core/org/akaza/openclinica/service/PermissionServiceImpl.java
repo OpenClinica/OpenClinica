@@ -60,10 +60,10 @@ public class PermissionServiceImpl implements PermissionService {
         HttpSession session = request.getSession();
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
         Study study = (Study) session.getAttribute("study");
-        return getTagList(roles, study);
+        return getTagList(roles.getBody(), study);
     }
 
-    private List<String> getTagList(ResponseEntity<List<StudyEnvironmentRoleDTO>> roles, Study study) {
+    private List<String> getTagList(List<StudyEnvironmentRoleDTO> roles, Study study) {
         String tmpUuid = null;
         if (StringUtils.isNotEmpty(study.getStudyEnvUuid()))
             tmpUuid = study.getStudyEnvUuid();
@@ -75,7 +75,7 @@ public class PermissionServiceImpl implements PermissionService {
             logger.error("***********Uuid should not be empty:");
         }
         Optional<StudyEnvironmentRoleDTO> dto =
-                roles.getBody().stream().filter(o -> (StringUtils.equals(o.getStudyEnvironmentUuid(), uuId) ||
+                roles.stream().filter(o -> (StringUtils.equals(o.getStudyEnvironmentUuid(), uuId) ||
                         (StringUtils.isNotEmpty(study.getStudyEnvSiteUuid()) && checkStudyUuid(o.getStudyEnvironmentUuid(), study.getStudy().getStudyId())))).findFirst();
 
         if (!dto.isPresent()) {
@@ -150,46 +150,9 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     public boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request) {
-
         Study currentStudy = (Study) request.getSession().getAttribute("study");
-        EventDefinitionCrf eventDefCrf = null;
-        final EventCrf eventCrf = ec;
-        int studyId = currentStudy.getStudyId();
-        if (currentStudy.getStudy() != null && currentStudy.getStudy().getStudyId() != 0) {
-            studyId = currentStudy.getStudy().getStudyId();
-        }
-        if (ec == null) {
-            if (formLayoutId != null && studyEventId != null) {
-                StudyEvent studyEvent = studyEventDao.findById(studyEventId);
-                // if we don't have studyEvent and EventCrf is null then this is a view request, so return true
-                if (studyEvent == null)
-                    return true;
-                FormLayout formLayout = formLayoutDao.findById(formLayoutId);
-
-                if (studyEvent != null && formLayout != null) {
-                    ec = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
-                    if (ec == null || eventDefCrf == null) {
-                        eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-                                studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
-                                formLayout.getCrf().getCrfId(), studyId);
-                    }
-                }
-            }
-        } else {
-            eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-                    eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(),
-                    eventCrf.getCrfVersion().getCrf().getCrfId(), studyId);
-        }
-
-        if (eventDefCrf == null) {
-            logger.error("EventDefCrf should not be null");
-            return false;
-        }
-
-        List<String> permissionTagsList = getPermissionTagsList(request);
-
-        return this.hasFormAccess(eventDefCrf, permissionTagsList);
-        
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
+        return hasFormAccess(ec, formLayoutId, studyEventId, currentStudy, roles.getBody());
     }
 
     public boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList) {
@@ -207,7 +170,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     public List<String> getPermissionTagsList(Study study, HttpServletRequest request) {
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
-        return getTagList(roles, study);
+        return getTagList(roles.getBody(), study);
     }
 
     public boolean isUserHasPermission(String column,HttpServletRequest request,Study studyBean) {
@@ -240,4 +203,48 @@ public class PermissionServiceImpl implements PermissionService {
     public String[] getPermissionTagsStringArray(Study study,HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(study,request);
         return getStringArray(tagsList);    }
+
+    public boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, Study study ,  List<StudyEnvironmentRoleDTO> roles) {
+
+        EventDefinitionCrf eventDefCrf = null;
+        final EventCrf eventCrf = ec;
+        int studyId = study.getStudyId();
+        if (study.getStudy() != null && study.getStudy().getStudyId() != 0) {
+            studyId = study.getStudy().getStudyId();
+        }
+        if (ec == null) {
+            if (formLayoutId != null && studyEventId != null) {
+                StudyEvent studyEvent = studyEventDao.findById(studyEventId);
+                // if we don't have studyEvent and EventCrf is null then this is a view request, so return true
+                if (studyEvent == null)
+                    return true;
+                FormLayout formLayout = formLayoutDao.findById(formLayoutId);
+
+                if (studyEvent != null && formLayout != null) {
+                    ec = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
+                    if (ec == null || eventDefCrf == null) {
+                        eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+                                studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
+                                formLayout.getCrf().getCrfId(), studyId);
+                    }
+                }
+            }
+        } else {
+            eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+                    eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(),
+                    eventCrf.getCrfVersion().getCrf().getCrfId(), studyId);
+        }
+
+        if (eventDefCrf == null) {
+            logger.error("EventDefCrf should not be null");
+            return false;
+        }
+
+        List<String> permissionTagsList = getTagList(roles,study);
+
+        return this.hasFormAccess(eventDefCrf, permissionTagsList);
+
+    }
+
+
 }
