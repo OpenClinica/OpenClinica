@@ -39,6 +39,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -478,12 +480,14 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
     public String isModuleEnabled(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
-        for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
-            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(module.name())) {
-                core.org.akaza.openclinica.domain.enumsupport.ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
-                if (moduleStatus.name().equalsIgnoreCase(ModuleProcessor.ModuleStatus.ACTIVE.name())) {
-                    logger.info("Module Status is Enabled");
-                    return ModuleProcessor.ModuleStatus.ENABLED.getValue();
+        if(moduleConfigDTOs!= null) {
+            for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
+                if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(module.name())) {
+                    core.org.akaza.openclinica.domain.enumsupport.ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
+                    if (moduleStatus.name().equalsIgnoreCase(ModuleProcessor.ModuleStatus.ACTIVE.name())) {
+                        logger.info("Module Status is Enabled");
+                        return ModuleProcessor.ModuleStatus.ENABLED.getValue();
+                    }
                 }
             }
         }
@@ -493,12 +497,13 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
 
     public ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study, ModuleProcessor.Modules module) {
-
-        Optional<ModuleConfigDTO> moduleConfigDTO =
-                moduleConfigDTOs.stream().filter(config -> config.getStudyUuid().equals(study.getStudyUuid()) && config.getModuleName().equalsIgnoreCase(module.name())).findAny();
-        if (moduleConfigDTO.isPresent()) {
-            logger.info("ModuleConfigDTO  is :" + moduleConfigDTO.get());
-            return moduleConfigDTO.get();
+        if(moduleConfigDTOs != null) {
+            Optional<ModuleConfigDTO> moduleConfigDTO =
+                    moduleConfigDTOs.stream().filter(config -> config.getStudyUuid().equals(study.getStudyUuid()) && config.getModuleName().equalsIgnoreCase(module.name())).findAny();
+            if (moduleConfigDTO.isPresent()) {
+                logger.info("ModuleConfigDTO  is :" + moduleConfigDTO.get());
+                return moduleConfigDTO.get();
+            }
         }
         logger.info("ModuleConfigDTO  is null");
         return null;
@@ -527,26 +532,31 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
         String appendUrl = "/study-service/api/studies/" + study.getStudyUuid() + "/module-configs";
         String uri = sbsUrl + appendUrl;
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Accept-Charset", "UTF-8");
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-        jsonConverter.setObjectMapper(objectMapper);
-        converters.add(jsonConverter);
-        restTemplate.setMessageConverters(converters);
-        ResponseEntity<List<ModuleConfigDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<ModuleConfigDTO>>() {
-        });
-        if (response == null)
-            return null;
-
-        return response.getBody();
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            headers.add("Authorization", "Bearer " + accessToken);
+            headers.add("Accept-Charset", "UTF-8");
+            HttpEntity<String> entity = new HttpEntity<String>(headers);
+            List<HttpMessageConverter<?>> converters = new ArrayList<>();
+            MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+            jsonConverter.setObjectMapper(objectMapper);
+            converters.add(jsonConverter);
+            restTemplate.setMessageConverters(converters);
+            ResponseEntity<List<ModuleConfigDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<ModuleConfigDTO>>() {
+            });
+            if (response == null)
+                return null;
+            return response.getBody();
+        } catch (HttpClientErrorException | HttpServerErrorException e ) {
+            logger.error("Client error: HttpStatusCode: {} HttpResponse: {} Error Trace: {}", e.getStatusCode(), e.getResponseBodyAsString(), e);
+        } catch (Exception e){
+            logger.error("Error in fetching Module config from SBS: {}", e);
+        }
+        return null;
     }
 
     public StudyEnvironmentDTO getStudyUuidFromStudyService(String accessToken, Study study) {

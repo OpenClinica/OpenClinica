@@ -25,7 +25,9 @@ public interface PermissionService {
     String[] getPermissionTagsStringArray(Study study ,HttpServletRequest request);
 
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);
-    
+
+    boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, Study study, List<StudyEnvironmentRoleDTO> roles);
+
     boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList);
 
     boolean isUserHasPermission(String column, HttpServletRequest request, Study studyBean);
