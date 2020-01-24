@@ -101,6 +101,8 @@ public class SDVUtil {
     public final static String CHECKBOX_NAME = "sdvCheck_";
     public final static String VIEW_ICON_HTML = "<span class=\"icon icon-search\" border=\"0>";
     private ResourceBundle resformat;
+    private final static String FORM_LOCKED_ICON_CLASS_NAME = "icon icon-lock";
+    private final static String FORM_COMPLETED_ICON_CLASS_NAME = "icon icon-checkbox-checked green";
     private String pathPrefix;
 
     String getIconForSdvStatusPrefix() {
@@ -710,9 +712,6 @@ public class SDVUtil {
 
         setTitles(allTitles, table);
 
-        // format column dates
-        formatColumns(table, new String[] { "eventDate", "lastUpdatedDate" }, request);
-
         table.getTableRenderer().setWidth("800");
         return tableFacade.render();
     }
@@ -916,14 +915,27 @@ public class SDVUtil {
                     status = DataEntryStage.LOCKED.getId();
                 }
 
-                String queryString = request.getQueryString();
-                if (null == queryString) {
-                    queryString = "";
+
+
+                StringBuilder crfStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
+                String input = "<input type=\"hidden\" statusId=\""+status+"\" />";
+                crfStatusBuilder.append(
+                        "<center>");
+                // "<input type=\"hidden\" statusId=\"1\" />"
+                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
+                String statusTitle= "";
+                String statusIconClassName = "";
+                if(DataEntryStage.get(status).equals(DataEntryStage.LOCKED)){
+                    statusTitle = DataEntryStage.LOCKED.getName();
+                    statusIconClassName = FORM_LOCKED_ICON_CLASS_NAME;
                 }
-                tempSDVBean.setCrfStatus(getCRFStatusIconPath(
-                    status, request, studySubjectBean.getId(), eventCRFBean.getId(), eventCRFBean.getCRFVersionId(),
-                    eventCRFBean.getFormLayoutId(), eventCRFBean.getStudyEventId(), studyBean.getStudyId(), queryString.replaceAll("&", "%26")
-                ));
+                else {
+                    statusTitle = resWords.getString("completed");
+                    statusIconClassName = FORM_COMPLETED_ICON_CLASS_NAME;
+                }
+                crfStatusBuilder.append("<a title='"+statusTitle+"' alt='"+statusTitle+"' class='"+statusIconClassName+"' accessCheck' border='0'/>");
+                crfStatusBuilder.append("</center>");
+                tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
             }
 
             tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
@@ -972,8 +984,12 @@ public class SDVUtil {
                 sdvStatus.append(" data-studyEventId='").append(studyEventId).append("'");
                 sdvStatus.append(">");
                 sdvStatus.append(getIconForSdvStatusPrefix()).append("</a></center>");
-            } else {
-                sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
+            } else if(eventCRFBean.getSdvStatus() == SdvStatus.CHANGED_AFTER_VERIFIED){
+                sdvStatus.append("<center><span class='icon-icon-sdv-change-status small-icon' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
+                        .append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
+                        .append(eventCRFBean.getId()).append("' /></center>");
+            }else {
+                sdvStatus.append("<center><input style='margin-right: .4em' type='checkbox' ").append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
                         .append(eventCRFBean.getId()).append("' /></center>");
 
             }
@@ -1011,8 +1027,18 @@ public class SDVUtil {
 
             }
 
-            actions = new StringBuilder("");
-            // append("<input type='hidden' name='crfId' value='").append(eventCRFBean.getId()).append("'").append("/> ")
+            String queryString = request.getQueryString();
+            if (queryString == null) {
+                queryString = "";
+            }
+            StringBuilder actionsBuilder = new StringBuilder(new HtmlBuilder().toString());
+            ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
+            actionsBuilder.append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;'/>");
+            if (eventCRFBean.getStatus() != null){
+                Integer status = eventCRFBean.getStage().getId();
+                actionsBuilder.append(getCRFViewIconPath( status, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
+                    eventCRFBean.getStudyEventId(), queryString.replaceAll("&", "%26") ));
+            }
             if (eventCRFBean.getSdvStatus() != SdvStatus.VERIFIED) {
                 // StringBuilder jsCodeString =
                 // new StringBuilder("this.form.method='GET';
@@ -1021,13 +1047,14 @@ public class SDVUtil {
                 // actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\"
                 // name=\"sdvSubmit\" ").append("onclick=\"").append(
                 // jsCodeString.toString()).append("\" />");
-                actions.append("<a class='accessCheck icon icon-icon-sdv-text' href='javascript:void(0)'")
-                    .append(" onclick='submitSdv(document.sdvForm,").append(eventCRFId).append(")'")
-                    .append(" data-eventCrfId='").append(eventCRFId).append("'")
-                    .append(" data-formLayoutId='").append(formLayoutId).append("'")
-                    .append(" data-studyEventId='").append(studyEventId).append("'")
-                    .append("></a>");
+
+                actionsBuilder.append("<input type='button' name='sdvVerify' style='margin-left: 1.5em; padding:.4em 0.9em' value='"+resWords.getString("sdv_verify")+"' onclick='submitSdv(document.sdvForm,").append(eventCRFId).append(")'")
+                        .append(" data-eventCrfId='").append(eventCRFId).append("'")
+                        .append(" data-formLayoutId='").append(formLayoutId).append("'")
+                        .append(" data-studyEventId='").append(studyEventId).append("'")
+                        .append("/>");
             }
+
 
             // Only implement the view icon if it is a event crf request
             /*
@@ -1044,7 +1071,7 @@ public class SDVUtil {
              * actions.append("&nbsp;").append(urlPrefix).append(VIEW_ICON_HTML).append("</a>");
              * }
              */
-            tempSDVBean.setSdvStatusActions(actions.toString());
+            tempSDVBean.setSdvStatusActions(actionsBuilder.toString());
             allRows.add(tempSDVBean);
 
         }
@@ -1052,8 +1079,8 @@ public class SDVUtil {
         return allRows;
     }
 
-    private String getCRFStatusIconPath(int statusId, HttpServletRequest request, int studySubjectId, int eventDefinitionCRFId, int crfVersionId,
-            int formLayoutId, int studyEventId, int studyId, String redirect) {
+    private String getCRFViewIconPath(int statusId, HttpServletRequest request, int eventDefinitionCRFId,
+            int formLayoutId, int studyEventId, String redirect) {
 
         HtmlBuilder html = new HtmlBuilder();
         // html.a().onclick(
@@ -1062,13 +1089,7 @@ public class SDVUtil {
         // + "&tabId=1&studySubjectId=" + studySubjectId + "');");
         // html.href('#').close();
 
-        StringBuilder builderHref = new StringBuilder("<a href='javascript:void(0)' onclick=\"");
-        // ViewSectionDataEntry?eventDefinitionCRFId=127&crfVersionId=682&tabId=1&studySubjectId=203
-        builderHref.append("document.location.href='").append(request.getContextPath()).append("/");
-        builderHref.append("ViewSectionDataEntry?eventDefinitionCRFId=").append(eventDefinitionCRFId);
-        builderHref.append("&crfVersionId=").append(crfVersionId).append("&tabId=1&studySubjectId=").append(studySubjectId).append("'\">");
-
-        StringBuilder builder = new StringBuilder(html.toString());
+        StringBuilder builder = new StringBuilder();
 
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
@@ -1076,7 +1097,7 @@ public class SDVUtil {
         String href = request.getContextPath() + "/EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId="
                 + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?" + redirect + "&mode=view";
         builder.append(
-                "<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + " accessCheck' border='0' href='" + href + "' ></a></center>");
+                "<a title='View CRF' alt='View CRF' class='icon icon-search' accessCheck' border='0' href='" + href + "' ></a>");
         // "<input type=\"hidden\" statusId=\"1\" />"
         builder.append(" ");
         builder.append(input.toString());
