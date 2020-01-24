@@ -282,31 +282,13 @@ public class PdfServiceImpl implements PdfService {
        	 String subStr = "";
        	 
        	 // write header in the UI table
-       	 writer.println("SubjectKey,ParticipantID,Status,Timestamp,Message"); 
+       	 writer.println("SubjectKey|ParticipantID|Status|Timestamp|Message"); 
        	 
        	 SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
        	 Date date = new Date(System.currentTimeMillis());
-       
-       	 writer.println(ss.getOcOid()+","+ss.getLabel()+","+"Failed"+","+formatter.format(date)+","+"Error Detail:");
-       	 
-       	 //during testing, found double quote make JSP error
-       	 msg = msg.replaceAll("\"", "");
-       	 
-       	 if(msg.length() > 100) {
-       		 while(msg.length() > 100) {
-       			 int endIndex = msg.indexOf(" ", 100);
-       			 subStr =  msg.substring(0, endIndex);
-       			 writer.println(", , , ," + subStr); 
-       			 
-       			 msg = msg.substring(endIndex);
-       		 }
-       		// write the last line
-       		writer.println(", , , ," +msg);
-       		
-       	 }else {
-       		  writer.println(", , , ," +msg); 
-       	 }
-       	    
+              	 
+       	 writer.println(ss.getOcOid()+"|"+ss.getLabel()+"|"+"Failed"+"|"+formatter.format(date)+"|"+"Error Detail: "+ msg);       	        
+              	        	    
        } catch (IOException e) {
        	 logger.error("Error while accessing file to start writing: ",e);
 		} finally {                        
