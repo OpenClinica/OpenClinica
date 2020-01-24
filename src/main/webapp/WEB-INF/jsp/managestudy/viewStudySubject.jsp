@@ -298,6 +298,11 @@
     font-size: 14px;
     color: #3a6087;
   }
+  #qrcode {
+    position: absolute;
+    left: 440px;
+    display: none;
+  }
   input[type=radio]:focus,input[type=checkbox]:focus {
     outline-style: solid;
   }
@@ -1622,7 +1627,8 @@
                   <i id="eye" class="fa fa-eye"></i>
                 </td>
                 <td valign="top" class="grayed-out" style="padding-top:4px;">
-                  <span><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
+                  <span id="audit-warning"><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
+                  <div id="qrcode"></div>
                 </td>
               </tr>
               <tr id="copy-result" style="display:none;">
@@ -1765,14 +1771,19 @@
             success: function(data) {
                 $('#access-code-input').val(data.accessCode !=null ? data.accessCode:"loading...");
                 $('#access-url').text(data.host);
+                $('#qrcode').qrcode({
+                    //render:"table"
+                    width: 80,
+                    height: 80,
+                    text: data.host + '?accessCode=' + data.accessCode
+                });
             },
             error: logDump
         });
     }
 
     jQuery(document).ready(function () {
-        updateParticipateInfo();
-        
+        updateParticipateInfo();        
         if ($('#contactInformation, #partid-edit').length) {
             jQuery.ajax({
                 type: 'get',
@@ -1953,7 +1964,8 @@
             getAccessCode("Y");
             $(this).hide();
             $('#access-code-input').attr('type', 'text');
-            $("#btn-copy").show();
+            $('#audit-warning').hide();
+            $('#btn-copy, #qrcode').show();
         });
      });
 
