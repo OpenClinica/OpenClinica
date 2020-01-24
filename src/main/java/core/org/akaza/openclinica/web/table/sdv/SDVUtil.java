@@ -868,7 +868,7 @@ public class SDVUtil {
         StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 
         EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-
+        ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
         StudySubjectBean studySubjectBean = null;
         SubjectBean subjectBean = null;
         StudyEventBean studyEventBean = null;
@@ -922,7 +922,7 @@ public class SDVUtil {
                 crfStatusBuilder.append(
                         "<center>");
                 // "<input type=\"hidden\" statusId=\"1\" />"
-                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
+//                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
                 String statusTitle= "";
                 String statusIconClassName = "";
                 if(DataEntryStage.get(status).equals(DataEntryStage.LOCKED)){
@@ -977,7 +977,7 @@ public class SDVUtil {
                 sdvStatus.append(")'>");
                 sdvStatus.append(getIconForSdvStatusPrefix()).append("</a></center>");
             } else if(eventCRFBean.getSdvStatus() == SdvStatus.CHANGED_AFTER_VERIFIED){
-                sdvStatus.append("<center><span class='icon-icon-sdv-change-status small-icon' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
+                sdvStatus.append("<center><span title='"+SdvStatus.CHANGED_AFTER_VERIFIED.getDisplayValue()+"' class='icon-icon-sdv-change-status small-icon' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
                         .append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
                         .append(eventCRFBean.getId()).append("' /></center>");
             }else {
@@ -1024,7 +1024,7 @@ public class SDVUtil {
                 queryString = "";
             }
             StringBuilder actionsBuilder = new StringBuilder(new HtmlBuilder().toString());
-            ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
+
             actionsBuilder.append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;'/>");
             if (eventCRFBean.getStatus() != null){
                 Integer status = eventCRFBean.getStage().getId();
