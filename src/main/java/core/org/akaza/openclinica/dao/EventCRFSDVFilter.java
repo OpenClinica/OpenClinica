@@ -37,11 +37,8 @@ public class EventCRFSDVFilter implements CriteriaCommand {
 
     public String execute(String criteria) {
         String theCriteria = "";
-        boolean isSdvStatusSet = false;
         for (Filter filter : filters) {
             theCriteria += buildCriteria(criteria, filter.getProperty(), filter.getValue());
-            if(filter.property.equals("sdvStatus"))
-                isSdvStatusSet = true;
         }
         return theCriteria;
     }
