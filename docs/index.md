@@ -16,3 +16,4 @@ test documentation for LibreClinica 0.5.0 pre-release
 | [T008](tests/t008.md) | rule management |
 | [T009](tests/t009.md) | site management |
 | [T010](tests/t010.md) | study user management |
+| [T014](tests/t014.md) | data entry |
