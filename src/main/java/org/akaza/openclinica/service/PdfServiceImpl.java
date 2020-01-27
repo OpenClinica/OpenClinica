@@ -23,7 +23,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.util.Matrix;
 import org.slf4j.Logger;
@@ -134,8 +133,8 @@ public class PdfServiceImpl implements PdfService {
      */
     public int addHeaderOrFooter(PDDocument document, String headerMsg,String footerMsg, int page_counter) throws IOException {
 
-        String footerMessage = null;      
-        PDFont font = PDType0Font.load(document, this.getClass().getResourceAsStream("/org/akaza/openclinica/i18n/utf8/uming.ttf"), false);
+        String footerMessage = null;             
+        PDFont font = PDType1Font.TIMES_ROMAN;
         float fontSize = 10.0f;
 
         for( PDPage page : document.getPages() )
@@ -240,7 +239,14 @@ public class PdfServiceImpl implements PdfService {
 			}
 	    	
 	    }
-	    		
+	    
+		// not support UTF-8 at this time
+		try {
+			pdfHeader = new String(pdfHeader.getBytes("ISO-8859-1"), "ISO-8859-1");
+		} catch (UnsupportedEncodingException e) {
+			;
+		}
+
 		// dynamically calculate the header length
 		while(pdfHeader.length() > 160) {
 			pdfHeader = pdfHeader.replaceFirst("  ", "");
