@@ -942,7 +942,7 @@ public class Study extends DataMapDomainObject {
     @Transient
     public String getAbbreviatedParentStudyName() {
         String parentStudyName = getStudy().getName();
-        if (parentStudyName.length() > 30) {
+        if (parentStudyName != null && parentStudyName.length() > 30) {
             parentStudyName = parentStudyName.substring(0, 27) + "...";
         }
         return parentStudyName;
@@ -951,7 +951,7 @@ public class Study extends DataMapDomainObject {
     @Transient
     public String getAbbreviatedIdentifier() {
         String identifier = getUniqueIdentifier();
-        if (identifier.length() > 25) {
+        if (identifier != null && identifier.length() > 25) {
             identifier = identifier.substring(0, 22) + "...";
         }
         return identifier;
@@ -959,7 +959,7 @@ public class Study extends DataMapDomainObject {
     @Transient
     public String getAbbreviatedName() {
         String name = getName();
-        if (name.length() > 30) {
+        if (name != null && name.length() > 30) {
             name = name.substring(0, 27) + "...";
         }
         return name;
