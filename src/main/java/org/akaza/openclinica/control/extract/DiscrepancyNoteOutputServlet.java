@@ -129,7 +129,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         response.addHeader(CONTENT_DISPOSITION_HEADER, CONTENT_DISPOSITION_VALUE + fileName);
         // Are we downloading a List of discrepancy notes or just one?
         // Not needed now: boolean isList = ("y".equalsIgnoreCase(isAList));
-        Study studyBean = (Study) session.getAttribute("study");
 
         // Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute("resolutionStatus");
 
@@ -190,7 +189,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
         Set<Integer> resolutionStatusIds = emptySet();
-        List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(accessList, sm.getDataSource(), studyBean);
+        List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(accessList, sm.getDataSource(), study);
 
         if ("csv".equalsIgnoreCase(format)) {
             /*
