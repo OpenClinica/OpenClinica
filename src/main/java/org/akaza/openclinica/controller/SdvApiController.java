@@ -39,22 +39,31 @@ public class SdvApiController {
     @Autowired
     UtilService utilService;
 
-        @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/forms/{FormOid}/participants/{ParticipantId}/viewSdvForm", method = RequestMethod.GET)
+        @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/{Ordinal}/forms/{FormOid}/participants/{ParticipantId}/viewSdvForm", method = RequestMethod.GET)
     public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
                                                         @PathVariable("studyOid") String studyOID,
                                                         @PathVariable("FormOid") String formOID,
                                                         @PathVariable("StudyEventOid") String studyEventOID,
+                                                        @PathVariable(value = "Ordinal") String ordinal,
                                                         @PathVariable("ParticipantId") String studySubjectLabel,
                                                         @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
         studyBuildService.setRequestSchemaByStudyOrParentStudy(studyOID);
             UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         boolean changedAfterSdvOnlyFilterFlag=true;
+        int ordinalValue ;
+
         if(changedAfterSdvOnlyFilter.equals("n"))
             changedAfterSdvOnlyFilterFlag = false;
         SdvDTO responseDTO = null;
         try {
-            validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean);
-            responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectLabel, changedAfterSdvOnlyFilterFlag);
+                if (ordinal == null)
+                    ordinalValue = 1;
+                else if(ordinal.matches("^[0-9]*$"))
+                    ordinalValue = Integer.parseInt(ordinal);
+                else
+                    throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_SHOULD_BE_NUMBER);
+            validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean,ordinalValue);
+            responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
         }
         catch(OpenClinicaSystemException e) {
             return new ResponseEntity<>(validateService.getResponseForException(e, studyOID, ""), HttpStatus.BAD_REQUEST);

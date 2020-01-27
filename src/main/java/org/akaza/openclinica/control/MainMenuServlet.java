@@ -184,7 +184,7 @@ public class MainMenuServlet extends SecureController {
             return;
         }
         if (currentRole.isMonitor()) {
-            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getStudyId()+"&sdv_f_sdvStatus=Ready+to+Verify+%26+Changed+since+verified");
+            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getStudyId()+"&sdv_f_sdvStatus=Ready+to+Verify+%2B+Changed+since+verified");
             return;
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
