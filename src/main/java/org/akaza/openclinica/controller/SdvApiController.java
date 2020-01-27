@@ -39,7 +39,7 @@ public class SdvApiController {
     @Autowired
     UtilService utilService;
 
-        @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/{Ordinal}/forms/{FormOid}/participants/{ParticipantId}/viewSdvForm", method = RequestMethod.GET)
+        @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/occurrences/{Ordinal}/forms/{FormOid}/participants/{ParticipantId}/sdvItems", method = RequestMethod.GET)
     public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
                                                         @PathVariable("studyOid") String studyOID,
                                                         @PathVariable("FormOid") String formOID,
@@ -58,10 +58,10 @@ public class SdvApiController {
         try {
                 if (ordinal == null)
                     ordinalValue = 1;
-                else if(ordinal.matches("^[0-9]*$"))
+                else if(ordinal.matches("^[0-9]*$") && Integer.parseInt(ordinal) > 0)
                     ordinalValue = Integer.parseInt(ordinal);
                 else
-                    throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_SHOULD_BE_NUMBER);
+                    throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_IS_INCORRECT);
             validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean,ordinalValue);
             responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
         }
