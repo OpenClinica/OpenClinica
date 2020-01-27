@@ -208,7 +208,11 @@
             source.splice(0, 1);
             source.splice(-2);
             source = source.join('_');
-            actionView = '';
+            
+            
+            if (logEntry.status !== 'FAILED') {            	
+            	actionView = '';
+            }
           }
           if (logEntry.status === 'IN_PROGRESS') {
             actionView = actionDownload = actionDelete = '';
