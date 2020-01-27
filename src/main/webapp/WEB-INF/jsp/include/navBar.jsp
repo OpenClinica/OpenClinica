@@ -244,10 +244,18 @@
                 <c:set var="isLogo" value="images/logo-color-on-dark.svg"/>
             </c:if>
 
+            <c:if test="${empty urlPrefix}">
+                <c:set var="isHref" value="${pageContext.request.contextPath}/MainMenu"/>
+                <c:set var="isLogo" value="${pageContext.request.contextPath}/images/logo-color-on-dark.svg"/>
+            </c:if>
+
             <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo"/></a>
         </div>
 
         <div id="StudyInfo">
+            <c:if test="${empty urlPrefix}">
+                <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
+            </c:if>
             <c:choose>
                 <c:when test='${study.study != null && study.study.studyId > 0}'>
                     <b><a href="${urlPrefix}ViewStudy?id=${study.study.studyId}&viewFull=yes"
@@ -314,6 +322,7 @@
                             <li>
                                 <a onClick="javascript:processLogoutClick('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="sign_out" bundle="${resworkflow}"/></a>
                             </li>
+
                         </ul>
                     </li>
                 </ul>
@@ -396,14 +405,15 @@
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
                                                                                     </c:if>
-                                                                                    <c:if test="${userRole.monitor }">
-                                                                                        <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home"
-                                                                                                                                        bundle="${resword}"/></a></li>
+                                                                                    <c:if test="${userRole.monitor}">
+                                                                                        <c:if test="${empty urlPrefix}">
+                                                                                            <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
+                                                                                        </c:if>
+                                                                                        <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a></li>
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
-                                                                                        <li>
-                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}"><fmt:message
-                                                                                                    key="nav_sdv" bundle="${resword}"/></a></li>
+                                                                                        <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}"><fmt:message
+                                                                                                key="nav_sdv" bundle="${resword}"/></a></li>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
                                                                                     </c:if>
