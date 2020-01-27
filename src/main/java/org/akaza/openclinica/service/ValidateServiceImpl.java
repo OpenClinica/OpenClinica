@@ -423,14 +423,15 @@ public class ValidateServiceImpl implements ValidateService {
     public boolean isEventPresent(String studyEventOid){
         return studyEventDefinitionDao.findByOcOID(studyEventOid) != null;
     }
-    public boolean isEventOidAndParticipantIdAreLinked( String studyEventOid, int studySubjectId){
-        return studyEventDao.fetchByStudyEventDefOID(studyEventOid, studySubjectId) != null;
+
+    public boolean isEventOidAndParticipantIdAreLinked( String studyEventOid, int studySubjectId, int ordinal){
+        return studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventOid, ordinal, studySubjectId) != null;
     }
     public  boolean isCrfPresent(String formOid){
         return crfDao.findByOcOID(formOid) != null;
     }
 
-    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount){
+    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int oridinal){
 
         if(!isStudyOidValidStudyLevelOid(studyOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
@@ -445,7 +446,7 @@ public class ValidateServiceImpl implements ValidateService {
         int studySubjectId = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectLabel, study).getStudySubjectId();
         if(!isEventPresent(studyEventOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENTOID_NOT_EXIST_IN_THIS_STUDY);
-        if(!isEventOidAndParticipantIdAreLinked(studyEventOid,studySubjectId))
+        if(!isEventOidAndParticipantIdAreLinked(studyEventOid, studySubjectId, oridinal))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_DOES_NOT_HAVE_THIS_EVENT_IN_THIS_STUDY);
         if(!isCrfPresent(formOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_FORMOID_NOT_EXIST_IN_THIS_STUDY);

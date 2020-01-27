@@ -8,6 +8,8 @@ public class SdvDTO {
     private String siteName;
     private String eventName;
     private Date eventStartDate;
+    private int eventOrdinal;
+    private boolean isRepeatingEvent;
     private String sdvRequirement;
     private String sdvStatus;
     private String formName;
@@ -45,6 +47,22 @@ public class SdvDTO {
 
     public void setEventStartDate(Date eventStartDate) {
         this.eventStartDate = eventStartDate;
+    }
+
+    public int getEventOrdinal() {
+        return eventOrdinal;
+    }
+
+    public void setEventOrdinal(int eventOrdinal) {
+        this.eventOrdinal = eventOrdinal;
+    }
+
+    public boolean isRepeatingEvent() {
+        return isRepeatingEvent;
+    }
+
+    public void setRepeatingEvent(boolean repeatingEvent) {
+        isRepeatingEvent = repeatingEvent;
     }
 
     public String getSdvRequirement() {

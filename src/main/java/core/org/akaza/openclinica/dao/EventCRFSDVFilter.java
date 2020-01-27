@@ -49,8 +49,8 @@ public class EventCRFSDVFilter implements CriteriaCommand {
             if (property.equals("sdvStatus")) {
                 ArrayList<String> sdvStatusFilterArray = new ArrayList<>();
                 String sdvStatusString = value.toString().trim();
-                if(sdvStatusString.contains("&")){
-                    for(String sdvStatus: sdvStatusString.split("&")){
+                if(sdvStatusString.contains("+")){
+                    for(String sdvStatus: sdvStatusString.split("\\+")){
                         sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatus.trim()).toString());
                     }
                 }
@@ -68,8 +68,8 @@ public class EventCRFSDVFilter implements CriteriaCommand {
             } else if (property.equals("sdvRequirementDefinition")) {
                 ArrayList<Integer> reqs = new ArrayList<Integer>();
                 String sdvRequirement = value.toString().trim();
-                if (sdvRequirement.contains("&")) {
-                    for (String requirement : sdvRequirement.split("&")) {
+                if (sdvRequirement.contains("+")) {
+                    for (String requirement : sdvRequirement.split("\\+")) {
                         reqs.add(SourceDataVerification.getByI18nDescription(requirement.trim()).getCode());
                     }
                 } else {
