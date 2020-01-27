@@ -977,7 +977,7 @@ public class SDVUtil {
                 sdvStatus.append(")'>");
                 sdvStatus.append(getIconForSdvStatusPrefix()).append("</a></center>");
             } else if(eventCRFBean.getSdvStatus() == SdvStatus.CHANGED_AFTER_VERIFIED){
-                sdvStatus.append("<center><span title='"+SdvStatus.CHANGED_AFTER_VERIFIED.getDisplayValue()+"' class='icon-icon-sdv-change-status small-icon' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
+                sdvStatus.append("<center><span title='"+resWords.getString(SdvStatus.CHANGED_AFTER_VERIFIED.toString())+"' class='icon-icon-sdv-change-status small-icon' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
                         .append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
                         .append(eventCRFBean.getId()).append("' /></center>");
             }else {
@@ -1029,7 +1029,7 @@ public class SDVUtil {
             if (eventCRFBean.getStatus() != null){
                 Integer status = eventCRFBean.getStage().getId();
                 actionsBuilder.append(getCRFViewIconPath( status, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
-                    eventCRFBean.getStudyEventId(), queryString.replaceAll("&", "%26") ));
+                    eventCRFBean.getStudyEventId(), queryString.replaceAll("\\+", "%2B") ));
             }
             if (eventCRFBean.getSdvStatus() != SdvStatus.VERIFIED) {
                 // StringBuilder jsCodeString =
@@ -1418,9 +1418,9 @@ public class SDVUtil {
         this.dataSource = dataSource;
     }
 
-    public SdvDTO getFormDetailsForSDV(String formOID, String studyEventOID, String studySubjectLabel, boolean changedAfterSdvOnlyFilter) {
+    public SdvDTO getFormDetailsForSDV(String formOID, String studyEventOID, String studySubjectLabel, int ordinal, boolean changedAfterSdvOnlyFilter) {
 
-        EventCrf eventCrf = getEventCrfDao().findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOID, studySubjectLabel, formOID);
+        EventCrf eventCrf = getEventCrfDao().findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOID, studySubjectLabel, formOID, ordinal);
         if(eventCrf != null &&  !Status.get(eventCrf.getStatusId()).equals(Status.UNAVAILABLE))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENT_CRF_NOT_COMPLETED);
         else if(eventCrf != null) {
@@ -1429,6 +1429,8 @@ public class SDVUtil {
             sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
             sdvDTO.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
             sdvDTO.setEventStartDate(eventCrf.getStudyEvent().getDateStart());
+            sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
+            sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
             EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), eventCrf.getStudySubject().getStudy().getStudyId());
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());

@@ -63,13 +63,13 @@ public interface ValidateService {
 
     ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
 
-    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount);
+    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int ordinal);
 
     boolean isCrfPresent(String formOid);
 
     boolean isEventPresent( String studyEventOid);
 
-    boolean isEventOidAndParticipantIdAreLinked( String studyEventOid, int studySubjectId);
+    boolean isEventOidAndParticipantIdAreLinked( String studyEventOid, int studySubjectId, int ordinal);
 
     boolean isStudySubjectPresent(String studySubjectLabel,Study study);
     }
