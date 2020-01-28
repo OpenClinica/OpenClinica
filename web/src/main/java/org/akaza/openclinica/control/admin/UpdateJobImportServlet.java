@@ -160,6 +160,7 @@ public class UpdateJobImportServlet extends SecureController {
                 jobDetailBean.setJobClass(org.akaza.openclinica.web.job.ImportStatefulJob.class);
                 jobDetailBean.setJobDataMap(trigger.getJobDataMap());
                 jobDetailBean.setDurability(true); // need durability?
+                jobDetailBean.afterPropertiesSet();
 
                 try {
                     scheduler.deleteJob(new JobKey(triggerName, TRIGGER_IMPORT_GROUP));
