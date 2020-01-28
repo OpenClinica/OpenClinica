@@ -20,6 +20,7 @@ import java.util.Map;
 public class KafkaConfig {
   private static final String KAFKA_BROKER_ADDRESS = "localhost:9092";
   public static final String FORM_STATUS_CHANGE_TOPIC = "formStatusChange";
+  public static final String ITEM_DATA_CHANGE_TOPIC = "itemDataChange";
 
   @Bean
   public ProducerFactory<Integer, String> producerFactory() {
@@ -50,6 +51,12 @@ public class KafkaConfig {
   @Bean
   public NewTopic formStatusChange() {
     return new NewTopic(FORM_STATUS_CHANGE_TOPIC, 10, (short) 3);
+  }
+
+
+  @Bean
+  public NewTopic itemDataChange() {
+    return new NewTopic(ITEM_DATA_CHANGE_TOPIC, 3, (short) 1);
   }
 
 }

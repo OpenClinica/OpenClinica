@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.openrosa.processor;
 
+import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -75,6 +76,9 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private RandomizationService randomizationService;
     @Autowired
     private StudyBuildService studyBuildService;
+
+    @Autowired
+    private KafkaService kafkaService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String STUDYEVENT = "study_event";
@@ -202,6 +206,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setInstanceId(container.getInstanceId());
                     existingItemData = itemDataDao.saveOrUpdate(existingItemData);
+                    kafkaService.sendItemDataChangeMessage(existingItemData);
                     updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
 
@@ -211,9 +216,11 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     ItemData newItemData = createItemData(ig.getItem(), "", itemOrdinal, container);
                     newItemData.setDeleted(true);
                     newItemData = itemDataDao.saveOrUpdate(newItemData);
+                    kafkaService.sendItemDataChangeMessage(newItemData);
                     updateEventSubjectStatusIfSigned(container);
                 }
             }
+
             return;
         }
 
@@ -269,6 +276,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 if (existingItemData == null) {
                     newItemData.setStatus(Status.UNAVAILABLE);
                     itemDataDao.saveOrUpdate(newItemData);
+                    kafkaService.sendItemDataChangeMessage(newItemData);
                     updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
                     randomizeDataCheck = newItemData;
@@ -279,6 +287,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
                     itemDataDao.saveOrUpdate(existingItemData);
+                    kafkaService.sendItemDataChangeMessage(existingItemData);
                     updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
                     randomizeDataCheck = existingItemData;

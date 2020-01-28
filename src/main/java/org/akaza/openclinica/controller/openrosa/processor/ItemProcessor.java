@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.openclinica.kafka.KafkaService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 import core.org.akaza.openclinica.dao.hibernate.CrfVersionDao;
@@ -61,6 +62,9 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    private KafkaService kafkaService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -196,6 +200,8 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     existingItemData.setDateUpdated(new Date());
                     itemDataDao.saveOrUpdate(existingItemData);
                 }
+
+                kafkaService.sendItemDataChangeMessage(existingItemData);
             }
         }
     }
