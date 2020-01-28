@@ -7,7 +7,6 @@
  */
 package org.akaza.openclinica.web.job;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,7 +62,6 @@ public class TriggerService {
     public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study, Date startDateTime, String locale) {
 
         String jobName = fp.getString(JOB_NAME);
-
         String email = fp.getString(EMAIL);
         String jobDesc = fp.getString(JOB_DESC);
         String directory = fp.getString(DIRECTORY);
@@ -80,12 +78,21 @@ public class TriggerService {
             long minutesInt = minutes * 60000;
             interval = interval + minutesInt;
         }
-        SimpleTrigger trigger = (SimpleTrigger) newTrigger()
-                .forJob(jobName, IMPORT_TRIGGER)
-                .withDescription(jobDesc)
-                .startAt(startDateTime)
-                .withSchedule(simpleSchedule().withRepeatCount(64000).withIntervalInSeconds(new Long(interval).intValue()).withMisfireHandlingInstructionNextWithExistingCount());
 
+        SimpleTrigger trigger = newTrigger()
+            .withIdentity(jobName, IMPORT_TRIGGER)
+            .forJob(jobName, IMPORT_TRIGGER)
+            .withDescription(jobDesc)
+            .startAt(startDateTime)
+            .withSchedule(
+                simpleSchedule()
+                    .withRepeatCount(64000)
+                    .withIntervalInSeconds(
+                        new Long(interval).intValue()
+                    )
+                    .withMisfireHandlingInstructionNextWithExistingCount()
+            )
+            .build();
         
         // set job data map
         trigger.getJobDataMap().put(EMAIL, email);
