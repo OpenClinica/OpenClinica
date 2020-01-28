@@ -3,6 +3,9 @@ package core.org.akaza.openclinica.web.table.sdv;
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -1027,9 +1030,15 @@ public class SDVUtil {
 
             actionsBuilder.append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;'/>");
             if (eventCRFBean.getStatus() != null){
+                String queryStringEncoded = "";
+                try {
+                    queryStringEncoded = URLEncoder.encode(queryString, StandardCharsets.UTF_8.toString());
+                }catch (UnsupportedEncodingException e){
+                    logger.error("Unsupport encoding");
+                }
                 Integer status = eventCRFBean.getStage().getId();
                 actionsBuilder.append(getCRFViewIconPath( status, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
-                    eventCRFBean.getStudyEventId(), queryString.replaceAll("\\+", "%2B") ));
+                    eventCRFBean.getStudyEventId(), queryStringEncoded));
             }
             if (eventCRFBean.getSdvStatus() != SdvStatus.VERIFIED) {
                 // StringBuilder jsCodeString =
