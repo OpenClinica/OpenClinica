@@ -11,12 +11,12 @@ import java.util.HashMap;
 * Locked, Skipped, Stopped should be cascaded and showed as locked in eventCrf level for UI, but event_crf table won't get updated, Hence marked it as 0 in this enum
 * */
 public enum EventCrfStatusEnum {
-    REMOVED(5,"invalid"), DATA_ENTRY_STARTED(1,"data_entry_started"), DATA_ENTRY_COMPLETED(2,"data_entry_complete"), EVENT_REMOVED(7, "invalid"), LOCKED (0,"locked");
+    REMOVED(5, "invalid"), DATA_ENTRY_STARTED(1, "data_entry_started"), DATA_ENTRY_COMPLETED(2, "data_entry_complete"), EVENT_REMOVED(7, "invalid"), LOCKED (0, "locked");
     int code;
     String description;
 
     /*studyEventStatusId is subjectEventStatusId from StudyEvent table*/
-    public static EventCrfStatusEnum getByCode(int code,int studyEventStatusId){
+    public static EventCrfStatusEnum getByCode(int code, int studyEventStatusId){
 
         SubjectEventStatus studyEventStatus = SubjectEventStatus.getByCode(studyEventStatusId);
         if(studyEventStatus.equals(SubjectEventStatus.LOCKED) || studyEventStatus.equals(SubjectEventStatus.SKIPPED) || studyEventStatus.equals(SubjectEventStatus.STOPPED))
