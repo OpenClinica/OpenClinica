@@ -11,16 +11,15 @@ import java.util.HashMap;
 * Locked, Skipped, Stopped should be cascaded and showed as locked in eventCrf level for UI, but event_crf table won't get updated, Hence marked it as 0 in this enum
 * */
 public enum EventCrfStatusEnum {
-    REMOVED(5, "invalid"), DATA_ENTRY_STARTED(1, "data_entry_started"), DATA_ENTRY_COMPLETED(2, "data_entry_complete"), EVENT_REMOVED(7, "invalid"), LOCKED (0, "locked");
+    LOCKED (0, "locked"), DATA_ENTRY_STARTED(1, "data_entry_started"), DATA_ENTRY_COMPLETED(2, "data_entry_complete"), REMOVED(5, "invalid"), AUTO_REMOVED(7, "invalid");
     int code;
     String description;
 
-    /*studyEventStatusId is subjectEventStatusId from StudyEvent table*/
-    public static EventCrfStatusEnum getByCode(int code, int studyEventStatusId){
-
-        SubjectEventStatus studyEventStatus = SubjectEventStatus.getByCode(studyEventStatusId);
-        if(studyEventStatus.equals(SubjectEventStatus.LOCKED) || studyEventStatus.equals(SubjectEventStatus.SKIPPED) || studyEventStatus.equals(SubjectEventStatus.STOPPED))
-                return LOCKED;
+    /*subjectEventStatusId is subject_event_status_id from StudyEvent table*/
+    public static EventCrfStatusEnum getByCode(int code, int subjectEventStatusId){
+        SubjectEventStatus subjectEventStatus = SubjectEventStatus.getByCode(subjectEventStatusId);
+        if(subjectEventStatus.equals(SubjectEventStatus.LOCKED) || subjectEventStatus.equals(SubjectEventStatus.SKIPPED) || subjectEventStatus.equals(SubjectEventStatus.STOPPED))
+                return EventCrfStatusEnum.LOCKED;
         HashMap<Integer, EventCrfStatusEnum> enumObjects = new HashMap<Integer, EventCrfStatusEnum>();
         for (EventCrfStatusEnum theEnum : EventCrfStatusEnum.values()) {
             enumObjects.put(theEnum.getCode(), theEnum);
