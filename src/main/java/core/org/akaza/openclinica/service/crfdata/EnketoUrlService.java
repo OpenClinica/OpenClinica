@@ -665,7 +665,7 @@ public class EnketoUrlService {
 
         // Call Enketo api to get url
         EnketoCredentials enketoCredentials = EnketoCredentials.getPdfInstance(studyOid);
-       
+
         EnketoAPI enketo = new EnketoAPI(enketoCredentials);
 
         // Build redirect url
