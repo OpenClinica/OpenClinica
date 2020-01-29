@@ -327,7 +327,7 @@ public class ChangeStudyServlet extends SecureController {
             return;
         }
         if (currentRole.isMonitor()) {
-            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getStudyId() + "&studyJustChanged=yes");
+            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getStudyId() + "&studyJustChanged=yes&sdv_f_sdvStatus=Ready+to+Verify+%2B+Changed+since+verified");
             return;
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();

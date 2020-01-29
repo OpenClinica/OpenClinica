@@ -186,5 +186,11 @@ public class ErrorConstants {
     public static final String ERR_INVALID_PAGE_NUMBER_PARAMETER = "errorCode.invalidPageNumberParameter";
     public static final String ERR_INVALID_PAGE_SIZE_PARAMETER = "errorCode.invalidPageSizeParameter";
 
+    public static final String ERR_STUDYSUBJECT_STUDYEVENT_STUDYFORM_NOT_RELATED = "errorCode.participantIdStudEventOIDAndFormOIDNotMatching";
+    public static final String ERR_EVENTOID_NOT_EXIST_IN_THIS_STUDY = "errorCode.eventOIDNotAvailableInThisStudy";
+    public static final String ERR_FORMOID_NOT_EXIST_IN_THIS_STUDY = "errorCode.formOIDNotAvailableInThisStudy";
+    public static final String ERR_PARTICIPANT_DOES_NOT_HAVE_THIS_EVENT_IN_THIS_STUDY = "errorCode.participantDoesNotHaveThisEventInThisStudy";
+    public static final String ERR_EVENT_CRF_NOT_COMPLETED = "errorCode.eventCrfIsNotInCompleted";
+    public static final String ERR_EVENT_ORDINAL_IS_INCORRECT = "errorCode.eventOrdinalIsIncorrect";
 
 }
