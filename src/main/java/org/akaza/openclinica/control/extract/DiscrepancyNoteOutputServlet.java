@@ -25,6 +25,7 @@ import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -506,8 +507,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setEventStart(se.getDateStarted());
                     dnb.setEventName(se.getName());
                     dnb.setCrfName(cb.getName());
-                    int studyEventStatusId = se != null && se.getSubjectEventStatus() != null ? se.getSubjectEventStatus().getId() : 0;
-                    String eventCrfStatus = resword.getString(EventCrfStatusEnum.getByCode(ec.getStatus().getId(), studyEventStatusId).getDescription());
+                    int subjectEventStatusId = se != null && se.getSubjectEventStatus() != null ? se.getSubjectEventStatus().getId() : SubjectEventStatus.INVALID.getCode();
+                    String eventCrfStatus = resword.getString(EventCrfStatusEnum.getByCode(ec.getStatus().getId(), subjectEventStatusId).getDescription());
                     if (eventCrfStatus.equals("Invalid")) {
                         eventCrfStatus = "";
                     } else if (eventCrfStatus.equals("Data Entry Complete")) {

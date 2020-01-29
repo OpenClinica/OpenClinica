@@ -292,8 +292,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 CrfBean crf = eventCrf.getCrfVersion().getCrf();
                 discrepancyNoteBean.setCrfName(crf.getName());
                 studyEvent = eventCrf.getStudyEvent();
-                int studyEventStatusId = studyEvent != null && studyEvent.getSubjectEventStatusId()!= null ? studyEvent.getSubjectEventStatusId() : 0;
-                String eventCrfStatus = resword.getString(EventCrfStatusEnum.getByCode(eventCrf.getStatusId(),studyEventStatusId).getDescription());
+                int subjectEventStatusId = studyEvent != null && studyEvent.getSubjectEventStatusId()!= null ? studyEvent.getSubjectEventStatusId() : SubjectEventStatus.INVALID.getCode();
+                String eventCrfStatus = resword.getString( EventCrfStatusEnum.getByCode(eventCrf.getStatusId(), subjectEventStatusId).getDescription());
                 if (eventCrfStatus.equals("Invalid")) {
                     eventCrfStatus = "";
                 } else if (eventCrfStatus.equals("Data Entry Complete")) {
