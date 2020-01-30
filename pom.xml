@@ -4,7 +4,7 @@
     <groupId>org.akaza.openclinica</groupId>
     <artifactId>OpenClinica-web</artifactId>
     <packaging>war</packaging>
-    <version>4.10.0</version>
+    <version>4.10.1</version>
     <name>OpenClinica</name>
     <description>OpenClinica</description>
 
