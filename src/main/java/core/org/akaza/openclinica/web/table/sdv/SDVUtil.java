@@ -682,6 +682,12 @@ public class SDVUtil {
         HtmlColumn sdvRequirementDefinition = row.getColumn("sdvRequirementDefinition");
         sdvRequirementDefinition.getFilterRenderer().setFilterEditor(new SDVRequirementFilter());
 
+        HtmlColumn eventDate = row.getColumn("eventDate");
+        eventDate.setSortable(true);
+
+        HtmlColumn lastUpdatedDate = row.getColumn("lastUpdatedDate");
+        lastUpdatedDate.setSortable(true);
+
         // fix HTML in columns
         setHtmlCellEditors(tableFacade, allColumns, true);
 
@@ -690,9 +696,8 @@ public class SDVUtil {
                 "lastUpdatedBy", "eventDate", "studyEventStatus" });
 
         turnOffSorts(tableFacade,
-                new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
-                        "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
-                        "sdvStatusActions" });
+                new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus",
+                        "lastUpdatedBy", "studyEventStatus", "sdvStatusActions" });
 
         // Create the custom toolbar
         SDVToolbar sDVToolbar = new SDVToolbar(showMoreLink);
