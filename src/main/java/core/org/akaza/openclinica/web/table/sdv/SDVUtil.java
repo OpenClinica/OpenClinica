@@ -1030,7 +1030,7 @@ public class SDVUtil {
 
             actionsBuilder.append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;'/>");
             if (eventCRFBean.getStatus() != null){
-                String queryStringEncoded = "";
+                String queryStringEncoded = queryString;
                 try {
                     queryStringEncoded = URLEncoder.encode(queryString, StandardCharsets.UTF_8.toString());
                 }catch (UnsupportedEncodingException e){
