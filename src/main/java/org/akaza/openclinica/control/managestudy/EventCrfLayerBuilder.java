@@ -306,9 +306,10 @@ public class EventCrfLayerBuilder {
                     if (!hiddenCrf()) {
                         html.tr(0).valign("top").close();
                         html.td(0).styleClass(table_cell_left).close();
-                        initialDataEntryParameterizedLink(html, eventCrfBean);
+                        initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
                         html.nbsp().nbsp();
-                        initialDataEntryParameterizedLink(html, eventCrfBean, reswords.getString("edit"));
+                        initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
+                                reswords.getString("edit"));
                         html.tdEnd().trEnd(0);
                     }
                 }

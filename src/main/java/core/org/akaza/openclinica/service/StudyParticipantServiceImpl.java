@@ -515,7 +515,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 				}
 				
 	            userService.persistJobFailed(jobDetail, mergedPdfFileNm);
-	            this.pdfService.writeToFile(e.getMessage(), fullFinalFilePathName);
+	            this.pdfService.writeToFile(e.getMessage(), fullFinalFilePathName,ss);
 	            throw e;
 	        }
 		    

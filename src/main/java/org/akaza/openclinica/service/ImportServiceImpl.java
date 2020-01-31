@@ -593,7 +593,6 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private ItemData createItemData(EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
-    	
     	// only created new event crf once
     	if(eventCrf.getEventCrfId() == 0) {
     		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);	    		
@@ -905,9 +904,12 @@ public class ImportServiceImpl implements ImportService {
                         if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
                             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
-                        if (eventCrf == null) {
-                            return new ErrorObj(FAILED, ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH);
-                        }
+						/*
+						 * OC-12136
+						 * at this time, eventCRF can still be null  see OC-11814 
+						 * if (eventCrf == null) { return new ErrorObj(FAILED,
+						 * ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH); }
+						 */
                     }
                     return studyEvent;
 
@@ -1024,7 +1026,7 @@ public class ImportServiceImpl implements ImportService {
         ErrorObj errorObj = null;
 
         if (studyEvent != null && (
-        		// OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet 
+        		// OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet
         		studyEvent.getStatusId()==Status.DELETED.getCode() ||
                 studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
@@ -1286,8 +1288,8 @@ public class ImportServiceImpl implements ImportService {
             }
         }
         if (studySubject != null && !(studySubject.getStatus().equals(Status.AVAILABLE)) && !(studySubject.getStatus().equals(Status.SIGNED))) {
-                       
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);            
+
+                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
@@ -1327,9 +1329,10 @@ public class ImportServiceImpl implements ImportService {
                     return new ErrorObj(FAILED, ErrorConstants.ERR_FORMLAYOUTOID_NOT_AVAILABLE);
             }
 
-            eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);            
+            eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
 
-            logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());          
+            logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
+       
 
             logger.debug("Study Event Id {} is updated", studyEvent.getStudyEventId());
         }
@@ -1375,6 +1378,9 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
+        if (!validateItemInGroup(item,itemGroupDataBean,crf)) {
+            return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUP_DOES_NOT_CONTAIN_ITEMDATA);
+        }
 
         if (itemDataBean.getValue() == null) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_VALUE);
@@ -1416,7 +1422,6 @@ public class ImportServiceImpl implements ImportService {
                 return new DataImportReport(null, null, null, null, null, null, null, null, UPDATED, sdf_logFile.format(new Date()), null);
             }
         } else {
-        	       	
             itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
             if (isEventCrfCompleted(eventCrf)) {
                 ErrorObj eb = createQuery(userAccount, study, studySubject, itemData, reasonForChange);
@@ -1468,7 +1473,7 @@ public class ImportServiceImpl implements ImportService {
             DiscrepancyNote childDN = queryService.createQuery(helperBean, queryBean, false);
             childDN.setParentDiscrepancyNote(parentDn);
             childDN = discrepancyNoteDao.saveOrUpdate(childDN);
-            
+
             // update Item data map           
             helperBean.setDn(childDN);
             helperBean.setParentDn(parentDn);
@@ -1549,4 +1554,13 @@ public class ImportServiceImpl implements ImportService {
         return formLayout;
     }
 
+    private boolean validateItemInGroup(Item item, ImportItemGroupDataBean itemGroupDataBean, CrfBean crf) {
+        ItemGroup itemGroup = itemGroupDao.findByOcOIDCrfId(itemGroupDataBean.getItemGroupOID(), crf);
+        for (ItemGroupMetadata itemGroupMetadata : itemGroup.getItemGroupMetadatas()) {
+            if (itemGroupMetadata.getItem().getOcOid().equals(item.getOcOid())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
