@@ -23,7 +23,9 @@ import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -503,13 +505,14 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setEventStart(se.getDateStarted());
                     dnb.setEventName(se.getName());
                     dnb.setCrfName(cb.getName());
-                    String crfStatus = resword.getString(ec.getStage().getNameRaw());
-                    if (crfStatus.equals("Invalid")) {
-                        crfStatus = "";
-                    } else if (crfStatus.equals("Data Entry Complete")) {
-                        crfStatus = "Complete";
+                    int subjectEventStatusId = se != null && se.getSubjectEventStatus() != null ? se.getSubjectEventStatus().getId() : SubjectEventStatus.INVALID.getCode();
+                    String eventCrfStatus = resword.getString(EventCrfStatusEnum.getByCode(ec.getStatus().getId(), subjectEventStatusId).getDescription());
+                    if (eventCrfStatus.equals("Invalid")) {
+                        eventCrfStatus = "";
+                    } else if (eventCrfStatus.equals("Data Entry Complete")) {
+                        eventCrfStatus = "Complete";
                     }
-                    dnb.setCrfStatus(crfStatus);
+                    dnb.setCrfStatus(eventCrfStatus);
                     dnb.setEvent(se);
                     dnb.setStudyEventDefinitionBean(sedb);
 
