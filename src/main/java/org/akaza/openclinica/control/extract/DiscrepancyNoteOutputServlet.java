@@ -359,7 +359,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
             if (dnb.getEntityId() > 0 && !entityType.equals("")) {
                 AuditableEntityBean aeb = dndao.findEntity(dnb);
-                dnb.setEntityName(aeb.getName());
                 if (entityType.equalsIgnoreCase("subject")) {
                     // allNotes.add(dnb);
                     SubjectBean sb = (SubjectBean) aeb;
@@ -448,7 +447,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     StudyEventBean se = (StudyEventBean) sedao.findByPK(dnb.getEntityId());
                     StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
                     se.setName(sedb.getName());
-                    dnb.setEntityName(sedb.getName());
+                    dnb.setEntityName(dnb.getEntityName());
                     StudySubjectBean ssub = (StudySubjectBean) studySubjectDAO.findByPK(se.getStudySubjectId());
                     dnb.setStudySub(ssub);
                     dnb.setEventStart(se.getDateStarted());
@@ -492,7 +491,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
                     // allNotes.add(dnb);
                     dnb.setStageId(ec.getStage().getId());
-                    dnb.setEntityName(ib.getName());
                     dnb.setEntityValue(idb.getValue());
 
                     StudyEventBean se = (StudyEventBean) sedao.findByPK(ec.getStudyEventId());
