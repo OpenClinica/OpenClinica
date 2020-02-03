@@ -1,23 +1,32 @@
 $(document).ready(function() {
     $('.accessCheck').unbind().click(function (event) {
-        var href = $(this).attr('href');
-        var ecId = getParameterByName("eventCrfId", href);
-        var formLayoutId = getParameterByName("formLayoutId", href);
-        var studyEventId = getParameterByName("studyEventId", href);
-        console.log("ecId:" + ecId);
+        var btn = $(event.target).closest('.accessCheck');
+        var ecId = getParameterByName("eventCrfId", btn);
+        var formLayoutId = getParameterByName("formLayoutId", btn);
+        var studyEventId = getParameterByName("studyEventId", btn);
         event.preventDefault();
         validateResourceAccess(ecId, formLayoutId, studyEventId).done(function(data){
             if (data.status == true) {
-                console.log("In promise:" + data.status);
-                location.href = href;
+                location.href = btn.attr('href');
+                var onclick = btn.data('onclick');
+                if (onclick) {
+                    onclick.call(this, event || window.event);
+                }
             } else {
                 alert("You don't have permission to perform this action. Please contact your administrator if you think you have received this message in error.");
             }
         });
+    }).each(function() {
+        if (this.onclick) {
+            $(this).data('onclick', this.onclick);
+            this.onclick = null;
+        }
     });
 });
-function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
+function getParameterByName(name, btn) {
+    var data = btn.data(name.toLowerCase());
+    if (data) return data;
+    var url = btn.attr('href') || window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');
     var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
         results = regex.exec(url);
@@ -26,7 +35,7 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-function validateResourceAccess(eventCrfId, formLayoutId, studyEventId){
+function validateResourceAccess(eventCrfId, formLayoutId, studyEventId) {
     if (formLayoutId == null || formLayoutId == '')
         formLayoutId = 0;
     if (studyEventId == null || studyEventId == '')
