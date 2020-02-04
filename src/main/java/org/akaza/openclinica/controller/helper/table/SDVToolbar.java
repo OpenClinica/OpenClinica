@@ -70,7 +70,7 @@ public class SDVToolbar extends DefaultToolbar {
         }
 
         String getIndexes() {
-            String result = "5,9,10,11";
+            String result = "6,10,11,12";
             return result;
         }
 
