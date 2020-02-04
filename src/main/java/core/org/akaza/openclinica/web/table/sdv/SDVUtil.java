@@ -989,10 +989,22 @@ public class SDVUtil {
             // "This Event CRF has been Source Data Verified. If you uncheck this box, you are removing Source Data
             // Verification for the Event CRF and you will have to repeat the process. Select OK to continue and Cancel
             // to cancel this transaction."
+<<<<<<< HEAD
             if (eventCRFBean.getSdvStatus() == SdvStatus.VERIFIED) {
                 sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm,");
+=======
+            String eventCRFId = Integer.toString(eventCRFBean.getId());
+            String formLayoutId = Integer.toString(eventCRFBean.getFormLayoutId());
+            String studyEventId = Integer.toString(eventCRFBean.getStudyEventId());
+            if (eventCRFBean.isSdvStatus()) {
+                sdvStatus.append("<center><a class='accessCheck' href='javascript:void(0)' onclick='prompt(document.sdvForm,");
+>>>>>>> 827dcb0b69654ea92b28b4e5b1945f862ec963c9
                 sdvStatus.append(eventCRFBean.getId());
-                sdvStatus.append(")'>");
+                sdvStatus.append(")'");
+                sdvStatus.append(" data-eventCrfId='").append(eventCRFId).append("'");
+                sdvStatus.append(" data-formLayoutId='").append(formLayoutId).append("'");
+                sdvStatus.append(" data-studyEventId='").append(studyEventId).append("'");
+                sdvStatus.append(">");
                 sdvStatus.append(getIconForSdvStatusPrefix()).append("</a></center>");
             } else if(eventCRFBean.getSdvStatus() == SdvStatus.CHANGED_AFTER_VERIFIED){
                 sdvStatus.append("<center><span title='"+resWords.getString(SdvStatus.CHANGED_AFTER_VERIFIED.toString())+"' class='icon-icon-sdv-change-status small-icon' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
@@ -1063,7 +1075,16 @@ public class SDVUtil {
                 // actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\"
                 // name=\"sdvSubmit\" ").append("onclick=\"").append(
                 // jsCodeString.toString()).append("\" />");
+<<<<<<< HEAD
                 actionsBuilder.append("<input type='button' name='sdvVerify' style='margin-left: 1.5em; padding:.4em 0.9em' value='"+resWords.getString("sdv_verify")+"' onclick='submitSdv(document.sdvForm,").append(eventCRFBean.getId()).append(")'/>");
+=======
+                actions.append("<a class='accessCheck icon icon-icon-sdv-text' href='javascript:void(0)'")
+                    .append(" onclick='submitSdv(document.sdvForm,").append(eventCRFId).append(")'")
+                    .append(" data-eventCrfId='").append(eventCRFId).append("'")
+                    .append(" data-formLayoutId='").append(formLayoutId).append("'")
+                    .append(" data-studyEventId='").append(studyEventId).append("'")
+                    .append("></a>");
+>>>>>>> 827dcb0b69654ea92b28b4e5b1945f862ec963c9
             }
 
 

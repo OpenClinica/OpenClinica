@@ -89,21 +89,6 @@ public class StudyConfigService {
 
     }
 
-    /**
-     * This method construct an object which has all the study parameter values
-     *
-     * @param study
-     * @return
-     */
-    public Study setParameterValuesForStudy(Study study) {
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-        ArrayList<StudyParameterValueBean> parameters = (ArrayList<StudyParameterValueBean>) spvdao.findAllParameterValuesByStudy(study);
-        for(StudyParameterValueBean spvb : parameters)
-            updateOrCreateSpv(study, spvb.getParameter(), spvb.getValue());
-        return study;
-
-    }
-
     public void updateOrCreateSpv(Study study, String handle, String value){
         boolean paramIsPresent = false;
         if(study.getStudyParameterValues() != null && study.getStudyParameterValues().size() != 0){
@@ -126,26 +111,6 @@ public class StudyConfigService {
             if(study.getStudyParameterValues() == null)
                 study.setStudyParameterValues(new ArrayList<StudyParameterValue>());
             study.getStudyParameterValues().add(newSpv);
-        }
-    }
-
-    public void setStudyParameterValueToStudyManually(Study study){
-        try {
-            String s = study.getCollectDob();
-        }catch (LazyInitializationException e ){
-            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(ds);
-            ArrayList<StudyParameterValueBean> spvbList = (ArrayList<StudyParameterValueBean>) spvdao.findAllParameterValuesByStudy(study);
-            List<StudyParameterValue> spvList = new ArrayList<>();
-            for (StudyParameterValueBean spvb : spvbList) {
-                StudyParameterValue newSpv = new StudyParameterValue();
-                StudyParameter parameter = spvdao.findParameterByHandle(spvb.getParameter());
-                newSpv.setStudyParameterValueId(spvb.getId());
-                newSpv.setStudyParameter(parameter);
-                newSpv.setValue(spvb.getValue());
-                newSpv.setStudy(study);
-                spvList.add(newSpv);
-            }
-            study.setStudyParameterValues(spvList);
         }
     }
 }

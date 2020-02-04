@@ -197,10 +197,6 @@ public class MetadataUnit extends OdmUnit {
 
 
         Study study =studyBase.getStudy();
-        if(study.getStudyParameterValues() == null || study.getStudyParameterValues().size() == 0) {
-            StudyConfigService studyConfig = new StudyConfigService(this.ds);
-            studyConfig.setParameterValuesForStudy(study);
-        }
 
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
         metadata.setStudy(study);
@@ -208,8 +204,6 @@ public class MetadataUnit extends OdmUnit {
         if(study.isSite())
         {
             Study parent = study.getStudy();
-            StudyConfigService scs = new StudyConfigService(ds);
-            scs.setStudyParameterValueToStudyManually(parent);
             discrepancyManagementValue = parent.getDiscrepancyManagement();
         }
         else
