@@ -222,11 +222,7 @@
         ${sdvTableAttribute}
         <br />
         <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="submit" bundle="${resword}"/>" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
-<<<<<<< HEAD
         <input type="submit" name="sdvAllFormCancel" class="button_medium" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=${param.studyId}&sdv_f_sdvStatus=Ready+to+Verify+%2B+Changed+since+verified&sdv_s_4_eventDate=asc';this.form.submit();"/>
-=======
-        <input type="submit" name="sdvAllFormCancel" class="button_medium" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=${param.studyId}&sdv_f_sdvStatus=Ready+to+Verify+%2B+Changed+since+verified';this.form.submit();"/>
->>>>>>> 09748067dcf22238b440b55eacab5ee8d5652f98
     </form>
     <script type="text/javascript">hideCols('sdv',[2,3,6,7,11,12,13])</script>
 
