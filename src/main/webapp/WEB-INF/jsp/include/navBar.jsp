@@ -485,11 +485,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-<<<<<<< HEAD
                 <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}&sdv_f_sdvStatus=Ready+to+Verify+%2B+Changed+since+verified&sdv_s_4_eventDate=asc&sdv_s_4_eventDate=asc"><fmt:message
-=======
-                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}&sdv_f_sdvStatus=Ready+to+Verify+%2B+Changed+since+verified"><fmt:message
->>>>>>> 09748067dcf22238b440b55eacab5ee8d5652f98
                         key="nav_source_data_verification" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
@@ -598,11 +594,7 @@
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
                         <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-<<<<<<< HEAD
                         <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}&sdv_f_sdvStatus=Ready+to+Verify+%2B+Changed+since+verified&sdv_s_4_eventDate=asc"><fmt:message
-=======
-                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.studyId}&sdv_f_sdvStatus=Ready+to+Verify+%2B+Changed+since+verified"><fmt:message
->>>>>>> 09748067dcf22238b440b55eacab5ee8d5652f98
                                 key="nav_source_data_verification" bundle="${resword}"/></a><br/></div>
                     </c:otherwise>
                 </c:choose>
