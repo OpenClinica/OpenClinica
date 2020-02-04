@@ -955,8 +955,8 @@ public class SDVUtil {
                 crfStatusBuilder.append("<center><a title='"+statusTitle+"' alt='"+statusTitle+"' class='"+statusIconClassName+"' accessCheck' border='0'/></center>");
                 tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
             }
-
-            tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
+            core.org.akaza.openclinica.domain.datamap.SubjectEventStatus subjectEventStatus = core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.getByCode(eventCrf.getStudyEvent().getSubjectEventStatusId());
+            tempSDVBean.setStudyEventStatus(resWords.getString(subjectEventStatus.getDescription()));
 
             // TODO: I18N Date must be formatted properly
             Locale locale = LocaleResolver.getLocale(request);
