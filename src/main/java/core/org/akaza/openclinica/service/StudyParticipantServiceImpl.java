@@ -128,10 +128,6 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         String studyOid = tenantStudy.getOc_oid();
         String siteOid = tenantSite.getOc_oid();
 
-        StudyConfigService studyConfig = new StudyConfigService(this.dataSource);
-        studyConfig.setStudyParameterValueToStudyManually(tenantStudy);
-        studyConfig.setStudyParameterValueToStudyManually(tenantSite);
-        
         if (isEnrollmentCapped(tenantStudy,tenantSite))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
         

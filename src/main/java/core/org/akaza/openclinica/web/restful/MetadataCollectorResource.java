@@ -148,9 +148,7 @@ public class MetadataCollectorResource {
     }
 
     public String collectODMMetadataForForm(String studyOID, String formVersionOID,HttpServletRequest request) {
-        Study studyBean = studyDaoHib.findByOcOID(studyOID);
-        if (studyBean != null)
-            studyBean = populateStudyBean(studyBean);
+        Study studyBean = studyDaoHib.findStudyWithSPVByOcOID(studyOID);
         String permissionTagsString = permissionService.getPermissionTagsString(studyBean,request);
 
         MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),permissionTagsString, studyDaoHib);
@@ -190,8 +188,7 @@ public class MetadataCollectorResource {
                                                              boolean showArchived , String permissionTagsString, boolean includeMetadata) {
         FullReportBean report = new FullReportBean();
         report.setStudyDao(studyDaoHib);
-            if (studyBean != null)
-                studyBean = populateStudyBean(studyBean);
+            studyBean = studyDaoHib.findStudyWithSPVByStudyId(studyBean.getStudyId());
             MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived, permissionTagsString, studyDaoHib);
             AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean, studyDaoHib);
             MetaDataCollector.setTextLength(200);
@@ -227,13 +224,4 @@ public class MetadataCollectorResource {
 
         return report;
     }
-
-    private Study populateStudyBean(Study studyBean) {
-        if (studyBean.getStudyParameterValues() == null || studyBean.getStudyParameterValues().size() == 0) {
-            StudyConfigService scs = new StudyConfigService(this.dataSource);
-            scs.setParameterValuesForStudy(studyBean);
-        }
-        return studyBean;
-    }
-
 }
