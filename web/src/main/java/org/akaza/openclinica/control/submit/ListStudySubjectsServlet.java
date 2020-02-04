@@ -137,7 +137,26 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
         factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
-        String findSubjectsHtml = factory.createTable(request, response).render();
+       
+        /**
+         * http://localhost:8080/OpenClinica/ListStudySubjects?module=admin&maxRows=25&showMoreLink=true&findSubjects_tr_=true&findSubjects_p_=1&findSubjects_mr_=25
+         */
+       
+        
+        // update session table attributes     
+        HashMap subjectTableSettings = getSubjectTableSettings();
+        
+        String findSubjectsHtml = null;
+        OCRequestWrapper requestWrapper = null;
+        if(!(subjectTableSettings.isEmpty())) {
+        	requestWrapper = new OCRequestWrapper(request, subjectTableSettings);  
+        	findSubjectsHtml = factory.createTable(requestWrapper, response).render();
+        }else{
+        	findSubjectsHtml = factory.createTable(request, response).render();
+        }
+        
+        
+       
 
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);
         // A. Hamid.
@@ -150,6 +169,67 @@ public class ListStudySubjectsServlet extends SecureController {
         forwardPage(Page.LIST_STUDY_SUBJECTS);
 
     }
+
+	/**
+	 * @return
+	 */
+	private HashMap getSubjectTableSettings() {
+		HashMap map = new HashMap<String, String>();
+        if(request.getParameter("maxRows") != null) {
+        	request.getSession().setAttribute("maxRows", request.getParameter("maxRows"));
+        }else {
+        	// restore from the session
+        	 String maxRows = (String) request.getSession().getAttribute("maxRows");
+        	
+        	 if(maxRows !=null) {        	
+        		 map.put("maxRows", maxRows);
+        	 }
+        }
+        
+        if(request.getParameter("showMoreLink") != null) {
+        	request.getSession().setAttribute("showMoreLink", request.getParameter("showMoreLink"));
+        }else {
+        	// restore from the session
+	       	 String showMoreLink = (String) request.getSession().getAttribute("showMoreLink");
+	       	
+	       	 if(showMoreLink !=null) {
+	       		map.put("showMoreLink", showMoreLink);
+	       	 }
+        }
+        
+        if(request.getParameter("findSubjects_tr_") != null) {
+        	request.getSession().setAttribute("findSubjects_tr_", request.getParameter("findSubjects_tr_"));
+        }else {
+        	// restore from the session
+	       	 String findSubjects_tr_ = (String) request.getSession().getAttribute("findSubjects_tr_");
+	       	 if(findSubjects_tr_ !=null) {
+	       		map.put("findSubjects_tr_", findSubjects_tr_);
+	       	 }
+        }
+        
+        if(request.getParameter("findSubjects_p_") != null) {
+        	request.getSession().setAttribute("findSubjects_p_", request.getParameter("findSubjects_p_"));
+        }else {
+        	// restore from the session
+	       	 String findSubjects_p_ = (String) request.getSession().getAttribute("findSubjects_p_");
+	       	 if(findSubjects_p_ !=null) {
+	       		map.put("findSubjects_p_", findSubjects_p_);
+	       	 }
+        }
+        
+        if(request.getParameter("findSubjects_mr_") != null) {
+        	request.getSession().setAttribute("findSubjects_mr_", request.getParameter("findSubjects_mr_"));
+        }else {
+        	// restore from the session
+	       	 String findSubjects_mr_ = (String) request.getSession().getAttribute("findSubjects_mr_");
+	       	 
+	       	 if(findSubjects_mr_ !=null) {
+	       		map.put("findSubjects_mr_", findSubjects_mr_);
+	       	 }
+        }
+        
+		return map;
+	}
 
     @Override
     protected String getAdminServlet() {
