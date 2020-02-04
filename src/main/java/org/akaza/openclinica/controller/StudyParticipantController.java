@@ -509,8 +509,8 @@ public class StudyParticipantController {
 		utilService.setSchemaFromStudyOid(studyOid);
 		UserAccount userAccount = uAccountDao.findById(userAccountBean.getId());
 
-		Study site = studyDao.findByOcOID(siteOid);
-		Study study = studyDao.findByOcOID(studyOid);
+		Study site = studyDao.findStudyWithSPVByOcOID(siteOid);
+		Study study = studyDao.findStudyWithSPVByOcOID(studyOid);
 		JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.BULK_ADD_PARTICIPANTS, file.getOriginalFilename());
 		CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
 			try {

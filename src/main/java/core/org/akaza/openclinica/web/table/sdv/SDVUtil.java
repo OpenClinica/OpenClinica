@@ -949,10 +949,17 @@ public class SDVUtil {
             // "This Event CRF has been Source Data Verified. If you uncheck this box, you are removing Source Data
             // Verification for the Event CRF and you will have to repeat the process. Select OK to continue and Cancel
             // to cancel this transaction."
+            String eventCRFId = Integer.toString(eventCRFBean.getId());
+            String formLayoutId = Integer.toString(eventCRFBean.getFormLayoutId());
+            String studyEventId = Integer.toString(eventCRFBean.getStudyEventId());
             if (eventCRFBean.isSdvStatus()) {
-                sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm,");
+                sdvStatus.append("<center><a class='accessCheck' href='javascript:void(0)' onclick='prompt(document.sdvForm,");
                 sdvStatus.append(eventCRFBean.getId());
-                sdvStatus.append(")'>");
+                sdvStatus.append(")'");
+                sdvStatus.append(" data-eventCrfId='").append(eventCRFId).append("'");
+                sdvStatus.append(" data-formLayoutId='").append(formLayoutId).append("'");
+                sdvStatus.append(" data-studyEventId='").append(studyEventId).append("'");
+                sdvStatus.append(">");
                 sdvStatus.append(getIconForSdvStatusPrefix()).append("</a></center>");
             } else {
                 sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
@@ -1003,8 +1010,12 @@ public class SDVUtil {
                 // actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\"
                 // name=\"sdvSubmit\" ").append("onclick=\"").append(
                 // jsCodeString.toString()).append("\" />");
-                actions.append("<a class='icon icon-icon-sdv-text' href='javascript:void(0)' onclick='submitSdv(document.sdvForm,").append(eventCRFBean.getId())
-                        .append(")'></a>");
+                actions.append("<a class='accessCheck icon icon-icon-sdv-text' href='javascript:void(0)'")
+                    .append(" onclick='submitSdv(document.sdvForm,").append(eventCRFId).append(")'")
+                    .append(" data-eventCrfId='").append(eventCRFId).append("'")
+                    .append(" data-formLayoutId='").append(formLayoutId).append("'")
+                    .append(" data-studyEventId='").append(studyEventId).append("'")
+                    .append("></a>");
             }
 
             // Only implement the view icon if it is a event crf request
