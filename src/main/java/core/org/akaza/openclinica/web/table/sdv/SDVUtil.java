@@ -88,7 +88,8 @@ public class SDVUtil {
     private ItemDao itemDao;
     @Autowired
     private ItemDataDao itemDataDao;
-
+    @Autowired
+    private DiscrepancyNoteDao discrepancyNoteDao;
     @Autowired
     private ItemGroupMetadataDao itemGroupMetadataDao;
     @Autowired
@@ -646,11 +647,11 @@ public class SDVUtil {
         resformat = ResourceBundleProvider.getFormatBundle(LocaleResolver.getLocale(request));
         this.pathPrefix = pathPrefix;
 
-        String[] allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
+        String[] allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName", "eventDate",
                 "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
                 "studyEventStatus", "sdvStatusActions" };
 
-        tableFacade.setColumnProperties("sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
+        tableFacade.setColumnProperties("sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName", "eventDate",
                 "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
                 "sdvStatusActions");
 
@@ -693,11 +694,12 @@ public class SDVUtil {
 
         // temporarily disable some of the filters for now
         turnOffFilters(tableFacade, new String[] { "studySubjectStatus", "crfNameVersion", "lastUpdatedDate",
-                "lastUpdatedBy", "eventDate", "studyEventStatus" });
+                "lastUpdatedBy", "eventDate", "studyEventStatus", "openQueries" });
 
         turnOffSorts(tableFacade,
-                new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus",
-                        "lastUpdatedBy", "studyEventStatus", "sdvStatusActions" });
+                new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName",
+                        "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedBy", "studyEventStatus",
+                        "sdvStatusActions" });
 
         // Create the custom toolbar
         SDVToolbar sDVToolbar = new SDVToolbar(showMoreLink);
@@ -713,7 +715,7 @@ public class SDVUtil {
         ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles = { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"),
-                resword.getString("event_name"), resword.getString("event_date"),
+                resword.getString("open_queries"), resword.getString("event_name"), resword.getString("event_date"),
                 resword.getString("subject_status"), resword.getString("CRF_name") + " / " + resword.getString("version"),
                 resword.getString("SDV_requirement"), resword.getString("CRF_status"), resword.getString("last_updated_date"),
                 resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("actions") };
@@ -865,6 +867,7 @@ public class SDVUtil {
      */
     public Collection<SubjectSDVContainer> getSubjectRows(List<EventCRFBean> eventCRFBeans, HttpServletRequest request) {
 
+
         if (eventCRFBeans == null || eventCRFBeans.isEmpty()) {
             return new ArrayList<SubjectSDVContainer>();
         }
@@ -895,7 +898,7 @@ public class SDVUtil {
         // allRows.add(tempSDVBean);
 
         for (EventCRFBean eventCRFBean : eventCRFBeans) {
-
+            EventCrf eventCrf = eventCrfDao.findByPK(eventCRFBean.getId());
             tempSDVBean = new SubjectSDVContainer();
 
             studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(eventCRFBean.getStudySubjectId());
@@ -914,6 +917,16 @@ public class SDVUtil {
                 tempSDVBean.setSdvRequirementDefinition("");
             }
 
+            int openQueriesCount = discrepancyNoteDao.findParentQueriesByEventCrfId(eventCrf.getEventCrfId()).size();
+
+            if(openQueriesCount > 0) {
+                String queriesPageUrl = request.getContextPath() + "/ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query&listNotes_f_discrepancyNoteBean.resolutionStatus=New+and+Updated&"
+                        + "listNotes_f_crfName=" + eventCrf.getCrfVersion().getCrf().getName()
+                        + "&listNotes_f_studySubject.label=" + eventCrf.getStudySubject().getLabel() + "&listNotes_f_eventName=" + eventCrf.getStudyEvent().getStudyEventDefinition().getName();
+                tempSDVBean.setOpenQueries("<center><a href='"+queriesPageUrl+"'>"+openQueriesCount+"</a></center>");
+            }
+            else
+                tempSDVBean.setOpenQueries("<center>"+openQueriesCount+"</center>");
             tempSDVBean.setCrfNameVersion(getCRFName(eventCRFBean.getCRFVersionId()) + "/ " + getFormLayoutName(eventCRFBean.getFormLayoutId()));
 
             if (eventCRFBean.getStatus() != null) {
@@ -927,8 +940,6 @@ public class SDVUtil {
 
                 StringBuilder crfStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
                 String input = "<input type=\"hidden\" statusId=\""+status+"\" />";
-                crfStatusBuilder.append(
-                        "<center>");
                 // "<input type=\"hidden\" statusId=\"1\" />"
 //                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
                 String statusTitle= "";
@@ -941,8 +952,7 @@ public class SDVUtil {
                     statusTitle = resWords.getString("completed");
                     statusIconClassName = FORM_COMPLETED_ICON_CLASS_NAME;
                 }
-                crfStatusBuilder.append("<a title='"+statusTitle+"' alt='"+statusTitle+"' class='"+statusIconClassName+"' accessCheck' border='0'/>");
-                crfStatusBuilder.append("</center>");
+                crfStatusBuilder.append("<center><a title='"+statusTitle+"' alt='"+statusTitle+"' class='"+statusIconClassName+"' accessCheck' border='0'/></center>");
                 tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
             }
 
