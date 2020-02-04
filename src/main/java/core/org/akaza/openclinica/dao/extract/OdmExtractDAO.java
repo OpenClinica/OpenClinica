@@ -3352,8 +3352,6 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected void setStudyParemeterConfig(Study study) {
-        StudyConfigService studyConfig = new StudyConfigService(this.ds);
-        studyConfig.setStudyParameterValueToStudyManually(study);
         StudyParameterValueBean param = new StudyParameterValueDAO(this.ds).findByHandleAndStudy(study.getStudyId(), "collectDob");
         study.setCollectDob(param.getValue());
     }

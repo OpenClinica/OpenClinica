@@ -91,9 +91,9 @@
         $(this).attr('disabled', 'disabled');
         $('#getPdfMessage').slideDown();
         <c:choose>
-            <c:when test='${study.study != null && study.study.studyId > 0}'>
+            <c:when test='${subjectStudy.study != null && subjectStudy.study.studyId > 0}'>
                 // site level
-                var url = '/studies/${study.study.oc_oid}/sites/${study.oc_oid}';
+                var url = '/studies/${subjectStudy.study.oc_oid}/sites/${subjectStudy.oc_oid}';
             </c:when>
             <c:otherwise>
                 // study level

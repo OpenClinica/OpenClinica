@@ -275,12 +275,12 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             if (studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.DELETED && studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED
-                    && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+                    && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 restoreEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                restoreEventCrf(html, eventCrfBean, studySubject, "Restore");
+                restoreEventCrf(html, eventCrfBean, studySubject, reswords.getString("restore"));
                 html.tdEnd().trEnd(0);
             }
         } else {

@@ -3,8 +3,7 @@
 	<xsl:output encoding="utf-8" indent="yes" method="xml" name="xml"/>
 	<xsl:template match="/">
 		<!-- Get the parent study oid, which is listed first. -->
-		<xsl:variable name="strippedOID" select="replace(replace(//odm:Study[position()=1]/@OID, '\(', ''),'\)','')" />
-		<xsl:variable name="vStudyName" select="substring(concat('S',substring($strippedOID, 3)),1,8)"/>
+		<xsl:variable name="vStudyName" select="substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '(')"/>
 		<xsl:element name="{$vStudyName}">
 			<xsl:for-each select="odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData/odm:ItemGroupData">
 				<xsl:element name="{@ItemGroupOID}">
