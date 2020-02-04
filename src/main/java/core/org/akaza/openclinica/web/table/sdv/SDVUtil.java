@@ -994,7 +994,6 @@ public class SDVUtil {
             String studyEventId = Integer.toString(eventCRFBean.getStudyEventId());
             if (eventCRFBean.getSdvStatus() == SdvStatus.VERIFIED) {
                 sdvStatus.append("<center><a class='accessCheck' href='javascript:void(0)' onclick='prompt(document.sdvForm,");
-
                 sdvStatus.append(eventCRFBean.getId());
                 sdvStatus.append(")'");
                 sdvStatus.append(" data-eventCrfId='").append(eventCRFId).append("'");
