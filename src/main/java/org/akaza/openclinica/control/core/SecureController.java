@@ -549,21 +549,19 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     return;
                 }
                 if(currentStudy == null || currentStudy.getStudyId() == 0 )
-                    currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
+                    currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 if (currentStudy != null) {
                     if(currentPublicStudy != null && currentPublicStudy.getStudy() != null)
                     {
                         if(currentStudy.getStudy() == null)
-                            currentStudy.setStudy(getStudyDao().findByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
+                            currentStudy.setStudy(getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
-                String tempCollectDob = currentStudy.getCollectDob(); //Initializing spv with the study before assigning in Session
                 session.setAttribute("study", currentStudy);
             }
             else {
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
-                currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
-                String tempCollectDob = currentStudy.getCollectDob(); //Initializing spv with the study before assigning in Session
+                currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 session.setAttribute("study", currentStudy);
             }
             request.setAttribute("requestSchema", "public");
@@ -1493,9 +1491,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         } else {
             currentPublicStudy = tmpPublicStudy;
             CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
-            currentStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
+            currentStudy = getStudyDao().findStudyWithSPVByStudyEnvUuid(studyEnvUuid);
 
-            String tempCollectDob = currentStudy.getCollectDob();  //Initializing spv with the study before assigning in Session
             session.setAttribute("publicStudy", currentPublicStudy);
             session.setAttribute("study", currentStudy);
             currentRole = role;

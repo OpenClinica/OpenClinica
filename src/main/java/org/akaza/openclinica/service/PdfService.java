@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
 
 /**
  * @author Tao Li
@@ -26,6 +27,6 @@ public interface PdfService {
     
     String preparePdfHeader(Study study, Study site, String studySubjectIdentifier,StudyEvent studyEvent);
     
-    void writeToFile(String message, String fileName);
+    void writeToFile(String message,  String fileName, StudySubject ss);
     
 }

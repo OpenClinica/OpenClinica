@@ -91,6 +91,7 @@ public abstract class OdmDataCollector {
             odmbean = new ODMBean();
 
             if (study != null) {
+                study = studyDao.findStudyWithSPVByStudyId(study.getStudyId());
                 if (study.isSite()) {
                     this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
                     this.studyBaseMap.put(study.getOc_oid(), new OdmStudyBase(ds, study));
@@ -142,7 +143,7 @@ public abstract class OdmDataCollector {
         this.studyDao = studyDao;
         this.dataset = dataset;
         odmbean = new ODMBean();
-        Study study = (Study) studyDao.findByPKWithSpv(dataset.getStudyId());
+        Study study = (Study) studyDao.findStudyWithSPVByStudyId(dataset.getStudyId());
         if (currentStudy.isSite()) {
             this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
             this.studyBaseMap.put(study.getOc_oid(), new OdmStudyBase(ds, study));

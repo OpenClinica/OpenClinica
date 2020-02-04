@@ -326,18 +326,6 @@ public class StudyDao extends AbstractDomainDao<Study> {
     }
 
     @Transactional
-    public Study findByPKWithSpv(int ID) {
-        /* This function will load the studyParamValues without lazy initialization*/
-        String query = "select distinct s from Study s left join fetch s.studyParameterValues where s.studyId = :studyId";
-        Query q = getCurrentSession().createQuery(query);
-        q.setParameter("studyId", ID);
-        List<Study> studyList = q.getResultList();
-        if(studyList != null || studyList.size() > 0)
-            return (Study) studyList.get(0);
-        return null;
-    }
-
-    @Transactional
     public Study findByName(String name){
         CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
         CriteriaQuery<Study> cq = cb.createQuery(Study.class);
@@ -472,6 +460,13 @@ public class StudyDao extends AbstractDomainDao<Study> {
         q.setParameter("studyId", parentStudyId);
         q.setParameter("parentStudyId", parentStudyId);
         List<Study> studyList = q.getResultList();
+        for(Study study : studyList){
+            if(study != null && study.isSite())
+            {
+                Study parentStudy = this.findStudyWithSPVByStudyId(study.getStudy().getStudyId());
+                study.setStudy(parentStudy);
+            }
+        }
         return studyList;
     }
     @Transactional
@@ -515,7 +510,54 @@ public class StudyDao extends AbstractDomainDao<Study> {
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyId", studyId);
         Study study = (Study) q.uniqueResult();
-        if(study.isSite()) {
+        if(study != null && study.isSite()) {
+            Study parentStudy = this.findStudyWithSPVByStudyId(study.getStudy().getStudyId());
+            study.setStudy(parentStudy);
+        }
+        return study;
+    }
+
+    @Transactional
+    public Study findStudyWithSPVByUniqueId(String uniqueId) {
+        /* This function will load the studyParamValues without lazy initialization*/
+        getSessionFactory().getStatistics().logSummary();
+        String query = " select distinct s from Study s left join fetch s.studyParameterValues where s.uniqueIdentifier = :uniqueId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("uniqueId", uniqueId);
+        Study study = (Study) q.uniqueResult();
+        if(study != null && study.isSite())
+        {
+            Study parentStudy = this.findStudyWithSPVByStudyId(study.getStudy().getStudyId());
+            study.setStudy(parentStudy);
+        }
+        return study;
+    }
+
+    @Transactional
+    public Study findStudyWithSPVByStudyEnvUuid(String studyEnvUuid) {
+        /* This function will load the studyParamValues without lazy initialization*/
+        getSessionFactory().getStatistics().logSummary();
+        String query = " select distinct s from Study s left join fetch s.studyParameterValues where s.studyEnvUuid = :studyEnvUuid " + "or s.studyEnvSiteUuid = :studyEnvUuid";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyEnvUuid", studyEnvUuid);
+        Study study = (Study) q.uniqueResult();
+        if(study != null && study.isSite())
+        {
+            Study parentStudy = this.findStudyWithSPVByStudyId(study.getStudy().getStudyId());
+            study.setStudy(parentStudy);
+        }
+        return study;
+    }
+
+    public Study findStudyWithSPVByOcOID(String OCOID) {
+        /* This function will load the studyParamValues without lazy initialization*/
+        getSessionFactory().getStatistics().logSummary();
+        String query = "select distinct s from " + getDomainClassName() + " s left join fetch s.studyParameterValues where s.oc_oid = :oc_oid";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("oc_oid", OCOID);
+        Study study = (Study) q.uniqueResult();
+        if(study != null && study.isSite())
+        {
             Study parentStudy = this.findStudyWithSPVByStudyId(study.getStudy().getStudyId());
             study.setStudy(parentStudy);
         }

@@ -23,10 +23,10 @@ import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
-import core.org.akaza.openclinica.domain.datamap.EventCrf;
+import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import core.org.akaza.openclinica.service.PermissionService;
-import core.org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -87,8 +87,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     /* Handle the HTTP Get or Post request. */
     @Override
     protected void processRequest() throws Exception {
-     Study study=currentStudy;
-        List<StudyEnvironmentRoleDTO> roles= getPermissionService().getUserRoles(request).getBody();
+
         FormProcessor fp = new FormProcessor(request);
         // the fileName contains any subject id and study unique protocol id;
         // see: chooseDownloadFormat.jsp
@@ -145,7 +144,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(getFilters(request), getDateFormat(), discrepancyNoteTypesDecoder,
                 resolutionStatusDecoder);
-        List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(study, filter, ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)), getPermissionTagsList());
+        List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(currentStudy, filter, ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)), getPermissionTagsList());
 
 
         ListNotesTableFactory factory = new ListNotesTableFactory(true, getPermissionTagsList());
@@ -161,10 +160,10 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         factory.setPermissionTagDao(getPermissionTagDao());
         factory.setStudyEventDefinitionHibDao(getStudyEventDefinitionDao());
 
-        int columnCount = factory.getNetCountCustomColumns(study, request);
+        int columnCount = factory.getNetCountCustomColumns(currentStudy, request);
         for (DiscrepancyNoteBean note : notes) {
             if (note.getEntityType().equals(ListNotesTableFactory.ITEM_DATA)) {
-                note.setCustomColumns(factory.getCustomColumns(note, study, request));
+                note.setCustomColumns(factory.getCustomColumns(note, currentStudy, request));
             } else if (note.getEntityType().equals(ListNotesTableFactory.STUDY_EVENT)) {
                 List<CustomColumn> customColumns = new ArrayList<>();
                 for (int i = 0; i < columnCount; i++) {
@@ -182,8 +181,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         ArrayList<DiscrepancyNoteBean> allDiscNotes = notes instanceof ArrayList ? (ArrayList<DiscrepancyNoteBean>) notes
                 : new ArrayList<DiscrepancyNoteBean>(notes);
 
-        ArrayList<DiscrepancyNoteBean> accessList = (ArrayList<DiscrepancyNoteBean>) removeNoAccessNotes(allDiscNotes,study,roles);
-        accessList = populateRowsWithAttachedData(accessList,study);
+        ArrayList<DiscrepancyNoteBean> accessList = (ArrayList<DiscrepancyNoteBean>) removeNoAccessNotes(allDiscNotes);
+        accessList = populateRowsWithAttachedData(accessList);
 
         // Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
         // Do the filtering for type or status here
@@ -217,11 +216,11 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         }
     }
 
-    private boolean checkNoteAccess(ItemDataDao itemDataDao, String entityType, int itemDataId,Study study,List <StudyEnvironmentRoleDTO> roles) {
+    private boolean checkNoteAccess(ItemDataDao itemDataDao, String entityType, int itemDataId) {
         if (entityType.equalsIgnoreCase("itemData")) {
 
             ItemData itemData = itemDataDao.findById(itemDataId);
-            if (hasFormAccess(itemData.getEventCrf(),study,roles)) {
+            if (hasFormAccess(itemData.getEventCrf())) {
                 return true;
             }
         } else if (entityType.equalsIgnoreCase("studyEvent"))
@@ -230,9 +229,9 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         return false;
     }
 
-    private List<DiscrepancyNoteBean> removeNoAccessNotes(List<DiscrepancyNoteBean> notes,Study study,List<StudyEnvironmentRoleDTO> roles) {
+    private List<DiscrepancyNoteBean> removeNoAccessNotes(List<DiscrepancyNoteBean> notes) {
         ItemDataDao itemDataDao = (ItemDataDao) SpringServletAccess.getApplicationContext(context).getBean("itemDataDao");
-        List<DiscrepancyNoteBean> accessList = notes.stream().filter(note -> checkNoteAccess(itemDataDao, note.getEntityType(), note.getEntityId(),study,roles))
+        List<DiscrepancyNoteBean> accessList = notes.stream().filter(note -> checkNoteAccess(itemDataDao, note.getEntityType(), note.getEntityId()))
                 .collect(toList());
         return accessList;
 
@@ -304,7 +303,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         return sortOrders;
     }
 
-    private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows,Study study) {
+    private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows) {
         Locale l = LocaleResolver.getLocale(request);
         resword = ResourceBundleProvider.getWordsBundle(l);
         resformat = ResourceBundleProvider.getFormatBundle(l);
@@ -327,7 +326,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
             DiscrepancyNoteBean dnb = noteRows.get(i);
             dnb.setCreatedDateString(dnb.getCreatedDate() == null ? "" : sdf.format(dnb.getCreatedDate()));
             if (dnb.getParentDnId() == 0) {
-                ArrayList children = dndao.findAllByStudyAndParent(study, dnb.getId());
+                ArrayList children = dndao.findAllByStudyAndParent(currentStudy, dnb.getId());
                 children = children == null ? new ArrayList() : children;
                 dnb.setNumChildren(children.size());
                 dnb.setChildren(children);
@@ -360,11 +359,10 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
             if (dnb.getEntityId() > 0 && !entityType.equals("")) {
                 AuditableEntityBean aeb = dndao.findEntity(dnb);
-                dnb.setEntityName(aeb.getName());
                 if (entityType.equalsIgnoreCase("subject")) {
                     // allNotes.add(dnb);
                     SubjectBean sb = (SubjectBean) aeb;
-                    StudySubjectBean ssb = studySubjectDAO.findBySubjectIdAndStudy(sb.getId(), study);
+                    StudySubjectBean ssb = studySubjectDAO.findBySubjectIdAndStudy(sb.getId(), currentStudy);
                     dnb.setStudySub(ssb);
                     dnb.setSubjectName(ssb.getLabel());
                     String column = dnb.getColumn().trim();
@@ -449,7 +447,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     StudyEventBean se = (StudyEventBean) sedao.findByPK(dnb.getEntityId());
                     StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
                     se.setName(sedb.getName());
-                    dnb.setEntityName(sedb.getName());
+                    dnb.setEntityName(dnb.getEntityName());
                     StudySubjectBean ssub = (StudySubjectBean) studySubjectDAO.findByPK(se.getStudySubjectId());
                     dnb.setStudySub(ssub);
                     dnb.setEventStart(se.getDateStarted());
@@ -493,7 +491,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
                     // allNotes.add(dnb);
                     dnb.setStageId(ec.getStage().getId());
-                    dnb.setEntityName(ib.getName());
                     dnb.setEntityValue(idb.getValue());
 
                     StudyEventBean se = (StudyEventBean) sedao.findByPK(ec.getStudyEventId());
@@ -508,13 +505,14 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setEventStart(se.getDateStarted());
                     dnb.setEventName(se.getName());
                     dnb.setCrfName(cb.getName());
-                    String crfStatus = resword.getString(ec.getStage().getNameRaw());
-                    if (crfStatus.equals("Invalid")) {
-                        crfStatus = "";
-                    } else if (crfStatus.equals("Data Entry Complete")) {
-                        crfStatus = "Complete";
+                    int subjectEventStatusId = se != null && se.getSubjectEventStatus() != null ? se.getSubjectEventStatus().getId() : SubjectEventStatus.INVALID.getCode();
+                    String eventCrfStatus = resword.getString(EventCrfStatusEnum.getByCode(ec.getStatus().getId(), subjectEventStatusId).getDescription());
+                    if (eventCrfStatus.equals("Invalid")) {
+                        eventCrfStatus = "";
+                    } else if (eventCrfStatus.equals("Data Entry Complete")) {
+                        eventCrfStatus = "Complete";
                     }
-                    dnb.setCrfStatus(crfStatus);
+                    dnb.setCrfStatus(eventCrfStatus);
                     dnb.setEvent(se);
                     dnb.setStudyEventDefinitionBean(sedb);
 
@@ -586,11 +584,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     }
     public StudyEventDefinitionDao getStudyEventDefinitionDao() {
         return studyEventDefinitionDao= (StudyEventDefinitionDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefDaoDomain");
-    }
-    public boolean hasFormAccess(EventCrf ec , Study study, List<StudyEnvironmentRoleDTO> roles) {
-        Integer formLayoutId = ec.getFormLayout().getFormLayoutId();
-        Integer studyEventId = ec.getStudyEvent().getStudyEventId();
-        return getPermissionService().hasFormAccess(ec, formLayoutId, studyEventId, study, roles);
     }
 
 }
