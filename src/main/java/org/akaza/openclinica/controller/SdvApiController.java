@@ -63,7 +63,7 @@ public class SdvApiController {
                 else
                     throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_IS_INCORRECT);
             validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean,ordinalValue);
-            responseDTO = sdvUtil.getFormDetailsForSDV(formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
+            responseDTO = sdvUtil.getFormDetailsForSDV(studyOID, formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
         }
         catch(OpenClinicaSystemException e) {
             return new ResponseEntity<>(validateService.getResponseForException(e, studyOID, ""), HttpStatus.BAD_REQUEST);

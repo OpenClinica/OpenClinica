@@ -917,7 +917,7 @@ public class SDVUtil {
                 tempSDVBean.setSdvRequirementDefinition("");
             }
 
-            int openQueriesCount = discrepancyNoteDao.findParentQueriesByEventCrfId(eventCrf.getEventCrfId()).size();
+            int openQueriesCount = discrepancyNoteDao.findNewOrUpdatedParentQueriesByEventCrfId(eventCrf.getEventCrfId()).size();
 
             if(openQueriesCount > 0) {
                 String queriesPageUrl = request.getContextPath() + "/ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query&listNotes_f_discrepancyNoteBean.resolutionStatus=New+and+Updated&"
@@ -1454,7 +1454,7 @@ public class SDVUtil {
         this.dataSource = dataSource;
     }
 
-    public SdvDTO getFormDetailsForSDV(String formOID, String studyEventOID, String studySubjectLabel, int ordinal, boolean changedAfterSdvOnlyFilter) {
+    public SdvDTO getFormDetailsForSDV(String studyOID, String formOID, String studyEventOID, String studySubjectLabel, int ordinal, boolean changedAfterSdvOnlyFilter) {
 
         EventCrf eventCrf = getEventCrfDao().findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOID, studySubjectLabel, formOID, ordinal);
         if(eventCrf != null &&  !Status.get(eventCrf.getStatusId()).equals(Status.UNAVAILABLE))
@@ -1467,7 +1467,9 @@ public class SDVUtil {
             sdvDTO.setEventStartDate(eventCrf.getStudyEvent().getDateStart());
             sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
             sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
-            EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), eventCrf.getStudySubject().getStudy().getStudyId());
+            Study parentStudy = studyDao.findByOcOID(studyOID);
+            parentStudy = parentStudy.isSite() ? parentStudy.getStudy() : parentStudy;
+            EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), parentStudy.getStudyId());
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
             core.org.akaza.openclinica.domain.Status status = core.org.akaza.openclinica.domain.Status.getByCode(eventCrf.getStatusId());
@@ -1485,6 +1487,7 @@ public class SDVUtil {
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
                     sdvItemDTO.setName(itemData.getItem().getName());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
+                    sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());
                     sdvItemDTO.setOrdinal(itemData.getOrdinal());
                         ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemId(itemData.getItem().getItemId());
                     if(itemGroupMetadata != null )
