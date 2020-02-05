@@ -1090,33 +1090,34 @@ public class CoreResources implements InitializingBean {
             EXTRACTINFO = loadProperties(EXTRACT_INFO_FILE_NAME);
     }
 
+    // Overwrites external properties (if present) on Internal properties
     public static Properties loadProperties(String fileProps) {
         Properties internalProp = null;
         InputStream inpStream;
         Properties externalProp = null;
-        try {
-            inpStream = CoreResources.class.getClassLoader().getResourceAsStream(fileProps);
-            internalProp = extractPropertiesFromFile(inpStream);
-            InputStream externalInpStream = new FileInputStream(EXTERNAL_PROPERTY_DIRECTORY + fileProps);
-            externalProp = extractPropertiesFromFile(externalInpStream);
+            try{
+                inpStream = CoreResources.class.getClassLoader().getResourceAsStream(fileProps);
+                internalProp = extractPropertiesFromFile(inpStream);
+                inpStream.close();
+            }catch (Exception e){
+                logger.warn("Failing to load the internal properties {}", e.getMessage());
+                internalProp = new Properties();
+            }
+            try {
+                InputStream externalInpStream = new FileInputStream(EXTERNAL_PROPERTY_DIRECTORY + fileProps);
+                externalProp = extractPropertiesFromFile(externalInpStream);
+                externalInpStream.close();
+            }catch (Exception e){
+                logger.warn("Failing to load the external properties {}", e.getMessage());
+                externalProp = new Properties();
+            }
             overwriteExternalPropOnInternalProp(internalProp, externalProp);
-            inpStream.close();
-            externalInpStream.close();
             return internalProp;
-        } catch (Exception e) {
-            logger.warn("Failing to load the properties {}", e.getMessage());
-        }
-        return internalProp;
     }
 
-    private static Properties extractPropertiesFromFile(InputStream input) {
+    private static Properties extractPropertiesFromFile(InputStream input) throws IOException{
         Properties prop = new Properties();
-
-        try {
-            prop.load(input);
-        } catch (IOException ioe) {
-            prop = null;
-        }
+        prop.load(input);
         return prop;
     }
 }

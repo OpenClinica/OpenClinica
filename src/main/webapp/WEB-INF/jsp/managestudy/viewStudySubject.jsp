@@ -1775,7 +1775,7 @@
             success: function(data) {
                 $('#access-code-input').val(data.accessCode !=null ? data.accessCode:"loading...");
                 $('#access-url').text(data.host);
-                $('#qrcode').qrcode({
+                $('#qrcode').empty().qrcode({
                     //render:"table"
                     width: 80,
                     height: 80,
