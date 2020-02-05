@@ -105,6 +105,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
             if (b.getEntityType().equals("itemData")) {
                 b.setEntityId(rs.getInt("item_data_id"));
                 b.setSubjectId(rs.getInt("study_subject_id"));
+                b.setEntityName(rs.getString("entity_name"));
             }
             if (b.getEntityType().equals("studyEvent")) {
                 b.setEntityName(rs.getString("column_name"));
