@@ -138,6 +138,7 @@ public class PdfServiceImpl implements PdfService {
         String footerMessage = null;             
         PDFont font = PDType1Font.TIMES_ROMAN;
         float fontSize = 10.0f;
+        final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy KK:mm:ss a Z");
 
         for( PDPage page : document.getPages() )
         {
@@ -177,6 +178,21 @@ public class PdfServiceImpl implements PdfService {
                 contentStream.setFont( font, fontSize );
                 // set text color to red
                 contentStream.setNonStrokingColor(0, 0, 0);
+                // footer time stamp
+                if (rotate)
+                {
+                    // rotate the text according to the page rotation
+                    contentStream.setTextMatrix(Matrix.getRotateInstance(Math.PI / 2, 50, footerCenterY));
+                }
+                else
+                {
+                    contentStream.setTextMatrix(Matrix.getTranslateInstance(50, footerCenterY));
+                }               
+
+                String footerTime = "Generated: " + sdf.format(new Date());
+                contentStream.showText(footerTime);
+
+                // footer page#
                 if (rotate)
                 {
                     // rotate the text according to the page rotation
