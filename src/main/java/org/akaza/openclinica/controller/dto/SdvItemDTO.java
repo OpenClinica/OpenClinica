@@ -14,6 +14,7 @@ public class SdvItemDTO {
     private String lastModifiedUserFirstName;
     private String lastModifiedUserLastName;
     private String sdvStatus;
+    private int openQueriesCount;
 
     public String getName() {
         return name;
@@ -101,5 +102,13 @@ public class SdvItemDTO {
 
     public void setLastModifiedDateHasOnlyDate(boolean lastModifiedDateHasOnlyDate) {
         this.lastModifiedDateHasOnlyDate = lastModifiedDateHasOnlyDate;
+    }
+
+    public int getOpenQueriesCount() {
+        return openQueriesCount;
+    }
+
+    public void setOpenQueriesCount(int openQueriesCount) {
+        this.openQueriesCount = openQueriesCount;
     }
 }
