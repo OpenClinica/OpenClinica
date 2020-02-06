@@ -1830,13 +1830,14 @@
                 identifier: $('#secid-input').val(),
                 resetAccessCode: $('#reset-participant-access-code').is(':checked')
             };
+
             if (data.inviteParticipant === 'true' || data.inviteViaSms === 'true') {
                 $('#inviting').show();
                 $('#connect-button, #cancel-button').attr('disabled', 'disabled');
-            }
-            else {
+            } else {
                 jQuery.unblockUI();
             }
+
             function doneInviting(result) {
                 if ($('#inviting').is(':hidden'))
                     return;
@@ -1845,6 +1846,7 @@
                 $('#inviteResultMessage').html(result);
                 jQuery.blockUI({message: jQuery('#inviteResultAlert'), css:{left: "300px", top:"100px" }});
             }
+
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oc_oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
@@ -1858,6 +1860,7 @@
                     doneInviting('<fmt:message key="invite_result_error" bundle="${resword}"/>: ' + arguments[2]);
                 }
             });
+
             return false;
         });
 
