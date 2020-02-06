@@ -566,10 +566,12 @@ a:hover, a:active {
  padding-top: 7px;
 }
 
-.tablebox_center { padding-left: 1px;
- padding-right: 6px;
- padding-top: 1px;
- padding-bottom: 7px;
+.tablebox_center {
+ padding: 0px;
+ border-width: 1px;
+ border-style: solid;
+ border-color: #CCC;
+ margin-bottom: 1em;
 }
 
 .navbox_center {
