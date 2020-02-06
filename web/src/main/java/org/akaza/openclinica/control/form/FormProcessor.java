@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.control.form;
 
@@ -397,8 +397,7 @@ public class FormProcessor {
             logger.debug("trying to parse " + fieldValue + " on the pattern " + resformat.getString("date_time_format_string"));
             result = sdf.parse(fieldValue);
         } catch (Exception fe) {
-            logger.debug("failed to parse");
-            fe.printStackTrace();
+            logger.debug("failed to parse ", fe);
             result = DEFAULT_DATE;
             logger.debug("replace with default date: " + result.toString());
         }

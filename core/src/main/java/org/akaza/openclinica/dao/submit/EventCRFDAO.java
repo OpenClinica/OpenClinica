@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 
 package org.akaza.openclinica.dao.submit;
@@ -47,7 +47,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * <P>
  * EventCRFDAO.java, data access object for an instance of an event being filled out on a subject. Was originally
- * individual_instrument table in OpenClinica v.1.
+ * individual_instrument table (in OC v.1).
  * 
  * @author thickerson
  * 

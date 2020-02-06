@@ -24,7 +24,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head><title>OpenClinica <fmt:message key="double_data_entry" bundle="${resword}"/></title>
+<head><title><fmt:message key="openclinica" bundle="${resword}"/> <fmt:message key="double_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">

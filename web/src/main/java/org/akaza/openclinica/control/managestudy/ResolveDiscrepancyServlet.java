@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  *
  * Created on Sep 22, 2005
  */
@@ -418,9 +418,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
                         dispatcher.forward(request, response);
                     }
                 } catch (ServletException e) {
-                    e.printStackTrace();
+                    logger.error("Dispatcher is not working properly: ", e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error in dispatcher: ", e);
                 }
             }
         }

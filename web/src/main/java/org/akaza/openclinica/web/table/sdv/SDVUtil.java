@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.web.table.sdv;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
@@ -70,11 +77,15 @@ import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.view.html.editor.HtmlCellEditor;
 import org.jmesa.web.WebContext;
 import org.springframework.validation.BindingResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
  */
 public class SDVUtil {
+
+    private static final Logger logger= LoggerFactory.getLogger(SDVUtil.class);
 
     private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
     private final static String VIEW_ICON_FORSUBJECT_SUFFIX = "\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"../images/bt_View.gif\" name=\"bt_View1\"/></a>";
@@ -1309,9 +1320,9 @@ public class SDVUtil {
         try {
             request.getRequestDispatcher(path).forward(request, response);
         } catch (ServletException e) {
-            e.printStackTrace();
+            logger.error("Error while forwarding to other location: ", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error while forwarding to other location: ", e);
         }
     }
 

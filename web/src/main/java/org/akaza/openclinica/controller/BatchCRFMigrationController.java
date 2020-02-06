@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.controller;
 
 import java.io.File;
@@ -736,7 +743,7 @@ public class BatchCRFMigrationController implements Runnable {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Error in creating file for logging report: ", e);
         } finally {
             writer.print(toStringTextFormat(reportLog, resterms, stBean, cBean));
             closeFile(writer);

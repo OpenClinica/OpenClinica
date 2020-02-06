@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.service.crfdata;
 
 import java.nio.charset.Charset;
@@ -52,7 +59,6 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.StratificationFactorBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.service.RandomizeService;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.codec.binary.Base64;
@@ -93,7 +99,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private StudyEventDAO studyEventDAO;
     private EventDefinitionCRFDAO eventDefinitionCRFDAO;
     private ExpressionService expressionService;
-    private RandomizeService randomizeService;
     
     public DynamicsMetadataService(DataSource ds) {
         // itemsAlreadyShown = new ArrayList<Integer>();
@@ -517,16 +522,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             logger.info("Value from property value is : {}", value);
             value = property.getValue();
         }
-        if(property.getValueExpression() == null) {
+        if (property.getValueExpression() == null) {
             logger.info("There is no ValueExpression for property ="+property.getOid());
-             if (stratificationFactorBeans!=null)
-                try {
-                    value=getRandomizeService().getRandomizationCode(eventCrfBean,stratificationFactorBeans,ruleSet);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
         } else {
             String expression =
                 getExpressionService().constructFullExpressionIfPartialProvided(property.getValueExpression().getValue(), ruleSet.getTarget().getValue());
@@ -545,7 +542,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
         }
         return value;
-
     }
 
     private String getDateFormat(PropertyBean property){
@@ -1104,21 +1100,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     public void setExpressionService(ExpressionService expressionService) {
         this.expressionService = expressionService;
     }
-
-
-    public RandomizeService getRandomizeService() {
-        return randomizeService;
-    }
-
-    public void setRandomizeService(RandomizeService randomizeService) {
-        this.randomizeService = randomizeService;
-    }
-
-
-
-
-
-
+    
     class ItemOrItemGroupHolder {
 
         ItemBean itemBean;

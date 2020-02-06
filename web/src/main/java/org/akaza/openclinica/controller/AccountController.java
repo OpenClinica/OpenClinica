@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.controller;
 
 import java.net.URLDecoder;
@@ -753,7 +760,6 @@ public class AccountController {
         UserAccountBean accessCodeAccountBean = getAccessCodeAccount(accessCode);
         if (accessCodeAccountBean.isActive()) {
             logger.info("***Access Code already Exist in the User Table ***");
-            System.out.println("***Access Code already Exist in the User Table ***");
             return true;
         }
         return false;
@@ -801,7 +807,7 @@ public class AccountController {
             if ((study.getId() == pStudyId) && (studyUserRoleBean.getRoleName().equals("ra") || studyUserRoleBean.getRoleName().equals("ra2"))
                     && studyUserRoleBean.getStatus().isAvailable()) {
                 found = true;
-                System.out.println("if found :" + found);
+                logger.info("if found : {}", found);
                 break;
             }
         }

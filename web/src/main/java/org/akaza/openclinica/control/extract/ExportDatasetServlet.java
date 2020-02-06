@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.control.extract;
 
@@ -104,9 +104,7 @@ public class ExportDatasetServlet extends SecureController {
                 datasetId = dsb.getId();
                 logger.info("dataset id was zero, trying session: " + datasetId);
             } catch (NullPointerException e) {
-
-                e.printStackTrace();
-                logger.info("tripped over null pointer exception");
+                logger.error("tripped over null pointer exception", e);
             }
         }
         DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
@@ -248,7 +246,7 @@ public class ExportDatasetServlet extends SecureController {
                         Date dateStart = scheduler.scheduleJob(jobDetailBean.getObject(), simpleTrigger);
                         logger.info("== found job date: " + dateStart.toString());
                     } catch (SchedulerException se) {
-                        se.printStackTrace();
+                        logger.error("job cannot be fetched: ", se);
                     }
                 }
             } else if ("txt".equalsIgnoreCase(action)) {
@@ -502,8 +500,7 @@ public class ExportDatasetServlet extends SecureController {
 
             zipFile.close();
           } catch (java.io.IOException ioe) {
-        	  logger.error("Unhandled exception:");
-            ioe.printStackTrace();
+            logger.error("Unhandled exception:", ioe);
             return;
           }
     }

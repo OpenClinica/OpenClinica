@@ -1,8 +1,15 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
  * copyright 2003-2011 Akaza Research
  */
 package org.akaza.openclinica.control.admin;
@@ -131,8 +138,7 @@ public class CreateCRFVersionServlet extends SecureController {
                 return;
             } catch (Exception e) {
                 //
-                logger.warn("*** Found exception during file upload***");
-                e.printStackTrace();
+                logger.error("*** Found exception during file upload***", e);
             }
             session.setAttribute("tempFileName", tempFile);
             // YW, at this point, if there are errors, they point to no file
@@ -485,9 +491,8 @@ public class CreateCRFVersionServlet extends SecureController {
                         session.setAttribute("preview_crf", preview.createCrfMetaObject(workbook));
                     } catch (Exception exc) { // opening the stream could
                         // throw FileNotFoundException
-                        exc.printStackTrace();
                         String message = resword.getString("the_application_encountered_a_problem_uploading_CRF");
-                        logger.debug(message + ": " + exc.getMessage());
+                        logger.debug("{} : {}", message , exc.getMessage(), exc);
                         this.addPageMessage(message);
                     } finally {
                         if (inputStream != null) {
@@ -667,7 +672,7 @@ public class CreateCRFVersionServlet extends SecureController {
     }
 
     /**
-     * When the version is added, for each non-new item OpenClinica should check the RESPONSE_OPTIONS_TEXT, and
+     * When the version is added, for each non-new item LibreClinica should check the RESPONSE_OPTIONS_TEXT, and
      * RESPONSE_VALUES used for the item in other versions of the CRF.
      * 
      * For a given RESPONSE_VALUES code, the associated RESPONSE_OPTIONS_TEXT string is different than in a previous

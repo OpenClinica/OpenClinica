@@ -1,7 +1,14 @@
-/* 
- * OpenClinica is distributed under the
+/*
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
- * For details see: http://www.openclinica.org/license
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
+/* 
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+ * For details see: https://libreclinica.org/license
  *
  * Copyright 2003-2008 Akaza Research 
  */
@@ -17,7 +24,7 @@ import javax.persistence.Table;
 
 /**
  * <p>
- * Does not extend any Super Domain class because it does not follow OpenClinica convention. This table is managed via LiquiBase
+ * Does not extend any Super Domain class because it does not follow the convention. This table is managed via LiquiBase
  * </p>
  * 
  * @author Krikor Krumlian

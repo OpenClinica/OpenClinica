@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.dao.extract;
 
@@ -3142,8 +3142,6 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
             }
         } catch (NullPointerException e) {
             // TODO Auto-generated catch block
-            // e.printStackTrace();
-            //System.out.println("caught NPE here");
 			logger.debug("caught NPE here");
         }
 

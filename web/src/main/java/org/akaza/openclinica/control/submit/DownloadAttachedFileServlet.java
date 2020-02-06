@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.control.submit;
 
@@ -129,7 +129,7 @@ public class DownloadAttachedFileServlet extends SecureController {
                 outStream.flush();
                 outStream.close();
             } catch (Exception ee) {
-                ee.printStackTrace();
+                logger.error("InputStream is not working properly: ", ee);
             } finally {
                 if (inStream != null) {
                     inStream.close();

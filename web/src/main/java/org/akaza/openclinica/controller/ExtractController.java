@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.controller;
 
 import java.io.File;
@@ -67,12 +74,12 @@ public class ExtractController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap processSubmit(@RequestParam("id") String id,
-                                  @RequestParam("datasetId") String datasetId, HttpServletRequest request, HttpServletResponse response)  {
-        if(!mayProceed(request)){
-            try{
+                                  @RequestParam("datasetId") String datasetId, HttpServletRequest request, HttpServletResponse response) {
+        if(!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Error in redirecting the response: ", e);
             }
             return null;
         }
@@ -174,7 +181,7 @@ public class ExtractController {
             logger.debug("== found job date: " + dateStart.toString());
 
         } catch (SchedulerException se) {
-            se.printStackTrace();
+            logger.error("Error while accessing job date: ", se);
         }
 
         request.setAttribute("datasetId", datasetId);

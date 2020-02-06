@@ -1,9 +1,18 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.view.form;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -15,6 +24,8 @@ import java.util.List;
  * Created by IntelliJ IDEA. User: bruceperry Date: May 15, 2007
  */
 public class DefaultFormBuilder implements FormBuilder {
+    private Logger logger= LoggerFactory.getLogger(getClass().getName());
+
     // The object that will provide the content of the table's headers and cells
     private List<Object> displayItems;
 
@@ -62,7 +73,7 @@ public class DefaultFormBuilder implements FormBuilder {
         try {
             outp.output(doc, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error while writing the XML", e);
         }
         return writer.toString();
     }

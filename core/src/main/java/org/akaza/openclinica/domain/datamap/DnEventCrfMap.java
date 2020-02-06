@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 // default package
 // Generated Aug 8, 2013 11:32:37 AM by Hibernate Tools 3.4.0.CR1
 package org.akaza.openclinica.domain.datamap;

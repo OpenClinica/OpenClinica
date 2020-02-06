@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.web.pform.widget;
 
 import javax.sql.DataSource;
@@ -36,8 +43,7 @@ public abstract class BaseWidget implements Widget {
 		//TODO: "BN","ED","TEL",FILE"
 		case "pdate":
 		default: 
-			log.debug("Unsupported item data type encountered.  Returning null.");
-			System.out.println("Unsupported item data type encountered: " + type + ".  Returning null.");
+			log.debug("Unsupported item data type encountered: {}. Returning null.", type);
 			return null;
 		}
 	}

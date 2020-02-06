@@ -1,8 +1,15 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
  * copyright 2003-2011 Akaza Research
  */
 package org.akaza.openclinica.control.submit;
@@ -248,15 +255,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 
     @Override
-    public void init(ServletConfig config) throws ServletException
-    {
+    public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        try{
-      ServletContext  context = getServletContext();
-    SessionManager     sm = new SessionManager(SpringServletAccess.getApplicationContext(context));
-        dataSource = sm.getDataSource();
-        }catch(Exception ne){
-            ne.printStackTrace();
+        try {
+            ServletContext  context = getServletContext();
+            SessionManager sm = new SessionManager(SpringServletAccess.getApplicationContext(context));
+            dataSource = sm.getDataSource();
+        } catch(Exception ne) {
+            LOGGER.error("Servlet context is not working properly: ", ne);
         }
     }
 
@@ -292,9 +298,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return "";
     }
 
-    private void logMe(String message)
-    {
-      // System.out.println(message);
+    private void logMe(String message) {
         LOGGER.trace(message);
     }
 
@@ -2206,11 +2210,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     }
                     // }
                 } catch (InconsistentStateException ie) {
-                    ie.printStackTrace();
+                    LOGGER.error("permission is not sufficient: ", ie);
                     addPageMessage(ie.getOpenClinicaMessage(), request);
                     throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, ie.getOpenClinicaMessage(), "1");
                 } catch (NullPointerException ne) {
-                    ne.printStackTrace();
+                    LOGGER.error("crf not created correctly: ", ne);
                     addPageMessage(ne.getMessage(), request);
                     throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, ne.getMessage(), "1");
                 }
@@ -3871,9 +3875,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 try {
                     ResponseOptionBean rob = (ResponseOptionBean) dib.getMetadata().getResponseSet().getOptions().get(0);
                     LOGGER.trace("test print of options for coding: " + rob.getValue());
-                } catch (NullPointerException e) {
-                    // TODO Auto-generated catch block
-                    // e.printStackTrace();
+                } catch (NullPointerException npe) {
+                    LOGGER.debug("found NPE ", npe);
                 }
                 int itemDataId = dib.getData().getId();
                 int itemId = dib.getItem().getId();
@@ -4207,7 +4210,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             if (itemdatas == null || itemdatas.size()==0)
                 return false;
             for (ItemDataBean itemdata : itemdatas) {
-                System.out.println(itemdata.getItemId() +"  :  "+   itemdata.getValue());
+                LOGGER.debug(itemdata.getItemId() + "  :  " + itemdata.getValue());
                 if ((itemdata.getValue()==null || itemdata.getValue().equals("") || itemdata.getValue().trim().length()==0) && dndao.findNumExistingNotesForItem(itemdata.getId())<1 ) {
                     return false;
                 }
@@ -5197,12 +5200,13 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
                 try {
                     customValidation = Validator.processCRFValidationFunction(customValidationString);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("CRF func: validation is failed: ", e);
                 }
             } else if (customValidationString.startsWith("regexp:")) {
                 try {
                     customValidation = Validator.processCRFValidationRegex(customValidationString);
                 } catch (Exception e) {
+                    LOGGER.error("CRF regexp: validation is failed: ", e);
                 }
             }
 
@@ -5335,8 +5339,7 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
                 ruleSets = getRuleSetService(request).solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
                 // next line here ?
             } catch (NullPointerException npe) {
-                LOGGER.debug("found NPE " + npe.getMessage());
-                npe.printStackTrace();
+                LOGGER.debug("found NPE ", npe);
             }
             // above throws NPE?
             // return getRuleSetService().runRules(ruleSets, dryRun,

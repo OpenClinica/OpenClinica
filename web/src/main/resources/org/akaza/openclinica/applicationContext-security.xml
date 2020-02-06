@@ -106,11 +106,27 @@
     
     
    
-    <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
-        <constructor-arg name="sessionRegistry" ref="sessionRegistry" />
-        <property name="maximumSessions" value="1" />
-    </bean>
-
+	<bean id="sas"
+		class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+		<constructor-arg>
+			<list>
+				<bean
+					class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
+					<constructor-arg ref="sessionRegistry" />
+					<property name="maximumSessions" value="1" />
+					<property name="exceptionIfMaximumExceeded"
+						value="false" />
+				</bean>
+				<bean
+					class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
+				</bean>
+				<bean
+					class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
+					<constructor-arg ref="sessionRegistry" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
     
     <bean id="openClinicaLogoutHandler" class="org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
         <property name="auditUserLoginDao" ref="auditUserLoginDao"/>

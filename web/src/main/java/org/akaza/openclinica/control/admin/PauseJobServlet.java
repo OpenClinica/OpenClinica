@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Role;
@@ -93,8 +100,7 @@ public class PauseJobServlet extends SecureController {
                 }
             }
         } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Scheduler cannot deleteJob: ", e);
         }
         // all validation done on JSP side
         // forward back to view job servlet here

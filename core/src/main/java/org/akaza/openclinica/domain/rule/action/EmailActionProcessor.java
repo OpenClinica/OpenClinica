@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.domain.rule.action;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -74,7 +81,7 @@ public class EmailActionProcessor implements ActionProcessor {
             helper.setText(body);
 
             mailSender.send(mimeMessage);
-            System.out.println("Sending Email thru Email Action");
+            logger.debug("Sending Email thru Email Action");
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
             logger.error("Email could not be sent");

@@ -1,0 +1,2 @@
+If you want to checkout LibreClinica without documentation you might find a solution at
+https://stackoverflow.com/questions/5494576/git-how-to-ignore-specify-files-for-checkout

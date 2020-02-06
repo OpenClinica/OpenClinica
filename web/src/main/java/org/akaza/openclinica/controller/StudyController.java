@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.controller;
 
 import java.text.ParseException;
@@ -131,7 +138,7 @@ public class StudyController {
 	public ResponseEntity<Object> createNewStudy(HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
 		StudyBean studyBean = null;
-		System.out.println("I'm in Create Study");
+		logger.debug("I'm in Create Study");
 		ResponseEntity<Object> response = null;
 
 		String validation_failed_message = "VALIDATION FAILED";
@@ -449,7 +456,7 @@ public class StudyController {
 
 	@RequestMapping(value = "/{uniqueProtocolID}/sites", method = RequestMethod.POST)
 	public ResponseEntity<Object> createNewSites(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID) throws Exception {
-		System.out.println("I'm in Create Sites ");
+		logger.debug("I'm in Create Sites ");
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
 		StudyBean siteBean = null;
 		ResponseEntity<Object> response = null;
@@ -740,7 +747,7 @@ public class StudyController {
 	@RequestMapping(value = "/{uniqueProtocolID}/eventdefinitions", method = RequestMethod.POST)
 	public ResponseEntity<Object> createEventDefinition(HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueProtocolID") String uniqueProtocolID)
 			throws Exception {
-		System.out.println("I'm in Create Event Definition ");
+		logger.debug("I'm in Create Event Definition ");
 		ArrayList<ErrorObject> errorObjects = new ArrayList();
 		StudyEventDefinitionBean eventBean = null;
 		ResponseEntity<Object> response = null;
@@ -898,7 +905,7 @@ public class StudyController {
 	public Boolean verifyProtocolTypeExist(String protocolType) {
 		ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
 		if (!protocolType.equals(resadmin.getString("interventional")) && !protocolType.equals(resadmin.getString("observational"))) {
-			System.out.println("Protocol Type not supported");
+			logger.info("Study Protocol Type not supported");
 			return false;
 		}
 		return true;
@@ -1017,7 +1024,6 @@ public class StudyController {
 		UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
 		if (!ownerUserAccount.isTechAdmin() && !ownerUserAccount.isSysAdmin()) {
 			logger.info("The Owner User Account is not Valid Account or Does not have Admin user type");
-			System.out.println("The Owner User Account is not Valid Account or Does not have Admin user type");
 			return null;
 		}
 		return ownerUserAccount;

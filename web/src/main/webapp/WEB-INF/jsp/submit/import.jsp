@@ -81,7 +81,7 @@
 	<td class="formlabel"><!--<fmt:message key="xml_file_to_upload" bundle="${resterms}"/>:--></td>
 	<td>
 		<div class="formfieldFile_BG">
-			<input type="file" name="xml_file" >
+			<input type="file" name="xml_file" class="no-border">
 
 		</div>
 		<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>

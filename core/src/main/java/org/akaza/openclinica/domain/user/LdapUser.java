@@ -1,8 +1,17 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.domain.user;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a user's information retrieved from LDAP/Active Directory
@@ -13,6 +22,7 @@ import java.net.URLEncoder;
 public class LdapUser implements Serializable {
 
     private static final long serialVersionUID = 989338796135101116L;
+    private static final Logger logger=LoggerFactory.getLogger(LdapUser.class);
 
     private String distinguishedName;
     private String username;
@@ -61,7 +71,7 @@ public class LdapUser implements Serializable {
         try {
             return URLEncoder.encode(getDistinguishedName(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("Unable to Encode to UTF-8: ", e);
         }
         return "";
     }

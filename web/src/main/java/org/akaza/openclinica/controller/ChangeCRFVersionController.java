@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.controller;
 
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -102,10 +109,10 @@ public class ChangeCRFVersionController {
 
     	//to be removed for aquamarine
     	  if(!mayProceed(request)){
-              try{
+              try {
                   response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-              }catch (Exception e){
-                  e.printStackTrace();
+              } catch (Exception e) {
+				  logger.error("Redirecting response failed: ", e);
               }
               return null;
           }
@@ -609,14 +616,13 @@ public class ChangeCRFVersionController {
         UserAccountBean ub = (UserAccountBean)request.getSession().getAttribute("userBean");
         return ub;
     }
-    private Object redirect(HttpServletRequest request,HttpServletResponse response, String location){
-    	 try{
-                response.sendRedirect(request.getContextPath() + location);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            return null;
-        
+    private Object redirect(HttpServletRequest request,HttpServletResponse response, String location) {
+    	try {
+    		response.sendRedirect(request.getContextPath() + location);
+		} catch (Exception e) {
+    		logger.error("Error while redirecting the request: ",e);
+		}
+		return null;
     }
     
     private void resetPanel(HttpServletRequest request){

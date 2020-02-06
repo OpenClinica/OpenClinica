@@ -8,16 +8,6 @@
 
 <jsp:useBean scope='session' id='trail' class='java.util.ArrayList'/>
 
-<!--script language="JavaScript">
-function reportBug() {
- var bugtrack = "http://dev.openclinica.org/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
- var user= "<c:out value="${userBean.name}"/>";
- bugtrack = bugtrack + user+ "&url=" + window.location.href;
- openDocWindow(bugtrack);
-
-}
-</script-->
-
 <!-- Breadcrumbs -->
 
 <!-- End Breadcrumbs -->

@@ -1,9 +1,9 @@
 /*
- * OpenClinica is distributed under the
+ * LibreClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
  */
 package org.akaza.openclinica.control.submit;
 
@@ -288,7 +288,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             		try {
             			pathStrippedValueToCompare = (ItemDataBean) BeanUtils.cloneBean(valueToCompare);
             		} catch (Throwable e) {
-            			e.printStackTrace();
+                        LOGGER.error("Error cloning the bean for pathStrippedValueToCompare: ", e);
             			return dib;
             		}
             		// the value we want to check only has filename with no path, so we strip path from the one stored in database, and compare

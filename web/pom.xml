@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.libreclinica</groupId>
 		<artifactId>LibreClinica</artifactId>
-		  <version>0.4.0</version>
+		  <version>0.6.0</version>
 	</parent>
 	<dependencies>
 		<dependency>
@@ -346,7 +346,7 @@
     </build>
 
     <properties>
-    	<assembly.name>OpenClinica</assembly.name>
+    	<assembly.name>LibreClinica</assembly.name>
     </properties>
 
 </project>

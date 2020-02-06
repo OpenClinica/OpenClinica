@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.domain.rule.action;
 
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
@@ -28,7 +35,8 @@ public class ActionProcessorFacade {
         case INSERT:
             return new InsertActionProcessor(ds, itemMetadataService, ruleActionRunLogDao, ruleSet, ruleSetRule);
         case RANDOMIZE:
-            return new RandomizeActionProcessor(ds, itemMetadataService, ruleActionRunLogDao, ruleSet, ruleSetRule);
+            // Randomization is removed from LibreClinica
+            throw new OpenClinicaSystemException("actionType", "action type 'RANDOMIZE' is not supported in LibreClinica!");
         default:
             throw new OpenClinicaSystemException("actionType", "Unrecognized action type!");
         }

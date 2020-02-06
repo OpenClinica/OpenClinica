@@ -1,3 +1,10 @@
+/*
+ * LibreClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: https://libreclinica.org/license
+ * LibreClinica, copyright (C) 2020
+ */
 package org.akaza.openclinica.web.pform;
 
 import java.io.Reader;
@@ -123,7 +130,6 @@ public class OpenRosaXmlGenerator {
             // add nodeset for instanceId
             String postInstance = "<bind calculate=\"concat('uuid:', uuid())\" nodeset=\"/" + crfVersion.getOid() + "/meta/instanceID\" readonly=\"true()\" type=\"string\"/>" + nodeset;
             logger.debug(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
-            System.out.println(preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance);
             return preInstance + "<instance>\n" + instance + "\n</instance>" + postInstance;
         } catch (Exception e) {
             log.error(e.getMessage());
