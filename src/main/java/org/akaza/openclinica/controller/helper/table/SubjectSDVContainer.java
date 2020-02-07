@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller.helper.table;
 
+import java.util.Date;
+
 /**
  * The container or bean representing a row in the sdv table.
  */
@@ -20,7 +22,7 @@ public class SubjectSDVContainer {
     private String personId;
     private String secondaryId;
     private String eventName;
-    private String eventDate;
+    private Date eventDate;
     private String enrollmentDate;
     private String studySubjectStatus;
     private String crfNameVersion;
@@ -28,7 +30,7 @@ public class SubjectSDVContainer {
     private String sdvRequirementDefinition;
     private String crfStatus;
     private String studyEventStatus;
-    private String lastUpdatedDate;
+    private Date lastUpdatedDate;
     private String lastUpdatedBy;
     private String sdvStatusActions;
     private String numberOfCRFsSDV;
@@ -43,14 +45,14 @@ public class SubjectSDVContainer {
         personId = "";
         secondaryId = "";
         eventName = "";
-        eventDate = "";
+        eventDate = null;
         enrollmentDate = "";
         studySubjectStatus = "";
         crfNameVersion = "";
         sdvRequirementDefinition = "";
         crfStatus = "";
         studyEventStatus = "";
-        lastUpdatedDate = "";
+        lastUpdatedDate = null;
         lastUpdatedBy = "";
         sdvStatusActions = "";
         numberOfCRFsSDV = "";
@@ -147,11 +149,11 @@ public class SubjectSDVContainer {
         this.eventName = eventName;
     }
 
-    public String getEventDate() {
+    public Date getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(String eventDate) {
+    public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
     }
 
@@ -179,11 +181,11 @@ public class SubjectSDVContainer {
         this.crfStatus = crfStatus;
     }
 
-    public String getLastUpdatedDate() {
+    public Date getLastUpdatedDate() {
         return lastUpdatedDate;
     }
 
-    public void setLastUpdatedDate(String lastUpdatedDate) {
+    public void setLastUpdatedDate(Date lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
