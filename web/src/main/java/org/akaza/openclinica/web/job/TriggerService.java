@@ -7,7 +7,6 @@
  */
 package org.akaza.openclinica.web.job;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,9 +26,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfo;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
-import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -57,79 +54,6 @@ public class TriggerService {
 
     private static String IMPORT_TRIGGER = "importTrigger";
 
-    public SimpleTrigger generateTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study, String locale) {
-        Date startDateTime = fp.getDateTime(DATE_START_JOB);
-        // check the above?
-        int datasetId = fp.getInt(DATASET_ID);
-        String period = fp.getString(PERIOD);
-        String email = fp.getString(EMAIL);
-        String jobName = fp.getString(JOB_NAME);
-        String jobDesc = fp.getString(JOB_DESC);
-        String spss = fp.getString(SPSS);
-        String tab = fp.getString(TAB);
-        String cdisc = fp.getString(CDISC);
-        String cdisc12 = fp.getString(ExampleSpringJob.CDISC12);
-        String cdisc13 = fp.getString(ExampleSpringJob.CDISC13);
-        String cdisc13oc = fp.getString(ExampleSpringJob.CDISC13OC);
-        BigInteger interval = new BigInteger("0");
-        if ("monthly".equalsIgnoreCase(period)) {
-            interval = new BigInteger("2419200000"); // how many
-            // milliseconds in
-            // a month? should
-            // be 24192000000
-        } else if ("weekly".equalsIgnoreCase(period)) {
-            interval = new BigInteger("604800000"); // how many
-            // milliseconds in
-            // a week? should
-            // be 6048000000
-        } else { // daily
-            interval = new BigInteger("86400000");// how many
-            // milliseconds in a
-            // day?
-        }
-        // set up and commit job here
-
-
-        // set the job detail name,
-        // based on our choice of format above
-        // what if there is more than one detail?
-        // what is the number of times it should repeat?
-        // arbitrary large number, 64K should be enough :)
-
-        SimpleTrigger trigger = (SimpleTrigger) newTrigger()
-                .forJob(jobName, "DEFAULT")
-                .withDescription(jobDesc)
-                .startAt(startDateTime)
-                .withSchedule(simpleSchedule().withRepeatCount(64000).withIntervalInSeconds(interval.intValue()).withMisfireHandlingInstructionNextWithExistingCount());
-
-        // set job data map
-        trigger.getJobDataMap().put(DATASET_ID, datasetId);
-        trigger.getJobDataMap().put(PERIOD, period);
-        trigger.getJobDataMap().put(EMAIL, email);
-        trigger.getJobDataMap().put(TAB, tab);
-        trigger.getJobDataMap().put(CDISC, cdisc);
-        trigger.getJobDataMap().put(ExampleSpringJob.CDISC12, cdisc12);
-        trigger.getJobDataMap().put(ExampleSpringJob.LOCALE, locale);
-        // System.out.println("found 1.2: " +
-        // trigger.getJobDataMap().get(ExampleSpringJob.CDISC12));
-        trigger.getJobDataMap().put(ExampleSpringJob.CDISC13, cdisc13);
-        // System.out.println("found 1.3: " +
-        // trigger.getJobDataMap().get(ExampleSpringJob.CDISC13));
-        trigger.getJobDataMap().put(ExampleSpringJob.CDISC13OC, cdisc13oc);
-        // System.out.println("found 1.3oc: " +
-        // trigger.getJobDataMap().get(ExampleSpringJob.CDISC13OC));
-        trigger.getJobDataMap().put(SPSS, spss);
-        trigger.getJobDataMap().put(USER_ID, userAccount.getId());
-        // StudyDAO studyDAO = new StudyDAO();
-        trigger.getJobDataMap().put(STUDY_ID, study.getId());
-        trigger.getJobDataMap().put(STUDY_NAME, study.getName());
-        trigger.getJobDataMap().put(STUDY_OID, study.getOid());
-        
-        // trigger.setRepeatInterval(interval.longValue());
-        // System.out.println("default for volatile: " + trigger.isVolatile());
-        return trigger;
-    }
-
     public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study, String locale) {
         Date startDateTime = new Date(System.currentTimeMillis());
         return generateImportTrigger(fp, userAccount, study, startDateTime, locale);
@@ -138,7 +62,6 @@ public class TriggerService {
     public SimpleTrigger generateImportTrigger(FormProcessor fp, UserAccountBean userAccount, StudyBean study, Date startDateTime, String locale) {
 
         String jobName = fp.getString(JOB_NAME);
-
         String email = fp.getString(EMAIL);
         String jobDesc = fp.getString(JOB_DESC);
         String directory = fp.getString(DIRECTORY);
@@ -155,12 +78,21 @@ public class TriggerService {
             long minutesInt = minutes * 60000;
             interval = interval + minutesInt;
         }
-        SimpleTrigger trigger = (SimpleTrigger) newTrigger()
-                .forJob(jobName, IMPORT_TRIGGER)
-                .withDescription(jobDesc)
-                .startAt(startDateTime)
-                .withSchedule(simpleSchedule().withRepeatCount(64000).withIntervalInSeconds(new Long(interval).intValue()).withMisfireHandlingInstructionNextWithExistingCount());
 
+        SimpleTrigger trigger = newTrigger()
+            .withIdentity(jobName, IMPORT_TRIGGER)
+            .forJob(jobName, IMPORT_TRIGGER)
+            .withDescription(jobDesc)
+            .startAt(startDateTime)
+            .withSchedule(
+                simpleSchedule()
+                    .withRepeatCount(64000)
+                    .withIntervalInSeconds(
+                        new Long(interval).intValue()
+                    )
+                    .withMisfireHandlingInstructionNextWithExistingCount()
+            )
+            .build();
         
         // set job data map
         trigger.getJobDataMap().put(EMAIL, email);
@@ -402,4 +334,5 @@ public class TriggerService {
 
         return errors;
     }
+    
 }

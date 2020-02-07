@@ -156,14 +156,14 @@ public class CreateJobImportServlet extends SecureController {
                 StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                 StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
                 SimpleTrigger trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), studyBean, LocaleResolver.getLocale(request).getLanguage());
-
-                // SimpleTrigger trigger = new SimpleTrigger();
+                
                 JobDetailFactoryBean jobDetailBean = new JobDetailFactoryBean();
                 jobDetailBean.setGroup(IMPORT_TRIGGER);
                 jobDetailBean.setName(trigger.getKey().getName());
                 jobDetailBean.setJobClass(org.akaza.openclinica.web.job.ImportStatefulJob.class);
                 jobDetailBean.setJobDataMap(trigger.getJobDataMap());
                 jobDetailBean.setDurability(true); // need durability?
+                jobDetailBean.afterPropertiesSet();
 
                 // set to the scheduler
                 try {
