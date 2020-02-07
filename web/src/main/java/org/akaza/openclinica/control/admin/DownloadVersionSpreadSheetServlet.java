@@ -1,8 +1,8 @@
-/* LibreClinica is distributed under the
+/* OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
- * For details see: https://libreclinica.org/license
- * LibreClinica, copyright (C) 2020
+ * For details see: http://www.openclinica.org/license
+ * copyright 2003-2005 Akaza Research
  */
 package org.akaza.openclinica.control.admin;
 
@@ -36,7 +36,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
     public static String CRF_VERSION_ID = "crfVersionId";
 
-    public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.9.xls";
+    public static String CRF_VERSION_TEMPLATE = "CRF_Template_lc_v1.0.xls";
 
     /**
      *
@@ -129,7 +129,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
                 op.flush();
                 op.close();
             } catch (Exception ee) {
-                logger.error("Input Stream is not working properly: ", ee);
+                ee.printStackTrace();
             } finally {
                 if (in != null) {
                     in.close();
