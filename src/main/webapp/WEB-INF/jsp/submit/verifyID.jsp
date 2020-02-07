@@ -25,7 +25,8 @@
                         url: sessionStorage.getItem("pageContextPath") + '/pages/api/insight/report/studies/' + sessionStorage.getItem("studyOid") + '/participantID/' + clickedParticipant.attr('name') + '/create',
                     });
                 }
-                window.location.href = window.location.toString().replace('ListStudySubjects', clickedParticipant.attr('href'));
+                var studySubjectUrl = window.location.toString().split('OpenClinica/')[0] + "OpenClinica/" + clickedParticipant.attr('href');
+                window.location.href = studySubjectUrl;
             } else {
                 jQuery('#pidv-err').show();                
             }
