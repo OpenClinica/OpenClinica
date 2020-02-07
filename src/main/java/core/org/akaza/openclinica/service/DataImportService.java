@@ -78,7 +78,12 @@ public class DataImportService {
 
     @Autowired
     private StudyDao studyDao;
-    @Autowired
+    public DataImportService(StudyDao studyDao) {
+		super();
+		this.studyDao = studyDao;
+	}
+
+	@Autowired
     private ImportCRFDataService importCRFDataService;
 
     public Locale getLocale() {
