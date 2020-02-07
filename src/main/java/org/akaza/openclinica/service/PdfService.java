@@ -19,13 +19,13 @@ import core.org.akaza.openclinica.domain.datamap.StudySubject;
 public interface PdfService {
 
     File mergePDF(ArrayList<File> files,
-                  String fullFinalFilePathName,ArrayList<String> pdfHeaders) throws IOException;
+                  String fullFinalFilePathName,ArrayList<String[]> pdfHeaders) throws IOException;
 
     String getCaseBookFileRootPath();
 
-    int addHeaderOrFooter(PDDocument document, String headerMsg,String footerMsg, int page_counter) throws IOException;
+    int addHeaderOrFooter(PDDocument document, String[] headerMsg,String footerMsg, int page_counter) throws IOException;
     
-    String preparePdfHeader(Study study, Study site, String studySubjectIdentifier,StudyEvent studyEvent);
+    String[] preparePdfHeader(Study study, Study site, String studySubjectIdentifier,StudyEvent studyEvent);
     
     void writeToFile(String message,  String fileName, StudySubject ss);
     

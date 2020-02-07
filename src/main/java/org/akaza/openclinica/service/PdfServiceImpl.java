@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 
@@ -39,10 +40,11 @@ import org.springframework.stereotype.Service;
 public class PdfServiceImpl implements PdfService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
-	 static final MessageFormat pdfHeaderFormat1 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                    {3}") ;
-	 static final MessageFormat pdfHeaderFormat2 =  new MessageFormat("{0} - Participant {2}                                                                                                                     {3}");
-	 static final MessageFormat pdfHeaderFormat3 =  new MessageFormat("{0}: {1} - Participant {2}                                                                                                                  {3} ({4})");
-	 static final MessageFormat pdfHeaderFormat4 =  new MessageFormat("{0} - Participant {2}                                                                                                                   {3} ({4})");  
+	 static final MessageFormat pdfHeaderLeftFormat1 =  new MessageFormat("{0}: {1} - Participant {2} ") ;
+	 static final MessageFormat pdfHeaderLeftFormat2 =  new MessageFormat("{0} - Participant {2}");
+	 
+	 static final MessageFormat pdfHeaderRightFormat1 =  new MessageFormat("{3} ({4})");
+	 static final MessageFormat pdfHeaderRightFormat2 =  new MessageFormat("{3}"); 	 
 
     /**
      *
@@ -59,7 +61,7 @@ public class PdfServiceImpl implements PdfService {
      * @throws IOException
      */
     public File mergePDF(ArrayList<File> files,
-                         String fullFinalFilePathName,ArrayList<String> pdfHeaders) throws IOException {
+                         String fullFinalFilePathName,ArrayList<String[]> pdfHeaders) throws IOException {
 
         //Instantiating PDFMergerUtility class
         PDFMergerUtility PDFmerger = new PDFMergerUtility();
@@ -79,7 +81,7 @@ public class PdfServiceImpl implements PdfService {
             docTemp.close();
         }
         String footerMsg = "Page X of " + totalPageNumber;
-        String headerMsg="";
+        String headerMsg[];
         int file_counter = 0;
         
         for(File file: files) {
@@ -133,7 +135,7 @@ public class PdfServiceImpl implements PdfService {
     /**
      * will return next available page number
      */
-    public int addHeaderOrFooter(PDDocument document, String headerMsg,String footerMsg, int page_counter) throws IOException {
+    public int addHeaderOrFooter(PDDocument document, String[] headerMsg,String footerMsg, int page_counter) throws IOException {
 
         String footerMessage = null;             
         PDFont font = PDType1Font.TIMES_ROMAN;
@@ -166,11 +168,24 @@ public class PdfServiceImpl implements PdfService {
             	if(headerMsg != null) {            		
                     // set font and font size
                     contentStream.setFont( font, fontSize);
-                    contentStream.moveTextPositionByAmount(headerCenterX, headerCenterY);
+                    /**
+                     *  header's left part
+                     *  50*2 is the margin space                   
+                     */
+                    float margin = 50;
+                    float space = 5;
+                    float rightHeaderWidth = (float) (pageWidth * 0.25 - margin);
+                    float leftHeaderStartX = margin;
+                    float leftHeaderWidth = (float) (pageWidth * 0.75 - margin - space);
+                    float rightHeaderStartX = leftHeaderStartX + leftHeaderWidth + space;
+                    // header's left part
+                    this.drawMultiLineText(headerMsg[0], leftHeaderStartX, headerCenterY, leftHeaderWidth, contentStream, font, fontSize, stringHeight+ 3);
                     
-                    contentStream.showText(headerMsg);
-                    
-                                       
+                    // header's right part, can't write in the margin place 
+                    if(rightHeaderStartX + rightHeaderWidth > pageWidth - margin) {
+                    	rightHeaderWidth = pageWidth - margin - rightHeaderStartX;
+                    }
+                    this.drawMultiLineText(headerMsg[1], rightHeaderStartX, headerCenterY, rightHeaderWidth, contentStream, font, fontSize, stringHeight+ 3);                                                           
             	}            	 
                  
                 // add footer             
@@ -214,7 +229,7 @@ public class PdfServiceImpl implements PdfService {
     }
 
 
-   public String preparePdfHeader(Study study, Study site, String studySubjectIdentifier,StudyEvent studyEvent) {
+   public String[] preparePdfHeader(Study study, Study site, String studySubjectIdentifier,StudyEvent studyEvent) {
 	  
 	    String siteName = null;
 	    String studyName = null;
@@ -222,7 +237,7 @@ public class PdfServiceImpl implements PdfService {
 	    String eventName = null;
 	    String eventNameWith = null;
 	    String sequence = null;
-	    Boolean isRepeating = false;
+	    Boolean isRepeating = false;	
 	    	    	    		  		    
 	    if(study != null) {				
 			studyName = study.getName();		
@@ -241,39 +256,20 @@ public class PdfServiceImpl implements PdfService {
 	    }
 	    Object[] headerArgs = {studyName, siteName,participantID,eventName,sequence};
 	    
-	    String pdfHeader;
-		if(siteName !=null) {
-			if(isRepeating) {
-				pdfHeader = pdfHeaderFormat3.format(headerArgs);
-			}else {
-				pdfHeader = pdfHeaderFormat1.format(headerArgs);
-			}
-	    	
+	    String[] pdfHeader = new String[2];
+	    // header's left part
+		if(siteName !=null) {			
+				pdfHeader[0] = pdfHeaderLeftFormat1.format(headerArgs);			    	
 	    }else {
-			if(isRepeating) {
-				pdfHeader = pdfHeaderFormat4.format(headerArgs);			
-			}else {
-				pdfHeader = pdfHeaderFormat2.format(headerArgs);
-			}
-	    	
+	    		pdfHeader[0] = pdfHeaderLeftFormat2.format(headerArgs);			    	
 	    }
-	    
-		// not support UTF-8 at this time
-		try {
-			pdfHeader = new String(pdfHeader.getBytes("ISO-8859-1"), "ISO-8859-1");
-		} catch (UnsupportedEncodingException e) {
-			;
+		// header's right part
+		if(isRepeating) {
+			pdfHeader[1] = pdfHeaderRightFormat1.format(headerArgs);			
+		}else {
+			pdfHeader[1] = pdfHeaderRightFormat2.format(headerArgs);
 		}
-
-		// dynamically calculate the header length
-		while(pdfHeader.length() > 160) {
-			pdfHeader = pdfHeader.replaceFirst("  ", "");
-			if(pdfHeader.indexOf("  ") < 0) {
-				break;
-			}
-		}
-		
-
+	
 	    return pdfHeader;
    }
 
@@ -313,5 +309,63 @@ public class PdfServiceImpl implements PdfService {
 
    }
 
+   /**
+    * 
+    * @param text
+    * @param x
+    * @param y
+    * @param allowedWidth
+    * @param contentStream
+    * @param font
+    * @param fontSize
+    * @param rowHeight
+    * @throws IOException
+    */
+   private void drawMultiLineText(String text, float x, float y, float allowedWidth, PDPageContentStream contentStream, PDFont font, float fontSize, float rowHeight) throws IOException {
+
+	    List<String> lines = new ArrayList<String>();
+
+	    String myLine = "";
+
+	  // not support UTF-8 at this time
+ 		try {
+ 			text = new String(text.getBytes("ISO-8859-1"), "ISO-8859-1");
+ 		} catch (UnsupportedEncodingException e) {
+ 			;
+ 		}
+ 		
+	    // get all words from the text
+	    String[] words = text.split(" ");
+	    for(String word : words) {
+
+	        if(!myLine.isEmpty()) {
+	            myLine += " ";
+	        }
+
+	        // test the width of the current line + the current word
+	        int size = (int) (fontSize * font.getStringWidth(myLine + word) / 1000);
+	        if(size > allowedWidth) {
+	            // if the line would be too long with the current word, add the line without the current word
+	            lines.add(myLine);
+
+	            // and start a new line with the current word
+	            myLine = word;
+	        } else {
+	            // if the current line + the current word would fit, add the current word to the line
+	            myLine += word;
+	        }
+	    }
+	    // add the rest to lines
+	    lines.add(myLine);
+
+	    for(String line : lines) {	      
+	        contentStream.setFont(font, fontSize);
+	        contentStream.setTextMatrix(Matrix.getTranslateInstance(x, y));                    
+            contentStream.showText(line);	       
+
+	        y -= rowHeight;
+	    }
+
+	}
 
 }

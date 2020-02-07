@@ -407,13 +407,13 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		
     	    CoreResources.setRequestSchema(schema);
     	    ArrayList<File> pdfFiles = new ArrayList<File>();
-    	    ArrayList<String> pdfHeaders = new ArrayList<String>();
+    	    ArrayList<String[]> pdfHeaders = new ArrayList<String[]>();
 		    File mergedPdfFile = null;
 		    String mergedPdfFileNm = null;
 		    int studyId = Integer.parseInt((String) servletContext.getAttribute("studyID"));
 		    
 		    // pdf header
-		    String pdfHeader = null;
+		    String[] pdfHeader = null;
 		   
 			/**
 			 *  need to check the number of study/events/forms for this subject
