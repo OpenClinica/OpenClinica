@@ -1050,8 +1050,7 @@ public class SDVUtil {
             }
             StringBuilder actionsBuilder = new StringBuilder(new HtmlBuilder().toString());
 
-            actionsBuilder.append("<a class='icon icon-doc-text-solid' href='javascript:void(0)' onclick='popupSdv(this)'></a> ");
-            actionsBuilder.append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;'/>");
+            actionsBuilder.append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;' onclick='popupSdv(this)'/>");
             if (eventCRFBean.getStatus() != null){
                 String queryStringEncoded = queryString;
                 try {
