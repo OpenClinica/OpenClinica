@@ -214,7 +214,22 @@ public class AddNewSubjectServlet extends SecureController {
             String label = fp.getString(INPUT_LABEL).trim();
 
             if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
-                label = generateParticipantIdUsingTemplate();
+                boolean labelExists;
+                int iteration =0;
+                do {
+                    labelExists = false;
+                    iteration++;
+                    label = generateParticipantIdUsingTemplate();
+                    StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getStudyId());
+                    StudySubjectBean subjectWithSameLabelInParent = null;
+                    if (currentStudy.isSite()) {
+                        subjectWithSameLabelInParent = ssd.findByLabelAndStudyForCreatingParticipant(label, currentStudy.getStudy().getStudyId());
+                    }
+                    if (subjectWithSameLabel.isActive() || (subjectWithSameLabelInParent != null && subjectWithSameLabelInParent.isActive())) {
+                        labelExists = true;
+                    }
+                } while (labelExists && iteration < 11);
+
                 request.setAttribute(INPUT_LABEL, label);
             }
             v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);

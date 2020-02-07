@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EnketoCredentials implements Serializable {
-    private String serverUrl = null;
+    private String serverUrl = null;  
     private String apiKey = null;
     private String ocInstanceUrl = null;
     protected static final Logger logger = LoggerFactory.getLogger(EnketoCredentials.class);
@@ -30,12 +30,24 @@ public class EnketoCredentials implements Serializable {
         studyOid = study.getOc_oid();
         EnketoCredentials credentials = new EnketoCredentials();
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        credentials.setServerUrl(CoreResources.getField("form.engine.url"));
+        credentials.setServerUrl(CoreResources.getField("form.engine.url"));       
         credentials.setApiKey(study.getStudyEnvUuid());
         credentials.setOcInstanceUrl(ocUrl);
         return credentials;
     }
 
+  
+    public static EnketoCredentials getPdfInstance(String studyOid) {
+        Study study = getParentStudy(studyOid);
+        studyOid = study.getOc_oid();
+        EnketoCredentials credentials = new EnketoCredentials();
+        String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+        credentials.setServerUrl(CoreResources.getField("pdf.form.engine.url"));       
+        credentials.setApiKey(study.getStudyEnvUuid());
+        credentials.setOcInstanceUrl(ocUrl);
+        return credentials;
+    }
+    
     public String getServerUrl() {
         return serverUrl;
     }
@@ -76,10 +88,11 @@ public class EnketoCredentials implements Serializable {
             Study study = studyDao.findByOcOID(studyOid);
         if (study.getStudy() == null) {
             logger.debug("The Study Oid: " + studyOid + " is a Study level Oid");
-            return study;
+            return null;
         } else {
             logger.debug("The Study Oid: " + studyOid + " is a Site level Oid");
-            return null;
+            return study;
         }
     }
+	
 }

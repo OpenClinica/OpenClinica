@@ -20,13 +20,13 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
     }
 
     /**
-     * findAllByStudy(Integer studyId,int pageNumber, int pageSize), finds all the studySubjects which are available or signed.
+     * findAllByStudyWithAvailableAndSignedStatusOnly(Integer studyId,int pageNumber, int pageSize), finds all the studySubjects which are available or signed.
      *
      * @return a list of studySubjects
      */
     @SuppressWarnings("unchecked")
     @Transactional
-    public List<StudySubject> findAllByStudy(Integer studyId,int pageNumber, int pageSize) {
+    public List<StudySubject> findAllByStudyWithAvailableAndSignedStatusOnly(Integer studyId,int pageNumber, int pageSize) {
         String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid and (status_id = :statusId or status_id = :statusId1) order by do.dateCreated ";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("statusId",1);
@@ -36,6 +36,14 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         q.setMaxResults(pageSize);
         return (List<StudySubject>) q.list();
 
+    }
+
+    public List<StudySubject> findAllByStudy(Study study){
+        String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid or do.study.study.studyId=:parentStudyId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyid", study.getStudyId());
+        q.setParameter("parentStudyId", study.getStudyId());
+        return (List<StudySubject>) q.list();
     }
 
     public StudySubject findByOcOID(String OCOID) {

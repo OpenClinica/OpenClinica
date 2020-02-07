@@ -56,7 +56,7 @@ public class EnketoFormServlet extends SecureController {
         OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
 
         String mode = request.getParameter(MODE);
-        String originatingPage = StringEscapeUtils.escapeHtml(request.getParameter(ORIGINATING_PAGE));
+        String originatingPage = request.getParameter(ORIGINATING_PAGE);
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         int formLayoutId = Integer.valueOf(request.getParameter(FORM_LAYOUT_ID));
         int studyEventId = Integer.valueOf(request.getParameter(STUDY_EVENT_ID));
@@ -85,6 +85,7 @@ public class EnketoFormServlet extends SecureController {
         subjectContext.setStudyOid((currentStudy.getOc_oid()));
         subjectContext.setFormLoadMode(mode);
         contextHash = cache.putSubjectContext(subjectContext);
+        logger.info("Subject Context info *** {} *** ",subjectContext.toString());
 
         Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOc_oid());
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");

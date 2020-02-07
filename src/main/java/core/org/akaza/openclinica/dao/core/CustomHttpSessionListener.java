@@ -31,7 +31,7 @@ public class CustomHttpSessionListener implements HttpSessionListener {
 
         UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
         if (ub == null) {
-            logger.error("UserAccountBean is null");
+            logger.debug("UserAccountBean is null");
             return;
         }
         EventCRFLocker eventCRFLocker =

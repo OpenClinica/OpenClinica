@@ -82,8 +82,11 @@
 
 <script>
   var dateFormat = 'hh:mma MMM DD YYYY';
-  function formatDate(date) {
-    return moment(date).format(dateFormat);
+  function formatDateWithNull(date){
+    if(date == null)
+        return ""
+    else
+        return moment(date).format(dateFormat);
   }
   function formatError(e) {
     return 'ERROR: ' + e.status + ': ' + e.statusText;
@@ -205,7 +208,11 @@
             source.splice(0, 1);
             source.splice(-2);
             source = source.join('_');
-            actionView = '';
+            
+            
+            if (logEntry.status !== 'FAILED') {            	
+            	actionView = '';
+            }
           }
           if (logEntry.status === 'IN_PROGRESS') {
             actionView = actionDownload = actionDelete = '';
@@ -215,9 +222,9 @@
             logEntry.type,
             logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid,
             logEntry.status,
-            formatDate(logEntry.dateCreated),
+            formatDateWithNull(logEntry.dateCreated),
             logEntry.createdByUsername,
-            formatDate(logEntry.dateCompleted),
+            formatDateWithNull(logEntry.dateCompleted),
             actionView + actionDownload + actionDelete
           ];
         }));
@@ -362,9 +369,9 @@
           return;
         $('#job-log-for').text(logEntry.sourceFileName || logEntry.type);
         $('#job-site-name').text(logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid);
-        $('#job-start-time').text(formatDate(logEntry.dateCreated));
+        $('#job-start-time').text(formatDateWithNull(logEntry.dateCreated));
         $('#job-submitted-by').text(logEntry.createdByUsername);
-        $('#job-completion-time').text(formatDate(logEntry.dateCompleted));
+        $('#job-completion-time').text(formatDateWithNull(logEntry.dateCompleted));
         $('#job-details').show();
       }).fail(function(e) {
         $('#loading').text(formatError(e));

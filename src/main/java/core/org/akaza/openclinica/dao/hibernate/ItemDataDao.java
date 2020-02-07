@@ -63,6 +63,17 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         return (ItemData) q.uniqueResult();
     }
 
+    public ItemData findByItemEventCrfOrdinalIncludeDeleted(Integer itemId, Integer eventCrfId, Integer ordinal) {
+        String query = "from " + getDomainClassName()
+                + " item_data where item_data.item.itemId = :itemid and item_data.eventCrf.eventCrfId = :eventcrfid and item_data.ordinal = :ordinal ";
+            
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("itemid", itemId);
+        q.setInteger("eventcrfid", eventCrfId);
+        q.setInteger("ordinal", ordinal);
+        return (ItemData) q.uniqueResult();
+    }
+    
     public List<ItemData> findByEventCrfGroup(Integer eventCrfId, Integer itemGroupId) {
         String query = "select id.* " + "from item_data id " + "join item i on id.item_id = i.item_id "
                 + "join event_crf ec on id.event_crf_id=ec.event_crf_id "

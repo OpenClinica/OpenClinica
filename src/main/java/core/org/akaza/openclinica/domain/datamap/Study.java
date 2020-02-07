@@ -880,6 +880,7 @@ public class Study extends DataMapDomainObject {
         return getStudy() != null && getStudy().getStudyId() > 0 ? true : false;
     }
 
+    //Parent Study is set to 0 if not present,This is done to use the same functionality of the getParentStudyId() in StudyDAO previously and 0 is handled in other places
     public int checkAndGetParentStudyId(){
         return isSite() ? this.getStudy().getStudyId() : 0;
     }
@@ -941,7 +942,7 @@ public class Study extends DataMapDomainObject {
     @Transient
     public String getAbbreviatedParentStudyName() {
         String parentStudyName = getStudy().getName();
-        if (parentStudyName.length() > 30) {
+        if (parentStudyName != null && parentStudyName.length() > 30) {
             parentStudyName = parentStudyName.substring(0, 27) + "...";
         }
         return parentStudyName;
@@ -950,7 +951,7 @@ public class Study extends DataMapDomainObject {
     @Transient
     public String getAbbreviatedIdentifier() {
         String identifier = getUniqueIdentifier();
-        if (identifier.length() > 25) {
+        if (identifier != null && identifier.length() > 25) {
             identifier = identifier.substring(0, 22) + "...";
         }
         return identifier;
@@ -958,7 +959,7 @@ public class Study extends DataMapDomainObject {
     @Transient
     public String getAbbreviatedName() {
         String name = getName();
-        if (name.length() > 30) {
+        if (name != null && name.length() > 30) {
             name = name.substring(0, 27) + "...";
         }
         return name;

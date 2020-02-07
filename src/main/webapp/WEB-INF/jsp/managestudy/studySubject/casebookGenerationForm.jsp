@@ -59,7 +59,7 @@
                            name="exit">
                     <input type="button" id="casebookPdfBtn" class="button_medium"
                            value="<fmt:message key="viewStudySubject.casebookGenerationForm.button.getPdf" bundle="${resword}"/>"
-                           name="GetPDF" disabled="disabled">
+                           name="GetPDF" style="visibility:hidden;">
                 </div>
                 <div style="display:none" id="casebookLinkDisplay"><br>
                     <fmt:message key="viewStudySubject.casebookGenerationForm.button.getLink.description"
@@ -74,30 +74,32 @@
 <script>
     $('input[type=radio][name=casebookType]').change(function() {
         if ($(this).val() === 'pdf/view') {
-            $('#casebookOptions').slideUp();
-            $('#casebookLinkBtn, #casebookOpenBtn').attr('disabled', 'disabled');
-            $('#casebookPdfBtn').removeAttr('disabled');
+            $('#casebookPdfBtn').css('visibility', 'visible');
+            $('#casebookLinkBtn, #casebookOpenBtn').css('visibility', 'hidden');
+            var checkboxes = $('#casebookOptions input[type=checkbox]');
+            checkboxes.prop('checked', true);
+            checkboxes.eq(2).removeAttr('checked');
+            checkboxes.attr('disabled', 'disabled');
         }
         else {
-            $('#casebookOptions').slideDown();
-            $('#casebookLinkBtn, #casebookOpenBtn').removeAttr('disabled');
-            $('#casebookPdfBtn').attr('disabled', 'disabled');
+            $('#casebookPdfBtn').css('visibility', 'hidden');
+            $('#casebookLinkBtn, #casebookOpenBtn').css('visibility', 'visible');
+            $('#casebookOptions input[type=checkbox]').removeAttr('disabled');
         }
     });
     $('#casebookPdfBtn').click(function () {
         $(this).attr('disabled', 'disabled');
         $('#getPdfMessage').slideDown();
         <c:choose>
-            <c:when test='${study.study != null && study.study.studyId > 0}'>
+            <c:when test='${subjectStudy.study != null && subjectStudy.study.studyId > 0}'>
                 // site level
-                var url = '/studies/${study.study.oc_oid}/sites/${study.oc_oid}';
+                var url = '/studies/${subjectStudy.study.oc_oid}/sites/${subjectStudy.oc_oid}';
             </c:when>
             <c:otherwise>
                 // study level
                 var url = '/studies/${study.oc_oid}';
             </c:otherwise>
         </c:choose>
-        alert(url);
         jQuery.ajax({
             'type': 'POST',
             'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata' + url + '/participants/${studySub.label}/casebook',

@@ -128,10 +128,6 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
         String studyOid = tenantStudy.getOc_oid();
         String siteOid = tenantSite.getOc_oid();
 
-        StudyConfigService studyConfig = new StudyConfigService(this.dataSource);
-        studyConfig.setStudyParameterValueToStudyManually(tenantStudy);
-        studyConfig.setStudyParameterValueToStudyManually(tenantSite);
-        
         if (isEnrollmentCapped(tenantStudy,tenantSite))
             throw new OpenClinicaSystemException( ErrorConstants.ERR_PARTICIPANTS_ENROLLMENT_CAP_REACHED);
         
@@ -411,12 +407,13 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		
     	    CoreResources.setRequestSchema(schema);
     	    ArrayList<File> pdfFiles = new ArrayList<File>();
+    	    ArrayList<String> pdfHeaders = new ArrayList<String>();
 		    File mergedPdfFile = null;
 		    String mergedPdfFileNm = null;
 		    int studyId = Integer.parseInt((String) servletContext.getAttribute("studyID"));
 		    
-		    // prepare  pdf header
-		    String pdfHeader = this.pdfService.preparePdfHeader(study, site, ss.getLabel());
+		    // pdf header
+		    String pdfHeader = null;
 		   
 			/**
 			 *  need to check the number of study/events/forms for this subject
@@ -441,6 +438,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    	
 			    ArrayList<StudyEvent> subjectStudyEvents = studySubjectHibDao.fetchListSEs(studySubjectOID);
 			    for(StudyEvent studyEvent : subjectStudyEvents) {
+
+			    	// prepare  pdf header
+				    pdfHeader = this.pdfService.preparePdfHeader(study, site, ss.getLabel(),studyEvent);
+				    
 			    	List<EventCrf> tmp = studyEvent.getEventCrfs();
 			    	
 			    	/*
@@ -491,20 +492,26 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 							
 							if(pdfFile !=null) {
 								pdfFiles.add(pdfFile);
+								pdfHeaders.add(pdfHeader);
 							}
 			    	    }										
 				        
 			    	}//for-loop-2	    						
 			    }//for-loop-1		   
 			    
-				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName,pdfHeader);
+				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName,pdfHeaders);
 				mergedPdfFileNm = mergedPdfFile.getName();
 				userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
 							
 				
-			} catch (Exception e) {
+			} catch (Exception e) {				
+				if(mergedPdfFileNm == null) {
+					int index= fullFinalFilePathName.lastIndexOf(File.separator);
+					mergedPdfFileNm = fullFinalFilePathName.substring(index+1);					
+				}
+				
 	            userService.persistJobFailed(jobDetail, mergedPdfFileNm);
-	            this.writeToFile(e.getMessage(), fullFinalFilePathName);
+	            this.pdfService.writeToFile(e.getMessage(), fullFinalFilePathName,ss);
 	            throw e;
 	        }
 		    
@@ -512,28 +519,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		}
   
     
-    /**
-     * 
-     * @param msg
-     * @param fileName
-     */
-    public void writeToFile(String msg, String fileName) {
-        logger.debug("writing report to File");
-     
-        File file = new File(fileName);       
-
-        PrintWriter writer = null;
-        try {
-        	 file.createNewFile();
-        	 writer = new PrintWriter(file.getPath(), "UTF-8");
-        	 writer.print(msg);     
-        } catch (IOException e) {
-        	 logger.error("Error while accessing file to start writing: ",e);
-		} finally {                        
-            writer.close();;
-        }
-
-    }
+   
    
 	    
 	/**

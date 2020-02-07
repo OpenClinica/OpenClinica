@@ -318,8 +318,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 			String crfOid = odmFormDef.getOID();
 			List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
 			if (formLayoutDefs.size() == 0) {
-				errors.rejectValue("name", "form_upload_error", "No Excel definition has been uploaded for Form \"" + odmFormDef.getName() + "\" - FAILED");
-				logger.info("No Excel definition has been uploaded for Form <" + odmFormDef.getName() + "> - FAILED");
+				errors.rejectValue("name", "form_upload_error", "No form version defined for Form \"" + odmFormDef.getName() + "\" - FAILED");
+				logger.info("No form version defined for Form <" + odmFormDef.getName() + "> - FAILED");
 			}
 			// String crfDescription = odmFormDef.getFormDetails().getDescription();
 			String crfName = odmFormDef.getName();

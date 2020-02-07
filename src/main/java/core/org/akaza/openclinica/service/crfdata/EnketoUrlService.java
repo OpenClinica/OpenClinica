@@ -206,6 +206,7 @@ public class EnketoUrlService {
             UserAccount userAccount = userAccountDao.findByUserId(ub.getId());
             eventCrf= createEventCrf(formLayout,studyEvent,subject,userAccount);
             logger.info("creating new event crf {}",eventCrf.getEventCrfId());
+            logger.info("Subject Context info *** {} *** ",subjectContext.toString());
         }
 
         CrfVersion crfVersion = eventCrf.getCrfVersion();
@@ -219,7 +220,7 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
         if(flavor.equals(PARTICIPATE_FLAVOR) || flavor.equals(QUERY_FLAVOR)){
-            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds);
+            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds,false);
             crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
@@ -325,7 +326,7 @@ public class EnketoUrlService {
         return dt;
     }
 
-    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,boolean formContainsContactData, List<Bind> binds)
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,boolean formContainsContactData, List<Bind> binds,boolean includeDeleted)
             throws Exception {
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -353,23 +354,31 @@ public class EnketoUrlService {
             boolean rowDeleted = false;
             if (igms.get(0).isRepeatingGroup()) {
                 for (int i = 0; i < maxRowCount; i++) {
-                    rowDeleted = false;
-                    for (ItemGroupMetadata igm : igms) {
-                        ItemData itemData = itemDataDao.findByItemEventCrfOrdinalDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
-                        if (itemData != null) {
-                            rowDeleted = true;
-                            break;
-                        }
-                    }
+                	
+        		   rowDeleted = false;
+        	
+        		   for (ItemGroupMetadata igm : igms) {
+                      ItemData itemData = itemDataDao.findByItemEventCrfOrdinalDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                      if (itemData != null) {
+                          rowDeleted = true;
+                          break;
+                      }
+                    }                	                                    
 
-                    if (!rowDeleted) {
+                    if (!rowDeleted || includeDeleted) {
                         hashMap = new HashMap<>();
                         hashMap.put("index", i + 1);
                         if (i == 0) {
                             hashMap.put("lastUsedOrdinal", maxRowCount);
                         }
                         for (ItemGroupMetadata igm : igms) {
-                            ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                        	ItemData itemData = null;
+                        	if(includeDeleted) {
+                        		 itemData = itemDataDao.findByItemEventCrfOrdinalIncludeDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                        	}else {
+                        		 itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
+                        	}
+                           
                             String itemValue = getItemValue(itemData, crfVersion);
                             hashMap.put(igm.getItem().getName(), itemData != null ? itemValue : "");
 
@@ -399,7 +408,13 @@ public class EnketoUrlService {
 
             if (!igms.get(0).isRepeatingGroup()) {
                 for (ItemGroupMetadata igm : igms) {
-                    ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
+                   
+                    ItemData itemData = null;
+                	if(includeDeleted) {
+                		 itemData = itemDataDao.findByItemEventCrfOrdinalIncludeDeleted(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
+                	}else {
+                		 itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
+                	}
                     String itemValue = getItemValue(itemData, crfVersion);
                     data.put(igm.getItem().getName(), itemData != null ? itemValue : "");
                     ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(igm.getItem().getItemId(), crfVersion.getCrfVersionId());
@@ -468,6 +483,7 @@ public class EnketoUrlService {
         return instance;
     }
 
+        
     private String getItemValue(ItemData itemData, CrfVersion crfVersion) {
         String itemValue = null;
         if (itemData != null) {
@@ -601,13 +617,14 @@ public class EnketoUrlService {
         }
     }
 
-    public File getFormPdf(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String studySubjectOID,FormLayout formLayout, String flavor,
+    public File getFormPdf(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOID, String studySubjectOID,FormLayout formLayout, String flavor,
                            ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked , boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub,String format, String margin,String landscape) throws Exception {
 
         File pdfFile = null;
-        Study study = enketoCredentials.getParentStudy(studyOid);
-        Study site = enketoCredentials.getSiteStudy(studyOid);
-        studyOid = study.getOc_oid();
+        Study study = enketoCredentials.getParentStudy(studyOID);
+        Study site = enketoCredentials.getSiteStudy(studyOID);        
+     
+        String studyOid = study.getOc_oid();              
         int filePath = study.getFilePath();
 
         String editURL = null;
@@ -641,13 +658,15 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
 
-        populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds);
+        populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds,true);
         crfFlavor = flavor;
 
         crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
 
         // Call Enketo api to get url
-        EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
+        EnketoCredentials enketoCredentials = EnketoCredentials.getPdfInstance(studyOid);
+
+        EnketoAPI enketo = new EnketoAPI(enketoCredentials);
 
         // Build redirect url
         String redirectUrl = CoreResources.getField("sysURL");

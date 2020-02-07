@@ -1,6 +1,7 @@
 package org.akaza.openclinica.controller;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -8,6 +9,12 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.EventCRFLocker;
@@ -18,10 +25,6 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.hibernate.VersioningMapDao;
-import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
@@ -86,6 +89,10 @@ public class ChangeCRFVersionController {
     private EventCrfDao eventCrfDao;
     @Autowired
     private PermissionService permissionService;
+    @Autowired
+    private StudyDao studyDao;
+
+    private DiscrepancyNoteDAO dnDao;
 
     ResourceBundle resword, resformat, respage;
 
@@ -126,13 +133,14 @@ public class ChangeCRFVersionController {
         request.setAttribute("crfName", crfName);
         request.setAttribute("formLayoutId", formLayoutId);
         request.setAttribute("formLayoutName", formLayoutName.trim());
-        String originatingPageEscaped = StringEscapeUtils.escapeHtml(originatingPage);
-        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPageEscaped);
+        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPage);
 
         ArrayList<String> pageMessages = initPageMessages(request);
-        Object errorMessage = request.getParameter("errorMessage");
+        String errorMessage = request.getParameter("errorMessage");
+        errorMessage = StringEscapeUtils.escapeHtml(errorMessage);
+        errorMessage = StringEscapeUtils.escapeJavaScript(errorMessage);
         if (errorMessage != null) {
-            pageMessages.add((String) errorMessage);
+            pageMessages.add(errorMessage);
         }
         // get CRF by ID with all versions
         // create List of all versions (label + value)
@@ -587,6 +595,26 @@ public class ChangeCRFVersionController {
             con.close();
             pageMessages.add(resword.getString("confirm_crf_version_ms"));
             String msg = resword.getString("confirm_crf_version_ms");
+
+            // OC-11580 Auto-close queries when a form is migrated to a version that does not contain the item that is queried
+            ItemDAO item_dao = new ItemDAO(dataSource);
+            List<ItemBean> cur_items_with_data = item_dao.findAllWithItemDataByFormLayoutId(formLayoutId, eventCRFId);
+            List<ItemBean> new_items_with_data = item_dao.findAllWithItemDataByFormLayoutId(newFormLayoutId, eventCRFId);
+            cur_items_with_data.removeAll(new_items_with_data);
+            dnDao = new DiscrepancyNoteDAO(dataSource);
+            Study study = studyDao.findByPK(studySubBean.getStudyId());
+            for (ItemBean item : cur_items_with_data) {
+                for (ItemDataBean itemData : item.getItemDataElements()) {
+                    ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = dnDao.findParentNotesOnlyByItemData(itemData.getId());
+                    for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
+                        String description = resword.getString("dn_auto-closed_description");
+                        String detailedNotes = resword.getString("dn_auto_closed_detailed_notes_due_to_migration");
+                        // create new DN record , new DN Map record , also update the parent record
+                        createDiscrepancyNoteBean(description, detailedNotes, itemData.getId(), study, ub, parentDiscrepancyNote);
+                    }
+                }
+            }
+
             redirect(request, response, "/ViewStudySubject?isFromCRFVersionChange=" + msg + "&id=" + studySubjectId);
         } catch (Exception e) {
 
@@ -609,6 +637,10 @@ public class ChangeCRFVersionController {
             return "redirect:/MainMenu";
         }
         throw ex;
+    }
+
+    public DiscrepancyNoteDAO getDnDao() {
+        return dnDao;
     }
 
     private void setUpSidebar(HttpServletRequest request) {
@@ -693,6 +725,35 @@ public class ChangeCRFVersionController {
 
         request.setAttribute("pageMessages", pageMessages);
         return pageMessages;
+    }
+
+    private void createDiscrepancyNoteBean(String description, String detailedNotes, int itemDataId, Study studyBean, UserAccountBean ub,
+                                           DiscrepancyNoteBean parentDiscrepancyNote) {
+        DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+        dnb.setEntityId(itemDataId); // this is needed for DN Map object
+        dnb.setStudyId(studyBean.getStudyId());
+        dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+        dnb.setDescription(description);
+        dnb.setDetailedNotes(detailedNotes);
+        dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
+        dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed Modified
+        dnb.setColumn("value"); // this is needed for DN Map object
+        dnb.setAssignedUser(null);
+        dnb.setOwner(ub);
+        dnb.setParentDnId(parentDiscrepancyNote.getId());
+        dnb.setActivated(false);
+        dnb.setThreadUuid(parentDiscrepancyNote.getThreadUuid());
+        dnb = (DiscrepancyNoteBean) getDnDao().create(dnb); // create child DN
+        getDnDao().createMapping(dnb); // create DN mapping
+
+        DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) getDnDao().findByPK(dnb.getParentDnId());
+        itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed Modified
+        itemParentNote.setAssignedUser(null);
+        itemParentNote.setOwner(ub);
+        itemParentNote.setDetailedNotes(detailedNotes);
+        getDnDao().update(itemParentNote); // update parent DN
+        getDnDao().updateAssignedUserToNull(itemParentNote); // update parent DN assigned user
+
     }
 
 }

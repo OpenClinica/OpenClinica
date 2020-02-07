@@ -132,6 +132,7 @@ public class EditFormController {
         subjectContext.setUserAccountId(subjectContextMap.get("userAccountID"));
         UserAccountDAO udao = new UserAccountDAO(dataSource);
         UserAccountBean ub = (UserAccountBean) udao.findByPK(Integer.parseInt(subjectContextMap.get("userAccountID")));
+        logger.info("Subject Context info *** {} *** ",subjectContext.toString());
 
         FormLayout formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         Role role = Role.RESEARCHASSISTANT;

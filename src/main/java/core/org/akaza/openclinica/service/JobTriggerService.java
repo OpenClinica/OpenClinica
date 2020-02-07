@@ -98,16 +98,17 @@ public class JobTriggerService {
 				if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
 					CoreResources.tenantSchema.set(schema);
 
-					if(ruleSet.getItemId()!=null){
-						// item Specific Rule
-						logger.debug("*** Item Specific Rule ***");
-						ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
-						Study currentStudy = (Study) studyDao.findByPK(ruleSet.getStudyId());
-						ResourceBundleProvider.updateLocale(Locale.getDefault());
-						UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
-						ruleSetBeans.add(ruleSet);
-						ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
-					} else {
+//					if(ruleSet.getItemId()!=null){
+//						// item Specific Rule
+//						logger.debug("*** Item Specific Rule ***");
+//						ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
+//						Study currentStudy = (Study) studyDao.findByPK(ruleSet.getStudyId());
+//						ResourceBundleProvider.updateLocale(Locale.getDefault());
+//						UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
+//						ruleSetBeans.add(ruleSet);
+//						ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
+//					} else {
+					if(ruleSet.getItemId() == null){
 						// Event Specific Rule
 						logger.debug("*** Event Specific Rule ***");
 						StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);

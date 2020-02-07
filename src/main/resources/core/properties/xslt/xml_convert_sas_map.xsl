@@ -6,7 +6,7 @@
     <!-- Suppress unmatched nodes. -->
     <xsl:template match="text()"/>
     <!-- Get the parent study oid, which is listed first. -->
-    <xsl:variable name="study_oid" select="substring(concat('S',substring(//odm:Study[position()=1]/@OID, 3)),1,8)"/>
+    <xsl:variable name="study_oid" select="substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '(')"/>
     <!-- Index of objects for lookup. -->
     <xsl:key name="event-name" match="odm:StudyEventDef" use="@OID"/>
     <xsl:key name="item-name" match="odm:ItemDef" use="@OID"/>
@@ -182,6 +182,20 @@
                         <xsl:value-of select="$itemdef/@Length"/>
                     </xsl:element>
                  </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="$itemdef/@Comment!=''">
+                    <xsl:element name="DESCRIPTION">
+                        <xsl:choose>
+                            <xsl:when test="string-length($itemdef/@Comment) &gt; 255">
+                                <xsl:value-of select="substring($itemdef/@Comment, 1, 255)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$itemdef/@Comment" />
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:element>
+                </xsl:when>
             </xsl:choose>
         </xsl:element>
     </xsl:template>

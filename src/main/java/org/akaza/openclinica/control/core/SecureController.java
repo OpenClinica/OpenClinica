@@ -549,19 +549,21 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     return;
                 }
                 if(currentStudy == null || currentStudy.getStudyId() == 0 )
-                    currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
+                    currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 if (currentStudy != null) {
                     if(currentPublicStudy != null && currentPublicStudy.getStudy() != null)
                     {
                         if(currentStudy.getStudy() == null)
-                            currentStudy.setStudy(getStudyDao().findByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
+                            currentStudy.setStudy(getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
                 session.setAttribute("study", currentStudy);
             }
-            request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
-            if(currentStudy == null || currentStudy.getStudyId() == 0 )
-                currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
+            else {
+                request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
+                currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
+                session.setAttribute("study", currentStudy);
+            }
             request.setAttribute("requestSchema", "public");
             currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
@@ -1415,7 +1417,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
 
-    private ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames){
+    private static ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames, HttpServletRequest request){
         ArrayList<String> parameters = new ArrayList<>();
         if (parameterNames.hasMoreElements()) {
             parameters = new ArrayList<>(Arrays.asList(request.getParameterNames().nextElement().split("=|&")));
@@ -1430,10 +1432,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * @param parameterName
      * @return parameter value
      */
-    protected String getParameter(HttpServletRequest request, String parameterName){
+    public static String getParameter(HttpServletRequest request, String parameterName){
         String paramValue = request.getParameter(parameterName);
         if (paramValue == null){
-            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames());
+            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames(),request);
             paramValue = parameters.indexOf(parameterName) > -1 ? parameters.get(parameters.indexOf(parameterName) + 1) : null;
         }
         logger.info("Getting parameter name: " + parameterName + " value: " + paramValue);
@@ -1489,7 +1491,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         } else {
             currentPublicStudy = tmpPublicStudy;
             CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
-            currentStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
+            currentStudy = getStudyDao().findStudyWithSPVByStudyEnvUuid(studyEnvUuid);
 
             session.setAttribute("publicStudy", currentPublicStudy);
             session.setAttribute("study", currentStudy);
@@ -1606,6 +1608,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     protected StudyDao getStudyDao() {
         return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
+    }
+
+    protected DiscrepancyNoteDao getDiscrepancyNoteDao() {
+        return (DiscrepancyNoteDao) SpringServletAccess.getApplicationContext(context).getBean("discrepancyNoteDao");
     }
 
     protected EnketoUrlService getEnketoUrlService() {

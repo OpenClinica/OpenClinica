@@ -38,6 +38,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
@@ -250,7 +251,11 @@ public class UserServiceImpl implements UserService {
     private String generateAccessCode(String accessToken, String realm) {
         String accessCode;
         do {
-            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+            // OC-11627 Update Access Codes to not include characters that can be confused for each other
+            // Exclude : digits - 0, 1, 5; lowercase letters - l, o; uppercase letters - I, O, S
+            String allowedChars = "2346789aAbBcCdDeEfFgGhHijJkKLmMnNpPqQrRstTuUvVwWxXyYzZ";
+            char[] chars = allowedChars.toCharArray();
+            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), 0, chars.length, true, true, chars);
         } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, realm));
         return accessCode;
     }
@@ -339,7 +344,7 @@ public class UserServiceImpl implements UserService {
                 + Thread.currentThread().getName());
 
         // Get all list of StudySubjects by studyId
-        List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId(),pageNumber, pageSize);
+        List<StudySubject> studySubjects = studySubjectDao.findAllByStudyWithAvailableAndSignedStatusOnly(site.getStudyId(),pageNumber, pageSize);
         List<OCUserDTO> userDTOS = new ArrayList<>();
         sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
         String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
@@ -931,6 +936,7 @@ public class UserServiceImpl implements UserService {
         logger.debug("Job Id {} has completed",jobDetail.getJobDetailId());
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void persistJobFailed(JobDetail jobDetail,String fileName) {
         jobDetail.setLogPath(fileName);
         jobDetail.setDateCompleted(new Date());

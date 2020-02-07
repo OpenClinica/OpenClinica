@@ -108,7 +108,7 @@ public class OdmImportController {
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
 
         //check publish status of study so no 2 processes can occur at the same time
-        List<JobDetail> jobsInProgress = jobDetailDao.findByStudyIdAndStatus(study.getStudyId(), JobStatus.IN_PROGRESS);
+        List<JobDetail> jobsInProgress = jobDetailDao.findByStudyIdAndStatusAndJobType(study.getStudyId(), JobStatus.IN_PROGRESS, JobType.PUBLISH_STUDY);
 
         // there are jobs in progress, look for datestamp to see if those jobs have been idle for more than 4 hours
         if (!jobsInProgress.isEmpty()) {

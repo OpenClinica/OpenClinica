@@ -162,19 +162,20 @@ public class MainMenuServlet extends SecureController {
         //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
         //  + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
         //Yufang code added by Jamuna, to optimize the query on MainMenu
-
-        int parentStudyId = currentStudy.checkAndGetParentStudyId();
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-        currentStudy.setSubjectIdGeneration(parentSPV.getValue());
-        String idSetting = parentSPV.getValue();
-        if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-            //Shaoyu Su
-            //int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
-            //request.setAttribute("label", new Integer(nextLabel).toString());
-            request.setAttribute("label", resword.getString("id_generated_Save_Add"));
-            //@pgawade 27-June-2012 fix for issue 13477: set label to "ID will be generated on Save or Add" in case of auto generated subject id
-            fp.addPresetValue("label", resword.getString("id_generated_Save_Add"));
+        if(currentStudy != null) {
+            int parentStudyId = currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId();
+            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+            StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
+            currentStudy.setSubjectIdGeneration(parentSPV.getValue());
+            String idSetting = parentSPV.getValue();
+            if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+                //Shaoyu Su
+                //int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
+                //request.setAttribute("label", new Integer(nextLabel).toString());
+                request.setAttribute("label", resword.getString("id_generated_Save_Add"));
+                //@pgawade 27-June-2012 fix for issue 13477: set label to "ID will be generated on Save or Add" in case of auto generated subject id
+                fp.addPresetValue("label", resword.getString("id_generated_Save_Add"));
+            }
         }
         setPresetValues(fp.getPresetValues());
 

@@ -1954,16 +1954,9 @@ public class StudyController {
             errorObjects.add(errorObject);
         }
 
-        if ((templateID.contains(HELPER_RANDOM))) {
-            if (templateID.contains(SITE_PARTICIPANT_COUNT)) {
-                ErrorObj errorObject = createErrorObject("Study Object", "ID Template cannot include " + RANDOM + " and " + SITE_PARTICIPANT_COUNT + " together.", "templateID");
-                errorObjects.add(errorObject);
-            }
-        } else {
-            if ((!templateID.contains(SITE_PARTICIPANT_COUNT) && !templateID.contains(SITE_ID)) || (templateID.contains(SITE_PARTICIPANT_COUNT) && !templateID.contains(SITE_ID))) {
-                ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include " + SITE_ID + " and " + SITE_PARTICIPANT_COUNT + " unless a " + RANDOM + " is included.", "templateID");
-                errorObjects.add(errorObject);
-            }
+        if (!templateID.contains(HELPER_RANDOM) && !templateID.contains(SITE_PARTICIPANT_COUNT)) {
+            ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include " + SITE_PARTICIPANT_COUNT + " or a " + RANDOM + " [helper.random(x)].", "templateID");
+            errorObjects.add(errorObject);
         }
 
 
