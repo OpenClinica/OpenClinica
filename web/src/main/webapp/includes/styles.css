@@ -994,7 +994,7 @@ padding-bottom: 3px;
    height: 17px;
    margin-top: 6px;
    margin-right: 10px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 .button_div {
@@ -1009,7 +1009,7 @@ padding-bottom: 3px;
    height: 17px;
    margin-top: 6px;
    margin-right: 10px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 
@@ -1025,7 +1025,7 @@ padding-bottom: 3px;
    height: 17px;
    margin-right: 10px;
    margin-top: 10px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 .button_search_dis {
@@ -1040,7 +1040,7 @@ padding-bottom: 3px;
    height: 17px;
    margin-top: 2px;
    margin-left: 3px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 .button_search {
@@ -1054,7 +1054,7 @@ padding-bottom: 3px;
    width: 37px;
    height: 17px;
    margin: 5px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 .button_remove {
@@ -1067,7 +1067,7 @@ padding-bottom: 3px;
    font-weight: bold;
    width: 24px;
    height: 15px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 .button_medium {
@@ -1081,7 +1081,7 @@ padding-bottom: 3px;
    width: 120px;
    height: 17px;
    margin: 5px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 .button_long {
@@ -1095,7 +1095,7 @@ padding-bottom: 3px;
    width: 180px;
    height: 17px;
    margin: 5px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 .button_xlong {
@@ -1109,7 +1109,7 @@ padding-bottom: 3px;
    width: 220px;
    height: 17px;
    margin: 5px;
-   -webkit-border-radius: 6px;
+   border-radius: 3px;
 }
 
 .formlabel { text-align: right;
