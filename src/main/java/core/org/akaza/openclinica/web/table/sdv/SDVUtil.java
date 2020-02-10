@@ -1049,8 +1049,14 @@ public class SDVUtil {
                 queryString = "";
             }
             StringBuilder actionsBuilder = new StringBuilder(new HtmlBuilder().toString());
-
-            actionsBuilder.append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;' onclick='popupSdv(this)'/>");
+            actionsBuilder
+                .append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;' onclick='popupSdv(this)'")
+                .append(" data-study-oid='").append(eventCrf.getStudyEvent().getStudyEventDefinition().getStudy().getOc_oid()).append("'")
+                .append(" data-event-oid='").append(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid()).append("'")
+                .append(" data-form-oid='").append(eventCrf.getFormLayout().getOcOid()).append("'")
+                .append(" data-crf-version-id='").append(eventCrf.getFormLayout().getName()).append("'")
+                .append(" data-participant-id='").append(eventCrf.getStudySubject().getOcOid()).append("'")
+                .append("/>");
             if (eventCRFBean.getStatus() != null){
                 String queryStringEncoded = queryString;
                 try {
