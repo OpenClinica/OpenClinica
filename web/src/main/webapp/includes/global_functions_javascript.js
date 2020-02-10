@@ -1606,18 +1606,6 @@ function sendRequest(method, url){
         http.send(null);
     }
 }
-
-function sendPostRequest(method, url,params){
-    if(method == 'post' || method == 'POST'){
-		var url = url;
-		var params = params;
-
-		http.open('POST', url, true);
-		http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');		
-        http.onreadystatechange = handleResponse;
-        http.send(params);
-    }
-}
 function handleResponse(){
     if(http.readyState == 4 && http.status == 200){
         var response = http.responseText;
@@ -1645,7 +1633,7 @@ function requestSignatureFromCheckbox(password, checkbox){
 		return;
 	}
 	if(checkbox != null && checkbox.checked){
-		sendPostRequest("POST", "MatchPassword","password=" + password);
+		sendRequest("GET", "MatchPassword?password=" + password);
 	}
 }
 
