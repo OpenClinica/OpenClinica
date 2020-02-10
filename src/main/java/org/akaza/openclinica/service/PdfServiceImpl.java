@@ -140,7 +140,7 @@ public class PdfServiceImpl implements PdfService {
         String footerMessage = null;             
         PDFont font = PDType1Font.TIMES_ROMAN;
         float fontSize = 10.0f;
-        final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy KK:mm:ss a Z");
+        final SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy KK:mm:ss a Z");
 
         for( PDPage page : document.getPages() )
         {
