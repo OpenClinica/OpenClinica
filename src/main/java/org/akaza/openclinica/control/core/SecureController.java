@@ -1627,5 +1627,27 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return contactsModuleStatus.equals(ENABLED) ? ENABLED : DISABLED;
     }
 
+    public void changeStudy(String study_oid){
+        currentPublicStudy = getStudyDao().findPublicStudy(study_oid.toUpperCase());
+        String schemaName =currentPublicStudy.getSchemaName();
+        CoreResources.setRequestSchema(schemaName);
+        if (currentPublicStudy != null) {
+            // study level
+            if (currentPublicStudy.getStudy() == null) {
+                currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
+            } else {
+                // Site level
+                currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
+            }
+            session.setAttribute("study", currentStudy);
+            session.setAttribute("publicStudy", currentPublicStudy);
+            ub.setActiveStudyId(currentPublicStudy.getStudyId());
+            UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
+            ub.setUpdater(ub);
+            ub.setUpdatedDate(new java.util.Date());
+            userAccountDAO.update(ub);
+        }
+    }
+
 
 }
