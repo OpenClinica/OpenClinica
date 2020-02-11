@@ -82,6 +82,10 @@ public class ViewNotesServlet extends SecureController {
     protected void processRequest() throws Exception {
         String module = request.getParameter("module");
         String moduleStr = "manage";
+        String study_oid = request.getParameter("study_oid");
+        if (study_oid != null) {
+            changeStudy(study_oid);
+        }
         if (module != null && module.trim().length() > 0) {
             if ("submit".equals(module)) {
                 request.setAttribute("module", "submit");
