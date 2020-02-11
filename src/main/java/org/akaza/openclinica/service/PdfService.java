@@ -25,7 +25,7 @@ public interface PdfService {
 
     int addHeaderOrFooter(PDDocument document, String[] headerMsg,String footerMsg, int page_counter) throws IOException;
     
-    String[] preparePdfHeader(Study study, Study site, String studySubjectIdentifier,StudyEvent studyEvent);
+    String[] preparePdfHeader(Study study, Study site, StudyEvent studyEvent);
     
     void writeToFile(String message,  String fileName, StudySubject ss);
     

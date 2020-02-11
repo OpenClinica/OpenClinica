@@ -440,7 +440,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    for(StudyEvent studyEvent : subjectStudyEvents) {
 
 			    	// prepare  pdf header
-				    pdfHeader = this.pdfService.preparePdfHeader(study, site, ss.getLabel(),studyEvent);
+				    pdfHeader = this.pdfService.preparePdfHeader(study, site, studyEvent);
 				    
 			    	List<EventCrf> tmp = studyEvent.getEventCrfs();
 			    	
@@ -487,6 +487,11 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 					        String subjectContextKey;
 					        
 							subjectContextKey = this.createSubjectContextKey(studyOID, formLayout, studyEvent, studySubjectOID, userAccountID, servletContext);
+							// dynamically reset paper size and margin
+							if(pdfHeader[0].length() > 240 && format.equals("A4") && margin.equals("0.5in")) {
+								format = "A3";
+								margin = "0.75in";
+							}
 							File pdfFile = urlService.getFormPdf(subjectContextKey, subjectContext, studyOID, studySubjectOID,formLayout, EnketoAPI.QUERY_FLAVOR, null, role, mode, null, false,formContainsContactData,binds,ub,
 									format, margin, landscape);
 							
