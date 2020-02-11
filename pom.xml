@@ -981,7 +981,7 @@
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -997,7 +997,7 @@
         <pluginRepository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Repository Group</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -1011,12 +1011,12 @@
         <repository>
             <id>openclinica-artifactory</id>
             <name>dev.openclinica.com-releases</name>
-            <url>http://dev.openclinica.com/artifactory/libs-release-local</url>
+            <url>https://dev.openclinica.com/artifactory/libs-release-local</url>
         </repository>
         <snapshotRepository>
             <id>openclinica-artifactory</id>
             <name>dev.openclinica.com-snapshots</name>
-            <url>http://dev.openclinica.com/artifactory/libs-snapshot-local</url>
+            <url>https://dev.openclinica.com/artifactory/libs-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
 
