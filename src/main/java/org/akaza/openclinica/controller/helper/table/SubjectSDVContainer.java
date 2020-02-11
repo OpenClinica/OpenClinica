@@ -25,11 +25,12 @@ public class SubjectSDVContainer {
     private Date eventDate;
     private String enrollmentDate;
     private String studySubjectStatus;
-    private String crfNameVersion;
+    private String crfName;
+    private String crfVersion;
     //100% Required, Partial Required, 100% and Partial, Not Required
     private String sdvRequirementDefinition;
     private String crfStatus;
-    private String studyEventStatus;
+    private String subjectEventStatus;
     private Date lastUpdatedDate;
     private String lastUpdatedBy;
     private String sdvStatusActions;
@@ -48,10 +49,10 @@ public class SubjectSDVContainer {
         eventDate = null;
         enrollmentDate = "";
         studySubjectStatus = "";
-        crfNameVersion = "";
+        crfName = "";
         sdvRequirementDefinition = "";
         crfStatus = "";
-        studyEventStatus = "";
+        subjectEventStatus = "";
         lastUpdatedDate = null;
         lastUpdatedBy = "";
         sdvStatusActions = "";
@@ -59,14 +60,15 @@ public class SubjectSDVContainer {
         percentageOfCRFsSDV = "";
         group = "";
         openQueries = "";
+        crfVersion = "";
     }
 
-    public String getStudyEventStatus() {
-        return studyEventStatus;
+    public String getSubjectEventStatus() {
+        return subjectEventStatus;
     }
 
-    public void setStudyEventStatus(String studyEventStatus) {
-        this.studyEventStatus = studyEventStatus;
+    public void setSubjectEventStatus(String subjectEventStatus) {
+        this.subjectEventStatus = subjectEventStatus;
     }
 
     public String getStudyIdentifier() {
@@ -109,12 +111,12 @@ public class SubjectSDVContainer {
         this.group = group;
     }
 
-    public String getCrfNameVersion() {
-        return crfNameVersion;
+    public String getCrfName() {
+        return crfName;
     }
 
-    public void setCrfNameVersion(String crfNameVersion) {
-        this.crfNameVersion = crfNameVersion;
+    public void setCrfName(String crfName) {
+        this.crfName = crfName;
     }
 
     public String getStudySubjectId() {
@@ -211,5 +213,13 @@ public class SubjectSDVContainer {
 
     public void setOpenQueries(String openQueries) {
         this.openQueries = openQueries;
+    }
+
+    public String getCrfVersion() {
+        return crfVersion;
+    }
+
+    public void setCrfVersion(String crfVersion) {
+        this.crfVersion = crfVersion;
     }
 }

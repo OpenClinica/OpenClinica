@@ -308,4 +308,5 @@
   jQuery('#sdv-items').DataTable({
     dom: 't'
   });
+
 </script>

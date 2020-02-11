@@ -2,8 +2,9 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd">
 	<xsl:output encoding="utf-8" indent="yes" method="xml" name="xml"/>
 	<xsl:template match="/">
-		<!-- Get the parent study oid, which is listed first. -->
-		<xsl:variable name="vStudyName" select="substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '(')"/>
+		<!-- //odm:Study[position()=1]/@OID translates to the study oid in the xml file (e.g. S_12345678910(TEST)) -->
+		<!-- The string manipulation: S_12345678910(TEST) -> 12345678910(TEST) -> S12345678910(TEST) -> S12345678910 -> S1234567 -->
+		<xsl:variable name="vStudyName" select="substring(substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '('),1,8)"/>
 		<xsl:element name="{$vStudyName}">
 			<xsl:for-each select="odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData/odm:ItemGroupData">
 				<xsl:element name="{@ItemGroupOID}">
