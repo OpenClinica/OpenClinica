@@ -195,6 +195,7 @@
   #itemsdv {
     position: relative;
   }
+
   #sdv-close-popup {
     float: right;
     position: absolute;
@@ -226,8 +227,8 @@
     border: 1px solid gray;
     font-weight: bold;
   }
-  #sdv-items {
-    padding: 10px;
+  #sdv-items_wrapper {
+    margin: 0 10px 10px;
   }
   #sdv-items th {
     font-weight: normal;
@@ -248,23 +249,23 @@
     <tbody>
       <tr>
         <th>Participant ID:</th>
-        <td></td>
+        <td id="participantId"></td>
         <th>Event Name:</th>
-        <td></td>
+        <td id="eventName"></td>
         <th>Form Name:</th>
-        <td></td>
+        <td id="formName"></td>
         <th>SDV Requirement:</th>
-        <td></td>
+        <td id="sdvRequirement"></td>
       </tr>
       <tr>
         <th>Site Name:</th>
-        <td></td>
+        <td id="siteName"></td>
         <th>Event Start Date:</th>
-        <td></td>
+        <td id="eventStartDate"></td>
         <th>Form Status:</th>
-        <td></td>
+        <td id="formStatus"></td>
         <th>SDV Status:</th>
-        <td></td>
+        <td id="sdvStatus"></td>
       </tr>
     </tbody>
   </table>
@@ -276,7 +277,7 @@
       <input name="type" type="radio"> Show only changed since last Verified
     </label>
   </div>
-  <table id="sdv-items">
+  <table id='sdv-items'>
     <thead>
       <tr>
         <th>Brief Description (Item Name)</th>
@@ -287,26 +288,47 @@
         <th>Modified By</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
+    <tbody id="sdvItems">
     </tbody>
   </table>
 </div>
 
 <script>
+  jQuery('#sdv-items').DataTable({
+    dom: 't',
+    columns: [
+    {data: 'briefDescription'},
+    {data: 'value'},
+    {data: 'lastVerifiedDate'},
+    {data: 'openQueriesCount'},
+    {data: 'lastModifiedDate'},
+    {data: 'lastModifiedUserName'},
+    ]
+  });
+
   function popupSdv(item) {
-    jQuery.blockUI({ message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
+    var data = $(item).data();
+    var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/1/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems?changedAfterSdvOnlyFilter=n';
+    $.get(url, function(data) {
+      $('#participantId').text(data.participantId);
+      $('#eventName').text(data.eventName);
+      $('#formName').text(data.formName);
+      $('#sdvRequirement').text(data.sdvRequirement);
+      $('#siteName').text(data.siteName);
+      $('#eventStartDate').text(data.eventStartDate);
+      $('#formStatus').text(data.formStatus);
+      $('#sdvStatus').text(data.sdvStatus);
+
+      var tbl = jQuery('#sdv-items').DataTable();
+      tbl.rows.add(data.sdvItems.map(function(item) {
+        item.lastVerifiedDate = data.lastVerifiedDate;
+        return item;
+      }));
+      tbl.draw();
+    });
+
+    jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
     var cols = $(item).closest('tr').children();
   }
-  jQuery('#sdv-items').DataTable({
-    dom: 't'
-  });
 
 </script>
