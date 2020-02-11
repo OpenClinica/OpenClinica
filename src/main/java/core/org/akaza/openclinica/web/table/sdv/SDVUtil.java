@@ -1054,8 +1054,8 @@ public class SDVUtil {
                 .append(" data-study-oid='").append(eventCrf.getStudyEvent().getStudyEventDefinition().getStudy().getOc_oid()).append("'")
                 .append(" data-event-oid='").append(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid()).append("'")
                 .append(" data-form-oid='").append(eventCrf.getFormLayout().getOcOid()).append("'")
-                .append(" data-crf-version-id='").append(eventCrf.getFormLayout().getName()).append("'")
-                .append(" data-participant-id='").append(eventCrf.getStudySubject().getOcOid()).append("'")
+                .append(" data-form-version='").append(eventCrf.getFormLayout().getName()).append("'")
+                .append(" data-participant-id='").append(studySubjectBean.getId()).append("'")
                 .append("/>");
             if (eventCRFBean.getStatus() != null){
                 String queryStringEncoded = queryString;
