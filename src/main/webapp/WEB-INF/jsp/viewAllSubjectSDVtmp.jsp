@@ -320,7 +320,10 @@
       $('#sdvStatus').text(data.sdvStatus);
 
       var tbl = jQuery('#sdv-items').DataTable();
-      tbl.rows.add(data.sdvItems);
+      tbl.rows.add(data.sdvItems.map(function(item) {
+        item.lastVerifiedDate = data.lastVerifiedDate;
+        return item;
+      }));
       tbl.draw();
     });
 
