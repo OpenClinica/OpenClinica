@@ -1049,20 +1049,21 @@ public class SDVUtil {
                 queryString = "";
             }
             StringBuilder actionsBuilder = new StringBuilder(new HtmlBuilder().toString());
+            StudyEventDefinition event = eventCrf.getStudyEvent().getStudyEventDefinition();
             actionsBuilder
-                .append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;' onclick='popupSdv(this)'")
-                .append(" data-study-oid='").append(eventCrf.getStudyEvent().getStudyEventDefinition().getStudy().getOc_oid()).append("'")
-                .append(" data-event-oid='").append(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid()).append("'")
-                .append(" data-form-oid='").append(eventCrf.getFormLayout().getOcOid()).append("'")
-                .append(" data-form-version='").append(eventCrf.getFormLayout().getName()).append("'")
-                .append(" data-participant-id='").append(studySubjectBean.getId()).append("'")
+                .append("<a title='" + resWords.getString("view_sdv_item_form") + "' alt='"+resWords.getString("view_sdv_item_form") + "' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;' onclick='popupSdv(this)'")
+                .append(" data-study-oid='").append(event.getStudy().getOc_oid()).append("'")
+                .append(" data-event-oid='").append(event.getOc_oid()).append("'")
+                .append(" data-event-ordinal='").append(event.getOrdinal() > 0 ? event.getOrdinal() : 1).append("'")
+                .append(" data-form-oid='").append(eventCrf.getFormLayout().getCrf().getOcOid()).append("'")
+                .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
                 .append("/>");
             if (eventCRFBean.getStatus() != null){
                 String queryStringEncoded = queryString;
                 try {
                     queryStringEncoded = URLEncoder.encode(queryString, StandardCharsets.UTF_8.toString());
-                }catch (UnsupportedEncodingException e){
-                    logger.error("Unsupport encoding");
+                } catch (UnsupportedEncodingException e){
+                    logger.error("Unsupported encoding");
                 }
                 Integer status = eventCRFBean.getStage().getId();
                 actionsBuilder.append(getCRFViewIconPath( status, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
