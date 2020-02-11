@@ -40,11 +40,11 @@ import org.springframework.stereotype.Service;
 public class PdfServiceImpl implements PdfService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
-	 static final MessageFormat pdfHeaderLeftFormat1 =  new MessageFormat("{0}: {1} - Participant {2} ") ;
-	 static final MessageFormat pdfHeaderLeftFormat2 =  new MessageFormat("{0} - Participant {2}");
+	 static final MessageFormat pdfHeaderLeftFormat1 =  new MessageFormat("{0}: {1} ") ;
+	 static final MessageFormat pdfHeaderLeftFormat2 =  new MessageFormat("{0} ");
 	 
-	 static final MessageFormat pdfHeaderRightFormat1 =  new MessageFormat("{3} ({4})");
-	 static final MessageFormat pdfHeaderRightFormat2 =  new MessageFormat("{3}"); 	 
+	 static final MessageFormat pdfHeaderRightFormat1 =  new MessageFormat("{2} ({3})");
+	 static final MessageFormat pdfHeaderRightFormat2 =  new MessageFormat("{2}"); 	 
 
     /**
      *
@@ -229,11 +229,10 @@ public class PdfServiceImpl implements PdfService {
     }
 
 
-   public String[] preparePdfHeader(Study study, Study site, String studySubjectIdentifier,StudyEvent studyEvent) {
+   public String[] preparePdfHeader(Study study, Study site, StudyEvent studyEvent) {
 	  
 	    String siteName = null;
-	    String studyName = null;
-	    String participantID = studySubjectIdentifier.trim();
+	    String studyName = null;	   
 	    String eventName = null;
 	    String eventNameWith = null;
 	    String sequence = null;
@@ -254,7 +253,7 @@ public class PdfServiceImpl implements PdfService {
 	    		sequence = studyEvent.getSampleOrdinal()+"";
 	    	}
 	    }
-	    Object[] headerArgs = {studyName, siteName,participantID,eventName,sequence};
+	    Object[] headerArgs = {studyName, siteName,eventName,sequence};
 	    
 	    String[] pdfHeader = new String[2];
 	    // header's left part
