@@ -1,5 +1,5 @@
 
-test documentation for LibreClinica 0.6.0 pre-release
+test documentation for LibreClinica 0.7.0 pre-release
 
 # LibreClinica test documentation {docsify-ignore}
 
@@ -16,3 +16,4 @@ test documentation for LibreClinica 0.6.0 pre-release
 | [T008](tests/t008.md) | rule management |
 | [T009](tests/t009.md) | site management |
 | [T010](tests/t010.md) | study user management |
+| [T014](tests/t014.md) | data entry |

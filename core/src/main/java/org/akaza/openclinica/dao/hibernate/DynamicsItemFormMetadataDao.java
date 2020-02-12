@@ -19,6 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -234,11 +235,12 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         }
         return HibernateUtil.queryIDsList(q);
     }
-    
-    public  void delete(int eventCrfId){
-        String query = " delete from " + getDomainClassName() +  "  where eventCrfId =:eventCrfId ";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("eventCrfId", eventCrfId);
+
+    @Transactional
+    public void delete(int eventCrfId) {
+        String query = "delete from " + getDomainClassName() + " metadata where metadata.eventCrfId = :eventCrfId";
+        org.hibernate.query.Query q = getCurrentSession().createQuery(query);
+        q.setParameter("eventCrfId", eventCrfId);
         q.executeUpdate();
     }
 

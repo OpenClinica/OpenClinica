@@ -35,11 +35,9 @@ import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.quartz.impl.triggers.SimpleTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,68 +183,66 @@ public class ScheduledJobController {
 
     @RequestMapping("/cancelScheduledJob")
     public String cancelScheduledJob(HttpServletRequest request, HttpServletResponse response,
-            @RequestParam("theJobName")   String theJobName,@RequestParam("theJobGroupName")   String theJobGroupName,
-            @RequestParam("theTriggerName")   String triggerName,@RequestParam("theTriggerGroupName")   String triggerGroupName,
-            @RequestParam("redirection") String redirection, ModelMap model) throws SchedulerException
-        {
+            @RequestParam("theJobName") String theJobName,
+            @RequestParam("theJobGroupName") String theJobGroupName,
+            @RequestParam("theTriggerName") String triggerName,
+            @RequestParam("theTriggerGroupName") String triggerGroupName,
+            @RequestParam("redirection") String redirection, ModelMap model) throws SchedulerException {
 
     	JobKey jobKey = new JobKey(theJobName, theJobGroupName);
     	TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroupName);
         scheduler.getJobDetail(jobKey);
-        logger.debug("About to pause the job-->"+theJobName+"Job Group Name -->"+theJobGroupName);
+        logger.debug("About to pause the job-->" + theJobName + "Job Group Name -->" + theJobGroupName);
 
         SimpleTrigger oldTrigger = (SimpleTrigger) scheduler.getTrigger(triggerKey);
-        if(oldTrigger!=null)
-        {
-        Date startTime = new Date(oldTrigger.getStartTime().getTime()+oldTrigger.getRepeatInterval());
-        if(triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME))
-        {
-            interruptQuartzJob(scheduler, theJobName, theJobGroupName);
-        }
+        if (oldTrigger != null) {
+            
+            Date startTime = new Date(oldTrigger.getStartTime().getTime() + oldTrigger.getRepeatInterval());
+            if (triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME)) {
+                interruptQuartzJob(scheduler, theJobName, theJobGroupName);
+            }
 
-        scheduler.pauseJob(jobKey);
+            scheduler.pauseJob(jobKey);
 
-        SimpleTrigger newTrigger = newTrigger()
-        		.withIdentity(triggerKey)
+            SimpleTrigger newTrigger = newTrigger()
+                .withIdentity(triggerKey)
                 .forJob(jobKey)
-				.withSchedule(simpleSchedule()
-					.withRepeatCount(oldTrigger.getRepeatCount())
-					.withIntervalInMilliseconds(oldTrigger.getRepeatInterval())
-					.withMisfireHandlingInstructionNextWithRemainingCount())
-				.withDescription(oldTrigger.getDescription())
-				.usingJobData(oldTrigger.getJobDataMap())
-				.build();
+                .withSchedule(simpleSchedule()
+                    .withRepeatCount(oldTrigger.getRepeatCount())
+                    .withIntervalInMilliseconds(oldTrigger.getRepeatInterval())
+                    .withMisfireHandlingInstructionNextWithRemainingCount())
+                .withDescription(oldTrigger.getDescription())
+                .usingJobData(oldTrigger.getJobDataMap())
+                .build();
 
-        scheduler.unscheduleJob(triggerKey);// these are the jobs which are from extract data and are not not required to be rescheduled.
+            scheduler.unscheduleJob(triggerKey);// these are the jobs which are from extract data and are not not required to be rescheduled.
 
-        ArrayList<String> pageMessages = new ArrayList<String>();
+            ArrayList<String> pageMessages = new ArrayList<>();
 
-        if(triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME))
-        {
-            scheduler.rescheduleJob(triggerKey, newTrigger);
+            if (triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME)) {
+                scheduler.rescheduleJob(triggerKey, newTrigger);
+                pageMessages.add("The Job " + theJobName + " has been cancelled");
+            } else if (triggerGroupName.equals(XsltTriggerService.TRIGGER_GROUP_NAME)) {
+                JobDetailFactoryBean jobDetailBean = new JobDetailFactoryBean();
+                jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
+                jobDetailBean.setName(newTrigger.getKey().getName());
+                jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
+                jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());
+                jobDetailBean.setDurability(true); // need durability?
+                jobDetailBean.afterPropertiesSet();
 
-            pageMessages.add("The Job  "+theJobName+" has been cancelled");
+                scheduler.deleteJob(jobKey);
+                scheduler.scheduleJob(jobDetailBean.getObject(), newTrigger);
+                pageMessages.add("The Job " + theJobName + " has been rescheduled");
+            }
+
+            request.setAttribute("pageMessages", pageMessages);
+
+            logger.debug("jobDetails>" + scheduler.getJobDetail(jobKey));
         }
-        else if(triggerGroupName.equals(XsltTriggerService.TRIGGER_GROUP_NAME))
-        {
-
-            JobDetailFactoryBean jobDetailBean = new JobDetailFactoryBean();
-            jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
-            jobDetailBean.setName(newTrigger.getKey().getName());
-            jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
-            jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());
-            jobDetailBean.setDurability(true); // need durability?
-
-           scheduler.deleteJob(jobKey);
-           scheduler.scheduleJob(jobDetailBean.getObject(), newTrigger);
-           pageMessages.add("The Job "+theJobName+"  has been rescheduled");
-        }
-
-        request.setAttribute("pageMessages", pageMessages);
-
-        logger.debug("jobDetails>"+ scheduler.getJobDetail(jobKey));
-        }
+        
         sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
+        
         return null;
     }
 
