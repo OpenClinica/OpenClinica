@@ -5,8 +5,9 @@
     <xsl:output encoding="utf-8" indent="no" method="text" name="plain" omit-xml-declaration="yes"/>
     <!-- Suppress unmatched nodes. -->
     <xsl:template match="text()"/>
-    <!-- Get the parent study oid, which is listed first. -->
-    <xsl:variable name="study_oid" select="substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '(')"/>
+    <!-- //odm:Study[position()=1]/@OID translates to the study oid in the xml file (e.g. S_12345678910(TEST)) -->
+    <!-- The string manipulation: S_12345678910(TEST) -> 12345678910(TEST) -> S12345678910(TEST) -> S12345678910 -> S1234567 -->
+    <xsl:variable name="study_oid" select="substring(substring-before(concat('S',substring(//odm:Study[position()=1]/@OID, 3)), '('),1,8)"/>
     <!-- Index of objects for lookup. -->
     <xsl:key name="event-name" match="odm:StudyEventDef" use="@OID"/>
     <xsl:key name="item-name" match="odm:ItemDef" use="@OID"/>

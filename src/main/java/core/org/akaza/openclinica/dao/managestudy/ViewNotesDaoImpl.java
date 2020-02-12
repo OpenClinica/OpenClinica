@@ -257,7 +257,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                                 filterQuery = filterQuery + " and UPPER(c.name) like \'" + value + "\'";
                                 break;
                             case ENTITY_NAME:
-                                filterQuery = filterQuery + " and UPPER(i.name) like \'" + value + "\'";
+                                filterQuery = filterQuery + " and ( UPPER(i.name) like \'" + value + "\' or ( dn.entity_type =\'studyEvent\' and UPPER (dsem.column_name) like \'"+ value +"\') )" ;
                                 break;
                             case ENTITY_VALUE:
                                 filterQuery = filterQuery + " and UPPER(id.value) like \'" + value + "\'";
