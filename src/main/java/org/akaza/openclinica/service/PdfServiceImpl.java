@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 
@@ -140,7 +141,8 @@ public class PdfServiceImpl implements PdfService {
         String footerMessage = null;             
         PDFont font = PDType1Font.TIMES_ROMAN;
         float fontSize = 10.0f;
-        final SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy KK:mm:ss a Z");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm");        
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));		
 
         for( PDPage page : document.getPages() )
         {
@@ -204,7 +206,7 @@ public class PdfServiceImpl implements PdfService {
                     contentStream.setTextMatrix(Matrix.getTranslateInstance(50, footerCenterY));
                 }               
 
-                String footerTime = "Generated: " + sdf.format(new Date());
+                String footerTime = "Generated: " + sdf.format(new Date()) + " UTC";
                 contentStream.showText(footerTime);
 
                 // footer page#
