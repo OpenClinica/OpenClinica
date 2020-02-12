@@ -1,4 +1,4 @@
-<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../properties/ehcache.xsd" maxBytesLocalHeap="128M"  maxBytesLocalOffHeap="128M">
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../properties/ehcache.xsd">
 <defaultCache 
 	maxElementsInMemory="500000" 
 	eternal="false" 
