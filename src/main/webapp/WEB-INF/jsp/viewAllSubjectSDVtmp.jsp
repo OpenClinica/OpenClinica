@@ -271,7 +271,7 @@
   </table>
   <div id="sdv-show-type">
     <label>
-      <input name="type" type="radio" autofocus="autofocus"> Show all items
+      <input name="type" type="radio" autofocus="autofocus" checked="checked"> Show all items
     </label>
     <label>
       <input name="type" type="radio"> Show only changed since last Verified
@@ -306,14 +306,26 @@
     ]
   });
 
+  function translate(str) {
+    var trans = {
+      '100percent_required': '100% Required'
+    };
+    return trans[str] || str;
+  }
+
   function popupSdv(item) {
     var data = $(item).data();
     var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/1/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems?changedAfterSdvOnlyFilter=n';
     $.get(url, function(data) {
       $('#participantId').text(data.participantId);
-      $('#eventName').text(data.eventName);
+      if (data.repeatingEvent) {
+        $('#eventName').text(data.eventName + '(' + data.eventOrdinal + ')');
+      }
+      else {
+        $('#eventName').text(data.eventName);
+      }
       $('#formName').text(data.formName);
-      $('#sdvRequirement').text(data.sdvRequirement);
+      $('#sdvRequirement').text(translate(data.sdvRequirement));
       $('#siteName').text(data.siteName);
       $('#eventStartDate').text(data.eventStartDate);
       $('#formStatus').text(data.formStatus);
