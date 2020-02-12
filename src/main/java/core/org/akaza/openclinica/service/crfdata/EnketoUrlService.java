@@ -220,7 +220,7 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
         if(flavor.equals(PARTICIPATE_FLAVOR) || flavor.equals(QUERY_FLAVOR)){
-            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds,false);
+            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,false,binds,false);
             crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
@@ -326,7 +326,7 @@ public class EnketoUrlService {
         return dt;
     }
 
-    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,boolean formContainsContactData, List<Bind> binds,boolean includeDeleted)
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete,boolean formContainsContactData, boolean maskFormContactData,List<Bind> binds,boolean includeDeleted)
             throws Exception {
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -451,7 +451,11 @@ public class EnketoUrlService {
         }
 
         if (formContainsContactData ){
-            addContactData(binds,data,eventCrf.getStudySubject());
+        	if(maskFormContactData) {
+        		addMaskedContactData(binds,data,eventCrf.getStudySubject());
+        	}else {
+        		addContactData(binds,data,eventCrf.getStudySubject());
+        	}           
         }
 
 
@@ -596,7 +600,7 @@ public class EnketoUrlService {
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;
     }
-
+    
     private void addContactData(List<Bind> binds, Map<String, Object> data,StudySubject studySubject) {
         StudySubjectDetail studySubjectDetail=studySubject.getStudySubjectDetail();
         for (Bind bind : binds) {
@@ -616,7 +620,33 @@ public class EnketoUrlService {
             }
         }
     }
-
+    
+    /**
+     * 
+     * @param binds
+     * @param data
+     * @param studySubject
+     */
+    private void addMaskedContactData(List<Bind> binds, Map<String, Object> data,StudySubject studySubject) {
+        StudySubjectDetail studySubjectDetail=studySubject.getStudySubjectDetail();
+        for (Bind bind : binds) {
+            if (bind.getOcExternal() != null && studySubjectDetail!=null) {
+                int begIndex = bind.getNodeSet().lastIndexOf("/");
+                String itemName = bind.getNodeSet().substring(begIndex + 1);
+                if (bind.getOcExternal().equals(CONTACTDATA_FIRSTNAME)) {
+                    data.put(itemName, "MaskedXXXXXXX");
+                } else if (bind.getOcExternal().equals(CONTACTDATA_LASTNAME)) {
+                    data.put(itemName, "MaskedXXXXXXX");
+                } else if (bind.getOcExternal().equals(CONTACTDATA_SECONDARYID)) {
+                    data.put(itemName, "MaskedXXXXXXX");
+                } else if (bind.getOcExternal().equals(CONTACTDATA_EMAIL)) {
+                    data.put(itemName, "masked@masked.masked");
+                } else if (bind.getOcExternal().equals(CONTACTDATA_MOBILENUMBER))
+                    data.put(itemName, "0000000000");
+            }
+        }
+    }
+    
     public File getFormPdf(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOID, String studySubjectOID,FormLayout formLayout, String flavor,
                            ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked , boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub,String format, String margin,String landscape) throws Exception {
 
@@ -658,7 +688,7 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
 
-        populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,binds,true);
+        populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete,formContainsContactData,true,binds,true);
         crfFlavor = flavor;
 
         crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
