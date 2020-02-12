@@ -168,7 +168,7 @@ public class UserServiceImpl implements UserService {
                     logger.info("Participate has not registered yet");
                     accessCode = generateAccessCode(accessToken, realm);
                     // show reset access code in participant audit log
-                    AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId());
+                    AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId(), 58);
                     auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
 
                     // create participant user Account In Keycloak
@@ -182,7 +182,7 @@ public class UserServiceImpl implements UserService {
                     accessCode = generateAccessCode(accessToken, realm);
                     keycloakClient.resetParticipateUserAccessCode(accessToken, null, username, accessCode, studyEnvironment, realm);
                     // show reset access code in participant audit log
-                    AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId());
+                    AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId(), 58);
                     auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
                 }
             }
@@ -730,7 +730,7 @@ public class UserServiceImpl implements UserService {
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
                     if (auditAccessCodeViewing) {
-                        AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId());
+                        AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId(), 42);
                         auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
                     }
                     return participantAccessDTO;
@@ -903,9 +903,9 @@ public class UserServiceImpl implements UserService {
         return sb.toString();
     }
 
-    private AuditLogEventDTO populateAuditLogEventDTO(int studySubjectId) {
+    private AuditLogEventDTO populateAuditLogEventDTO(int studySubjectId, int auditLogEventTypeId) {
         AuditLogEventDTO auditLogEventDTO = new AuditLogEventDTO();
-        auditLogEventDTO.setAuditLogEventTypId(42);
+        auditLogEventDTO.setAuditLogEventTypId(auditLogEventTypeId);
         auditLogEventDTO.setEntityId(studySubjectId);
         auditLogEventDTO.setEntityName("Participant access code");
         auditLogEventDTO.setAuditTable("study_subject");

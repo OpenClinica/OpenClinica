@@ -1184,6 +1184,12 @@
 			<column name="name" value="participant_identifier_viewed"/>
 		</insert>
 	</changeSet>
+	<changeSet author="schan" id="2019-02-12-OC-12216">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="58"/>
+			<column name="name" value="participant_access_code_reset"/>
+		</insert>
+	</changeSet>
 
 	<changeSet author="jkeremian" id="2015-12-08-OC-6847">
 		<comment>Insert a new record in the studyParameter table</comment>
