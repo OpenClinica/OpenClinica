@@ -22,7 +22,7 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 # Table of contents
   
-[Choosing your browser and starting](#choosing your browser and starting)  
+[Choosing your browser and starting](#choosing-your-browser-and-starting)  
 [Logging in](#logging-in)  
 [Changing your password on first time log-in](#changing-your-password-on-first-time-log-in)  
 [Logging out](#logging-out)  
