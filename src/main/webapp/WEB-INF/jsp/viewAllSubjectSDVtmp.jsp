@@ -190,6 +190,8 @@
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
 
 <style>
   #itemsdv {
@@ -239,6 +241,10 @@
   .blockUI.blockMsg.blockPage {
     padding: 0 !important;
   }
+  #clear-filter {
+    float: left;
+    margin: 5px 10px;
+  }
 </style>
 
 <div id="itemsdv" style="display:none;">
@@ -277,14 +283,16 @@
       <input name="type" type="radio"> Show only changed since last Verified
     </label>
   </div>
+
+  <a id="clear-filter" href="javascript:clearFilter()">Clear Filter</a>
   <table id='sdv-items'>
     <thead>
       <tr>
         <th>Brief Description (Item Name)</th>
         <th>Value</th>
-        <th>Last Verified</th>
+        <th>Last Verified (UTC)</th>
         <th>Open Queries</th>
-        <th>Last Modified</th>
+        <th>Last Modified (UTC)</th>
         <th>Modified By</th>
       </tr>
     </thead>
@@ -294,17 +302,22 @@
 </div>
 
 <script>
-  jQuery('#sdv-items').DataTable({
+  var datatable = jQuery('#sdv-items').DataTable({
     dom: 't',
     columns: [
-    {data: 'briefDescription'},
-    {data: 'value'},
-    {data: 'lastVerifiedDate'},
-    {data: 'openQueriesCount'},
-    {data: 'lastModifiedDate'},
-    {data: 'lastModifiedUserName'},
+      {data: 'briefDescription'},
+      {data: 'value'},
+      {data: 'lastVerifiedDate'},
+      {data: 'openQueriesCount'},
+      {data: 'lastModifiedDate'},
+      {data: 'lastModifiedUserName'},
     ]
   });
+  datatable.order([]);
+
+  function clearFilter() {
+    jQuery('#sdv-items').dataTable().fnSortNeutral();
+  }
 
   function translate(str) {
     var trans = {
