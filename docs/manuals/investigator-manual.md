@@ -1,22 +1,20 @@
-OpenClinica 3.14
+LibreClinica 1.0
 
 for
 
 Investigators
 
-[http://www.trialdatasolutions.com](http://www.trialdatasolutions.com/) © 2019
+[https://libreclinica.org](https://libreclinica.org) © 2020
 
 Preface
 
-This manual describes the main activities of the Investigator-role in OpenClinica 3.14: Entering data, Handling Discrepancies and Signing Subjects.
+This manual describes the main activities of the Investigator-role in LibreClinica 1.00: Entering data, Handling Discrepancies and Signing Subjects.
 
 To use this manual an account with the role of Investigator is the only requirement.
 
 Please contact us for other manuals for the roles of Clinical Research Coordinator or Monitor or if you would like a tailor-made manual, based on this one.
 
-Gerben Rienk Visser
-
-GerbenRienk@trialdatasolutions.com
+[The LibreClinica Community](https://libreclinica.org)
 
 The manual is a distributed under the <a name="firstheading">Creative Commons Attribution-ShareAlike 3.0 Unported License . This means you are free to copy, distribute and transmit the work, and to adapt the work under the following conditions:</a>
 
@@ -24,28 +22,48 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 2 if you alter, transform, or build upon this work, you may distribute the resulting work only under the same, similar or a compatible license.
 
-Inhoud
+# Contents
 
 [Choosing your browser and starting](#choosing-your-browser-and-starting)
+
 [Logging in](#logging-in)
+
 [Changing your password on first time log-in](#changing-your-password-on-first-time-log-in)
+
 [Logging out](#logging-out)
+
 [Changing your password](#changing-your-password)
+
 [When you've lost your password](#when-you've-lost-your-password)
+
 [Change Study/Site](#change-study/site)
+
 [Your "Home" in OpenClinica](#your-"home"-in-openclinica)
+
 [Adding Study Subjects](#adding-study-subjects)
+
 [Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#choosing-a-subject;-a-shortcut;-the-subject-matrix;-filtering-and-sorting)
+
 [Adding or scheduling Events](#adding-or-scheduling-events)
+
 [Data-entry: elements in the screen](#data-entry:-elements-in-the-screen)
+
 [Changing the attributes of an Event](#changing-the-attributes-of-an-event)
+
 [Data-entry: required fields and error-messages](#data-entry:-required-fields-and-error-messages)
+
 [Adding a Note](#adding-a-note)
+
 [Discrepancies: filtering by status, type, Event, Subject](#discrepancies:-filtering-by-status,-type,-event,-subject)
+
 [An example of a discrepancy](#an-example-of-a-discrepancy)
+
 [Mark CRF Complete](#mark-crf-complete)
+
 [The status of a CRF and of an Event](#the-status-of-a-crf-and-of-an-event)
+
 [Signing CRFs](#signing-crfs)
+
 [Changing data in complete CRFs](#changing-data-in-complete-crfs)
 
 # Choosing your browser and starting
@@ -58,7 +76,7 @@ In Internet Explorer you can check if Java-script is enabled by clicking menu op
 
 # Logging in
 
-To start OpenClinica, type in the address you've been given. You will automatically be routed to [https://www.trialdatasolutions.com/OpenClinica/pages/login/login;jsessionid](https://www.openclinica.nl/OpenClinica/pages/login/login;jsessionid) = and the login-screen appears.
+To start OpenClinica, type in the address you've been given, e. g. [https://libreclinica.org/lc-demo/](https://libreclinica.org/lc-deb10/pages/login/login) = and the login-screen appears.
 You can log in with the user name and password that have been sent to you by mail. Click on button Login.
 
 # Changing your password on first time log-in
