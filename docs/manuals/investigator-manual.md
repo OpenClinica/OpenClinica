@@ -34,11 +34,11 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 [Changing your password](#changing-your-password)
 
-[When you've lost your password](#when-you've-lost-your-password)
+[When you've lost your password](#when-youve-lost-your-password)
 
 [Change Study/Site](#change-study/site)
 
-[Your "Home" in OpenClinica](#your-"home"-in-openclinica)
+[Your "Home" in OpenClinica](#your-home-in-openclinica)
 
 [Adding Study Subjects](#adding-study-subjects)
 
