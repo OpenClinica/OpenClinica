@@ -26,39 +26,23 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 Table of contents
 
-[1](#-toc416706745) [Choosing your browser and starting](#-toc416706745) [ 4](#-toc416706745)
-
-[2](#-toc416706746) [Logging in](#-toc416706746) [ 5](#-toc416706746)
-
-[3](#-toc416706747) [Changing your password on first time log-in](#-toc416706747) [ 5](#-toc416706747)
-
-[4](#-toc416706748) [Logging out](#-toc416706748) [ 5](#-toc416706748)
-
-[5](#-toc416706749) [Changing your password](#-toc416706749) [ 5](#-toc416706749)
-
-[6](#-toc416706750) [When you've lost your password](#-toc416706750) [ 7](#-toc416706750)
-
-[7](#-toc416706751) [Change Study/Site](#-toc416706751) [ 8](#-toc416706751)
-
-[8](#-toc416706752) [Your "Home" in OpenClinica](#-toc416706752) [ 9](#-toc416706752)
-
-[9](#-toc416706753) [How data is organised in OpenClinica](#-toc416706753) [ 9](#-toc416706753)
-
-[10](#-toc416706754) [Source Data Verification](#-toc416706754) [ 9](#-toc416706754)
-
-[11](#-toc416706755) [Elements of a CRF](#-toc416706755) [ 12](#-toc416706755)
-
-[12](#-toc416706756) [Notes & Discrepancies](#-toc416706756) [ 13](#-toc416706756)
-
-[13](#-toc416706757) [An example of a Query](#-toc416706757) [ 15](#-toc416706757)
-
-[14](#-toc416706758) [An example of a Failed Validation Check](#-toc416706758) [ 18](#-toc416706758)
-
-[15](#-toc416706759) [An example of an Annotation](#-toc416706759) [ 20](#-toc416706759)
-
-[16](#-toc416706760) [An example of a Reason for Change](#-toc416706760) [ 22](#-toc416706760)
-
-[17](#-toc416706761) [Study Audit Log](#-toc416706761) [ 23](#-toc416706761)
+[Choosing your browser and starting](#choosing your browser and starting)
+[Logging in](#logging-in)
+[Changing your password on first time log-in](#changing-your-password-on-first-time-log-in)
+[Logging out](#logging-out)
+[Changing your password](#changing-your-password)
+[When you've lost your password](#when-you-ve-lost-your-password)
+[Change Study/Site](#change-study-site)
+[Your "Home" in OpenClinica](#your--home--in-openclinica)
+[How data is organised in OpenClinica](#how-data-is-organised-in-openclinica)
+[Source Data Verification](#source-data-verification)
+[Elements of a CRF](#elements-of-a-crf)
+[Notes & Discrepancies](#notes---discrepancies)
+[An example of a Query](#an-example-of-a-query)
+[An example of a Failed Validation Check](#an-example-of-a-failed-validation-check)
+[An example of an Annotation](#an-example-of-an-annotation)
+[An example of a Reason for Change](#an-example-of-a-reason-for-change)
+[Study Audit Log](#study-audit-log)
 
 To use OpenClinica you need a browser. You can use Firefox (Mozilla) version 3 or higher, or Microsoft Internet Explorer version 7 or higher, or Chrome (Google) or Safari (Mac).
 
@@ -66,7 +50,7 @@ Furthermore your browser must be set up to execute Java-script.
 
 In Firefox you can check this by clicking the menu-option "Tools"-"Options". In the window that opens, click on the tab "Content" and make sure "Enable JavaScript" is checked.
 
-In Internet Explorer you can check if Java-script is enabled by clicking menu option "Tools", "Internet options". In the window that opens click on tab "Security". Then you click "Custom Level ..." Scroll down to "Scripting" and check if "Active Scripting" is set to "Enable".       
+In Internet Explorer you can check if Java-script is enabled by clicking menu option "Tools", "Internet options". In the window that opens click on tab "Security". Then you click "Custom Level ..." Scroll down to "Scripting" and check if "Active Scripting" is set to "Enable".       
 
 To start OpenClinica, type in the address you've been given. You will automatically be routed to the login-screen.
 
@@ -74,7 +58,7 @@ You can log in with the user name and password that have been sent to you by mai
 
 Because this is the first time you log in to OpenClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
 
-After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
+After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
 
 When you're finished with your OpenClinica-activities you must log out. This prevents unauthorized persons to view or change the data. You log out by clicking Log Out in the upper right corner of the screen.
 
@@ -183,7 +167,7 @@ In the next four sections we will discuss how each type of Discrepancy is genera
 
 Queries are made by Monitors, mostly in the process of Source Data Verification. When you compare the source data and the data in OpenClinica and find a difference, you create a Query. You do this in the CRF you are SDV-ing by clicking the flag to the right of the item that has a difference. A new window opens, "Add Discrepancy Note". Here you must give a short Desciption of what you found, a Detailed Note, that explains in detail what action must be taken. The Type of the Discrepancy is "Query" and can not be changed. The Status however can be chosen: "New", "Updated" or "Closed".
 
-For an example, let's say that the for "Height"  a value was entered of "120", while the Monitor reads "170" in the source data. Click on the flag next to the inputbox of "Height".
+For an example, let's say that the for "Height"  a value was entered of "120", while the Monitor reads "170" in the source data. Click on the flag next to the inputbox of "Height".
 In the Discrepancy window that opens you fill in for Description "Wrong value" and in Detailed Note "I read 170. Please correct this." The type of Discrepancy is "Query" and this can not be changed. The field "Set to Status" can be left at "New".You can choose who to assign this Discrepancy to and by default this is the person who entered the data. If you want to send the user an e-mail, tick the box "Email Assigned User". This mail will be automatically generated and can not be edited by you. When you've completed the form, click Submit & Close.
 
 The user will see this Discrepancy in the list "Notes & Discrepancies Assigned to Me". He or she can change the value for Height and after that, update the Discrepancy, indicating the correction and setting the Status of the Discrepancy to "Updated" or to "Resolution Proposed". By default the assigned user is the one who created the Query, so this is left unchanged and again it is possible to send an e-mail.
@@ -198,7 +182,7 @@ The Monitor-role is the only role that can Close a Discrepancy.
 A Failed Validation Check is a Discrepancy that's automatically created by OpenClinica. For example on a field where the number of dispensed vials must be entered, an upperrange is defined of 240. If the user enters "250", this results in a message "[No. of dispensed vials must be between 0 and 241]". If this is indeed the number of vials as recorded in the source data, the user must enter this. In order to save the data he must first fill in the details of the Discrepancy.
 
 When the Monitor logs in, he/she will check for any new Discrepancies by clicking on the menu-option Notes & Discrepancies and filtering on Status New. The new Discrepancy is in the list and by clicking on the "View within record"-icon we open the CRF and the Discrepancy.
-In this case the value is accepted by the Monitor, so he/she clicks  Close Note and for Description enters "Accepted" and leaves Detailed Note blank. For "Set to Status" he/she chooses "Closed". "Assign to User" will again be the user who started the Discrepancy. When this user logs in, the Discrepancy will be in the list of Notes & Discrepancies Assigned to Me, but the status will be closed.
+In this case the value is accepted by the Monitor, so he/she clicks  Close Note and for Description enters "Accepted" and leaves Detailed Note blank. For "Set to Status" he/she chooses "Closed". "Assign to User" will again be the user who started the Discrepancy. When this user logs in, the Discrepancy will be in the list of Notes & Discrepancies Assigned to Me, but the status will be closed.
 
 Again we see that the Status of this type of Discrepancy starts with "New", then changes one or more times to "Updated" or "Resolution Proposed" and finally ends with "Closed": just as the Discrepancy-type "Failed Validation Check".
 
