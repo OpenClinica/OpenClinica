@@ -68,7 +68,7 @@ Inhoud
 
 [21](#-toc416706637) [Changing data in complete CRFs](#-toc416706637) [ 20](#-toc416706637)
 
-[link to heading](#Choosing-your-browser-and-starting)
+[link to heading](#choosing-your-browser-and-starting)
 
 
 
@@ -85,7 +85,7 @@ Because this is the first time you log in to OpenClinica, you will be asked to c
 
 After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
 
-(#Choosing-your-browser-and-starting)
+# Choosing your browser and starting
 
 When you're finished with data-entry you must log out. This prevents unauthorized persons from viewing or changing  data. You log out by clicking Log Out in the upper right corner of the screen.
 
