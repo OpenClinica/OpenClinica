@@ -26,51 +26,29 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 Inhoud
 
-[1](#-toc416706617) [Choosing your browser and starting](#-toc416706617) [ 4](#-toc416706617)
+[Choosing your browser and starting](#choosing-your-browser-and-starting)
+[Logging in](#logging-in)
+[Changing your password on first time log-in](#changing-your-password-on-first-time-log-in)
+[Logging out](#logging-out)
+[Changing your password](#changing-your-password)
+[When you've lost your password](#when-you've-lost-your-password)
+[Change Study/Site](#change-study/site)
+[Your "Home" in OpenClinica](#your-"home"-in-openclinica)
+[Adding Study Subjects](#adding-study-subjects)
+[Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#choosing-a-subject;-a-shortcut;-the-subject-matrix;-filtering-and-sorting)
+[Adding or scheduling Events](#adding-or-scheduling-events)
+[Data-entry: elements in the screen](#data-entry:-elements-in-the-screen)
+[Changing the attributes of an Event](#changing-the-attributes-of-an-event)
+[Data-entry: required fields and error-messages](#data-entry:-required-fields-and-error-messages)
+[Adding a Note](#adding-a-note)
+[Discrepancies: filtering by status, type, Event, Subject](#discrepancies:-filtering-by-status,-type,-event,-subject)
+[An example of a discrepancy](#an-example-of-a-discrepancy)
+[Mark CRF Complete](#mark-crf-complete)
+[The status of a CRF and of an Event](#the-status-of-a-crf-and-of-an-event)
+[Signing CRFs](#signing-crfs)
+[Changing data in complete CRFs](#changing-data-in-complete-crfs)
 
-[2](#-toc416706618) [Logging in](#-toc416706618) [ 5](#-toc416706618)
-
-[3](#-toc416706619) [Changing your password on first time log-in](#-toc416706619) [ 5](#-toc416706619)
-
-[4](#-toc416706620) [Logging out](#-toc416706620) [ 6](#-toc416706620)
-
-[5](#-toc416706621) [Changing your password](#-toc416706621) [ 6](#-toc416706621)
-
-[6](#-toc416706622) [When you've lost your password](#-toc416706622) [ 8](#-toc416706622)
-
-[7](#-toc416706623) [Change Study/Site](#-toc416706623) [ 9](#-toc416706623)
-
-[8](#-toc416706624) [Your "Home" in OpenClinica](#-toc416706624) [ 9](#-toc416706624)
-
-[9](#-toc416706625) [Adding Study Subjects](#-toc416706625) [ 10](#-toc416706625)
-
-[10](#-toc416706626) [Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#-toc416706626) [ 11](#-toc416706626)
-
-[11](#-toc416706627) [Adding or scheduling Events](#-toc416706627) [ 11](#-toc416706627)
-
-[12](#-toc416706628) [Data-entry: elements in the screen](#-toc416706628) [ 12](#-toc416706628)
-
-[13](#-toc416706629) [Changing the attributes of an Event](#-toc416706629) [ 14](#-toc416706629)
-
-[14](#-toc416706630) [Data-entry: required fields and error-messages](#-toc416706630) [ 14](#-toc416706630)
-
-[15](#-toc416706631) [Adding a Note](#-toc416706631) [ 15](#-toc416706631)
-
-[16](#-toc416706632) [Discrepancies: filtering by status, type, Event, Subject](#-toc416706632) [ 15](#-toc416706632)
-
-[17](#-toc416706633) [An example of a discrepancy](#-toc416706633) [ 15](#-toc416706633)
-
-[18](#-toc416706634) [Mark CRF Complete](#-toc416706634) [ 18](#-toc416706634)
-
-[19](#-toc416706635) [The status of a CRF and of an Event](#-toc416706635) [ 19](#-toc416706635)
-
-[20](#-toc416706636) [Signing CRFs](#-toc416706636) [ 19](#-toc416706636)
-
-[21](#-toc416706637) [Changing data in complete CRFs](#-toc416706637) [ 20](#-toc416706637)
-
-[link to heading](#choosing-your-browser-and-starting)
-
-
+# Choosing your browser and starting
 
 To use OpenClinica you need a browser. You can use Firefox (Mozilla) version 3 or higher, Microsoft Internet Explorer version 7 or higher, Google Chrome or Safari (Mac). Furthermore your browser must be set up to execute Java-script.
 
@@ -78,16 +56,22 @@ In Firefox you can check this by clicking the menu-option "Tools"-"Options". In 
 
 In Internet Explorer you can check if Java-script is enabled by clicking menu option "Tools", "Internet options". In the window that opens click on tab "Security". Then you click "Custom Level ..." Scroll down to "Scripting" and check if "Active Scripting" is set to "Enable".
 
+# Logging in
+
 To start OpenClinica, type in the address you've been given. You will automatically be routed to [https://www.trialdatasolutions.com/OpenClinica/pages/login/login;jsessionid](https://www.openclinica.nl/OpenClinica/pages/login/login;jsessionid) = and the login-screen appears.
 You can log in with the user name and password that have been sent to you by mail. Click on button Login.
+
+# 3 Changing your password on first time log-in
 
 Because this is the first time you log in to OpenClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
 
 After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
 
-# Choosing your browser and starting
+# Logging out
 
 When you're finished with data-entry you must log out. This prevents unauthorized persons from viewing or changing  data. You log out by clicking Log Out in the upper right corner of the screen.
+
+# 5 Changing your password
 
 You can change your password any time by clicking on menu option Tasks and then choosing Update Profile.
 
@@ -95,9 +79,13 @@ The form "Change User Profile" appears, allowing you to change data about your a
 
 After clicking button Confirm Profile Changes, the screen "Confirm User Profile Updates" opens. Check your account-data one more time and click button Update Profile. In the left column of the screen the message "Your profile has been updated successfully" appears.
 
+# 6 When you've lost your password
+
 When you've lost your password you can request a reset of the password. A new, random password will be sent to the email-address you provided in your account-data. You request this new password by clicking Forgot Password? in the log in screen. The form "Request Password Form" opens.
 
 Type in User Name your user-name and in Email the email address, as used in OpenClinica. Then you select the Password Challenge Question and give your Password Challenge Answer. Click button Submit Password Request and after a few minutes a mail will be sent to you with the new password. After logging in with this new password, you must change it immediately, just as when you log in for the first time.
+
+# 7 Change Study/Site
 
 When you log in to OpenClinica, your active study will be the study you last worked on. If you are assigned to more than one study, you can change to another study, by using the link Change Study/Site.
 You see in the upper-left corner the active Study "GCP-Service training study". If you want to change to study "Tolram Study" you click the radio-button and then click the button Change Study. The screen "Confirm Changing Study" opens and here you click on Confirm.
@@ -106,7 +94,11 @@ In the left column you see under Alerts & Messages "Your current active study ha
 
 Another option is when you have rights to a Study as a whole, so to all the sites, for example the Bortezomib Study.
 
+# Your “Home” in OpenClinica
+
 After you've logged in successfully your "Home"-screen opens. This screen has links to your main activities in OpenClinica. In your case these are "Notes and Discrepancies Assigned to Me" and the so-called "Subject Matrix". We will come back to these in [16](#--refheading--456-2139846958) [Discrepancies: filtering by status, type, Event, Subject](#--refheading--456-2139846958) and in [10](#--refheading--544-1991669544) [Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#--refheading--544-1991669544).
+
+# Adding Study Subjects
 
 When you start entering data, the first thing you must do is add study subjects. This can be done in three ways:
 
@@ -125,6 +117,8 @@ After reviewing the data you click one of the three Save-buttons. Make sure the 
 
 If you've added a Subject by clicking the link Add New Subject in the Subject Matrix, you also get the input fields described above and furthermore the option to add a Study Event. You do not have to do it at this stage. Adding Events will discussed in [11](#--refheading--579-1325233557) [Adding or scheduling Events](#--refheading--579-1325233557).
 
+# Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting
+
 If you have many Subjects in your Study or Site, there are three ways to find them quickly.
 
 First of all you can use the input field in the upper right corner with "Study Subject ID" in it and a button labeled "Go" to the right of it. If you know the Study Id of a subject, type it here and click Go. The Subject Matrix appears with the Events of this Subject. For example you want to enter data for Subject TF031. You type "31" in the input field and click "Go". In the Subject Matrix that appears you see that under the header of the first column, labeled "Study Subject ID" your "31" is displayed and that all Events for "TF031" are in the matrix.
@@ -134,6 +128,8 @@ This brings us to the second way the quickly find Subject: by using filters in t
 A third way to quickly find Subjects is by using another way of sorting the Subjects than the default way. By default the Subjects are shown in order of enrollment. If you want them sorted on Study Subject ID, just click on the blue header with "Study Subject ID". The subjects are shown in groups of 15 and you can scroll through them by using the buttons in the upper left corner. You can also set the number of Subjects on the page: 15, 25 of 50.
 
 Another way of displaying the data of the Subject Matrix exists and that is by using "Select An Event". Now the Subject Matrix changes in a matrix with all Subjects plus all the CRFs used in this particular Event. Now you can see not only the status of the Event, but all statuses of all CRFs in that Event.
+
+# Adding or scheduling Events
 
 Adding a Study Visit for a Study Subject is called Scheduling an Event in OpenClinica. Before you can start DataEntry you must schedule the Event. This can be done:
 
@@ -157,6 +153,8 @@ If you only want to view the CRF, you can use the magnifier-icon.
 
 If you want to print the data on the CRF, click on the printer-icon.
 
+# Data-entry: elements in the screen
+
 The screen "Base V09" is now displayed. In the upper part of the screen you see the name of the CRF, "Base", the version, "V09", and the Subject ID, "TDS023". By default, more information about the Event and about the Discrepancies on this CRF is hidden. This information can be displayed by clicking CRF Header Info.
 
 When you start entering data, the form will change. To the right of the buttons Exit red and yellow icons appear, to indicate that the form contains data that have to be saved. Input fields with changed data get a yellow background.
@@ -169,9 +167,13 @@ When the data have been stored successfully, the message appears "Your data has 
 
 In the next section other aspects of Data-entry will be discussed.
 
+# Changing the attributes of an Event
+
 Every now and then you may want to change attributes of an Event, for example the Start-date. You do this by clicking in the Subject Matrix on the Event you want to change. In the floating window that appears, click on "View/Enter Data". The screen "Enter or Validate Data for CRFs in [CRF-name]" appears. Click on the pencil-icon or on the link "Edit Study Event" in the upper right corner.
 
 You can now change Location and Start and Stop date. You also have the option to change the status of an Event. This will be discussed in more detail in section [19](#--refheading--429-727116019) [The status of a CRF and of an Event](#--refheading--429-727116019).
+
+# Data-entry: required fields and error-messages
 
 In a CRF all required fields are indicated with a red asterisk.
 
@@ -183,7 +185,11 @@ The Study Coordinator or the Monitor can reply to your Discrepancy Note. In that
 
 You follow the same procedure if you get the message that your input is out of range. For example a Subject weighs 155 kilo, and on entering this, the message "Please provide a weight between 45 and 150 kg." appears.
 
+# Adding a Note
+
 When you're entering data you may want to consult the Study Coordinator or the Monitor. For example the Subject answered to the question "Do you smoke?" not by ticking Yes or NO, but wrote on the CRF "I quit last week." You add a Note by clicking on the blue flag-icon and the same screen "Add Discrepancy Note" appears. The only difference is that "Resolution status" cannot be changed.
+
+# Discrepancies: filtering by status, type, Event, Subject
 
 You can get a list of all Discrepancies by clicking Notes & Discrepancies in the top of your screen.
 
@@ -202,6 +208,8 @@ Many extra attributes can be shown, such as CRF, Item, Value, Error-message and 
 
 By clicking on the Down-arrow-icon you can download the discrepancies as a PDF or as a comma-separated list of values.
 
+# An example of a discrepancy
+
 Let's work out a Discrepancy. You're filling in a CRF and for weight you're entering a number that's out of range. Our example is from a Study with children and the maximum weight is 60 kg. When the Save-button is clicked, a message will appear "There are issue(s) with your submission. The data has NOT been saved. See below for details" plus in red the message "Value for weight out of range! (8-60)".
 
 Click on the blue flag, next to the input field and a new window opens "Add Discrepancy Note."
@@ -218,11 +226,15 @@ If the Monitor logs in, he/she will check for any new or changed Discrepancies. 
 
 Now when you log in and click on Notes & Discrepancies, you will see the new status of the Discrepancy, closed. The colour of the flag is now black.
 
+# An example of a discrepancy
+
 When data-entry is complete and all Discrepancies have been solved, then the CRF can be marked as Complete. You do this by going to the last tab of the CRF. Next to the buttons "Save" en "Exit" is a check-box "Mark CRF Complete".
 
 On ticking this check-box, a pop-up window appears with a warning message:
 
 After clicking the OK-button, you must save the CRF. If you do not save the CRF, it will not be marked as Complete.
+
+# The status of a CRF and of an Event
 
 An Event can have different statuses. These are indicated by icons and these icons are used for Events and for CRFs, which can be confusing. We'll first discuss the status of a CRF.
 
@@ -248,6 +260,8 @@ CRFs can be checked, using the source documents, the so called Source Document V
 
 Finally you as the Investigator can electronically sign all CRFs of a Subject. We will discuss this in the next paragraph.
 
+# Signing CRFs
+
 Once you've finished entering the data for a Subject, you can "sign" the CRFs. This is done in the Subject Matrix. In the right column a green icon of a pen appears and in the legend it says "Signed", but in this case it means "Click to sign the CRFs of this Subject".
 
 When you click on the green icon with the pen, a new screen opens with the statement "As the investigator or designated member of the investigator's staff, I confirm that the electronic case report forms for this subject are a full, accurate, and complete record of the observations recorded. I intend for this electronic signature to be the legally binding equivalent of my written signature."
@@ -255,6 +269,8 @@ When you click on the green icon with the pen, a new screen opens with the state
 For this electronic signature to be valid, you must supply your username plus your OpenClinica-password. This must be repeated for very subject that you sign.
 
 After signing the subject, the icons of the all the Events change to the green "Signed"-icon; the icons of the CRFs will stay the same, "Completed".
+
+# Changing data in complete CRFs
 
 If you change data in a CRF of an Event with status "Complete", you must provide a reason for this change. This indicated by the message in red.
 
