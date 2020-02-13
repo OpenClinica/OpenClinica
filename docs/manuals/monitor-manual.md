@@ -29,7 +29,7 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 1. [Changing your password](#changing-your-password)  
 1. [When you've lost your password](#when-you-ve-lost-your-password)  
 1. [Change Study/Site](#change-study-site)  
-1. [Your "Home" in OpenClinica](#your--home--in-openclinica)  
+1. [Your "Home" in OpenClinica](#your-home-in-openclinica)  
 1. [How data is organised in OpenClinica](#how-data-is-organised-in-openclinica)  
 1. [Source Data Verification](#source-data-verification)  
 1. [Elements of a CRF](#elements-of-a-crf)  
