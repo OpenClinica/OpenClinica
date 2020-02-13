@@ -42,19 +42,19 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 [Adding Study Subjects](#adding-study-subjects)
 
-[Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#choosing-a-subject;-a-shortcut;-the-subject-matrix;-filtering-and-sorting)
+[Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#choosing-a-subject-a-shortcut-the-subject-matrix-filtering-and-sorting)
 
 [Adding or scheduling Events](#adding-or-scheduling-events)
 
-[Data-entry: elements in the screen](#data-entry:-elements-in-the-screen)
+[Data-entry: elements in the screen](#data-entry-elements-in-the-screen)
 
 [Changing the attributes of an Event](#changing-the-attributes-of-an-event)
 
-[Data-entry: required fields and error-messages](#data-entry:-required-fields-and-error-messages)
+[Data-entry: required fields and error-messages](#data-entry-required-fields-and-error-messages)
 
 [Adding a Note](#adding-a-note)
 
-[Discrepancies: filtering by status, type, Event, Subject](#discrepancies:-filtering-by-status,-type,-event,-subject)
+[Discrepancies: filtering by status, type, Event, Subject](#discrepancies-filtering-by-status-type-event-subject)
 
 [An example of a discrepancy](#an-example-of-a-discrepancy)
 
