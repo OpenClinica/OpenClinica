@@ -61,7 +61,7 @@ In Internet Explorer you can check if Java-script is enabled by clicking menu op
 To start OpenClinica, type in the address you've been given. You will automatically be routed to [https://www.trialdatasolutions.com/OpenClinica/pages/login/login;jsessionid](https://www.openclinica.nl/OpenClinica/pages/login/login;jsessionid) = and the login-screen appears.
 You can log in with the user name and password that have been sent to you by mail. Click on button Login.
 
-# 3 Changing your password on first time log-in
+# Changing your password on first time log-in
 
 Because this is the first time you log in to OpenClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
 
@@ -71,7 +71,7 @@ After that you must choose a question plus the answer to that question. These wi
 
 When you're finished with data-entry you must log out. This prevents unauthorized persons from viewing or changing  data. You log out by clicking Log Out in the upper right corner of the screen.
 
-# 5 Changing your password
+# Changing your password
 
 You can change your password any time by clicking on menu option Tasks and then choosing Update Profile.
 
@@ -79,13 +79,13 @@ The form "Change User Profile" appears, allowing you to change data about your a
 
 After clicking button Confirm Profile Changes, the screen "Confirm User Profile Updates" opens. Check your account-data one more time and click button Update Profile. In the left column of the screen the message "Your profile has been updated successfully" appears.
 
-# 6 When you've lost your password
+# When you've lost your password
 
 When you've lost your password you can request a reset of the password. A new, random password will be sent to the email-address you provided in your account-data. You request this new password by clicking Forgot Password? in the log in screen. The form "Request Password Form" opens.
 
 Type in User Name your user-name and in Email the email address, as used in OpenClinica. Then you select the Password Challenge Question and give your Password Challenge Answer. Click button Submit Password Request and after a few minutes a mail will be sent to you with the new password. After logging in with this new password, you must change it immediately, just as when you log in for the first time.
 
-# 7 Change Study/Site
+# Change Study/Site
 
 When you log in to OpenClinica, your active study will be the study you last worked on. If you are assigned to more than one study, you can change to another study, by using the link Change Study/Site.
 You see in the upper-left corner the active Study "GCP-Service training study". If you want to change to study "Tolram Study" you click the radio-button and then click the button Change Study. The screen "Confirm Changing Study" opens and here you click on Confirm.
