@@ -102,15 +102,15 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 
         /**
          * @return Dynamically generate the indexes of studyGroupClasses. It
-         *         starts from 4 because there are 4 columns before study group
+         *         starts from 7 because there are 7 columns before study group
          *         columns that will require to be hidden.
          * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade,
          *      java.util.Locale)
          */
         String getIndexes() {
-            String result = "1,2,3,4,5";
+            String result = "1,2,3,4,5,6";
             for (int i = 0; i < studyGroupClasses.size(); i++) {
-                result += "," + (5 + i + 1);
+                result += "," + (6 + i + 1);
             }
             return result;
         }

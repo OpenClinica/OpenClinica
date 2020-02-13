@@ -26,7 +26,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
         columnMapping.put("enrolledAt", "ST.unique_identifier");
         columnMapping.put("studySubject.secondaryLabel", "ss.secondary_label");
         columnMapping.put("subject.charGender", "s.gender");
-
+        columnMapping.put("subject.uniqueIdentifier", "s.unique_identifier");
     }
 
     public void addFilter(String property, Object value) {
