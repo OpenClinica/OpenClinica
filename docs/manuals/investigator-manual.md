@@ -1,8 +1,5 @@
-LibreClinica 1.0
-
-for
-
-Investigators
+LibreClinica 1.0 for Investigators
+==================================
 
 [https://libreclinica.org](https://libreclinica.org) © 2020
 
@@ -36,9 +33,9 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 [When you've lost your password](#when-youve-lost-your-password)
 
-[Change Study/Site](#change-study/site)
+[Change Study/Site](#change-studysite)
 
-[Your "Home" in OpenClinica](#your-home-in-openclinica)
+[Your "Home" in LibreClinica](#your-home-in-libreclinica)
 
 [Adding Study Subjects](#adding-study-subjects)
 
@@ -68,7 +65,7 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 # Choosing your browser and starting
 
-To use OpenClinica you need a browser. You can use Firefox (Mozilla) version 3 or higher, Microsoft Internet Explorer version 7 or higher, Google Chrome or Safari (Mac). Furthermore your browser must be set up to execute Java-script.
+To use LibreClinica you need a browser. You can use Firefox (Mozilla) version 3 or higher, Microsoft Internet Explorer version 7 or higher, Google Chrome or Safari (Mac). Furthermore your browser must be set up to execute Java-script.
 
 In Firefox you can check this by clicking the menu-option "Tools"-"Options". In the window that opens, click on the tab "Content" and make sure "Enable JavaScript" is checked.
 ![enable JavaScript](investigator-manual_images/enable_JavaScript1.png "enable JavaScript")
@@ -78,13 +75,13 @@ In Internet Explorer you can check if Java-script is enabled by clicking menu op
 
 # Logging in
 
-To start OpenClinica, type in the address you've been given, e. g. [https://libreclinica.org/lc-demo/](https://libreclinica.org/lc-deb10/pages/login/login) and the login-screen appears.
+To start LibreClinica, type in the address you've been given, e. g. [https://libreclinica.org/lc-demo/](https://libreclinica.org/lc-deb10/pages/login/login) and the login-screen appears.
 You can log in with the user name and password that have been sent to you by mail. Click on button Login.
 ![login screen](investigator-manual_images/login_screen.png "login screen")
 
 # Changing your password on first time log-in
 
-Because this is the first time you log in to OpenClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
+Because this is the first time you log in to LibreClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
 ![reset password](investigator-manual_images/reset_password.png "reset password")
 
 After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
@@ -111,12 +108,12 @@ After clicking button Confirm Profile Changes, the screen "Confirm User Profile 
 
 When you've lost your password you can request a reset of the password. A new, random password will be sent to the email-address you provided in your account-data. You request this new password by clicking Forgot Password? in the log in screen. The form "Request Password Form" opens.
 
-Type in User Name your user-name and in Email the email address, as used in OpenClinica. Then you select the Password Challenge Question and give your Password Challenge Answer. Click button Submit Password Request and after a few minutes a mail will be sent to you with the new password. After logging in with this new password, you must change it immediately, just as when you log in for the first time.
+Type in User Name your user-name and in Email the email address, as used in LibreClinica. Then you select the Password Challenge Question and give your Password Challenge Answer. Click button Submit Password Request and after a few minutes a mail will be sent to you with the new password. After logging in with this new password, you must change it immediately, just as when you log in for the first time.
 ![request password](investigator-manual_images/request_password.png "request password")
 
 # Change Study/Site
 
-When you log in to OpenClinica, your active study will be the study you last worked on. If you are assigned to more than one study, you can change to another study, by using the link Change Study/Site.
+When you log in to LibreClinica, your active study will be the study you last worked on. If you are assigned to more than one study, you can change to another study, by using the link Change Study/Site.
 You see in the upper-left corner the active Study "GCP-Service training study". If you want to change to study "Tolram Study" you click the radio-button and then click the button Change Study. The screen "Confirm Changing Study" opens and here you click on Confirm.
 ![change study](investigator-manual_images/change_study.png "change study")
 
@@ -125,9 +122,9 @@ In the left column you see under Alerts & Messages "Your current active study ha
 
 Another option is when you have rights to a Study as a whole, so to all the sites, for example the Bortezomib Study.
 
-# Your “Home” in OpenClinica
+# Your “Home” in LibreClinica
 
-After you've logged in successfully your "Home"-screen opens. This screen has links to your main activities in OpenClinica. In your case these are "Notes and Discrepancies Assigned to Me" and the so-called "Subject Matrix". We will come back to these in [Discrepancies: filtering by status, type, Event, Subject](#discrepancies-filtering-by-status-type-event-subject) and in [Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#choosing-a-subject-a-shortcut-the-subject-matrix-filtering-and-sorting).
+After you've logged in successfully your "Home"-screen opens. This screen has links to your main activities in LibreClinica. In your case these are "Notes and Discrepancies Assigned to Me" and the so-called "Subject Matrix". We will come back to these in [Discrepancies: filtering by status, type, Event, Subject](#discrepancies-filtering-by-status-type-event-subject) and in [Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#choosing-a-subject-a-shortcut-the-subject-matrix-filtering-and-sorting).
 
 # Adding Study Subjects
 ![add subject](investigator-manual_images/add_subject_menu.png "add subject")
@@ -171,7 +168,7 @@ Another way of displaying the data of the Subject Matrix exists and that is by u
 # Adding or scheduling Events
 ![schedule event](investigator-manual_images/schedule_event.png "schedule event")
 
-Adding a Study Visit for a Study Subject is called Scheduling an Event in OpenClinica. Before you can start DataEntry you must schedule the Event. This can be done:
+Adding a Study Visit for a Study Subject is called Scheduling an Event in LibreClinica. Before you can start DataEntry you must schedule the Event. This can be done:
 
 1. 1.using menu option Tasks-Submit Data, Schedule Event
 2. 2.from the Subject Matrix
@@ -328,7 +325,7 @@ Once you've finished entering the data for a Subject, you can "sign" the CRFs. T
 
 When you click on the green icon with the pen, a new screen opens with the statement "As the investigator or designated member of the investigator's staff, I confirm that the electronic case report forms for this subject are a full, accurate, and complete record of the observations recorded. I intend for this electronic signature to be the legally binding equivalent of my written signature."
 
-For this electronic signature to be valid, you must supply your username plus your OpenClinica-password. This must be repeated for very subject that you sign.
+For this electronic signature to be valid, you must supply your username plus your LibreClinica-password. This must be repeated for very subject that you sign.
 
 After signing the subject, the icons of the all the Events change to the green "Signed"-icon; the icons of the CRFs will stay the same, "Completed".
 
