@@ -285,7 +285,7 @@
   </div>
 
   <a id="clear-filter" href="javascript:clearFilter()">Clear Filter</a>
-  <table id='sdv-items'>
+  <table id='sdv-items' style="width:100%">
     <thead>
       <tr>
         <th>Brief Description (Item Name)</th>
@@ -294,6 +294,7 @@
         <th>Open Queries</th>
         <th>Last Modified (UTC)</th>
         <th>Modified By</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody id="sdvItems">
@@ -305,12 +306,13 @@
   var datatable = jQuery('#sdv-items').DataTable({
     dom: 't',
     columns: [
-      {data: 'briefDescription'},
+      {data: 'briefDescriptionItemName'},
       {data: 'value'},
       {data: 'lastVerifiedDate'},
       {data: 'openQueriesCount'},
       {data: 'lastModifiedDate'},
       {data: 'lastModifiedUserName'},
+      {data: 'actions'}
     ]
   });
   datatable.order([]);
@@ -346,7 +348,13 @@
 
       var tbl = jQuery('#sdv-items').DataTable();
       tbl.rows.add(data.sdvItems.map(function(item) {
+        console.log(item);
+        item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
+        if (item.repeatingGroup) {
+          item.briefDescriptionItemName += ' ' + item.ordinal;
+        }
         item.lastVerifiedDate = data.lastVerifiedDate;
+        item.actions = '';
         return item;
       }));
       tbl.draw();
