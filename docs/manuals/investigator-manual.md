@@ -151,7 +151,11 @@ If you've added a Subject by clicking the link Add New Subject in the Subject Ma
 
 If you have many Subjects in your Study or Site, there are three ways to find them quickly.
 
-First of all you can use the input field in the upper right corner with "Study Subject ID" in it and a button labeled "Go" to the right of it. If you know the Study Id of a subject, type it here and click Go. The Subject Matrix appears with the Events of this Subject. For example you want to enter data for Subject TF031. You type "31" in the input field and click "Go". In the Subject Matrix that appears you see that under the header of the first column, labeled "Study Subject ID" your "31" is displayed and that all Events for "TF031" are in the matrix.
+First of all you can use the input field in the upper right corner with "Study Subject ID" in it and a button labeled "Go" to the right of it. If you know the Study Id of a subject, type it here and click Go. The Subject Matrix appears with the Events of this Subject. For example you want to enter data for Subject TF031. You type "31" in the input field and click "Go".
+![filter subjects](investigator-manual_images/filter_subjects.png "filter subjects")
+
+In the Subject Matrix that appears you see that under the header of the first column, labeled "Study Subject ID" your "31" is displayed and that all Events for "TF031" are in the matrix.
+![filter subjects](investigator-manual_images/filter_subject_matrix.png "filter subjects")
 
 This brings us to the second way the quickly find Subject: by using filters in the Subject Matrix. You've already seen one example: filtering on Study Subject ID. You do this by typing in the input field directly under "Study Subject ID" a part of the ID your looking for and then clicking Apply Filter. When you click Show More, in the header of the Subject Matrix, more fields will be shown, that can be used for filtering as well, like the Secondary ID.
 
@@ -160,6 +164,7 @@ A third way to quickly find Subjects is by using another way of sorting the Subj
 Another way of displaying the data of the Subject Matrix exists and that is by using "Select An Event". Now the Subject Matrix changes in a matrix with all Subjects plus all the CRFs used in this particular Event. Now you can see not only the status of the Event, but all statuses of all CRFs in that Event.
 
 # Adding or scheduling Events
+![schedule event](investigator-manual_images/schedule_event.png "schedule event")
 
 Adding a Study Visit for a Study Subject is called Scheduling an Event in OpenClinica. Before you can start DataEntry you must schedule the Event. This can be done:
 
@@ -176,6 +181,7 @@ When you use option 3, i.e. right after adding a new Subject you click Save and 
 Also in this form all required fields are marked with an asterisk. Finish the scheduling by clicking Proceed to Enter Data.
 
 The form Enter or Validate Data for CRFs in Baseline appears. This may be a bit confusing, because an Event can contain one or more CRFs.  For this reason this form is displayed so you can specify for which CRFs you want to enter data.
+![enter crf](investigator-manual_images/enter_crf.png "enter crf")
 
 Each CRF has one or more versions. One version is set as default, but you can choose from all the available versions. Take the default version, unless you are instructed otherwise by the Study Coordinator. You start DataEntry by clicking the pencil-icon, to the right of the CRF.
 
@@ -186,9 +192,11 @@ If you want to print the data on the CRF, click on the printer-icon.
 # Data-entry: elements in the screen
 
 The screen "Base V09" is now displayed. In the upper part of the screen you see the name of the CRF, "Base", the version, "V09", and the Subject ID, "TDS023". By default, more information about the Event and about the Discrepancies on this CRF is hidden. This information can be displayed by clicking CRF Header Info.
-
+![crf sections](investigator-manual_images/crf_sections.png "crf sections")
+The lower part of the screen is used for the input fields. These are divided among one or more tabs. You select tabs by clicking on them, or by using the select-box to the right of the tabs (– Select to Jump --). Behind the name of each tab are two numbers, indicating the number of items answered and the total number of items on a tab.
+![enter data](investigator-manual_images/enter_data.png "enter data")
 When you start entering data, the form will change. To the right of the buttons Exit red and yellow icons appear, to indicate that the form contains data that have to be saved. Input fields with changed data get a yellow background.
-
+![confirm save](investigator-manual_images/confirm_save.png "confirm save")
 When you click one of the Save-buttons the data will be saved. If the CRF you're working on has more than one tab, the next tab will be displayed.
 
 If you click Exit or move to another tab and the data have not been saved yet, a pop-up appears with a warning message. Click "Cancel" to return to the CRF and save the data or click "OK" if the changes do not have to be saved.
@@ -200,7 +208,7 @@ In the next section other aspects of Data-entry will be discussed.
 # Changing the attributes of an Event
 
 Every now and then you may want to change attributes of an Event, for example the Start-date. You do this by clicking in the Subject Matrix on the Event you want to change. In the floating window that appears, click on "View/Enter Data". The screen "Enter or Validate Data for CRFs in [CRF-name]" appears. Click on the pencil-icon or on the link "Edit Study Event" in the upper right corner.
-
+![edit event](investigator-manual_images/edit_event.png "edit event")
 You can now change Location and Start and Stop date. You also have the option to change the status of an Event. This will be discussed in more detail in section [The status of a CRF and of an Event](#the-status-of-a-crf-and-of-an-event).
 
 # Data-entry: required fields and error-messages
@@ -208,6 +216,7 @@ You can now change Location and Start and Stop date. You also have the option to
 In a CRF all required fields are indicated with a red asterisk.
 
 If you try to save a CRF by clicking the Save -button and not all required fields are filled in,  the message "There are issue(s) with your submission. The data has NOT been saved. See below for details." appears, plus the message "Missing data in a required field." If the data is available, you can enter it and save the data by clicking Save.
+![error required fields](investigator-manual_images/error_required_fields.png "erro required fields")
 
 If the data is and will not be available you will have to make a Note/Discrepancy. You do this by clicking by clicking the flag-icon, to the right of the input field. A new window will appear, "Add Discrepancy Note". The Subject is displayed, the Item concerned and the type of Discrepancy. In this case it is a "Failed Validation Check". In "Description" you provide a reason, for example "forgot to ask." Now click on Submit. Close the window and click on Save in the CRF screen. Now the data will be saved and the following message appears: "Your data has been saved. You may continue entering/editing data now or return at a later time."
 
