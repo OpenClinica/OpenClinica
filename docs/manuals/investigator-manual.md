@@ -193,10 +193,13 @@ If you want to print the data on the CRF, click on the printer-icon.
 
 The screen "Base V09" is now displayed. In the upper part of the screen you see the name of the CRF, "Base", the version, "V09", and the Subject ID, "TDS023". By default, more information about the Event and about the Discrepancies on this CRF is hidden. This information can be displayed by clicking CRF Header Info.
 ![crf sections](investigator-manual_images/crf_sections.png "crf sections")
+
 The lower part of the screen is used for the input fields. These are divided among one or more tabs. You select tabs by clicking on them, or by using the select-box to the right of the tabs (– Select to Jump --). Behind the name of each tab are two numbers, indicating the number of items answered and the total number of items on a tab.
 ![enter data](investigator-manual_images/enter_data.png "enter data")
+
 When you start entering data, the form will change. To the right of the buttons Exit red and yellow icons appear, to indicate that the form contains data that have to be saved. Input fields with changed data get a yellow background.
 ![confirm save](investigator-manual_images/confirm_save.png "confirm save")
+
 When you click one of the Save-buttons the data will be saved. If the CRF you're working on has more than one tab, the next tab will be displayed.
 
 If you click Exit or move to another tab and the data have not been saved yet, a pop-up appears with a warning message. Click "Cancel" to return to the CRF and save the data or click "OK" if the changes do not have to be saved.
@@ -209,6 +212,7 @@ In the next section other aspects of Data-entry will be discussed.
 
 Every now and then you may want to change attributes of an Event, for example the Start-date. You do this by clicking in the Subject Matrix on the Event you want to change. In the floating window that appears, click on "View/Enter Data". The screen "Enter or Validate Data for CRFs in [CRF-name]" appears. Click on the pencil-icon or on the link "Edit Study Event" in the upper right corner.
 ![edit event](investigator-manual_images/edit_event.png "edit event")
+
 You can now change Location and Start and Stop date. You also have the option to change the status of an Event. This will be discussed in more detail in section [The status of a CRF and of an Event](#the-status-of-a-crf-and-of-an-event).
 
 # Data-entry: required fields and error-messages
@@ -216,7 +220,7 @@ You can now change Location and Start and Stop date. You also have the option to
 In a CRF all required fields are indicated with a red asterisk.
 
 If you try to save a CRF by clicking the Save -button and not all required fields are filled in,  the message "There are issue(s) with your submission. The data has NOT been saved. See below for details." appears, plus the message "Missing data in a required field." If the data is available, you can enter it and save the data by clicking Save.
-![error required fields](investigator-manual_images/error_required_fields.png "erro required fields")
+![error required fields](investigator-manual_images/error_required_fields.png "error required fields")
 
 If the data is and will not be available you will have to make a Note/Discrepancy. You do this by clicking by clicking the flag-icon, to the right of the input field. A new window will appear, "Add Discrepancy Note". The Subject is displayed, the Item concerned and the type of Discrepancy. In this case it is a "Failed Validation Check". In "Description" you provide a reason, for example "forgot to ask." Now click on Submit. Close the window and click on Save in the CRF screen. Now the data will be saved and the following message appears: "Your data has been saved. You may continue entering/editing data now or return at a later time."
 
@@ -243,6 +247,8 @@ The third type, "Query", is a lot like "Annotation", but is made by a Monitor or
 The fourth type, "Reason for Change" is raised when data are changed on a CRF that was already marked as "Complete" (see section [Changing data in complete CRFs](#changing-data-in-complete-crfs)).
 
 If you open Notes and Discrepancy the discrepancies will be shown in a form similar to the Subject Matrix.
+![discrepancy list](investigator-manual_images/discrepancy_list1.png "discrepancy list")
+
 Many extra attributes can be shown, such as CRF, Item, Value, Error-message and the user whom this Query is assigned to.
 
 By clicking on the Down-arrow-icon you can download the discrepancies as a PDF or as a comma-separated list of values.
@@ -250,32 +256,39 @@ By clicking on the Down-arrow-icon you can download the discrepancies as a PDF o
 # An example of a discrepancy
 
 Let's work out a Discrepancy. You're filling in a CRF and for weight you're entering a number that's out of range. Our example is from a Study with children and the maximum weight is 60 kg. When the Save-button is clicked, a message will appear "There are issue(s) with your submission. The data has NOT been saved. See below for details" plus in red the message "Value for weight out of range! (8-60)".
+![discrepancy note required](investigator-manual_images/discrepancy_required.png "discrepancy note required")
 
 Click on the blue flag, next to the input field and a new window opens "Add Discrepancy Note."
 
 In this window you give a short description of your problem in the input filed "Description". In "Detailed Note" you can give more information. Let's assume that you find the value acceptable. You write this in the Detailed Note and change "Set to Status" to "Resolution proposed".
+![add discrepancy note](investigator-manual_images/add_discrepancy.png "add discrepancy note")
 
- Click on button Submit and close the window. You are now back in the window with the CRF. The color of the flag has changed from blue to green, indicating the status of the Discrepancy (Resolution Proposed). Click on Save. The data will now be saved and the next tab of the CRF opens, and you can continue data-entry.
+Click on button Submit and close the window. You are now back in the window with the CRF. The color of the flag has changed from blue to green, indicating the status of the Discrepancy (Resolution Proposed). Click on Save. The data will now be saved and the next tab of the CRF opens, and you can continue data-entry.
 
 Now let's take a closer look at the Discrepancy. A discrepancy is a collection of comments on an item of a CRF. The comments are called Notes and the collection of Notes is called a Thread.
 
 If you want to see the status of all the Discrepancies of your Subjects, click on menu-option Notes & Discrepancies.
+![discrepancy list](investigator-manual_images/discrepancy_list2.png "discrepancy list")
 
 If the Monitor logs in, he/she will check for any new or changed Discrepancies. The Discrepancy you just created will be in the list and by clicking on the arrow-icon it will be opened. If the value is indeed acceptable to the Monitor, he/she can close the Discrepancy by clicking Close Note and adding a comment.
+![submit note](investigator-manual_images/submit_discrepancy.png "submit note")
 
 Now when you log in and click on Notes & Discrepancies, you will see the new status of the Discrepancy, closed. The colour of the flag is now black.
 
-# An example of a discrepancy
+# Mark CRF Complete
 
 When data-entry is complete and all Discrepancies have been solved, then the CRF can be marked as Complete. You do this by going to the last tab of the CRF. Next to the buttons "Save" en "Exit" is a check-box "Mark CRF Complete".
+![mark crf complete](investigator-manual_images/mark_crf_complete.png "mark crf complete")
 
 On ticking this check-box, a pop-up window appears with a warning message:
+![mark crf complete warning](investigator-manual_images/complete_warning.png "mark crf complete warning")
 
 After clicking the OK-button, you must save the CRF. If you do not save the CRF, it will not be marked as Complete.
 
 # The status of a CRF and of an Event
 
 An Event can have different statuses. These are indicated by icons and these icons are used for Events and for CRFs, which can be confusing. We'll first discuss the status of a CRF.
+![crf/event status](investigator-manual_images/crf_status.png "crf/event status")
 
 When nothing has happened yet the status of a CRF will be "Not Started". Once you've opened the CRF for data-entry the status changes to "Data Entry Started", even if you haven't entered any data. After you have entered the data and marked the CRF as complete by ticking the check-box "Mark CRF Complete" the status of the CRF will change to "Completed".
 
@@ -302,6 +315,7 @@ Finally you as the Investigator can electronically sign all CRFs of a Subject. W
 # Signing CRFs
 
 Once you've finished entering the data for a Subject, you can "sign" the CRFs. This is done in the Subject Matrix. In the right column a green icon of a pen appears and in the legend it says "Signed", but in this case it means "Click to sign the CRFs of this Subject".
+![subject matrix signed crf](investigator-manual_images/subject_matrix_sign.png "subject matrix signed crf")
 
 When you click on the green icon with the pen, a new screen opens with the statement "As the investigator or designated member of the investigator's staff, I confirm that the electronic case report forms for this subject are a full, accurate, and complete record of the observations recorded. I intend for this electronic signature to be the legally binding equivalent of my written signature."
 
@@ -312,6 +326,7 @@ After signing the subject, the icons of the all the Events change to the green "
 # Changing data in complete CRFs
 
 If you change data in a CRF of an Event with status "Complete", you must provide a reason for this change. This indicated by the message in red.
+![change completed crf](investigator-manual_images/change_completed_crf.png "change completed crf")
 
 To provide this reason for change, click on the flag of the item you changed. A new window opens in which you can write your reason. Click Submit & Close and now you are able to save the data on the CRF. The colour of the flag will change from blue to white.
 
