@@ -92,16 +92,19 @@ After that you must choose a question plus the answer to that question. These wi
 # Logging out
 
 When you're finished with data-entry you must log out. This prevents unauthorized persons from viewing or changing  data. You log out by clicking Log Out in the upper right corner of the screen.
+
 ![log out](investigator-manual_images/logout.png "log out")
 
 # Changing your password
 ![change password](investigator-manual_images/change_password_menu.png "change password")
+
 You can change your password any time by clicking on menu option Tasks and then choosing Update Profile.
 ![change user profile](investigator-manual_images/change_user_profile.png "change user profile")
 
 The form "Change User Profile" appears, allowing you to change data about your account. All fields with an asterisk * are required. This means you must provide a telephone number for Phone. Of course this can be any number. To save the changes you must provide your password, even if you have only changed for example your email. In that case you can leave field New Password blank.
 
 After clicking button Confirm Profile Changes, the screen "Confirm User Profile Updates" opens. Check your account-data one more time and click button Update Profile. In the left column of the screen the message "Your profile has been updated successfully" appears.
+
 ![confirm user profile](investigator-manual_images/confirm_user_profile.png "confirm user profile")
 
 # When you've lost your password
@@ -128,11 +131,12 @@ After you've logged in successfully your "Home"-screen opens. This screen has li
 
 # Adding Study Subjects
 ![add subject](investigator-manual_images/add_subject_menu.png "add subject")
+
 When you start entering data, the first thing you must do is add study subjects. This can be done in three ways:
 
-1. 1.By using the link Add New Subject, in the upper right corner of the Subject matrix
-2. 2.By using the menu-option Add Subject
-3. 3.By clicking the menu "Tasks"-"Submit Data"-"Add Subject"
+1. By using the link Add New Subject, in the upper right corner of the Subject matrix
+2. By using the menu-option Add Subject
+3. By clicking the menu "Tasks"-"Submit Data"-"Add Subject"
 
 When you choose one of the above the screen Add Subject opens. Here you provide the Study Subject ID, the Secondary ID, Date of Enrollment and Gender. Type in the following:
 ![enter subject](investigator-manual_images/enter_subject.png "enter subject")
@@ -155,6 +159,7 @@ First of all you can use the input field in the upper right corner with "Study S
 ![filter subjects](investigator-manual_images/filter_subjects.png "filter subjects")
 
 In the Subject Matrix that appears you see that under the header of the first column, labeled "Study Subject ID" your "31" is displayed and that all Events for "TF031" are in the matrix.
+
 ![filter subjects](investigator-manual_images/filter_subject_matrix.png "filter subjects")
 
 This brings us to the second way the quickly find Subject: by using filters in the Subject Matrix. You've already seen one example: filtering on Study Subject ID. You do this by typing in the input field directly under "Study Subject ID" a part of the ID your looking for and then clicking Apply Filter. When you click Show More, in the header of the Subject Matrix, more fields will be shown, that can be used for filtering as well, like the Secondary ID.
@@ -211,6 +216,7 @@ In the next section other aspects of Data-entry will be discussed.
 # Changing the attributes of an Event
 
 Every now and then you may want to change attributes of an Event, for example the Start-date. You do this by clicking in the Subject Matrix on the Event you want to change. In the floating window that appears, click on "View/Enter Data". The screen "Enter or Validate Data for CRFs in [CRF-name]" appears. Click on the pencil-icon or on the link "Edit Study Event" in the upper right corner.
+
 ![edit event](investigator-manual_images/edit_event.png "edit event")
 
 You can now change Location and Start and Stop date. You also have the option to change the status of an Event. This will be discussed in more detail in section [The status of a CRF and of an Event](#the-status-of-a-crf-and-of-an-event).
@@ -261,6 +267,7 @@ Let's work out a Discrepancy. You're filling in a CRF and for weight you're ente
 Click on the blue flag, next to the input field and a new window opens "Add Discrepancy Note."
 
 In this window you give a short description of your problem in the input filed "Description". In "Detailed Note" you can give more information. Let's assume that you find the value acceptable. You write this in the Detailed Note and change "Set to Status" to "Resolution proposed".
+
 ![add discrepancy note](investigator-manual_images/add_discrepancy.png "add discrepancy note")
 
 Click on button Submit and close the window. You are now back in the window with the CRF. The color of the flag has changed from blue to green, indicating the status of the Discrepancy (Resolution Proposed). Click on Save. The data will now be saved and the next tab of the CRF opens, and you can continue data-entry.
@@ -288,6 +295,7 @@ After clicking the OK-button, you must save the CRF. If you do not save the CRF,
 # The status of a CRF and of an Event
 
 An Event can have different statuses. These are indicated by icons and these icons are used for Events and for CRFs, which can be confusing. We'll first discuss the status of a CRF.
+
 ![crf/event status](investigator-manual_images/crf_status.png "crf/event status")
 
 When nothing has happened yet the status of a CRF will be "Not Started". Once you've opened the CRF for data-entry the status changes to "Data Entry Started", even if you haven't entered any data. After you have entered the data and marked the CRF as complete by ticking the check-box "Mark CRF Complete" the status of the CRF will change to "Completed".
@@ -315,6 +323,7 @@ Finally you as the Investigator can electronically sign all CRFs of a Subject. W
 # Signing CRFs
 
 Once you've finished entering the data for a Subject, you can "sign" the CRFs. This is done in the Subject Matrix. In the right column a green icon of a pen appears and in the legend it says "Signed", but in this case it means "Click to sign the CRFs of this Subject".
+
 ![subject matrix signed crf](investigator-manual_images/subject_matrix_sign.png "subject matrix signed crf")
 
 When you click on the green icon with the pen, a new screen opens with the statement "As the investigator or designated member of the investigator's staff, I confirm that the electronic case report forms for this subject are a full, accurate, and complete record of the observations recorded. I intend for this electronic signature to be the legally binding equivalent of my written signature."
@@ -326,6 +335,7 @@ After signing the subject, the icons of the all the Events change to the green "
 # Changing data in complete CRFs
 
 If you change data in a CRF of an Event with status "Complete", you must provide a reason for this change. This indicated by the message in red.
+
 ![change completed crf](investigator-manual_images/change_completed_crf.png "change completed crf")
 
 To provide this reason for change, click on the flag of the item you changed. A new window opens in which you can write your reason. Click Submit & Close and now you are able to save the data on the CRF. The colour of the flag will change from blue to white.
