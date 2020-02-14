@@ -71,53 +71,63 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 To use OpenClinica you need a browser. You can use Firefox (Mozilla) version 3 or higher, Microsoft Internet Explorer version 7 or higher, Google Chrome or Safari (Mac). Furthermore your browser must be set up to execute Java-script.
 
 In Firefox you can check this by clicking the menu-option "Tools"-"Options". In the window that opens, click on the tab "Content" and make sure "Enable JavaScript" is checked.
+![enable JavaScript](investigator-manual_images/enable_JavaScript1.png "enable JavaScript")
 
 In Internet Explorer you can check if Java-script is enabled by clicking menu option "Tools", "Internet options". In the window that opens click on tab "Security". Then you click "Custom Level ..." Scroll down to "Scripting" and check if "Active Scripting" is set to "Enable".
+![enable JavaScript](investigator-manual_images/enable_JavaScript2.png "enable JavaScript")
 
 # Logging in
 
-To start OpenClinica, type in the address you've been given, e. g. [https://libreclinica.org/lc-demo/](https://libreclinica.org/lc-deb10/pages/login/login) = and the login-screen appears.
+To start OpenClinica, type in the address you've been given, e. g. [https://libreclinica.org/lc-demo/](https://libreclinica.org/lc-deb10/pages/login/login) and the login-screen appears.
 You can log in with the user name and password that have been sent to you by mail. Click on button Login.
+![login screen](investigator-manual_images/login_screen.png "login screen")
 
 # Changing your password on first time log-in
 
 Because this is the first time you log in to OpenClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
+![reset password](investigator-manual_images/reset_password.png "reset password")
 
-After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
+After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
 
 # Logging out
 
-When you're finished with data-entry you must log out. This prevents unauthorized persons from viewing or changing  data. You log out by clicking Log Out in the upper right corner of the screen.
+When you're finished with data-entry you must log out. This prevents unauthorized persons from viewing or changing  data. You log out by clicking Log Out in the upper right corner of the screen.
+![log out](investigator-manual_images/logout.png "log out")
 
 # Changing your password
-
+![change password](investigator-manual_images/change_password_menu.png "change password")
 You can change your password any time by clicking on menu option Tasks and then choosing Update Profile.
+![change user profile](investigator-manual_images/change_user_profile.png "change user profile")
 
 The form "Change User Profile" appears, allowing you to change data about your account. All fields with an asterisk * are required. This means you must provide a telephone number for Phone. Of course this can be any number. To save the changes you must provide your password, even if you have only changed for example your email. In that case you can leave field New Password blank.
 
 After clicking button Confirm Profile Changes, the screen "Confirm User Profile Updates" opens. Check your account-data one more time and click button Update Profile. In the left column of the screen the message "Your profile has been updated successfully" appears.
+![confirm user profile](investigator-manual_images/confirm_user_profile.png "confirm user profile")
 
 # When you've lost your password
 
 When you've lost your password you can request a reset of the password. A new, random password will be sent to the email-address you provided in your account-data. You request this new password by clicking Forgot Password? in the log in screen. The form "Request Password Form" opens.
 
 Type in User Name your user-name and in Email the email address, as used in OpenClinica. Then you select the Password Challenge Question and give your Password Challenge Answer. Click button Submit Password Request and after a few minutes a mail will be sent to you with the new password. After logging in with this new password, you must change it immediately, just as when you log in for the first time.
+![request password](investigator-manual_images/request_password.png "request password")
 
 # Change Study/Site
 
 When you log in to OpenClinica, your active study will be the study you last worked on. If you are assigned to more than one study, you can change to another study, by using the link Change Study/Site.
 You see in the upper-left corner the active Study "GCP-Service training study". If you want to change to study "Tolram Study" you click the radio-button and then click the button Change Study. The screen "Confirm Changing Study" opens and here you click on Confirm.
+![change study](investigator-manual_images/change_study.png "change study")
 
 In the left column you see under Alerts & Messages "Your current active study has been changed succesfully".
+![study changed](investigator-manual_images/study_changed.png "study changed")
 
 Another option is when you have rights to a Study as a whole, so to all the sites, for example the Bortezomib Study.
 
 # Your “Home” in OpenClinica
 
-After you've logged in successfully your "Home"-screen opens. This screen has links to your main activities in OpenClinica. In your case these are "Notes and Discrepancies Assigned to Me" and the so-called "Subject Matrix". We will come back to these in [16](#--refheading--456-2139846958) [Discrepancies: filtering by status, type, Event, Subject](#--refheading--456-2139846958) and in [10](#--refheading--544-1991669544) [Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#--refheading--544-1991669544).
+After you've logged in successfully your "Home"-screen opens. This screen has links to your main activities in OpenClinica. In your case these are "Notes and Discrepancies Assigned to Me" and the so-called "Subject Matrix". We will come back to these in [Discrepancies: filtering by status, type, Event, Subject](#discrepancies-filtering-by-status-type-event-subject) and in [Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting](#choosing-a-subject-a-shortcut-the-subject-matrix-filtering-and-sorting).
 
 # Adding Study Subjects
-
+![add subject](investigator-manual_images/add_subject_menu.png "add subject")
 When you start entering data, the first thing you must do is add study subjects. This can be done in three ways:
 
 1. 1.By using the link Add New Subject, in the upper right corner of the Subject matrix
@@ -125,6 +135,8 @@ When you start entering data, the first thing you must do is add study subjects.
 3. 3.By clicking the menu "Tasks"-"Submit Data"-"Add Subject"
 
 When you choose one of the above the screen Add Subject opens. Here you provide the Study Subject ID, the Secondary ID, Date of Enrollment and Gender. Type in the following:
+![enter subject](investigator-manual_images/enter_subject.png "enter subject")
+
 In Study Subject ID you provide the ID that is used to identify the study participant.
 
 In Secondary ID you can type anything you want. This secondary ID can be used to find a Study Subject quicker. It is absolutely not allowed to use this field for data that can be used to identify someone, so no name, no social security number, no hospital ID, etc.
@@ -133,7 +145,7 @@ For Date of Enrollment you type in the date as two digits for the day, the first
 
 After reviewing the data you click one of the three Save-buttons. Make sure the data are correct before Study or saving them, because you can not change them afterward. If you've made a mistake, you must contact the Study-coordinator who can change it.
 
-If you've added a Subject by clicking the link Add New Subject in the Subject Matrix, you also get the input fields described above and furthermore the option to add a Study Event. You do not have to do it at this stage. Adding Events will discussed in [11](#--refheading--579-1325233557) [Adding or scheduling Events](#--refheading--579-1325233557).
+If you've added a Subject by clicking the link Add New Subject in the Subject Matrix, you also get the input fields described above and furthermore the option to add a Study Event. You do not have to do it at this stage. Adding Events will discussed in [Adding or scheduling Events](#adding-or-scheduling-events).
 
 # Choosing a subject; a shortcut; the Subject Matrix; filtering and sorting
 
@@ -163,7 +175,7 @@ When you use option 3, i.e. right after adding a new Subject you click Save and 
 
 Also in this form all required fields are marked with an asterisk. Finish the scheduling by clicking Proceed to Enter Data.
 
-The form Enter or Validate Data for CRFs in Baseline appears. This may be a bit confusing, because an Event can contain one or more CRFs.  For this reason this form is displayed so you can specify for which CRFs you want to enter data.
+The form Enter or Validate Data for CRFs in Baseline appears. This may be a bit confusing, because an Event can contain one or more CRFs.  For this reason this form is displayed so you can specify for which CRFs you want to enter data.
 
 Each CRF has one or more versions. One version is set as default, but you can choose from all the available versions. Take the default version, unless you are instructed otherwise by the Study Coordinator. You start DataEntry by clicking the pencil-icon, to the right of the CRF.
 
@@ -189,17 +201,17 @@ In the next section other aspects of Data-entry will be discussed.
 
 Every now and then you may want to change attributes of an Event, for example the Start-date. You do this by clicking in the Subject Matrix on the Event you want to change. In the floating window that appears, click on "View/Enter Data". The screen "Enter or Validate Data for CRFs in [CRF-name]" appears. Click on the pencil-icon or on the link "Edit Study Event" in the upper right corner.
 
-You can now change Location and Start and Stop date. You also have the option to change the status of an Event. This will be discussed in more detail in section [19](#--refheading--429-727116019) [The status of a CRF and of an Event](#--refheading--429-727116019).
+You can now change Location and Start and Stop date. You also have the option to change the status of an Event. This will be discussed in more detail in section [The status of a CRF and of an Event](#the-status-of-a-crf-and-of-an-event).
 
 # Data-entry: required fields and error-messages
 
 In a CRF all required fields are indicated with a red asterisk.
 
-If you try to save a CRF by clicking the Save -button and not all required fields are filled in,  the message "There are issue(s) with your submission. The data has NOT been saved. See below for details." appears, plus the message "Missing data in a required field." If the data is available, you can enter it and save the data by clicking Save.
+If you try to save a CRF by clicking the Save -button and not all required fields are filled in,  the message "There are issue(s) with your submission. The data has NOT been saved. See below for details." appears, plus the message "Missing data in a required field." If the data is available, you can enter it and save the data by clicking Save.
 
 If the data is and will not be available you will have to make a Note/Discrepancy. You do this by clicking by clicking the flag-icon, to the right of the input field. A new window will appear, "Add Discrepancy Note". The Subject is displayed, the Item concerned and the type of Discrepancy. In this case it is a "Failed Validation Check". In "Description" you provide a reason, for example "forgot to ask." Now click on Submit. Close the window and click on Save in the CRF screen. Now the data will be saved and the following message appears: "Your data has been saved. You may continue entering/editing data now or return at a later time."
 
-The Study Coordinator or the Monitor can reply to your Discrepancy Note. In that case the status will change from "New" to "Updated". More about this will be discussed in section [Discrepancies: filtering by status, type, Event, Subject](#--refheading--456-2139846958). [Discrepancies: filtering by status, type, Event, Subject](#--refheading--456-2139846958).
+The Study Coordinator or the Monitor can reply to your Discrepancy Note. In that case the status will change from "New" to "Updated". More about this will be discussed in section [Discrepancies: filtering by status, type, Event, Subject](#discrepancies-filtering-by-status-type-event-subject).
 
 You follow the same procedure if you get the message that your input is out of range. For example a Subject weighs 155 kilo, and on entering this, the message "Please provide a weight between 45 and 150 kg." appears.
 
@@ -219,7 +231,7 @@ The second type, "Annotation" occurs when you want to add a note to an input fie
 
 The third type, "Query", is a lot like "Annotation", but is made by a Monitor or Investigator. If he/she wants to ask you a question about data entered, he/she does this by creating a Note of type Query. You can see which Discrepancies are assigned to you by clicking Home, followed by clicking Notes & Discrepancies Assigned to Me.
 
-The fourth type, "Reason for Change" is raised when data are changed on a CRF that was already marked as "Complete" (see section [Changing data in complete CRFs](#--refheading--859-614533537) [Changing data in complete CRFs](#--refheading--859-614533537)).
+The fourth type, "Reason for Change" is raised when data are changed on a CRF that was already marked as "Complete" (see section [Changing data in complete CRFs](#changing-data-in-complete-crfs)).
 
 If you open Notes and Discrepancy the discrepancies will be shown in a form similar to the Subject Matrix.
 Many extra attributes can be shown, such as CRF, Item, Value, Error-message and the user whom this Query is assigned to.
@@ -234,7 +246,7 @@ Click on the blue flag, next to the input field and a new window opens "Add Disc
 
 In this window you give a short description of your problem in the input filed "Description". In "Detailed Note" you can give more information. Let's assume that you find the value acceptable. You write this in the Detailed Note and change "Set to Status" to "Resolution proposed".
 
- Click on button Submit and close the window. You are now back in the window with the CRF. The color of the flag has changed from blue to green, indicating the status of the Discrepancy (Resolution Proposed). Click on Save. The data will now be saved and the next tab of the CRF opens, and you can continue data-entry.
+ Click on button Submit and close the window. You are now back in the window with the CRF. The color of the flag has changed from blue to green, indicating the status of the Discrepancy (Resolution Proposed). Click on Save. The data will now be saved and the next tab of the CRF opens, and you can continue data-entry.
 
 Now let's take a closer look at the Discrepancy. A discrepancy is a collection of comments on an item of a CRF. The comments are called Notes and the collection of Notes is called a Thread.
 
@@ -268,7 +280,7 @@ If data-entry has started on one of the CRFs of the Event, the status will chang
 
 When all required CRFs of an Event are "Marked as Complete, the status of the Event will change to "Completed".
 
-Sometimes a visit is skipped. In that case you can manually set the status on  "Skipped".
+Sometimes a visit is skipped. In that case you can manually set the status on  "Skipped".
 
 In very rare circumstances data-entry of a CRF can be stopped halfway. In that case you can manually set the status to "Stopped".
 
