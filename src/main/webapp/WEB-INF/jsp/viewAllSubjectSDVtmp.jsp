@@ -197,7 +197,10 @@
   #itemsdv {
     position: relative;
   }
-
+  #clear-filter {
+    float: left;
+    margin: 5px 10px;
+  }
   #sdv-close-popup {
     float: right;
     position: absolute;
@@ -218,6 +221,7 @@
   #sdv-details {
     padding: 10px;
     background-color: lightgray;
+    width: 100%;
   }
   #sdv-details th {
     font-weight: normal;
@@ -241,9 +245,8 @@
   .blockUI.blockMsg.blockPage {
     padding: 0 !important;
   }
-  #clear-filter {
-    float: left;
-    margin: 5px 10px;
+  #sdvVerify {
+    margin-bottom: 10px;
   }
 </style>
 
@@ -300,6 +303,7 @@
     <tbody id="sdvItems">
     </tbody>
   </table>
+  <input type="button" id="sdvVerify" name="sdvVerify" value="Verify" onclick="submitSdv(document.sdvForm, 2)" data-eventcrfid="2" data-formlayoutid="1" data-studyeventid="1">
 </div>
 
 <script>
@@ -329,6 +333,11 @@
   }
 
   function popupSdv(item) {
+    var verifyButton = $(item).siblings()[3];
+    $('#sdvVerify').click(function() {
+      $(verifyButton).click();
+    });
+
     var data = $(item).data();
     var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems?changedAfterSdvOnlyFilter=n';
     $.get(url, function(data) {
@@ -349,7 +358,7 @@
       var itemsTable = jQuery('#sdv-items').DataTable();
       itemsTable.rows.add(data.sdvItems.map(function(item) {
         console.log(item);
-        
+
         item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
         if (item.repeatingGroup) {
           item.briefDescriptionItemName += ' ' + item.ordinal;
