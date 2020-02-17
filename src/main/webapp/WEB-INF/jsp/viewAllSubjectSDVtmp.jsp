@@ -311,7 +311,7 @@
       {data: 'lastVerifiedDate'},
       {data: 'openQueriesCount'},
       {data: 'lastModifiedDate'},
-      {data: 'lastModifiedUserName'},
+      {data: 'lastModifiedBy'},
       {data: 'actions'}
     ]
   });
@@ -349,10 +349,12 @@
       var itemsTable = jQuery('#sdv-items').DataTable();
       itemsTable.rows.add(data.sdvItems.map(function(item) {
         console.log(item);
+        
         item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
         if (item.repeatingGroup) {
           item.briefDescriptionItemName += ' ' + item.ordinal;
         }
+
         item.lastVerifiedDate = data.lastVerifiedDate;
         if (item.lastVerifiedDate) {
           item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
@@ -360,6 +362,8 @@
         else {
           item.lastVerifiedDate = 'Never';
         }
+
+        item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
         item.actions = '';
         return item;
       }));
