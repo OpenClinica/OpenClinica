@@ -357,7 +357,10 @@
         if (item.lastVerifiedDate) {
           item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
         }
-        item.actions = '<a href="google.com">click here</a>';
+        else {
+          item.lastVerifiedDate = 'Never';
+        }
+        item.actions = '';
         return item;
       }));
       itemsTable.draw();
