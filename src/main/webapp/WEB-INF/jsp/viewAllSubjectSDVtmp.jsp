@@ -373,7 +373,7 @@
         }
 
         item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
-        item.actions = '';
+        item.actions = '<a href="#"><span title="View Form" class="icon icon-view-within">&nbsp;</span></a>';
         return item;
       }));
       itemsTable.draw();
