@@ -330,11 +330,11 @@
 
   function popupSdv(item) {
     var data = $(item).data();
-    var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/1/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems?changedAfterSdvOnlyFilter=n';
+    var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems?changedAfterSdvOnlyFilter=n';
     $.get(url, function(data) {
       $('#participantId').text(data.participantId);
       if (data.repeatingEvent) {
-        $('#eventName').text(data.eventName + '(' + data.eventOrdinal + ')');
+        $('#eventName').text(data.eventName + ' (' + data.eventOrdinal + ')');
       }
       else {
         $('#eventName').text(data.eventName);
@@ -346,18 +346,21 @@
       $('#formStatus').text(data.formStatus);
       $('#sdvStatus').text(data.sdvStatus);
 
-      var tbl = jQuery('#sdv-items').DataTable();
-      tbl.rows.add(data.sdvItems.map(function(item) {
+      var itemsTable = jQuery('#sdv-items').DataTable();
+      itemsTable.rows.add(data.sdvItems.map(function(item) {
         console.log(item);
         item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
         if (item.repeatingGroup) {
           item.briefDescriptionItemName += ' ' + item.ordinal;
         }
         item.lastVerifiedDate = data.lastVerifiedDate;
-        item.actions = '';
+        if (item.lastVerifiedDate) {
+          item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
+        }
+        item.actions = '<a href="google.com">click here</a>';
         return item;
       }));
-      tbl.draw();
+      itemsTable.draw();
     });
 
     jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
