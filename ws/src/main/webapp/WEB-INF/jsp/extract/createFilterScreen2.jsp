@@ -13,7 +13,7 @@
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 
-<h1><span class="title_manage"><fmt:message key="create_filters" bundle="${resword}"/>: <fmt:message key="instructions" bundle="${resword}"/> <a href="javascript:openDocWindow('help/3_4_createFilter_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_filters" bundle="${resword}"/>: <fmt:message key="instructions" bundle="${resword}"/></span></h1>
 <P>
 <fmt:message key="throughout_the_next_few_screens" bundle="${restext}"/>
 </P>

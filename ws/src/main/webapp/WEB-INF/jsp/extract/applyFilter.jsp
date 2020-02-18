@@ -14,7 +14,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 
 
-<h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="apply_dataset_filter" bundle="${resword}"/> <a href="javascript:openDocWindow('help/4_2_createDataset_Help.html#step3')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="apply_dataset_filter" bundle="${resword}"/></span></h1>
 
 <P><jsp:include page="../showInfo.jsp"/></P>
 

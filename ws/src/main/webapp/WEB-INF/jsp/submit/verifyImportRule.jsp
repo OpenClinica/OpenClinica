@@ -53,17 +53,7 @@
 
  <c:out value="${crfName}"/>
 
-<c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
-        <h1><span class="title_manage">
-    </c:when>
-    <c:otherwise>
-        <h1>
-        <span class="title_manage">
-    </c:otherwise>
-</c:choose>
-
-<fmt:message key="import_rule_data" bundle="${resworkflow}"/></h1>
+<h1><span class="title_manage"><fmt:message key="import_rule_data" bundle="${resworkflow}"/></span></h1>
 <p><fmt:message key="import_rule_instructions" bundle="${restext}"/></p>
 
 <form action="VerifyImportedRule?action=save" method="POST">

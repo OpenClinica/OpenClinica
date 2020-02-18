@@ -35,7 +35,7 @@
 	</c:if>
 </c:forEach>
 
-<h1><span class="title_manage"><fmt:message key="create_filter" bundle="${resword}"/>: <fmt:message key="specify_filter_properties" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_filter" bundle="${resword}"/>: <fmt:message key="specify_filter_properties" bundle="${resword}"/></span></h1>
 <P><jsp:include page="../include/showPageMessages.jsp"/></P>
 <jsp:include page="createFilterBoxes.jsp">
 	<jsp:param name="save" value="1"/>

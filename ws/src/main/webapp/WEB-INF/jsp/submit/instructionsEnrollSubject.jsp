@@ -38,7 +38,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-	<h1><span class="title_manage"><fmt:message key="add_subject" bundle="${resword}"/>- <fmt:message key="instructions" bundle="${restext}"/> <a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="H<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a></span></h1>
+	<h1><span class="title_manage"><fmt:message key="add_subject" bundle="${resword}"/>- <fmt:message key="instructions" bundle="${restext}"/></span></h1>
 
 
 

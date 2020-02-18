@@ -71,18 +71,7 @@ function notSelectAll() {
 <c:when test="${newDataset.id>0}">
 <h1>
  <span class="title_manage">
-   <fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="select_items" bundle="${resword}"/>
-   <c:choose>
-   <c:when test="${newDataset.id<=0}">
-   <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')">
-   <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-   </c:when>
-   <c:otherwise>
-   <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/edit-dataset')">
-   <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-   </c:otherwise>
-   </c:choose>
-   : <c:out value="${newDataset.name}"/>
+   <fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="select_items" bundle="${resword}"/>: <c:out value="${newDataset.name}"/>
  </span>
 </h1>
 </c:when>
@@ -90,8 +79,6 @@ function notSelectAll() {
 <h1>
  <span class="title_manage">
    <fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_items" bundle="${resword}"/>
-   <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')">
-   <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
  </span>
 </h1>
 </c:otherwise>

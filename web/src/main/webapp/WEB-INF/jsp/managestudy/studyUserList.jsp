@@ -68,8 +68,6 @@
         </c:otherwise>
     </c:choose>
     <c:out value="${study.name}"/>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/manage-users/manage-user-roles#content-title-4354')">
-	<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 </span>
 </h1>
 

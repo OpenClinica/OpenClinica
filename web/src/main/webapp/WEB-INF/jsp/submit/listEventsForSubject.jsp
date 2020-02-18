@@ -60,13 +60,12 @@
     <c:when test="${userRole.manageStudy && module=='manage'}">
     <span class="title_manage">
     <fmt:message key="manage_all_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/subject-matrix')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a></span></h1>
+    </span></h1>
     </c:when>
     <c:otherwise>
     <span class="title_manage">
     <fmt:message key="view_all_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
-
-<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/subject-matrix')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a></span></h1>
+    </span></h1>
     </c:otherwise>
 </c:choose>
 

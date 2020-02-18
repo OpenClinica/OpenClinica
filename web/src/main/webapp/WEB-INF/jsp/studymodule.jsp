@@ -140,9 +140,7 @@
 
   <form action="studymodule" method="post">
   <div>
-      <h1><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/></a>
-      </span></h1>
+      <h1><span class="title_manage"><c:out value="${currentStudy.name}"/></span></h1>
   </div>
   <div style="border: 1px solid #ccc; width:70%; padding-left:5px">
       <p>
@@ -721,9 +719,6 @@
         <form action="studymodule/${currentStudy.oid}/register" method="post">
             <h1>
                 <fmt:message key="participate_reg_title" bundle="${resword}"/>
-                <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
-                    <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
-                </a>
             </h1>
             <p class="participate-text"><fmt:message key="participate_reg_instructions_part1" bundle="${resword}"/></p>
             <p class="participate-text"><fmt:message key="participate_reg_instructions_part2" bundle="${resword}"/></p>
@@ -750,9 +745,6 @@
         <form action="studymodule/${currentStudy.oid}/randomize" method="post">
             <h1>
                 <fmt:message key="randomization_reg_title" bundle="${resword}"/>
-                <a href="javascript:openDocWindow('https://docs.openclinica.com/randomization/activate-openclinica-randomize-your-study')">
-                    <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
-                </a>
             </h1>
             <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part1" bundle="${resword}"/></p>
             <br>

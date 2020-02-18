@@ -26,9 +26,7 @@ document.write('<table border="0" cellpadding=0" cellspacing="0" width="' + docu
 				<td class="footer">
 				<a href="#"><fmt:message key="openclinica_portal" bundle="${resword}"/></a>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<a href="javascript:openDocWindow('help/index.html')"><fmt:message key="help" bundle="${resword}"/></a>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<a href="javascript:reportBug()"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>
+				<a href="https://www.libreclinica.org/documentation" target="new"><fmt:message key="help" bundle="${resword}"/></a>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;				
 				<a href="#"><fmt:message key="contact" bundle="${resword}"/></a>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

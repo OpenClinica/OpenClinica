@@ -58,11 +58,7 @@
     }
 </script></div>
 
-<h1><span class="title_manage">
-<fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data')">
-        <img src="../images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
-</span></h1>
+<h1><span class="title_manage"><fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/></span></h1>
 
 <jsp:useBean scope='session' id='sSdvRestore' class='java.lang.String' />
 <c:set var="restore" value="true"/>

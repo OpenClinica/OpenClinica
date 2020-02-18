@@ -134,7 +134,6 @@
                                     <td align="right" style="font-weight: normal;">
 
                                         <form METHOD="GET" action="${urlPrefix}ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
-                                            <!--<a href="javascript:reportBug()"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></a>&nbsp;|&nbsp;-->
                                             <c:if test="${not empty sessionScope.supportURL}">
                                             	<a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>&nbsp;&nbsp;
                                             </c:if>

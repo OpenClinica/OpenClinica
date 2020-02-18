@@ -8,16 +8,6 @@
 
 <jsp:useBean scope='session' id='trail' class='java.util.ArrayList'/>
 
-<script language="JavaScript">
-function reportBug() {
- var bugtrack = "http://dev.openclinica.org/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
- var user= "<c:out value="${userBean.name}"/>";
- bugtrack = bugtrack + user+ "&url=" + window.location.href;
- openDocWindow(bugtrack);
-
-}
-</script>
-
 <!-- Breadcrumbs -->
 
 <!-- End Breadcrumbs -->
@@ -36,9 +26,9 @@ function reportBug() {
 
 							<img
 							name="bt_ReportIssue_lit" src="images/bt_ReportIssue_lit.gif" width="76" height="22" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="openclinica_report_issue" bundle="${resword}"/>" style="margin-top: 2px; margin-left: 2px; margin-right: 2px; margin-bottom: 2px">--%>
-            <td style="white-space:nowrap"><a href="javascript:reportBug()">
-              <span class="aka_font_general" style="font-size: 0.9em"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></span> </a> | <a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><span class="aka_font_general" style="font-size: 0.9em"><fmt:message key="openclinica_feedback" bundle="${resword}"/></span></a>
-						</td>	
+            <td style="white-space:nowrap">
+				<a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><span class="aka_font_general" style="font-size: 0.9em"><fmt:message key="openclinica_feedback" bundle="${resword}"/></span></a>
+			</td>
 					</tr>
 				<%--	<tr>
 						<td><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><img

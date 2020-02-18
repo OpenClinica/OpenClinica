@@ -82,13 +82,13 @@
 <h1> 
     <span class="title_manage">
         <fmt:message key="welcome_to" bundle="${restext}"/>
-            <c:choose>
-                <c:when test='${study.parentStudyId > 0}'>
-                    <c:out value='${study.parentStudyName}'/>                
-                </c:when>
-                <c:otherwise>
-                    <c:out value='${study.name}'/>
-                </c:otherwise>
+        <c:choose>
+            <c:when test='${study.parentStudyId > 0}'>
+                <c:out value='${study.parentStudyName}'/>
+            </c:when>
+            <c:otherwise>
+                <c:out value='${study.name}'/>
+            </c:otherwise>
         </c:choose>
     </span>
 </h1>

@@ -83,33 +83,7 @@
 </script>
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tr><td>
-        <h1>
-            <c:choose>
-            <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-            <div class="title_manage">
-                </c:when>
-                <c:otherwise>
-
-                <c:choose>
-                <c:when test="${userRole.manageStudy}">
-                <div class="title_manage">
-                    </c:when>
-                    <c:otherwise>
-                    <div class="title_manage">
-                        </c:otherwise>
-                        </c:choose>
-
-                        </c:otherwise>
-                        </c:choose>
-                        <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
-                    </div>
-    </td>
-        <td align="right">
-            <!-- <span style="font-size:11px"><a href="#"><img
-		    src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"></a>View Printable Record</div>-->
-            </h1>
-        </td></tr>
+    <tr><td><h1><div class="title_manage"><fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/></div></h1></td></tr>
 </table>
 
 <%-- <p>

@@ -45,7 +45,7 @@
 <jsp:useBean scope="request" id="datasets" class="java.util.ArrayList"/>
 
 
-<h1><span class="title_manage"><c:out value="${study.name}" />: <fmt:message key="view_dataset" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('help/4_1_viewDatasets_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><c:out value="${study.name}" />: <fmt:message key="view_dataset" bundle="${resworkflow}"/></span></h1>
 
 
 <%--<p><center><a href="ViewDatasets?action=owner&ownerId=<c:out value="${userBean.id}"/>">Show Only My Datasets</a> |
