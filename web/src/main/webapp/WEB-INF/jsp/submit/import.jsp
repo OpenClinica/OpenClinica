@@ -63,9 +63,7 @@
 </c:choose>
 
 <fmt:message key="import_crf_data" bundle="${resworkflow}"/>
-<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/import-data')">
-    <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>">
-</a></h1>
+</h1>
 <p><fmt:message key="import_instructions" bundle="${restext}"/></p>
 
 

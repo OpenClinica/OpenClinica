@@ -82,16 +82,14 @@
 <h1> 
     <span class="title_manage" style="line-height:5px;">
         <fmt:message key="welcome_to" bundle="${restext}"/>
-            <c:choose>
-                <c:when test='${study.parentStudyId > 0}'>
-                    <c:out value='${study.parentStudyName}'/>                
-                </c:when>
-                <c:otherwise>
-                    <c:out value='${study.name}'/>
-                </c:otherwise>
+        <c:choose>
+            <c:when test='${study.parentStudyId > 0}'>
+                <c:out value='${study.parentStudyName}'/>
+            </c:when>
+            <c:otherwise>
+                <c:out value='${study.name}'/>
+            </c:otherwise>
         </c:choose>
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/overview-openclinica')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
     </span>
 </h1>
 

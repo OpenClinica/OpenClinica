@@ -107,17 +107,7 @@
 </script>
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tr><td>
-        <h1>
-            <div class="title_manage">
-                <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
-                <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-subject')">
-                    <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-
-           </div>
-        </h1>
-        </td>
-    </tr>
+    <tr><td><h1><div class="title_manage"><fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/></div></h1></td></tr>
 </table>
 
 <%-- <p>

@@ -61,11 +61,6 @@
 
 <h1><span class="title_manage">
 <fmt:message key="view_study_log_for" bundle="${resword}"/> <c:out value="${study.name}"/>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/study-audit-logs')">
-        <c:choose>
-        <c:when test="${module eq 'manage'}"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:when>
-        <c:otherwise><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:otherwise></c:choose></a>
-
 </span></h1>
 
 <div id="findSubjectsDiv">

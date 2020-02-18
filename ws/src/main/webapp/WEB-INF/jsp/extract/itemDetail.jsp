@@ -40,7 +40,7 @@
  <jsp:include page="../include/alertbox.jsp"/>
  <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
  <tr valign="top">
-	<td background="images/popup_BG.gif" ><img src="images/popup_OC.gif"></td>	
+	<td background="images/popup_BG.gif"></td>
   </tr>
  <tr valign="top"> 
  <td>

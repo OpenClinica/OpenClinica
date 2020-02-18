@@ -45,7 +45,7 @@
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />
 
-<h1><span class="title_manage">View Job: <c:out value="${triggerBean.fullName}" /><a href="javascript:openDocWindow('help/6_4_administerJobs_Help.html')">&nbsp; <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage">View Job: <c:out value="${triggerBean.fullName}" /></span></h1>
 
 <P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
 <%-- set up table here --%>

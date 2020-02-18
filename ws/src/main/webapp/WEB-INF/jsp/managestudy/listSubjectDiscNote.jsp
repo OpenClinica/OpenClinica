@@ -80,25 +80,7 @@ applied on resolution status or type--%>
 
 
 
-<h1>
-    <c:choose>
-    <c:when test="${module eq 'manage'}"><span class="title_manage"></c:when>
-    <c:otherwise><span class="title_manage"></c:otherwise>
-        </c:choose>
-<fmt:message key="manage_all_discrepancy_notes_in" bundle="${restext}"/> <c:out value="${study.name}"/>
-    <c:choose>
-        <c:when test="${module eq 'manage'}">
-            <a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>">
-            </a>
-        </c:when>
-        <c:otherwise>
-            <a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>">
-            </a>
-        </c:otherwise>
-    </c:choose>
-</span></h1>
+<h1><span class="title_manage"><fmt:message key="manage_all_discrepancy_notes_in" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1>
 <!--Message about [] repeating events symbol; the key to filtering the flag icons and Disc Note types -->
 <div class="dnKey"><strong><fmt:message key="Filter_by_status" bundle="${resword}"/>
     :</strong>

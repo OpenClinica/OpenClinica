@@ -192,7 +192,6 @@ function setYPos(id) {
 			<div style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
 		</c:if>
 		<div style="float:right">
-			<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 			<c:choose>
 			<c:when test="${parentId==0}">
 				<a href="javascript:scrollToY('p');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>

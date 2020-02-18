@@ -50,9 +50,7 @@
 
 
 
-<h1><span class="title_manage">
-<fmt:message key="manage_all_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
-</span></h1>
+<h1><span class="title_manage"><fmt:message key="manage_all_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1>
 
 <!--<p>List of all subjects with their enrollment dates and status of study events. Select any subject for details on his/her subject record and study events or assign or reassign him/her to a different study/site.</p>
 

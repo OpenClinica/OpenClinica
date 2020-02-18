@@ -56,7 +56,7 @@ function refreshMe() {
 <!-- work on putting csv, etc into web page tomorrow? -->
 <!--<div id="mainpage">-->
 
-<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/>  <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/></span></h1>
 
 <P><jsp:include page="../showInfo.jsp"/></P>
 
@@ -121,7 +121,7 @@ function refreshMe() {
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
-<p><i><fmt:message key="internet_explorer_users" bundle="${resword}"/></i>: <fmt:message key="export_dataset_download4" bundle="${restext}"/><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> <fmt:message key="export_dataset_download5" bundle="${restext}"/>
+<p><i><fmt:message key="internet_explorer_users" bundle="${resword}"/></i>: <fmt:message key="export_dataset_download4" bundle="${restext}"/> <fmt:message key="export_dataset_download5" bundle="${restext}"/>
 
 
 <!--</div>-->

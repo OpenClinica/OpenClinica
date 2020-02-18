@@ -41,7 +41,7 @@
 
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 
-<h1><span class="title_manage"><fmt:message key="manage_all_users_in" bundle="${restext}"/> <c:out value="${study.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/manage-users/manage-user-roles')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="manage_all_users_in" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1>
 
 <%-- 
 <div class="homebox_bullets"><a href="AssignUserToStudy"><fmt:message key="assign_new_user_to_current_study" bundle="${restext}"/></a></div>
