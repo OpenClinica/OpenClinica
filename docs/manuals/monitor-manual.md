@@ -110,6 +110,7 @@ Type in User Name your user-name and in Email the email address, as used in Open
 When you log in to LibreClinica, your active study will be the study you last worked on. If you are assigned to more than one study, you can change to another study, by using the link Change Study/Site.
 
 You see in the upper-left corner the active Study "GCP-Service training study: Bremen (TDS0004: Site B)". If you want to change to site"Amsterdam" you click the radio-button and then click the button Change Study. The screen "Confirm Changing Study" opens and here you click on Confirm.
+
 ![change study](monitor-manual_images/change_study.png "change study")
 
 In the left column you see under Alerts & Messages "Your current active study has been changed succesfully".
@@ -118,7 +119,7 @@ In the left column you see under Alerts & Messages "Your current active study ha
 Another option is when you have rights to a Study as a whole, so to all the sites. If you click the link "Change Study/Site" you can choose the Bortezomib-study and this will give you access to all sites in that study.
 
 # Your “Home” in OpenClinica
-![monitor home](monitor-manual_images/study_changed.png "monitor home")
+![monitor home](monitor-manual_images/monitor_home.png "monitor home")
 
 After you've logged in successfully your "Home"-screen opens. This screen displays the matrix for Source Data Validation, plus a link labeled Notes & Discrepancies Assigned to Me. You can always return to this screen by clicking Home in the menu in the top of screen. .
 
@@ -149,10 +150,10 @@ Start SDV by clicking the menu-option SDV in the menu in the top of your screen.
 The screen opens by default with the "View By Event CRF"-tab. This screen provides you several ways to quickly find the CRFs of the Subjects you want to do SDV for. It displays for all Subjects all the CRFs with status "Completed" or "Locked". The sort-order is by Event Date.
 
 You can filter the CRF by using the columns that have an input box below the column-header. For example if you want to filter on Study Subject ID you enter this in the inputbox and hit return, or click on "Apply Filter, in the upper right corner of the matrix. Now all CRFs for for this particular Subject will be displayed.
-![SDV listed by event](investigator-manual_images/sdv_event_list.png "SDV listed by event")
+![SDV listed by event](monitor-manual_images/sdv_event_list.png "SDV listed by event")
 
 You can refine your search by displaying only the CRFs that are not SDV'd yet. To do this click in the box under the header of column "SDV Status" and choose "None".
-![open SDV listed by event](investigator-manual_images/sdv_event_list_filter.png "open SDV listed by event")
+![open SDV listed by event](monitor-manual_images/sdv_event_list_filter.png "open SDV listed by event")
 
 When SDV is not required for all CRFs, you can refine your search even further by filtering on "SDV Requirement". By choosing "100% Required and Partial Required" and then clicking "Apply Filter" you now have a list of all the CRFs of this Subject that still have to be SDV'd and for which (partial) SDV is mandatory.
 
@@ -174,7 +175,7 @@ It's also possible to SDV all CRFs in two clicks, for example when you've select
 
 If data in a CRF that has been SDV'd are changed, then the SDV-status changes to "not SDV'd" and the Monitor must SDV the CRF again!
 
-# Change Study/Site
+# Elements of a CRF
 
 In a CRF the layout of the screen is as follows.
 
