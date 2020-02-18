@@ -156,17 +156,22 @@ You can refine your search by displaying only the CRFs that are not SDV'd yet. T
 ![open SDV listed by event](monitor-manual_images/sdv_event_list_filter.png "open SDV listed by event")
 
 When SDV is not required for all CRFs, you can refine your search even further by filtering on "SDV Requirement". By choosing "100% Required and Partial Required" and then clicking "Apply Filter" you now have a list of all the CRFs of this Subject that still have to be SDV'd and for which (partial) SDV is mandatory.
+![required SDV listed by event](monitor-manual_images/sdv_event_list_required.png "required SDV listed by event")
 
 If you want to view all CRFs again, click "Clear Filter".
 
 The other tab of the screen "Source Data Verification" is called "View By Study Subject ID". When you click it, a list of all available Subjects is displayed plus a summary of the CRFs for this Subject. Listed are the number of CRFs completed, the number of CRFs that have been SDV'd and the total number of CRFs. This includes Subjects that have no CRFs with data yet or CRFs where data-entry has been started.
 
 Only Subjects with CRFs Completed and not yet SDV'd can be a candidate for SDV and therefore have a button labeled SDV in the last column. All other Subjects have the text "SDV N/A". If you have SDV'd all CRFs of a Subject and found them in order, then you can use the button SDV to mark all the CRFs of this Subject as SDV'd.
+![SDV listed by subject](monitor-manual_images/sdv_subject_list.png "SDV listed by subject")
 
 Normally you want to go through the CRFs of a Subject one by one. Choose the Subject you want to work with by clicking on the magnifier-icon in the right column. Now you are switched back to the tab "View By Event CRF", but this time filtered on the Subject you chose in the tab "View By Study Subject ID".
 
 If you want you, can add the two extra filters as described earlier, "SDV status = none" and SDV Requirement = 100% Required & Partial Required"
 You open a CRF for viewing, by clicking the icon in the column "CRF Status", which is either the completed-icon or the locked-icon in the column "CRF Status". A new browser window opens and with it you can verify that the data entered in the OpenClinica-CRF are the same as the source data. After you have reviewed it, close the window with the CRF. If by accident you click the "Exit" button, you will be redirected to the Subject Matrix. If this happens you can just close the browser window.
+
+![mark CRFs SDVed](monitor-manual_images/mark_crf_sdv1.png "mark CRFs SDVed")
+![mark CRFs SDVed](monitor-manual_images/mark_crf_sdv2.png "mark CRFs SDVed")
 
 Now you can mark this CRF as SDV'ed by clicking the button labeled "SDV". In the left column under "Alerts and Messages" you will see "The Event CRFs have been source data verified."
 You can also tick the checkbox in the left column for each CRF you have SDV'ed and then click the button in the bottom of your screen, labeled SDV All Checked.
