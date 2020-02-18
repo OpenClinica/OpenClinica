@@ -191,7 +191,6 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
 
 <style>
   #itemsdv {
@@ -214,6 +213,7 @@
   #sdv-show-type {
     float: right;
     padding: 10px;
+    border: none;
   }
   #sdv-items {
     clear: both;
@@ -278,14 +278,14 @@
       </tr>
     </tbody>
   </table>
-  <div id="sdv-show-type">
+  <fieldset id="sdv-show-type">
     <label>
-      <input name="type" type="radio" autofocus="autofocus" checked="checked"> Show all items
+      <input type="radio" name="sinceLastVerified" value="n" autofocus="autofocus" checked="checked"> Show all items
     </label>
     <label>
-      <input name="type" type="radio"> Show only changed since last Verified
+      <input type="radio" name="sinceLastVerified" value="y"> Show only changed since last Verified
     </label>
-  </div>
+  </fieldset>
 
   <a id="clear-filter" href="javascript:clearFilter()">Clear Filter</a>
   <table id='sdv-items' style="width:100%">
@@ -307,7 +307,7 @@
 </div>
 
 <script>
-  var datatable = jQuery('#sdv-items').DataTable({
+  var itemsTable = jQuery('#sdv-items').DataTable({
     dom: 't',
     columns: [
       {data: 'briefDescriptionItemName'},
@@ -319,11 +319,11 @@
       {data: 'actions'}
     ]
   });
-  datatable.order([]);
 
   function clearFilter() {
-    jQuery('#sdv-items').dataTable().fnSortNeutral();
+    itemsTable.order([]);
   }
+  clearFilter();
 
   function translate(str) {
     var trans = {
@@ -333,54 +333,70 @@
   }
 
   function popupSdv(item) {
+    var data = $(item).data();
+    var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
+    
+    function getItems() {
+      var sinceLastVerified = $('#sdv-show-type input:checked').val();
+      $.get(url + '?changedAfterSdvOnlyFilter=' + sinceLastVerified, function(data) {
+
+        $('#participantId').text(data.participantId);
+        if (data.repeatingEvent) {
+          $('#eventName').text(data.eventName + ' (' + data.eventOrdinal + ')');
+        }
+        else {
+          $('#eventName').text(data.eventName);
+        }
+        $('#formName').text(data.formName);
+        $('#sdvRequirement').text(translate(data.sdvRequirement));
+        $('#siteName').text(data.siteName);
+        $('#eventStartDate').text(data.eventStartDate);
+        $('#formStatus').text(data.formStatus);
+        $('#sdvStatus').text(data.sdvStatus);
+
+        itemsTable.rows.add(data.sdvItems.map(function(item) {
+          console.log(item);
+
+          item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
+          if (item.repeatingGroup) {
+            item.briefDescriptionItemName += ' ' + item.ordinal;
+          }
+
+          item.lastVerifiedDate = data.lastVerifiedDate;
+          if (item.lastVerifiedDate != null && item.lastModifiedDate > item.lastVerifiedDate) {
+            item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
+          }
+          if (!item.lastVerifiedDate) {
+            item.lastVerifiedDate = 'Never';
+          }
+
+          item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
+          item.actions = '<a href="#"><span title="View Form" class="icon icon-view-within">&nbsp;</span></a>';
+          return item;
+        }));
+        itemsTable.draw();
+      });
+    }
+
+    $('#sdv-show-type').off('change');
+    if (data.sdvStatus === 'VERIFIED') {
+      $('#sdv-show-type input[value=n]').click();
+    }
+    else {
+      $('#sdv-show-type input[value=y]').click();
+    }
+
+    $('#sdv-show-type').change(function() {
+      itemsTable.clear().draw();
+      getItems();
+    }).change();
+
     var verifyButton = $(item).siblings()[3];
-    $('#sdvVerify').click(function() {
+    $('#sdvVerify').off('click').click(function() {
       $(verifyButton).click();
     });
 
-    var data = $(item).data();
-    var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems?changedAfterSdvOnlyFilter=n';
-    $.get(url, function(data) {
-      $('#participantId').text(data.participantId);
-      if (data.repeatingEvent) {
-        $('#eventName').text(data.eventName + ' (' + data.eventOrdinal + ')');
-      }
-      else {
-        $('#eventName').text(data.eventName);
-      }
-      $('#formName').text(data.formName);
-      $('#sdvRequirement').text(translate(data.sdvRequirement));
-      $('#siteName').text(data.siteName);
-      $('#eventStartDate').text(data.eventStartDate);
-      $('#formStatus').text(data.formStatus);
-      $('#sdvStatus').text(data.sdvStatus);
-
-      var itemsTable = jQuery('#sdv-items').DataTable();
-      itemsTable.rows.add(data.sdvItems.map(function(item) {
-        console.log(item);
-
-        item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
-        if (item.repeatingGroup) {
-          item.briefDescriptionItemName += ' ' + item.ordinal;
-        }
-
-        item.lastVerifiedDate = data.lastVerifiedDate;
-        if (item.lastVerifiedDate) {
-          item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
-        }
-        else {
-          item.lastVerifiedDate = 'Never';
-        }
-
-        item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
-        item.actions = '<a href="#"><span title="View Form" class="icon icon-view-within">&nbsp;</span></a>';
-        return item;
-      }));
-      itemsTable.draw();
-    });
-
     jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
-    var cols = $(item).closest('tr').children();
   }
 
 </script>
