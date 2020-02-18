@@ -195,27 +195,18 @@
   #itemsdv {
     position: relative;
   }
-  #clear-filter {
-    float: left;
-    margin: 5px 10px;
-  }
-  #sdv-close-popup {
-    float: right;
-    position: absolute;
-    right: -25px;
-    top: -25px;
-  }
-  #sdv-close-popup > .icon-cancel::before {
-    border-radius: 50px;
-    color: white;
-  }
-  #sdv-show-type {
-    float: right;
-    padding: 10px;
-    border: none;
-  }
   #sdv-items {
     clear: both;
+  }
+  #sdv-items th {
+    font-weight: normal;
+  }
+  #sdv-items .icon::before {
+    padding: 0;
+    min-width: 1.45em;
+  }
+  #sdv-items_wrapper {
+    margin: 0 10px 10px;
   }
   #sdv-details {
     padding: 10px;
@@ -232,11 +223,27 @@
     border: 1px solid gray;
     font-weight: bold;
   }
-  #sdv-items_wrapper {
-    margin: 0 10px 10px;
+  #sdv-show-type {
+    float: right;
+    padding: 10px;
+    border: none;
   }
-  #sdv-items th {
-    font-weight: normal;
+  #sdvVerify {
+    margin-bottom: 10px;
+  }
+  #sdv-close-popup {
+    float: right;
+    position: absolute;
+    right: -25px;
+    top: -25px;
+  }
+  #sdv-close-popup > .icon-cancel::before {
+    border-radius: 50px;
+    color: white;
+  }
+  #clear-filter {
+    float: left;
+    margin: 5px 10px;
   }
   .blockOverlay {
     cursor: default !important;
@@ -244,9 +251,7 @@
   .blockUI.blockMsg.blockPage {
     padding: 0 !important;
   }
-  #sdvVerify {
-    margin-bottom: 10px;
-  }
+  
 </style>
 
 <div id="itemsdv" style="display:none;">
@@ -299,7 +304,7 @@
         <th>Actions</th>
       </tr>
     </thead>
-    <tbody id="sdvItems">
+    <tbody>
     </tbody>
   </table>
   <input type="button" id="sdvVerify" name="sdvVerify" value="Verify" onclick="submitSdv(document.sdvForm, 2)" data-eventcrfid="2" data-formlayoutid="1" data-studyeventid="1">
@@ -370,7 +375,7 @@
           }
 
           item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
-          item.actions = '<a href="#"><span title="View Form" class="icon icon-view-within">&nbsp;</span></a>';
+          item.actions = '<a href="#" title="View Form" class="icon icon-view-within"></a>';
           return item;
         }));
         itemsTable.draw();
