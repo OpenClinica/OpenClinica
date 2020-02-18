@@ -1,6 +1,7 @@
-**LibreClinica 1.0 for Monitors**
+LibreClinica 1.0 for Monitors
+=============================
 
-[https://www.libreclinica.org](https://www.libreclinica.org/) © 2019
+[https://libreclinica.org](https://libreclinica.org) © 2020
 
 **Preface**
 
@@ -10,9 +11,7 @@ To use this manual an account with the role of Monitor is the only requirement.
 
 Please contact us for manuals for the roles of Clinical Reasearch Coordinator and Investigator or if you would like a tailor-made manual, based on this one.
 
-Gerben Rienk Visser
-
-GerbenRienk@trialdatasolutions.com
+[The LibreClinica Community](https://libreclinica.org)
 
 The manual is a distributed under the <a name="firstheading">Creative Commons Attribution-ShareAlike 3.0 Unported License . This means you are free to copy, distribute and transmit the work, and to adapt the work under the following conditions:</a>
 
@@ -20,24 +19,39 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 2 if you alter, transform, or build upon this work, you may distribute the resulting work only under the same, similar or a compatible license.
 
-# Table of contents
+# Contents
   
-1. [Choosing your browser and starting](#choosing-your-browser-and-starting)  
-1. [Logging in](#logging-in)  
-1. [Changing your password on first time log-in](#changing-your-password-on-first-time-log-in)  
-1. [Logging out](#logging-out)  
-1. [Changing your password](#changing-your-password)  
-1. [When you've lost your password](#when-youve-lost-your-password)  
-1. [Change Study/Site](#change-studysite)  
-1. [Your "Home" in OpenClinica](#your-home-in-openclinica)  
-1. [How data is organised in OpenClinica](#how-data-is-organised-in-openclinica)  
-1. [Source Data Verification](#source-data-verification)  
-1. [Elements of a CRF](#elements-of-a-crf)  
-1. [Notes & Discrepancies](#notes--discrepancies)  
-1. [An example of a Query](#an-example-of-a-query)  
-1. [An example of a Failed Validation Check](#an-example-of-a-failed-validation-check)  
-1. [An example of an Annotation](#an-example-of-an-annotation)  
-1. [An example of a Reason for Change](#an-example-of-a-reason-for-change)  
+1. [Choosing your browser and starting](#choosing-your-browser-and-starting)
+
+1. [Logging in](#logging-in)
+
+1. [Changing your password on first time log-in](#changing-your-password-on-first-time-log-in)
+
+1. [Logging out](#logging-out)
+
+1. [Changing your password](#changing-your-password)
+
+1. [When you've lost your password](#when-youve-lost-your-password)
+
+1. [Change Study/Site](#change-studysite)
+1. [Your "Home" in OpenClinica](#your-home-in-openclinica)
+
+1. [How data is organised in OpenClinica](#how-data-is-organised-in-openclinica)
+
+1. [Source Data Verification](#source-data-verification)
+
+1. [Elements of a CRF](#elements-of-a-crf)
+
+1. [Notes & Discrepancies](#notes--discrepancies)
+
+1. [An example of a Query](#an-example-of-a-query)
+
+1. [An example of a Failed Validation Check](#an-example-of-a-failed-validation-check)
+
+1. [An example of an Annotation](#an-example-of-an-annotation)
+
+1. [An example of a Reason for Change](#an-example-of-a-reason-for-change)
+
 1. [Study Audit Log](#study-audit-log)  
 
 
@@ -48,18 +62,21 @@ To use OpenClinica you need a browser. You can use Firefox (Mozilla) version 3 o
 Furthermore your browser must be set up to execute Java-script.
 
 In Firefox you can check this by clicking the menu-option "Tools"-"Options". In the window that opens, click on the tab "Content" and make sure "Enable JavaScript" is checked.
+![enable JavaScript](monitor-manual_images/enable_JavaScript1.png "enable JavaScript")
 
 In Internet Explorer you can check if Java-script is enabled by clicking menu option "Tools", "Internet options". In the window that opens click on tab "Security". Then you click "Custom Level ..." Scroll down to "Scripting" and check if "Active Scripting" is set to "Enable".       
+![enable JavaScript](monitor-manual_images/enable_JavaScript2.png "enable JavaScript")
 
 # Logging in
 
-To start LibreClinica, type in the address you've been given. You will automatically be routed to the login-screen.
-
+To start LibreClinica, type in the address you've been given, e. g. [https://libreclinica.org/lc-demo/](https://libreclinica.org/lc-deb10/pages/login/login). You will automatically be routed to the login-screen.
 You can log in with the user name and password that have been sent to you by mail. Click on button Login.
+![login screen](monitor-manual_images/login_screen.png "login screen")
 
 # Changing your password on first time log-in
 
 Because this is the first time you log in to OpenClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
+![reset password](monitor-manual_images/reset_password.png "reset password")
 
 After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
 
@@ -67,31 +84,41 @@ After that you must choose a question plus the answer to that question. These wi
 
 When you're finished with your OpenClinica-activities you must log out. This prevents unauthorized persons to view or change the data. You log out by clicking Log Out in the upper right corner of the screen.
 
+![log out](monitor-manual_images/logout.png "log out")
+
 # Changing your password
+![change password](monitor-manual_images/change_password_menu.png "change password")
 
 You can change your password any time by clicking menu option Tasks and then choosing Update Profile.
+![change user profile](monitor-manual_images/change_user_profile.png "change user profile")
 
 The form "Change User Profile" appears, allowing you to change data about your account. All fields with an asterisk * are required. This means you must provide a telephone number for Phone. Of course this can be any number. To save the changes you must provide your password, even if you have only changed for example your telephone number. In that case you can leave field New Password blank.
 
 After clicking button Confirm Profile Changes, the screen "Confirm User Profile Updates" opens. Check your account-data one more time and click button Update Profile. In the left column of the screen the message "Your profile has been updated successfully" appears.
+
+![confirm user profile](monitor-manual_images/confirm_user_profile.png "confirm user profile")
 
 # When you've lost your password
 
 When you've lost your password you can request a reset of the password. A new, random password will be sent to the email-address you provided in your account-data. You request this new password by clicking Forgot Password? in the log in screen. The form "Request Password Form" opens.
 
 Type in User Name your user-name and in Email the email address, as used in OpenClinica. Then you select the Password Challenge Question and give your Password Challenge Answer. Click button Submit Password Request and after a few minutes a mail will be sent to you with the new password. After logging in with this new password, you must change it immediately, just as when you log in for the first time.
+![request password](monitor-manual_images/request_password.png "request password")
 
 # Change Study/Site
 
 When you log in to LibreClinica, your active study will be the study you last worked on. If you are assigned to more than one study, you can change to another study, by using the link Change Study/Site.
 
 You see in the upper-left corner the active Study "GCP-Service training study: Bremen (TDS0004: Site B)". If you want to change to site"Amsterdam" you click the radio-button and then click the button Change Study. The screen "Confirm Changing Study" opens and here you click on Confirm.
+![change study](monitor-manual_images/change_study.png "change study")
 
 In the left column you see under Alerts & Messages "Your current active study has been changed succesfully".
+![study changed](monitor-manual_images/study_changed.png "study changed")
 
 Another option is when you have rights to a Study as a whole, so to all the sites. If you click the link "Change Study/Site" you can choose the Bortezomib-study and this will give you access to all sites in that study.
 
 # Your “Home” in OpenClinica
+![monitor home](monitor-manual_images/study_changed.png "monitor home")
 
 After you've logged in successfully your "Home"-screen opens. This screen displays the matrix for Source Data Validation, plus a link labeled Notes & Discrepancies Assigned to Me. You can always return to this screen by clicking Home in the menu in the top of screen. .
 
@@ -122,8 +149,10 @@ Start SDV by clicking the menu-option SDV in the menu in the top of your screen.
 The screen opens by default with the "View By Event CRF"-tab. This screen provides you several ways to quickly find the CRFs of the Subjects you want to do SDV for. It displays for all Subjects all the CRFs with status "Completed" or "Locked". The sort-order is by Event Date.
 
 You can filter the CRF by using the columns that have an input box below the column-header. For example if you want to filter on Study Subject ID you enter this in the inputbox and hit return, or click on "Apply Filter, in the upper right corner of the matrix. Now all CRFs for for this particular Subject will be displayed.
+![SDV listed by event](investigator-manual_images/sdv_event_list.png "SDV listed by event")
 
 You can refine your search by displaying only the CRFs that are not SDV'd yet. To do this click in the box under the header of column "SDV Status" and choose "None".
+![open SDV listed by event](investigator-manual_images/sdv_event_list_filter.png "open SDV listed by event")
 
 When SDV is not required for all CRFs, you can refine your search even further by filtering on "SDV Requirement". By choosing "100% Required and Partial Required" and then clicking "Apply Filter" you now have a list of all the CRFs of this Subject that still have to be SDV'd and for which (partial) SDV is mandatory.
 
