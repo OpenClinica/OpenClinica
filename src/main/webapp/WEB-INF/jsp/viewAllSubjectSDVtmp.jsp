@@ -104,9 +104,8 @@
     }
 
     function prompt(formObj,crfId){
-        var bool = confirm(
-                "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
-        if(bool){
+        var bool = confirm('<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>');
+        if (bool) {
             setRedirection(formObj);
             formObj.action='${pageContext.request.contextPath}/pages/handleSDVRemove';
             formObj.crfId.value=crfId;
