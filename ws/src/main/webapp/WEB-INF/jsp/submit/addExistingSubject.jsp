@@ -105,9 +105,7 @@
 </c:forEach>
 
 
-<h1><span class="title_manage">
-<c:out value="${study.name}" />: <fmt:message key="enroll_subject" bundle="${resword}"/> <a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step1')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-</span></h1>
+<h1><span class="title_manage"><c:out value="${study.name}" />: <fmt:message key="enroll_subject" bundle="${resword}"/></span></h1>
 <br>
 
 <jsp:include page="../include/alertbox.jsp" />

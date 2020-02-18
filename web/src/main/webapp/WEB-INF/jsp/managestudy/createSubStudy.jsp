@@ -125,7 +125,7 @@ function updateThis(multiSelEle, count) {
         }
 </script>
 
-<h1><span class="title_manage"><fmt:message key="create_a_new_site" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_a_new_site" bundle="${resword}"/></span></h1>
 
 <form action="CreateSubStudy" method="post">
 * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>

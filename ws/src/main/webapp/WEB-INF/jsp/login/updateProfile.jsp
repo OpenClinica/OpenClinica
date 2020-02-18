@@ -41,7 +41,7 @@
 <jsp:useBean scope="session" id="userBean1" class="org.akaza.openclinica.bean.login.UserAccountBean"/>
 
 
-<h1><span class="title_manage"><fmt:message key="change_user_profile" bundle="${resword}"/> <a href="javascript:openDocWindow('help/1_1_updateProfile_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="change_user_profile" bundle="${resword}"/></span></h1>
 
 
 

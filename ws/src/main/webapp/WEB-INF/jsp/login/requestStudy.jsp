@@ -40,7 +40,7 @@
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="roles" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="newRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
-<h1><span class="title_manage"><fmt:message key="request_study_access" bundle="${resword}"/> <a href="javascript:openDocWindow('help/1_2_requestStudy_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" ></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="request_study_access" bundle="${resword}"/></span></h1>
 <P><fmt:message key="fill_out_form_to_request_study" bundle="${restext}"/><p>
 
 <form action="RequestStudy" method="post">

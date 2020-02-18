@@ -4,16 +4,7 @@
 <%@page import="org.akaza.openclinica.web.SQLInitServlet"%>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/> 
-
-<script language="JavaScript">
-function reportBug(versionNumber) {
- var bugtrack = "https://www.openclinica.org/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&url=";
- bugtrack = bugtrack + window.location.href;
- openDocWindow(bugtrack);
-
-}
-</script>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
 <!-- End Header Table -->
 <table border="0" cellpadding=0" cellspacing="0">
