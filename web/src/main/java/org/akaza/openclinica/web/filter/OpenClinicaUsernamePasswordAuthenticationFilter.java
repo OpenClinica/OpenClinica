@@ -105,14 +105,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
         username = username.trim();
 
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
-
-        // Place the last username attempted into HttpSession for views
-        HttpSession session = request.getSession(false);
-
-        if (session != null || getAllowSessionCreation()) {
-            request.getSession().setAttribute(SPRING_SECURITY_LAST_USERNAME_KEY, TextEscapeUtils.escapeEntities(username));
-        }
-
+       
         // Allow subclasses to set the "details" property
         setDetails(request, authRequest);
 
@@ -125,6 +118,24 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
             if (userAccountBean == null) {
                 throw new BadCredentialsException("Bad Credentials");
+            }
+            /**
+             *  OC-12286
+             */
+            // check the user in the current session
+            HttpSession session  = null;
+            UserAccountBean currentSessionUser = null;
+            currentSessionUser = (UserAccountBean) request.getSession().getAttribute(SecureController.USER_BEAN_NAME);
+            
+            if(currentSessionUser !=null && !(currentSessionUser.equals(eb))) {
+            	request.getSession().invalidate();
+            	
+            }            
+        	// Place the last username attempted into HttpSession for views
+        	session = request.getSession(false);                    
+
+            if (session != null || getAllowSessionCreation()) {
+                request.getSession().setAttribute(SPRING_SECURITY_LAST_USERNAME_KEY, TextEscapeUtils.escapeEntities(username));
             }
             // Manually Checking if the user is locked which should be thrown by authenticate. Mantis Issue: 9016
             // ToDo somebody should find why getAuthenticationManager().authenticate is not working!
