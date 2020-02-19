@@ -128,7 +128,7 @@ public class EnketoAPI {
             return null;
     }
 
-    public FormUrlObject getFormURL(String subjectContextKey, String crfOID, String studyOid, Role role, Study parentStudy, StudyEvent studyEvent,
+    public FormUrlObject getFormURL(String subjectContextKey, String crfOID, Study site, Role role, Study parentStudy, StudyEvent studyEvent,
                                     String mode, String loadWarning, boolean isFormLocked) throws Exception {
         boolean lockOn = false;
         boolean shouldLock = false;
@@ -148,7 +148,8 @@ public class EnketoAPI {
         // https://jira.openclinica.com/browse/OC-7573 Data Manager views XForms.
         // https://jira.openclinica.com/browse/OC-7574 Study Director views XForms.
         // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
-        if (parentStudy.getStatus().equals(Status.LOCKED)
+        if ((parentStudy.getStatus().equals(Status.LOCKED)
+                || (site != null && site.getStatus().equals(Status.LOCKED)))
                 || (studyEvent != null && studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId()))
                 || parentStudy.getStatus().equals(Status.FROZEN) || mode.equals(VIEW_MODE)) {
             eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
