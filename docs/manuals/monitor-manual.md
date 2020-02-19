@@ -222,6 +222,7 @@ You can filter the Discrepancies on each of the columns or on a combination of t
 ![notes filtered and sorted](monitor-manual_images/notes_filtered_sorted1.png "notes filtered and sorted")
 
 The columns "Days open" and "Days Since Updated" only display data for records with Status "New", "Updated" or "Resolution Proposed". They can be used in combination with the greater-than or less-than signs. For example if you want a list of all Discrepancies that have been updated in the last week, you enter in the inputbox under "Days Since Updated" "<7".
+
 ![notes filtered and sorted](monitor-manual_images/notes_filtered_sorted2.png "notes filtered and sorted")
 
 You can download the selection you made by clicking the Down-Arrow-icon: a new screen opens in which you can choose the format, comma-separated-values or pdf.
@@ -237,12 +238,24 @@ In the next four sections we will discuss how each type of Discrepancy is genera
 Queries are made by Monitors, mostly in the process of Source Data Verification. When you compare the source data and the data in OpenClinica and find a difference, you create a Query. You do this in the CRF you are SDV-ing by clicking the flag to the right of the item that has a difference. A new window opens, "Add Discrepancy Note". Here you must give a short Desciption of what you found, a Detailed Note, that explains in detail what action must be taken. The Type of the Discrepancy is "Query" and can not be changed. The Status however can be chosen: "New", "Updated" or "Closed".
 
 For an example, let's say that the for "Height"  a value was entered of "120", while the Monitor reads "170" in the source data. Click on the flag next to the inputbox of "Height".
+
+![suspicious CRF entry](monitor-manual_images/suspicious_entry.png "suspicious CRF entry")
+
 In the Discrepancy window that opens you fill in for Description "Wrong value" and in Detailed Note "I read 170. Please correct this." The type of Discrepancy is "Query" and this can not be changed. The field "Set to Status" can be left at "New".You can choose who to assign this Discrepancy to and by default this is the person who entered the data. If you want to send the user an e-mail, tick the box "Email Assigned User". This mail will be automatically generated and can not be edited by you. When you've completed the form, click Submit & Close.
+
+![query](monitor-manual_images/query.png "query")
 
 The user will see this Discrepancy in the list "Notes & Discrepancies Assigned to Me". He or she can change the value for Height and after that, update the Discrepancy, indicating the correction and setting the Status of the Discrepancy to "Updated" or to "Resolution Proposed". By default the assigned user is the one who created the Query, so this is left unchanged and again it is possible to send an e-mail.
 
+![answer to query](monitor-manual_images/query_answer.png "answer to query")
+
 Now after this correction, if the Monitor clicks Home and then Notes & Discrepancies to Me, the Query comes up in the list.
+
+![query updated](monitor-manual_images/query_updated.png "query updated")
+
 The Monitor opens the CRF by clicking on "View within record" and verify that indeed the value has been changed to "170". He/she switches to the window with the Discrepancy and clicks the button Close Note. In the section that opens he/she fills in for "Description" "Checked". For "Set to Status" he/she chooses "Closed" and for "Assign to User" he/she chooses blank. Finally click Submit & Exit.
+
+![close query](monitor-manual_images/close_query.png "close query")
 
 From this example we see that the Status of this type of Discrepancy starts with "New", then changes one or more times to "Updated" or "Resolution Proposed" and finally ends with "Closed".
 
