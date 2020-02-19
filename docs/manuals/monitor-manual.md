@@ -265,14 +265,31 @@ The Monitor-role is the only role that can Close a Discrepancy.
 
 A Failed Validation Check is a Discrepancy that's automatically created by OpenClinica. For example on a field where the number of dispensed vials must be entered, an upperrange is defined of 240. If the user enters "250", this results in a message "[No. of dispensed vials must be between 0 and 241]". If this is indeed the number of vials as recorded in the source data, the user must enter this. In order to save the data he must first fill in the details of the Discrepancy.
 
+![failed validation check](monitor-manual_images/failed_validation_check.png "failed validation check")
+
+This is done by clicking the blue flag to the right of the field. A new window opens Add Discrepancy Note and in this window the Clinical Research Coordinator or the Investigator gives a short description of the problem in the input field “Description”, for example “Value is correct”. For “Detailed Note” "more vials were dispensed because of holiday.” can be entered. The field “Type” can be left as “Failed Validation Check” and “Set to Status” can be left as “New”. Unlike a Monitor, an Investigator, or a Clinical Research Coordinator, can not assign a Discrepancy to another user. To save the data of the Discrepancy, the button Submit must be clicked.
+
+![add discrepancy note](monitor-manual_images/add_discrepancy_note.png "add discrepancy note")
+
 When the Monitor logs in, he/she will check for any new Discrepancies by clicking on the menu-option Notes & Discrepancies and filtering on Status New. The new Discrepancy is in the list and by clicking on the "View within record"-icon we open the CRF and the Discrepancy.
+
+![new discrepancy note](monitor-manual_images/new_discrepancy_note.png "new discrepancy note")
+
 In this case the value is accepted by the Monitor, so he/she clicks  Close Note and for Description enters "Accepted" and leaves Detailed Note blank. For "Set to Status" he/she chooses "Closed". "Assign to User" will again be the user who started the Discrepancy. When this user logs in, the Discrepancy will be in the list of Notes & Discrepancies Assigned to Me, but the status will be closed.
+
+![accept discrepancy note](monitor-manual_images/accept_discrepancy_note.png "accept discrepancy note")
 
 Again we see that the Status of this type of Discrepancy starts with "New", then changes one or more times to "Updated" or "Resolution Proposed" and finally ends with "Closed": just as the Discrepancy-type "Failed Validation Check".
 
 # An example of an Annotation
 
 Annotations are a special kind of Discrepancies because they can only be made by Clinial Research Coordinators and Investigators and there is no follow-up to them. For example, an Investigator notes that the Subject says 2 visits to an ER have been made in one week.
+
+![remarkable CRF entry](monitor-manual_images/remarkable_entry.png "remarkable CRF entry")
+
+He or she finds may want to explain that the details of these visits were recorded in the Adverse Event CRF and makes a note for the Monitor, by clicking the flag to the right if the field. In the screen Add Discrepancy Note he enters for Description “2 ER Visits” and for Detailed Note “Details of these visits are on the AE-CRF dated 21-Oct-2011 and 23-Oct-2011”. Type is left as “Annotation” and “Set to Status” can only be “Not Applicable”.
+
+![add note](monitor-manual_images/add_note.png "add note")
 
 When the Monitor reviews the CRF, it is visible that a note was attached to this field, because it has a white flag, indicating an Annotation. If the Monitor clicks on the white flag, it is not possible to add a Note to the Annotation. But if the button Begin New Thread is clicked a new Discreppancy is created of type Query. This can be followed in the same way as described in [An example of a Query](#--refheading--932-355433200) [An example of a Query](#--refheading--932-355433200).
 
