@@ -156,15 +156,16 @@ public class EnketoUrlService {
                                                 String flavor, Role role,
                                                 String mode, String hash, String loadWarning, boolean isFormLocked) throws Exception {
         Study parentStudy = enketoCredentials.getParentStudy(studyOid);
-        studyOid = parentStudy.getOc_oid();
-        EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
+        Study site = enketoCredentials.getSiteStudy(studyOid);
+
+        EnketoCredentials credentials = EnketoCredentials.getInstance(parentStudy.getOc_oid());
         EnketoAPI enketo = new EnketoAPI(credentials);
         StudyEvent studyEvent = null;
         if (subjectContext.getStudyEventId() != null) {
             studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
         }
         String crfOID = subjectContext.getFormLayoutOid() + DASH + hash + flavor;
-        FormUrlObject formUrlObject = enketo.getFormURL(subjectContextKey, crfOID, studyOid, role,
+        FormUrlObject formUrlObject = enketo.getFormURL(subjectContextKey, crfOID, site, role,
                 parentStudy, studyEvent, mode, loadWarning, isFormLocked);
         return formUrlObject;
 

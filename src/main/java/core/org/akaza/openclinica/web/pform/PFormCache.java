@@ -66,12 +66,12 @@ public class PFormCache {
 
     public String getPFormURL(String studyOID, String crfOID, StudyEvent studyEvent,String contextHash) throws Exception {
         Study parentStudy = enketoCredentials.getParentStudy(studyOID);
-        studyOID = parentStudy.getOc_oid();
+        Study site = enketoCredentials.getSiteStudy(studyOID);
 
-        EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOID));
+        EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(parentStudy.getOc_oid()));
         HashMap<String, String> studyURLs = null;
 
-        FormUrlObject formUrlObject = enketo.getFormURL(contextHash, crfOID, studyOID,
+        FormUrlObject formUrlObject = enketo.getFormURL(contextHash, crfOID, site,
                 Role.RESEARCHASSISTANT, parentStudy, studyEvent, PARTICIPATE_MODE, null, false);
         return formUrlObject.getFormUrl();
     }
