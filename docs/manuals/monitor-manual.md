@@ -185,10 +185,13 @@ If data in a CRF that has been SDV'd are changed, then the SDV-status changes to
 In a CRF the layout of the screen is as follows.
 
 In the top on the left are displayed the name and version of the CRF and on the right the Subject.
+![CRF overview](monitor-manual_images/crf_overview.png "CRF overview")
 
 On the next line is a link CRF Header Info and when you click it, a section is shown. If you click the link again, the information will be hidden. The information is about the Event (start-date and the names of the Study and the site), the Subject (Sex and Age At Enrollment) and the Discrepancy Notes of this CRF. The totals of Discrepancy Notes are shown per Status. The different Statuses will be discussed in [Notes & Discrepancies](#--refheading--456-2139846958) [Notes & Discrepancies](#--refheading--456-2139846958).
+![CRF header](monitor-manual_images/crf_header.png "CRF header")
 
 The actual CRF data are displayed in one or more tabs. You can switch to another tab by clicking on it, or by using the select-box on the right. It may look like you are able to modify the data, but it is not possible to save them to the database.
+![CRF tabs](monitor-manual_images/crf_tabs.png "CRF tabs")
 
 To the right of each input field is a flag. The color of this flag indicates if there is a Discrepancy Note attached to this item and the status of it. You can view, update or add a Discrepancy Note by clicking on the flag. How this is done will be discussed in the following paragraphs.
 
@@ -205,6 +208,7 @@ The third type, "Annotation" occurs when someone performing data-entry wants to 
 The fourth type, "Reason for Change" is created automatically when data are changed of a CRF that was already marked as "Complete" See paragraph [An example of a Reason for Change](#--refheading--1944-355433200) [An example of a Reason for Change](#--refheading--1944-355433200).
 
 You can get a list of all Discrepancies by clicking Notes & Discrepancies in the top of your screen or by using the menu option Tasks, Submit Data - Notes & Discrepancy. In the screen that opens all Discrepancies are listed and a summary of this list is given in the top of the screen in the form of a matrix.
+![notes and discrepancies](monitor-manual_images/notes+discrepancies.png "notes and discrepancies")
 
 A Discrepancy has a Status, which is indicated by the color of the flag: "New" , "Updated", "Resolution Proposed", "Closed" or "Not applicable". What the possible statuses are for the four different types of Discrepancies will be discussed in the next paragraphs.
 
@@ -215,7 +219,14 @@ A Discrepancy Note can not be deleted: only the status can be changed to "Closed
 You can sort the Discrepancies on three columns: "SubjectID", "Days open" and "Days Since Updated"
 
 You can filter the Discrepancies on each of the columns or on a combination of these. For example you can filter on all Discrepancies with status "New and Updated" for Site "B" and sort them on Study Subject ID in descending order.
+![notes filtered and sorted](monitor-manual_images/notes_filtered_sorted1.png "notes filtered and sorted")
+
 The columns "Days open" and "Days Since Updated" only display data for records with Status "New", "Updated" or "Resolution Proposed". They can be used in combination with the greater-than or less-than signs. For example if you want a list of all Discrepancies that have been updated in the last week, you enter in the inputbox under "Days Since Updated" "<7".
+![notes filtered and sorted](monitor-manual_images/notes_filtered_sorted2.png "notes filtered and sorted")
+
+You can download the selection you made by clicking the Down-Arrow-icon: a new screen opens in which you can choose the format, comma-separated-values or pdf.
+
+![download notes](monitor-manual_images/download_notes.png "download notes")
 
 To view or update a Discrepancy, click one of the two icons in the right column, "View" or "View within record", the magnifier-icon or the right-arrow-icon. If you click "View", a separate window will open with the details of the Discrepancy. If you click "View within record", the CRF is opened in your current browser-window, plus a new window opens with the Discrepancy. Another convenient way to open the CRF plus the Discrepancy is by right-clicking on "View within record" and then choosing "Open link in new window".
 
