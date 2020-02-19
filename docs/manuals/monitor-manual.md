@@ -34,9 +34,9 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 1. [When you've lost your password](#when-youve-lost-your-password)
 
 1. [Change Study/Site](#change-studysite)
-1. [Your "Home" in OpenClinica](#your-home-in-openclinica)
+1. [Your "Home" in LibreClinica](#your-home-in-libreclinica)
 
-1. [How data is organised in OpenClinica](#how-data-is-organised-in-openclinica)
+1. [How data is organised in LibreClinica](#how-data-is-organised-in-libreclinica)
 
 1. [Source Data Verification](#source-data-verification)
 
@@ -57,7 +57,7 @@ The manual is a distributed under the <a name="firstheading">Creative Commons At
 
 # Choosing your browser and starting
 
-To use OpenClinica you need a browser. You can use Firefox (Mozilla) version 3 or higher, or Microsoft Internet Explorer version 7 or higher, or Chrome (Google) or Safari (Mac).
+To use LibreClinica you need a browser. You can use Firefox (Mozilla) version 3 or higher, or Microsoft Internet Explorer version 7 or higher, or Chrome (Google) or Safari (Mac).
 
 Furthermore your browser must be set up to execute Java-script.
 
@@ -75,14 +75,14 @@ You can log in with the user name and password that have been sent to you by mai
 
 # Changing your password on first time log-in
 
-Because this is the first time you log in to OpenClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
+Because this is the first time you log in to LibreClinica, you will be asked to change your password. In the form that opens, "Reset password", you are asked to once more type in the password you've been given, Old Password. In the next input you type your new password, directly followed by the same password, New Password and Confirm New Password.
 ![reset password](monitor-manual_images/reset_password.png "reset password")
 
 After that you must choose a question plus the answer to that question. These will be used in case you have lost your password and have to request a new one. For example: Password Challenge Question you  choose Favorite Color, with Password Challenge Answer blue.
 
 # Logging out
 
-When you're finished with your OpenClinica-activities you must log out. This prevents unauthorized persons to view or change the data. You log out by clicking Log Out in the upper right corner of the screen.
+When you're finished with your LibreClinica-activities you must log out. This prevents unauthorized persons to view or change the data. You log out by clicking Log Out in the upper right corner of the screen.
 
 ![log out](monitor-manual_images/logout.png "log out")
 
@@ -102,7 +102,7 @@ After clicking button Confirm Profile Changes, the screen "Confirm User Profile 
 
 When you've lost your password you can request a reset of the password. A new, random password will be sent to the email-address you provided in your account-data. You request this new password by clicking Forgot Password? in the log in screen. The form "Request Password Form" opens.
 
-Type in User Name your user-name and in Email the email address, as used in OpenClinica. Then you select the Password Challenge Question and give your Password Challenge Answer. Click button Submit Password Request and after a few minutes a mail will be sent to you with the new password. After logging in with this new password, you must change it immediately, just as when you log in for the first time.
+Type in User Name your user-name and in Email the email address, as used in LibreClinica. Then you select the Password Challenge Question and give your Password Challenge Answer. Click button Submit Password Request and after a few minutes a mail will be sent to you with the new password. After logging in with this new password, you must change it immediately, just as when you log in for the first time.
 ![request password](monitor-manual_images/request_password.png "request password")
 
 # Change Study/Site
@@ -118,18 +118,18 @@ In the left column you see under Alerts & Messages "Your current active study ha
 
 Another option is when you have rights to a Study as a whole, so to all the sites. If you click the link "Change Study/Site" you can choose the Bortezomib-study and this will give you access to all sites in that study.
 
-# Your “Home” in OpenClinica
+# Your “Home” in LibreClinica
 ![monitor home](monitor-manual_images/monitor_home.png "monitor home")
 
 After you've logged in successfully your "Home"-screen opens. This screen displays the matrix for Source Data Validation, plus a link labeled Notes & Discrepancies Assigned to Me. You can always return to this screen by clicking Home in the menu in the top of screen. .
 
-Your main activities in OpenClinica will be Source Data Verification, or SDV, and Discrepancy Management. You can also view all data entered by using the Subject Matrix.
+Your main activities in LibreClinica will be Source Data Verification, or SDV, and Discrepancy Management. You can also view all data entered by using the Subject Matrix.
 
 As a Monitor it is not possible for you to enter Study-data, only to review data and handle queries about it.
 
-In OpenClinica the participants of a Study are called Subjects or StudySubjects. The Subjects are assigned to Sites.
+In LibreClinica the participants of a Study are called Subjects or StudySubjects. The Subjects are assigned to Sites.
 
-# How data is organised in OpenClinica
+# How data is organised in LibreClinica
 
 The visits that the Subjects make in the process of the Study are called Events.
 
@@ -139,11 +139,11 @@ Each CRF can have one or more tabs, or Sections, with input boxes for items.
 
 # Source Data Verification
 
-Source Data Verification is the process of comparing a source data with the data entered in OpenClinica. In the study-setup, the study-coordinator can give each CRF in each Event an "SDV-required-status". This status ranges from "not required", via "partially required" to "100% required".
+Source Data Verification is the process of comparing a source data with the data entered in LibreClinica. In the study-setup, the study-coordinator can give each CRF in each Event an "SDV-required-status". This status ranges from "not required", via "partially required" to "100% required".
 
-When you have checked that everything has been entered in OpenClinica according to the source data, then the CRF must be marked as "SDV'd".
+When you have checked that everything has been entered in LibreClinica according to the source data, then the CRF must be marked as "SDV'd".
 
-For items where the source data and the data in OpenClinica are different, you can create a Query, as described in [13](#--refheading--932-355433200) [An example of a Query](#--refheading--932-355433200).
+For items where the source data and the data in LibreClinica are different, you can create a Query, as described in [13](#--refheading--932-355433200) [An example of a Query](#--refheading--932-355433200).
 
 Start SDV by clicking the menu-option SDV in the menu in the top of your screen. You can also click menu Tasks, Monitor and Manage Data – Source Data Verification.
 
@@ -168,7 +168,7 @@ Only Subjects with CRFs Completed and not yet SDV'd can be a candidate for SDV a
 Normally you want to go through the CRFs of a Subject one by one. Choose the Subject you want to work with by clicking on the magnifier-icon in the right column. Now you are switched back to the tab "View By Event CRF", but this time filtered on the Subject you chose in the tab "View By Study Subject ID".
 
 If you want you, can add the two extra filters as described earlier, "SDV status = none" and SDV Requirement = 100% Required & Partial Required"
-You open a CRF for viewing, by clicking the icon in the column "CRF Status", which is either the completed-icon or the locked-icon in the column "CRF Status". A new browser window opens and with it you can verify that the data entered in the OpenClinica-CRF are the same as the source data. After you have reviewed it, close the window with the CRF. If by accident you click the "Exit" button, you will be redirected to the Subject Matrix. If this happens you can just close the browser window.
+You open a CRF for viewing, by clicking the icon in the column "CRF Status", which is either the completed-icon or the locked-icon in the column "CRF Status". A new browser window opens and with it you can verify that the data entered in the LibreClinica-CRF are the same as the source data. After you have reviewed it, close the window with the CRF. If by accident you click the "Exit" button, you will be redirected to the Subject Matrix. If this happens you can just close the browser window.
 
 ![mark CRFs SDVed](monitor-manual_images/mark_crf_sdv1.png "mark CRFs SDVed")
 ![mark CRFs SDVed](monitor-manual_images/mark_crf_sdv2.png "mark CRFs SDVed")
@@ -197,9 +197,9 @@ To the right of each input field is a flag. The color of this flag indicates if 
 
 # Notes & Discrepancies
 
-In OpenClinica four types of Discrepancy Notes exist: "Query", "Failed Validation Check", "Reason for Change" and "Annotation".
+In LibreClinica four types of Discrepancy Notes exist: "Query", "Failed Validation Check", "Reason for Change" and "Annotation".
 
-The first type, "Query", can only be created by a Monitor. Particularly during the process of Source Data Verification: if data entered in OpenClinica does not match the source data, the monitor can create a Query to ask the person responsible for data-entry, to correct the item. See paragrap [An example of a Query](#--refheading--932-355433200) [An example of a Query](#--refheading--932-355433200).
+The first type, "Query", can only be created by a Monitor. Particularly during the process of Source Data Verification: if data entered in LibreClinica does not match the source data, the monitor can create a Query to ask the person responsible for data-entry, to correct the item. See paragrap [An example of a Query](#--refheading--932-355433200) [An example of a Query](#--refheading--932-355433200).
 
 The second type, "Failed Validation Check", is raised if a value entered exceeds a certain range, or if a Validation check if violated, for example a weight of more than 150 kg. See paragraph [An example of a Failed Validation Check](#--refheading--1892-355433200) [An example of a Failed Validation Check](#--refheading--1892-355433200)
 
@@ -235,7 +235,7 @@ In the next four sections we will discuss how each type of Discrepancy is genera
 
 # An example of a Query
 
-Queries are made by Monitors, mostly in the process of Source Data Verification. When you compare the source data and the data in OpenClinica and find a difference, you create a Query. You do this in the CRF you are SDV-ing by clicking the flag to the right of the item that has a difference. A new window opens, "Add Discrepancy Note". Here you must give a short Desciption of what you found, a Detailed Note, that explains in detail what action must be taken. The Type of the Discrepancy is "Query" and can not be changed. The Status however can be chosen: "New", "Updated" or "Closed".
+Queries are made by Monitors, mostly in the process of Source Data Verification. When you compare the source data and the data in LibreClinica and find a difference, you create a Query. You do this in the CRF you are SDV-ing by clicking the flag to the right of the item that has a difference. A new window opens, "Add Discrepancy Note". Here you must give a short Desciption of what you found, a Detailed Note, that explains in detail what action must be taken. The Type of the Discrepancy is "Query" and can not be changed. The Status however can be chosen: "New", "Updated" or "Closed".
 
 For an example, let's say that the for "Height"  a value was entered of "120", while the Monitor reads "170" in the source data. Click on the flag next to the inputbox of "Height".
 
@@ -263,7 +263,7 @@ The Monitor-role is the only role that can Close a Discrepancy.
 
 # An example of a Failed Validation Check
 
-A Failed Validation Check is a Discrepancy that's automatically created by OpenClinica. For example on a field where the number of dispensed vials must be entered, an upperrange is defined of 240. If the user enters "250", this results in a message "[No. of dispensed vials must be between 0 and 241]". If this is indeed the number of vials as recorded in the source data, the user must enter this. In order to save the data he must first fill in the details of the Discrepancy.
+A Failed Validation Check is a Discrepancy that's automatically created by LibreClinica. For example on a field where the number of dispensed vials must be entered, an upperrange is defined of 240. If the user enters "250", this results in a message "[No. of dispensed vials must be between 0 and 241]". If this is indeed the number of vials as recorded in the source data, the user must enter this. In order to save the data he must first fill in the details of the Discrepancy.
 
 ![failed validation check](monitor-manual_images/failed_validation_check.png "failed validation check")
 
@@ -302,7 +302,15 @@ The only exception to this is when data are deleted: then all Discrepancies of a
 After a CRF has been marked complete, all changes to the data have to be accounted for. This means that a reason for change must be given. Therefor a Discrepancy is automatically created when a user changes data in a CRF that is marked complete.
 When this happens, an error-message appears "You have changed data after this CRF was marked complete. You must provide a Reason For Change discrepancy note for this item before you can save this updated information." and the flag next to the changed item must be clicked.
 
+![add correction note](monitor-manual_images/add_correction_note.png "add correction note")
+![note required for correction](monitor-manual_images/add_note.png "note required for correction")
+
+In the screen Add Discrepancy Note the user must provide a Description and in Detailed Note the reason of this change. The field “Set to Status” can not be changed and must be “Not Applicable”.
+
 When the Monitor opens this Discrepancy, not only is the normal information available, but also the Audit History. Here both the old and the new value are shown.
+
+![note details](monitor-manual_images/note_details.png "note details")
+
 As with an Annotation, the status of a Discrepancy of type "Reason for Change" is always "Not Applicable", except when data are deleted: then the status changes to "Closed".
 
 The Monitor will see the Discrepancy in the CRF at the time of Source Data Verification. If the CRF was already marked as SDV'd, the status will change to Not-SDV'd, when the data of the CRF are changed. The Monitor will must do the Source Data Verification again for this CRF and will then see the Discrepancy in the CRF, indicated by the white flag.
@@ -311,8 +319,12 @@ The Monitor will see the Discrepancy in the CRF at the time of Source Data Verif
 
 In the Study Audit Log all changes are recorded. This is displayed on a per-Subject-basis. The Study Audit Log can be accessed by clicking Tasks, Monitor and Manage Data – Study Audit Log. A screen is opened with a list of all available Subjects. You can apply filters to quickly find a Subject.
 
+![view study log](monitor-manual_images/view_study_log.png "view study log")
+
 View the Audit Log of a Subject by clicking the magnifier-icon to the right.
 
 Audit data apply to the Subject, the Events, the CRFs and the CRF-items.
 
 It is not possible to filter on these.
+
+![audit log entry](monitor-manual_images/audit_log_entry.png "audit log entry")
