@@ -336,6 +336,16 @@
     return trans[str] || str;
   }
 
+  function formatDate(date) {
+    date = moment(date);
+    if (date.hours === 0 && date.minutes === 0 && date.seconds === 0) {
+      return date.format('MM/DD/YYYY');
+    }
+    else {
+      return date.format('MM/DD/YYYY hh:mm:ss');
+    }
+  }
+
   function popupSdv(item) {
     var data = $(item).data();
     var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
@@ -354,7 +364,7 @@
         $('#formName').text(data.formName);
         $('#sdvRequirement').text(translate(data.sdvRequirement));
         $('#siteName').text(data.siteName);
-        $('#eventStartDate').text(data.eventStartDate);
+        $('#eventStartDate').text(formatDate(data.eventStartDate));
         $('#formStatus').text(data.formStatus);
         $('#sdvStatus').text(data.sdvStatus);
 
@@ -373,6 +383,10 @@
           if (!item.lastVerifiedDate) {
             item.lastVerifiedDate = 'Never';
           }
+          else {
+            item.lastVerifiedDate = formatDate(item.lastVerifiedDate);
+          }
+          item.lastModifiedDate = formatDate(item.lastModifiedDate);
 
           item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
           item.actions = '<a href="#" title="View Form" class="icon icon-view-within"></a>';
