@@ -68,21 +68,13 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1><c:choose>
-        <c:when test="${module eq 'manage'}"><span class="title_manage"></c:when>
-        <c:otherwise><span class="title_manage"></c:otherwise>
-        </c:choose>
-	<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')">
-        <c:choose>
-        <c:when test="${module eq 'manage'}"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:when>
-        <c:otherwise><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:otherwise></c:choose></a>
- <%--<a href="javascript:openDocWindow('ViewNotes?print=yes')"--%>
+<h1><span class="title_manage"><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></span></h1>
+<%--<a href="javascript:openDocWindow('ViewNotes?print=yes')"--%>
 <%--<a href="javascript:onInvokeAction('listNotes','filter')"--%>
-	<%--onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"--%>
-	<%--onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">--%>
-	<%--<img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>--%>
-</span></h1>
+<%--onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"--%>
+<%--onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">--%>
+<%--<img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>--%>
+
 <%--
 <div class="dnKey"><strong><fmt:message key="Filter_by_status" bundle="${resword}"/>
 :</strong>

@@ -158,6 +158,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("secondary_ID"), null, null);
         ++index;
+        configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_unique_ID"), null, null);
+        ++index;
         // group class columns
         for (int i = index; i < index + studyGroupClasses.size(); i++) {
             StudyGroupClassBean studyGroupClass = studyGroupClasses.get(i - index);
@@ -190,10 +192,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // tableFacade.addFilterMatcher(new MatcherKey(Integer.class), new
         // SubjectEventStatusFilterMatcher());
 
-        for (int i = 6; i < 6 + studyGroupClasses.size(); i++) {
+        for (int i = 7; i < 7 + studyGroupClasses.size(); i++) {
             tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectGroupFilterMatcher());
         }
-        for (int i = 6 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
+        for (int i = 7 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
             tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectEventStatusFilterMatcher());
         }
 
@@ -238,6 +240,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
             theItem.put("subject", subjectBean);
             theItem.put("subject.charGender", subjectBean.getGender());
+            theItem.put("subject.uniqueIdentifier", subjectBean.getUniqueIdentifier());
 
             // Get All study events for this study subject and then put list in
             // HashMap with study event definition id as
@@ -362,6 +365,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("studySubject.oid");
         columnNamesList.add("subject.charGender");
         columnNamesList.add("studySubject.secondaryLabel");
+        columnNamesList.add("subject.uniqueIdentifier");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }

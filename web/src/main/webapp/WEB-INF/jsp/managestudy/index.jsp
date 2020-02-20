@@ -52,7 +52,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<h1 style="margin-left: 185px;"><span class="title_manage"><fmt:message key="manage_study" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1 style="margin-left: 185px;"><span class="title_manage"><fmt:message key="manage_study" bundle="${resworkflow}"/></span></h1>
 <div style="padding-left: 185px; float: left;">
 <%-- 3057 removed this: <span style="font-size:12px"><fmt:message key="select_to_manage" bundle="${restext}"/></span>--%>
 <h2><fmt:message key="recent_activity" bundle="${restext}"/> ${studyIdentifier}</h2>

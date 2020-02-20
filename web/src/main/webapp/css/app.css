@@ -9,19 +9,19 @@ table.item-row {
 }
 
 h1 {
-  font-weight:normal
+  font-weight:normal;
   font-size: 12px;
 }
 h2 {
-  font-weight:normal
+  font-weight:normal;
   font-size: 11px;
 }
 h3 {
-  font-weight:normal
+  font-weight:normal;
   font-size: 10px;
 }
 h4 {
-  font-weight:normal
+  font-weight:normal;
   font-size: 9px;
 }
 
@@ -151,7 +151,7 @@ a:active {
   display:inline-block;
   margin-top:0px;
   margin-bottom:0px;
-  margin-left:5x;
+  margin-left:5px;
 }
 
 

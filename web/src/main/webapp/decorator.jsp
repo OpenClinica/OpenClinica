@@ -42,7 +42,7 @@
     </div>
 
     <div id="reportIssueDiv">
-        <a href="javascript:reportBug()"> <span class="originalFont"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></span> </a> | <a href="javascript:openDocWindow('http://www.openclinica.org/OpenClinica/2.2/support/')"><span class="originalFont"><fmt:message key="openclinica_feedback" bundle="${resword}"/></span></a>
+        
     </div>
     <div id="userBoxDiv" class="userbox">
         <view:userbox />

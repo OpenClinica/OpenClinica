@@ -51,7 +51,7 @@
 <jsp:useBean scope="request" id="extractBean" class="org.akaza.openclinica.bean.extract.ExtractBean"/>
 --%>
 
-<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"> <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/></span></h1>
 
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>

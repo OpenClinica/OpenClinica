@@ -51,23 +51,14 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
-	<h1><span class="title_manage"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/>
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/administer-crfs-crf-template#content-title-2991')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-</span></h1>
+	<h1><span class="title_manage"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/></span></h1>
 </c:when>
 <c:otherwise>
-	<h1><span class="title_manage"><fmt:message key="manage_CRFs2" bundle="${resworkflow}"/>
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/manage-crf')">
-		<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-</span></h1>
+	<h1><span class="title_manage"><fmt:message key="manage_CRFs2" bundle="${resworkflow}"/></span></h1>
 </c:otherwise>
 </c:choose>
 
 <!-- <p><fmt:message key="can_download_blank_CRF_excel" bundle="${restext}"/> <a href="DownloadVersionSpreadSheet?template=1"><b><fmt:message key="here" bundle="${resword}"/></b></a>.</p> -->
-<%--
-<p><fmt:message key="also_download_set_example_CRFs" bundle="${restext}"/> <a href="http://www.openclinica.org/entities/entity_details.php?eid=151" target="_blank"><fmt:message key="here" bundle="${resword}"/></a>.</p>
---%>
 
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showCRFRow.jsp" /></c:import>
 

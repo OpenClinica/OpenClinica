@@ -104,13 +104,6 @@ function toggleName(str){
         str.innerHTML='Show';
     }
 }
-function reportBug() {
-    var bugtrack = "http://dev.openclinica.org/OpenClinica/bug.php?version=SNAPSHOT&user=";
-    var user= "newuser3";
-    bugtrack = bugtrack + user+ "&url=" + window.location.href;
-    openDocWindow(bugtrack);
-
-}
 function changeOpenDivButton(imgObject) {
 
     if(imgObject && imgObject.src.indexOf('sidebar_collapse.gif') != -1){

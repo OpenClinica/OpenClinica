@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.libreclinica</groupId>
         <artifactId>LibreClinica</artifactId>
-      <version>0.7.1</version>
+      <version>0.8.0</version>
     </parent>
     <dependencies>
 		<dependency>

@@ -207,6 +207,7 @@ public class ScheduledJobController {
             SimpleTrigger newTrigger = newTrigger()
                 .withIdentity(triggerKey)
                 .forJob(jobKey)
+                .startAt(startTime)
                 .withSchedule(simpleSchedule()
                     .withRepeatCount(oldTrigger.getRepeatCount())
                     .withIntervalInMilliseconds(oldTrigger.getRepeatInterval())

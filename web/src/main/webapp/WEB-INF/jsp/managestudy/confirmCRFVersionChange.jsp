@@ -42,12 +42,7 @@
   
   
   
-<h1><span class="title_manage">
-<fmt:message key="confirm_CRF_version" bundle="${resword}"/>
-
- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/crf-version-migration')"><img src="../../images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
- 
-</span></h1>
+<h1><span class="title_manage"><fmt:message key="confirm_CRF_version" bundle="${resword}"/></span></h1>
 
 
 

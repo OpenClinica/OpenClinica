@@ -24,14 +24,8 @@
 				<table border="0" cellpadding="0" cellspacing="0">
 					<tr>&nbsp;</tr>
 					<tr>			
-						<%--<td><a href="javascript:reportBug(<fmt:message key='version_number' bundle='${resword}'/>)"
-							onMouseDown="javascript:setImage('bt_Help','images/bt_ReportIssue.gif');"
-							onMouseUp="javascript:setImage('bt_Help','images/bt_ReportIssue.gif');"><img 
-							name="bt_ReportIssue" src="images/bt_ReportIssue.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="openclinica_report_issue" bundle="${resword}"/>" style="margin-top: 2px; margin-left: 2px; margin-right: 2px; margin-bottom: 2px"></a>
-						</td>
-						<c:out value="${sessionScope.supportURL}" />--%>
+						<%--<c:out value="${sessionScope.supportURL}" />--%>
             <td style="white-space:nowrap">
-              <!--<a href="javascript:reportBug()"><span class="aka_font_general" style="font-size: 0.9em">Report Issue</span> </a> | <br/>-->
               <a href="javascript:openDocWindow('<%out.println(SQLInitServlet.getSupportURL());%>')"><span class="aka_font_general" style="font-size: 0.9em"><fmt:message key="openclinica_feedback" bundle="${resword}"/></span></a>
 
 
