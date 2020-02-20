@@ -22,6 +22,7 @@ import core.org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTa
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -48,6 +49,11 @@ public class AccessFileServlet extends SecureController {
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         int fileId = fp.getInt("fileId");
+
+        String study_oid = fp.getString("study_oid");
+        if (!StringUtils.isEmpty(study_oid)) {
+            changeStudy(study_oid);
+        }
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         DatasetDAO dsDao = new DatasetDAO(sm.getDataSource());
         ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);

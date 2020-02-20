@@ -334,11 +334,13 @@ public class QueryServiceImpl implements QueryService {
         if (null == threadNumber)
             threadNumber = helperBean.getDn().getParentDiscrepancyNote().getThreadNumber();
 
+        String studyOid=helperBean.getContainer().getSubject().getStudy().getOc_oid();
+
         message.append(MessageFormat.format(respage.getString("mailDNHeader"), helperBean.getUserAccount().getFirstName(), helperBean.getUserAccount().getLastName()));
         message.append(
             "<A HREF='" +
                 SQLInitServlet.getField("sysURL.base") + 
-                "ViewNotes?module=submit&maxRows=50&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=50&listNotes_f_discrepancyNoteBean.disType=Query&listNotes_f_discrepancyNoteBean.threadNumber=" + 
+                "ViewNotes?module=submit&study_oid="+studyOid.toLowerCase()+"&maxRows=50&showMoreLink=true&listNotes_tr_=true&listNotes_p_=1&listNotes_mr_=50&listNotes_f_discrepancyNoteBean.disType=Query&listNotes_f_discrepancyNoteBean.threadNumber=" +
                 threadNumber.toString() + 
             "'>[Click Here]</A><BR/>"
         );

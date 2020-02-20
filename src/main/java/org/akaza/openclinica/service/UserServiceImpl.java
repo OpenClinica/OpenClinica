@@ -59,16 +59,15 @@ import static core.org.akaza.openclinica.domain.rule.action.NotificationActionPr
 
 /**
  * This Service class is used with View Study Subject Page
- *
  * @author joekeremian
  */
 
-@Service( "userService" )
+@Service("userService")
 public class UserServiceImpl implements UserService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Autowired
-    @Qualifier( "dataSource" )
+    @Qualifier("dataSource")
     private BasicDataSource dataSource;
 
     @Autowired
@@ -133,7 +132,6 @@ public class UserServiceImpl implements UserService {
 
     private StudySubjectDAO ssDao;
 
-
     public StudySubject getStudySubject(String ssid, Study study) {
         return studySubjectDao.findByLabelAndStudyOrParentStudy(ssid, study);
     }
@@ -144,7 +142,7 @@ public class UserServiceImpl implements UserService {
 
 
     public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,
-                                        UserAccountBean userAccountBean, String realm,String customerUuid, ResourceBundle restext) {
+                                        UserAccountBean userAccountBean, String realm, String customerUuid, ResourceBundle restext) {
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
         String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
@@ -152,7 +150,6 @@ public class UserServiceImpl implements UserService {
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
         String username = oid + "." + studySubject.getOcOid();
         username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
-
 
         String accessCode = "";
 
@@ -166,11 +163,16 @@ public class UserServiceImpl implements UserService {
             UserStatus userStatus = null;
             Integer userId = null;
             if (validateService.isParticipateActive(tenantStudy)) {
-                if (studySubject.getUserId() == null ) {
+                //This happens during the first invite
+                if (studySubject.getUserId() == null) {
                     logger.info("Participate has not registered yet");
                     accessCode = generateAccessCode(accessToken, realm);
+                    // show reset access code in participant audit log
+                    AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId(), 58);
+                    auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
+
                     // create participant user Account In Keycloak
-                    String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, realm,customerUuid);
+                    String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, realm, customerUuid);
                     // create participant user Account In Runtime
                     pUserAccount = createUserAccount(participantDTO, studySubject, userAccountBean, username, publicStudy, keycloakUserId);
                     // create study subject detail Account
@@ -179,6 +181,9 @@ public class UserServiceImpl implements UserService {
                 } else if (participantDTO.isResetAccessCode()) {
                     accessCode = generateAccessCode(accessToken, realm);
                     keycloakClient.resetParticipateUserAccessCode(accessToken, null, username, accessCode, studyEnvironment, realm);
+                    // show reset access code in participant audit log
+                    AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId(), 58);
+                    auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
                 }
             }
             studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, userStatus, userId, tenantStudy, userAccount);
@@ -190,8 +195,7 @@ public class UserServiceImpl implements UserService {
         ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
         if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
-            ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean,false);
-            boolean updateUserStatus = false;
+            ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean, false);
 
             if (participantDTO.isInviteViaSms())
                 inviteEnum = ParticipateInviteEnum.SMS_INVITE;
@@ -242,7 +246,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        ocUserDTO = buildOcUserDTO(studySubject,true);
+        ocUserDTO = buildOcUserDTO(studySubject, true);
         ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum, restext));
 
         return ocUserDTO;
@@ -264,7 +268,7 @@ public class UserServiceImpl implements UserService {
         String message = null;
         if (inviteEnum == ParticipateInviteEnum.NO_INVITE)
             return message;
-        switch(inviteStatusEnum) {
+        switch (inviteStatusEnum) {
             case EMAIL_INVITE_SUCCESS:
                 message = restext.getString("email_invite_success");
                 break;
@@ -294,6 +298,7 @@ public class UserServiceImpl implements UserService {
         }
         return message;
     }
+
     private StudySubject saveOrUpdateStudySubject(StudySubject studySubject, OCParticipantDTO participantDTO,
                                                   UserStatus userStatus, Integer userId, Study tenantStudy, UserAccount userAccount) {
 
@@ -333,7 +338,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail,boolean incRelatedInfo,int pageNumber,int pageSize, boolean isStudyLevelUser) {
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean incRelatedInfo, int pageNumber, int pageSize, boolean isStudyLevelUser) {
 
         CoreResources.setRequestSchema(schema);
 
@@ -344,16 +349,16 @@ public class UserServiceImpl implements UserService {
                 + Thread.currentThread().getName());
 
         // Get all list of StudySubjects by studyId
-        List<StudySubject> studySubjects = studySubjectDao.findAllByStudyWithAvailableAndSignedStatusOnly(site.getStudyId(),pageNumber, pageSize);
+        List<StudySubject> studySubjects = studySubjectDao.findAllByStudyWithAvailableAndSignedStatusOnly(site.getStudyId(), pageNumber, pageSize);
         List<OCUserDTO> userDTOS = new ArrayList<>();
         sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
+        String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE + "_" + sdf_fileName.format(new Date()) + ".csv";
 
         try {
             OCUserDTO userDTO = null;
             for (StudySubject studySubject : studySubjects) {
-                userDTO = getOCUserDTO(siteOid, accessToken, realm, userAccountBean, incRelatedInfo,studySubject, isStudyLevelUser);
-                if(userDTO!=null)
+                userDTO = getOCUserDTO(siteOid, accessToken, realm, userAccountBean, incRelatedInfo, studySubject, isStudyLevelUser);
+                if (userDTO != null)
                     userDTOS.add(userDTO);
             }
 
@@ -361,14 +366,13 @@ public class UserServiceImpl implements UserService {
             writeToFile(userDTOS, studyOid, fileName, isStudyLevelUser, incRelatedInfo);
         } catch (Exception e) {
             persistJobFailed(jobDetail, fileName);
-            logger.error(" Access code Job Creation Failed ",e);
+            logger.error(" Access code Job Creation Failed ", e);
         }
         persistJobCompleted(jobDetail, fileName);
     }
 
     @Transactional
-    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String participantID,boolean incRelatedInfo, boolean isStudyLevelUser) throws OpenClinicaSystemException
-    {
+    public StudyParticipantDetailDTO extractParticipantInfo(String studyOid, String siteOid, String accessToken, String realm, UserAccountBean userAccountBean, String participantID, boolean incRelatedInfo, boolean isStudyLevelUser) throws OpenClinicaSystemException {
 
 
         Study site = studyDao.findByOcOID(siteOid);
@@ -378,9 +382,9 @@ public class UserServiceImpl implements UserService {
         // Get the StudySubject by studyId and participantID
         StudySubject ss = studySubjectDao.findByLabelAndStudyOrParentStudy(participantID, study);
         OCUserDTO ocuserDTO = null;
-        StudyParticipantDetailDTO spDTO= new StudyParticipantDetailDTO();
+        StudyParticipantDetailDTO spDTO = new StudyParticipantDetailDTO();
 
-        if(ss == null) {
+        if (ss == null) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
         }
 
@@ -396,30 +400,30 @@ public class UserServiceImpl implements UserService {
 
             spDTO.setSubjectOid(ss.getOcOid());
             spDTO.setSubjectKey(ss.getLabel());
-            if(ss.getStudySubjectDetail() != null) {
+            if (ss.getStudySubjectDetail() != null) {
                 spDTO.setSecondaryID(ss.getStudySubjectDetail().getIdentifier());
             }
 
             spDTO.setCreatedBy(ss.getUserAccount().getUserName());
             spDTO.setLastModifiedBy(userAccountDao.findById(ss.getUpdateId()).getUserName());
 
-            if(ss.getDateCreated()!=null) {
+            if (ss.getDateCreated() != null) {
                 spDTO.setCreatedAt(ss.getDateCreated().toLocaleString());
             }
-            if(ss.getDateUpdated() !=null) {
+            if (ss.getDateUpdated() != null) {
                 spDTO.setLastModified(ss.getDateUpdated().toLocaleString());
             }
-            if(ss.getUserStatus() !=null) {
+            if (ss.getUserStatus() != null) {
                 spDTO.setStatus(ss.getUserStatus().getValue());
             }
-            if(!isStudyLevelUser){
+            if (!isStudyLevelUser) {
                 if (ocuserDTO != null) {
                     spDTO.setFirstName(ocuserDTO.getFirstName());
                     spDTO.setLastName(ocuserDTO.getLastName());
                     spDTO.setEmail(ocuserDTO.getEmail());
                     spDTO.setMobileNumber(ocuserDTO.getPhoneNumber());
                 }
-                if(incRelatedInfo)
+                if (incRelatedInfo)
                     spDTO.setAccessCode(ocuserDTO.getAccessCode());
             }
         } catch (Exception e) {
@@ -433,11 +437,9 @@ public class UserServiceImpl implements UserService {
     /**
      * @param siteOid
      * @param accessToken
-     * @param customerUuid
      * @param userAccountBean
      * @param incRelatedInfo
      * @param studySubject
-     * @param ocuserDTO
      * @return
      */
     private OCUserDTO getOCUserDTO(String siteOid, String accessToken, String realm,
@@ -458,7 +460,7 @@ public class UserServiceImpl implements UserService {
 
                 //Get accessToken from Keycloak
                 ocuserDTO = buildOcUserDTOForExtractInfo(studySubject, isStudyLevelUser);
-                ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), realm, userAccountBean,incRelatedInfo,incRelatedInfo);
+                ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), realm, userAccountBean, incRelatedInfo, incRelatedInfo);
 
 
                 if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null && incRelatedInfo) {
@@ -478,7 +480,7 @@ public class UserServiceImpl implements UserService {
         StudySubject studySubject = getStudySubject(ssid, study);
 
         if (studySubject != null) {
-            ocUserDTO = buildOcUserDTO(studySubject,true);
+            ocUserDTO = buildOcUserDTO(studySubject, true);
         }
         return ocUserDTO;
     }
@@ -543,7 +545,7 @@ public class UserServiceImpl implements UserService {
 
 
     public List<OCUserDTO> getAllParticipantAccountsFromUserService(String accessToken) {
-        String uri =sbsUrl + "/user-service/api/users" + PAGINATION;
+        String uri = sbsUrl + "/user-service/api/users" + PAGINATION;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -572,7 +574,7 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private boolean sendSMSToParticipant (String accessToken, OCParticipantDTO participantDTO, Study tenantStudy, ParticipantAccessDTO accessDTO) {
+    private boolean sendSMSToParticipant(String accessToken, OCParticipantDTO participantDTO, Study tenantStudy, ParticipantAccessDTO accessDTO) {
         String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
 
         StringBuffer buffer = new StringBuffer("Hi ").append(participantDTO.getFirstName())
@@ -634,7 +636,7 @@ public class UserServiceImpl implements UserService {
                 "style=\"margin:0; padding:20px; font-family:'Open Sans',sans-serif; height:100%!important\"><div>");
         sb.append("<h1 style=\"font-family:'Didact Gothic',sans-serif;color:#618ebb\">" +
                 "Welcome to " + studyName + " Study!</h1>");
-        sb.append("<p style='text-align:left'>Dear "+ studySubject.getStudySubjectDetail().getFirstName() + ",</p>");
+        sb.append("<p style='text-align:left'>Dear " + studySubject.getStudySubjectDetail().getFirstName() + ",</p>");
         sb.append("<p>Thanks for participating in " + studyName + " study! " +
                 "Please click the link below to get started.</p>");
         sb.append("<p style='text-align:center;margin:25px'>" +
@@ -681,11 +683,11 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String realm, UserAccountBean userAccountBean,boolean auditAccessCodeViewing) {
-        return getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean,auditAccessCodeViewing,true);
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String realm, UserAccountBean userAccountBean, boolean auditAccessCodeViewing) {
+        return getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean, auditAccessCodeViewing, true);
     }
 
-    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String realm, UserAccountBean userAccountBean,boolean auditAccessCodeViewing,boolean includeAccessCode) {
+    public ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String realm, UserAccountBean userAccountBean, boolean auditAccessCodeViewing, boolean includeAccessCode) {
         Study tenantStudy = getStudy(studyOid);
         if (!validateService.isParticipateActive(tenantStudy)) {
             logger.error("Participant account is not Active");
@@ -704,10 +706,10 @@ public class UserServiceImpl implements UserService {
         }
 
         String accessCode = null;
-        if(includeAccessCode) {
+        if (includeAccessCode) {
             accessCode = keycloakClient.getAccessCode(accessToken, pUserAccount.getUserUuid(), realm);
             if (accessCode == null) {
-                logger.error(" Access code from Keycloack returned null ");
+                logger.error(" Access code from Keycloak returned null");
                 return null;
             }
         }
@@ -727,8 +729,8 @@ public class UserServiceImpl implements UserService {
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
                     participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
 
-                    if(auditAccessCodeViewing) {
-                        AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId());
+                    if (auditAccessCodeViewing) {
+                        AuditLogEventDTO auditLogEventDTO = populateAuditLogEventDTO(studySubject.getStudySubjectId(), 42);
                         auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
                     }
                     return participantAccessDTO;
@@ -748,7 +750,7 @@ public class UserServiceImpl implements UserService {
         return auditLogEventDTO;
     }
 
-    private OCUserDTO buildOcUserDTO(StudySubject studySubject,boolean incRelatedInfo) {
+    private OCUserDTO buildOcUserDTO(StudySubject studySubject, boolean incRelatedInfo) {
         OCUserDTO ocUserDTO = new OCUserDTO();
         ocUserDTO.setParticipantId(studySubject.getLabel());
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
@@ -759,7 +761,7 @@ public class UserServiceImpl implements UserService {
             ocUserDTO.setLastName(studySubjectDetail.getLastName() != null ? studySubjectDetail.getLastName() : "");
             ocUserDTO.setIdentifier(studySubjectDetail.getIdentifier() != null ? studySubjectDetail.getIdentifier() : "");
 
-            if(incRelatedInfo) {
+            if (incRelatedInfo) {
                 ocUserDTO.setStatus(studySubject.getUserStatus());
             }
         } else {
@@ -776,8 +778,8 @@ public class UserServiceImpl implements UserService {
         OCUserDTO ocUserDTO = new OCUserDTO();
         ocUserDTO.setParticipantId(studySubject.getLabel());
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
-        if (studySubjectDetail != null){
-            if(!isStudyLevelUser) {
+        if (studySubjectDetail != null) {
+            if (!isStudyLevelUser) {
                 ocUserDTO.setFirstName(studySubjectDetail.getFirstName() != null ? studySubjectDetail.getFirstName() : "");
                 ocUserDTO.setEmail(studySubjectDetail.getEmail() != null ? studySubjectDetail.getEmail() : "");
                 ocUserDTO.setPhoneNumber(studySubjectDetail.getPhone() != null ? studySubjectDetail.getPhone() : "");
@@ -820,18 +822,17 @@ public class UserServiceImpl implements UserService {
             writer = openFile(file);
             writer.print(writeToTextFile(userDTOs, isStudyLevelUser, incRelatedInfo));
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            logger.error("Error while accessing file for writing: ",e);
+            logger.error("Error while accessing file for writing: ", e);
         } catch (Exception exception) {
-            logger.error("Error while writing to file : ",exception);
+            logger.error("Error while writing to file: ", exception);
         } finally {
             closeFile(writer);
         }
     }
 
 
-
     public String getFilePath(JobType jobType) {
-        String dirPath= CoreResources.getField("filePath") + BULK_JOBS+ File.separator+ jobType.toString().toLowerCase();
+        String dirPath = CoreResources.getField("filePath") + BULK_JOBS + File.separator + jobType.toString().toLowerCase();
         File directory = new File(dirPath);
         if (!directory.exists()) {
             directory.mkdirs();
@@ -850,12 +851,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private String writeToTextFile(List<OCUserDTO> userDTOS,  boolean isStudyLevelUser, boolean incRelatedInfo) {
+    private String writeToTextFile(List<OCUserDTO> userDTOS, boolean isStudyLevelUser, boolean incRelatedInfo) {
 
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("ParticipantId");
         stringBuffer.append(SEPERATOR);
-        if(!isStudyLevelUser) {
+        if (!isStudyLevelUser) {
             stringBuffer.append("First Name");
             stringBuffer.append(SEPERATOR);
             stringBuffer.append("Last Name");
@@ -867,7 +868,7 @@ public class UserServiceImpl implements UserService {
             stringBuffer.append("Identifier");
             stringBuffer.append(SEPERATOR);
         }
-        if(!isStudyLevelUser && incRelatedInfo) {
+        if (!isStudyLevelUser && incRelatedInfo) {
             stringBuffer.append("Access Code");
             stringBuffer.append(SEPERATOR);
         }
@@ -876,7 +877,7 @@ public class UserServiceImpl implements UserService {
         for (OCUserDTO userDTO : userDTOS) {
             stringBuffer.append(userDTO.getParticipantId() != null ? userDTO.getParticipantId() : "");
             stringBuffer.append(SEPERATOR);
-            if(!isStudyLevelUser ) {
+            if (!isStudyLevelUser) {
                 stringBuffer.append(userDTO.getFirstName() != null ? userDTO.getFirstName() : "");
                 stringBuffer.append(SEPERATOR);
                 stringBuffer.append(userDTO.getLastName() != null ? userDTO.getLastName() : "");
@@ -888,7 +889,7 @@ public class UserServiceImpl implements UserService {
                 stringBuffer.append(userDTO.getIdentifier() != null ? userDTO.getIdentifier() : "");
                 stringBuffer.append(SEPERATOR);
             }
-            if(!isStudyLevelUser && incRelatedInfo) {
+            if (!isStudyLevelUser && incRelatedInfo) {
                 stringBuffer.append(userDTO.getAccessCode() != null ? userDTO.getAccessCode() : "");
                 stringBuffer.append(SEPERATOR);
             }
@@ -902,9 +903,9 @@ public class UserServiceImpl implements UserService {
         return sb.toString();
     }
 
-    private AuditLogEventDTO populateAuditLogEventDTO(int studySubjectId) {
+    private AuditLogEventDTO populateAuditLogEventDTO(int studySubjectId, int auditLogEventTypeId) {
         AuditLogEventDTO auditLogEventDTO = new AuditLogEventDTO();
-        auditLogEventDTO.setAuditLogEventTypId(42);
+        auditLogEventDTO.setAuditLogEventTypId(auditLogEventTypeId);
         auditLogEventDTO.setEntityId(studySubjectId);
         auditLogEventDTO.setEntityName("Participant access code");
         auditLogEventDTO.setAuditTable("study_subject");
@@ -912,7 +913,7 @@ public class UserServiceImpl implements UserService {
         return auditLogEventDTO;
     }
 
-    public JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy,JobType jobType,String sourceFileName) {
+    public JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy, JobType jobType, String sourceFileName) {
         JobDetail jobDetail = new JobDetail();
         jobDetail.setCreatedBy(createdBy);
         jobDetail.setDateCreated(new Date());
@@ -922,8 +923,8 @@ public class UserServiceImpl implements UserService {
         jobDetail.setType(jobType);
         jobDetail.setUuid(UUID.randomUUID().toString());
         jobDetail.setSourceFileName(sourceFileName);
-        jobDetail =jobService.saveOrUpdateJob(jobDetail);
-        logger.debug("Job Id {} has started",jobDetail.getJobDetailId());
+        jobDetail = jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has started", jobDetail.getJobDetailId());
         return jobDetail;
     }
 
@@ -932,19 +933,18 @@ public class UserServiceImpl implements UserService {
         jobDetail.setLogPath(fileName);
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.COMPLETED);
-        jobDetail =jobService.saveOrUpdateJob(jobDetail);
-        logger.debug("Job Id {} has completed",jobDetail.getJobDetailId());
+        jobDetail = jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has completed", jobDetail.getJobDetailId());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void persistJobFailed(JobDetail jobDetail,String fileName) {
+    public void persistJobFailed(JobDetail jobDetail, String fileName) {
         jobDetail.setLogPath(fileName);
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.FAILED);
-        jobDetail =jobService.saveOrUpdateJob(jobDetail);
-        logger.debug("Job Id {} has failed",jobDetail.getJobDetailId());
+        jobDetail = jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has failed", jobDetail.getJobDetailId());
     }
-
 
 
 }

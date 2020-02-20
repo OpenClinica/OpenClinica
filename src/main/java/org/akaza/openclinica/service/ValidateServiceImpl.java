@@ -296,6 +296,46 @@ public class ValidateServiceImpl implements ValidateService {
         }
 
     }
+    
+    public void validateStudyAndRolesForPdfCaseBook(String studyOid, String siteOid, UserAccountBean userAccountBean) {
+
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+        if (studyOid != null)
+            studyOid = studyOid.toUpperCase();
+        if (siteOid != null)
+            siteOid = siteOid.toUpperCase();
+
+        if (!isStudyOidValid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+        }
+        if (!isStudyOidValidStudyLevelOid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+        }
+        if (!isUserHasAccessToStudy(userRoles, studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        }
+        
+        if (siteOid != null) {
+        	if(!isSiteOidValid(siteOid)) {        
+	            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
+	        }
+        	
+	        if (!isSiteOidValidSiteLevelOid(siteOid)) {
+	            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+	        }
+       
+	        if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
+	            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+	        }
+	        
+	        if (!isUserHasAccessToSite(userRoles, siteOid)) {
+	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+	        } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+	        }
+        }  
+
+    }
 
     /**
      *  this is used by case book PDF process
