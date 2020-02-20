@@ -19,3 +19,6 @@ catalina.home_IS_UNDEFINED/
 
 # netbeans
 nb-configuration.xml
+
+#vscode
+.vscode

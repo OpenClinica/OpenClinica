@@ -104,9 +104,8 @@
     }
 
     function prompt(formObj,crfId){
-        var bool = confirm(
-                "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
-        if(bool){
+        var bool = confirm('<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>');
+        if (bool) {
             setRedirection(formObj);
             formObj.action='${pageContext.request.contextPath}/pages/handleSDVRemove';
             formObj.crfId.value=crfId;
@@ -191,33 +190,28 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
 
 <style>
   #itemsdv {
     position: relative;
   }
-
-  #sdv-close-popup {
-    float: right;
-    position: absolute;
-    right: -25px;
-    top: -25px;
-  }
-  #sdv-close-popup > .icon-cancel::before {
-    border-radius: 50px;
-    color: white;
-  }
-  #sdv-show-type {
-    float: right;
-    padding: 10px;
-  }
   #sdv-items {
     clear: both;
+  }
+  #sdv-items th {
+    font-weight: normal;
+  }
+  #sdv-items .icon::before {
+    padding: 0;
+    min-width: 1.45em;
+  }
+  #sdv-items_wrapper {
+    margin: 0 10px 10px;
   }
   #sdv-details {
     padding: 10px;
     background-color: lightgray;
+    width: 100%;
   }
   #sdv-details th {
     font-weight: normal;
@@ -229,11 +223,27 @@
     border: 1px solid gray;
     font-weight: bold;
   }
-  #sdv-items_wrapper {
-    margin: 0 10px 10px;
+  #sdv-show-type {
+    float: right;
+    padding: 10px;
+    border: none;
   }
-  #sdv-items th {
-    font-weight: normal;
+  #sdvVerify {
+    margin-bottom: 10px;
+  }
+  #sdv-close-popup {
+    float: right;
+    position: absolute;
+    right: -25px;
+    top: -25px;
+  }
+  #sdv-close-popup > .icon-cancel::before {
+    border-radius: 50px;
+    color: white;
+  }
+  #clear-filter {
+    float: left;
+    margin: 5px 10px;
   }
   .blockOverlay {
     cursor: default !important;
@@ -241,10 +251,7 @@
   .blockUI.blockMsg.blockPage {
     padding: 0 !important;
   }
-  #clear-filter {
-    float: left;
-    margin: 5px 10px;
-  }
+  
 </style>
 
 <div id="itemsdv" style="display:none;">
@@ -275,17 +282,17 @@
       </tr>
     </tbody>
   </table>
-  <div id="sdv-show-type">
+  <fieldset id="sdv-show-type">
     <label>
-      <input name="type" type="radio" autofocus="autofocus" checked="checked"> Show all items
+      <input type="radio" name="sinceLastVerified" value="n" autofocus="autofocus" checked="checked"> Show all items
     </label>
     <label>
-      <input name="type" type="radio"> Show only changed since last Verified
+      <input type="radio" name="sinceLastVerified" value="y"> Show only changed since last Verified
     </label>
-  </div>
+  </fieldset>
 
   <a id="clear-filter" href="javascript:clearFilter()">Clear Filter</a>
-  <table id='sdv-items'>
+  <table id='sdv-items' style="width:100%">
     <thead>
       <tr>
         <th>Brief Description (Item Name)</th>
@@ -294,30 +301,33 @@
         <th>Open Queries</th>
         <th>Last Modified (UTC)</th>
         <th>Modified By</th>
+        <th>Actions</th>
       </tr>
     </thead>
-    <tbody id="sdvItems">
+    <tbody>
     </tbody>
   </table>
+  <input type="button" id="sdvVerify" name="sdvVerify" value="Verify" onclick="submitSdv(document.sdvForm, 2)" data-eventcrfid="2" data-formlayoutid="1" data-studyeventid="1">
 </div>
 
 <script>
-  var datatable = jQuery('#sdv-items').DataTable({
+  var itemsTable = jQuery('#sdv-items').DataTable({
     dom: 't',
     columns: [
-      {data: 'briefDescription'},
+      {data: 'briefDescriptionItemName'},
       {data: 'value'},
       {data: 'lastVerifiedDate'},
       {data: 'openQueriesCount'},
       {data: 'lastModifiedDate'},
-      {data: 'lastModifiedUserName'},
+      {data: 'lastModifiedBy'},
+      {data: 'actions'}
     ]
   });
-  datatable.order([]);
 
   function clearFilter() {
-    jQuery('#sdv-items').dataTable().fnSortNeutral();
+    itemsTable.order([]);
   }
+  clearFilter();
 
   function translate(str) {
     var trans = {
@@ -326,41 +336,86 @@
     return trans[str] || str;
   }
 
-  function translate(str) {
-    var trans = {
-      '100percent_required': '100% Required'
-    };
-    return trans[str] || str;
+
+  function formatDate(date) {
+    date = moment(date);
+    if (date.hours === 0 && date.minutes === 0 && date.seconds === 0) {
+      return date.format('MM/DD/YYYY');
+    }
+    else {
+      return date.format('MM/DD/YYYY hh:mm:ss');
+    }
   }
 
   function popupSdv(item) {
     var data = $(item).data();
-    var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/1/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems?changedAfterSdvOnlyFilter=n';
-    $.get(url, function(data) {
-      $('#participantId').text(data.participantId);
-      if (data.repeatingEvent) {
-        $('#eventName').text(data.eventName + '(' + data.eventOrdinal + ')');
-      }
-      else {
-        $('#eventName').text(data.eventName);
-      }
-      $('#formName').text(data.formName);
-      $('#sdvRequirement').text(translate(data.sdvRequirement));
-      $('#siteName').text(data.siteName);
-      $('#eventStartDate').text(data.eventStartDate);
-      $('#formStatus').text(data.formStatus);
-      $('#sdvStatus').text(data.sdvStatus);
+    var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
+    
+    function getItems() {
+      var sinceLastVerified = $('#sdv-show-type input:checked').val();
+      $.get(url + '?changedAfterSdvOnlyFilter=' + sinceLastVerified, function(data) {
 
-      var tbl = jQuery('#sdv-items').DataTable();
-      tbl.rows.add(data.sdvItems.map(function(item) {
-        item.lastVerifiedDate = data.lastVerifiedDate;
-        return item;
-      }));
-      tbl.draw();
+        $('#participantId').text(data.participantId);
+        if (data.repeatingEvent) {
+          $('#eventName').text(data.eventName + ' (' + data.eventOrdinal + ')');
+        }
+        else {
+          $('#eventName').text(data.eventName);
+        }
+        $('#formName').text(data.formName);
+        $('#sdvRequirement').text(translate(data.sdvRequirement));
+        $('#siteName').text(data.siteName);
+        $('#eventStartDate').text(formatDate(data.eventStartDate));
+        $('#formStatus').text(data.formStatus);
+        $('#sdvStatus').text(data.sdvStatus);
+
+        itemsTable.rows.add(data.sdvItems.map(function(item) {
+          console.log(item);
+
+          item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
+          if (item.repeatingGroup) {
+            item.briefDescriptionItemName += ' ' + item.ordinal;
+          }
+
+          item.lastVerifiedDate = data.lastVerifiedDate;
+          if (item.lastVerifiedDate != null && item.lastModifiedDate > item.lastVerifiedDate) {
+            item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
+          }
+          if (!item.lastVerifiedDate) {
+            item.lastVerifiedDate = 'Never';
+          }
+          else {
+            item.lastVerifiedDate = formatDate(item.lastVerifiedDate);
+          }
+          item.lastModifiedDate = formatDate(item.lastModifiedDate);
+
+          item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
+          item.actions = '<a href="#" title="View Form" class="icon icon-view-within"></a>';
+          return item;
+        }));
+        itemsTable.draw();
+      });
+    }
+
+    $('#sdv-show-type').off('change');
+    if (data.sdvStatus === 'VERIFIED') {
+      $('#sdv-show-type input[value=n]').click();
+    }
+    else {
+      $('#sdv-show-type input[value=y]').click();
+    }
+
+    $('#sdv-show-type').change(function() {
+      itemsTable.clear().draw();
+      getItems();
+    }).change();
+
+    var verifyButton = $(item).siblings()[3];
+    $('#sdvVerify').off('click').click(function() {
+      $(verifyButton).click();
     });
 
     jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
-    var cols = $(item).closest('tr').children();
   }
 
 </script>

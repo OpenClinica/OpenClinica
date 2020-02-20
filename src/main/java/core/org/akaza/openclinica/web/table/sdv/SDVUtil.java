@@ -1064,11 +1064,12 @@ public class SDVUtil {
             StudyEventDefinition event = eventCrf.getStudyEvent().getStudyEventDefinition();
             actionsBuilder
                 .append("<a title='" + resWords.getString("view_sdv_item_data_hover") + "' alt='" + resWords.getString("view_sdv_item_data_hover") + "' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;' onclick='popupSdv(this)'")
+                .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
                 .append(" data-study-oid='").append(event.getStudy().getOc_oid()).append("'")
                 .append(" data-event-oid='").append(event.getOc_oid()).append("'")
                 .append(" data-event-ordinal='").append(event.getOrdinal() > 0 ? event.getOrdinal() : 1).append("'")
                 .append(" data-form-oid='").append(eventCrf.getFormLayout().getCrf().getOcOid()).append("'")
-                .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
+                .append(" data-sdv-status='").append(eventCRFBean.getSdvStatus()).append("'")
                 .append("/>");
             if (eventCRFBean.getStatus() != null){
                 String queryStringEncoded = queryString;
