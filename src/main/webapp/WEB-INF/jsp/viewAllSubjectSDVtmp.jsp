@@ -336,6 +336,7 @@
     return trans[str] || str;
   }
 
+
   function formatDate(date) {
     date = moment(date);
     if (date.hours === 0 && date.minutes === 0 && date.seconds === 0) {
