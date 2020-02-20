@@ -60,6 +60,8 @@ public interface ValidateService {
     boolean hasCRFpermissionTag(EventDefinitionCrf edc, List<String> permissionTags);
 
     ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
+    
+    void validateStudyAndRolesForPdfCaseBook(String studyOid, String siteOid, UserAccountBean userAccountBean);
 
 
     }

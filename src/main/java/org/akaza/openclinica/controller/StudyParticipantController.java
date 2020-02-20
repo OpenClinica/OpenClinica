@@ -542,7 +542,7 @@ public class StudyParticipantController {
 		 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 	 			 	  
 			  try {				 
-				  validateService.validateStudyAndRoles(studyOid.trim(),siteOid.trim(),userAccountBean);			 	 			 	 		 	 
+				  validateService.validateStudyAndRolesForPdfCaseBook(studyOid.trim(),siteOid.trim(),userAccountBean);			 	 			 	 		 	 
 			 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,siteOid, participantId, request, userAccountBean, format, margin, landscape);
 
 				  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
@@ -571,7 +571,7 @@ public class StudyParticipantController {
 	 	  UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 	 	
 		  try {				 
-			  validateService.validateStudyAndRoles(studyOid.trim(),userAccountBean);			 	 			 	 		 	 
+			  validateService.validateStudyAndRolesForPdfCaseBook(studyOid.trim(),null,userAccountBean);			 	 			 	 		 	 
 		 	  String uuid = startBulkCaseBookPDFJob(schema,studyOid,null, participantId, request, userAccountBean, format, margin, landscape);
 
 			  logger.info("REST request to Casebook PDF Job uuid {} ", uuid);			
