@@ -139,6 +139,7 @@
                 <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.provider_configuration_file_resource_path">/org/akaza/openclinica/ehcache.xml</prop>
+                <prop key="hibernate.allow_update_outside_transaction">true</prop>
                 <!-- Uncommenting the following line allows better logging of Hibernate errors for debugging purposes. Must be commented out for production use. -->
                 <!-- prop key="hibernate.jdbc.batch_size">0</prop -->
             </props>
