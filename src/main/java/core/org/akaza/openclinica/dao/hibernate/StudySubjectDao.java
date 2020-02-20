@@ -184,5 +184,4 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         }
         return greatestLabel;
     }
-
 }

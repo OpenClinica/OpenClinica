@@ -1,5 +1,6 @@
 package core.org.akaza.openclinica.web.table.sdv;
 
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.jmesa.core.filter.FilterMatcher;
 
 /**
@@ -11,6 +12,7 @@ public class SdvStatusMatcher implements FilterMatcher {
         String item = String.valueOf(itemValue);
         String filter = String.valueOf(filterValue);
 
-        return (filter.equalsIgnoreCase("none")) || (filter.equalsIgnoreCase("complete") && (item.contains("icon-icon-SDV-doubleCheck")));
+        return (filter.equalsIgnoreCase(SdvStatus.NOT_VERIFIED.getDisplayValue() +" + " + SdvStatus.CHANGED_AFTER_VERIFIED.getDisplayValue() ) || filter.equalsIgnoreCase(SdvStatus.NOT_VERIFIED.getDisplayValue()) ||
+                filter.equalsIgnoreCase(SdvStatus.CHANGED_AFTER_VERIFIED.getDisplayValue()) || (filter.equalsIgnoreCase(SdvStatus.VERIFIED.getDisplayValue()) && (item.contains("icon-icon-SDV-doubleCheck"))));
     }
 }

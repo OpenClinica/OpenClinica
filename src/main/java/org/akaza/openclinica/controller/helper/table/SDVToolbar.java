@@ -24,9 +24,7 @@ public class SDVToolbar extends DefaultToolbar {
     protected void addToolbarItems() {
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new ShowMoreItem()));
-        addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new NewHiddenItem()));
-        addToolbarItem(createCustomItem(new InfoItem()));
     }
 
     private ToolbarItem createCustomItem(AbstractItem item) {
@@ -36,23 +34,6 @@ public class SDVToolbar extends DefaultToolbar {
         item.setToolbarItemRenderer(renderer);
 
         return item;
-    }
-
-    private class InfoItem extends AbstractItem {
-
-        @Override
-        public String disabled() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public String enabled() {
-            HtmlBuilder html = new HtmlBuilder();
-            html.nbsp().append(reswords.getString("table_sorted_event_date"));
-
-            return html.toString();
-        }
     }
 
     private class ShowMoreItem extends AbstractItem {
@@ -89,7 +70,7 @@ public class SDVToolbar extends DefaultToolbar {
         }
 
         String getIndexes() {
-            String result = "5,9,10,11";
+            String result = "6,10,11,12";
             return result;
         }
 
