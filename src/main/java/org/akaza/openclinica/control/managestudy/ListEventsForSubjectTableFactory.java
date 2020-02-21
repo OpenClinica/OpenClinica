@@ -255,7 +255,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     if (eventCRFBean != null) {
                         d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
                         FormLayoutBean formLayoutBean= (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
-                        if(formLayoutBean.getStatus().equals(Status.LOCKED) && eventCRFBean.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
+                        if(formLayoutBean.getStatus().equals(Status.LOCKED)) {
                             d.getProps().put("crf_" + crf.getId(), DataEntryStage.LOCKED);
                         }else {
                             d.getProps().put("crf_" + crf.getId(), eventCRFBean.getStage());
