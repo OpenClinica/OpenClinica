@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.service.crfdata.xform.*;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -156,15 +157,16 @@ public class EnketoUrlService {
                                                 String flavor, Role role,
                                                 String mode, String hash, String loadWarning, boolean isFormLocked) throws Exception {
         Study parentStudy = enketoCredentials.getParentStudy(studyOid);
-        studyOid = parentStudy.getOc_oid();
-        EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
+        Study site = enketoCredentials.getSiteStudy(studyOid);
+
+        EnketoCredentials credentials = EnketoCredentials.getInstance(parentStudy.getOc_oid());
         EnketoAPI enketo = new EnketoAPI(credentials);
         StudyEvent studyEvent = null;
         if (subjectContext.getStudyEventId() != null) {
             studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
         }
         String crfOID = subjectContext.getFormLayoutOid() + DASH + hash + flavor;
-        FormUrlObject formUrlObject = enketo.getFormURL(subjectContextKey, crfOID, studyOid, role,
+        FormUrlObject formUrlObject = enketo.getFormURL(subjectContextKey, crfOID, site, role,
                 parentStudy, studyEvent, mode, loadWarning, isFormLocked);
         return formUrlObject;
 
@@ -596,6 +598,7 @@ public class EnketoUrlService {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
+        eventCrf.setSdvStatus(SdvStatus.NOT_VERIFIED);
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;

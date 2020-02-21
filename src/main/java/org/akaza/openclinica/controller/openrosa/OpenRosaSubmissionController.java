@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import com.openclinica.kafka.KafkaService;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -564,6 +565,7 @@ public class OpenRosaSubmissionController {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
+        eventCrf.setSdvStatus(SdvStatus.NOT_VERIFIED);
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;

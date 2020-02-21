@@ -42,6 +42,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import core.org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
@@ -317,9 +318,9 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         }
 
                     }
-                    // Reset the SDV status if item data has been changed or added
-                    if (eventCrfBean != null && resetSDV)
-                        eventCrfDao.setSDVStatus(false, ub.getId(), eventCrfBean.getId());
+                    // Alter the SDV status if item data has been changed or added
+                    if (eventCrfBean != null && resetSDV && eventCrfBean.getSdvStatus() == SdvStatus.VERIFIED)
+                        eventCrfDao.setSDVStatus(SdvStatus.CHANGED_AFTER_VERIFIED, ub.getId(), eventCrfBean.getId());
 
                     // end of item datas, tbh
                     // crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
