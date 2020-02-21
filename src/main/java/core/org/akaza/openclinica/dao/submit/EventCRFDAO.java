@@ -1048,14 +1048,14 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.INT);
         this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.BOOL);
+        this.setTypeExpected(4, TypeNames.STRING);
         this.setTypeExpected(3, TypeNames.INT);
 
         HashMap variables = new HashMap();
         variables.put(1, crf_version_id);
         variables.put(2, user_id);
         variables.put(3, user_id);
-        variables.put(4, false);
+        variables.put(4, SdvStatus.NOT_VERIFIED.toString());
         variables.put(5, event_crf_id);
         String sql = digester.getQuery("updateCRFVersionID");
         // this is the way to make the change transactional
@@ -1071,14 +1071,14 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.INT);
         this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.BOOL);
+        this.setTypeExpected(4, TypeNames.STRING);
         this.setTypeExpected(3, TypeNames.INT);
 
         HashMap variables = new HashMap();
         variables.put(1, form_layout_id);
         variables.put(2, user_id);
         variables.put(3, user_id);
-        variables.put(4, false);
+        variables.put(4, SdvStatus.NOT_VERIFIED.toString());
         variables.put(5, event_crf_id);
         String sql = digester.getQuery("updateFormLayoutID");
         // this is the way to make the change transactional
