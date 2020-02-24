@@ -648,6 +648,7 @@ public class DataController {
         mFiles[1] = dataFile;
         
         String studyOID = this.getRestfulServiceHelper().getImportDataHelper().getStudyOidFromMappingFile(mappingFile);
+        getRestfulServiceHelper().setSchema(studyOID, request);
         
         
         try {       	         	  
