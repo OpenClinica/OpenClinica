@@ -493,7 +493,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 ecb.setStage(DataEntryStage.LOCKED);
             } else if (!cb.getStatus().equals(Status.AVAILABLE)) {
                 ecb.setStage(DataEntryStage.LOCKED);
-            } else if (!cvb.getStatus().equals(Status.AVAILABLE)) {
+            } else if (!flb.getStatus().equals(Status.AVAILABLE)) {
                 ecb.setStage(DataEntryStage.LOCKED);
             }
             // above added 092007-102007 tbh

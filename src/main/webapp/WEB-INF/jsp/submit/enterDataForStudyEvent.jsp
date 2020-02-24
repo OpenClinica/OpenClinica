@@ -556,11 +556,14 @@
                    onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                   ><span name="bt_Remove<c:out value="${rowCount}"/>" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>"  hspace="2"></span></a>
                   </td>
+
+              <c:if test="${!dec.stage.locked}">
                <td><a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                    onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                   ><span name="bt_Remove<c:out value="${rowCount}"/>" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"  hspace="2"></span></a>
                   </td>
+             </c:if>
             </c:if>
 
                <!--  reasign crf version -->
