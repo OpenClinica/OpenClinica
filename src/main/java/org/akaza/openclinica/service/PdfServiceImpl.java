@@ -45,7 +45,8 @@ public class PdfServiceImpl implements PdfService {
 	 static final MessageFormat pdfHeaderLeftFormat2 =  new MessageFormat("{0} ");
 	 
 	 static final MessageFormat pdfHeaderRightFormat1 =  new MessageFormat("{2} ({3})");
-	 static final MessageFormat pdfHeaderRightFormat2 =  new MessageFormat("{2}"); 	 
+	 static final MessageFormat pdfHeaderRightFormat2 =  new MessageFormat("{2}"); 	
+	 static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm");  
 
     /**
      *
@@ -62,7 +63,7 @@ public class PdfServiceImpl implements PdfService {
      * @throws IOException
      */
     public File mergePDF(ArrayList<File> files,
-                         String fullFinalFilePathName,ArrayList<String[]> pdfHeaders) throws IOException {
+                         String fullFinalFilePathName,ArrayList<String[]> pdfHeaders,ArrayList<String> pdfLeftFooters) throws IOException {
 
         //Instantiating PDFMergerUtility class
         PDFMergerUtility PDFmerger = new PDFMergerUtility();
@@ -83,12 +84,14 @@ public class PdfServiceImpl implements PdfService {
         }
         String footerMsg = "Page X of " + totalPageNumber;
         String headerMsg[];
+        String footerTime = null;
         int file_counter = 0;
         
         for(File file: files) {
             PDDocument doc = PDDocument.load(file);
             headerMsg = pdfHeaders.get(file_counter);
-            page_counter = this.addHeaderOrFooter(doc, headerMsg,footerMsg, page_counter);
+            footerTime = pdfLeftFooters.get(file_counter);
+            page_counter = this.addHeaderOrFooter(doc, headerMsg,footerTime,footerMsg, page_counter);
 
             // after add footer, use the new content
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -136,14 +139,12 @@ public class PdfServiceImpl implements PdfService {
     /**
      * will return next available page number
      */
-    public int addHeaderOrFooter(PDDocument document, String[] headerMsg,String footerMsg, int page_counter) throws IOException {
+    public int addHeaderOrFooter(PDDocument document, String[] headerMsg,String footerTime,String footerMsg, int page_counter) throws IOException {
 
         String footerMessage = null;             
         PDFont font = PDType1Font.TIMES_ROMAN;
         float fontSize = 10.0f;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm");        
-		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));		
-
+             				
         for( PDPage page : document.getPages() )
         {
             PDRectangle pageSize = page.getMediaBox();
@@ -205,8 +206,7 @@ public class PdfServiceImpl implements PdfService {
                 {
                     contentStream.setTextMatrix(Matrix.getTranslateInstance(50, footerCenterY));
                 }               
-
-                String footerTime = "Generated: " + sdf.format(new Date()) + " UTC";
+                
                 contentStream.showText(footerTime);
 
                 // footer page#
@@ -231,6 +231,13 @@ public class PdfServiceImpl implements PdfService {
     }
 
 
+   public String preparePdfFooterTime() {
+	   
+	   sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+	   String footerTime = "Generated: " + sdf.format(new Date()) + " UTC";
+	   return footerTime;
+    }
+  	  
    public String[] preparePdfHeader(Study study, Study site, StudyEvent studyEvent) {
 	  
 	    String siteName = null;
