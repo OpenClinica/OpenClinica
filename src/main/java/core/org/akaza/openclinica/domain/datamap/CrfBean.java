@@ -45,7 +45,6 @@ public class CrfBean extends DataMapDomainObject {
     private List<ItemGroup> itemGroups;
     private List<EventDefinitionCrf> eventDefinitionCrfs;
     private List<CrfVersion> crfVersions;
-    private Integer version;
 
     public CrfBean() {
     }
