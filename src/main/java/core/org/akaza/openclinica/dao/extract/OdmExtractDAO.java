@@ -3231,6 +3231,7 @@ public class OdmExtractDAO extends DatasetDAO {
                         ecIds += "'" + ecId + "', ";
                         form.setFormOID(cBean.getOid());
                         form.setFormName(cBean.getName());
+                        form.setFormLayoutName(flBean.getName());
                         // ----- add openclinica crf attributes
                         if (dataset.isShowCRFversion()) {
                             form.setCrfVersion((String) row.get("crf_version"));

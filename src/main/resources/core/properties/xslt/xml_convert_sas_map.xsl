@@ -42,6 +42,16 @@
             <TYPE>numeric</TYPE>
             <DATATYPE>integer</DATATYPE>
         </row>
+        <row name="Form">
+            <TYPE>character</TYPE>
+            <DATATYPE>string</DATATYPE>
+            <LENGTH>255</LENGTH>
+        </row>
+        <row name="FormVersion">
+            <TYPE>character</TYPE>
+            <DATATYPE>string</DATATYPE>
+            <LENGTH>50</LENGTH>
+        </row>
         <row name="ItemGroupRepeatKey">
             <TYPE>numeric</TYPE>
             <DATATYPE>integer</DATATYPE>
