@@ -1060,6 +1060,9 @@ padding-bottom: 3px;
 .button_remove {
    background-color: var(--lightblue-d20);
    border-width: 0px;
+   background-image: url(../images/bt_Remove.gif);
+   background-repeat: no-repeat;
+   background-position: bottom;
    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
    font-size: 11px;
    line-height: 11px;
