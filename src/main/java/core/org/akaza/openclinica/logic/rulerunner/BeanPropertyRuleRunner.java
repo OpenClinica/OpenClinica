@@ -53,6 +53,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	{
 		for (RuleSetBean ruleSet : ruleSets)
 		{
+			logger.debug("RuleSetBean Object: "+ ruleSet.toString());
 			List<ExpressionBean> expressions = ruleSet.getExpressions();
 			for (ExpressionBean expressionBean : expressions) {
 				ruleSet.setTarget(expressionBean);
@@ -71,8 +72,10 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 					if(ruleSetRule.getStatus()==Status.AVAILABLE)
 					{
 						RuleBean rule = ruleSetRule.getRuleBean();
+						logger.debug("Rule Object"+ rule.toString());
 						//       StudyBean currentStudy = rule.getStudy();//TODO:Fix me!
 						Study currentStudy = (Study) getStudyDao().findByPK(rule.getStudyId());
+						logger.info("StudyOid in Rule :"+currentStudy.getOc_oid());
 						ExpressionBeanObjectWrapper eow = new ExpressionBeanObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet,studySubjectBeanId, studyEventDaoHib, studyEventDefDaoHib);
 						try {
 							// StopWatch sw = new StopWatch();

@@ -1104,7 +1104,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 				ruleSets = (ArrayList<RuleSetBean>) filterRuleSetsByStudySubject(ruleSets);
 			} catch (NumberFormatException | ParseException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+                logger.error("RuleSet filter by studySubject error " , e.getStackTrace());
 			}
 
     		ruleRunner.runRules(ruleSets,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender,notificationService, keycloakClientImpl);
