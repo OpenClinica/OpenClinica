@@ -10,3 +10,4 @@
 * [T009](tests/t009.md "T009 - site management")
 * [T010](tests/t010.md "T010 - study user management")
 * [T014](tests/t014.md "T014 - data entry")
+* [T031](tests/t031.md "T031 - study audit log")
