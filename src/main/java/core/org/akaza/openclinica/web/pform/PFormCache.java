@@ -103,7 +103,7 @@ public class PFormCache {
         contextMap.put("accessToken", accessToken);
 
 
-        contextMap.put("studyOid", studyOid);
+        contextMap.put("studyOID", studyOid);
         String hashString = userAccountID + "." + studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
         ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
         String hashOutput = encoder.encodePassword(hashString, null);
@@ -125,7 +125,7 @@ public class PFormCache {
         contextMap.put("accessToken", accessToken);
 
 
-        contextMap.put("studyOid", studyOid);
+        contextMap.put("studyOID", studyOid);
         String hashString = userAccountID + "." + studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
         ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
         String hashOutput = encoder.encodePassword(hashString, null);
