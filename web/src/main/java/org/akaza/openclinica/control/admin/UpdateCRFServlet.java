@@ -86,10 +86,9 @@ public class UpdateCRFServlet extends SecureController {
          * contents and upload a new version."); setToPanel("CRF Spreadsheet
          * <br>Template", "<br>Download a blank CRF Excel spreadsheet " +
          * "template <a href=\"DownloadVersionSpreadSheet?template=1\"><b>here</b></a>.");
-         * setToPanel( "Example CRF <br>Spreadsheets", "<br>Download example
-         * CRFs and instructions from the" + " <a
-         * href=\"http://www.openclinica.org/entities/entity_details.php?eid=151\"><b>OpenClinica.org
-         * portal</b></a> " + "(OpenClinica.org user account required).");
+         * setToPanel( "Example CRF <br>Spreadsheets", "<br>Download example CRFs from the
+         * <a href="https://medical-data-models.org" target="new"><b>Medical Data Models (MDM) Portal</b></a>
+         * (MDM-Portal user account required).");
          */
         FormProcessor fp = new FormProcessor(request);
 

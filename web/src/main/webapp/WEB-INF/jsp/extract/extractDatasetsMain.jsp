@@ -50,7 +50,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="datasets" class="java.util.ArrayList"/>
 
-<h1><span class="title_manage"><c:out value="${study.name}" />: <fmt:message key="extract_datasets" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></h1>
+<h1><span class="title_manage"><c:out value="${study.name}" />: <fmt:message key="extract_datasets" bundle="${resworkflow}"/></span></h1>
 
 <OL>
 <LI><a href="ViewDatasets"><fmt:message key="view_datasets" bundle="${resworkflow}"/></a>

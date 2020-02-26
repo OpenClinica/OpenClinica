@@ -41,7 +41,7 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1><span class="title_manage"><fmt:message key="scheduled_export_data_jobs" bundle="${resword}"/><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/brief-overview/jobs#content-title-4363')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="scheduled_export_data_jobs" bundle="${resword}"/></span></h1>
 
 <div class="homebox_bullets"><a href="CreateJobExport">Create a new Export Data Job</a></div>
 <%-- <div class="homebox_bullets"><a href="CreateJobImport">Create a new Import Data Job</a></div> --%>

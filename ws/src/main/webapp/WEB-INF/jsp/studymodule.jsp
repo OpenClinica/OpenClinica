@@ -78,9 +78,7 @@
 
   <form action="studymodule" method="post">
   <div>
-      <h1><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
-		<a href="javascript:openDocWindow('http://www.openclinica.org/OpenClinica/3.0/doc/5_1_buildStudy_Help.html')"><img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/></a>
-	  </span></h1>
+      <h1><span class="title_manage"><c:out value="${currentStudy.name}"/></span></h1>
   </div>
   <div style="border: 1px solid #ccc; width:70%; padding-left:5px">
       <p>

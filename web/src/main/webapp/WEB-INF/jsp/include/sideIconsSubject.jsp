@@ -91,8 +91,6 @@ View
 
         <div class="sidebar_tab_content">
 
-            <a href="#" onClick="openDefWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/overview-openclinica/home-page#content-title-3610'); return false;"><fmt:message key="view_all_icons" bundle="${reswords}"/></a>
-
         </div>
 
     </td>

@@ -46,9 +46,7 @@
 
 
 
-<h1><span class="title_manage">
-<fmt:message key="view_all_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
-<a href="javascript:openDocWindow('help/2_1_subjectMatrix_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="view_all_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1>
 
 
 

@@ -11,7 +11,7 @@
 
 <jsp:useBean scope="request" id="currRow" class=
         "org.akaza.openclinica.web.bean.DisplayStudySubjectRow" />
-<c:set var="groups" value="5"/>
+<c:set var="groups" value="6"/>
 <c:forEach var="group" items="${currRow.bean.studyGroups}">
     <c:set var="groups" value="${groups+1}"/>
 </c:forEach>
@@ -33,8 +33,10 @@
         <td class="table_cell" style="display: all" id="Groups_0_2_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.oid}"/>&nbsp;</td>
         <td class="table_cell" style="display: all" id="Groups_0_3_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.gender}"/>&nbsp;</td>
         <td class="table_cell" style="display: all" id="Groups_0_4_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.secondaryLabel}"/>&nbsp;</td>
+        <td class="table_cell" style="display: all" id="Groups_0_5_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.subject.uniqueIdentifier}"/> </td>
+
         <%-- This value should not be hard-coded --%>
-        <c:set var="groupCount" value="5"/>
+        <c:set var="groupCount" value="6"/>
         <c:forEach var="group" items="${currRow.bean.studyGroups}">
             <td class="table_cell" style="display: all" id="Groups_0_<c:out value="${groupCount}"/>_<c:out value="${eblRowCount+1}"/>"><c:out value="${group.studyGroupName}"/>&nbsp;</td>
             <c:set var="groupCount" value="${groupCount+1}"/>
@@ -56,8 +58,9 @@
         <td class="table_cell" style="display: none" id="Groups_0_2_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.oid}"/>&nbsp;</td>
         <td class="table_cell" style="display: none" id="Groups_0_3_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.gender}"/>&nbsp;</td>
         <td class="table_cell" style="display: none" id="Groups_0_4_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.studySubject.secondaryLabel}"/>&nbsp;</td>
+        <td class="table_cell" style="display: none" id="Groups_0_5_<c:out value="${eblRowCount+1}"/>"><c:out value="${currRow.bean.subject.uniqueIdentifier}"/> </td>
 
-        <c:set var="groupCount" value="5"/>
+        <c:set var="groupCount" value="6"/>
         <c:forEach var="group" items="${currRow.bean.studyGroups}">
             <td class="table_cell" style="display: none" id="Groups_0_<c:out value="${groupCount}"/>_<c:out value="${eblRowCount+1}"/>"><c:out value="${group.studyGroupName}"/>&nbsp;</td>
             <c:set var="groupCount" value="${groupCount+1}"/>

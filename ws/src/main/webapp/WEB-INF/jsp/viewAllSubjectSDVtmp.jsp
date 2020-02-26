@@ -57,10 +57,7 @@
     }
 </script></div>
 
-<h1><span class="title_manage">
-<fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/> <a href="javascript:openDocWindow('help/3_1_SDV_Help.html')"><img src="../images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
-</span></h1>
-
+<h1><span class="title_manage"><fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/></span></h1>
 
 <div id="searchFilterSDV">
     <table border="0" cellpadding="0" cellspacing="0">

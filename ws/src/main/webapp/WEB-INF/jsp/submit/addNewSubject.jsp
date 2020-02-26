@@ -92,11 +92,7 @@
 </c:forEach>
 
 
-<h1><span class="title_manage">
-<c:out value="${study.name}" />:
-    <fmt:message key="add_subject" bundle="${resword}"/>
-    <a href="javascript:openDocWindow('help/2_2_enrollSubject_Help.html#step1')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
-</span></h1>
+<h1><span class="title_manage"><c:out value="${study.name}" />: <fmt:message key="add_subject" bundle="${resword}"/></span></h1>
 <!--
 <c:if test="${study.genetic && (!empty mothers) || (!empty fathers)}">
 <p class="text">Indicate the subject's parents, if applicable.
