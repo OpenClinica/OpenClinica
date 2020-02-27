@@ -253,8 +253,13 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
                     EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
                     if (eventCRFBean != null) {
-                        d.getProps().put("crf_" + crf.getId(), eventCRFBean.getStage());
                         d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
+                        FormLayoutBean formLayoutBean= (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
+                        if(formLayoutBean.getStatus().equals(Status.LOCKED)) {
+                            d.getProps().put("crf_" + crf.getId(), DataEntryStage.LOCKED);
+                        }else {
+                            d.getProps().put("crf_" + crf.getId(), eventCRFBean.getStage());
+                        }
 
                     } else {
                         d.getProps().put("crf_" + crf.getId(), DataEntryStage.UNCOMPLETED);

@@ -347,10 +347,7 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isStudyOidValidStudyLevelOid(studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
         }
-        if (!isUserHasAccessToStudy(userRoles, studyOid)) {
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-        }
-        
+              
         if (siteOid != null) {
         	if(!isSiteOidValid(siteOid)) {        
 	            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
@@ -363,13 +360,18 @@ public class ValidateServiceImpl implements ValidateService {
 	        if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
 	            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
 	        }
-	        
+	       //only check site level
 	        if (!isUserHasAccessToSite(userRoles, siteOid)) {
 	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
 	        } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
 	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
 	        }
-        }  
+        }else {
+        	//only check study level
+        	 if (!isUserHasAccessToStudy(userRoles, studyOid)) {
+                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+             }
+        }
 
     }
 
