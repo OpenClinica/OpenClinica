@@ -1062,6 +1062,18 @@ public class SDVUtil {
                 actionsBuilder.append(getCRFViewIconPath( status, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
                     eventCRFBean.getStudyEventId(), queryStringEncoded));
             }
+
+            StudyEventDefinition event = eventCrf.getStudyEvent().getStudyEventDefinition();
+            actionsBuilder
+                .append("<button style='padding:.4em 0.9em' class='accessCheck popupSdv' title='" + resWords.getString("view_sdv_item_data_hover") + "'")
+                .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
+                .append(" data-study-oid='").append(event.getStudy().getOc_oid()).append("'")
+                .append(" data-event-oid='").append(event.getOc_oid()).append("'")
+                .append(" data-event-ordinal='").append(event.getOrdinal() > 0 ? event.getOrdinal() : 1).append("'")
+                .append(" data-form-oid='").append(eventCrf.getFormLayout().getCrf().getOcOid()).append("'")
+                .append(" data-sdv-status='").append(eventCRFBean.getSdvStatus()).append("'")
+                .append(">" + resWords.getString("sdv_item_data") + "</button>");
+        
             if (eventCRFBean.getSdvStatus() != SdvStatus.VERIFIED) {
                 // StringBuilder jsCodeString =
                 // new StringBuilder("this.form.method='GET';
@@ -1485,6 +1497,7 @@ public class SDVUtil {
 
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_AFTER_VERIFIED)) {
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
+                    sdvItemDTO.setDataId(itemData.getItemDataId());
                     sdvItemDTO.setName(itemData.getItem().getName());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
                     sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());
