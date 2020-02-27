@@ -1050,7 +1050,6 @@ public class SDVUtil {
             }
             StringBuilder actionsBuilder = new StringBuilder(new HtmlBuilder().toString());
 
-            actionsBuilder.append("<a title='"+resWords.getString("view_sdv_item_form")+"' alt='"+resWords.getString("view_sdv_item_form")+"' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;'/>");
             if (eventCRFBean.getStatus() != null){
                 String queryStringEncoded = queryString;
                 try {

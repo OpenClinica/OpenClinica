@@ -390,8 +390,8 @@
 
           item.actions = 
             '<a title="View Form" class="icon icon-view-within" href="ResolveDiscrepancy?itemDataId=' + 
-              item.id + "&flavor=-query"
-            '""></a>';
+              item.id + '&flavor=-query' +
+            '"></a>';
 
           console.log(item);
           return item;
