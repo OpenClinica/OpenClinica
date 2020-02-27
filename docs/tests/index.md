@@ -17,3 +17,4 @@ test documentation for LibreClinica 0.8.1 pre-release
 | [T009](tests/t009.md) | site management |
 | [T010](tests/t010.md) | study user management |
 | [T014](tests/t014.md) | data entry |
+| [T031](tests/t031.md) | study audit log |
