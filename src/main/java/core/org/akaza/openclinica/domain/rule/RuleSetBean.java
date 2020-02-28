@@ -461,4 +461,28 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject implements
         return formLayout;
     }
 
+    @Override
+    public String toString() {
+        return "RuleSetBean{" +
+                "studyEventDefinition=" + studyEventDefinition +
+                ", study=" + study +
+                ", crf=" + crf +
+                ", crfVersion=" + crfVersion +
+                ", formLayout=" + formLayout +
+                ", item=" + item +
+                ", runSchedule=" + runSchedule +
+                ", runTime='" + runTime + '\'' +
+                ", runOnSchedule=" + runOnSchedule +
+                ", target=" + target +
+                ", originalTarget=" + originalTarget +
+                ", expressions=" + expressions +
+                ", itemGroup=" + itemGroup +
+                ", studyEventDefinitionId=" + studyEventDefinitionId +
+                ", studyId=" + studyId +
+                ", crfId=" + crfId +
+                ", crfVersionId=" + crfVersionId +
+                ", itemId=" + itemId +
+                ", itemGroupId=" + itemGroupId +
+                '}';
+    }
 }

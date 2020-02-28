@@ -15,28 +15,26 @@ import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.odmbeans.*;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.EventCRFStatus;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 /**
  * Create ODM XML ClinicalData Element for a study.
@@ -142,7 +140,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             xml.append(nls);
 
             ArrayList<ExportStudyEventDataBean> ses = (ArrayList<ExportStudyEventDataBean>) sub.getExportStudyEventData();// *****************
-
+            FormLayoutDAO formLayoutDao = new FormLayoutDAO(dataSource);
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
             StudyEventDefinitionDAO<String, ArrayList> seddao = new StudyEventDefinitionDAO(dataSource);
             CRFDAO crfdao = new CRFDAO(dataSource);
@@ -426,8 +424,19 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     }
                                     // ***************** OpenClinica:Link REASSIGN EVENT CRF **************
 
-                                    // (userRole.director || userRole.coordinator) &&
+                                    // Hide reassign button when there's only one version available
+                                    ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(formLayout.getCrf().getCrfId());
+                                    boolean otherVersionAvailable = false;
+                                    if (versions.size() == 1) {
+                                        for (FormLayoutBean v : versions) {
+                                            if (v.getId() != formLayout.getFormLayoutId()) {
+                                                otherVersionAvailable = true;
+                                                break;
+                                            }
+                                        }
+                                    }
                                     if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
+                                            && (versions.size() > 1 || otherVersionAvailable)
                                             && studyBean.getStatus().equals(Status.AVAILABLE)
                                             && !(studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode()
                                                     || studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode())) {

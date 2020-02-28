@@ -107,7 +107,7 @@
         content: "\e813";
     }
     .actions .icon.icon-reassign:before {
-        content: "\e92f";
+        content: "\e930";
     }
     .actions .icon.icon-restore:before {
         content: "\e817";
