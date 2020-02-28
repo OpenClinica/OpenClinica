@@ -34,7 +34,6 @@ public class SubjectSDVContainer {
     private String numberOfCRFsSDV;
     private String percentageOfCRFsSDV;
     private String group;
-    private String openQueries;
 
     public SubjectSDVContainer() {
         sdvStatus = "";
@@ -56,7 +55,6 @@ public class SubjectSDVContainer {
         numberOfCRFsSDV = "";
         percentageOfCRFsSDV = "";
         group = "";
-        openQueries = "";
     }
 
     public String getStudyEventStatus() {
@@ -201,13 +199,5 @@ public class SubjectSDVContainer {
 
     public void setSdvStatusActions(String sdvStatusActions) {
         this.sdvStatusActions = sdvStatusActions;
-    }
-
-    public String getOpenQueries() {
-        return openQueries;
-    }
-
-    public void setOpenQueries(String openQueries) {
-        this.openQueries = openQueries;
     }
 }

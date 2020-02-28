@@ -5,16 +5,9 @@ import java.util.Date;
 public class SdvItemDTO {
     private String name;
     private String briefDescription;
-    private int ordinal;
-    private boolean isRepeatingGroup;
     private String value;
     private Date lastModifiedDate;
-    private boolean lastModifiedDateHasOnlyDate;
-    private String lastModifiedUserName;
-    private String lastModifiedUserFirstName;
-    private String lastModifiedUserLastName;
-    private String sdvStatus;
-    private int openQueriesCount;
+    private String lastModifiedBy;
 
     public String getName() {
         return name;
@@ -48,67 +41,11 @@ public class SdvItemDTO {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public String getLastModifiedUserName() {
-        return lastModifiedUserName;
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
     }
 
-    public void setLastModifiedUserName(String lastModifiedUserName) {
-        this.lastModifiedUserName = lastModifiedUserName;
-    }
-
-    public String getLastModifiedUserFirstName() {
-        return lastModifiedUserFirstName;
-    }
-
-    public void setLastModifiedUserFirstName(String lastModifiedUserFirstName) {
-        this.lastModifiedUserFirstName = lastModifiedUserFirstName;
-    }
-
-    public String getLastModifiedUserLastName() {
-        return lastModifiedUserLastName;
-    }
-
-    public void setLastModifiedUserLastName(String lastModifiedUserLastName) {
-        this.lastModifiedUserLastName = lastModifiedUserLastName;
-    }
-
-    public String getSdvStatus() {
-        return sdvStatus;
-    }
-
-    public void setSdvStatus(String sdvStatus) {
-        this.sdvStatus = sdvStatus;
-    }
-
-    public int getOrdinal() {
-        return ordinal;
-    }
-
-    public void setOrdinal(int ordinal) {
-        this.ordinal = ordinal;
-    }
-
-    public boolean isRepeatingGroup() {
-        return isRepeatingGroup;
-    }
-
-    public void setRepeatingGroup(boolean repeatingGroup) {
-        isRepeatingGroup = repeatingGroup;
-    }
-
-    public boolean isLastModifiedDateHasOnlyDate() {
-        return lastModifiedDateHasOnlyDate;
-    }
-
-    public void setLastModifiedDateHasOnlyDate(boolean lastModifiedDateHasOnlyDate) {
-        this.lastModifiedDateHasOnlyDate = lastModifiedDateHasOnlyDate;
-    }
-
-    public int getOpenQueriesCount() {
-        return openQueriesCount;
-    }
-
-    public void setOpenQueriesCount(int openQueriesCount) {
-        this.openQueriesCount = openQueriesCount;
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 }

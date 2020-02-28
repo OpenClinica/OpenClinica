@@ -285,7 +285,10 @@ public class QueryServiceImpl implements QueryService {
         return itemData;
     }
 
-
+    private DiscrepancyNote findQueryParent(ItemData itemData, int noteTypeId) {
+        DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(itemData.getItemDataId(), noteTypeId);
+        return parentDiscrepancyNote;
+    }
 
     private List<DiscrepancyNote> findChildQueries(ItemData itemData) {
         List<DiscrepancyNote> childDiscrepancyNotes = discrepancyNoteDao.findChildQueriesByItemData(itemData.getItemDataId());

@@ -67,7 +67,6 @@ public class UtilServiceImpl implements UtilService {
         studyBuildService.setRequestSchemaByStudy(studyOid);
     }
 
-
     public String getCustomerUuidFromRequest(HttpServletRequest request) {
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
         return (String) userContextMap.get("customerUuid");

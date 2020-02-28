@@ -32,7 +32,6 @@ import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.beanutils.BeanUtils;
 import core.org.akaza.openclinica.bean.admin.AuditBean;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
@@ -1498,14 +1497,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     ssb.setUpdatedDate(new Date());
                     studySubjectDao.update(ssb);
                 }
-                if (ecb.getSdvStatus() == SdvStatus.VERIFIED && changedItemsList.size() > 0) {
+                if (ecb.isSdvStatus() && changedItemsList.size() > 0) {
                     LOGGER.debug("Status of Study Subject is SDV we are updating");
                     StudySubjectDAO studySubjectDao = new StudySubjectDAO(getDataSource());
                     ssb.setStatus(Status.AVAILABLE);
                     ssb.setUpdater(ub);
                     ssb.setUpdatedDate(new Date());
                     studySubjectDao.update(ssb);
-                    ecb.setSdvStatus(SdvStatus.CHANGED_AFTER_VERIFIED);
+                    ecb.setSdvStatus(false);
                     ecb.setSdvUpdateId(ub.getId());
                 }
 

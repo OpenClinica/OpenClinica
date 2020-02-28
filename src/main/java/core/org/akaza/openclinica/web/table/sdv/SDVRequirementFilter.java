@@ -16,7 +16,7 @@ public class SDVRequirementFilter extends DroplistFilterEditor {
     @Override
     protected List<Option> getOptions() {
         List<Option> options = new ArrayList<Option>();
-        String optionA = SourceDataVerification.AllREQUIRED.toString() + " + " + SourceDataVerification.PARTIALREQUIRED.toString();
+        String optionA = SourceDataVerification.AllREQUIRED.toString() + " & " + SourceDataVerification.PARTIALREQUIRED.toString();
         options.add(new Option(optionA, optionA));
         for (SourceDataVerification sdv : SourceDataVerification.values()) {
             if (sdv != SourceDataVerification.NOTAPPLICABLE) {

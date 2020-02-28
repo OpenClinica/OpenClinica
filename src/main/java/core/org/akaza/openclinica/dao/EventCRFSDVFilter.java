@@ -3,7 +3,6 @@ package core.org.akaza.openclinica.dao;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -47,29 +46,21 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         value = StringEscapeUtils.escapeSql(value.toString());
         if (value != null) {
             if (property.equals("sdvStatus")) {
-                ArrayList<String> sdvStatusFilterArray = new ArrayList<>();
-                String sdvStatusString = value.toString().trim();
-                if(sdvStatusString.contains("+")){
-                    for(String sdvStatus: sdvStatusString.split("\\+")){
-                        sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatus.trim()).toString());
-                    }
+                String dbType = CoreResources.getDBName();
+                String theTrue = dbType.equals("postgres") ? " true " : " 1 ";
+                String theFalse = dbType.equals("postgres") ? " false " : " 0 ";
+                if (value.equals("complete")) {
+                    criteria = criteria + " and ";
+                    criteria = criteria + " " + columnMapping.get(property) + " = " + theTrue;
+                } else {
+                    criteria = criteria + " and ";
+                    criteria = criteria + " " + columnMapping.get(property) + " = " + theFalse;
                 }
-                else
-                    sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatusString).toString());
-                criteria = criteria + " and (";
-
-                for(int i = 0 ; i < sdvStatusFilterArray.size(); i++){
-                    if(i == 0)
-                        criteria = criteria + " " + columnMapping.get(property) + " = '" + sdvStatusFilterArray.get(i) + "'";
-                    else
-                        criteria = criteria + " or " + columnMapping.get(property) + " = '" + sdvStatusFilterArray.get(i) + "'";
-                }
-                criteria = criteria +" ) ";
             } else if (property.equals("sdvRequirementDefinition")) {
                 ArrayList<Integer> reqs = new ArrayList<Integer>();
                 String sdvRequirement = value.toString().trim();
-                if (sdvRequirement.contains("+")) {
-                    for (String requirement : sdvRequirement.split("\\+")) {
+                if (sdvRequirement.contains("&")) {
+                    for (String requirement : sdvRequirement.split("&")) {
                         reqs.add(SourceDataVerification.getByI18nDescription(requirement.trim()).getCode());
                     }
                 } else {

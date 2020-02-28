@@ -1,6 +1,5 @@
 package core.org.akaza.openclinica.web.rest.client.auth.impl;
 
-import core.org.akaza.openclinica.dao.core.CoreResources;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.admin.client.Keycloak;
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,13 +18,12 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Configuration
+@PropertySource("classpath:auth.properties")
 public class KeycloakConfig {
-
-
-    private String authBaseUrl;
-    private String authRealm;
-    private String authClientId;
-    private String authClientSecret;
+    @Value("${auth.base-url}") private String authBaseUrl;
+    @Value("${auth.realm}") private String authRealm;
+    @Value("${auth.client-id}") private String authClientId;
+    @Value("${auth.client-secret}") private String authClientSecret;
 
     private static final int CONNECTION_POOL_SIZE = 10;
     public static final long CONNECTION_TTL = 60000;
@@ -34,12 +31,6 @@ public class KeycloakConfig {
 
     @Bean
     public Keycloak Keycloak() {
-
-        Properties authProperties = CoreResources.loadProperties("auth.properties");
-        authBaseUrl= authProperties.getProperty("auth.base-url");
-        authRealm= authProperties.getProperty("auth.realm");
-        authClientId= authProperties.getProperty("auth.client-id");
-        authClientSecret= authProperties.getProperty("auth.client-secret");
         ResteasyClient resteasyClient = new ResteasyClientBuilder()
                 .connectionPoolSize(CONNECTION_POOL_SIZE)
                 .connectionTTL(CONNECTION_TTL, TimeUnit.MILLISECONDS)

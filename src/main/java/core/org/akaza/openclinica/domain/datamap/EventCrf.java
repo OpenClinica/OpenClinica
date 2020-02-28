@@ -5,12 +5,23 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -44,13 +55,12 @@ public class EventCrf extends DataMapDomainObject {
     private Date dateUpdated;
     private Integer updateId;
     private Boolean electronicSignatureStatus;
-//    private boolean sdvStatus;
-    private SdvStatus sdvStatus;
+    private boolean sdvStatus;
     private Integer oldStatusId;
     private Integer sdvUpdateId;
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
-    private Date lastSdvVerifiedDate;
+    
     static Comparator<EventCrf> compareByOrdinal;
     public EventCrf() {
     }
@@ -59,7 +69,7 @@ public class EventCrf extends DataMapDomainObject {
         this.eventCrfId = eventCrfId;
     }
 
-    public EventCrf(int eventCrfId, SdvStatus sdvStatus) {
+    public EventCrf(int eventCrfId, boolean sdvStatus) {
         this.eventCrfId = eventCrfId;
         this.sdvStatus = sdvStatus;
     }
@@ -67,8 +77,8 @@ public class EventCrf extends DataMapDomainObject {
     public EventCrf(int eventCrfId, UserAccount userAccount, CompletionStatus completionStatus, StudyEvent studyEvent, StudySubject studySubject,
             CrfVersion crfVersion, Integer statusId, Date dateInterviewed, String interviewerName, String annotations, Date dateCompleted, Integer validatorId,
             Date dateValidate, Date dateValidateCompleted, String validatorAnnotations, String validateString, Date dateCreated, Date dateUpdated,
-            Integer updateId, Boolean electronicSignatureStatus, SdvStatus sdvStatus, Integer oldStatusId, Integer sdvUpdateId,
-            List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas, FormLayout formLayout, Date lastSdvVerifiedDate) {
+            Integer updateId, Boolean electronicSignatureStatus, boolean sdvStatus, Integer oldStatusId, Integer sdvUpdateId,
+            List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas, FormLayout formLayout) {
         this.eventCrfId = eventCrfId;
         this.userAccount = userAccount;
         this.completionStatus = completionStatus;
@@ -95,7 +105,6 @@ public class EventCrf extends DataMapDomainObject {
         this.dnEventCrfMaps = dnEventCrfMaps;
         this.itemDatas = itemDatas;
         this.formLayout = formLayout;
-        this.lastSdvVerifiedDate = lastSdvVerifiedDate;
     }
 
     @Id
@@ -295,13 +304,12 @@ public class EventCrf extends DataMapDomainObject {
         this.electronicSignatureStatus = electronicSignatureStatus;
     }
 
-    @Enumerated( EnumType.STRING )
     @Column(name = "sdv_status", nullable = false)
-    public SdvStatus getSdvStatus() {
+    public boolean isSdvStatus() {
         return this.sdvStatus;
     }
 
-    public void setSdvStatus(SdvStatus sdvStatus) {
+    public void setSdvStatus(boolean sdvStatus) {
         this.sdvStatus = sdvStatus;
     }
 
@@ -351,18 +359,9 @@ public class EventCrf extends DataMapDomainObject {
     public void setFormLayout(FormLayout formLayout) {
         this.formLayout = formLayout;
     }
+   
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "date_last_sdv_verified", length = 8)
-    public Date getLastSdvVerifiedDate() {
-        return lastSdvVerifiedDate;
-    }
-
-    public void setLastSdvVerifiedDate(Date lastSdvVerifiedDate) {
-        this.lastSdvVerifiedDate = lastSdvVerifiedDate;
-    }
-
-    public static Comparator<EventCrf> getCompareByOrdinal() {
+	public static Comparator<EventCrf> getCompareByOrdinal() {
 		if(compareByOrdinal != null) {
 			return compareByOrdinal;
 		}else {

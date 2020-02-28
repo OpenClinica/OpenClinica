@@ -55,6 +55,4 @@ public interface StudyBuildService {
     Boolean isPublicStudySameAsTenantStudy(Study tenantStudy, String publicStudyOID);
 
     public void setRequestSchemaByStudy(String ocId);
-
-    public void setRequestSchemaByStudyOrParentStudy(String ocId);
 }

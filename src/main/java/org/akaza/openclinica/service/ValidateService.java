@@ -54,8 +54,6 @@ public interface ValidateService {
 
     boolean isUserHas_DM_DEP_DS_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOid);
 
-    boolean isUserHas_DM_MON_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOID);
-
     void validateStudyAndRoles(String studyOid,  UserAccountBean userAccountBean);
      void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean);
      void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includePII);
@@ -65,13 +63,5 @@ public interface ValidateService {
     
     void validateStudyAndRolesForPdfCaseBook(String studyOid, String siteOid, UserAccountBean userAccountBean);
 
-    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int ordinal);
 
-    boolean isCrfPresent(String formOid);
-
-    boolean isEventPresent( String studyEventOid);
-
-    boolean isEventOidAndParticipantIdAreLinked( String studyEventOid, int studySubjectId, int ordinal);
-
-    boolean isStudySubjectPresent(String studySubjectLabel,Study study);
     }

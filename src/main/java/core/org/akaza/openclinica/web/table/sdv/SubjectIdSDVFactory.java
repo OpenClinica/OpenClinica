@@ -23,7 +23,6 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
@@ -359,7 +358,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
         for (EventCRFBean eventBean : eventCRFBeans) {
 
-            if (eventBean.getSdvStatus() == SdvStatus.VERIFIED) {
+            if (eventBean.isSdvStatus()) {
                 counter++;
             }
 
@@ -392,7 +391,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
                 numberOfCompletedEventCRFs++;
             }*/
             // get number of completed event SDVd events
-            if (eventBean.getSdvStatus() == SdvStatus.VERIFIED) {
+            if (eventBean.isSdvStatus()) {
                 numberOfSDVdEventCRFs++;
             }
             // get number of all non SDVd events that are 100% or partial required
@@ -408,7 +407,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
                 partialOrHundred = true;
             }
             if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)
-                && eventBean.getSdvStatus() != SdvStatus.VERIFIED && (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED)) {
+                && eventBean.isSdvStatus() == false && (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED)) {
                 areEventCRFsSDVd = 1;
             }
 

@@ -58,7 +58,6 @@ import core.org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer
 import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.crfdata.ImportCRFDataService;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.lang.StringUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
@@ -691,9 +690,9 @@ public class ImportSpringJob extends QuartzJobBean {
 
                         }
                         itemDataDao.setFormatDates(true);
-                        // Alter the SDV status if item data has been changed or added
-                        if (eventCrfBean != null && resetSDV && eventCrfBean.getSdvStatus() == SdvStatus.VERIFIED)
-                            eventCrfDao.setSDVStatus(SdvStatus.CHANGED_AFTER_VERIFIED, ub.getId(), eventCrfBean.getId());
+                        // Reset the SDV status if item data has been changed or added
+                        if (eventCrfBean != null && resetSDV)
+                            eventCrfDao.setSDVStatus(false, ub.getId(), eventCrfBean.getId());
                     }
                 }
                 // msg.append("===+");

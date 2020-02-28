@@ -4,7 +4,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.service.JobService;
 import core.org.akaza.openclinica.service.UtilService;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
@@ -643,7 +643,7 @@ public class ImportServiceImpl implements ImportService {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
-        eventCrf.setSdvStatus(SdvStatus.NOT_VERIFIED);
+       
         logger.debug("Creating new Event Crf");
 
         return eventCrf;

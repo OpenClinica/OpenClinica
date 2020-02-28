@@ -57,7 +57,6 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
@@ -927,12 +926,12 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 studySubject.setUpdatedDate(new Date());
                 studySubjectDAO.update(studySubject);
             }
-            if (ec.getSdvStatus() == SdvStatus.VERIFIED) {
+            if (ec.isSdvStatus()) {
                 studySubject.setStatus(Status.AVAILABLE);
                 studySubject.setUpdater(ub);
                 studySubject.setUpdatedDate(new Date());
                 studySubjectDAO.update(studySubject);
-                ec.setSdvStatus(SdvStatus.CHANGED_AFTER_VERIFIED);
+                ec.setSdvStatus(false);
                 ec.setSdvUpdateId(ub.getId());
                 ecdao.update(ec);
             }

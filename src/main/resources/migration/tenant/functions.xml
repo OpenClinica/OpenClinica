@@ -843,7 +843,8 @@
             SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
             SELECT INTO entity_name_value ''EventCRF SDV Status'';
             INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id ,study_event_id, event_crf_version_id)
-            VALUES (pk, ''32'', now(), NEW.sdv_update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.sdv_status, NEW.sdv_status, NEW.event_crf_id , NEW.study_event_id ,NEW.form_layout_id);
+            VALUES (pk, ''32'', now(), NEW.sdv_update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, (select case when OLD.sdv_status is true then ''TRUE'' else ''FALSE'' end),
+            (select case when NEW.sdv_status is true then ''TRUE'' else ''FALSE'' end), NEW.event_crf_id , NEW.study_event_id ,NEW.form_layout_id);
             /*---------------*/
             END IF;
             RETURN NULL;  /*return values ignored for ''after'' triggers*/

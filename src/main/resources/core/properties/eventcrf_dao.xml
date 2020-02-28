@@ -290,7 +290,7 @@
              where
              ec.study_event_id = se.study_event_id AND
              ( se.subject_event_status_id = 4 or se.subject_event_status_id = 7 ) AND
-             (ec.sdv_status = 'NOT_VERIFIED' or ec.sdv_status = 'CHANGED_AFTER_VERIFIED') AND
+             ec.sdv_status = false AND
              ec.study_subject_id = ?
         </sql>
     </query>

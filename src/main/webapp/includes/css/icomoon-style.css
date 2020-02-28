@@ -1,11 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-
-  src:  url('../fonts/icomoon.eot?ayqyno');
-  src:  url('../fonts/icomoon.eot?ayqyno#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?ayqyno') format('truetype'),
-    url('../fonts/icomoon.woff?ayqyno') format('woff'),
-    url('../fonts/icomoon.svg?ayqyno#icomoon') format('svg');
+  src:  url('../fonts/icomoon.eot?37gwv7');
+  src:  url('../fonts/icomoon.eot?37gwv7#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?37gwv7') format('truetype'),
+    url('../fonts/icomoon.woff?37gwv7') format('woff'),
+    url('../fonts/icomoon.svg?37gwv7#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -25,10 +24,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-icon-sdv-change-status:before {
-  content: "\e900";
-  color: #ED7800;
-  display: inline-block;
+.icon-doc-text-solid:before {
+  content: "\e901";
 }
 .icon-doc:before {
   content: "\e80f";
@@ -75,9 +72,6 @@
 .icon-print:before {
   content: "\e81d";
 }
-.icon-doc-text-solid:before {
-  content: "\e901";
-}
 .icon-icon-sdv-text:before {
   content: "\e919";
 }
@@ -102,9 +96,6 @@
 .icon-icon-newVersion:before {
   content: "\e921";
 }
-.icon-sdv-item-form:before {
-  content: "\e922";
-}
 .icon-icon-unArchive:before {
   content: "\e925";
 }
@@ -114,41 +105,41 @@
 .icon-icon-doubleDataEntry:before {
   content: "\e927";
 }
+.icon-caret-right:before {
+  content: "\e928";
+}
 .icon-caret-right-blue:before {
   content: "\e928";
 }
-.icon-caret-right:before {
+.icon-caret-left:before {
   content: "\e929";
 }
-.icon-caret-left:before {
+.icon-caret-up:before {
   content: "\e92a";
 }
-.icon-caret-up:before {
+.icon-caret-down:before {
   content: "\e92b";
 }
-.icon-caret-down:before {
+.icon-question-circle:before {
   content: "\e92c";
 }
-.icon-question-circle:before {
+.icon-question:before {
   content: "\e92d";
 }
-.icon-question:before {
+.icon-archive:before {
   content: "\e92e";
 }
-.icon-archive:before {
+.icon-icon-reassign3:before {
   content: "\e92f";
 }
-.icon-icon-reassign3:before {
+.icon-minus-square-o:before {
   content: "\e930";
 }
 .icon-icon-SDV-doubleCheck:before {
   content: "\e931";
 }
-.icon-minus-square-o:before {
-  content: "\e932";
-}
 .icon-doc-text-half:before {
-  content: "\e933";
+  content: "\e932";
 }
 .icon-clock:before {
   content: "\e950";
