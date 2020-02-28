@@ -1945,7 +1945,7 @@
 
         jQuery('#participateAccess').click(function() {
             getAccessCode("N");
-            $('#eye, #audit-warning').show();
+            $('#eye').show();
             $('#btn-copy, #copy-result, #qrcode').hide();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
@@ -1970,9 +1970,10 @@
 
         jQuery('#eye').click(function() {
             getAccessCode("Y");
-            $('#eye, #audit-warning').hide();
-            $('#btn-copy, #copy-result, #qrcode').show();
+            $(this).hide();
             $('#access-code-input').attr('type', 'text');
+            $('#audit-warning').hide();
+            $('#btn-copy, #qrcode').show();
         });
      });
 
