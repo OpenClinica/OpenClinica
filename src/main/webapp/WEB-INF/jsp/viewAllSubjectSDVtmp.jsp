@@ -190,6 +190,7 @@
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
 
 <style>
@@ -326,7 +327,7 @@
   });
 
   function clearFilter() {
-    itemsTable.order([]);
+    jQuery('#sdv-items').dataTable().fnSortNeutral();
   }
   clearFilter();
 
