@@ -160,7 +160,7 @@ public class PdfServiceImpl implements PdfService {
             
             float stringHeight = fontSize; 
             float headerCenterX = rotate ? 5 : stringHeight+ 5;
-            float headerCenterY = rotate ? stringHeight+ 5 :  pageHeight - stringHeight;
+            float headerCenterY = (float) (rotate ? stringHeight+ 10 :  pageHeight - stringHeight*1.4);
 
             // append the content to the existing stream
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page, true, true, true))

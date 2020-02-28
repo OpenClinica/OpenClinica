@@ -211,7 +211,8 @@ public class EnterDataForStudyEventServlet extends SecureController {
         request.setAttribute("eventCRF", ecb);
         // Make available the study
         request.setAttribute("study", currentStudy);
-
+        Study subjectStudy= getStudyDao().findByPK(studySubjectBean.getStudyId());
+        request.setAttribute("subjectStudy" ,subjectStudy);
         forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT);
     }
 

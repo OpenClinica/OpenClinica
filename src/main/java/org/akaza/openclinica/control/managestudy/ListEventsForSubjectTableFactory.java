@@ -253,8 +253,13 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
                     EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
                     if (eventCRFBean != null) {
-                        d.getProps().put("crf_" + crf.getId(), eventCRFBean.getStage());
                         d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
+                        FormLayoutBean formLayoutBean= (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
+                        if(formLayoutBean.getStatus().equals(Status.LOCKED)) {
+                            d.getProps().put("crf_" + crf.getId(), DataEntryStage.LOCKED);
+                        }else {
+                            d.getProps().put("crf_" + crf.getId(), eventCRFBean.getStage());
+                        }
 
                     } else {
                         d.getProps().put("crf_" + crf.getId(), DataEntryStage.UNCOMPLETED);
@@ -744,7 +749,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 }
 
                 EventCrfLayerBuilder eventCrfLayerBuilder = new EventCrfLayerBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents,
-                        dataEntryStage, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path);
+                        dataEntryStage, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path,studyDao);
 
                 url.append(eventCrfLayerBuilder.buid());
                 url.append("<span class='" + crfColumnImageIconPaths.get(dataEntryStage.getId()) + "' border='0'>");
@@ -760,19 +765,20 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
             StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
+           Study subjectStudy = studyDao.findByPK(studySubjectBean.getStudyId());
             Integer studySubjectId = studySubjectBean.getId();
             if (studySubjectId != null) {
                 StringBuilder url = new StringBuilder();
 
                 url.append(viewStudySubjectLinkBuilder(studySubjectBean));
                 if (getCurrentRole().getRole() != Role.MONITOR) {
-                    if (getStudyBean().getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED) {
+                    if (subjectStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED) {
                         url.append(removeStudySubjectLinkBuilder(studySubjectBean));
                     }
-                    if (getStudyBean().getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE && studySubjectBean.getStatus() == Status.DELETED) {
+                    if (subjectStudy.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE && studySubjectBean.getStatus() == Status.DELETED) {
                         url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
                     }
-                    if (getStudyBean().getStatus() == core.org.akaza.openclinica.domain.Status
+                    if (subjectStudy.getStatus() == core.org.akaza.openclinica.domain.Status
                             .AVAILABLE && studySubjectBean.getStatus() == Status.AVAILABLE) {
                         if (currentRole.getRole() != Role.INVESTIGATOR && currentRole.getRole() != Role.RESEARCHASSISTANT
                                 && currentRole.getRole() != Role.RESEARCHASSISTANT2) {
