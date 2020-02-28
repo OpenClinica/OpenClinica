@@ -3,7 +3,6 @@ package org.akaza.openclinica.controller.dto;
 import java.util.Date;
 
 public class SdvItemDTO {
-    private int dataId;
     private String name;
     private String briefDescription;
     private int ordinal;
@@ -16,14 +15,6 @@ public class SdvItemDTO {
     private String lastModifiedUserLastName;
     private String sdvStatus;
     private int openQueriesCount;
-
-    public int getDataId() {
-        return dataId;
-    }
-
-    public void setDataId(int dataId) {
-        this.dataId = dataId;
-    }
 
     public String getName() {
         return name;

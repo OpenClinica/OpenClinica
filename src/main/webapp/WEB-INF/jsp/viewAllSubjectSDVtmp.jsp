@@ -119,7 +119,6 @@
         formObj.crfId.value=crfId;
         formObj.submit();
     }
-
 </script>
 <div id="subjectSDV">
     <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
@@ -337,6 +336,7 @@
     return trans[str] || str;
   }
 
+
   function formatDate(date) {
     date = moment(date);
     if (date.hours === 0 && date.minutes === 0 && date.seconds === 0) {
@@ -347,8 +347,8 @@
     }
   }
 
-  $('#sdv').on('click', '.popupSdv', function() {
-    var data = $(this).data();
+  function popupSdv(item) {
+    var data = $(item).data();
     var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
     
     function getItems() {
@@ -370,6 +370,8 @@
         $('#sdvStatus').text(data.sdvStatus);
 
         itemsTable.rows.add(data.sdvItems.map(function(item) {
+          console.log(item);
+
           item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
           if (item.repeatingGroup) {
             item.briefDescriptionItemName += ' ' + item.ordinal;
@@ -386,14 +388,9 @@
             item.lastVerifiedDate = formatDate(item.lastVerifiedDate);
           }
           item.lastModifiedDate = formatDate(item.lastModifiedDate);
+
           item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
-
-          item.actions = 
-            '<a title="View Form" class="icon icon-view-within" href="ResolveDiscrepancy?itemDataId=' + 
-              item.dataId + '&flavor=-query' +
-            '"></a>';
-
-          console.log(item);
+          item.actions = '<a href="#" title="View Form" class="icon icon-view-within"></a>';
           return item;
         }));
         itemsTable.draw();
@@ -413,12 +410,12 @@
       getItems();
     }).change();
 
-    var verifyButton = $(this).siblings()[3];
+    var verifyButton = $(item).siblings()[3];
     $('#sdvVerify').off('click').click(function() {
       $(verifyButton).click();
     });
 
     jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
-  });
+  }
 
 </script>
