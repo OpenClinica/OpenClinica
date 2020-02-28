@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<jsp:useBean class="org.apache.commons.lang.StringEscapeUtils" id="esc" />
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
@@ -94,7 +93,7 @@
         <c:choose>
             <c:when test='${subjectStudy.study != null && subjectStudy.study.studyId > 0}'>
                 // site level
-                var url = '/studies/${subjectStudy.study.oc_oid}/sites/${esc.escapeJavaScript(subjectStudy.oc_oid)}';
+                var url = '/studies/${subjectStudy.study.oc_oid}/sites/${subjectStudy.oc_oid}';
             </c:when>
             <c:otherwise>
                 // study level
@@ -103,7 +102,7 @@
         </c:choose>
         jQuery.ajax({
             'type': 'POST',
-            'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata' + url + '/participants/${esc.escapeJavaScript(studySub.label)}/casebook',
+            'url': '${pageContext.request.contextPath}/pages/auth/api/clinicaldata' + url + '/participants/${studySub.label}/casebook',
             'contentType': 'application/json',
             'dataType': 'json',
             'data': {}
