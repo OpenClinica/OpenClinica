@@ -3,18 +3,11 @@ package core.org.akaza.openclinica.web.table.sdv;
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -33,9 +26,13 @@ import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.control.DefaultActionsEditor;
+import org.akaza.openclinica.controller.dto.SdvDTO;
+import org.akaza.openclinica.controller.dto.SdvItemDTO;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SDVToolbar;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
@@ -54,6 +51,9 @@ import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.checkerframework.checker.units.qual.A;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
@@ -82,6 +82,20 @@ import org.springframework.validation.BindingResult;
 public class SDVUtil {
 
     private StudyDao studyDao;
+    @Autowired
+    private EventCrfDao eventCrfDao;
+    @Autowired
+    private ItemDao itemDao;
+    @Autowired
+    private ItemDataDao itemDataDao;
+    @Autowired
+    private DiscrepancyNoteDao discrepancyNoteDao;
+    @Autowired
+    private ItemGroupMetadataDao itemGroupMetadataDao;
+    @Autowired
+    private UserAccountDao userAccountDao;
+    @Autowired
+    private EventDefinitionCrfDao eventDefinitionCrfDao;
     private static final Logger logger= LoggerFactory.getLogger(SDVUtil.class);
     private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
     private final static String VIEW_ICON_FORSUBJECT_SUFFIX = "\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-serach\" name=\"bt_View1\"/></a>";
@@ -91,12 +105,10 @@ public class SDVUtil {
     public final static String CHECKBOX_NAME = "sdvCheck_";
     public final static String VIEW_ICON_HTML = "<span class=\"icon icon-search\" border=\"0>";
     private ResourceBundle resformat;
+    private ResourceBundle resWords;
+    private final static String FORM_LOCKED_ICON_CLASS_NAME = "icon icon-lock";
+    private final static String FORM_COMPLETED_ICON_CLASS_NAME = "icon icon-checkbox-checked green";
     private String pathPrefix;
-
-    String getIconForSdvStatusPrefix() {
-        String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "<span hspace='2' border='0'  title='SDV Complete' alt='SDV Complete' class='icon icon-icon-SDV-doubleCheck'>";
-    }
 
     String getIconForCrfStatusPrefix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
@@ -113,18 +125,19 @@ public class SDVUtil {
         return "<span src=\"icon icon-search\" border=\"0\" />";
     }
 
-    public final static Map<Integer, String> SUBJECT_EVENT_STATUS_ICONS = new HashMap<Integer, String>();
+    public final static Map<core.org.akaza.openclinica.domain.datamap.SubjectEventStatus, String> SUBJECT_EVENT_STATUS_ICONS = new HashMap<core.org.akaza.openclinica.domain.datamap.SubjectEventStatus, String>();
     public final static Map<Integer, String> CRF_STATUS_ICONS = new HashMap<Integer, String>();
     static {
-        SUBJECT_EVENT_STATUS_ICONS.put(0, "Invalid");
-        SUBJECT_EVENT_STATUS_ICONS.put(1, "Scheduled");
-        SUBJECT_EVENT_STATUS_ICONS.put(2, "NotStarted");
-        SUBJECT_EVENT_STATUS_ICONS.put(3, "InitialDE");
-        SUBJECT_EVENT_STATUS_ICONS.put(4, "DEcomplete");
-        SUBJECT_EVENT_STATUS_ICONS.put(5, "Stopped");
-        SUBJECT_EVENT_STATUS_ICONS.put(6, "Skipped");
-        SUBJECT_EVENT_STATUS_ICONS.put(7, "Locked");
-        SUBJECT_EVENT_STATUS_ICONS.put(8, "Signed");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.INVALID, "icon icon-doc");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SCHEDULED, "icon icon-clock2");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.NOT_SCHEDULED, "icon icon-clock");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.DATA_ENTRY_STARTED,  "icon icon-pencil-squared orange");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.COMPLETED, "icon icon-checkbox-checked green");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.STOPPED, "icon icon-stop-circle red");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SKIPPED, "icon icon-redo");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.LOCKED, "icon icon-lock");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SIGNED, "icon con-icon-sign green");
+
 
         CRF_STATUS_ICONS.put(0, "icon icon-file-excel red");
         CRF_STATUS_ICONS.put(1, "icon icon-doc");
@@ -135,6 +148,8 @@ public class SDVUtil {
         CRF_STATUS_ICONS.put(6, "icon icon-pencil-squared orange");
         CRF_STATUS_ICONS.put(7, "icon icon-lock");
     }
+
+
 
     private DataSource dataSource;
 
@@ -258,14 +273,14 @@ public class SDVUtil {
          * Limit limit = tableFacade.getLimit();
          * FilterSet filterSet = limit.getFilterSet();
          * int totalRows = getTotalRowCount(filterSet, studyId);
-         * 
+         *
          * tableFacade.setTotalRows(totalRows);
          * SortSet sortSet = limit.getSortSet();
          * int rowStart = limit.getRowSelect().getRowStart();
          * int rowEnd = limit.getRowSelect().getRowEnd();
          * Collection<SubjectSDVContainer> items = getFilteredItems(filterSet, sortSet, rowStart, rowEnd, studyId,
          * request);
-         * 
+         *
          * tableFacade.setItems(items);
          */
     }
@@ -317,10 +332,10 @@ public class SDVUtil {
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         /*
          * StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-         * 
+         *
          * StudyDAO studyDAO = new StudyDAO(dataSource);
          * StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
-         * 
+         *
          * String label = "";
          * String eventName = "";
          * String eventDate = "";
@@ -329,23 +344,23 @@ public class SDVUtil {
          * String studyIdentifier = "";
          * String sdvRequirement = "";
          * SourceDataVerification sourceDataVerification = null;
-         * 
+         *
          * if (filterSet.getFilter("studySubjectId") != null) {
-         * 
+         *
          * label = filterSet.getFilter("studySubjectId").getValue().trim();
          * eventCRFBeans = eventCRFDAO.getEventCRFsByStudySubjectLabelLimit(label, studyId, studyId, rowEnd - rowStart,
          * rowStart);
-         * 
+         *
          * } else if (filterSet.getFilter("eventName") != null) {
-         * 
+         *
          * eventName = filterSet.getFilter("eventName").getValue().trim();
          * eventCRFBeans = eventCRFDAO.getEventCRFsByEventNameLimit(eventName, rowEnd - rowStart, rowStart);
-         * 
+         *
          * } else if (filterSet.getFilter("eventDate") != null) {
-         * 
+         *
          * eventDate = filterSet.getFilter("eventDate").getValue().trim();
          * eventCRFBeans = eventCRFDAO.getEventCRFsByEventDateLimit(studyId, eventDate, rowEnd - rowStart, rowStart);
-         * 
+         *
          * } else if (filterSet.getFilter("crfStatus") != null) {
          * //
          * //SubjectEventStatus.getSubjectEventStatusIdByName(crfStatus)
@@ -353,21 +368,21 @@ public class SDVUtil {
          * //Get the study event for the event crf
          * eventCRFBeans = eventCRFDAO.getEventCRFsByCRFStatus(studyId, Integer.parseInt(crfStatus), rowEnd - rowStart,
          * rowStart);
-         * 
+         *
          * } else if (filterSet.getFilter("sdvStatus") != null) {
-         * 
+         *
          * sdvStatus = filterSet.getFilter("sdvStatus").getValue().trim();
          * eventCRFBeans = eventCRFDAO.getEventCRFsByStudySDV(studyId, ("complete".equalsIgnoreCase(sdvStatus)), rowEnd
          * - rowStart, rowStart);
-         * 
+         *
          * } else if (filterSet.getFilter("studyIdentifier") != null) {
-         * 
+         *
          * studyIdentifier = filterSet.getFilter("studyIdentifier").getValue().trim();
          * eventCRFBeans = eventCRFDAO.getEventCRFsByStudyIdentifier(studyId, studyId, studyIdentifier, rowEnd -
          * rowStart, rowStart);
-         * 
+         *
          * } else if (filterSet.getFilter("sdvRequirementDefinition") != null) {
-         * 
+         *
          * ArrayList<Integer> reqs = new ArrayList<Integer>();
          * sdvRequirement = filterSet.getFilter("sdvRequirementDefinition").getValue().trim();
          * if (sdvRequirement.contains("&")) {
@@ -382,10 +397,10 @@ public class SDVUtil {
          * eventCRFBeans = eventCRFDAO.getEventCRFsBySDVRequirement(studyId, studyId, rowEnd - rowStart, rowStart,
          * reqs.toArray(a));
          * }
-         * 
+         *
          * } else {
          * eventCRFBeans = eventCRFDAO.getEventCRFsByStudy(studyId, studyId, rowEnd - rowStart, rowStart);
-         * 
+         *
          * }
          */
         eventCRFBeans = eventCRFDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd ,permissionTags);
@@ -448,14 +463,14 @@ public class SDVUtil {
 
     /*
      * private int getTotalRowCount(FilterSet filterSet, int studyId) {
-     * 
-     * 
+     *
+     *
      * EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-     * 
+     *
      * if (filterSet.getFilters().size() == 0) {
      * return eventCRFDAO.countEventCRFsByStudy(studyId, studyId);
      * }
-     * 
+     *
      * int count = 0;
      * //Filter for study subject label
      * StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -469,9 +484,9 @@ public class SDVUtil {
      * String sdvStatus = "";
      * String studyIdentifier = "";
      * String sdvRequirement = "";
-     * 
+     *
      * for (Filter filter : filterSet.getFilters()) {
-     * 
+     *
      * if (filter.getProperty().equalsIgnoreCase("studySubjectId")) {
      * subjectValue = filter.getValue();
      * continue;
@@ -480,40 +495,40 @@ public class SDVUtil {
      * eventNameValue = filter.getValue();
      * continue;
      * }
-     * 
+     *
      * if (filter.getProperty().equalsIgnoreCase("eventDate")) {
      * eventDateValue = filter.getValue();
      * continue;
      * }
-     * 
+     *
      * if (filter.getProperty().equalsIgnoreCase("crfStatus")) {
      * crfStatus = filter.getValue();
      * continue;
      * }
-     * 
+     *
      * if (filter.getProperty().equalsIgnoreCase("sdvStatus")) {
      * sdvStatus = filter.getValue();
      * }
-     * 
+     *
      * if (filter.getProperty().equalsIgnoreCase("studyIdentifier")) {
      * studyIdentifier = filter.getValue();
      * }
-     * 
+     *
      * if (filter.getProperty().equalsIgnoreCase("sdvRequirementDefinition")) {
      * sdvRequirement = filter.getValue();
      * }
      * }
-     * 
+     *
      * SourceDataVerification sourceDataVerification = null;
-     * 
+     *
      * if (subjectValue.length() > 0) {
      * return eventCRFDAO.countEventCRFsByStudySubjectLabel(subjectValue, studyId, studyId);
      * }
-     * 
+     *
      * if (eventNameValue.length() > 0) {
      * return eventCRFDAO.countEventCRFsByEventName(eventNameValue);
      * }
-     * 
+     *
      * if (eventDateValue.length() > 0) {
      * return eventCRFDAO.countEventCRFsByEventDate(studyId, eventDateValue);
      * }
@@ -521,15 +536,15 @@ public class SDVUtil {
      * if (crfStatus.length() > 0) {
      * return eventCRFDAO.countEventCRFsByCRFStatus(studyId, Integer.parseInt(crfStatus));
      * }
-     * 
+     *
      * if (sdvStatus.length() > 0) {
      * return eventCRFDAO.countEventCRFsByStudySDV(studyId, ("complete".equalsIgnoreCase(sdvStatus)));
      * }
-     * 
+     *
      * if (studyIdentifier.length() > 0) {
      * return eventCRFDAO.countEventCRFsByStudyIdentifier(studyId, studyId, studyIdentifier);
      * }
-     * 
+     *
      * if (sdvRequirement.length() > 0) {
      * ArrayList<Integer> reqs = new ArrayList<Integer>();
      * if (sdvRequirement.contains("&")) {
@@ -544,7 +559,7 @@ public class SDVUtil {
      * return eventCRFDAO.countEventCRFsBySDVRequirement(studyId, studyId, reqs.toArray(a));
      * }
      * }
-     * 
+     *
      * return eventCRFDAO.countEventCRFsByStudy(studyId, studyId);
      * }
      */
@@ -552,9 +567,9 @@ public class SDVUtil {
     /*
      * public String renderAllEventCRFTable(List<EventCRFBean> eventCRFBeans,
      * HttpServletRequest request){
-     * 
+     *
      * Collection<SubjectSDVContainer> items = getSubjectRows(eventCRFBeans,request);
-     * 
+     *
      * //The number of items represents the total number of returned rows
      * int totalRowCount =0;
      * if(items != null && items.size() > 0) {
@@ -562,33 +577,33 @@ public class SDVUtil {
      * }
      * TableFacade tableFacade = createTableFacade("sdv", request);
      * tableFacade.setStateAttr("restore");
-     * 
+     *
      * String[] allColumns = new String[]{"studySubjectId","personId","secondaryId",
      * "eventName", "eventDate","enrollmentDate","studySubjectStatus","crfNameVersion","crfStatus",
      * "lastUpdatedDate","lastUpdatedBy","sdvStatusActions"};
-     * 
+     *
      * tableFacade.setColumnProperties("studySubjectId","personId","secondaryId",
      * "eventName",
      * "eventDate","enrollmentDate","studySubjectStatus","crfNameVersion","crfStatus",
      * "lastUpdatedDate",
      * "lastUpdatedBy","sdvStatusActions");
-     * 
+     *
      * tableFacade.addFilterMatcher(new MatcherKey(String.class, "studySubjectStatus"),
      * new SubjectStatusMatcher());
      * tableFacade.setItems(items);
-     * 
+     *
      * HtmlRow row = (HtmlRow) tableFacade.getTable().getRow();
      * HtmlColumn studySubjectStatus = row.getColumn("studySubjectStatus");
      * studySubjectStatus.getFilterRenderer().setFilterEditor(new SubjectStatusFilter());
-     * 
-     * 
+     *
+     *
      * //fix HTML in columns
      * setHtmlCellEditors(tableFacade,allColumns,true);
-     * 
-     * 
+     *
+     *
      * //Create the custom toolbar
      * SDVToolbar sDVToolbar = new SDVToolbar();
-     * 
+     *
      * // if(totalRowCount > 0){
      * if(totalRowCount <= 25){
      * sDVToolbar.setMaxRowsIncrements(new int[]{10,15,totalRowCount});}
@@ -598,24 +613,24 @@ public class SDVUtil {
      * sDVToolbar.setMaxRowsIncrements(new int[]{15,50,100});
      * }
      * tableFacade.setToolbar(sDVToolbar);
-     * 
+     *
      * //Fix column titles
      * HtmlTable table = (HtmlTable) tableFacade.getTable();
      * //i18n caption; TODO: convert to Spring messages
      * ResourceBundle resourceBundle = ResourceBundle.getBundle(
      * "core.org.akaza.openclinica.i18n.words",LocaleResolver.getLocale(request));
-     * 
+     *
      * String[] allTitles = {"Study Subject Id","Person Id","Secondary Id" ,"Event Name",
      * "Event Date","Enrollment Date","Subject Status","CRF Name / Version","CRF Status",
      * "Last Updated Date",
      * "Last Updated By","SDV Status / Actions"};
-     * 
+     *
      * setTitles(allTitles,table);
-     * 
+     *
      * //format column dates
      * formatColumns(table,new String[]{"eventDate","enrollmentDate","lastUpdatedDate"},
      * request);
-     * 
+     *
      * table.getTableRenderer().setWidth("800");
      * return tableFacade.render();
      * }
@@ -631,14 +646,13 @@ public class SDVUtil {
         resformat = ResourceBundleProvider.getFormatBundle(LocaleResolver.getLocale(request));
         this.pathPrefix = pathPrefix;
 
-        String[] allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
-                "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
-                "studyEventStatus", "sdvStatusActions" };
+        String[] allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName", "eventDate",
+                "studySubjectStatus", "crfName", "crfVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
+                "subjectEventStatus", "sdvStatusActions" };
 
-        tableFacade.setColumnProperties("sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
-                "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
+        tableFacade.setColumnProperties("sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName", "eventDate",
+                "studySubjectStatus", "crfName", "crfVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "subjectEventStatus",
                 "sdvStatusActions");
-
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "studySubjectStatus"), new SubjectStatusMatcher());
 
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new CrfStatusMatcher());
@@ -646,6 +660,8 @@ public class SDVUtil {
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvStatus"), new SdvStatusMatcher());
 
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvRequirementDefinition"), new SDVRequirementMatcher());
+
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "openQueries"), new OpenQueriesMatcher());
 
         this.setDataAndLimitVariables(tableFacade, studyId, request,permissionTags);
 
@@ -667,16 +683,28 @@ public class SDVUtil {
         HtmlColumn sdvRequirementDefinition = row.getColumn("sdvRequirementDefinition");
         sdvRequirementDefinition.getFilterRenderer().setFilterEditor(new SDVRequirementFilter());
 
+        HtmlColumn subjectEventStatus = row.getColumn("subjectEventStatus");
+        subjectEventStatus.getFilterRenderer().setFilterEditor(new SubjectEventStatusFilter());
+
+        HtmlColumn openQueries = row.getColumn("openQueries");
+        openQueries.getFilterRenderer().setFilterEditor(new OpenQueriesFilter());
+
+        HtmlColumn eventDate = row.getColumn("eventDate");
+        eventDate.setSortable(true);
+
+        HtmlColumn lastUpdatedDate = row.getColumn("lastUpdatedDate");
+        lastUpdatedDate.setSortable(true);
+
         // fix HTML in columns
         setHtmlCellEditors(tableFacade, allColumns, true);
 
         // temporarily disable some of the filters for now
-        turnOffFilters(tableFacade, new String[] { "studySubjectStatus", "crfNameVersion", "lastUpdatedDate",
-                "lastUpdatedBy", "eventDate", "studyEventStatus" });
+        turnOffFilters(tableFacade, new String[] { "studySubjectStatus", "crfName", "crfVersion", "lastUpdatedDate",
+                "lastUpdatedBy", "eventDate" });
 
         turnOffSorts(tableFacade,
-                new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
-                        "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
+                new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "openQueries", "eventName",
+                        "studySubjectStatus", "crfName", "crfVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedBy", "subjectEventStatus",
                         "sdvStatusActions" });
 
         // Create the custom toolbar
@@ -693,16 +721,15 @@ public class SDVUtil {
         ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles = { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"),
-                resword.getString("event_name"), resword.getString("event_date"),
-                resword.getString("subject_status"), resword.getString("CRF_name") + " / " + resword.getString("version"),
+                resword.getString("open_queries"), resword.getString("event_name"), resword.getString("event_date"),
+                resword.getString("subject_status"), resword.getString("CRF_name"), resword.getString("CRF_version"),
                 resword.getString("SDV_requirement"), resword.getString("CRF_status"), resword.getString("last_updated_date"),
-                resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("actions") };
+                resword.getString("last_updated_by"), resword.getString("subject_event_status"), resword.getString("actions") };
 
         setTitles(allTitles, table);
 
         // format column dates
         formatColumns(table, new String[] { "eventDate", "lastUpdatedDate" }, request);
-
         table.getTableRenderer().setWidth("800");
         return tableFacade.render();
     }
@@ -830,7 +857,7 @@ public class SDVUtil {
             ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
         }
         ResourceBundle bundle = ResourceBundleProvider.getFormatBundle();
-        String format = bundle.getString("date_time_format_string");
+        String format = bundle.getString("date_format_string");
         HtmlRow row = table.getRow();
         HtmlColumn column = null;
 
@@ -848,6 +875,7 @@ public class SDVUtil {
      */
     public Collection<SubjectSDVContainer> getSubjectRows(List<EventCRFBean> eventCRFBeans, HttpServletRequest request) {
 
+
         if (eventCRFBeans == null || eventCRFBeans.isEmpty()) {
             return new ArrayList<SubjectSDVContainer>();
         }
@@ -859,7 +887,7 @@ public class SDVUtil {
         StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 
         EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
-
+        ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
         StudySubjectBean studySubjectBean = null;
         SubjectBean subjectBean = null;
         StudyEventBean studyEventBean = null;
@@ -878,7 +906,7 @@ public class SDVUtil {
         // allRows.add(tempSDVBean);
 
         for (EventCRFBean eventCRFBean : eventCRFBeans) {
-
+            EventCrf eventCrf = eventCrfDao.findByPK(eventCRFBean.getId());
             tempSDVBean = new SubjectSDVContainer();
 
             studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(eventCRFBean.getStudySubjectId());
@@ -897,8 +925,18 @@ public class SDVUtil {
                 tempSDVBean.setSdvRequirementDefinition("");
             }
 
-            tempSDVBean.setCrfNameVersion(getCRFName(eventCRFBean.getCRFVersionId()) + "/ " + getFormLayoutName(eventCRFBean.getFormLayoutId()));
+            int openQueriesCount = discrepancyNoteDao.findNewOrUpdatedParentQueriesByEventCrfId(eventCrf.getEventCrfId()).size();
 
+            if(openQueriesCount > 0) {
+                String queriesPageUrl = request.getContextPath() + "/ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query&listNotes_f_discrepancyNoteBean.resolutionStatus=New+and+Updated&"
+                        + "listNotes_f_crfName=" + eventCrf.getCrfVersion().getCrf().getName()
+                        + "&listNotes_f_studySubject.label=" + eventCrf.getStudySubject().getLabel() + "&listNotes_f_eventName=" + eventCrf.getStudyEvent().getStudyEventDefinition().getName();
+                tempSDVBean.setOpenQueries("<center><a href='"+queriesPageUrl+"'>"+openQueriesCount+"</a></center>");
+            }
+            else
+                tempSDVBean.setOpenQueries("<center>"+openQueriesCount+"</center>");
+            tempSDVBean.setCrfName(getCRFName(eventCRFBean.getCRFVersionId()));
+            tempSDVBean.setCrfVersion(getFormLayoutName(eventCRFBean.getFormLayoutId()));
             if (eventCRFBean.getStatus() != null) {
                 Integer status = eventCRFBean.getStage().getId();
                 if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED
@@ -906,17 +944,28 @@ public class SDVUtil {
                     status = DataEntryStage.LOCKED.getId();
                 }
 
-                String queryString = request.getQueryString();
-                if (null == queryString) {
-                    queryString = "";
-                }
-                tempSDVBean.setCrfStatus(getCRFStatusIconPath(
-                    status, request, studySubjectBean.getId(), eventCRFBean.getId(), eventCRFBean.getCRFVersionId(),
-                    eventCRFBean.getFormLayoutId(), eventCRFBean.getStudyEventId(), studyBean.getStudyId(), queryString.replaceAll("&", "%26")
-                ));
-            }
 
-            tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
+
+                StringBuilder crfStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
+                String input = "<input type=\"hidden\" statusId=\""+status+"\" />";
+                // "<input type=\"hidden\" statusId=\"1\" />"
+//                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
+                String statusTitle= "";
+                String statusIconClassName = "";
+                if(DataEntryStage.get(status).equals(DataEntryStage.LOCKED)){
+                    statusTitle = DataEntryStage.LOCKED.getName();
+                    statusIconClassName = FORM_LOCKED_ICON_CLASS_NAME;
+                }
+                else {
+                    statusTitle = resWords.getString("completed");
+                    statusIconClassName = FORM_COMPLETED_ICON_CLASS_NAME;
+                }
+                crfStatusBuilder.append("<center><a title='"+statusTitle+"' alt='"+statusTitle+"' class='"+statusIconClassName+"' accessCheck' border='0'/></center>");
+                tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
+            }
+            core.org.akaza.openclinica.domain.datamap.SubjectEventStatus subjectEventStatus = core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.getByCode(eventCrf.getStudyEvent().getSubjectEventStatusId());
+            String eventStatusDesc = resWords.getString(subjectEventStatus.getDescription());
+            tempSDVBean.setSubjectEventStatus("<center><a title='"+eventStatusDesc+"' alt='"+eventStatusDesc+"' class='"+SUBJECT_EVENT_STATUS_ICONS.get(subjectEventStatus)+"' accessCheck' border='0'/></center>");
 
             // TODO: I18N Date must be formatted properly
             Locale locale = LocaleResolver.getLocale(request);
@@ -933,7 +982,7 @@ public class SDVUtil {
             StudyEventDAO sedao = new StudyEventDAO(dataSource);
             StudyEventBean seBean = (StudyEventBean) sedao.findByPK(eventCRFBean.getStudyEventId());
             if (seBean.getDateStarted() != null)
-                tempSDVBean.setEventDate(sdformat.format(seBean.getDateStarted()));
+                tempSDVBean.setEventDate(seBean.getDateStarted());
 
             // if (eventCRFBean.getCreatedDate() != null) {
             // tempSDVBean.setEventDate(sdformat.format(eventCRFBean.getCreatedDate()));
@@ -942,7 +991,10 @@ public class SDVUtil {
             //
             // }
             // eventCRFBean.getEventName()
-            tempSDVBean.setEventName(eventCRFBean.getEventName());
+            if(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating())
+                tempSDVBean.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName()+ " (" +eventCrf.getStudyEvent().getSampleOrdinal()+")");
+            else
+                tempSDVBean.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
             // The checkbox is next to the study subject id
             StringBuilder sdvStatus = new StringBuilder("");
             // .getNexGenStatus().getCode() == 10
@@ -952,17 +1004,21 @@ public class SDVUtil {
             String eventCRFId = Integer.toString(eventCRFBean.getId());
             String formLayoutId = Integer.toString(eventCRFBean.getFormLayoutId());
             String studyEventId = Integer.toString(eventCRFBean.getStudyEventId());
-            if (eventCRFBean.isSdvStatus()) {
-                sdvStatus.append("<center><a class='accessCheck' href='javascript:void(0)' onclick='prompt(document.sdvForm,");
+            if (eventCRFBean.getSdvStatus() == SdvStatus.VERIFIED) {
+                sdvStatus.append("<center><a  class='accessCheck' href='javascript:void(0)' onclick='prompt(document.sdvForm,");
                 sdvStatus.append(eventCRFBean.getId());
                 sdvStatus.append(")'");
                 sdvStatus.append(" data-eventCrfId='").append(eventCRFId).append("'");
                 sdvStatus.append(" data-formLayoutId='").append(formLayoutId).append("'");
                 sdvStatus.append(" data-studyEventId='").append(studyEventId).append("'");
                 sdvStatus.append(">");
-                sdvStatus.append(getIconForSdvStatusPrefix()).append("</a></center>");
-            } else {
-                sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
+                sdvStatus.append("<span hspace='2' border='0'  title='"+resWords.getString(SdvStatus.VERIFIED.toString())+"' alt='SDV Complete' class='icon icon-icon-SDV-doubleCheck'>").append("</a></center>");
+            } else if(eventCRFBean.getSdvStatus() == SdvStatus.CHANGED_AFTER_VERIFIED){
+                sdvStatus.append("<center><span title='"+resWords.getString(SdvStatus.CHANGED_AFTER_VERIFIED.toString())+"' class='icon-icon-sdv-change-status small-icon' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
+                        .append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
+                        .append(eventCRFBean.getId()).append("' /></center>");
+            }else {
+                sdvStatus.append("<center><input style='margin-right: .4em' type='checkbox' ").append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
                         .append(eventCRFBean.getId()).append("' /></center>");
 
             }
@@ -988,9 +1044,9 @@ public class SDVUtil {
 
             // TODO: I18N Date must be formatted properly
             if (eventCRFBean.getUpdatedDate() != null) {
-                tempSDVBean.setLastUpdatedDate(sdformat.format(eventCRFBean.getUpdatedDate()));
+                tempSDVBean.setLastUpdatedDate(eventCRFBean.getUpdatedDate());
             } else {
-                tempSDVBean.setLastUpdatedDate("unknown");
+                tempSDVBean.setLastUpdatedDate(null);
 
             }
 
@@ -1000,9 +1056,35 @@ public class SDVUtil {
 
             }
 
-            actions = new StringBuilder("");
-            // append("<input type='hidden' name='crfId' value='").append(eventCRFBean.getId()).append("'").append("/> ")
-            if (!eventCRFBean.isSdvStatus()) {
+            String queryString = request.getQueryString();
+            if (queryString == null) {
+                queryString = "";
+            }
+            StringBuilder actionsBuilder = new StringBuilder(new HtmlBuilder().toString());
+            StudyEventDefinition event = eventCrf.getStudyEvent().getStudyEventDefinition();
+            actionsBuilder
+                .append("<a title='" + resWords.getString("view_sdv_item_data_hover") + "' alt='" + resWords.getString("view_sdv_item_data_hover") + "' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;' onclick='popupSdv(this)'")
+                .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
+                .append(" data-study-oid='").append(event.getStudy().getOc_oid()).append("'")
+                .append(" data-event-oid='").append(event.getOc_oid()).append("'")
+                .append(" data-event-ordinal='").append(event.getOrdinal() > 0 ? event.getOrdinal() : 1).append("'")
+                .append(" data-form-oid='").append(eventCrf.getFormLayout().getCrf().getOcOid()).append("'")
+                .append(" data-sdv-status='").append(eventCRFBean.getSdvStatus()).append("'")
+                .append("/>");
+            if (eventCRFBean.getStatus() != null){
+                String queryStringEncoded = queryString;
+                try {
+                    queryStringEncoded = URLEncoder.encode(queryString, StandardCharsets.UTF_8.toString());
+                } catch (UnsupportedEncodingException e){
+                    logger.error("Unsupported encoding");
+                }
+                Integer status = eventCRFBean.getStage().getId();
+                actionsBuilder.append(getCRFViewIconPath( status, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
+                    eventCRFBean.getStudyEventId(), queryStringEncoded));
+            }
+
+            actionsBuilder.append("<input type='button' name='sdvItemData' style='margin-left:0.6em; padding:.4em 0.9em' value='"+resWords.getString("sdv_item_data")+"'  title='"+resWords.getString("view_sdv_item_data_hover")+"' onclick='popupSdv(this)'/>");
+            if (eventCRFBean.getSdvStatus() != SdvStatus.VERIFIED) {
                 // StringBuilder jsCodeString =
                 // new StringBuilder("this.form.method='GET';
                 // this.form.action='").append(request.getContextPath()).append("/pages/handleSDVGet").append("';")
@@ -1010,14 +1092,13 @@ public class SDVUtil {
                 // actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\"
                 // name=\"sdvSubmit\" ").append("onclick=\"").append(
                 // jsCodeString.toString()).append("\" />");
-                actions.append("<a class='accessCheck icon icon-icon-sdv-text' href='javascript:void(0)'")
-                    .append(" onclick='submitSdv(document.sdvForm,").append(eventCRFId).append(")'")
-                    .append(" data-eventCrfId='").append(eventCRFId).append("'")
-                    .append(" data-formLayoutId='").append(formLayoutId).append("'")
-                    .append(" data-studyEventId='").append(studyEventId).append("'")
-                    .append("></a>");
-            }
+                actionsBuilder.append("<input type='button' name='sdvVerify' style='margin-left: 0.8em; padding:.4em 0.9em' value='"+resWords.getString("sdv_verify")+"' onclick='submitSdv(document.sdvForm,").append(eventCRFBean.getId()).append(")'")
+                        .append(" data-eventCrfId='").append(eventCRFId).append("'")
+                        .append(" data-formLayoutId='").append(formLayoutId).append("'")
+                        .append(" data-studyEventId='").append(studyEventId).append("'")
+                        .append("/>");
 
+            }
             // Only implement the view icon if it is a event crf request
             /*
              * String bool = (String) request.getAttribute("isViewSubjectRequest");
@@ -1028,12 +1109,12 @@ public class SDVUtil {
              * StringBuilder(request.getContextPath()).append("/pages/viewAllSubjectSDV?studyId=").append(
              * studySubjectBean.getStudyId()).append("&studySubjectId=");
              * path.append(studySubjectBean.getId());
-             * 
+             *
              * urlPrefix.append(path).append("'\">");
              * actions.append("&nbsp;").append(urlPrefix).append(VIEW_ICON_HTML).append("</a>");
              * }
              */
-            tempSDVBean.setSdvStatusActions(actions.toString());
+            tempSDVBean.setSdvStatusActions(actionsBuilder.toString());
             allRows.add(tempSDVBean);
 
         }
@@ -1041,8 +1122,8 @@ public class SDVUtil {
         return allRows;
     }
 
-    private String getCRFStatusIconPath(int statusId, HttpServletRequest request, int studySubjectId, int eventDefinitionCRFId, int crfVersionId,
-            int formLayoutId, int studyEventId, int studyId, String redirect) {
+    private String getCRFViewIconPath(int statusId, HttpServletRequest request, int eventDefinitionCRFId,
+            int formLayoutId, int studyEventId, String redirect) {
 
         HtmlBuilder html = new HtmlBuilder();
         // html.a().onclick(
@@ -1051,13 +1132,7 @@ public class SDVUtil {
         // + "&tabId=1&studySubjectId=" + studySubjectId + "');");
         // html.href('#').close();
 
-        StringBuilder builderHref = new StringBuilder("<a href='javascript:void(0)' onclick=\"");
-        // ViewSectionDataEntry?eventDefinitionCRFId=127&crfVersionId=682&tabId=1&studySubjectId=203
-        builderHref.append("document.location.href='").append(request.getContextPath()).append("/");
-        builderHref.append("ViewSectionDataEntry?eventDefinitionCRFId=").append(eventDefinitionCRFId);
-        builderHref.append("&crfVersionId=").append(crfVersionId).append("&tabId=1&studySubjectId=").append(studySubjectId).append("'\">");
-
-        StringBuilder builder = new StringBuilder(html.toString());
+        StringBuilder builder = new StringBuilder();
 
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
@@ -1065,7 +1140,7 @@ public class SDVUtil {
         String href = request.getContextPath() + "/EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId="
                 + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?" + redirect + "&mode=view";
         builder.append(
-                "<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + " accessCheck' border='0' href='" + href + "' ></a></center>");
+                "<a title='View CRF' alt='View CRF' class='icon icon-search' accessCheck' border='0' href='" + href + "' ></a>");
         // "<input type=\"hidden\" statusId=\"1\" />"
         builder.append(" ");
         builder.append(input.toString());
@@ -1275,7 +1350,7 @@ public class SDVUtil {
 
     }
 
-    public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, boolean setVerification) {
+    public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, SdvStatus sdvStatus) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -1302,7 +1377,7 @@ public class SDVUtil {
                 if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
                         || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
                     try {
-                        eventCRFDAO.setSDVStatus(setVerification, userId, eventCRFBean.getId());
+                        eventCrfDao.updateSdvStatus(sdvStatus, userId, eventCRFBean.getId());
                     } catch (Exception exc) {
                         // System.out.println(exc.getMessage());
                         return false;
@@ -1315,7 +1390,7 @@ public class SDVUtil {
         return true;
     }
 
-    public boolean setSDVerified(List<Integer> eventCRFIds, int userId, boolean setVerification) {
+    public boolean setSDVerified(List<Integer> eventCRFIds, int userId, SdvStatus sdvStatus) {
 
         // If no event CRFs are offered to SDV, then the transaction has not
         // caused a problem, so return true
@@ -1327,7 +1402,7 @@ public class SDVUtil {
 
         for (Integer eventCrfId : eventCRFIds) {
             try {
-                eventCRFDAO.setSDVStatus(setVerification, userId, eventCrfId);
+                eventCrfDao.updateSdvStatus(sdvStatus, userId, eventCrfId);
             } catch (Exception exc) {
                 // System.out.println(exc.getMessage());
                 return false;
@@ -1391,97 +1466,6 @@ public class SDVUtil {
 
     }
 
-    public List<EventCRFBean> filterEventCRFs(List<EventCRFBean> eventCRFBeans, BindingResult bindingResult) {
-
-        /*
-         * study_subject_id=Subject+D&eventCRF=0&studyEventDefinition=0&
-         * studyEventStatus=-1&eventCRFStatus=-1&eventcrfSDVStatus=None&
-         * sdvRequirement=0&startUpdatedDate=&endDate=&submit=Apply+Filter
-         */
-        List<EventCRFBean> newList = new ArrayList<EventCRFBean>();
-
-        if (eventCRFBeans == null || eventCRFBeans.isEmpty() || bindingResult == null) {
-            return eventCRFBeans;
-        }
-
-        SdvFilterDataBean filterBean = (SdvFilterDataBean) bindingResult.getTarget();
-        StudySubjectBean studySubjectBean = null;
-        StudyEventBean studyEventBean = null;
-        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-        boolean studySub = true, studyEventDef = true, studyEventStatus = true, eventCRFStatusBool = true, eventcrfSDVStatus = true, eventCRFNameBool = true,
-                upDatedDateBool = true, sdvRequirementBool = true;
-
-        for (EventCRFBean eventCBean : eventCRFBeans) {
-            // filter study subject
-            if (filterBean.getStudy_subject_id().length() > 0) {
-                studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(eventCBean.getStudySubjectId());
-
-                studySub = filterBean.getStudy_subject_id().equalsIgnoreCase(studySubjectBean.getLabel());
-
-            }
-
-            // filter study event definition
-
-            if (filterBean.getStudyEventDefinition() > 0) {
-                studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCBean.getStudyEventId());
-
-                studyEventDef = filterBean.getStudyEventDefinition() == studyEventBean.getStudyEventDefinitionId();
-
-            }
-
-            // Event CRF status
-            if (filterBean.getStudyEventStatus() > 0) {
-
-                studyEventStatus = filterBean.getStudyEventStatus() == eventCBean.getStatus().getId();
-            }
-
-            // Event CRF subject event status
-            if (filterBean.getEventCRFStatus() > 0) {
-                studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCBean.getStudyEventId());
-
-                eventCRFStatusBool = filterBean.getEventCRFStatus() == studyEventBean.getSubjectEventStatus().getId();
-            }
-
-            // Event CRF SDV status; true or false
-            if (!filterBean.getEventcrfSDVStatus().equalsIgnoreCase("N/A")) {
-                boolean sdvBool = filterBean.getEventcrfSDVStatus().equalsIgnoreCase("complete");
-                eventcrfSDVStatus = eventCBean.isSdvStatus() == sdvBool;
-            }
-
-            // Event CRF name match
-            if (filterBean.getEventCRFName().length() > 0) {
-                String tmpName = getCRFName(eventCBean.getCRFVersionId());
-                eventCRFNameBool = tmpName.equalsIgnoreCase(filterBean.getEventCRFName());
-            }
-
-            // TODO: Event CRF SDV requirement, when the application provides a way
-            // TODO: of setting this requirement in the event definition
-
-            // event CRF updated date
-            if (eventCBean.getUpdatedDate() != null && filterBean.getStartUpdatedDate() != null && filterBean.getEndDate() != null) {
-
-                GregorianCalendar calStart = new GregorianCalendar();
-                calStart.setTime(filterBean.getStartUpdatedDate());
-
-                GregorianCalendar calendarEnd = new GregorianCalendar();
-                calendarEnd.setTime(filterBean.getEndDate());
-
-                GregorianCalendar calendarNow = new GregorianCalendar();
-                calendarNow.setTime(eventCBean.getUpdatedDate());
-
-                upDatedDateBool = calendarNow.after(calStart) && calendarNow.before(calendarEnd) || calendarNow.equals(calStart)
-                        || calendarNow.equals(calendarEnd);
-
-            }
-
-            if (upDatedDateBool && eventCRFNameBool && eventcrfSDVStatus && eventCRFStatusBool && studyEventStatus && studyEventDef && studySub) {
-                newList.add(eventCBean);
-            }
-        }
-        return newList;
-    }
-
     public DataSource getDataSource() {
         return dataSource;
     }
@@ -1490,6 +1474,119 @@ public class SDVUtil {
         this.dataSource = dataSource;
     }
 
+    public SdvDTO getFormDetailsForSDV(String studyOID, String formOID, String studyEventOID, String studySubjectLabel, int ordinal, boolean changedAfterSdvOnlyFilter) {
+
+        EventCrf eventCrf = getEventCrfDao().findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOID, studySubjectLabel, formOID, ordinal);
+        if(eventCrf != null &&  !Status.get(eventCrf.getStatusId()).equals(Status.UNAVAILABLE))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENT_CRF_NOT_COMPLETED);
+        else if(eventCrf != null) {
+            SdvDTO sdvDTO = new SdvDTO();
+            sdvDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
+            sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
+            sdvDTO.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
+            sdvDTO.setEventStartDate(eventCrf.getStudyEvent().getDateStart());
+            sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
+            sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
+            Study parentStudy = studyDao.findByOcOID(studyOID);
+            parentStudy = parentStudy.isSite() ? parentStudy.getStudy() : parentStudy;
+            EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), parentStudy.getStudyId());
+            sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
+            sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
+            core.org.akaza.openclinica.domain.Status status = core.org.akaza.openclinica.domain.Status.getByCode(eventCrf.getStatusId());
+            core.org.akaza.openclinica.domain.datamap.SubjectEventStatus eventStatus = core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.getByCode(eventCrf.getStudyEvent().getSubjectEventStatusId());
+            if(eventStatus.equals(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.LOCKED)) {
+                sdvDTO.setFormStatus(eventStatus.getDescription());
+            }else
+                sdvDTO.setFormStatus("completed"); //EventCrf Status is checked to be UNAVAVAILABLE (i.e. COMPLETED) at parent If Itself
+            sdvDTO.setLastVerifiedDate(eventCrf.getLastSdvVerifiedDate());
+            sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
+            List<SdvItemDTO> sdvItemDTOS = new ArrayList<>();
+            for (ItemData itemData : getItemDataDao().findByEventCrfId(eventCrf.getEventCrfId())) {
+
+                if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_AFTER_VERIFIED)) {
+                    SdvItemDTO sdvItemDTO = new SdvItemDTO();
+                    sdvItemDTO.setName(itemData.getItem().getName());
+                    sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
+                    sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());
+                    sdvItemDTO.setOrdinal(itemData.getOrdinal());
+                        ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemId(itemData.getItem().getItemId());
+                    if(itemGroupMetadata != null )
+                        sdvItemDTO.setRepeatingGroup(itemGroupMetadata.isRepeatingGroup());
+                    sdvItemDTO.setValue(itemData.getValue());
+                    if (itemData.getDateUpdated() != null)
+                        sdvItemDTO.setLastModifiedDate(itemData.getDateUpdated());
+                    else
+                        sdvItemDTO.setLastModifiedDate(itemData.getDateCreated());
+                    sdvItemDTO.setLastModifiedDateHasOnlyDate(isOnlyDateAvailableInItemTable(itemData));
+                    int updateUserId = itemData.getUpdateId() != null ? itemData.getUpdateId() : itemData.getUserAccount().getUserId();
+                    UserAccount itemUpdatedUserAccount = userAccountDao.findByUserId(updateUserId);
+                    sdvItemDTO.setLastModifiedUserName(itemUpdatedUserAccount.getUserName());
+                    sdvItemDTO.setLastModifiedUserFirstName(itemUpdatedUserAccount.getFirstName());
+                    sdvItemDTO.setLastModifiedUserLastName(itemUpdatedUserAccount.getLastName());
+                    sdvItemDTO.setSdvStatus(getItemSdvStatus(eventCrf, itemData).toString());
+                    sdvItemDTOS.add(sdvItemDTO);
+                }
+            }
+            Collections.sort(sdvItemDTOS, new Comparator<SdvItemDTO>() {
+                @Override
+                public int compare(SdvItemDTO o1, SdvItemDTO o2) {
+                    return o1.getSdvStatus().compareTo(o2.getSdvStatus());
+                }
+            }.thenComparing(new Comparator<SdvItemDTO>() {
+                @Override
+                public int compare(SdvItemDTO o1, SdvItemDTO o2) {
+                    return (-1)*(o1.getLastModifiedDate().compareTo(o2.getLastModifiedDate()));
+                }
+            }));
+            sdvDTO.setSdvItems(sdvItemDTOS);
+            return sdvDTO;
+        }
+        else
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDYSUBJECT_STUDYEVENT_STUDYFORM_NOT_RELATED);
+    }
+    private SdvStatus getItemSdvStatus(EventCrf eventCrf, ItemData itemData){
+        if(eventCrf.getSdvStatus().equals(SdvStatus.CHANGED_AFTER_VERIFIED)){
+
+            Date lastUpdatedItemDate = eventCrf.getLastSdvVerifiedDate();
+            if(isOnlyDateAvailableInItemTable(itemData)) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(lastUpdatedItemDate);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                lastUpdatedItemDate = cal.getTime();
+            }
+
+            if(lastUpdatedItemDate.compareTo(itemData.getDateCreated()) < 0 )
+                return SdvStatus.CHANGED_AFTER_VERIFIED;
+            else{
+                if (itemData.getDateUpdated() != null && lastUpdatedItemDate.compareTo(itemData.getDateUpdated()) < 0)
+                    return SdvStatus.CHANGED_AFTER_VERIFIED;
+                else
+                    return SdvStatus.VERIFIED;
+            }
+
+        }
+        else
+            return eventCrf.getSdvStatus();
+    }
+
+    //Previously Item table had only date, This function is used inOrder to compare dateUpdated or dateCreated with lastSdvDate correctly
+    public boolean isOnlyDateAvailableInItemTable(ItemData itemData){
+        Date dateForCheck = itemData.getDateUpdated() != null ? itemData.getDateUpdated() : itemData.getDateCreated();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dateForCheck);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date dateWithMidnightTime = cal.getTime();
+        if(dateForCheck.getTime() == dateWithMidnightTime.getTime())
+            return true;
+        else
+            return false;
+    }
     class SDVView extends AbstractHtmlView {
 
         private final ResourceBundle resword;
@@ -1573,5 +1670,47 @@ public class SDVUtil {
 
     public void setStudyDao(StudyDao studyDao) {
         this.studyDao = studyDao;
+    }
+
+
+    public EventCrfDao getEventCrfDao() {
+        return eventCrfDao;
+    }
+
+    public void setEventCrfDao(EventCrfDao eventCrfDao) {
+        this.eventCrfDao = eventCrfDao;
+    }
+
+    public ItemDao getItemDao() {
+        return itemDao;
+    }
+
+    public void setItemDao(ItemDao itemDao) {
+        this.itemDao = itemDao;
+    }
+
+
+    public EventDefinitionCrfDao getEventDefinitionCrfDao() {
+        return eventDefinitionCrfDao;
+    }
+
+    public void setEventDefinitionCrfDao(EventDefinitionCrfDao eventDefinitionCrfDao) {
+        this.eventDefinitionCrfDao = eventDefinitionCrfDao;
+    }
+
+    public ItemDataDao getItemDataDao() {
+        return itemDataDao;
+    }
+
+    public void setItemDataDao(ItemDataDao itemDataDao) {
+        this.itemDataDao = itemDataDao;
+    }
+
+    public UserAccountDao getUserAccountDao() {
+        return userAccountDao;
+    }
+
+    public void setUserAccountDao(UserAccountDao userAccountDao) {
+        this.userAccountDao = userAccountDao;
     }
 }

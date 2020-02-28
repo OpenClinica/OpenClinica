@@ -41,6 +41,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -107,10 +108,11 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         this.setTypeExpected(18, TypeNames.DATE);// date updated
         this.setTypeExpected(19, TypeNames.INT);// updater
         this.setTypeExpected(20, TypeNames.BOOL);// electronic_signature_status
-        this.setTypeExpected(21, TypeNames.BOOL);// sdv_status
-        this.setTypeExpected(22, TypeNames.INT);// old_status
-        this.setTypeExpected(23, TypeNames.INT); // sdv_update_id
-        this.setTypeExpected(24, TypeNames.INT); // form_layout_id
+        this.setTypeExpected(21, TypeNames.INT);// old_status
+        this.setTypeExpected(22, TypeNames.INT); // sdv_update_id
+        this.setTypeExpected(23, TypeNames.INT); // form_layout_id
+        this.setTypeExpected(24, TypeNames.STRING);// sdv_status
+        this.setTypeExpected(25, TypeNames.DATE);// date last sdv verified
         // if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
         // this.setTypeExpected(24, TypeNames.INT); // r
         // }
@@ -167,7 +169,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(15), new Integer(ecb.getUpdaterId()));
         variables.put(new Integer(16), new Boolean(ecb.isElectronicSignatureStatus()));
 
-        variables.put(new Integer(17), new Boolean(ecb.isSdvStatus()));
+        variables.put(new Integer(17), ecb.getSdvStatus().toString());
         if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
             variables.put(new Integer(18), new Integer(ecb.getOldStatus().getId()));
         } else {
@@ -251,7 +253,8 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         eb.setValidatorAnnotations((String) hm.get("validator_annotations"));
         eb.setValidateString((String) hm.get("validate_string"));
         eb.setStudySubjectId(((Integer) hm.get("study_subject_id")).intValue());
-        eb.setSdvStatus((Boolean) hm.get("sdv_status"));
+        String sdvStatus = (String) hm.get("sdv_status");
+        eb.setSdvStatus((SdvStatus) SdvStatus.valueOf(sdvStatus));
         eb.setSdvUpdateId((Integer) hm.get("sdv_update_id"));
         eb.setFormLayoutId(((Integer) hm.get("form_layout_id")).intValue());
         Integer oldStatusId = (Integer) hm.get("old_status_id");
@@ -507,9 +510,9 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
 
     }
 
-    public void setSDVStatus(boolean sdvStatus, int userId, int eventCRFId) {
+    public void setSDVStatus(SdvStatus sdvStatus, int userId, int eventCRFId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), sdvStatus);
+        variables.put(new Integer(1), sdvStatus.toString());
         variables.put(new Integer(2), userId);
         variables.put(new Integer(3), eventCRFId);
 
@@ -786,11 +789,11 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("getEventCRFsByEventDateLimit", variables);
     }
 
-    public ArrayList getEventCRFsByStudySDV(int studyId, boolean sdvStatus, int limit, int offset) {
+    public ArrayList getEventCRFsByStudySDV(int studyId, SdvStatus sdvStatus, int limit, int offset) {
 
         HashMap variables = new HashMap();
         variables.put(1, studyId);
-        variables.put(2, sdvStatus);
+        variables.put(2, sdvStatus.toString());
         variables.put(3, limit);
         variables.put(4, offset);
 
@@ -856,14 +859,14 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         }
     }
 
-    public Integer countEventCRFsByStudySDV(int studyId, boolean sdvStatus) {
+    public Integer countEventCRFsByStudySDV(int studyId, SdvStatus sdvStatus) {
 
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
 
         HashMap variables = new HashMap();
         variables.put(1, studyId);
-        variables.put(2, sdvStatus);
+        variables.put(2, sdvStatus.toString());
         String sql = digester.getQuery("countEventCRFsByStudySDV");
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();

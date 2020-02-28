@@ -12,10 +12,18 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
         return DiscrepancyNote.class;
     }
 
-    static String findParentQueryByItemDataQuery = "select dn from DiscrepancyNote dn "
+    static String findParentOpenQueriesByEventCrfIdAndNoteTypeId = "select dn from DiscrepancyNote dn "
+            + "join DnItemDataMap didm on didm.discrepancyNote.discrepancyNoteId = dn.discrepancyNoteId "
+            + "join DiscrepancyNoteType dnt on dn.discrepancyNoteType.discrepancyNoteTypeId = dnt.discrepancyNoteTypeId "
+            + "join ItemData id on didm.itemData.itemDataId = id.itemDataId "
+            + "where dn.parentDiscrepancyNote is null and dn.discrepancyNoteType.discrepancyNoteTypeId= :noteTypeId "
+            + "and (dn.resolutionStatus.resolutionStatusId = 1 or dn.resolutionStatus.resolutionStatusId = 2 ) "
+            +" and id.eventCrf.eventCrfId= :eventCrfId";
+    static String findParentOpenQueriesByItemDataIdAndNoteTypeId = "select dn from DiscrepancyNote dn "
             + "join DnItemDataMap didm on didm.discrepancyNote.discrepancyNoteId = dn.discrepancyNoteId "
             + "join DiscrepancyNoteType dnt on dn.discrepancyNoteType.discrepancyNoteTypeId = dnt.discrepancyNoteTypeId "
             + "where dn.parentDiscrepancyNote is null "
+            + "and (dn.resolutionStatus.resolutionStatusId = 1 or dn.resolutionStatus.resolutionStatusId = 2 ) "
             + "and didm.itemData.itemDataId = :itemDataId and dn.discrepancyNoteType.discrepancyNoteTypeId= :noteTypeId";
 
     static String findChildQueriesByItemData = "select dn from DiscrepancyNote dn "
@@ -37,11 +45,11 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
         return (DiscrepancyNote) q.uniqueResult();
     }
 
-    public DiscrepancyNote findParentQueryByItemData(Integer itemDataId, Integer noteTypeId) {
-        Query q = getCurrentSession().createQuery(findParentQueryByItemDataQuery);
+    public List<DiscrepancyNote> findNewOrUpdatedParentQueriesByItemData(Integer itemDataId, Integer noteTypeId) {
+        Query q = getCurrentSession().createQuery(findParentOpenQueriesByItemDataIdAndNoteTypeId);
         q.setParameter("itemDataId", itemDataId);
         q.setParameter("noteTypeId", noteTypeId);
-        return (DiscrepancyNote) q.uniqueResult();
+        return (List<DiscrepancyNote>) q.list();
     }
 
     public List<DiscrepancyNote> findChildQueriesByItemData(Integer itemDataId) {
@@ -49,6 +57,14 @@ public class DiscrepancyNoteDao extends AbstractDomainDao<DiscrepancyNote> {
         q.setParameter("itemDataId", itemDataId);
         return ((List<DiscrepancyNote>) q.list());
     }
+
+    public List<DiscrepancyNote> findNewOrUpdatedParentQueriesByEventCrfId(Integer eventCrfId) {
+        Query q = getCurrentSession().createQuery(findParentOpenQueriesByEventCrfIdAndNoteTypeId);
+        q.setParameter("noteTypeId", 3);  //DiscrepencyNoteType = Query
+        q.setParameter("eventCrfId", eventCrfId);
+        return ((List<DiscrepancyNote>) q.list());
+    }
+
 
     public int getMaxThreadNumber() {
         String query = "select max(dn.thread_number) from discrepancy_note dn ";
