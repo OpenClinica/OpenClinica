@@ -67,6 +67,7 @@
 <jsp:useBean scope="request" id="studySubject" class="core.org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
 <jsp:useBean scope="request" id="uncompletedEventDefinitionCRFs" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="displayEventCRFs" class="java.util.ArrayList" />
+<jsp:useBean scope='request' id="subjectStudy" class='core.org.akaza.openclinica.domain.datamap.Study'/>
 
 <h1><span class="title_manage"><fmt:message key="enter_or_validate_data" bundle="${resword}"/><c:out value="${studyEvent.studyEventDefinition.name}" /></span></h1><br/>
 
@@ -95,7 +96,7 @@
                     <tr>
                         <td class="table_tools">
                             &nbsp;
-                            <c:if test="${studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && study.status.available && studyEvent.editable && !userRole.monitor}">
+                            <c:if test="${studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && subjectStudy.status.available && studyEvent.editable && !userRole.monitor}">
                                 <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"></a>
                                 &nbsp;
                                 <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><fmt:message key="edit_study_event" bundle="${resword}"/></a>
@@ -144,7 +145,7 @@
                                      </span>
                                     </c:when>
                                     <c:otherwise>
-                                       <c:if test="${!study.status.locked}">
+                                       <c:if test="${!subjectStudy.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg=','spanAlert-start_date'); return false;">
                                             <span id="flag_start_date" name="flag_start_date" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" ></span>
@@ -169,7 +170,7 @@
                                      </span>
                                     </c:when>
                                     <c:otherwise>
-                                      <c:if test="${!study.status.locked}">
+                                      <c:if test="${!subjectStudy.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg=','spanAlert-end_date'); return false;">
                                         <span id="flag_end_date" name="flag_end_date" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" ></span>
@@ -376,7 +377,7 @@
                     &nbsp;
                 </c:when>
 
-                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && !studyEvent.subjectEventStatus.locked &&!userRole.monitor}">
+                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && subjectStudy.status.available && !studyEvent.status.deleted && !studyEvent.subjectEventStatus.locked &&!userRole.monitor}">
                     <td >
                         <c:choose>
                         <c:when test="${dedc.eventCRF.status.id != 0}">
@@ -461,7 +462,7 @@
 
 <td class="table_cell" style="width:180px;">
     <c:set var="actionQuery" value="" />
-    <c:if test="${study.status.available}">
+    <c:if test="${subjectStudy.status.available}">
         <c:if test="${dec.continueInitialDataEntryPermitted}">
             <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
         </c:if>
@@ -489,7 +490,7 @@
                onclick="return checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
            <span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>
 </td>
-			<c:if test="${(!userRole.monitor && dec.eventCRF.status.name != 'auto-removed') && (study.status.available) && (studySubject.status.available)}">
+			<c:if test="${(!userRole.monitor && dec.eventCRF.status.name != 'auto-removed') && (subjectStudy.status.available) && (studySubject.status.available)}">
           <td>      <a class="accessCheck" href="RestoreEventCRF?action=confirm&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                    onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
@@ -550,7 +551,7 @@
                     <span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></span></a>
               </td>
 
-            <c:if test="${study.status.available && !userRole.monitor}">
+            <c:if test="${subjectStudy.status.available && !userRole.monitor}">
                <td> <a class="accessCheck" href="RemoveEventCRF?action=confirm&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                    onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
@@ -569,7 +570,7 @@
                <!--  reasign crf version -->
 
  <c:if test="${( userRole.director || userRole.coordinator) &&
- (study.status.available )
+ (subjectStudy.status.available )
  && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)}">
 
   <td>  <a class="accessCheck" href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"

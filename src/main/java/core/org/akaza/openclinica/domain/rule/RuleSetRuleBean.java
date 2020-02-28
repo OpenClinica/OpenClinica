@@ -230,4 +230,13 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject implem
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "RuleSetRuleBean{" +
+                ", ruleBean=" + ruleBean +
+                ", actions=" + actions +
+                ", oid='" + oid + '\'' +
+                ", ruleSetRuleBeanImportStatus=" + ruleSetRuleBeanImportStatus +
+                '}';
+    }
 }

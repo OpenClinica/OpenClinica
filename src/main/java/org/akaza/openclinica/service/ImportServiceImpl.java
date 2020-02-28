@@ -5,7 +5,6 @@ import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.service.JobService;
 import core.org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
-import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.controller.dto.DataImportReport;
 import org.akaza.openclinica.controller.helper.table.ItemCountInForm;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
@@ -40,7 +39,6 @@ import java.util.*;
 
 /**
  * This Service class is used with View Study Subject Page
- *
  * @author joekeremian
  */
 
@@ -135,14 +133,13 @@ public class ImportServiceImpl implements ImportService {
     public static final String DiscrepancyNoteMessage = "import XML";
     public static final String DetailedNotes = "Update via Import";
 
-    List<DataImportReport> dataImportReports = null;
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
     SimpleDateFormat sdf_logFile = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @Transactional
     public boolean validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean isSystemUserImport) {
         CoreResources.setRequestSchema(schema);
-        Study tenantStudy = null;
+        Study tenantStudy;
         if (siteOid != null) {
             tenantStudy = studyDao.findByOcOID(siteOid);
         } else {
@@ -152,8 +149,8 @@ public class ImportServiceImpl implements ImportService {
             logger.error("Study {} Not Valid", tenantStudy.getOc_oid());
         }
 
-        dataImportReports = new ArrayList<>();
-        DataImportReport dataImportReport = null;
+        List<DataImportReport> dataImportReports = new ArrayList<>();
+        DataImportReport dataImportReport;
         sdf_logFile.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
@@ -165,7 +162,7 @@ public class ImportServiceImpl implements ImportService {
 
         logger.debug("Job Filename is : {}", fileName);
 
-        Object subjectObject = null;
+        Object subjectObject;
         StudySubject studySubject = null;
 
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
@@ -594,12 +591,12 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private ItemData createItemData(EventCrf eventCrf, ImportItemDataBean itemDataBean, UserAccount userAccount, Item item, int groupRepeatKey) {
-    	// only created new event crf once
-    	if(eventCrf.getEventCrfId() == 0) {
-    		eventCrf = eventCrfDao.saveOrUpdate(eventCrf);	    		
-    		updateStudyEvntStatus(eventCrf.getStudyEvent(), userAccount, DATA_ENTRY_STARTED);
-    	} 
-    	
+        // only created new event crf once
+        if (eventCrf.getEventCrfId() == 0) {
+            eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+            updateStudyEvntStatus(eventCrf.getStudyEvent(), userAccount, DATA_ENTRY_STARTED);
+        }
+
         ItemData itemData = new ItemData();
         itemData.setEventCrf(eventCrf);
         itemData.setItem(item);
@@ -905,12 +902,12 @@ public class ImportServiceImpl implements ImportService {
                         if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
                             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
-						/*
-						 * OC-12136
-						 * at this time, eventCRF can still be null  see OC-11814 
-						 * if (eventCrf == null) { return new ErrorObj(FAILED,
-						 * ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH); }
-						 */
+                        /*
+                         * OC-12136
+                         * at this time, eventCRF can still be null  see OC-11814
+                         * if (eventCrf == null) { return new ErrorObj(FAILED,
+                         * ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH); }
+                         */
                     }
                     return studyEvent;
 
@@ -1027,9 +1024,9 @@ public class ImportServiceImpl implements ImportService {
         ErrorObj errorObj = null;
 
         if (studyEvent != null && (
-        		// OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet
-        		studyEvent.getStatusId()==Status.DELETED.getCode() ||
-                studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() ||
+                // OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet
+                studyEvent.getStatusId() == Status.DELETED.getCode() ||
+                        studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode() ||
                         studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())) {
 
@@ -1290,7 +1287,7 @@ public class ImportServiceImpl implements ImportService {
         }
         if (studySubject != null && !(studySubject.getStatus().equals(Status.AVAILABLE)) && !(studySubject.getStatus().equals(Status.SIGNED))) {
 
-                return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+            return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
@@ -1333,7 +1330,7 @@ public class ImportServiceImpl implements ImportService {
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
 
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
-       
+
 
             logger.debug("Study Event Id {} is updated", studyEvent.getStudyEventId());
         }
@@ -1379,7 +1376,7 @@ public class ImportServiceImpl implements ImportService {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_NOT_FOUND);
         }
 
-        if (!validateItemInGroup(item,itemGroupDataBean,crf)) {
+        if (!validateItemInGroup(item, itemGroupDataBean, crf)) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_ITEMGROUP_DOES_NOT_CONTAIN_ITEMDATA);
         }
 

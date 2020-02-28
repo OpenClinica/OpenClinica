@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -38,10 +39,11 @@ public class EventCrfLayerBuilder {
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
     private ResourceBundle restexts = ResourceBundleProvider.getTextsBundle();
     String contextPath;
+    StudyDao studyDao;
 
     public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, DataEntryStage eventCrfStatus,
-            EventCRFBean eventCrfBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
-            EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath) {
+                                EventCRFBean eventCrfBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
+                                EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath , StudyDao studyDao) {
         super();
         this.html = new HtmlBuilder();
         this.subject = subject;
@@ -57,6 +59,7 @@ public class EventCrfLayerBuilder {
         this.crf = crf;
         this.studyEventDefinition = studyEventDefinition;
         this.contextPath = contextPath;
+        this.studyDao=studyDao;
     }
 
     StudyEventBean getStudyEvent() {
@@ -176,6 +179,8 @@ public class EventCrfLayerBuilder {
         html.tr(0).id("Menu_on_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount).style("display: none").close();
         html.td(0).colspan("2").close();
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
+
+        Study subjectStudy=studyDao.findByPK(studySubject.getStudyId());
         if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -188,7 +193,7 @@ public class EventCrfLayerBuilder {
 
             // if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() ||
             // currentUser.isSysAdmin())) {
-            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE) {
                 if (!hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
@@ -207,7 +212,7 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
-            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 deleteEventCrf(html, eventCrfBean, studySubject);
@@ -215,7 +220,7 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -238,7 +243,7 @@ public class EventCrfLayerBuilder {
                 viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), reswords.getString("print"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
@@ -255,7 +260,7 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntryParameterized(html, eventCrfBean, eventDefinitionCrf, reswords.getString("view"), getStudyEvent());
                 html.tdEnd().trEnd(0);
 
-                if (getStudyEvent() != null && !currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
+                if (getStudyEvent() != null && !currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
@@ -292,7 +297,7 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
             }
-            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE) {
                 if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
                     if (!hiddenCrf()) {
                         html.tr(0).valign("top").close();
@@ -314,7 +319,7 @@ public class EventCrfLayerBuilder {
                     }
                 }
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
@@ -323,7 +328,7 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
-            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 deleteEventCrf(html, eventCrfBean, studySubject);
@@ -331,7 +336,7 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
