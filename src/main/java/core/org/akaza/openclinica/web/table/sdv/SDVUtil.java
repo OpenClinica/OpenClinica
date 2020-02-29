@@ -1496,7 +1496,7 @@ public class SDVUtil {
 
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_AFTER_VERIFIED)) {
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
-                    sdvItemDTO.setDataId(itemData.getItemDataId());
+                    sdvItemDTO.setItemDataId(itemData.getItemDataId());
                     sdvItemDTO.setName(itemData.getItem().getName());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
                     sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());

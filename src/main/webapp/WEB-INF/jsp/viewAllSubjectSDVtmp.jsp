@@ -390,8 +390,8 @@
           item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
 
           item.actions = 
-            '<a title="View Form" class="icon icon-view-within" href="ResolveDiscrepancy?itemDataId=' + 
-              item.dataId + '&flavor=-query' +
+            '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy?itemDataId=' + 
+              item.itemDataId +
             '"></a>';
 
           console.log(item);

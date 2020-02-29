@@ -408,7 +408,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         logger.info("itemDataId " + Integer.toString(itemDataId));
         if (itemDataId > 0) {
+            flavor = QUERY_FLAVOR;
             prepareItemRequest(request, sm.getDataSource(), currentStudy, null, module, flavor, "SDV Load Item", false, itemDataId);
+            forwardPage(Page.ENKETO_FORM_SERVLET);
             return;
         }
 
