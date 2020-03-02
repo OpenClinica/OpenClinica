@@ -1,9 +1,10 @@
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/jsp/taglibs.jsp" %>
 <%String action = request.getParameter("action");%>
+<c:set var="action" value="<%=action%>" scope="request"></c:set>
 <!-- For Mantis Issue 6099 -->
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-    <c:if test="${userBean.name!='' && action!=null}">
+    <c:if test="${userBean.name!='' && empty action}">	
     <c:redirect url="/MainMenu"/>
     </c:if>
 <!-- End of 6099-->

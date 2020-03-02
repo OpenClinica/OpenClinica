@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -54,6 +55,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
     private void checkUpdateDataPermission(HttpServletRequest request) throws InsufficientPermissionException {
 		  Boolean auth = true;
 		  UserAccountBean userBean =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+		  StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
 		  ArrayList userRoles = userBean.getRoles();
 		  String submitted =(String) request.getParameter("submitted");
 		  String checkInputs = (String)request.getParameter("checkInputs");
@@ -62,9 +64,11 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 			  for (int i = 0; i < userRoles.size(); i++) {
 		            StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
 
-					if(studyRole.getRole().equals(Role.MONITOR))
+					if(studyRole.getRole().equals(Role.MONITOR) && studyRole.getStudyId() == currentStudy.getId())
 					{
-						auth = false;						
+						auth = false;
+						
+						break;
 					}
 		        }
 		  }

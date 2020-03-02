@@ -35,6 +35,8 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -64,7 +66,7 @@ import org.springframework.util.Assert;
  */
 public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     //~ Static fields/initializers =====================================================================================
-
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "j_username";
     public static final String SPRING_SECURITY_FORM_PASSWORD_KEY = "j_password";
     public static final String SPRING_SECURITY_LAST_USERNAME_KEY = "SPRING_SECURITY_LAST_USERNAME";
@@ -126,10 +128,9 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 				response.sendRedirect(request.getContextPath() +"/pages/login/login?action=errorSessionLocked");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
-        	return null;
-        	//throw new LockedException("Already have  other user logined in in the same computer, please wait");
+        	return null;        	
         }	
         //
 
