@@ -1,5 +1,7 @@
 package org.akaza.openclinica.web.filter;
 
+import java.io.IOException;
+
 /* Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +35,8 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -62,7 +66,7 @@ import org.springframework.util.Assert;
  */
 public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     //~ Static fields/initializers =====================================================================================
-
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "j_username";
     public static final String SPRING_SECURITY_FORM_PASSWORD_KEY = "j_password";
     public static final String SPRING_SECURITY_LAST_USERNAME_KEY = "SPRING_SECURITY_LAST_USERNAME";
@@ -108,6 +112,27 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
         // Place the last username attempted into HttpSession for views
         HttpSession session = request.getSession(false);
+        
+        
+        /**
+         *  OC-12286
+         */
+        // check the user in the current session
+        
+        UserAccountBean currentSessionUser = null;
+        currentSessionUser = (UserAccountBean) session.getAttribute(SecureController.USER_BEAN_NAME);
+        
+        if(currentSessionUser !=null && !(currentSessionUser.getName().isEmpty()) && !(currentSessionUser.getName().equals(username))) {
+        	//setFilterProcessesUrl("/pages/login/login?action=errorSessionLocked");
+        	try {
+				response.sendRedirect(request.getContextPath() +"/pages/login/login?action=errorSessionLocked");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				logger.error(e.getMessage());
+			}
+        	return null;        	
+        }	
+        //
 
         if (session != null || getAllowSessionCreation()) {
             request.getSession().setAttribute(SPRING_SECURITY_LAST_USERNAME_KEY, TextEscapeUtils.escapeEntities(username));

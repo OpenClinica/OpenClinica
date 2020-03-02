@@ -7,8 +7,12 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -43,6 +47,38 @@ public class InitialDataEntryServlet extends DataEntryServlet {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     Locale locale;
 
+    /**
+     * 
+     * @param request
+     * @throws InsufficientPermissionException
+     */
+    private void checkUpdateDataPermission(HttpServletRequest request) throws InsufficientPermissionException {
+		  Boolean auth = true;
+		  UserAccountBean userBean =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+		  StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+		  ArrayList userRoles = userBean.getRoles();
+		  String submitted =(String) request.getParameter("submitted");
+		  String checkInputs = (String)request.getParameter("checkInputs");
+		  
+		  if(submitted !=null && submitted.equals("1") && checkInputs!=null && checkInputs.equals("1")) {
+			  for (int i = 0; i < userRoles.size(); i++) {
+		            StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
+
+					if(studyRole.getRole().equals(Role.MONITOR) && studyRole.getStudyId() == currentStudy.getId())
+					{
+						auth = false;
+						
+						break;
+					}
+		        }
+		  }
+	       
+		if(!auth) {
+			 addPageMessage(respage.getString("you_not_have_permission_update_a_CRF"), request);
+             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("no_permission_to_perform_data_entry"), "1");
+		}
+	}
+    
     // < ResourceBundleresexception,respage;
 
     /*
@@ -56,6 +92,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
         mayAccess(request);
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
         checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+        this.checkUpdateDataPermission(request);
+        
         HttpSession session = request.getSession();
         locale = LocaleResolver.getLocale(request);
 
