@@ -1,5 +1,7 @@
 package org.akaza.openclinica.web.filter;
 
+import java.io.IOException;
+
 /* Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -108,6 +110,28 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
         // Place the last username attempted into HttpSession for views
         HttpSession session = request.getSession(false);
+        
+        
+        /**
+         *  OC-12286
+         */
+        // check the user in the current session
+        
+        UserAccountBean currentSessionUser = null;
+        currentSessionUser = (UserAccountBean) session.getAttribute(SecureController.USER_BEAN_NAME);
+        
+        if(currentSessionUser !=null && !(currentSessionUser.getName().isEmpty()) && !(currentSessionUser.getName().equals(username))) {
+        	//setFilterProcessesUrl("/pages/login/login?action=errorSessionLocked");
+        	try {
+				response.sendRedirect(request.getContextPath() +"/pages/login/login?action=errorSessionLocked");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	return null;
+        	//throw new LockedException("Already have  other user logined in in the same computer, please wait");
+        }	
+        //
 
         if (session != null || getAllowSessionCreation()) {
             request.getSession().setAttribute(SPRING_SECURITY_LAST_USERNAME_KEY, TextEscapeUtils.escapeEntities(username));

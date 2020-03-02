@@ -25,4 +25,14 @@
     }
 
 %>
+<% 
+    if (action!=null) {
+       if (action.equals("errorSessionLocked")) { 
+%>
+    <div class="alertbox_center"><fmt:message key="session_locked" bundle="${restext}"/></div>
+<%
+       } 
+    }
+
+%>
 <jsp:include page="../include/showPageMessages.jsp" />
