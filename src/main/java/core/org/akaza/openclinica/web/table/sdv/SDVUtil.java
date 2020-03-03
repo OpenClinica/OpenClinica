@@ -1061,16 +1061,6 @@ public class SDVUtil {
                 queryString = "";
             }
             StringBuilder actionsBuilder = new StringBuilder(new HtmlBuilder().toString());
-            StudyEventDefinition event = eventCrf.getStudyEvent().getStudyEventDefinition();
-            actionsBuilder
-                .append("<a title='" + resWords.getString("view_sdv_item_data_hover") + "' alt='" + resWords.getString("view_sdv_item_data_hover") + "' class='icon icon-sdv-item-form black' accessCheck' border='0' style='margin-right: 5px;' onclick='popupSdv(this)'")
-                .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
-                .append(" data-study-oid='").append(event.getStudy().getOc_oid()).append("'")
-                .append(" data-event-oid='").append(event.getOc_oid()).append("'")
-                .append(" data-event-ordinal='").append(event.getOrdinal() > 0 ? event.getOrdinal() : 1).append("'")
-                .append(" data-form-oid='").append(eventCrf.getFormLayout().getCrf().getOcOid()).append("'")
-                .append(" data-sdv-status='").append(eventCRFBean.getSdvStatus()).append("'")
-                .append("/>");
             if (eventCRFBean.getStatus() != null){
                 String queryStringEncoded = queryString;
                 try {
@@ -1083,7 +1073,17 @@ public class SDVUtil {
                     eventCRFBean.getStudyEventId(), queryStringEncoded));
             }
 
-            actionsBuilder.append("<input type='button' name='sdvItemData' style='margin-left:0.6em; padding:.4em 0.9em' value='"+resWords.getString("sdv_item_data")+"'  title='"+resWords.getString("view_sdv_item_data_hover")+"' onclick='popupSdv(this)'/>");
+            StudyEventDefinition event = eventCrf.getStudyEvent().getStudyEventDefinition();
+            actionsBuilder
+                .append("<button style='padding:.4em 0.9em' class='accessCheck popupSdv' title='" + resWords.getString("view_sdv_item_data_hover") + "'")
+                .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
+                .append(" data-study-oid='").append(event.getStudy().getOc_oid()).append("'")
+                .append(" data-event-oid='").append(event.getOc_oid()).append("'")
+                .append(" data-event-ordinal='").append(event.getOrdinal() > 0 ? event.getOrdinal() : 1).append("'")
+                .append(" data-form-oid='").append(eventCrf.getFormLayout().getCrf().getOcOid()).append("'")
+                .append(" data-sdv-status='").append(eventCRFBean.getSdvStatus()).append("'")
+                .append(">" + resWords.getString("sdv_item_data") + "</button>");
+        
             if (eventCRFBean.getSdvStatus() != SdvStatus.VERIFIED) {
                 // StringBuilder jsCodeString =
                 // new StringBuilder("this.form.method='GET';
@@ -1092,7 +1092,7 @@ public class SDVUtil {
                 // actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\"
                 // name=\"sdvSubmit\" ").append("onclick=\"").append(
                 // jsCodeString.toString()).append("\" />");
-                actionsBuilder.append("<input type='button' name='sdvVerify' style='margin-left: 0.8em; padding:.4em 0.9em' value='"+resWords.getString("sdv_verify")+"' onclick='submitSdv(document.sdvForm,").append(eventCRFBean.getId()).append(")'")
+                actionsBuilder.append("<input type='button' name='sdvVerify' style='margin-left: 0.3em; padding:.4em 0.9em' value='"+resWords.getString("sdv_verify")+"' onclick='submitSdv(document.sdvForm,").append(eventCRFBean.getId()).append(")'")
                         .append(" data-eventCrfId='").append(eventCRFId).append("'")
                         .append(" data-formLayoutId='").append(formLayoutId).append("'")
                         .append(" data-studyEventId='").append(studyEventId).append("'")
@@ -1505,6 +1505,7 @@ public class SDVUtil {
 
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_AFTER_VERIFIED)) {
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
+                    sdvItemDTO.setItemDataId(itemData.getItemDataId());
                     sdvItemDTO.setName(itemData.getItem().getName());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
                     sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());

@@ -119,6 +119,7 @@
         formObj.crfId.value=crfId;
         formObj.submit();
     }
+
 </script>
 <div id="subjectSDV">
     <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
@@ -189,6 +190,7 @@
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
 
 <style>
@@ -325,7 +327,7 @@
   });
 
   function clearFilter() {
-    itemsTable.order([]);
+    jQuery('#sdv-items').dataTable().fnSortNeutral();
   }
   clearFilter();
 
@@ -335,7 +337,6 @@
     };
     return trans[str] || str;
   }
-
 
   function formatDate(date) {
     date = moment(date);
@@ -347,8 +348,8 @@
     }
   }
 
-  function popupSdv(item) {
-    var data = $(item).data();
+  $('#sdv').on('click', '.popupSdv', function() {
+    var data = $(this).data();
     var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
     
     function getItems() {
@@ -370,8 +371,6 @@
         $('#sdvStatus').text(data.sdvStatus);
 
         itemsTable.rows.add(data.sdvItems.map(function(item) {
-          console.log(item);
-
           item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
           if (item.repeatingGroup) {
             item.briefDescriptionItemName += ' ' + item.ordinal;
@@ -388,9 +387,14 @@
             item.lastVerifiedDate = formatDate(item.lastVerifiedDate);
           }
           item.lastModifiedDate = formatDate(item.lastModifiedDate);
-
           item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
-          item.actions = '<a href="#" title="View Form" class="icon icon-view-within"></a>';
+
+          item.actions = 
+            '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy?itemDataId=' + 
+              item.itemDataId +
+            '"></a>';
+
+          console.log(item);
           return item;
         }));
         itemsTable.draw();
@@ -410,12 +414,12 @@
       getItems();
     }).change();
 
-    var verifyButton = $(item).siblings()[3];
+    var verifyButton = $(this).siblings()[3];
     $('#sdvVerify').off('click').click(function() {
       $(verifyButton).click();
     });
 
     jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
-  }
+  });
 
 </script>
