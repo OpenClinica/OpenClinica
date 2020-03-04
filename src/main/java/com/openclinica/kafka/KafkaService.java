@@ -1,6 +1,7 @@
 package com.openclinica.kafka;
 
 import com.openclinica.kafka.dto.ItemDataChangeDTO;
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.ItemData;
 import core.org.akaza.openclinica.domain.datamap.Study;
@@ -12,9 +13,6 @@ import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class KafkaService {
@@ -35,6 +33,7 @@ public class KafkaService {
       siteOid = study.getOc_oid();
       studyOid = study.getStudy().getOc_oid();
     }
+    formStatusChangeDTO.setRealm(CoreResources.getKeyCloakConfig().getRealm());
     formStatusChangeDTO.setStudyOid(studyOid);
     formStatusChangeDTO.setSiteOid(siteOid);
     formStatusChangeDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
@@ -73,6 +72,7 @@ public class KafkaService {
       studyOid = study.getStudy().getOc_oid();
     }
 
+    itemDataChangeDTO.setRealm(CoreResources.getKeyCloakConfig().getRealm());
     itemDataChangeDTO.setStudyOid(studyOid);
     itemDataChangeDTO.setSiteOid(siteOid);
     itemDataChangeDTO.setParticipantId(itemData.getEventCrf().getStudySubject().getLabel());
@@ -80,7 +80,7 @@ public class KafkaService {
     itemDataChangeDTO.setFormOid(itemData.getEventCrf().getFormLayout().getCrf().getOcOid());
     itemDataChangeDTO.setEventOid(itemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid());
 
-    //itemDataChangeDTO.setItemGroupOid(itemData.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
+    itemDataChangeDTO.setItemGroupOid(itemData.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
     itemDataChangeDTO.setItemDataType(itemData.getItem().getItemDataType().getName());
     itemDataChangeDTO.setItemName(itemData.getItem().getName());
     itemDataChangeDTO.setItemOid(itemData.getItem().getOcOid());

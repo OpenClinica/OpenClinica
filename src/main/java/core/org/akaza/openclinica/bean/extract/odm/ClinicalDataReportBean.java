@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.service.ValidateService;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
