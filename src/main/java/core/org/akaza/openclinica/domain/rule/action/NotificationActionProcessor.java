@@ -351,7 +351,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			pDTO = new ParticipantDTO();
 			pDTO.setParticipantId(studySubject.getLabel());
 
-			if(studySubject.getStudySubjectDetail()!=null) {
+			if(userUuid!=null && studySubject.getStudySubjectDetail()!=null) {
 				pDTO.setfName(studySubject.getStudySubjectDetail().getFirstName());
 				pDTO.setParticipantEmailAccount(studySubject.getStudySubjectDetail().getEmail());
 				pDTO.setPhone(studySubject.getStudySubjectDetail().getPhone());

@@ -422,6 +422,8 @@ public class ViewStudySubjectServlet extends SecureController {
                 request.setAttribute("errorData", errorData);
             Study tempParentStudy = currentStudy.isSite() ? currentStudy.getStudy() : currentStudy;
             request.setAttribute("participateStatus", getParticipateStatus(tempParentStudy).toLowerCase());
+            Study subjectStudy= getStudyDao().findByPK(studySub.getStudyId());
+            request.setAttribute("subjectStudy" ,subjectStudy);
             forwardPage(Page.VIEW_STUDY_SUBJECT);
         }
     }

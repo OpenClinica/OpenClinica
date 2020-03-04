@@ -163,6 +163,15 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             } else if (!flb.getStatus().equals(Status.AVAILABLE)) {
                 ecb.setStage(DataEntryStage.LOCKED);
             }
+
+            FormLayoutDAO formLayoutDao = new FormLayoutDAO(dataSource);
+            Iterator edcs = eventDefinitionCRFs.iterator();
+            while(edcs.hasNext()) {
+                EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcs.next();
+                ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edcBean.getCrfId());
+                edcBean.setVersions(versions);
+            }
+
             // above added 092007-102007 tbh
             // TODO need to refactor since this is similar to other code, tbh
             if (edc != null) {

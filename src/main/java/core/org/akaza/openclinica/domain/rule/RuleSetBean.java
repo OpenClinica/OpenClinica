@@ -473,7 +473,6 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject implements
                 ", runSchedule=" + runSchedule +
                 ", runTime='" + runTime + '\'' +
                 ", runOnSchedule=" + runOnSchedule +
-                ", ruleSetRules=" + ruleSetRules +
                 ", target=" + target +
                 ", originalTarget=" + originalTarget +
                 ", expressions=" + expressions +
