@@ -17,6 +17,7 @@
  <jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 <jsp:useBean scope='request' id='exitTo' class='java.lang.String' />
+<jsp:useBean scope='request' id='sid' class='java.lang.String' />
 <jsp:useBean scope="request" id="fromViewNotes" class="java.lang.String"/>
 <jsp:useBean scope="session" id="viewNotesURL" class="java.lang.String"/>
 
@@ -117,6 +118,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
 <input type="hidden" name="exitTo" value="${fn:escapeXml(exitTo)}" />
+<input type="hidden" name="sid" value="${section.eventDefinitionCRF.studyId}" />
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[
     function getSib(theSibling){

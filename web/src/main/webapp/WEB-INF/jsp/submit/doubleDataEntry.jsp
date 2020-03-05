@@ -15,6 +15,7 @@
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope='request' id='isAdminServlet' class='java.lang.String' />
 <jsp:useBean scope='request' id='exitTo' class='java.lang.String' />
+<jsp:useBean scope='request' id='sid' class='java.lang.String' />
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="annotations" class="java.lang.String" />
 <jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
@@ -115,6 +116,7 @@
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${fn:escapeXml(exitTo)}" />
+<input type="hidden" name="sid" value="${section.eventDefinitionCRF.studyId}" />
 
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[
