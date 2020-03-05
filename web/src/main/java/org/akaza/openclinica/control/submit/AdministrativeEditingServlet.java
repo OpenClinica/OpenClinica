@@ -183,6 +183,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
             checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
             checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
         }
+        this.checkUpdateDataPermission(request);
         request.setAttribute("fromResolvingNotes", fromResolvingNotes);
         LOGGER.debug(" +++++++++++++++++++ " + ecb.getStudyEventId());
         // StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
