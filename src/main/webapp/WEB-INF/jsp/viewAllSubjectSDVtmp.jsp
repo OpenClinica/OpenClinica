@@ -422,4 +422,15 @@
     jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
   });
 
+  var sdvTableHeaders = $('#sdv > thead').children();
+  var sdvtColumnTitles = sdvTableHeaders.filter('.header').children();
+  var sdvtFilterBoxes = sdvTableHeaders.filter('.filter').children();
+  function limitFilterWidth(width, columnTitle) {
+    var colIndex = sdvtColumnTitles.find(':contains(' + columnTitle + ')').closest('td').index();
+    var theFilterBox = sdvtFilterBoxes.eq(colIndex).children();
+    theFilterBox.wrapInner('<div style="width:' + width + '; overflow:hidden; text-overflow:ellipsis;">');
+  }
+  limitFilterWidth('110px', 'SDV Status');
+  limitFilterWidth('110px', 'SDV Requirement');
+
 </script>
