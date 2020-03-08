@@ -21,13 +21,12 @@
 
         <div class="sidebar_tab_content">
 
-            <fmt:message key="design_implement_sdv" bundle="${restext}"/>
+            <%--            <fmt:message key="design_implement_sdv" bundle="${restext}"/>--%>
 
         </div>
-
     </td>
-
 </tr>
+
 <tr id="sidebar_Instructions_closed" style="display: none">
     <td class="sidebar_tab">
 
@@ -37,7 +36,85 @@
 
     </td>
 </tr>
+
+<tr id="sidebar_IconKey_open">
+    <td class="sidebar_tab">
+
+        <a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><span
+                class="icon icon-caret-down gray"></span></a>
+
+        Icon Key<br clear="all"><br>
+
+        <table border="0" cellpadding="4" cellspacing="0" width="100%">
+            <tbody>
+            <tr>
+                <td>Statuses</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-doc"></span></td>
+                <td>Not Started</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-clock"></span></td>
+                <td>Not Scheduled</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-clock2"></span></td>
+                <td>Scheduled</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-pencil-squared orange"></span></td>
+                <td>Data Entry Started</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-stop-circle red"></span></td>
+                <td>Stopped</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-redo"></span></td>
+                <td>Skipped</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-checkbox-checked green"></span></td>
+                <td>Completed</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-icon-sign green"></span></td>
+                <td>Signed</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-lock"></span></td>
+                <td>Locked</td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-file-excel red"></span></td>
+                <td>Invalid</td>
+            </tr>
+            </tbody>
+        </table>
+    </td>
+</tr>
+
+<tr id="sidebar_IconKey_closed" style="display: none">
+    <td class="sidebar_tab">
+        <a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><span
+                class="icon icon-caret-right gray"></span></a>
+        Icon Key
+    </td>
+</tr>
+
+<script>
+    $(function () {
+        $('#sidebar_Info_closed').css('display', 'none');
+        $('#sidebar_Info_open').removeAttr('style');
+
+        $('#sidebar_Links_closed').css('display', 'none');
+        $('#sidebar_Links_open').removeAttr('style');
+    });
+</script>
+
 <jsp:include page="include/sideInfo.jsp"/>
+
 <link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jmesa.js"></script>
