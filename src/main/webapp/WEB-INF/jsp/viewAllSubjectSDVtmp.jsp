@@ -315,6 +315,7 @@
 <script>
   var itemsTable = jQuery('#sdv-items').DataTable({
     dom: 't',
+    paging: false,
     columns: [
       {data: 'briefDescriptionItemName'},
       {data: 'value'},
