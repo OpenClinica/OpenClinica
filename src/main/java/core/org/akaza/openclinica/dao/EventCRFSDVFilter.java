@@ -27,6 +27,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         columnMapping.put("studySubjectId", "ss.label");
         columnMapping.put("studyIdentifier", "s.unique_identifier");
         columnMapping.put("eventName", "sed.name");
+        columnMapping.put("crfName", "ec.name_id");
         columnMapping.put("sdvRequirementDefinition", "");
         columnMapping.put("crfStatus", "ec.status_id");
         columnMapping.put("subjectEventStatus","se.subject_event_status_id");
