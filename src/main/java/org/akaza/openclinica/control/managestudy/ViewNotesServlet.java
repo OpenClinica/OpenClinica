@@ -37,7 +37,6 @@ import core.org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.apache.commons.lang3.StringUtils;
 import org.jmesa.facade.TableFacade;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -83,10 +82,6 @@ public class ViewNotesServlet extends SecureController {
     protected void processRequest() throws Exception {
         String module = request.getParameter("module");
         String moduleStr = "manage";
-        String study_oid = request.getParameter("study_oid");
-        if (!StringUtils.isEmpty(study_oid)) {
-            changeStudy(study_oid);
-        }
         if (module != null && module.trim().length() > 0) {
             if ("submit".equals(module)) {
                 request.setAttribute("module", "submit");

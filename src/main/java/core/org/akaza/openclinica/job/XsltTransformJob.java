@@ -451,16 +451,15 @@ public class XsltTransformJob extends QuartzJobBean {
                     subject = "Job Ran: " + datasetBean.getName();
                 }
 
-                Study study =studyDao.findByPK(datasetBean.getStudyId());
-
                 if (successMsg == null || successMsg.isEmpty()) {
                     logger.info("email buffer??" + emailBuffer);
 
                 } else {
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
-                                successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?study_oid="+study.getOc_oid().toLowerCase()+"&fileId=" + fbFinal.getId()
-                                        + "\"> [Click Here] </a>");
+                                successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
+                                        + "\">" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
+                                        + " </a>");
                     }
                     emailBuffer.append("<p>" + successMsg + "</p>");
                 }
