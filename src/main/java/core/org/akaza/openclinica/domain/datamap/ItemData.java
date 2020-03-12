@@ -135,6 +135,24 @@ public class ItemData extends DataMapDomainObject {
     }
 
     public void setValue(String value) {
+        // workaround to prevent the surrogate characters saved to DB (OC-12432)
+        // and this code should be removed after updated to JDK 9
+        // (https://bugs.openjdk.java.net/browse/JDK-8062362)
+        char current;
+        StringBuffer out = new StringBuffer();
+        if (value != null || !("".equals(value))) {
+            for (int i = 0; i < value.length(); i++) {
+                current = value.charAt(i);
+                if ((current == 0x9) ||
+                        (current == 0xA) ||
+                        (current == 0xD) ||
+                        ((current >= 0x20) && (current <= 0xD7FF)) ||
+                        ((current >= 0xE000) && (current <= 0xFFFD)) ||
+                        ((current >= 0x10000) && (current <= 0x10FFFF)))
+                    out.append(current);
+            }
+            value = out.toString();
+        }
         this.value = value;
     }
 
