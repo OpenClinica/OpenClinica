@@ -50,7 +50,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     private boolean checkStudyUuid(String studyUuid, int parentStudyId) {
         if (parentStudyId == 0) return false;
-        Study study = studyDao.findPublicStudyById(parentStudyId);
+        Study study = studyDao.findById(parentStudyId);
         if (StringUtils.equals(study.getStudyEnvUuid(), studyUuid))
             return true;
         return false;

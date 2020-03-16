@@ -64,6 +64,7 @@ public class AccessFileServlet extends SecureController {
         if (!StringUtils.isEmpty(study_oid)) {
             study = getStudyDao().findPublicStudy(study_oid.toUpperCase());
             CoreResources.setRequestSchema(request, study.getSchemaName());
+            study=getStudyDao().findByOid(study.getOc_oid());
             if (checkRolesByUserAndStudy(ub, study)) {
                 permissionTagsList = getPermissionService().getPermissionTagsList(study, request);
                 asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
