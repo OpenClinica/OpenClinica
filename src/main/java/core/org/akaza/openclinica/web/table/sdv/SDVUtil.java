@@ -1072,13 +1072,14 @@ public class SDVUtil {
                         eventCRFBean.getStudyEventId(), queryStringEncoded));
             }
 
-            StudyEventDefinition event = eventCrf.getStudyEvent().getStudyEventDefinition();
+            StudyEvent event = eventCrf.getStudyEvent();
+            StudyEventDefinition eventDef = event.getStudyEventDefinition();
             actionsBuilder
                 .append("<button style='padding:.4em 0.9em' class='accessCheck popupSdv' title='" + resWords.getString("view_sdv_item_data_hover") + "'")
                 .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
-                .append(" data-study-oid='").append(event.getStudy().getOc_oid()).append("'")
-                .append(" data-event-oid='").append(event.getOc_oid()).append("'")
-                .append(" data-event-ordinal='").append(event.getOrdinal() > 0 ? event.getOrdinal() : 1).append("'")
+                .append(" data-study-oid='").append(eventDef.getStudy().getOc_oid()).append("'")
+                .append(" data-event-oid='").append(eventDef.getOc_oid()).append("'")
+                .append(" data-event-ordinal='").append(event.getSampleOrdinal() > 0 ? event.getSampleOrdinal() : 1).append("'")
                 .append(" data-form-oid='").append(eventCrf.getFormLayout().getCrf().getOcOid()).append("'")
                 .append(" data-sdv-status='").append(eventCRFBean.getSdvStatus()).append("'")
                 .append(">" + resWords.getString("sdv_item_data") + "</button>");
