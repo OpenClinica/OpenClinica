@@ -408,12 +408,14 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     	    CoreResources.setRequestSchema(schema);
     	    ArrayList<File> pdfFiles = new ArrayList<File>();
     	    ArrayList<String[]> pdfHeaders = new ArrayList<String[]>();
+    	    ArrayList<String> pdfLeftFooters = new ArrayList<String>();
 		    File mergedPdfFile = null;
 		    String mergedPdfFileNm = null;
 		    int studyId = Integer.parseInt((String) servletContext.getAttribute("studyID"));
 		    
-		    // pdf header
+		    // pdf header, footer
 		    String[] pdfHeader = null;
+		    String pdfFooterTime = null;
 		   
 			/**
 			 *  need to check the number of study/events/forms for this subject
@@ -498,13 +500,15 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 							if(pdfFile !=null) {
 								pdfFiles.add(pdfFile);
 								pdfHeaders.add(pdfHeader);
+								pdfFooterTime = this.pdfService.preparePdfFooterTime();
+								pdfLeftFooters.add(pdfFooterTime);
 							}
 			    	    }										
 				        
 			    	}//for-loop-2	    						
 			    }//for-loop-1		   
 			    
-				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName,pdfHeaders);
+				mergedPdfFile = pdfService.mergePDF(pdfFiles, fullFinalFilePathName,pdfHeaders,pdfLeftFooters);
 				mergedPdfFileNm = mergedPdfFile.getName();
 				userService.persistJobCompleted(jobDetail, mergedPdfFileNm);
 							
