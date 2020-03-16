@@ -1306,6 +1306,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public void checkRoleByUserAndStudy(UserAccountBean ub, Study tenantStudy) {
+        if (!checkRolesByUserAndStudy(ub, tenantStudy)) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
+    }
+
+    public boolean checkRolesByUserAndStudy(UserAccountBean ub, Study tenantStudy) {
         Study study = null;
 
         if (StringUtils.isNotEmpty(tenantStudy.getSchemaName()))
@@ -1319,11 +1327,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             siteUserRole = ub.getRoleByStudy(study.getStudyId());
         }
         if (studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)) {
-            addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
-            forwardPage(Page.MENU_SERVLET);
-            return;
+            return false;
         }
+        return true;
     }
+
 
     protected void baseUrl() throws MalformedURLException {
         /*
@@ -1649,5 +1657,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
+ protected PermissionService getPermissionService(){
+     return  (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+
+ }
 
 }
