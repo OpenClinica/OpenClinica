@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page import="core.org.akaza.openclinica.logic.importdata.*" %>
 <%@ page import="java.io.*" %>
-<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.*" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URLEncoder" %>
@@ -129,7 +129,11 @@
 		fileObjects= f.listFiles();
 	}	
 	
-    
+    Arrays.sort(fileObjects, new Comparator<File>() {
+    public int compare(File f1, File f2) {
+        return Long.compare(f2.lastModified(), f1.lastModified());
+    }
+	});
 	// debug
 	if(fileObjects.length == 0){
 		logger.info("No any log files can be found in file directory : " + fileDir);
