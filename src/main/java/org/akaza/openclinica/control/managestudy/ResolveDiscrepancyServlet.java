@@ -214,9 +214,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
         ItemBean item = (ItemBean) idao.findByPK(idb.getItemId());
         ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO<>(ds);
 
-        logger.info("ItemDataBean id: " + Integer.toString(idb.getId()));
-        logger.info("ItemBean id: " + Integer.toString(item.getId()));
-
         EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
@@ -405,7 +402,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
         String flavor = fp.getString(FLAVOR);
         String module = (String) session.getAttribute("module");
 
-        logger.info("itemDataId " + Integer.toString(itemDataId));
         if (itemDataId > 0) {
             flavor = QUERY_FLAVOR;
             prepareItemRequest(request, sm.getDataSource(), currentStudy, null, module, flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE);
