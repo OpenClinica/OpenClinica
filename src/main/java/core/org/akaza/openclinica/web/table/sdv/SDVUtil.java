@@ -33,7 +33,6 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.controller.dto.SdvDTO;
 import org.akaza.openclinica.controller.dto.SdvItemDTO;
-import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SDVToolbar;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import core.org.akaza.openclinica.dao.EventCRFSDVFilter;
@@ -52,9 +51,8 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.checkerframework.checker.units.qual.A;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
@@ -75,7 +73,6 @@ import org.jmesa.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 
 /**
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
@@ -128,7 +125,7 @@ public class SDVUtil {
 
     public final static Map<core.org.akaza.openclinica.domain.datamap.SubjectEventStatus, String> SUBJECT_EVENT_STATUS_ICONS = new HashMap<core.org.akaza.openclinica.domain.datamap.SubjectEventStatus, String>();
     public final static Map<Integer, String> CRF_STATUS_ICONS = new HashMap<Integer, String>();
-    public final static Map<StudyEventWorkflowEnum, String> STUDY_EVENT_WORKFLOW_ICONS = new HashMap();
+    public final static Map<StudyEventWorkflowStatusEnum, String> STUDY_EVENT_WORKFLOW_ICONS = new HashMap();
     static {
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.INVALID, "icon icon-doc");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SCHEDULED, "icon icon-clock2");
@@ -140,16 +137,16 @@ public class SDVUtil {
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.LOCKED, "icon icon-lock");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SIGNED, "icon con-icon-sign green");
 
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.SCHEDULED, "icon icon-clock2");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.NOT_SCHEDULED, "icon icon-clock");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.DATA_ENTRY_STARTED,  "icon icon-pencil-squared orange");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.COMPLETED, "icon icon-checkbox-checked green");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.STOPPED, "icon icon-stop-circle red");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.SKIPPED, "icon icon-redo");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SCHEDULED, "icon icon-clock2");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED, "icon icon-clock");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED,  "icon icon-pencil-squared orange");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.COMPLETED, "icon icon-checkbox-checked green");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.STOPPED, "icon icon-stop-circle red");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SKIPPED, "icon icon-redo");
         /*******************
           STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.LOCKED, "icon icon-lock");
           */
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.SIGNED, "icon con-icon-sign green");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SIGNED, "icon con-icon-sign green");
 
 
 

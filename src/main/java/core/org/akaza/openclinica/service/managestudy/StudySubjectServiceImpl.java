@@ -34,15 +34,13 @@ import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -124,7 +122,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         return displayEvents;
     }
 
-    private List<DisplayEventCRFBean> getDisplayEventCRFs(List eventCRFs, UserAccountBean ub, StudyUserRoleBean currentRole, StudyEventWorkflowEnum status,
+    private List<DisplayEventCRFBean> getDisplayEventCRFs(List eventCRFs, UserAccountBean ub, StudyUserRoleBean currentRole, StudyEventWorkflowStatusEnum status,
             Study study, Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById,
             Integer studyEventDefinitionId, List eventDefinitionCRFs) {
         ArrayList<DisplayEventCRFBean> answer = new ArrayList<DisplayEventCRFBean>();
@@ -200,7 +198,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         return answer;
     }
 
-    private ArrayList<DisplayEventDefinitionCRFBean> getUncompletedCRFs(List eventDefinitionCRFs, List eventCRFs, StudyEventWorkflowEnum status,
+    private ArrayList<DisplayEventDefinitionCRFBean> getUncompletedCRFs(List eventDefinitionCRFs, List eventCRFs, StudyEventWorkflowStatusEnum status,
             Set<Integer> nonEmptyEventCrf, Map<Integer, FormLayoutBean> formLayoutById, Map<Integer, CRFBean> crfById) {
         int i;
         HashMap<Integer, Boolean> completed = new HashMap<Integer, Boolean>();

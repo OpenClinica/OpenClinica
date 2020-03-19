@@ -12,7 +12,7 @@ package core.org.akaza.openclinica.bean.submit.crfdata;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 
 /**
  * OpenClinica form attributes have been included in addition to ODM FormData
@@ -26,7 +26,7 @@ public class ExportFormDataBean extends FormDataBean {
     private String interviewerName;
     private String interviewDate;
     private String status;
-    private EventCrfWorkflowEnum workflowStatus;
+    private EventCrfWorkflowStatusEnum workflowStatus;
     private String formLayoutName;
     private String formName;
     private FormLayout formLayout;
@@ -112,11 +112,11 @@ public class ExportFormDataBean extends FormDataBean {
         this.eventDefinitionCrf = eventDefinitionCrf;
     }
 
-    public EventCrfWorkflowEnum getWorkflowStatus() {
+    public EventCrfWorkflowStatusEnum getWorkflowStatus() {
         return workflowStatus;
     }
 
-    public void setWorkflowStatus(EventCrfWorkflowEnum workflowStatus) {
+    public void setWorkflowStatus(EventCrfWorkflowStatusEnum workflowStatus) {
         this.workflowStatus = workflowStatus;
     }
 

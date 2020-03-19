@@ -8,7 +8,7 @@ import java.util.ResourceBundle;
 /**
  * The EventCrfWorkflowEnum enumeration.
  */
-public enum EventCrfWorkflowEnum {
+public enum EventCrfWorkflowStatusEnum {
     NOT_STARTED ,INITIAL_DATA_ENTRY, COMPLETED;
 
     public String getDisplayValue() {
@@ -16,9 +16,9 @@ public enum EventCrfWorkflowEnum {
         return resterm.getString(this.toString().toLowerCase());
     }
 
-    public static EventCrfWorkflowEnum getByI18nDescription(String description) {
-        HashMap<String, EventCrfWorkflowEnum> mapObject = new HashMap<String, EventCrfWorkflowEnum>();
-        for (EventCrfWorkflowEnum theEnum : EventCrfWorkflowEnum.values()) {
+    public static EventCrfWorkflowStatusEnum getByI18nDescription(String description) {
+        HashMap<String, EventCrfWorkflowStatusEnum> mapObject = new HashMap<String, EventCrfWorkflowStatusEnum>();
+        for (EventCrfWorkflowStatusEnum theEnum : EventCrfWorkflowStatusEnum.values()) {
             mapObject.put(theEnum.getDisplayValue(), theEnum);
         }
         return mapObject.get(description);

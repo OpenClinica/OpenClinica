@@ -14,7 +14,6 @@ import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.ItemDataType;
 import core.org.akaza.openclinica.bean.core.NullValue;
 import core.org.akaza.openclinica.bean.core.ResponseType;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -49,7 +48,6 @@ import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -67,7 +65,7 @@ import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
@@ -154,8 +152,8 @@ public class ImportCRFDataService {
                     // if event status is one of the - stopped, signed,
                     // locked
                     if ((studyEventBean.getLocked()!=null && studyEventBean.getLocked())
-                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.SIGNED)
-                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.STOPPED)) {
+                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)
+                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                         return null;
                     }
                 }
@@ -259,7 +257,7 @@ public class ImportCRFDataService {
                              tempStudyEventBean.setUpdater(ub);
                              tempStudyEventBean.setUpdatedDate(today);
                              tempStudyEventBean.setStudySubjectId(studySubjectBean.getId());
-                             tempStudyEventBean.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
+                             tempStudyEventBean.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                              tempStudyEventBean.setStatus(core.org.akaza.openclinica.bean.core.Status.AVAILABLE);
                              tempStudyEventBean.setStudyEventDefinitionId(studyEventDefinitionBean.getId());
                              tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
@@ -313,9 +311,9 @@ public class ImportCRFDataService {
                             // spell out criteria and create a bean if
                             // necessary, avoiding false-positives
                             if ((studyEventDefinitionBean.isTypeCommon()
-                                    ||studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)
-                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)
-                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED)) && upsert.isNotStarted()) {
+                                    ||studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
+                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
+                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) && upsert.isNotStarted()) {
 
                                 EventCRFBean newEventCrfBean = buildEventCrfBean(studySubjectBean, studyEventBean, formLayoutBean, crfVersionBean, ub);
                                 if (persistEventCrfs){
@@ -541,8 +539,8 @@ public class ImportCRFDataService {
                     // if event status is one of the - stopped, signed,
                     // locked
                     if ((studyEventBean.getLocked()!=null && studyEventBean.getLocked())
-                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.SIGNED)
-                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.STOPPED)) {
+                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)
+                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                     	errors.add("Do not allow the data import, if scheduled event is one of the status - stopped, signed,locked");
                         return errors;
                     }
@@ -772,8 +770,8 @@ public class ImportCRFDataService {
                 // if event status is one of the - stopped, signed,
                 // locked
                 if ((studyEventBean.getLocked()!=null && studyEventBean.getLocked())
-                        || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.SIGNED)
-                        || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.STOPPED)) {
+                        || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)
+                        || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                     return true;
                 }
                 for (FormDataBean formDataBean : formDataBeans) {
@@ -787,9 +785,9 @@ public class ImportCRFDataService {
                         // event crf, yet.
                         if (eventCrfBeans.isEmpty()) {
                             logger.debug("   found no event crfs from Study Event id " + studyEventBean.getId() + ", location " + studyEventBean.getLocation());
-                            if ((studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)
-                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)
-                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED))) {
+                            if ((studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
+                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
+                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED))) {
 
                             	//new requirments:common events has nothing related to upsert setting
                             	if(studyEventDefinitionBean.isTypeCommon()) {
@@ -1851,7 +1849,7 @@ public class ImportCRFDataService {
                      tempStudyEventBean.setUpdater(ub);
                      tempStudyEventBean.setUpdatedDate(today);
                      tempStudyEventBean.setStudySubjectId(studySubjectBean.getId());
-                     tempStudyEventBean.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
+                     tempStudyEventBean.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                      tempStudyEventBean.setStatus(core.org.akaza.openclinica.bean.core.Status.AVAILABLE);
                      tempStudyEventBean.setStudyEventDefinitionId(sedBean.getId());
                      tempStudyEventBean.setSampleOrdinal(ordinal);                     

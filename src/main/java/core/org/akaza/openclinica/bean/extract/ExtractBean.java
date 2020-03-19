@@ -46,7 +46,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1831,7 +1831,7 @@ public class ExtractBean {
             eventCRF = (EventCRFBean) seb.getEventCRFs().get(0);
         }
         String crfVersionStatus = "";
-        StudyEventWorkflowEnum status = StudyEventWorkflowEnum.NOT_SCHEDULED;
+        StudyEventWorkflowStatusEnum status = StudyEventWorkflowStatusEnum.NOT_SCHEDULED;
         CRFVersionBean crfv = new CRFVersionBean();
         crfv.setStatus(Status.AVAILABLE);
         // modified stage so that crfVersionStatus could be the same as what it

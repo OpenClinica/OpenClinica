@@ -16,7 +16,7 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.ocobserver.Listener;
 import core.org.akaza.openclinica.ocobserver.Observer;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 /**
  * @author jxu
@@ -67,7 +67,7 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
     private boolean endTimeFlag = false;
     private String attestation = "";
     private String additionalNotes;
-    private StudyEventWorkflowEnum workflowStatus;
+    private StudyEventWorkflowStatusEnum workflowStatus;
     private Boolean removed;
     private Boolean archived;
     private Boolean locked;
@@ -177,7 +177,7 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
 
     public StudyEventBean() {
         stage = DataEntryStage.UNCOMPLETED;
-        workflowStatus = StudyEventWorkflowEnum.SCHEDULED;
+        workflowStatus = StudyEventWorkflowStatusEnum.SCHEDULED;
     }
 
     /**
@@ -420,11 +420,11 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
         this.locked = locked;
     }
 
-    public StudyEventWorkflowEnum getWorkflowStatus() {
+    public StudyEventWorkflowStatusEnum getWorkflowStatus() {
         return workflowStatus;
     }
 
-    public void setWorkflowStatus(StudyEventWorkflowEnum workflowStatus) {
+    public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
         this.workflowStatus = workflowStatus;
     }
 }

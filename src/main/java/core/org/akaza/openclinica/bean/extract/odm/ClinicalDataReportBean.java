@@ -29,8 +29,8 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.util.StringUtils;
 
@@ -216,7 +216,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         }
 
                         if(se.getWorkflowStatus()!=null) {
-                            StudyEventWorkflowEnum workflow = se.getWorkflowStatus();
+                            StudyEventWorkflowStatusEnum workflow = se.getWorkflowStatus();
                             if (!StringUtils.isEmpty(workflow)) {
                                 xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
                             }
@@ -290,9 +290,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 // ***************** OpenClinica:Link SIGN EVENT **************
 
                                 if (role.equals(Role.INVESTIGATOR)
-                                        && (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED)
-                                                || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SKIPPED)
-                                                || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.STOPPED) )
+                                        && (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
+                                                || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
+                                                || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED) )
                                         && studySubject.getStatus().equals(Status.AVAILABLE)
                                         && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                     String signUrl = "/UpdateStudyEvent?action=submit&event_id=" + studyEvent.getStudyEventId() + "&ss_id="
@@ -372,7 +372,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 }
 
                                 if(form.getWorkflowStatus()!=null) {
-                                    EventCrfWorkflowEnum workflow = form.getWorkflowStatus();
+                                    EventCrfWorkflowStatusEnum workflow = form.getWorkflowStatus();
                                     if (!StringUtils.isEmpty(workflow)) {
                                         xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
                                     }
@@ -423,7 +423,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     if (!formLayout.getStatus().equals(Status.LOCKED)
                                             && !role.equals(Role.MONITOR)
                                             && (eventCrf.getRemoved()==null || (eventCrf.getRemoved()!=null && !eventCrf.getRemoved())) && (eventCrf.getArchived()==null || (eventCrf.getArchived()!=null && !eventCrf.getArchived())) && eventCrf.getStatusId() != Status.LOCKED.getCode()
-                                            && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SKIPPED)
+                                            && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
                                             && (studyEvent.getRemoved()==null || (studyEvent.getRemoved()!=null && !studyEvent.getRemoved()))
                                             && (studyEvent.getArchived()==null || (studyEvent.getArchived()!=null && !studyEvent.getArchived()))
                                             && studyBean.getStatus().equals(Status.AVAILABLE)) {
@@ -479,7 +479,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
                                             && (versions.size() > 1 || otherVersionAvailable)
                                             && studyBean.getStatus().equals(Status.AVAILABLE)
-                                            && !(studyEvent.getLocked() || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SKIPPED)) ) {
+                                            && !(studyEvent.getLocked() || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)) ) {
 
                                         String reassignUrl = "/pages/managestudy/chooseCRFVersion?crfId=" + formLayout.getCrf().getCrfId() + "&crfName="
                                                 + formLayout.getCrf().getName() + "&formLayoutId=" + formLayout.getFormLayoutId() + "&formLayoutName="

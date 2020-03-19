@@ -35,7 +35,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -50,7 +50,6 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -951,7 +950,7 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
         String eventText = resword.getString("event");
         ;
 
-        StudyEventWorkflowEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
+        StudyEventWorkflowStatusEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowStatusEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
         // String studyEventName = studyEvents.size() == 0 ? "" :
         // studyEvents.get(0).getName();
         String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
@@ -979,14 +978,14 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus.equals(StudyEventWorkflowEnum.NOT_SCHEDULED)  && currentRole.getRole() != Role.MONITOR) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)  && currentRole.getRole() != Role.MONITOR) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);
                 eventDiv.tdEnd().trEnd(0);
             }
 
-            else if (eventStatus.equals(StudyEventWorkflowEnum.COMPLETED) ) {
+            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);

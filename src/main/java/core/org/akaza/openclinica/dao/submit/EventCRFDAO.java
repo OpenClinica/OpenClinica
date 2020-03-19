@@ -41,7 +41,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.lang.StringUtils;
 
@@ -281,7 +281,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         eb.setOldStatus(Status.get(oldStatusId));
         String workflow = (String) hm.get("workflow_status");
         if (!StringUtils.isEmpty(workflow)) {
-            eb.setWorkflowStatus((EventCrfWorkflowEnum) EventCrfWorkflowEnum.valueOf(workflow));
+            eb.setWorkflowStatus((EventCrfWorkflowStatusEnum) EventCrfWorkflowStatusEnum.valueOf(workflow));
         }
         Boolean removed=  (Boolean) hm.get("removed");
         Boolean archived=  (Boolean) hm.get("archived");

@@ -23,7 +23,6 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -53,13 +52,12 @@ import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.AuditLogEventService;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -183,7 +181,7 @@ public class UpdateStudyEventServlet extends SecureController {
         // }
         // above removed tbh 11162007
 
-        List<StudyEventWorkflowEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowEnum.values()));
+        List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
 
 
         // remove more eventWorkflowStatuses here, tbh, 092007
@@ -213,27 +211,27 @@ public class UpdateStudyEventServlet extends SecureController {
         ArrayList eventCrfs = studyEvent.getEventCRFs();
 
         if (!currentRole.isInvestigator()) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowEnum.SIGNED);
+            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SIGNED);
         }
         // ///End of remove signed status from the list
 
         // BWP: 2735>>keep the DATA_ENTRY_STARTED status
 
-        if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.NOT_SCHEDULED)) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowEnum.NOT_SCHEDULED);
+        if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)) {
+            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
         }
-        if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)) {
+        if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
             // can't lock a non-completed CRF, but removed above
-            eventWorkflowStatuses.remove(StudyEventWorkflowEnum.SCHEDULED);
+            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SCHEDULED);
             // addl rule: skipped should only be present before data starts
             // being entered
         }
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowEnum.SKIPPED);
+        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
+            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SKIPPED);
         }
-        if ((studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)
-                || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)) && currentRole.isInvestigator()) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowEnum.SIGNED);
+        if ((studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
+                || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) && currentRole.isInvestigator()) {
+            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SIGNED);
         }
 
         ArrayList getECRFs = studyEvent.getEventCRFs();
@@ -250,7 +248,7 @@ public class UpdateStudyEventServlet extends SecureController {
             //
             logger.debug("found number of existing ecrfs: " + getECRFs.size());
             if (getECRFs.size() == 0) {
-                eventWorkflowStatuses.remove(StudyEventWorkflowEnum.COMPLETED);
+                eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.COMPLETED);
 
             } // otherwise...
             for (int uv = 0; uv < getECRFs.size(); uv++) {
@@ -272,7 +270,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
                     logger.debug("found that " + existingBean.getCrfVersion().getName() + " is required...");
                     // that is, it's not completed but required to complete
-                    eventWorkflowStatuses.remove(StudyEventWorkflowEnum.COMPLETED);
+                    eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.COMPLETED);
                     // per new rule above 11-16-2007
                 }
                 // }
@@ -282,9 +280,9 @@ public class UpdateStudyEventServlet extends SecureController {
 
         // also, if data entry is started, can't move back to scheduled or not
         // scheduled
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowEnum.NOT_SCHEDULED);
-            eventWorkflowStatuses.remove(StudyEventWorkflowEnum.SCHEDULED);
+        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
+            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
+            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SCHEDULED);
         }
 
         // ### tbh, above modified 102007
@@ -312,12 +310,12 @@ public class UpdateStudyEventServlet extends SecureController {
         if (action.equalsIgnoreCase("submit")) {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
-            StudyEventWorkflowEnum ses = StudyEventWorkflowEnum.valueOf( fp.getString(SUBJECT_EVENT_STATUS_ID));
+            StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(SUBJECT_EVENT_STATUS_ID));
             session.setAttribute(PREV_STUDY_EVENT_WORKFLOW_STATUS, studyEvent.getWorkflowStatus());
             studyEvent.setWorkflowStatus(ses);
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
-            if (ses.equals(StudyEventWorkflowEnum.SKIPPED) ) {
+            if (ses.equals(StudyEventWorkflowStatusEnum.SKIPPED) ) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
@@ -538,14 +536,14 @@ public class UpdateStudyEventServlet extends SecureController {
                 // OC-10834 OC4 - Signature not recorded when signing an event if the event status is already Signed
                 // manually add audit-log-event when user re-signed without any changes
                 String eventWorkflowStatus = (String)session.getAttribute(PREV_STUDY_EVENT_WORKFLOW_STATUS);
-                if (seb.getWorkflowStatus().equals(StudyEventWorkflowEnum.SIGNED) && eventWorkflowStatus.equals(StudyEventWorkflowEnum.SIGNED) ) {
+                if (seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED) && eventWorkflowStatus.equals(StudyEventWorkflowStatusEnum.SIGNED) ) {
                     AuditLogEvent auditLogEvent = new AuditLogEvent();
                     auditLogEvent.setAuditTable(STUDY_EVENT);
                     auditLogEvent.setEntityId(seb.getId());
                     auditLogEvent.setEntityName("Status");
                     auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-                    auditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowEnum.SIGNED));
-                    auditLogEvent.setOldValue(String.valueOf(StudyEventWorkflowEnum.SIGNED));
+                    auditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowStatusEnum.SIGNED));
+                    auditLogEvent.setOldValue(String.valueOf(StudyEventWorkflowStatusEnum.SIGNED));
                     auditLogEvent.setDetails(detail);
                     getAuditLogEventService().saveAuditLogEvent(auditLogEvent, ub);
                 }

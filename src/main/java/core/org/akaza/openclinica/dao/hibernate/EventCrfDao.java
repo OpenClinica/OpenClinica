@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +18,7 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
         String query = "from " + getDomainClassName()
                 + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid " +
                 "and (event_crf.removed = null or event_crf.removed !=:removed) and (event_crf.archived = null or event_crf.archived !=:archived) ";
+
         org.hibernate.query.Query hibernateQuery = getCurrentSession().createQuery(query);
         hibernateQuery.setParameter("studyeventid", study_event_id);
         hibernateQuery.setParameter("removed", true);

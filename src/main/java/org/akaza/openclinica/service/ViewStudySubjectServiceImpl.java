@@ -7,7 +7,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -240,7 +240,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(maxOrdinal + 1);
-        studyEvent.setWorkflowStatus(StudyEventWorkflowEnum.NOT_SCHEDULED);
+        studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
         studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());

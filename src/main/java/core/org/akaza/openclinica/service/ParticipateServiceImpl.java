@@ -26,8 +26,8 @@ import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
@@ -427,7 +427,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                 if (eventDefCrf.getCrf().getCrfId() == eventCrf.getFormLayout().getCrf().getCrfId()) {
                     foundEventCrfMatch = true;
                     if (eventDefCrf.getParicipantForm()) {
-                         eventCrf.setWorkflowStatus(EventCrfWorkflowEnum.COMPLETED);
+                         eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
                         eventCrf.setDateCompleted(new Date());
                         eventCrfDao.saveOrUpdate(eventCrf);
                         randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
@@ -441,8 +441,8 @@ public class ParticipateServiceImpl implements ParticipateService {
         boolean statusChanged=false;
         if (completeStudyEvent) {
 
-            if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED)) {
-                studyEvent.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
+            if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
                 statusChanged = true;
             }
             StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged,false);

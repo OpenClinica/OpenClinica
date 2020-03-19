@@ -40,7 +40,7 @@ import core.org.akaza.openclinica.ocobserver.Observer;
 import core.org.akaza.openclinica.ocobserver.StudyEventBeanContainer;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.service.rule.StudyEventBeanListener;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -192,7 +192,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         eb.setAttestation((String) hm.get("attestation"));
         String workflow = (String) hm.get("workflow_status");
         if (!StringUtils.isEmpty(workflow)) {
-            eb.setWorkflowStatus((StudyEventWorkflowEnum) StudyEventWorkflowEnum.valueOf(workflow));
+            eb.setWorkflowStatus((StudyEventWorkflowStatusEnum) StudyEventWorkflowStatusEnum.valueOf(workflow));
         }
         Boolean removed=  (Boolean) hm.get("removed");
         Boolean archived=  (Boolean) hm.get("archived");
@@ -227,7 +227,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         int subjectEventStatuId = ((Integer) hm.get("subject_event_status_id")).intValue();
         String workflow = (String) hm.get("workflow_status");
         if (!StringUtils.isEmpty(workflow)) {
-            eb.setWorkflowStatus((StudyEventWorkflowEnum) StudyEventWorkflowEnum.valueOf(workflow));
+            eb.setWorkflowStatus((StudyEventWorkflowStatusEnum) StudyEventWorkflowStatusEnum.valueOf(workflow));
         }
 
         // YW 08-17-2007

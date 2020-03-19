@@ -10,7 +10,6 @@ package org.akaza.openclinica.control.managestudy;
 import core.org.akaza.openclinica.bean.admin.AuditEventBean;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.admin.StudyEventAuditBean;
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -19,7 +18,6 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
@@ -27,21 +25,18 @@ import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.*;
-import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.crfdata.HideCRFManager;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.sql.DataSource;
@@ -438,7 +433,7 @@ public class ViewStudySubjectServlet extends SecureController {
      * @return The list of DisplayEventCRFBeans for this study event.
      */
     public static ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
-                                                StudyUserRoleBean currentRole, StudyEventWorkflowEnum workflowStatus, Study study) {
+                                                StudyUserRoleBean currentRole, StudyEventWorkflowStatusEnum workflowStatus, Study study) {
         ArrayList answer = new ArrayList();
 
         // HashMap definitionsById = new HashMap();
@@ -525,7 +520,7 @@ public class ViewStudySubjectServlet extends SecureController {
      *            All of the event CRFs for this study event.
      * @return The list of event definitions for which no event CRF exists.
      */
-    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, StudyEventWorkflowEnum workflowStatus, int studyEventId) {
+    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, StudyEventWorkflowStatusEnum workflowStatus, int studyEventId) {
 
         HashMap<Integer, EventDefinitionCRFBean> eventDefinitionsHashMap = new HashMap();
 

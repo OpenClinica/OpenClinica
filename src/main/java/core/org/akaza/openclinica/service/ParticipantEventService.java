@@ -6,7 +6,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -18,8 +17,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 public class ParticipantEventService {
 
@@ -41,8 +39,8 @@ public class ParticipantEventService {
         for (StudyEventBean studyEvent:studyEvents) {
             // Skip to next event if study event is not in the right status
             if (studyEvent.getStatus() != Status.AVAILABLE || 
-                    (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)
-                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED))) continue;
+                    (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
+                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED))) continue;
             
             List<EventDefinitionCRFBean> eventDefCrfs = getEventDefCrfsForStudyEvent(studySubject, studyEvent);
             

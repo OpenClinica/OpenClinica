@@ -17,10 +17,9 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -323,7 +322,7 @@ public class CrfBusinessLogicHelper {
 
         if (sedBean.getCrfs().size() == 1) {
 
-            seb.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
             logger.info("just set subj event status to -- COMPLETED --");
         }
         // 2. More than one CRF in the event, all of them being required. If
@@ -334,7 +333,7 @@ public class CrfBusinessLogicHelper {
         // removing sedBean.getCrfs().size() > 1 &&
         else if (areAllRequired(seb, study) && !areAllCompleted(seb, study)) {
 
-            seb.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
             logger.info("just set subj event status to -- DATAENTRYSTARTED --");
         }
         // 3. More than one CRF in the event, one is required, the other is
@@ -351,10 +350,10 @@ public class CrfBusinessLogicHelper {
         // removing sedBean.getCrfs().size() > 1 &&
         else if (!areAllRequired(seb, study)) {
             if (areAllRequiredCompleted(seb, study)) {
-                seb.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
+                seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
                 logger.info("just set subj event status to -- 3completed3 --");
             } else {
-                seb.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
+                seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                 logger.info("just set subj event status to -- DATAENTRYSTARTED --");
             }
         }
@@ -369,7 +368,7 @@ public class CrfBusinessLogicHelper {
         // removing sedBean.getCrfs().size() > 1 &&
 
         else if (noneAreRequired(seb, study)) {
-            seb.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
             logger.info("just set subj event status to -- 5completed5 --");
         }
         logger.debug("just set subj event status, final status is " + seb.getWorkflowStatus());
@@ -412,11 +411,11 @@ public class CrfBusinessLogicHelper {
 
         StudyEventDAO sedao = new StudyEventDAO(ds);
         StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
-        if (seb.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowEnum.NOT_SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)) {
+        if (seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
             // change status for study event
             seb.setUpdatedDate(new Date());
             seb.setUpdater(ub);
-            seb.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
             seb = (StudyEventBean) sedao.update(seb);
         }
 
@@ -456,11 +455,11 @@ public class CrfBusinessLogicHelper {
 
         StudyEventDAO sedao = new StudyEventDAO(ds);
         StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
-        if (seb.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowEnum.NOT_SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)) {
+        if (seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) || seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
             // change status for study event
             seb.setUpdatedDate(new Date());
             seb.setUpdater(ub);
-            seb.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
             seb = (StudyEventBean) sedao.update(seb,inTransaction);
         }
 
@@ -544,7 +543,7 @@ public class CrfBusinessLogicHelper {
         if (sedBean.getCrfs().size() == 1) { // && edcb.getCrfId() ==
             // ecb.getCrf().getId()) {
 
-            seb.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
             logger.info("just set subj event status to -- COMPLETED --");
         }
         // 2. More than one CRF in the event, all of them being required. If
@@ -555,7 +554,7 @@ public class CrfBusinessLogicHelper {
         // removing sedBean.getCrfs().size() > 1 &&
         else if (areAllRequired(seb, study) && !areAllCompleted(seb, study)) {
 
-            seb.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
             logger.info("just set subj event status to -- DATAENTRYSTARTED --");
         }
         // 3. More than one CRF in the event, one is required, the other is
@@ -572,10 +571,10 @@ public class CrfBusinessLogicHelper {
         // removing sedBean.getCrfs().size() > 1 &&
         else if (!areAllRequired(seb, study)) {
             if (areAllRequiredCompleted(seb, study)) {
-                seb.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
+                seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
                 logger.info("just set subj event status to -- 3completed3 --");
             } else {
-                seb.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
+                seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                 logger.info("just set subj event status to -- DATAENTRYSTARTED --");
             }
         }
@@ -590,7 +589,7 @@ public class CrfBusinessLogicHelper {
         // removing sedBean.getCrfs().size() > 1 &&
 
         else if (noneAreRequired(seb, study)) {
-            seb.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
+            seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
             logger.info("just set subj event status to -- 5completed5 --");
         }
         logger.debug("just set subj event status, final status is " + seb.getWorkflowStatus());

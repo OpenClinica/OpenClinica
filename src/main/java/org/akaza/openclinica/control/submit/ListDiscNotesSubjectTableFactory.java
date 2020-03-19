@@ -41,7 +41,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -56,7 +56,6 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
@@ -230,12 +229,12 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             for (StudyEventDefinitionBean studyEventDefinition : getStudyEventDefinitions()) {
 
                 List<StudyEventBean> studyEvents = allStudyEventsForStudySubjectBySedId.get(studyEventDefinition.getId());
-                StudyEventWorkflowEnum subjectEventStatus = null;
+                StudyEventWorkflowStatusEnum subjectEventStatus = null;
                 HashMap<ResolutionStatus, Integer> discCounts = new HashMap<ResolutionStatus, Integer>();
 
                 studyEvents = studyEvents == null ? new ArrayList<StudyEventBean>() : studyEvents;
                 if (studyEvents.size() < 1) {
-                    subjectEventStatus.equals(StudyEventWorkflowEnum.NOT_SCHEDULED);
+                    subjectEventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
                 } else {
                     for (StudyEventBean studyEventBean : studyEvents) {
                         discCounts = countAll(discCounts, studyEventBean, constraints, study.isSite());
@@ -267,7 +266,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         boolean isSignable = true;
         boolean isRequiredUncomplete;
         for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
-            if (studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)) {
+            if (studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
                 isSignable = false;
                 break;
             } else {
@@ -893,7 +892,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             StudySubjectBean studySubject, StudyEventBean currentEvent) {
 
         Status eventSysStatus = studySubject.getStatus();
-        StudyEventWorkflowEnum eventStatus = currentEvent.getWorkflowStatus();
+        StudyEventWorkflowStatusEnum eventStatus = currentEvent.getWorkflowStatus();
         String studyEventId = String.valueOf(currentEvent.getId());
 
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
@@ -903,7 +902,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus.equals(StudyEventWorkflowEnum.COMPLETED)) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -975,7 +974,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         String eventText = resword.getString("event");
         String status = resword.getString("status");
 
-        StudyEventWorkflowEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
+        StudyEventWorkflowStatusEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowStatusEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
         String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
         String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
         Status eventSysStatus = studySubject.getStatus();
@@ -1027,14 +1026,14 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus.equals(StudyEventWorkflowEnum.NOT_SCHEDULED) && currentRole.getRole() != Role.MONITOR) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) && currentRole.getRole() != Role.MONITOR) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);
                 eventDiv.tdEnd().trEnd(0);
             }
 
-            else if (eventStatus.equals(StudyEventWorkflowEnum.COMPLETED)  ) {
+            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)  ) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);

@@ -43,6 +43,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private final static String CLOSE_ORDINAL_DELIMITER = "]";
 	private static final Object STATUS = "Status";
 	private static final Object STUDY_EVENT = "study_event";
+	private static final Object EVENT_CRF = "event_crf";
 	private static final Object SUBJECT_GROUP_MAP = "subject_group_map";
 	private static boolean isActiveRoleAtSite = true;
 
@@ -847,7 +848,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				 * }
 				 * else
 				 */
-				if (auditLogEvent.getAuditTable().equals(STUDY_EVENT)) {
+				if (auditLogEvent.getAuditTable().equals(STUDY_EVENT) || auditLogEvent.getAuditTable().equals(EVENT_CRF)) {
 					auditBean.setNewValue(auditLogEvent.getNewValue());
 					auditBean.setOldValue(auditLogEvent.getOldValue());
 				} else if (auditLogEvent.getAuditTable().equals(SUBJECT_GROUP_MAP)) {

@@ -26,9 +26,9 @@ import core.org.akaza.openclinica.domain.datamap.StudySubject;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,9 +152,9 @@ public class EventProcessor implements Processor {
                 container.setEventCrf(createEventCrf(formLayout, container.getStudyEvent(), container.getSubject(), container.getUser()));
                 break;
             } else if (!existingStudyEvent.getRemoved() || !existingStudyEvent.getArchived()
-                    || (!existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)
-                            && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.NOT_SCHEDULED)
-                            && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED))) {
+                    || (!existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
+                            && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                            && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))) {
                 if (studyEventDefinition.getRepeating()) {
                     ordinal++;
                     continue;
@@ -205,7 +205,7 @@ public class EventProcessor implements Processor {
         studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setUserAccount(user);
         studyEvent.setDateStart(currentDate);
-        studyEvent.setWorkflowStatus(StudyEventWorkflowEnum.SCHEDULED);
+        studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
         studyEvent.setDateCreated(currentDate);
@@ -229,7 +229,7 @@ public class EventProcessor implements Processor {
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
-        eventCrf.setWorkflowStatus(EventCrfWorkflowEnum.INITIAL_DATA_ENTRY);
+        eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         eventCrf.setCompletionStatus(completionStatusDao.findByCompletionStatusId(1));// setCompletionStatusId(1);
         eventCrf.setStudySubject(studySubject);
         eventCrf.setStudyEvent(studyEvent);
@@ -248,16 +248,16 @@ public class EventProcessor implements Processor {
 
     private StudyEvent updateStudyEvent(StudyEvent studyEvent, StudyEventDefinition studyEventDefinition, Study study, StudySubject studySubject,
             UserAccount user, boolean isAnonymous) {
-        StudyEventWorkflowEnum newStatus = null;
+        StudyEventWorkflowStatusEnum newStatus = null;
         int crfCount = 0;
         int hiddenSiteCrfCount = 0;
         int completedCrfCount = 0;
 
         if (!isAnonymous) {
-            if ((studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED))
-                    || (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.NOT_SCHEDULED)
+            if ((studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED))
+                    || (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
                             && studyEventDefinition.getType().equals(COMMON))) {
-                newStatus = StudyEventWorkflowEnum.DATA_ENTRY_STARTED;
+                newStatus = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED;
             }
 
         } else {
@@ -275,14 +275,14 @@ public class EventProcessor implements Processor {
             // Get a count of completed CRFs for the event
             completedCrfCount = eventCrfDao.findByStudyEventStatus(studyEvent.getStudyEventId(), Status.UNAVAILABLE.getCode()).size();
             if ((crfCount - hiddenSiteCrfCount) == completedCrfCount) {
-                if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)
-                        || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)) {
-                    newStatus = StudyEventWorkflowEnum.COMPLETED;
+                if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
+                        || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
+                    newStatus = StudyEventWorkflowStatusEnum.COMPLETED;
                 }
-            } else if ((studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED) )
-                    || (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.NOT_SCHEDULED)
+            } else if ((studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) )
+                    || (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
                             && studyEventDefinition.getType().equals(COMMON))) {
-                newStatus = StudyEventWorkflowEnum.DATA_ENTRY_STARTED;
+                newStatus = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED;
             }
         }
 
@@ -308,12 +308,12 @@ public class EventProcessor implements Processor {
      *
      */
     private EventCrf updateEventCrf(EventCrf eventCrf, Study study, StudySubject studySubject, UserAccount user, boolean isAnonymous) {
-        if(eventCrf.getWorkflowStatus().equals(EventCrfWorkflowEnum.NOT_STARTED))
-            eventCrf.setWorkflowStatus(EventCrfWorkflowEnum.INITIAL_DATA_ENTRY);
+        if(eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED))
+            eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         eventCrf.setUpdateId(user.getUserId());
         eventCrf.setDateUpdated(new Date());
         if (isAnonymous) {
-            eventCrf.setWorkflowStatus(EventCrfWorkflowEnum.COMPLETED);
+            eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
         }
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("*********UPDATED EVENT CRF");

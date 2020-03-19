@@ -10,7 +10,7 @@ import javax.persistence.*;
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -52,7 +52,7 @@ public class EventCrf extends DataMapDomainObject {
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
     private Date lastSdvVerifiedDate;
-    private EventCrfWorkflowEnum workflowStatus;
+    private EventCrfWorkflowStatusEnum workflowStatus;
     private Boolean removed;
     private Boolean archived;
 
@@ -418,11 +418,11 @@ public class EventCrf extends DataMapDomainObject {
 
     @Enumerated( EnumType.STRING )
     @Column(name = "workflow_status")
-    public EventCrfWorkflowEnum getWorkflowStatus() {
+    public EventCrfWorkflowStatusEnum getWorkflowStatus() {
         return workflowStatus;
     }
 
-    public void setWorkflowStatus(EventCrfWorkflowEnum workflowStatus) {
+    public void setWorkflowStatus(EventCrfWorkflowStatusEnum workflowStatus) {
         this.workflowStatus = workflowStatus;
     }
 

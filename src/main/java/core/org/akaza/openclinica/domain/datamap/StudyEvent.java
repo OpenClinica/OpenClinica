@@ -9,7 +9,7 @@ import javax.persistence.*;
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -41,7 +41,7 @@ public class StudyEvent extends DataMapDomainObject  {
 	private List<DnStudyEventMap> dnStudyEventMaps ;
 	private List<EventCrf> eventCrfs ;
 	private Integer sedOrdinal;
-	private StudyEventWorkflowEnum workflowStatus;
+	private StudyEventWorkflowStatusEnum workflowStatus;
 	private Boolean removed;
 	private Boolean archived;
 	private Boolean locked;
@@ -298,11 +298,11 @@ public class StudyEvent extends DataMapDomainObject  {
 
 	@Enumerated( EnumType.STRING )
 	@Column(name = "workflow_status")
-	public StudyEventWorkflowEnum getWorkflowStatus() {
+	public StudyEventWorkflowStatusEnum getWorkflowStatus() {
 		return workflowStatus;
 	}
 
-	public void setWorkflowStatus(StudyEventWorkflowEnum workflowStatus) {
+	public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
 		this.workflowStatus = workflowStatus;
 	}
 }

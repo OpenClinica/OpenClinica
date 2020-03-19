@@ -26,7 +26,6 @@ import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.*;
-import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -41,9 +40,8 @@ import core.org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
@@ -3176,7 +3174,7 @@ public class OdmExtractDAO extends DatasetDAO {
                         }
                     }
                     if (dataset.isShowEventStatus()) {
-                        StudyEventWorkflowEnum workflowEnum = StudyEventWorkflowEnum.valueOf((String) row.get("event_workflow_status")) ;
+                        StudyEventWorkflowStatusEnum workflowEnum = StudyEventWorkflowStatusEnum.valueOf((String) row.get("event_workflow_status")) ;
                         se.setWorkflowStatus(workflowEnum);
                     }
                     // ----- finish adding study event attributes
@@ -3206,7 +3204,7 @@ public class OdmExtractDAO extends DatasetDAO {
                             form.setCrfVersion((String) row.get("crf_version"));
                         }
                         if (dataset.isShowCRFstatus()) {
-                            EventCrfWorkflowEnum workflowEnum = EventCrfWorkflowEnum.valueOf((String) row.get("event_crf_workflow_status")) ;
+                            EventCrfWorkflowStatusEnum workflowEnum = EventCrfWorkflowStatusEnum.valueOf((String) row.get("event_crf_workflow_status")) ;
                             form.setWorkflowStatus(workflowEnum);
                         }
                         if (dataset.isShowCRFinterviewerName()) {

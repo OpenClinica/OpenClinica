@@ -19,7 +19,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.apache.commons.collections.CollectionUtils;
@@ -144,13 +144,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     public ListStudySubjectTableFactory(boolean showMoreLink) {
         this.showMoreLink = showMoreLink;
-        imageIconPaths.put("NOT_SCHEDULED", "icon icon-clock2");
-        imageIconPaths.put("SCHEDULED", "icon icon-clock");
-        imageIconPaths.put("DATA_ENTRY_STARTED", "icon icon-pencil-squared orange");
-        imageIconPaths.put("COMPLETED", "icon icon-checkbox-checked green");
-        imageIconPaths.put("STOPPED", "icon icon-stop-circle red");
-        imageIconPaths.put("SKIPPED", "icon icon-redo");
-        imageIconPaths.put("SIGNED", "icon icon-icon-sign");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.toString(), "icon icon-clock2");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.SCHEDULED.toString(), "icon icon-clock");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString(), "icon icon-pencil-squared orange");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.SIGNED.toString(), "icon icon-icon-sign");
     }
 
     @Override
@@ -451,10 +451,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             for (StudyEventDefinitionBean studyEventDefinition : getStudyEventDefinitions()) {
 
                 List<StudyEventBean> studyEvents = allStudyEventsForStudySubjectBySedId.get(studyEventDefinition.getId());
-                StudyEventWorkflowEnum workflowStatus = null;
+                StudyEventWorkflowStatusEnum workflowStatus = null;
                 studyEvents = studyEvents == null ? new ArrayList<StudyEventBean>() : studyEvents;
                 if (studyEvents.size() < 1) {
-                    workflowStatus = StudyEventWorkflowEnum.NOT_SCHEDULED;
+                    workflowStatus = StudyEventWorkflowStatusEnum.NOT_SCHEDULED;
                 } else {
                     for (StudyEventBean studyEventBean : studyEvents) {
                         if (studyEventBean.getSampleOrdinal() == 1) {
@@ -485,8 +485,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             return false;
         }
         for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
-            if (studyEventBean.getStatus() != Status.DELETED && (studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)
-                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED) )) {
+            if (studyEventBean.getStatus() != Status.DELETED && (studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
+                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) )) {
                 isSignable = false;
                 break;
             } else {
@@ -812,7 +812,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     public class StudyEventWorkflowStatusFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
-            String item =StudyEventWorkflowEnum.getByI18nDescription((String) itemValue).toString();
+            String item = StudyEventWorkflowStatusEnum.getByI18nDescription((String) itemValue).toString();
             String filter = StringUtils.lowerCase(String.valueOf(filterValue));// .trim().replace(" ", "_");
             if (filterValue.equals(resterms.getString(item))) {
                 return true;
@@ -899,9 +899,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            List<StudyEventWorkflowEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowEnum.values()));
+            List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
 
-            for (StudyEventWorkflowEnum workflow : eventWorkflowStatuses) {
+            for (StudyEventWorkflowStatusEnum workflow : eventWorkflowStatuses) {
                 options.add(new Option(workflow.toString(),workflow.getDisplayValue()));
             }
             return options;
@@ -950,7 +950,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         StudyEventDefinitionBean studyEventDefinition;
         StudySubjectBean studySubjectBean;
-        StudyEventWorkflowEnum workflowStatus;
+        StudyEventWorkflowStatusEnum workflowStatus;
         List<StudyEventBean> studyEvents;
 
         public StudyEventDefinitionCellEditor(StudyEventDefinitionBean studyEventDefinition) {
@@ -961,7 +961,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         private void logic() {
             studyEvents = getStudyEventDAO().findAllByStudySubjectAndDefinition(studySubjectBean, studyEventDefinition);
             if (studyEvents.size() < 1) {
-                workflowStatus= StudyEventWorkflowEnum.NOT_SCHEDULED ;
+                workflowStatus= StudyEventWorkflowStatusEnum.NOT_SCHEDULED ;
             } else {
                 workflowStatus = studyEvents.get(studyEvents.size() - 1).getWorkflowStatus();
 
@@ -991,7 +991,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         StudyEventDefinitionBean studyEventDefinition;
         StudySubjectBean studySubjectBean;
-        StudyEventWorkflowEnum workflowStatus;
+        StudyEventWorkflowStatusEnum workflowStatus;
         List<StudyEventBean> studyEvents;
         SubjectBean subject;
 
@@ -1003,7 +1003,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         public Object getValue(Object item, String property, int rowcount) {
             studyEvents = (List<StudyEventBean>) ((HashMap<Object, Object>) item).get(property + "_studyEvents");
             studyEventDefinition = (StudyEventDefinitionBean) ((HashMap<Object, Object>) item).get(property + "_object");
-            workflowStatus = (StudyEventWorkflowEnum) ((HashMap<Object, Object>) item).get(property);
+            workflowStatus = (StudyEventWorkflowStatusEnum) ((HashMap<Object, Object>) item).get(property);
             subject = (SubjectBean) ((HashMap<Object, Object>) item).get("subject");
             studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
 
@@ -1355,7 +1355,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                                  StudySubjectBean studySubject, StudyEventBean currentEvent) {
 
         Status eventSysStatus = studySubject.getStatus();
-        StudyEventWorkflowEnum eventStatus = currentEvent.getWorkflowStatus();
+        StudyEventWorkflowStatusEnum eventStatus = currentEvent.getWorkflowStatus();
         String studyEventId = String.valueOf(currentEvent.getId());
 
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
@@ -1366,7 +1366,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus.equals(StudyEventWorkflowEnum.COMPLETED) ) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -1466,7 +1466,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String eventText = resword.getString("event");
         String status = resword.getString("status");
 
-        StudyEventWorkflowEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
+        StudyEventWorkflowStatusEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowStatusEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
         String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
         String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
         Status eventSysStatus = studySubject.getStatus();
@@ -1497,7 +1497,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
                 eventDiv.append(studyEvents.get(0).getWorkflowStatus());
             } else {
-                eventDiv.append(StudyEventWorkflowEnum.NOT_SCHEDULED);
+                eventDiv.append(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
             }
             eventDiv.boldEnd().tdEnd().trEnd(0);
             if (studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
@@ -1518,14 +1518,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus.equals(StudyEventWorkflowEnum.NOT_SCHEDULED) && currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen()) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) && currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen()) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);
                 eventDiv.tdEnd().trEnd(0);
             }
 
-            else if (eventStatus.equals(StudyEventWorkflowEnum.COMPLETED)) {
+            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -1583,7 +1583,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
                 eventDiv.tdEnd().trEnd(0);
                 if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
-                        && currentRole.getRole() != Role.MONITOR && !eventStatus.equals(StudyEventWorkflowEnum.SCHEDULED)) {
+                        && currentRole.getRole() != Role.MONITOR && !eventStatus.equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell_left").close();
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);

@@ -29,7 +29,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
@@ -219,7 +219,7 @@ public class ViewStudyEventsServlet extends SecureController {
             // find the first firstStartDateForScheduled
             for (int k = 0; k < events.size(); k++) {
                 StudyEventBean se = (StudyEventBean) events.get(k);
-                if (se.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)) {
+                if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
                     firstStartDateForScheduled = se.getDateStarted();
                     break;
                 }
@@ -228,7 +228,7 @@ public class ViewStudyEventsServlet extends SecureController {
             // find the first lastCompletionDate
             for (int k = 0; k < events.size(); k++) {
                 StudyEventBean se = (StudyEventBean) events.get(k);
-                if (se.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED) && se.getDateEnded() != null) {
+                if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) && se.getDateEnded() != null) {
                     lastCompletionDate = se.getDateEnded();
                     break;
                 }
@@ -236,7 +236,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
             for (int j = 0; j < events.size(); j++) {
                 StudyEventBean se = (StudyEventBean) events.get(j);
-                if (se.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)) {
+                if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
                     subjectScheduled++;
                     if (se.getDateStarted().before(new Date())) {
                         ArrayList eventCRFs = ecdao.findAllByStudyEvent(se);
@@ -249,7 +249,7 @@ public class ViewStudyEventsServlet extends SecureController {
                     } else if (se.getDateStarted().before(firstStartDateForScheduled)) {
                         firstStartDateForScheduled = se.getDateStarted();
                     }
-                } else if (se.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED)) {
+                } else if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                     subjectCompleted++;
                     if (lastCompletionDate == null) {
                         lastCompletionDate = se.getDateEnded();
@@ -355,7 +355,7 @@ public class ViewStudyEventsServlet extends SecureController {
             // find the first firstStartDateForScheduled
             for (int k = 0; k < events.size(); k++) {
                 StudyEventBean se = (StudyEventBean) events.get(k);
-                if (se.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)) {
+                if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
                     firstStartDateForScheduled = se.getDateStarted();
                     break;
                 }
@@ -364,7 +364,7 @@ public class ViewStudyEventsServlet extends SecureController {
             // find the first lastCompletionDate
             for (int k = 0; k < events.size(); k++) {
                 StudyEventBean se = (StudyEventBean) events.get(k);
-                if (se.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED)) {
+                if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                     lastCompletionDate = se.getDateEnded();
                     break;
                 }
@@ -372,7 +372,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
             for (int j = 0; j < events.size(); j++) {
                 StudyEventBean se = (StudyEventBean) events.get(j);
-                if (se.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)) {
+                if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
                     subjectScheduled++;
                     if (se.getDateStarted().before(new Date())) {
                         ArrayList eventCRFs = ecdao.findAllByStudyEvent(se);
@@ -385,7 +385,7 @@ public class ViewStudyEventsServlet extends SecureController {
                     } else if (se.getDateStarted().before(firstStartDateForScheduled)) {
                         firstStartDateForScheduled = se.getDateStarted();
                     }
-                } else if (se.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED)) {
+                } else if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                     subjectCompleted++;
                     if (lastCompletionDate == null) {
                         lastCompletionDate = se.getDateEnded();

@@ -7,11 +7,10 @@
  */
 package core.org.akaza.openclinica.web.bean;
 
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 import java.util.ArrayList;
 
@@ -112,8 +111,8 @@ public class DisplayStudySubjectRow extends EntityBeanRow {
             break;
         case COL_STUDYEVENT:
             // studyEvent status comparision
-            StudyEventWorkflowEnum thisSes = ((StudyEventBean) thisStudy.getStudyEvents().get(sortingColumn - 5 - groupSize)).getWorkflowStatus();
-            StudyEventWorkflowEnum argSes = ((StudyEventBean) argStudy.getStudyEvents().get(sortingColumn - 5 - groupSize)).getWorkflowStatus();
+            StudyEventWorkflowStatusEnum thisSes = ((StudyEventBean) thisStudy.getStudyEvents().get(sortingColumn - 5 - groupSize)).getWorkflowStatus();
+            StudyEventWorkflowStatusEnum argSes = ((StudyEventBean) argStudy.getStudyEvents().get(sortingColumn - 5 - groupSize)).getWorkflowStatus();
 
         }
         return answer;

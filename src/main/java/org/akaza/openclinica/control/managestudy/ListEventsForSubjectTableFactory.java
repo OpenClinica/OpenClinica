@@ -17,7 +17,7 @@ import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.*;
 import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -28,7 +28,6 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
@@ -76,13 +75,13 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>(8);
 
     public ListEventsForSubjectTableFactory(boolean showMoreLink) {
-        imageIconPaths.put("NOT_SCHEDULED", "icon icon-clock2");
-        imageIconPaths.put("SCHEDULED", "icon icon-clock");
-        imageIconPaths.put("DATA_ENTRY_STARTED", "icon icon-pencil-squared orange");
-        imageIconPaths.put("COMPLETED", "icon icon-checkbox-checked green");
-        imageIconPaths.put("STOPPED", "icon icon-stop-circle red");
-        imageIconPaths.put("SKIPPED", "icon icon-redo");
-        imageIconPaths.put("SIGNED", "icon icon-icon-sign");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.toString(), "icon icon-clock2");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.SCHEDULED.toString(), "icon icon-clock");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString(), "icon icon-pencil-squared orange");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.SIGNED.toString(), "icon icon-icon-sign");
 
         crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
         crfColumnImageIconPaths.put(1, "icon icon-doc");
@@ -229,7 +228,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             if (eventsForStudySubjectAndEventDefinitions.size() < 1) {
                 DisplayBean d = new DisplayBean();
                 d.getProps().put("event", null);
-                d.getProps().put("event.status", StudyEventWorkflowEnum.NOT_SCHEDULED);
+                d.getProps().put("event.status", StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
                 d.getProps().put("studySubject.createdDate", null);
                 for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
                     CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
@@ -675,7 +674,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             StringBuilder url = new StringBuilder();
             for (int i = 0; i < events.size(); i++) {
                 DisplayBean display = events.get(i);
-                StudyEventWorkflowEnum workflowStatus = (StudyEventWorkflowEnum) display.getProps().get("event.status");
+                StudyEventWorkflowStatusEnum workflowStatus = (StudyEventWorkflowStatusEnum) display.getProps().get("event.status");
                 studyEvent = (StudyEventBean) display.getProps().get("event");
                 studyEvents = new ArrayList<StudyEventBean>();
                 if (studyEvent != null) {
@@ -739,7 +738,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 crf = (CRFBean) display.getProps().get(property + "_crf");
                 eventDefintionCrf = (EventDefinitionCRFBean) display.getProps().get(property + "_eventDefinitionCrf");
                 eventCrf = (EventCRFBean) display.getProps().get(property + "_eventCrf");
-                StudyEventWorkflowEnum workflowStatus = (StudyEventWorkflowEnum) display.getProps().get("event.status");
+                StudyEventWorkflowStatusEnum workflowStatus = (StudyEventWorkflowStatusEnum) display.getProps().get("event.status");
                 studyEvent = (StudyEventBean) display.getProps().get("event");
                 studyEvents = new ArrayList<StudyEventBean>();
 
@@ -896,7 +895,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         String eventText = resword.getString("event");
         ;
 
-        StudyEventWorkflowEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
+        StudyEventWorkflowStatusEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowStatusEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
         // String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
         String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
         Status eventSysStatus = studySubject.getStatus();
@@ -923,14 +922,14 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus.equals(StudyEventWorkflowEnum.NOT_SCHEDULED) && currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen()) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) && currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen()) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);
                 eventDiv.tdEnd().trEnd(0);
             }
 
-            else if (eventStatus.equals(StudyEventWorkflowEnum.COMPLETED)  ) {
+            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)  ) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);

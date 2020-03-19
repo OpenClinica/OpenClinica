@@ -15,7 +15,6 @@ import java.util.Locale;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
@@ -31,8 +30,8 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -223,7 +222,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
                     ecb.setDateValidateCompleted(new Date());
                     ide = false;
                 }
-                ecb.setWorkflowStatus(EventCrfWorkflowEnum.COMPLETED);
+                ecb.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
                 ecb = (EventCRFBean) ecdao.update(ecb);
                 ecdao.markComplete(ecb, ide);
 
@@ -248,7 +247,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
                     }
                 }
                 if (eventCompleted && allCRFs.size() >= allEDCs.size()) {
-                    seb.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
+                    seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
                 }
 
                 seb = (StudyEventBean) sedao.update(seb);
