@@ -18,10 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 public class PFormCache {
-    public static final String VIEW_MODE = "view";
-    public static final String EDIT_MODE = "edit";
-    public static final String PARTICIPATE_MODE = "participate";
-
     // HashMap of study, HashMap of crfVersionOID, pFormURL
     HashMap<String, HashMap<String, String>> urlCache = null;
     // HashMap of study, HashMap of crfVersionOID, pFormURL
@@ -72,7 +68,7 @@ public class PFormCache {
         HashMap<String, String> studyURLs = null;
 
         FormUrlObject formUrlObject = enketo.getFormURL(contextHash, crfOID, site,
-                Role.RESEARCHASSISTANT, parentStudy, studyEvent, PARTICIPATE_MODE, null, false);
+                Role.RESEARCHASSISTANT, parentStudy, studyEvent, EnketoAPI.PARTICIPATE_MODE, null, false);
         return formUrlObject.getFormUrl();
     }
 

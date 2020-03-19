@@ -10,8 +10,10 @@ package org.akaza.openclinica.control.extract;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -44,63 +46,64 @@ public class AccessFileServlet extends SecureController {
     }
 
     private static String WEB_DIR = "/WEB-INF/datasets/";
+    private static String ORIGINATING_PAGE = "/OpenClinica/MainMenu";
 
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        ArchivedDatasetFileDAO  asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
+        DatasetDAO dsDao = new DatasetDAO(sm.getDataSource());
         int fileId = fp.getInt("fileId");
 
         String study_oid = fp.getString("study_oid");
+        Study study = null;
+        List<String> permissionTagsList = null;
+        DatasetBean dsBean = null;
+        ArchivedDatasetFileBean asdfBean = null;
+
         if (!StringUtils.isEmpty(study_oid)) {
-            changeStudy(study_oid);
-        }
-        ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
-        DatasetDAO dsDao = new DatasetDAO(sm.getDataSource());
-        ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
-        DatasetBean dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
-
-        List<String> permissionTagsList= getPermissionTagsList();
-        List<ArchivedDatasetFilePermissionTag> adfTags = getArchivedDatasetFileTags(asdfBean.getId());
-
-        for(ArchivedDatasetFilePermissionTag adfTag:adfTags){
-           if(!permissionTagsList.contains(adfTag.getPermissionTagId())){
-               String originatingPage ="ExportDataset?datasetId="+ dsBean.getId();
-               request.setAttribute("originatingPage", originatingPage);
-               forwardPage(Page.NO_ACCESS);
-               return;
-           }
-        }
-
-
-        int parentId = currentStudy.checkAndGetParentStudyId();
-        if(parentId==0)//Logged in at study level
-        {
-            Study studyBean = (Study)getStudyDao().findByPK(dsBean.getStudyId());
-            parentId =  studyBean.checkAndGetParentStudyId();//parent id of dataset created
-
-        }
-        //logic: is parentId of the dataset created not equal to currentstudy? or is current study
-        if (parentId!=currentStudy.getStudyId() )
-if( dsBean.getStudyId() != currentStudy.getStudyId())		{
-            addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-            throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+            study = getStudyDao().findPublicStudy(study_oid.toUpperCase());
+            CoreResources.setRequestSchema(request, study.getSchemaName());
+            study=getStudyDao().findByOid(study.getOc_oid());
+            if (checkRolesByUserAndStudy(ub, study)) {
+                permissionTagsList = getPermissionService().getPermissionTagsList(study, request);
+                asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
+                dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
+                if(!hasAccessPermission(asdfBean,  permissionTagsList, ORIGINATING_PAGE)){
+                    return;
+                }
+            } else {
+                request.setAttribute("originatingPage", ORIGINATING_PAGE);
+                forwardPage(Page.NO_ACCESS);
+                return;
+            }
+        } else {
+            permissionTagsList = getPermissionTagsList();
+            asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
+            dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
+            String originatingPage = "ExportDataset?datasetId=" + dsBean.getId();
+            if(!hasAccessPermission(asdfBean,  permissionTagsList, originatingPage)){
+                return;
+            }
         }
 
-        // asdfBean.setWebPath(WEB_DIR+
-        // asdfBean.getDatasetId()+
-        // "/"+
-        // asdfBean.getName());
-        Page finalTarget = Page.EXPORT_DATA_CUSTOM;
-        /*
-         * if (asdfBean.getExportFormatId() ==
-         * ExportFormatBean.EXCELFILE.getId()) { //
-         * response.setContentType("application/octet-stream");
-         * response.setHeader("Content-Disposition", "attachment; filename=" +
-         * asdfBean.getName()); logger.info("found file name: "+
-         * finalTarget.getFileName()); //
-         * finalTarget.setFileName(asdfBean.getWebPath()); finalTarget =
-         * Page.GENERATE_EXCEL_DATASET; } else {
-         */
+
+        if (study_oid == null) {
+            int parentId = currentStudy.checkAndGetParentStudyId();
+            if (parentId == 0)//Logged in at study level
+            {
+                Study studyBean = (Study) getStudyDao().findByPK(dsBean.getStudyId());
+                parentId = studyBean.checkAndGetParentStudyId();//parent id of dataset created
+            }
+
+            //logic: is parentId of the dataset created not equal to currentstudy? or is current study
+            if (parentId != currentStudy.getStudyId())
+                if (dsBean.getStudyId() != currentStudy.getStudyId()) {
+                    addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+                    throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+                }
+        }
+
         logger.debug("found file reference: " + asdfBean.getFileReference() + " and file name: " + asdfBean.getName());
         if (asdfBean.getFileReference().endsWith(".zip")) {
             response.setHeader("Content-disposition", "attachment; filename=\"" + asdfBean.getName() + "\";");
@@ -127,14 +130,13 @@ if( dsBean.getStudyId() != currentStudy.getStudyId())		{
             // to ensure backwards compatability to text files shown on server
             // not needed anymore? tbh 10/2010
         }
-
-      
+        Page finalTarget = Page.EXPORT_DATA_CUSTOM;
         finalTarget.setFileName("/WEB-INF/jsp/extract/generatedFileDataset.jsp");
-        // }
         // finalTarget.setFileName(asdfBean.getWebPath());
         request.setAttribute("generate", asdfBean.getFileReference());
         response.setHeader("Pragma", "public");
         forwardPage(finalTarget);
+
     }
 
     @Override
@@ -166,4 +168,18 @@ if( dsBean.getStudyId() != currentStudy.getStudyId())		{
         List<ArchivedDatasetFilePermissionTag> adfTags = adfDao.findAllByArchivedDatasetFileId(adfId);
         return adfTags;
     }
+
+    private boolean hasAccessPermission(ArchivedDatasetFileBean asdfBean,  List<String> permissionTagsList, String originatingPage) {
+        List<ArchivedDatasetFilePermissionTag> adfTags = getArchivedDatasetFileTags(asdfBean.getId());
+
+        for (ArchivedDatasetFilePermissionTag adfTag : adfTags) {
+            if (!permissionTagsList.contains(adfTag.getPermissionTagId())) {
+                request.setAttribute("originatingPage", originatingPage);
+                forwardPage(Page.NO_ACCESS);
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
