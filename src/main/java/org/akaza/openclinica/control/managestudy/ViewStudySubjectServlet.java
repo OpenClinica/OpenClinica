@@ -121,6 +121,7 @@ public class ViewStudySubjectServlet extends SecureController {
             StudyEventBean event = (StudyEventBean) events.get(i);
 
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+
             event.setStudyEventDefinition(sed);
 
             // find all active crfs in the definition
@@ -484,6 +485,8 @@ public class ViewStudySubjectServlet extends SecureController {
             // edc, note that on definitionId can be related to multiple
             // eventdefinitioncrfBeans
             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
+            ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) fldao.findAllActiveByCRF(edc.getCrfId());
+            edc.setVersions(versions);
             // below added 092007 tbh
             // rules updated 112007 tbh
             if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED ) || status.equals(SubjectEventStatus.STOPPED )) {

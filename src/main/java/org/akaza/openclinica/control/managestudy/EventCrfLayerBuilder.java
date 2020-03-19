@@ -14,6 +14,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.Status;
@@ -43,7 +44,7 @@ public class EventCrfLayerBuilder {
 
     public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, DataEntryStage eventCrfStatus,
                                 EventCRFBean eventCrfBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
-                                EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath , StudyDao studyDao) {
+                                EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath, StudyDao studyDao) {
         super();
         this.html = new HtmlBuilder();
         this.subject = subject;
@@ -59,7 +60,7 @@ public class EventCrfLayerBuilder {
         this.crf = crf;
         this.studyEventDefinition = studyEventDefinition;
         this.contextPath = contextPath;
-        this.studyDao=studyDao;
+        this.studyDao = studyDao;
     }
 
     StudyEventBean getStudyEvent() {
@@ -156,6 +157,12 @@ public class EventCrfLayerBuilder {
         String in_order_to_enter_data_create_event = restexts.getString("in_order_to_enter_data_create_e");
         String click_for_more_options = restexts.getString("click_for_more_options");
 
+        // Show the reassign button only when there are others to choose from
+        int numberOfVersions = eventDefinitionCrf.getVersions().size();
+        boolean otherVersionAvailable = false;
+        if (numberOfVersions == 1)
+            otherVersionAvailable = ((FormLayoutBean) eventDefinitionCrf.getVersions().get(0)).getCrfId() != crf.getId();
+
         String table_cell_left = "table_cell_left";
 
         String studySubjectLabel = studySubject.getLabel();
@@ -180,7 +187,7 @@ public class EventCrfLayerBuilder {
         html.td(0).colspan("2").close();
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
 
-        Study subjectStudy=studyDao.findByPK(studySubject.getStudyId());
+        Study subjectStudy = studyDao.findByPK(studySubject.getStudyId());
         if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -220,7 +227,7 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -336,7 +343,8 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -412,7 +420,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void viewSectionDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, String link, EventDefinitionCRFBean eventDefinitionCrf,
-            StudyEventBean studyEvent) {
+                                      StudyEventBean studyEvent) {
         int formLayoutId = 0;
         int eventCrfId = 0;
         int studyEventId = 0;
@@ -455,7 +463,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void viewSectionDataEntryParameterized(HtmlBuilder builder, EventCRFBean eventCrf, EventDefinitionCRFBean eventDefinitionCrf, String link,
-            StudyEventBean studyEvent) {
+                                                   StudyEventBean studyEvent) {
         int formLayoutId = 0;
         int eventCrfId = 0;
         int studyEventId = 0;
@@ -477,7 +485,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void viewSectionDataEntryParameterized(HtmlBuilder builder, EventCRFBean eventCrf, EventDefinitionCRFBean eventDefinitionCrf,
-            StudyEventBean studyEvent) {
+                                                   StudyEventBean studyEvent) {
         int formLayoutId = 0;
         int eventCrfId = 0;
         int studyEventId = 0;
@@ -626,7 +634,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void initialDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, EventDefinitionCRFBean eventDefinitionCrf,
-            StudyEventBean studyEvent) {
+                                      StudyEventBean studyEvent) {
         int formLayoutId = 0;
         if (eventCrf == null || eventCrf.getId() == 0) {
             formLayoutId = eventDefinitionCrf.getDefaultVersionId();
@@ -642,7 +650,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void initialDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, EventDefinitionCRFBean eventDefinitionCrf,
-            StudyEventBean studyEvent, String link) {
+                                      StudyEventBean studyEvent, String link) {
         int formLayoutId = 0;
         if (eventCrf == null || eventCrf.getId() == 0) {
             formLayoutId = eventDefinitionCrf.getDefaultVersionId();
