@@ -21,6 +21,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
@@ -142,7 +143,7 @@ public class ParticipateServiceImpl implements ParticipateService {
 
         StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(),userAccountID, String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
+                formLayout.getOid(),userAccountID, String.valueOf(nextEvent.getId()), studyOID, EnketoAPI.PARTICIPATE_MODE);
 
         String crfOID= formLayout.getOid()+DASH+formLayout.getXform()+PARTICIPATE_FLAVOR;
 
@@ -223,7 +224,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     private String createEditUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid, String userAccountID) throws Exception {
         PFormCache cache = PFormCache.getInstance(context);
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(),userAccountID ,String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
+                formLayout.getOid(),userAccountID ,String.valueOf(nextEvent.getId()), studyOID, EnketoAPI.PARTICIPATE_MODE);
         String editURL = CoreResources.getField("sysURL.base") + "pages/auth/api/editform/" + studyOID + "/url";
 
         String url = editURL + "?" + FORM_CONTEXT + "=" + contextHash;

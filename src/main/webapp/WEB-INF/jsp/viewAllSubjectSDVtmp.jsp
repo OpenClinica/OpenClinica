@@ -392,6 +392,7 @@
 <script>
   var itemsTable = jQuery('#sdv-items').DataTable({
     dom: 't',
+    paging: false,
     columns: [
       {data: 'briefDescriptionItemName'},
       {data: 'value'},
@@ -410,7 +411,13 @@
 
   function translate(str) {
     var trans = {
-      '100percent_required': '100% Required'
+      'VERIFIED': 'Verified',
+      'NOT_VERIFIED': 'Ready to verify',
+      'CHANGED_AFTER_VERIFIED': 'Changed since verified',
+      '100percent_required': '100% Required',
+      'partial_required': 'Partial Required',
+      'not_required': 'Not Required',
+      'not_applicable': 'N/A'
     };
     return trans[str] || str;
   }
@@ -445,7 +452,7 @@
         $('#siteName').text(data.siteName);
         $('#eventStartDate').text(formatDate(data.eventStartDate));
         $('#formStatus').text(data.formStatus);
-        $('#sdvStatus').text(data.sdvStatus);
+        $('#sdvStatus').text(translate(data.sdvStatus));
 
         itemsTable.rows.add(data.sdvItems.map(function(item) {
           item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
@@ -479,11 +486,11 @@
     }
 
     $('#sdv-show-type').off('change');
-    if (data.sdvStatus === 'VERIFIED') {
-      $('#sdv-show-type input[value=n]').click();
+    if (data.sdvStatus === 'CHANGED_AFTER_VERIFIED') {
+      $('#sdv-show-type input[value=y]').click();
     }
     else {
-      $('#sdv-show-type input[value=y]').click();
+      $('#sdv-show-type input[value=n]').click();
     }
 
     $('#sdv-show-type').change(function() {
@@ -498,5 +505,16 @@
 
     jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
   });
+
+  var sdvTableHeaders = $('#sdv > thead').children();
+  var sdvtColumnTitles = sdvTableHeaders.filter('.header').children();
+  var sdvtFilterBoxes = sdvTableHeaders.filter('.filter').children();
+  function limitFilterWidth(width, columnTitle) {
+    var colIndex = sdvtColumnTitles.find(':contains(' + columnTitle + ')').closest('td').index();
+    var theFilterBox = sdvtFilterBoxes.eq(colIndex).children();
+    theFilterBox.wrapInner('<div style="width:' + width + '; overflow:hidden; text-overflow:ellipsis;">');
+  }
+  limitFilterWidth('110px', 'SDV Status');
+  limitFilterWidth('110px', 'SDV Requirement');
 
 </script>
