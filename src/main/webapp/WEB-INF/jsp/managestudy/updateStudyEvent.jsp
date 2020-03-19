@@ -205,22 +205,23 @@
     <td>
      <div class="formfieldM_BG">
          <c:choose>
-         <c:when test="${studyEvent.subjectEventStatus.locked && userRole.researchAssistant ||studyEvent.subjectEventStatus.locked && userRole.researchAssistant2}">
-           <c:set var="status1" value="${studyEvent.subjectEventStatus.id}"/>
+         <c:when test="${(studyEvent.locked == true && userRole.researchAssistant) ||(studyEvent.locked == true && userRole.researchAssistant2)}">
+           <c:set var="status1" value="${studyEvent.workflowStatus}"/>
            <select class="formfieldM" name="statusId" disabled="true">
-                 <option value="<c:out value="${studyEvent.subjectEventStatus.id}"/>" selected><c:out value="${event.subjectEventStatus.name}"/>
+                 <option value="<c:out value="${studyEvent.workflowStatus}"/>" selected><c:out value="${event.workflowStatus}"/>
            </select>
         </c:when>
         <c:otherwise>
-            <c:set var="status1" value="${studyEvent.subjectEventStatus.id}"/>
+            <c:set var="status1" value="${studyEvent.workflowStatus}"/>
             <select class="formfieldM" name="statusId">
-               <c:forEach var="status" items="${statuses}">
+               <c:forEach var="status" items="${eventWorkflowStatuses}">
                 <c:choose>
-                 <c:when test="${status1 == status.id}">
-                  <option value="<c:out value="${status.id}"/>" selected><c:out value="${status.name}"/>
+                 <c:when test="${status1 == status}">
+
+                  <option value="<c:out value="${status}"/>" selected><c:out value="${status.displayValue}"/>
                  </c:when>
                  <c:otherwise>
-                  <option value="<c:out value="${status.id}"/>"><c:out value="${status.name}"/>
+                  <option value="<c:out value="${status}"/>"><c:out value="${status.displayValue}"/>
                  </c:otherwise>
                 </c:choose>
              </c:forEach>

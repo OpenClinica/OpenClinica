@@ -115,40 +115,6 @@ public class RestoreStudySubjectServlet extends SecureController {
                 // restore all event crfs
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
-                for (int j = 0; j < displayEvents.size(); j++) {
-                    DisplayStudyEventBean dispEvent = displayEvents.get(j);
-                    StudyEventBean event = dispEvent.getStudyEvent();
-                    if (event.getStatus().equals(Status.AUTO_DELETED)) {
-                        event.setStatus(Status.AVAILABLE);
-                        event.setUpdater(ub);
-                        event.setUpdatedDate(new Date());
-                        sedao.update(event);
-                    }
-
-                    ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-                    ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-                    for (int k = 0; k < eventCRFs.size(); k++) {
-                        EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                        if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-                            eventCRF.setStatus(Status.AVAILABLE);
-                            eventCRF.setUpdater(ub);
-                            eventCRF.setUpdatedDate(new Date());
-                            ecdao.update(eventCRF);
-                            // remove all the item data
-                            ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-                            for (int a = 0; a < itemDatas.size(); a++) {
-                                ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-                                if (item.getStatus().equals(Status.AUTO_DELETED)) {
-                                    item.setStatus(Status.AVAILABLE);
-                                    item.setUpdater(ub);
-                                    item.setUpdatedDate(new Date());
-                                    iddao.update(item);
-                                }
-                            }
-                        }
-                    }
-                }
 
                 String emailBody =
                     respage.getString("the_subject") + " " + studySub.getName() + " " + respage.getString("has_been_restored_to_the_study") + " "

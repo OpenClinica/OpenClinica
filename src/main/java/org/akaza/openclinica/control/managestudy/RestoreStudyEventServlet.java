@@ -110,13 +110,7 @@ public class RestoreStudyEventServlet extends SecureController {
 
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
-                if (event.getStatus().equals(Status.AVAILABLE)) {
-                    addPageMessage(respage.getString("this_event_is_already_available_for_study") + " "
-                            + respage.getString("please_contact_sysadmin_for_more_information"));
-                    request.setAttribute("id", new Integer(studySubId).toString());
-                    forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-                    return;
-                }
+
 
                 EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
                 // find all crfs in the definition
@@ -136,61 +130,14 @@ public class RestoreStudyEventServlet extends SecureController {
             } else {
                 logger.info("submit to restore the event to study");
                 // restore event to study
-                event.setStatus(Status.AVAILABLE);
+                event.setRemoved(Boolean.FALSE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
                 sedao.update(event);
 
                 // restore event crfs
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-                FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
-                CRFDAO cdao = new CRFDAO(sm.getDataSource());
 
-                ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
-                ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-                for (int k = 0; k < eventCRFs.size(); k++) {
-                    EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                    FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(eventCRF.getFormLayoutId());
-                    CRFBean crf = (CRFBean) cdao.findByPK(formLayout.getCrfId());
-                    EventDefinitionCRFBean edc = null;
-
-                    if (study.isSite()) {
-                        edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getStudyId());
-                        if (edc == null || !edc.isActive()) {
-                            edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.checkAndGetParentStudyId());
-                        }
-                    } else {
-                        edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getStudyId());
-                    }
-                    if (edc == null || !edc.isActive()) {
-                        logger.error("Event Definition Crf is null");
-                    }
-
-                    if (eventCRF.getStatus().equals(Status.AUTO_DELETED) && edc.getStatus().equals(Status.AVAILABLE)) {
-                        if (eventCRF.getOldStatus().equals(Status.UNAVAILABLE)){
-                            eventCRF.setStatus(Status.UNAVAILABLE);
-                        }
-                        else {
-                            eventCRF.setStatus(Status.AVAILABLE);
-                        }
-                        eventCRF.setUpdater(ub);
-                        eventCRF.setUpdatedDate(new Date());
-                        ecdao.update(eventCRF);
-                        // remove all the item data
-                        ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-                        for (int a = 0; a < itemDatas.size(); a++) {
-                            ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-                            if (item.getStatus().equals(Status.AUTO_DELETED)) {
-                                item.setStatus(Status.AVAILABLE);
-                                item.setUpdater(ub);
-                                item.setUpdatedDate(new Date());
-                                iddao.update(item);
-                            }
-                        }
-                    }
-                }
 
                 String emailBody = respage.getString("the_event") + event.getStudyEventDefinition().getName() + " "
                         + respage.getString("has_been_restored_to_the_study") + " " + study.getName() + ".";

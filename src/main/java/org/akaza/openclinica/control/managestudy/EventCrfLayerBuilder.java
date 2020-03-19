@@ -19,6 +19,7 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.jmesa.view.html.HtmlBuilder;
 
 public class EventCrfLayerBuilder {
@@ -67,6 +68,10 @@ public class EventCrfLayerBuilder {
     }
 
     String buid() {
+        if (eventCrfBean==null){
+            eventCrfBean= new EventCRFBean(EventCrfWorkflowStatusEnum.NOT_STARTED);
+        }
+
         buildLock();
         buildEvent();
         clickToEnterData();
@@ -83,20 +88,13 @@ public class EventCrfLayerBuilder {
         // Lock Div
         html.div().id("Lock_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount)
                 .style("position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
-        if (eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
-            lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete_collapse.gif", "images/CRF_status_icon_Complete.gif");
-        } else if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) {
-            lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_InitialDEcomplete_collapse.gif",
-                    "images/CRF_status_icon_InitialDEcomplete.gif");
-        } else if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
-            lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_DDE_collapse.gif", "images/CRF_status_icon_DDE.gif");
-        } else if (eventCrfStatus == DataEntryStage.LOCKED) {
-            // Do Nothing
-        } else if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
-            lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Scheduled.gif", "images/CRF_status_icon_Scheduled.gif");
-        } else if (eventCrfStatus == DataEntryStage.INVALID) {
+        if ((eventCrfBean.getRemoved()!=null && eventCrfBean.getRemoved())) {
             lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid_collapse.gif", "images/CRF_status_icon_Invalid.gif");
-        } else {
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
+            lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete_collapse.gif", "images/CRF_status_icon_Complete.gif");
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
+            lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Scheduled.gif", "images/CRF_status_icon_Scheduled.gif");
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) {
             lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Started.gif", "images/CRF_status_icon_Started.gif");
         }
         html.divEnd();
@@ -129,19 +127,13 @@ public class EventCrfLayerBuilder {
         html.append("Status").append(": ").append(eventCrfStatus.getName()).br();
         html.tdEnd();
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
-        if (eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
-            linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete.gif");
-        } else if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) {
-            linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_InitialDEcomplete.gif");
-        } else if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
-            linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_DDE.gif");
-        } else if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
-            linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Scheduled.gif");
-        } else if (eventCrfStatus == DataEntryStage.LOCKED) {
-            // Do Nothing
-        } else if (eventCrfStatus == DataEntryStage.INVALID) {
+        if ((eventCrfBean.getRemoved()!=null && eventCrfBean.getRemoved())) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid.gif");
-        } else {
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
+            linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete.gif");
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
+            linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Scheduled.gif");
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Started.gif");
         }
         html.tdEnd().trEnd(0);
@@ -161,14 +153,14 @@ public class EventCrfLayerBuilder {
         String studySubjectLabel = studySubject.getLabel();
         html.tr(0).id("Menu_off_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount).style("display: all").close();
         html.td(0).styleClass("table_cell_left").colspan("2").close();
-        if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
-            if (getStudyEvent() != null) {
+            if (eventCrfBean.getWorkflowStatus()== EventCrfWorkflowStatusEnum.NOT_STARTED) {
+                if (getStudyEvent() != null) {
                 html.append("<i>" + click_to_enter_data).br();
                 html.append(to_use_another_version_click + "</i>");
             } else {
                 html.append("<i>" + in_order_to_enter_data_create_event + "</i>");
             }
-        } else if (getStudyEvent() == null && eventCrfStatus == DataEntryStage.UNCOMPLETED) {
+        } else if (getStudyEvent() == null && eventCrfBean.getWorkflowStatus()== EventCrfWorkflowStatusEnum.NOT_STARTED) {
             html.append("<i>" + click_to_enter_data).br();
             html.append(to_use_another_version_click + "</i>");
         } else {
@@ -181,7 +173,30 @@ public class EventCrfLayerBuilder {
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
 
         Study subjectStudy=studyDao.findByPK(studySubject.getStudyId());
-        if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
+
+
+        if ((eventCrfBean.getRemoved()!=null && eventCrfBean.getRemoved())) {
+
+            if (!hiddenCrf()) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
+                html.nbsp().nbsp();
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
+                html.tdEnd().trEnd(0);
+            }
+            if (studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.DELETED && studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED
+                    && !currentRole.isMonitor()) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                restoreEventCrf(html, eventCrfBean, studySubject);
+                html.nbsp().nbsp();
+                restoreEventCrf(html, eventCrfBean, studySubject, reswords.getString("restore"));
+                html.tdEnd().trEnd(0);
+            }
+
+
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -228,30 +243,8 @@ public class EventCrfLayerBuilder {
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject, reswords.getString("reassign"));
                 html.tdEnd().trEnd(0);
             }
-        } else if (eventCrfStatus == DataEntryStage.LOCKED) {
-            if (!hiddenCrf()) {
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
-                html.nbsp().nbsp();
-                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
-                html.tdEnd().trEnd(0);
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                viewEventCrfContentLinkPrint(html, studySubject, eventCrfBean, getStudyEvent());
-                html.nbsp().nbsp();
-                viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), reswords.getString("print"));
-                html.tdEnd().trEnd(0);
-            }
-            if (subjectStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                removeEventCrf(html, eventCrfBean, studySubject);
-                html.nbsp().nbsp();
-                removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
-                html.tdEnd().trEnd(0);
-            }
-        } else if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
+
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -270,25 +263,8 @@ public class EventCrfLayerBuilder {
                     html.tdEnd().trEnd(0);
                 }
             }
-        } else if (eventCrfStatus == DataEntryStage.INVALID) {
-            if (!hiddenCrf()) {
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
-                html.nbsp().nbsp();
-                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
-                html.tdEnd().trEnd(0);
-            }
-            if (studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.DELETED && studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED
-                    && !currentRole.isMonitor()) {
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                restoreEventCrf(html, eventCrfBean, studySubject);
-                html.nbsp().nbsp();
-                restoreEventCrf(html, eventCrfBean, studySubject, reswords.getString("restore"));
-                html.tdEnd().trEnd(0);
-            }
-        } else {
+
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -298,25 +274,14 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE) {
-                if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
-                    if (!hiddenCrf()) {
-                        html.tr(0).valign("top").close();
-                        html.td(0).styleClass(table_cell_left).close();
-                        doubleDataEntryLink(html, eventCrfBean);
-                        html.nbsp().nbsp();
-                        doubleDataEntryLink(html, eventCrfBean, reswords.getString("edit"));
-                        html.tdEnd().trEnd(0);
-                    }
-                } else {
-                    if (!hiddenCrf()) {
-                        html.tr(0).valign("top").close();
-                        html.td(0).styleClass(table_cell_left).close();
-                        initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
-                        html.nbsp().nbsp();
-                        initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
-                                reswords.getString("edit"));
-                        html.tdEnd().trEnd(0);
-                    }
+                if (!hiddenCrf()) {
+                    html.tr(0).valign("top").close();
+                    html.td(0).styleClass(table_cell_left).close();
+                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
+                    html.nbsp().nbsp();
+                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
+                            reswords.getString("edit"));
+                    html.tdEnd().trEnd(0);
                 }
             }
             if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
@@ -374,18 +339,13 @@ public class EventCrfLayerBuilder {
     void buildEnd() {
 
         String studySubjectLabel = studySubject.getLabel();
-        if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
-            iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete_expand.gif", "images/CRF_status_icon_Complete.gif");
-        } else if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) {
-            iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_InitialDEcomplete_expand.gif",
-                    "images/CRF_status_icon_InitialDEcomplete.gif");
-        } else if (eventCrfStatus == DataEntryStage.LOCKED) {
-            // Do Nothing
-        } else if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
-            iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Scheduled.gif", "images/CRF_status_icon_Scheduled.gif");
-        } else if (eventCrfStatus == DataEntryStage.INVALID) {
+        if ((eventCrfBean.getRemoved()!=null && eventCrfBean.getRemoved())) {
             iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid_expand.gif", "images/CRF_status_icon_Invalid.gif");
-        } else {
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
+            iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete_expand.gif", "images/CRF_status_icon_Complete.gif");
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
+            iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Scheduled.gif", "images/CRF_status_icon_Scheduled.gif");
+        } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY) {
             iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Started.gif", "images/CRF_status_icon_Started.gif");
         }
     }

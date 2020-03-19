@@ -477,9 +477,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 isLocked = true;
             } else {
                 // failed to get a lock
-                if ((seb.getSubjectEventStatus().isLocked() != true)
-                        && !lockCRF(ecb))
-                    isLocked = true;
+                if ((seb.getSubjectEventStatus().isLocked() != true) && !lockCRF(ecb))
+                    if ((seb.getLocked()==null || (seb.getLocked()!=null && !seb.getLocked())) && !lockCRF(ecb))
+                        isLocked = true;
+
             }
             StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
 

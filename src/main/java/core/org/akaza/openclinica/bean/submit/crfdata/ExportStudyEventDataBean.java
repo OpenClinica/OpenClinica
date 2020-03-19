@@ -12,6 +12,7 @@ package core.org.akaza.openclinica.bean.submit.crfdata;
 import java.util.ArrayList;
 
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 /**
  * OpenClinica event attributes have been included in addition to ODM
@@ -29,6 +30,10 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
     private String eventName;
     private StudyEvent studyEvent;
     private ArrayList<ExportFormDataBean> exportFormData;
+    private StudyEventWorkflowStatusEnum workflowStatus;
+    private Boolean removed;
+    private Boolean archived;
+    private Boolean locked;
 
     public ExportStudyEventDataBean() {
         super();
@@ -99,4 +104,35 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
         this.studyEvent = studyEvent;
     }
 
+    public StudyEventWorkflowStatusEnum getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
+    public Boolean getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(Boolean removed) {
+        this.removed = removed;
+    }
+
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
 }

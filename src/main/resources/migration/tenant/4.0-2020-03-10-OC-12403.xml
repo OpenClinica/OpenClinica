@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet author="jkeremian" id="2020-03-10-OC-12403-01">
+        <comment>Adding new columns workflow_status , removed , archived and locked  to study_event table</comment>
+        <addColumn tableName="study_event">
+            <column name="workflow_status" type="VARCHAR(64)" />
+            <column name="removed" type="BOOLEAN" />
+            <column name="archived" type="BOOLEAN" />
+            <column name="locked" type="BOOLEAN" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2020-03-10-OC-12403-02">
+        <comment>Updating the workflow_status column on subject_event_status in study_event  table</comment>
+        <sql>
+            UPDATE study_event SET workflow_status='SCHEDULED' WHERE subject_event_status_id ='1';
+            UPDATE study_event SET workflow_status='NOT_SCHEDULED' WHERE subject_event_status_id ='2';
+            UPDATE study_event SET workflow_status='DATA_ENTRY_STARTED' WHERE subject_event_status_id ='3';
+            UPDATE study_event SET workflow_status='COMPLETED' WHERE subject_event_status_id ='4';
+            UPDATE study_event SET workflow_status='STOPPED' WHERE subject_event_status_id ='5';
+            UPDATE study_event SET workflow_status='SKIPPED' WHERE subject_event_status_id ='6';
+            UPDATE study_event SET workflow_status='SIGNED' WHERE subject_event_status_id ='8';
+
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="jkeremian" id="2020-03-10-OC-12403-03">
+        <comment>Updating the locked column where subject_event_status is locked in study_event table</comment>
+        <sql>
+            UPDATE study_event SET locked='true' and workflow_status='DATA_ENTRY_STARTED' WHERE subject_event_status_id ='7';
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="jkeremian" id="2020-03-10-OC-12403-04">
+        <comment>Updating the removed column where status_id=5 and 7 on study_event table</comment>
+        <sql>
+            UPDATE study_event SET removed='true'  WHERE status_id ='5' or status_id='7';
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet author="JKEREMIAN " id="2020-03-18-12403-01" runOnChange="true">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+            <!--fixing restore study event trigger -->
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION study_event_trigger_new() RETURNS "trigger"
+            AS 'DECLARE
+            pk INTEGER;
+            BEGIN
+            IF (TG_OP = ''INSERT'') THEN
+            IF(NEW.workflow_status = ''SCHEDULED'') THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''17'', now(), NEW.owner_id, ''study_event'', NEW.study_event_id, ''Status'','''', NEW.workflow_status);
+            END IF;
+            END IF;
+
+            IF (TG_OP = ''UPDATE'') THEN
+            IF(OLD.workflow_status <![CDATA[<>]]> NEW.workflow_status) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            IF(NEW.workflow_status = ''SCHEDULED'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''17'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.workflow_status, NEW.workflow_status);
+            ELSIF(NEW.workflow_status = ''DATA_ENTRY_STARTED'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''18'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.workflow_status, NEW.workflow_status);
+            ELSIF(NEW.workflow_status = ''COMPLETED'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''19'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.workflow_status, NEW.workflow_status);
+            ELSIF(NEW.workflow_status = ''STOPPED'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''20'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.workflow_status, NEW.workflow_status);
+            ELSIF(NEW.workflow_status = ''SKIPPED'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''21'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.workflow_status, NEW.workflow_status);
+            ELSIF(NEW.workflow_status = ''SIGNED'') THEN
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value,details)
+            VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.workflow_status, NEW.workflow_status,NEW.attestation);
+            END IF;
+            END IF;
+
+            IF((OLD.removed is NULL and NEW.removed is not Null)
+            or(OLD.removed is not NULL and NEW.removed is Null)
+            or (OLD.removed <![CDATA[<>]]> NEW.removed)) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''23'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Removed'', OLD.removed, NEW.removed);
+            END IF;
+
+            IF((OLD.archived is NULL and NEW.archived is not Null)
+            or(OLD.archived is not NULL and NEW.archived is Null)
+            or (OLD.archived <![CDATA[<>]]> NEW.archived)) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''59'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Archived'', OLD.archived, NEW.archived);
+            END IF;
+
+            IF((OLD.locked is NULL and NEW.locked is not Null)
+            or(OLD.locked is not NULL and NEW.locked is Null)
+            or (OLD.locked <![CDATA[<>]]> NEW.locked)) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''60'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Locked'', OLD.locked, NEW.locked);
+            END IF;
+
+
+            IF(OLD.date_start <![CDATA[<>]]> NEW.date_start) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''24'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Start date'', OLD.date_start, NEW.date_start);
+            END IF;
+            IF(OLD.date_end <![CDATA[<>]]> NEW.date_end) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''25'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''End date'', OLD.date_end, NEW.date_end);
+            END IF;
+            IF(OLD.location <![CDATA[<>]]> NEW.location) THEN
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''26'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Location'', OLD.location, NEW.location);
+            END IF;
+            RETURN NULL;  /*return values ignored for ''after'' triggers*/
+            END IF;
+            RETURN NULL;
+            END;'
+            LANGUAGE plpgsql;
+
+        </sql>
+    </changeSet>
+
+    <changeSet author="htaycher " id="2020-03-18-12403-02">
+        <sql splitStatements="false">
+            CREATE TRIGGER study_event_insert
+            AFTER INSERT ON study_event
+            FOR EACH ROW
+            EXECUTE PROCEDURE study_event_trigger_new();
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -43,6 +43,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private final static String CLOSE_ORDINAL_DELIMITER = "]";
 	private static final Object STATUS = "Status";
 	private static final Object STUDY_EVENT = "study_event";
+	private static final Object EVENT_CRF = "event_crf";
 	private static final Object SUBJECT_GROUP_MAP = "subject_group_map";
 	private static boolean isActiveRoleAtSite = true;
 
@@ -173,17 +174,20 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 
 		for (StudySubject studySubj : studySubjs) {
-		if(studyEvents==null)
-				studyEvents = (ArrayList<StudyEvent>) studyEventDao.fetchListSEs(studySubj.getOcOid());
-
+			if (studyEvents == null) {
+				if (odmFilter.showArchived())
+					studyEvents = (ArrayList<StudyEvent>) studyEventDao.fetchListSEs(studySubj.getOcOid());
+				else
+					studyEvents = (ArrayList<StudyEvent>) studyEventDao.fetchNonArchivedListSEs(studySubj.getOcOid());
+			}
 			if (studyEvents != null) {
-				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId, tagIds);
+				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID, userId, tagIds);
 				exportSubjDataBeanList.add(expSubjectBean);
 
 				odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
 				odmClinicalDataBean.setStudyOID(study.getOc_oid());
 			}
-			studyEvents=null;
+			studyEvents = null;
 		}
 
 		return odmClinicalDataBean;
@@ -284,7 +288,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if (se.getStudySubject().getSubject().getDateOfBirth() != null && se.getDateStart() != null)
 					expSEBean.setAgeAtEvent(Utils.getAge(se.getStudySubject().getSubject().getDateOfBirth(), se.getDateStart()));
 
-				expSEBean.setStatus(fetchStudyEventStatus(se.getSubjectEventStatusId()));
+				expSEBean.setWorkflowStatus(se.getWorkflowStatus());
+				expSEBean.setRemoved(se.getRemoved());
+				expSEBean.setArchived(se.getArchived());
+				expSEBean.setLocked(se.getLocked());
 				if (odmFilter.isIncludeAudit())
 					expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(), "study_event", se.getStudyEventDefinition().getOc_oid(), null));
 				if (odmFilter.isIncludeDN())
@@ -388,6 +395,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 							dataBean.setInterviewerName(ecrf.getInterviewerName());
 						// dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
 						dataBean.setStatus(fetchEventCRFStatus(ecrf));
+						dataBean.setWorkflowStatus(ecrf.getWorkflowStatus());
+						dataBean.setRemoved(ecrf.getRemoved());
+						dataBean.setArchived(ecrf.getArchived());
 						dataBean.setCreatedDate(ecrf.getDateCreated());
 						dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
 						dataBean.setUpdatedDate(ecrf.getDateUpdated());
@@ -838,9 +848,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				 * }
 				 * else
 				 */
-				if (auditLogEvent.getAuditTable().equals(STUDY_EVENT)) {
-					auditBean.setNewValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getNewValue())));
-					auditBean.setOldValue(fetchStudyEventStatus(Integer.valueOf(auditLogEvent.getOldValue())));
+				if (auditLogEvent.getAuditTable().equals(STUDY_EVENT) || auditLogEvent.getAuditTable().equals(EVENT_CRF)) {
+					auditBean.setNewValue(auditLogEvent.getNewValue());
+					auditBean.setOldValue(auditLogEvent.getOldValue());
 				} else if (auditLogEvent.getAuditTable().equals(SUBJECT_GROUP_MAP)) {
 					auditBean.setNewValue(auditLogEvent.getNewValue());
 					auditBean.setOldValue(auditLogEvent.getOldValue());
@@ -883,10 +893,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return auditLogsBean;
 	}
 
-	private String fetchStudyEventStatus(Integer valueOf) {
-		return SubjectEventStatus.getByCode(valueOf).getI18nDescription(getLocale());
-
-	}
 
 	/**
 	 * This is a generic method where the control enters first. Regardless what URL is being used. Depending upon the

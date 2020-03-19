@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 
 /**
@@ -60,6 +61,13 @@ public class EventCRFBean extends AuditableEntityBean {
     private CRFBean crf = new CRFBean();
     private CRFVersionBean crfVersion = new CRFVersionBean();
     private DataEntryStage stage;
+    private EventCrfWorkflowStatusEnum workflowStatus;
+    private Boolean removed;
+    private Boolean archived;
+
+    public EventCRFBean(EventCrfWorkflowStatusEnum workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
 
     public EventCRFBean() {
         stage = DataEntryStage.INVALID;
@@ -588,4 +596,28 @@ public class EventCRFBean extends AuditableEntityBean {
         return true;
     }
 
+
+    public EventCrfWorkflowStatusEnum getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(EventCrfWorkflowStatusEnum workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
+    public Boolean getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(Boolean removed) {
+        this.removed = removed;
+    }
+
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
+    }
 }

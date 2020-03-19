@@ -35,6 +35,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -49,7 +50,6 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -267,7 +267,7 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
             for (StudyEventBean studyEventBean : eventsForStudySubjectAndEventDefinitions) {
                 DisplayBean d = new DisplayBean();
                 d.getProps().put("event", studyEventBean);
-                d.getProps().put("event.status", studyEventBean.getSubjectEventStatus());
+                d.getProps().put("event.status", studyEventBean.getWorkflowStatus());
                 d.getProps().put("event.startDate", studyEventBean.getCreatedDate());
                 for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
                     CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
@@ -950,7 +950,7 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
         String eventText = resword.getString("event");
         ;
 
-        SubjectEventStatus eventStatus = studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED : studyEvents.get(0).getSubjectEventStatus();
+        StudyEventWorkflowStatusEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowStatusEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
         // String studyEventName = studyEvents.size() == 0 ? "" :
         // studyEvents.get(0).getName();
         String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
@@ -961,7 +961,7 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
         eventDiv.append(subjectText).append(": ").append(studySubjectLabel).br();
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
-        eventDiv.append("Status").append(":").append(eventStatus.getName()).br();
+        eventDiv.append("Status").append(":").append(eventStatus).br();
         eventDiv.tdEnd();
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
         linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
@@ -978,14 +978,14 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && currentRole.getRole() != Role.MONITOR) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)  && currentRole.getRole() != Role.MONITOR) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);
                 eventDiv.tdEnd().trEnd(0);
             }
 
-            else if (eventStatus == SubjectEventStatus.COMPLETED) {
+            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -1002,7 +1002,7 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
                 }
             }
 
-            else if (eventStatus == SubjectEventStatus.LOCKED) {
+            else if (studyEvents.get(0).getLocked() !=null && studyEvents.get(0).getLocked()) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();
