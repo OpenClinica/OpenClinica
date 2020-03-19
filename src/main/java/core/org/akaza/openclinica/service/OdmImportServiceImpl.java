@@ -391,7 +391,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 			if (!jsonEventList.contains(ocEvent)) {
 				// remove study event defn
 				logger.info("Removing study event {}",ocEvent.getName());
-				eventService.removeStudyEventDefn(ocEvent.getStudyEventDefinitionId(), userAccount.getUserId());
+				eventService.removeStudyEventDefn(ocEvent.getStudyEventDefinitionId(), userAccount.getUserId(),study);
 				logger.info("Completed Removing study event {}",ocEvent.getName());
 			}
 		}

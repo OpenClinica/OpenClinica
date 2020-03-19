@@ -16,6 +16,7 @@ import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
 
 /**
  * @author jxu
@@ -62,6 +63,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private String entityValue = "";
     private boolean isSaved = true;
     private boolean activated = true;
+    private EventCrfWorkflowEnum eventCrfWorkflowStatus;
 
     private StudySubjectBean studySub = new StudySubjectBean();
 
@@ -658,5 +660,13 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
     public void setCustomColumns(List<CustomColumn> customColumns) {
         this.customColumns = customColumns;
+    }
+
+    public EventCrfWorkflowEnum getEventCrfWorkflowStatus() {
+        return eventCrfWorkflowStatus;
+    }
+
+    public void setEventCrfWorkflowStatus(EventCrfWorkflowEnum eventCrfWorkflowStatus) {
+        this.eventCrfWorkflowStatus = eventCrfWorkflowStatus;
     }
 }

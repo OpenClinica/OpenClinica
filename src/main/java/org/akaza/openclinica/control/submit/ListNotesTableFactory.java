@@ -44,6 +44,8 @@ import core.org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesService;
 import core.org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.facade.TableFacade;
@@ -292,14 +294,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 CrfBean crf = eventCrf.getCrfVersion().getCrf();
                 discrepancyNoteBean.setCrfName(crf.getName());
                 studyEvent = eventCrf.getStudyEvent();
-                int subjectEventStatusId = studyEvent != null && studyEvent.getSubjectEventStatusId()!= null ? studyEvent.getSubjectEventStatusId() : SubjectEventStatus.INVALID.getCode();
-                String eventCrfStatus = resword.getString( EventCrfStatusEnum.getByCode(eventCrf.getStatusId(), subjectEventStatusId).getDescription());
-                if (eventCrfStatus.equals("Invalid")) {
-                    eventCrfStatus = "";
-                } else if (eventCrfStatus.equals("Data Entry Complete")) {
-                    eventCrfStatus = "Complete";
-                }
-                discrepancyNoteBean.setCrfStatus(eventCrfStatus);
+
+                discrepancyNoteBean.setEventCrfWorkflowStatus(eventCrf.getWorkflowStatus());
                 studyEventDefinition = studyEvent.getStudyEventDefinition();
                 discrepancyNoteBean.setEventName(studyEventDefinition.getName());
                 discrepancyNoteBean.setEventStart(studyEvent.getDateStart());

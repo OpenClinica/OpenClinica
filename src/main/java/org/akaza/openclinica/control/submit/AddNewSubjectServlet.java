@@ -34,6 +34,7 @@ import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.controller.helper.TemplateHelper;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -377,7 +378,7 @@ public class AddNewSubjectServlet extends SecureController {
                 se.setStudyEventDefinitionId(studyEventDefinitionId);
                 se.setStatus(Status.AVAILABLE);
                 se.setStudySubjectId(s.getId());
-                se.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+                se.setWorkflowStatus(StudyEventWorkflowEnum.SCHEDULED);
 
 
                 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);

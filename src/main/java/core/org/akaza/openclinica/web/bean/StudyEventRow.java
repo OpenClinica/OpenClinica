@@ -54,7 +54,7 @@ public class StudyEventRow extends EntityBeanRow {
             break;
 
         case COL_SUBJECT_EVENT_STATUS:
-            answer = thisEvent.getSubjectEventStatus().compareTo(argEvent.getSubjectEventStatus());
+            answer = thisEvent.getWorkflowStatus().compareTo(argEvent.getWorkflowStatus());
             break;
         }
 
@@ -64,7 +64,7 @@ public class StudyEventRow extends EntityBeanRow {
     @Override
     public String getSearchString() {
         StudyEventBean thisEvent = (StudyEventBean) bean;
-        return thisEvent.getStudySubjectLabel() + " " + thisEvent.getSubjectEventStatus().getName();
+        return thisEvent.getStudySubjectLabel() + " " + thisEvent.getWorkflowStatus();
     }
 
     /*

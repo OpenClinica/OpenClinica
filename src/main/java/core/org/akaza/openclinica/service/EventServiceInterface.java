@@ -20,7 +20,7 @@ public interface EventServiceInterface {
 	 * @param defId
 	 * @param userId
 	 */
-	public void removeStudyEventDefn(int defId, int userId);
+	public void removeStudyEventDefn(int defId, int userId,Study study);
 
 	/**
 	 * This method will restore Study Event Definition

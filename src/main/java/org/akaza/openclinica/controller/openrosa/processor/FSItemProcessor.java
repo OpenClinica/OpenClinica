@@ -17,6 +17,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,21 +338,20 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     private void updateEventSubjectStatusIfSigned(SubmissionContainer container) {
         StudyEvent studyEvent = container.getEventCrf().getStudyEvent();
-        if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SIGNED.getId()) {
-            String eventOldStatusId = "3";
+        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SIGNED) ) {
+            String eventOldworkflowStatus = StudyEventWorkflowEnum.DATA_ENTRY_STARTED.toString();
             AuditLogEvent eventAuditLogEvent = new AuditLogEvent();
             eventAuditLogEvent.setAuditTable(STUDYEVENT);
             eventAuditLogEvent.setEntityId(studyEvent.getStudyEventId());
             eventAuditLogEvent.setEntityName("Status");
             eventAuditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-            eventAuditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+            eventAuditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowEnum.SIGNED));
 
             List<AuditLogEvent> eventAles = auditLogEventDao.findByParam(eventAuditLogEvent);
             for (AuditLogEvent audit : eventAles) {
-                eventOldStatusId = audit.getOldValue();
+                eventOldworkflowStatus = audit.getOldValue();
                 break;
             }
-            studyEvent.setSubjectEventStatusId(Integer.valueOf(eventOldStatusId));
             studyEvent.setUpdateId(container.getUser().getUserId());
             studyEvent.setDateUpdated(new Date());
             studyEventDao.saveOrUpdate(studyEvent);
@@ -368,7 +368,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             subjectAuditLogEvent.setEntityId(studySubject.getStudySubjectId());
             subjectAuditLogEvent.setEntityName("Status");
             subjectAuditLogEvent.setAuditLogEventType(new AuditLogEventType(3));
-            subjectAuditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+            subjectAuditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowEnum.SIGNED));
 
             List<AuditLogEvent> subjectAles = auditLogEventDao.findByParam(subjectAuditLogEvent);
             for (AuditLogEvent audit : subjectAles) {

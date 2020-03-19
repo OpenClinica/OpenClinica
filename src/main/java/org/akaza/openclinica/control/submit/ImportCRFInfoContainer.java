@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,9 +133,9 @@ public class ImportCRFInfoContainer {
                                 importCrfInfo.setPreImportStage(DataEntryStage.INVALID);
                             } else if (crfStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName()))
                                 importCrfInfo.setPostImportStage(DataEntryStage.INITIAL_DATA_ENTRY);
-                            if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED))) {
+                            if ((studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.SCHEDULED)
+                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.DATA_ENTRY_STARTED)
+                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED))) {
 
                                 if (!upsert.isNotStarted()) {
                                     importCrfInfo.setProcessImport(false);

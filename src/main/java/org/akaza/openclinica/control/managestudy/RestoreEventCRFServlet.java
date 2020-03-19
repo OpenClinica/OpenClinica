@@ -134,21 +134,13 @@ public class RestoreEventCRFServlet extends SecureController {
 
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
-                if (!eventCRF.getStatus().equals(Status.DELETED) && !eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-                    addPageMessage(respage.getString("this_event_CRF_avilable_for_study") + " " + " "
-                        + respage.getString("please_contact_sysadmin_for_more_information"));
-                    request.setAttribute("id", new Integer(studySubId).toString());
-                    forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-                    return;
-                }
-
                 request.setAttribute("displayEventCRF", dec);
 
                 forwardPage(Page.RESTORE_EVENT_CRF);
             } else {
                 logger.info("submit to restore the event CRF from study");
 
-                eventCRF.setStatus(Status.AVAILABLE);
+                eventCRF.setRemoved(Boolean.FALSE);
                 eventCRF.setUpdater(ub);
                 eventCRF.setUpdatedDate(new Date());
                 ecdao.update(eventCRF);

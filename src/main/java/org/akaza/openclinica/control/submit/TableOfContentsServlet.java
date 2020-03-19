@@ -55,6 +55,7 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import core.org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -257,7 +258,7 @@ public class TableOfContentsServlet extends SecureController {
                 ecb.setDateInterviewed(null);
             }
             ecb.setOwnerId(ub.getId());
-            ecb.setStatus(Status.AVAILABLE);
+     //**********       ecb.setStatus(Status.AVAILABLE);
             ecb.setCompletionStatusId(1);
             ecb.setStudySubjectId(ssb.getId());
             ecb.setStudyEventId(studyEventId);
@@ -280,7 +281,7 @@ public class TableOfContentsServlet extends SecureController {
         if (!ecb.isActive()) {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("new_event_CRF_not_created_database_error"));
         } else {
-            sEvent.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+            sEvent.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
             sEvent.setUpdater(ub);
             sEvent.setUpdatedDate(new Date());
             sedao.update(sEvent);

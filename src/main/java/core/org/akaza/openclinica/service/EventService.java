@@ -16,8 +16,10 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.ItemData;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,12 +60,10 @@ public class EventService implements EventServiceInterface {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void removeStudyEventDefn(int defId, int userId) {
+	public void removeStudyEventDefn(int defId, int userId, Study study) {
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
-		UserAccountBean ub =  getUserAccount();
+		UserAccountBean ub = getUserAccount();
 
-		// find all event defn CRFs
-		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList) getEventDefinitionCRFDao().findAllByDefinition(defId);
 		// finds all study events
 		ArrayList<StudyEventBean> events = (ArrayList) getStudyEventDao().findAllByDefinition(sed.getId());
 
@@ -72,24 +72,11 @@ public class EventService implements EventServiceInterface {
 		sed.setUpdatedDate(new Date());
 		getStudyEventDefinitionDao().update(sed);
 
-		// remove all event defn crfs
-		for (int j = 0; j < eventDefinitionCRFs.size(); j++) {
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(j);
-			if (!edc.getStatus().equals(Status.DELETED) || !edc.getStatus().equals(Status.AUTO_DELETED)) {
-				edc.setStatus(Status.AUTO_DELETED);
-				edc.setUpdater(ub);
-				edc.setUpdatedDate(new Date());
-				edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().update(edc);
-				odmImportService.removeSiteDefinitions(edc.getId(), userId);
-
-			}
-		}
-
 		// remove all study events
 		for (int j = 0; j < events.size(); j++) {
 			StudyEventBean event = (StudyEventBean) events.get(j);
-			if (!event.getStatus().equals(Status.DELETED) || !event.getStatus().equals(Status.AUTO_DELETED)) {
-				event.setStatus(Status.AUTO_DELETED);
+			if (event.getArchived()==null || ( event.getArchived() != null && !event.getArchived())) {
+				event.setArchived(Boolean.TRUE);
 				event.setUpdater(ub);
 				event.setUpdatedDate(new Date());
 				getStudyEventDao().update(event);
@@ -98,30 +85,19 @@ public class EventService implements EventServiceInterface {
 				ArrayList eventCRFs = getEventCRFDao().findAllByStudyEvent(event);
 				for (int k = 0; k < eventCRFs.size(); k++) {
 					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-					if (!eventCRF.getStatus().equals(Status.DELETED) || !eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-						eventCRF.setStatus(Status.AUTO_DELETED);
-						eventCRF.setUpdater(ub);
-						eventCRF.setUpdatedDate(new Date());
-						getEventCRFDao().update(eventCRF);
 
-						// remove all item data
-						ArrayList itemDatas = getItemDataDao().findAllByEventCRFId(eventCRF.getId());
-						for (int a = 0; a < itemDatas.size(); a++) {
-							ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-							if (!item.getStatus().equals(Status.DELETED) || !item.getStatus().equals(Status.AUTO_DELETED)) {
-								item.setStatus(Status.AUTO_DELETED);
-								item.setUpdater(ub);
-								item.setUpdatedDate(new Date());
-								getItemDataDao().update(item);
-							}
-						}
+					// remove all item data
+					ArrayList itemDatas = getItemDataDao().findAllByEventCRFId(eventCRF.getId());
+					for (int a = 0; a < itemDatas.size(); a++) {
+						ItemDataBean itemData = (ItemDataBean) itemDatas.get(a);
+						closeDns(ub, study, itemData);
 					}
 				}
 			}
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings( {"unchecked", "rawtypes"} )
 	public void restoreStudyEventDefn(int defId, int userId) {
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
 		UserAccountBean ub = getUserAccount();
@@ -135,52 +111,14 @@ public class EventService implements EventServiceInterface {
 		sed.setUpdatedDate(new Date());
 		getStudyEventDefinitionDao().update(sed);
 
-		// restore all event defn crfs
-		for (int j = 0; j < eventDefinitionCRFs.size(); j++) {
-			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(j);
-			CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
-			if (edc.getStatus().equals(Status.AUTO_DELETED) || edc.getStatus().equals(Status.DELETED)) {
-				edc.setStatus(Status.AVAILABLE);
-				edc.setUpdater(ub);
-				edc.setUpdatedDate(new Date());
-				edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().update(edc);
-				odmImportService.restoreSiteDefinitions(edc.getId(), userId);
-
-			}
-		}
-
 		// restore all study events
 		for (int j = 0; j < events.size(); j++) {
 			StudyEventBean event = (StudyEventBean) events.get(j);
-			if (event.getStatus().equals(Status.AUTO_DELETED) || event.getStatus().equals(Status.DELETED)) {
-				event.setStatus(Status.AVAILABLE);
+			if (event.getArchived() != null && event.getArchived()) {
+				event.setArchived(Boolean.FALSE);
 				event.setUpdater(ub);
 				event.setUpdatedDate(new Date());
 				getStudyEventDao().update(event);
-
-				// restore all event crf
-				ArrayList eventCRFs = getEventCRFDao().findAllByStudyEvent(event);
-				for (int k = 0; k < eventCRFs.size(); k++) {
-					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-					if (eventCRF.getStatus().equals(Status.AUTO_DELETED) || eventCRF.getStatus().equals(Status.DELETED)) {
-						eventCRF.setStatus(Status.AVAILABLE);
-						eventCRF.setUpdater(ub);
-						eventCRF.setUpdatedDate(new Date());
-						getEventCRFDao().update(eventCRF);
-
-						// restore all item data
-						ArrayList itemDatas = getItemDataDao().findAllByEventCRFId(eventCRF.getId());
-						for (int a = 0; a < itemDatas.size(); a++) {
-							ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-							if (item.getStatus().equals(Status.AUTO_DELETED) || item.getStatus().equals(Status.DELETED)) {
-								item.setStatus(Status.AVAILABLE);
-								item.setUpdater(ub);
-								item.setUpdatedDate(new Date());
-								getItemDataDao().update(item);
-							}
-						}
-					}
-				}
 			}
 		}
 	}
@@ -201,7 +139,7 @@ public class EventService implements EventServiceInterface {
 	}
 
 	public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub, Study study) {
-		logger.info("Removing All Event Crf Items.. {} - items",edc.getCrf().getName() );
+		logger.info("Archive All Event Crf " );
 		CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
 		// Getting Study Events
 		ArrayList seList = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), crf.getOid());
@@ -211,60 +149,23 @@ public class EventService implements EventServiceInterface {
 			ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndFormOrFormLayoutOid(seBean, crf.getOid());
 			for (int k = 0; k < ecrfList.size(); k++) {
 				EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
-				ecrfBean.setOldStatus(ecrfBean.getStatus());
-				ecrfBean.setStatus(Status.AUTO_DELETED);
+				ecrfBean.setArchived(Boolean.TRUE);
 				ecrfBean.setUpdater(ub);
 				ecrfBean.setUpdatedDate(new Date());
 				getEventCRFDao().update(ecrfBean);
 				// Getting Item Data
-				ArrayList itemData = getItemDataDao().findAllByEventCRFId(ecrfBean.getId());
+				ArrayList itemDatas = getItemDataDao().findAllByEventCRFId(ecrfBean.getId());
 				// remove all the item data
-				for (int a = 0; a < itemData.size(); a++) {
-					ItemDataBean item = (ItemDataBean) itemData.get(a);
-					if (!item.getStatus().equals(Status.DELETED)) {
-						item.setOldStatus(item.getStatus());
-						item.setStatus(Status.AUTO_DELETED);
-						item.setUpdater(ub);
-						item.setUpdatedDate(new Date());
-						getItemDataDao().update(item);
-						List dnNotesOfRemovedItem = getDiscrepancyNoteDao().findParentNotesOnlyByItemData(item.getId());
-						if (!dnNotesOfRemovedItem.isEmpty()) {
-							DiscrepancyNoteBean itemParentNote = null;
-							for (Object obj : dnNotesOfRemovedItem) {
-								if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
-									itemParentNote = (DiscrepancyNoteBean) obj;
-								}
-							}
-							DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-							if (itemParentNote != null) {
-								dnb.setParentDnId(itemParentNote.getId());
-								dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
-								dnb.setThreadUuid(itemParentNote.getThreadUuid());
-							}
-							dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
-							dnb.setStudyId(study.getStudyId());
-							dnb.setAssignedUserId(ub.getId());
-							dnb.setOwner(ub);
-							dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
-							dnb.setEntityId(item.getId());
-							dnb.setColumn("value");
-							dnb.setCreatedDate(new Date());
-							String detailedNotes="The item has been removed, this Query has been Closed.";
-							dnb.setDetailedNotes(detailedNotes);
-							getDiscrepancyNoteDao().create(dnb);
-							getDiscrepancyNoteDao().createMapping(dnb);
-							itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
-							itemParentNote.setDetailedNotes(detailedNotes);
-							getDiscrepancyNoteDao().update(itemParentNote);
-						}
-					}
+				for (int a = 0; a < itemDatas.size(); a++) {
+					ItemDataBean itemData = (ItemDataBean) itemDatas.get(a);
+						closeDns( ub ,  study ,  itemData);
 				}
 			}
 		}
 	}
 
 	public void restoreAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub) {
-		logger.info("Restoring All Event Items.. {} - items",edc.getCrf().getName() );
+		logger.info("Restoring Archived event_crfs" );
 		CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
 		// All Study Events
 		ArrayList seList = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), crf.getOid());
@@ -274,22 +175,11 @@ public class EventService implements EventServiceInterface {
 			ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndFormOrFormLayoutOid(seBean, crf.getOid());
 			for (int k = 0; k < ecrfList.size(); k++) {
 				EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
-				ecrfBean.setStatus(ecrfBean.getOldStatus());
+				ecrfBean.setArchived(Boolean.FALSE);
 				ecrfBean.setUpdater(ub);
 				ecrfBean.setUpdatedDate(new Date());
 				getEventCRFDao().update(ecrfBean);
-				// All Item Data
-				ArrayList itemData = getItemDataDao().findAllByEventCRFId(ecrfBean.getId());
-				// remove all the item data
-				for (int a = 0; a < itemData.size(); a++) {
-					ItemDataBean item = (ItemDataBean) itemData.get(a);
-					if (item.getStatus().equals(Status.DELETED) || item.getStatus().equals(Status.AUTO_DELETED)) {
-						item.setStatus(item.getOldStatus());
-						item.setUpdater(ub);
-						item.setUpdatedDate(new Date());
-						getItemDataDao().update(item);
-					}
-				}
+
 			}
 		}
 
@@ -318,7 +208,7 @@ public class EventService implements EventServiceInterface {
 			studyEvent.setDateEnded(endDateTime);
 			studyEvent.setOwner(user);
 			studyEvent.setStatus(Status.AVAILABLE);
-			studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+			studyEvent.setWorkflowStatus(StudyEventWorkflowEnum.SCHEDULED);
 			studyEvent.setSampleOrdinal(getStudyEventDao().getMaxSampleOrdinal(studyEventDefinition, studySubject) + 1);
 			studyEvent = (StudyEventBean) getStudyEventDao().create(studyEvent, true);
 			studyEventOrdinal = studyEvent.getSampleOrdinal();
@@ -436,6 +326,39 @@ public class EventService implements EventServiceInterface {
 	public DiscrepancyNoteDAO getDiscrepancyNoteDao() {
 		discrepancyNoteDao = discrepancyNoteDao != null ? discrepancyNoteDao : new DiscrepancyNoteDAO(dataSource);
 		return discrepancyNoteDao;
+	}
+
+	public void closeDns(UserAccountBean ub , Study study , ItemDataBean itemData){
+		List dnNotesOfRemovedItem = getDiscrepancyNoteDao().findParentNotesOnlyByItemData(itemData.getId());
+		if (!dnNotesOfRemovedItem.isEmpty()) {
+			DiscrepancyNoteBean itemParentNote = null;
+			for (Object obj : dnNotesOfRemovedItem) {
+				if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
+					itemParentNote = (DiscrepancyNoteBean) obj;
+				}
+			}
+			DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+			if (itemParentNote != null) {
+				dnb.setParentDnId(itemParentNote.getId());
+				dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+				dnb.setThreadUuid(itemParentNote.getThreadUuid());
+			}
+			dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
+			dnb.setStudyId(study.getStudyId());
+			dnb.setAssignedUserId(ub.getId());
+			dnb.setOwner(ub);
+			dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+			dnb.setEntityId(itemData.getId());
+			dnb.setColumn("value");
+			dnb.setCreatedDate(new Date());
+			String detailedNotes="The item has been removed, this Query has been Closed.";
+			dnb.setDetailedNotes(detailedNotes);
+			getDiscrepancyNoteDao().create(dnb);
+			getDiscrepancyNoteDao().createMapping(dnb);
+			itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());  // set to closed-modified
+			itemParentNote.setDetailedNotes(detailedNotes);
+			getDiscrepancyNoteDao().update(itemParentNote);
+		}
 	}
 
 }

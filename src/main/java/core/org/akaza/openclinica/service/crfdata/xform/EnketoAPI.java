@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.core.util.EncryptionUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.Status;
@@ -150,7 +149,7 @@ public class EnketoAPI {
         // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
         if ((parentStudy.getStatus().equals(Status.LOCKED)
                 || (site != null && site.getStatus().equals(Status.LOCKED)))
-                || (studyEvent != null && studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId()))
+                || (studyEvent != null && (studyEvent.getLocked()!=null && studyEvent.getLocked()) )
                 || parentStudy.getStatus().equals(Status.FROZEN) || mode.equals(VIEW_MODE)) {
             eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
             lockOn = false;
@@ -426,7 +425,7 @@ public class EnketoAPI {
 
             if (((parentStudy.getStatus().equals(Status.LOCKED))
                     || (site != null && site.getStatus().equals(Status.LOCKED)))
-                 || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())
+                 ||( studyEvent.getLocked()!=null && studyEvent.getLocked())
                  || studyEvent.getStatusId().equals(Status.DELETED.getCode())
                  || studyEvent.getStatusId().equals(Status.AUTO_DELETED.getCode())
                  || edc.getStatusId().equals(Status.DELETED.getCode())

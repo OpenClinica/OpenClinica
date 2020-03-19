@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet author="jkeremian" id="2020-03-04-OC-12403-01">
+        <comment>Adding new columns workflow_status , removed and archived  to event_crf table</comment>
+        <addColumn tableName="event_crf">
+            <column name="workflow_status" type="VARCHAR(64)" />
+            <column name="removed" type="BOOLEAN" />
+            <column name="archived" type="BOOLEAN" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2020-03-04-OC-12403-02">
+        <comment>Updating the workflow_status column where status_id=1 on event_crf table</comment>
+        <sql>
+            UPDATE event_crf SET workflow_status='INITIAL_DATA_ENTRY' WHERE status_id ='1';
+        </sql>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2020-03-04-OC-12403-03">
+        <comment>Updating the workflow_status column where status_id=2 on event_crf table</comment>
+        <sql>
+            UPDATE event_crf SET workflow_status='COMPLETED' WHERE status_id ='2';
+        </sql>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2020-03-04-OC-12403-04">
+        <comment>Updating the removed column where status_id=5 and 7 on event_crf table</comment>
+        <sql>
+            UPDATE event_crf SET removed='true'  WHERE status_id ='5' or status_id='7';
+        </sql>
+    </changeSet>
+
+
+
+
+    <changeSet author="jkeremian" id="2020-03-05-OC-12403-06">
+        <comment>Updating the removed column where status_id=5 on event_crf table</comment>
+        <sql>
+            UPDATE event_crf
+            SET workflow_status= CASE old_status_id
+            WHEN '1' THEN 'INITIAL_DATA_ENTRY'
+            WHEN '2' THEN 'COMPLETED'
+            ELSE 'INITIAL_DATA_ENTRY'
+            END
+            WHERE removed='true';
+
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>

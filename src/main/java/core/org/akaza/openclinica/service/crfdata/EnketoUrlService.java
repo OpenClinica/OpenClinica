@@ -11,7 +11,6 @@ import java.util.*;
 import javax.servlet.ServletContext;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.core.Utils;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -29,7 +28,9 @@ import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.service.crfdata.xform.*;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -469,13 +470,13 @@ public class EnketoUrlService {
 
         String instance = wtr.toString();
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrf.getStudyEvent().getStudyEventId());
-        if (studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.SIGNED.getId())) {
+        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowEnum.SIGNED)) {
             AuditLogEvent auditLogEvent = new AuditLogEvent();
             auditLogEvent.setAuditTable(STUDYEVENT);
             auditLogEvent.setEntityId(studyEvent.getStudyEventId());
             auditLogEvent.setEntityName("Status");
             auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-            auditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+            auditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowEnum.SIGNED));
 
             List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
             for (AuditLogEvent audit : ales) {
@@ -589,7 +590,7 @@ public class EnketoUrlService {
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
-        eventCrf.setStatusId(core.org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
+        eventCrf.setWorkflowStatus(EventCrfWorkflowEnum.INITIAL_DATA_ENTRY);
         eventCrf.setCompletionStatus(completionStatusDao.findByCompletionStatusId(1));// setCompletionStatusId(1);
         eventCrf.setStudySubject(studySubject);
         eventCrf.setStudyEvent(studyEvent);

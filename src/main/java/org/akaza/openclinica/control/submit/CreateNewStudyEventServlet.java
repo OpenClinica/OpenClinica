@@ -41,6 +41,7 @@ import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -509,7 +510,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setOwner(ub);
                 studyEvent.setStatus(Status.AVAILABLE);
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
-                studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+                studyEvent.setWorkflowStatus(StudyEventWorkflowEnum.SCHEDULED);
 
                 studySubject = unsignSignedParticipant(studySubject);
                 studySubject.setUpdater(ub);
@@ -577,7 +578,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 studyEventScheduled.setOwner(ub);
                                 studyEventScheduled.setStatus(Status.AVAILABLE);
                                 studyEventScheduled.setLocation(fp.getString(INPUT_SCHEDULED_LOCATION[i]));
-                                studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+                                studyEvent.setWorkflowStatus(StudyEventWorkflowEnum.SCHEDULED);
 
                                 // subjectsExistingEvents =
                                 // sed.findAllByStudyAndStudySubjectId(

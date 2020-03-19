@@ -52,6 +52,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.checkerframework.checker.units.qual.A;
 import org.jmesa.core.filter.MatcherKey;
@@ -127,7 +128,7 @@ public class SDVUtil {
 
     public final static Map<core.org.akaza.openclinica.domain.datamap.SubjectEventStatus, String> SUBJECT_EVENT_STATUS_ICONS = new HashMap<core.org.akaza.openclinica.domain.datamap.SubjectEventStatus, String>();
     public final static Map<Integer, String> CRF_STATUS_ICONS = new HashMap<Integer, String>();
-
+    public final static Map<StudyEventWorkflowEnum, String> STUDY_EVENT_WORKFLOW_ICONS = new HashMap();
     static {
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.INVALID, "icon icon-doc");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SCHEDULED, "icon icon-clock2");
@@ -138,6 +139,18 @@ public class SDVUtil {
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SKIPPED, "icon icon-redo");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.LOCKED, "icon icon-lock");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SIGNED, "icon con-icon-sign green");
+
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.SCHEDULED, "icon icon-clock2");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.NOT_SCHEDULED, "icon icon-clock");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.DATA_ENTRY_STARTED,  "icon icon-pencil-squared orange");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.COMPLETED, "icon icon-checkbox-checked green");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.STOPPED, "icon icon-stop-circle red");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.SKIPPED, "icon icon-redo");
+        /*******************
+          STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.LOCKED, "icon icon-lock");
+          */
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.SIGNED, "icon con-icon-sign green");
+
 
 
         CRF_STATUS_ICONS.put(0, "icon icon-file-excel red");
@@ -940,11 +953,6 @@ public class SDVUtil {
             tempSDVBean.setCrfVersion(getFormLayoutName(eventCRFBean.getFormLayoutId()));
             if (eventCRFBean.getStatus() != null) {
                 Integer status = eventCRFBean.getStage().getId();
-                if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.LOCKED || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.STOPPED
-                        || studyEventBean.getSubjectEventStatus() == SubjectEventStatus.SKIPPED) {
-                    status = DataEntryStage.LOCKED.getId();
-                }
-
 
                 StringBuilder crfStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
                 String input = "<input type=\"hidden\" statusId=\"" + status + "\" />";
@@ -963,8 +971,7 @@ public class SDVUtil {
                 tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
             }
             core.org.akaza.openclinica.domain.datamap.SubjectEventStatus subjectEventStatus = core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.getByCode(eventCrf.getStudyEvent().getSubjectEventStatusId());
-            String eventStatusDesc = resWords.getString(subjectEventStatus.getDescription());
-            tempSDVBean.setSubjectEventStatus("<center><a title='" + eventStatusDesc + "' alt='" + eventStatusDesc + "' class='" + SUBJECT_EVENT_STATUS_ICONS.get(subjectEventStatus) + "' accessCheck' border='0'/></center>");
+            tempSDVBean.setSubjectEventStatus("<center><a title='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' alt='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' class='"+STUDY_EVENT_WORKFLOW_ICONS.get(eventCrf.getStudyEvent().getWorkflowStatus())+"' accessCheck' border='0'/></center>");
 
             // TODO: I18N Date must be formatted properly
             Locale locale = LocaleResolver.getLocale(request);
@@ -1494,8 +1501,8 @@ public class SDVUtil {
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
             core.org.akaza.openclinica.domain.Status status = core.org.akaza.openclinica.domain.Status.getByCode(eventCrf.getStatusId());
             core.org.akaza.openclinica.domain.datamap.SubjectEventStatus eventStatus = core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.getByCode(eventCrf.getStudyEvent().getSubjectEventStatusId());
-            if (eventStatus.equals(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.LOCKED)) {
-                sdvDTO.setFormStatus(eventStatus.getDescription());
+            if(eventCrf.getStudyEvent().getLocked()!=null && eventCrf.getStudyEvent().getLocked()) {
+                sdvDTO.setFormStatus("locked");
             } else
                 sdvDTO.setFormStatus("completed"); //EventCrf Status is checked to be UNAVAVAILABLE (i.e. COMPLETED) at parent If Itself
             sdvDTO.setLastVerifiedDate(eventCrf.getLastSdvVerifiedDate());

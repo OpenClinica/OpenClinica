@@ -35,6 +35,7 @@ import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.crfdata.HideCRFManager;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudyEventRow;
@@ -131,8 +132,8 @@ public class ViewStudySubjectServlet extends SecureController {
             // construct info needed on view study event page
             DisplayStudyEventBean de = new DisplayStudyEventBean();
             de.setStudyEvent(event);
-            de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole, event.getSubjectEventStatus(), study));
-            ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus(), sed.getId());
+            de.setDisplayEventCRFs(getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole, event.getWorkflowStatus(), study));
+            ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getWorkflowStatus(), sed.getId());
             populateUncompletedCRFsWithCRFAndVersions(ds, al);
             de.setUncompletedCRFs(al);
 
@@ -345,9 +346,7 @@ public class ViewStudySubjectServlet extends SecureController {
                            }
                        }
                    }
-                    if (!(currentRole.isDirector() || currentRole.isCoordinator()) && decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
-                        decb.getStudyEvent().setEditable(false);
-                    }
+
 
             }
             if (currentStudy.isSite()) {
@@ -439,7 +438,7 @@ public class ViewStudySubjectServlet extends SecureController {
      * @return The list of DisplayEventCRFBeans for this study event.
      */
     public static ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
-            StudyUserRoleBean currentRole, SubjectEventStatus status, Study study) {
+                                                StudyUserRoleBean currentRole, StudyEventWorkflowEnum workflowStatus, Study study) {
         ArrayList answer = new ArrayList();
 
         // HashMap definitionsById = new HashMap();
@@ -485,22 +484,14 @@ public class ViewStudySubjectServlet extends SecureController {
             // eventdefinitioncrfBeans
             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
             // below added 092007 tbh
-            // rules updated 112007 tbh
-            if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED ) || status.equals(SubjectEventStatus.STOPPED )) {
-                ecb.setStage(DataEntryStage.LOCKED);
 
-                // we need to set a SED-wide flag here, because other edcs
-                // in this event can be filled in and change the status, tbh
-            } else if (status.equals(SubjectEventStatus.INVALID)) {
-                ecb.setStage(DataEntryStage.LOCKED);
-            } else if (!cb.getStatus().equals(Status.AVAILABLE)) {
-                ecb.setStage(DataEntryStage.LOCKED);
-            } else if (!flb.getStatus().equals(Status.AVAILABLE)) {
-                ecb.setStage(DataEntryStage.LOCKED);
-            }
             // above added 092007-102007 tbh
             // TODO need to refactor since this is similar to other code, tbh
             if (edc != null) {
+                FormLayoutDAO formLayoutDao = new FormLayoutDAO(ds);
+                    ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edc.getCrfId());
+                    edc.setVersions(versions);
+
                 // System.out.println("edc is not null, need to set flags");
                 DisplayEventCRFBean dec = new DisplayEventCRFBean();
                 dec.setEventDefinitionCRF(edc);
@@ -534,7 +525,7 @@ public class ViewStudySubjectServlet extends SecureController {
      *            All of the event CRFs for this study event.
      * @return The list of event definitions for which no event CRF exists.
      */
-    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status, int studyEventId) {
+    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, StudyEventWorkflowEnum workflowStatus, int studyEventId) {
 
         HashMap<Integer, EventDefinitionCRFBean> eventDefinitionsHashMap = new HashMap();
 
@@ -565,9 +556,6 @@ public class ViewStudySubjectServlet extends SecureController {
             DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
             dedc.setEdc(eventDefinitionCrfBean);
 
-            if (status.equals(SubjectEventStatus.LOCKED)) {
-                dedc.setStatus(Status.LOCKED);
-            }
 
             dedc.setEventCRF(new EventCRFBean());
             answer.add(dedc);

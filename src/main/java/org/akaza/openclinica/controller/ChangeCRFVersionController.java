@@ -34,6 +34,7 @@ import core.org.akaza.openclinica.domain.datamap.VersioningMap;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -562,7 +563,8 @@ public class ChangeCRFVersionController {
             eventCRFDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
 
             String status_before_update = null;
-            SubjectEventStatus eventStatus = null;
+            String status_before_update_new = null;
+
             Status subjectStatus = null;
             AuditDAO auditDao = new AuditDAO(dataSource);
 
@@ -583,10 +585,10 @@ public class ChangeCRFVersionController {
             seb.setUpdatedDate(new Date());
 
             status_before_update = auditDao.findLastStatus("study_event", seb.getId(), "8");
-            if (status_before_update != null && status_before_update.length() == 1) {
-                int status = Integer.parseInt(status_before_update);
-                eventStatus = SubjectEventStatus.get(status);
-                seb.setSubjectEventStatus(eventStatus);
+            status_before_update_new = auditDao.findLastStatus("study_event", seb.getId(), "SIGNED");
+
+            if (status_before_update != null && (status_before_update.length() == 1 || status_before_update_new.length() == 1)) {
+                seb.setWorkflowStatus(StudyEventWorkflowEnum.SIGNED);
             }
             sed.update(seb, con);
 

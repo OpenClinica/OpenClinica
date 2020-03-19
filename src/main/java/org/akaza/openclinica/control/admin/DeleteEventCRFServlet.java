@@ -38,6 +38,8 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -181,11 +183,7 @@ public class DeleteEventCRFServlet extends SecureController {
                 // getDynamicsItemFormMetadataDao().delete(eventCRFId);
                 // getDynamicsItemGroupMetadataDao().delete(eventCRFId);
 
-                eventCRF.setOldStatus(eventCRF.getStatus());
-                eventCRF.setStatus(Status.RESET);
-                eventCRF.setUpdater(ub);
-                eventCRF.setDateCompleted(null);
-                ecdao.update(eventCRF);
+
 
                 for (ItemDataBean itemdata : itemData) {
                     // OC-6343 Rule behaviour must be reset if an Event CRF is deleted
@@ -231,14 +229,14 @@ public class DeleteEventCRFServlet extends SecureController {
 
                 }
                 // OC-6291 event_crf status change
-
                 eventCRF.setOldStatus(eventCRF.getStatus());
-                eventCRF.setStatus(Status.AVAILABLE);
+                eventCRF.setWorkflowStatus(EventCrfWorkflowEnum.NOT_STARTED);
                 eventCRF.setUpdater(ub);
+                eventCRF.setDateCompleted(null);
                 ecdao.update(eventCRF);
 
-                if (event.getSubjectEventStatus().isCompleted() || event.getSubjectEventStatus().isSigned()) {
-                    event.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+                if (event.getWorkflowStatus().equals(StudyEventWorkflowEnum.COMPLETED) || event.getWorkflowStatus().equals(StudyEventWorkflowEnum.SIGNED)) {
+                    event.setWorkflowStatus(StudyEventWorkflowEnum.DATA_ENTRY_STARTED);
                     event.setUpdater(ub);
                     sedao = new StudyEventDAO(sm.getDataSource());
                     sedao.update(event);

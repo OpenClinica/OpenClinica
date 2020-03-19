@@ -620,7 +620,7 @@ public class StudyInfoPanel implements Serializable {
             }
 
             displayData.add(new StudyInfoPanelLine("<b>Status: </b>", "<a href='EnterDataForStudyEvent?eventId=" + seBean.getId() + "'>"
-                + seBean.getSubjectEventStatus().getName() + "</a>", false, false, false));
+                + seBean.getWorkflowStatus() + "</a>", false, false, false));
             ArrayList displayCRFs = dseBean.getDisplayEventCRFs();
             int count = 0;
             Iterator displayIt = displayCRFs.iterator();
@@ -712,7 +712,7 @@ public class StudyInfoPanel implements Serializable {
                 displayData.add(new StudyInfoPanelLine("Study Event", seBean.getStudyEventDefinition().getName(), true, false, false));
             }
 
-            displayData.add(new StudyInfoPanelLine("<b>Status: </b>", seBean.getSubjectEventStatus().getName(), false, false, false));
+            displayData.add(new StudyInfoPanelLine("<b>Status: </b>", seBean.getWorkflowStatus().toString(), false, false, false));
             ArrayList displayCRFs = dseBean.getDisplayEventCRFs();
             int count = 0;
             Iterator displayIt = displayCRFs.iterator();

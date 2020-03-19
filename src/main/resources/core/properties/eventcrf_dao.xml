@@ -363,6 +363,10 @@
             , OLD_STATUS_ID=?
             , SDV_UPDATE_ID = ?
             , FORM_LAYOUT_ID=?
+            , WORKFLOW_STATUS=?
+            , REMOVED=?
+            , ARCHIVED=?
+
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>
@@ -375,7 +379,7 @@
     
     <query>
         <name>findAllByStudyEventAndStatus</name>
-        <sql>SELECT * FROM event_crf WHERE study_event_id=? and status_id = ? order by event_crf_id asc</sql>
+        <sql>SELECT * FROM event_crf WHERE study_event_id=? and workflow_status = ? order by event_crf_id asc</sql>
     </query>
     
     <query>

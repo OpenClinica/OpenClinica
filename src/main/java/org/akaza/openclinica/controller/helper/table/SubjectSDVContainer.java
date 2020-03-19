@@ -1,5 +1,8 @@
 package org.akaza.openclinica.controller.helper.table;
 
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
+
 import java.util.Date;
 
 /**
@@ -38,6 +41,8 @@ public class SubjectSDVContainer {
     private String percentageOfCRFsSDV;
     private String group;
     private String openQueries;
+    private EventCrfWorkflowEnum  crfWorkflowStatus;
+    private StudyEventWorkflowEnum eventWorkflowStatus;
 
     public SubjectSDVContainer() {
         sdvStatus = "";
@@ -61,6 +66,7 @@ public class SubjectSDVContainer {
         group = "";
         openQueries = "";
         crfVersion = "";
+
     }
 
     public String getSubjectEventStatus() {
@@ -221,5 +227,21 @@ public class SubjectSDVContainer {
 
     public void setCrfVersion(String crfVersion) {
         this.crfVersion = crfVersion;
+    }
+
+    public EventCrfWorkflowEnum getCrfWorkflowStatus() {
+        return crfWorkflowStatus;
+    }
+
+    public void setCrfWorkflowStatus(EventCrfWorkflowEnum crfWorkflowStatus) {
+        this.crfWorkflowStatus = crfWorkflowStatus;
+    }
+
+    public StudyEventWorkflowEnum getEventWorkflowStatus() {
+        return eventWorkflowStatus;
+    }
+
+    public void setEventWorkflowStatus(StudyEventWorkflowEnum eventWorkflowStatus) {
+        this.eventWorkflowStatus = eventWorkflowStatus;
     }
 }

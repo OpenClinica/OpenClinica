@@ -31,6 +31,8 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SectionDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -221,7 +223,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
                     ecb.setDateValidateCompleted(new Date());
                     ide = false;
                 }
-                ecb.setStatus(newStatus);
+                ecb.setWorkflowStatus(EventCrfWorkflowEnum.COMPLETED);
                 ecb = (EventCRFBean) ecdao.update(ecb);
                 ecdao.markComplete(ecb, ide);
 
@@ -246,7 +248,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
                     }
                 }
                 if (eventCompleted && allCRFs.size() >= allEDCs.size()) {
-                    seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+                    seb.setWorkflowStatus(StudyEventWorkflowEnum.COMPLETED);
                 }
 
                 seb = (StudyEventBean) sedao.update(seb);
