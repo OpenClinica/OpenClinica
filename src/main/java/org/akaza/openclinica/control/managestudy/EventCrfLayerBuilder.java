@@ -14,6 +14,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.Status;
@@ -44,7 +45,7 @@ public class EventCrfLayerBuilder {
 
     public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, DataEntryStage eventCrfStatus,
                                 EventCRFBean eventCrfBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
-                                EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath , StudyDao studyDao) {
+                                EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath, StudyDao studyDao) {
         super();
         this.html = new HtmlBuilder();
         this.subject = subject;
@@ -60,7 +61,7 @@ public class EventCrfLayerBuilder {
         this.crf = crf;
         this.studyEventDefinition = studyEventDefinition;
         this.contextPath = contextPath;
-        this.studyDao=studyDao;
+        this.studyDao = studyDao;
     }
 
     StudyEventBean getStudyEvent() {
@@ -68,8 +69,8 @@ public class EventCrfLayerBuilder {
     }
 
     String buid() {
-        if (eventCrfBean==null){
-            eventCrfBean= new EventCRFBean(EventCrfWorkflowStatusEnum.NOT_STARTED);
+        if (eventCrfBean == null) {
+            eventCrfBean = new EventCRFBean(EventCrfWorkflowStatusEnum.NOT_STARTED);
         }
 
         buildLock();
@@ -88,7 +89,7 @@ public class EventCrfLayerBuilder {
         // Lock Div
         html.div().id("Lock_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount)
                 .style("position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
-        if ((eventCrfBean.getRemoved()!=null && eventCrfBean.getRemoved())) {
+        if ((eventCrfBean.getRemoved() != null && eventCrfBean.getRemoved())) {
             lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid_collapse.gif", "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete_collapse.gif", "images/CRF_status_icon_Complete.gif");
@@ -127,7 +128,7 @@ public class EventCrfLayerBuilder {
         html.append("Status").append(": ").append(eventCrfStatus.getName()).br();
         html.tdEnd();
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
-        if ((eventCrfBean.getRemoved()!=null && eventCrfBean.getRemoved())) {
+        if ((eventCrfBean.getRemoved() != null && eventCrfBean.getRemoved())) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete.gif");
@@ -148,19 +149,25 @@ public class EventCrfLayerBuilder {
         String in_order_to_enter_data_create_event = restexts.getString("in_order_to_enter_data_create_e");
         String click_for_more_options = restexts.getString("click_for_more_options");
 
+        // Show the reassign button only when there are others to choose from
+        int numberOfVersions = eventDefinitionCrf.getVersions().size();
+        boolean otherVersionAvailable = false;
+        if (numberOfVersions == 1)
+            otherVersionAvailable = ((FormLayoutBean) eventDefinitionCrf.getVersions().get(0)).getCrfId() != crf.getId();
+
         String table_cell_left = "table_cell_left";
 
         String studySubjectLabel = studySubject.getLabel();
         html.tr(0).id("Menu_off_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount).style("display: all").close();
         html.td(0).styleClass("table_cell_left").colspan("2").close();
-            if (eventCrfBean.getWorkflowStatus()== EventCrfWorkflowStatusEnum.NOT_STARTED) {
-                if (getStudyEvent() != null) {
+        if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
+            if (getStudyEvent() != null) {
                 html.append("<i>" + click_to_enter_data).br();
                 html.append(to_use_another_version_click + "</i>");
             } else {
                 html.append("<i>" + in_order_to_enter_data_create_event + "</i>");
             }
-        } else if (getStudyEvent() == null && eventCrfBean.getWorkflowStatus()== EventCrfWorkflowStatusEnum.NOT_STARTED) {
+        } else if (getStudyEvent() == null && eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
             html.append("<i>" + click_to_enter_data).br();
             html.append(to_use_another_version_click + "</i>");
         } else {
@@ -172,10 +179,10 @@ public class EventCrfLayerBuilder {
         html.td(0).colspan("2").close();
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
 
-        Study subjectStudy=studyDao.findByPK(studySubject.getStudyId());
+        Study subjectStudy = studyDao.findByPK(studySubject.getStudyId());
 
 
-        if ((eventCrfBean.getRemoved()!=null && eventCrfBean.getRemoved())) {
+        if ((eventCrfBean.getRemoved() != null && eventCrfBean.getRemoved())) {
 
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -235,7 +242,7 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -301,7 +308,8 @@ public class EventCrfLayerBuilder {
                 deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -339,7 +347,7 @@ public class EventCrfLayerBuilder {
     void buildEnd() {
 
         String studySubjectLabel = studySubject.getLabel();
-        if ((eventCrfBean.getRemoved()!=null && eventCrfBean.getRemoved())) {
+        if ((eventCrfBean.getRemoved() != null && eventCrfBean.getRemoved())) {
             iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid_expand.gif", "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete_expand.gif", "images/CRF_status_icon_Complete.gif");
@@ -372,7 +380,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void viewSectionDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, String link, EventDefinitionCRFBean eventDefinitionCrf,
-            StudyEventBean studyEvent) {
+                                      StudyEventBean studyEvent) {
         int formLayoutId = 0;
         int eventCrfId = 0;
         int studyEventId = 0;
@@ -415,7 +423,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void viewSectionDataEntryParameterized(HtmlBuilder builder, EventCRFBean eventCrf, EventDefinitionCRFBean eventDefinitionCrf, String link,
-            StudyEventBean studyEvent) {
+                                                   StudyEventBean studyEvent) {
         int formLayoutId = 0;
         int eventCrfId = 0;
         int studyEventId = 0;
@@ -437,7 +445,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void viewSectionDataEntryParameterized(HtmlBuilder builder, EventCRFBean eventCrf, EventDefinitionCRFBean eventDefinitionCrf,
-            StudyEventBean studyEvent) {
+                                                   StudyEventBean studyEvent) {
         int formLayoutId = 0;
         int eventCrfId = 0;
         int studyEventId = 0;
@@ -586,7 +594,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void initialDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, EventDefinitionCRFBean eventDefinitionCrf,
-            StudyEventBean studyEvent) {
+                                      StudyEventBean studyEvent) {
         int formLayoutId = 0;
         if (eventCrf == null || eventCrf.getId() == 0) {
             formLayoutId = eventDefinitionCrf.getDefaultVersionId();
@@ -602,7 +610,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void initialDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, EventDefinitionCRFBean eventDefinitionCrf,
-            StudyEventBean studyEvent, String link) {
+                                      StudyEventBean studyEvent, String link) {
         int formLayoutId = 0;
         if (eventCrf == null || eventCrf.getId() == 0) {
             formLayoutId = eventDefinitionCrf.getDefaultVersionId();

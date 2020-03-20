@@ -117,6 +117,7 @@ public class ViewStudySubjectServlet extends SecureController {
             StudyEventBean event = (StudyEventBean) events.get(i);
 
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+
             event.setStudyEventDefinition(sed);
 
             // find all active crfs in the definition
@@ -483,9 +484,8 @@ public class ViewStudySubjectServlet extends SecureController {
             // above added 092007-102007 tbh
             // TODO need to refactor since this is similar to other code, tbh
             if (edc != null) {
-                FormLayoutDAO formLayoutDao = new FormLayoutDAO(ds);
-                    ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edc.getCrfId());
-                    edc.setVersions(versions);
+                ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) fldao.findAllActiveByCRF(edc.getCrfId());
+                edc.setVersions(versions);
 
                 // System.out.println("edc is not null, need to set flags");
                 DisplayEventCRFBean dec = new DisplayEventCRFBean();
@@ -691,14 +691,6 @@ public class ViewStudySubjectServlet extends SecureController {
             discBeans.addAll(discrepancyNoteDAO.findAllSubjectByStudyAndId(studyBean, subjectId));
             discBeans.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(studyBean, studySubId));
         }
-
     }
-
-
-
-
-
-
-
 
 }

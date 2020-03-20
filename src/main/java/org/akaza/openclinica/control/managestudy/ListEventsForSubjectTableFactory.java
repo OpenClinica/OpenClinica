@@ -50,6 +50,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     private final String COMMON = "common";
 
     public StudyDao studyDao;
+
     public CRFVersionDAO getCrfVersionDAO() {
         return crfVersionDAO;
     }
@@ -59,7 +60,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     }
 
     private Study studyBean;
-    private String[] columnNames = new String[] {};
+    private String[] columnNames = new String[]{};
     private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
     private ArrayList<CRFBean> crfBeans;
     private ArrayList<EventDefinitionCRFBean> eventDefinitionCrfs;
@@ -136,6 +137,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     false);
         }
 
+        // actions column
         String actionsHeader = resword.getString("rule_actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn(columnNames[columnNames.length - 1]), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true,
                 false);
@@ -253,10 +255,10 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
                     if (eventCRFBean != null) {
                         d.getProps().put("crf_" + crf.getId() + "_eventCrf", eventCRFBean);
-                        FormLayoutBean formLayoutBean= (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
-                        if(formLayoutBean.getStatus().equals(Status.LOCKED)) {
+                        FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByPK(eventCRFBean.getFormLayoutId());
+                        if (formLayoutBean.getStatus().equals(Status.LOCKED)) {
                             d.getProps().put("crf_" + crf.getId(), DataEntryStage.LOCKED);
-                        }else {
+                        } else {
                             d.getProps().put("crf_" + crf.getId(), eventCRFBean.getStage());
                         }
 
@@ -293,6 +295,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         }
         FormLayoutBean defaultVersion = (FormLayoutBean) getFormLayoutDAO().findByPK(eventDefinitionCrf.getDefaultVersionId());
         eventDefinitionCrf.setDefaultCRF(defaultVersion);
+        //set versions
+        ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) getFormLayoutDAO().findAllActiveByCRF(eventDefinitionCrf.getCrfId());
+        eventDefinitionCrf.setVersions(versions);
         return eventDefinitionCrf;
     }
 
@@ -747,7 +752,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 }
 
                 EventCrfLayerBuilder eventCrfLayerBuilder = new EventCrfLayerBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents,
-                        dataEntryStage, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path,studyDao);
+                        dataEntryStage, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path, studyDao);
 
                 url.append(eventCrfLayerBuilder.buid());
                 url.append("<span class='" + crfColumnImageIconPaths.get(dataEntryStage.getId()) + "' border='0'>");
@@ -763,7 +768,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
             StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
-           Study subjectStudy = studyDao.findByPK(studySubjectBean.getStudyId());
+            Study subjectStudy = studyDao.findByPK(studySubjectBean.getStudyId());
             Integer studySubjectId = studySubjectBean.getId();
             if (studySubjectId != null) {
                 StringBuilder url = new StringBuilder();
@@ -846,7 +851,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     }
 
     private String eventDivBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed,
-            StudySubjectBean studySubject) {
+                                   StudySubjectBean studySubject) {
 
         String studySubjectLabel = studySubject.getLabel();
 
@@ -879,8 +884,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         return eventDiv.toString();
     }
 
+    // for event status
     private void singleEventDivBuilder(HtmlBuilder eventDiv, SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
+                                       StudyEventDefinitionBean sed, StudySubjectBean studySubject) {
 
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
         String click_for_more_options = resword.getString("click_for_more_options");
@@ -927,9 +933,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);
                 eventDiv.tdEnd().trEnd(0);
-            }
-
-            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)  ) {
+            } else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)  ) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -944,9 +948,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
                     eventDiv.tdEnd().trEnd(0);
                 }
-            }
-
-            else if (studyEvents.get(0).getLocked() !=null && studyEvents.get(0).getLocked()) {
+            }  else if (studyEvents.get(0).getLocked() !=null && studyEvents.get(0).getLocked()) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();
@@ -1029,7 +1031,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     }
 
     private void lockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed) {
+                                 StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1 = "javascript:leftnavExpand('S_Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('S_Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
@@ -1047,7 +1049,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     }
 
     private void iconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
-            StudyEventDefinitionBean sed) {
+                                 StudyEventDefinitionBean sed) {
         studySubjectLabel = studySubjectLabel.replaceAll("'", "\\\\'");
         String href1Repeating = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size()
                 + "); ";
