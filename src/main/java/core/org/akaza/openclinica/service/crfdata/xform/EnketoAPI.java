@@ -424,14 +424,16 @@ public class EnketoAPI {
             // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
 
             if (((parentStudy.getStatus().equals(Status.LOCKED))
-                    || (site != null && site.getStatus().equals(Status.LOCKED)))
+                 || (site != null && site.getStatus().equals(Status.LOCKED)))
                  ||( studyEvent.getLocked()!=null && studyEvent.getLocked())
-                 || studyEvent.getStatusId().equals(Status.DELETED.getCode())
-                 || studyEvent.getStatusId().equals(Status.AUTO_DELETED.getCode())
+                 || (studyEvent.getRemoved()!=null && studyEvent.getRemoved())
+                 || (studyEvent.getArchived()!=null && studyEvent.getArchived())
                  || edc.getStatusId().equals(Status.DELETED.getCode())
                  || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
-                 || eventCrf.getStatusId().equals(Status.DELETED.getCode())
-                 || eventCrf.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
+                 || (eventCrf.getRemoved()!=null && eventCrf.getRemoved())
+                 || (eventCrf.getArchived()!=null && eventCrf.getArchived())) {
+
+
 
                 eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                 markComplete = false;
