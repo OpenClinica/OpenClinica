@@ -843,8 +843,11 @@ public class ImportServiceImpl implements ImportService {
         List<EventCrf> eventCrfs = null;
         for (StudyEvent stEvent : studyEvents) {
             eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(stEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
-            if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
-            break;
+            if (eventCrfs.size() > 0) {
+            	eventCrf = eventCrfs.get(0);
+            	break;
+            }
+            
         }
 
         return eventCrf;
@@ -938,7 +941,26 @@ public class ImportServiceImpl implements ImportService {
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(studyEvent.getSampleOrdinal()));
                     return studyEvent;
                 } else {
-                    studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
+                	// Repeat Key, if found in xml file, then use it
+                	if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   
+                		eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
+                        if (eventObject instanceof ErrorObj) return eventObject;                                      		              	
+                	}else {
+                		studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));  
+                	}
+                    
+                	//check blank event                	 
+                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
+
+                     ErrorObj errorObj = checkEventAvailable(studyEvent);
+                     if (errorObj != null) {
+                         return errorObj;
+                     }
+                     
+                     if(studyEvent !=null){
+                    	 return studyEvent;
+                     }
+                	
                     studyEvent = scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
                     return studyEvent;
                 }
