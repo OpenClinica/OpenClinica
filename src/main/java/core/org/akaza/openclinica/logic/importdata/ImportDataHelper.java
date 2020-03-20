@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -736,6 +737,8 @@ public class ImportDataHelper {
     	      }
     	    }
     	
+    	fileList.sort(new LogFileSorter());
+    	
     	return fileList;
     }
     
@@ -872,4 +875,11 @@ public void setCurrentActiveStudyId(int currentActiveStudyId) {
 	this.currentActiveStudyId = currentActiveStudyId;
 }
 
+class LogFileSorter implements Comparator<File> 
+{
+    @Override
+    public int compare(File f1, File f2) {
+        return Long.compare(f2.lastModified(), f1.lastModified());
+    }
+}
    }
