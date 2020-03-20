@@ -162,13 +162,6 @@ public class RemoveEventCRFServlet extends SecureController {
                 }
             }
             if ("confirm".equalsIgnoreCase(action)) {
-                if (eventCRF.getStatus().equals(Status.DELETED) || eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-                    addPageMessage(respage.getString("this_event_CRF_is_removed_for_this_study") + " "
-                            + respage.getString("please_contact_sysadmin_for_more_information"));
-                    request.setAttribute("id", new Integer(studySubId).toString());
-                    forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-                    return;
-                }
 
                 request.setAttribute("displayEventCRF", dec);
 
@@ -176,7 +169,7 @@ public class RemoveEventCRFServlet extends SecureController {
             } else {
                 logger.info("submit to remove the event CRF from study");
 
-                eventCRF.setStatus(Status.DELETED);
+                eventCRF.setRemoved(Boolean.TRUE);
                 eventCRF.setUpdater(ub);
                 eventCRF.setUpdatedDate(new Date());
                 ecdao.update(eventCRF);

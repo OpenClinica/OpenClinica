@@ -631,6 +631,8 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                                     // table study_event
                                     if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
                                         hm.put(column, new Boolean(false));
+                                    }else  if (column.equalsIgnoreCase("removed") || column.equalsIgnoreCase("archived") || column.equalsIgnoreCase("locked")) {
+                                            hm.put(column, null);
                                     } else {
                                         hm.put(column, new Boolean(true));
                                     }
@@ -1746,7 +1748,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                 }
 
                 // subject_event_status_id
-                Integer vsubject_event_status_id = Integer.valueOf(rs.getInt("subject_event_status_id"));
+                String vsubject_event_status_id = String.valueOf(rs.getInt("subject_event_status_id"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
@@ -1972,7 +1974,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "   SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname, item.description AS itemdesc,  "
                     + "   item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid,  "
                     + "   event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid " + "   FROM item_data, item, event_crf "
-                    + "   JOIN crf_version  ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id " + ecStatusConstraint + ") "
+                    + "   JOIN crf_version  ON event_crf.crf_version_id = crf_version.crf_version_id "
                     + "   WHERE  " + "   item_data.item_id = item.item_id " + "   AND " + "   item_data.event_crf_id = event_crf.event_crf_id " + "   AND "
                     + "   item_data.item_id IN " + it_in + "   AND item_data.event_crf_id IN  " + "   ( " + "       SELECT event_crf_id FROM event_crf "
                     + "       WHERE  " + "           event_crf.study_event_id IN  " + "           ( "
@@ -1998,7 +2000,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                       study_event.study_event_id = event_crf.study_event_id  "
                     + "                                      AND  "
                     + "                                       study_event.study_subject_id = event_crf.study_subject_id  "
-                    + "                                      AND " + "                                       (event_crf.status_id " + ecStatusConstraint + ") "
                     + "                                      ) " + "                   WHERE "
                     + "                       study_event_definition.study_event_definition_id IN " + sedin + "                  )  " + "           ) "
                     + "           AND study_subject_id IN ( " + "               SELECT DISTINCT study_subject.study_subject_id "
@@ -2017,11 +2018,10 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                  ) " + "                JOIN   event_crf       ON ( "
                     + "                                   study_event.study_event_id = event_crf.study_event_id  " + "                                  AND  "
                     + "                                   study_event.study_subject_id = event_crf.study_subject_id  "
-                    + "                                  AND " + "                                   (event_crf.status_id " + ecStatusConstraint + ") "
                     + "                                  ) " + "               WHERE  "
-                    + "                   study_event_definition.study_event_definition_id IN " + sedin + "           ) " + "           AND "
-                    + "           (event_crf.status_id " + ecStatusConstraint + ") " + "   )  " + "   AND  " + "   (item_data.status_id " + itStatusConstraint
-                    + ")  " + " ) AS SBQONE, study_event, study_event_definition " + " WHERE  " + " (study_event.study_event_id = SBQONE.studyeventid) "
+                    + "                   study_event_definition.study_event_definition_id IN " + sedin + "           ) " + "      "
+                    + "   )  "
+                    + " ) AS SBQONE, study_event, study_event_definition " + " WHERE  " + " (study_event.study_event_id = SBQONE.studyeventid) "
                     + " AND " + " (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) " + " ORDER BY itemdataid asc ";
         }
     }// getSQLDatasetBASE_EVENTSIDE

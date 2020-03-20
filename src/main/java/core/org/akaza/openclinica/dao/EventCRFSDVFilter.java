@@ -30,7 +30,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         columnMapping.put("crfName", "ec.name_id");
         columnMapping.put("sdvRequirementDefinition", "");
         columnMapping.put("crfStatus", "ec.status_id");
-        columnMapping.put("subjectEventStatus","se.subject_event_status_id");
+        columnMapping.put("subjectEventStatus","se.workflow_status");
     }
 
     public void addFilter(String property, Object value) {

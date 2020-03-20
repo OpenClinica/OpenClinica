@@ -24,6 +24,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
@@ -39,7 +40,6 @@ import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -344,8 +344,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         for (EventCRFBean eventBean : eventCRFBeans) {
 
             studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventBean.getStudyEventId());
-            statusId = studyEventBean.getSubjectEventStatus().getId();
-            if (statusId == 4) {
+            if (studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
                 counter++;
             }
 

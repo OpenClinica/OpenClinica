@@ -19,25 +19,19 @@ import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.dao.hibernate.*;
-import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.DropdownFilter;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import core.org.akaza.openclinica.dao.managestudy.ListNotesSort;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.DiscrepancyNotesSummary;
@@ -61,7 +55,6 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -292,14 +285,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 CrfBean crf = eventCrf.getCrfVersion().getCrf();
                 discrepancyNoteBean.setCrfName(crf.getName());
                 studyEvent = eventCrf.getStudyEvent();
-                int subjectEventStatusId = studyEvent != null && studyEvent.getSubjectEventStatusId()!= null ? studyEvent.getSubjectEventStatusId() : SubjectEventStatus.INVALID.getCode();
-                String eventCrfStatus = resword.getString( EventCrfStatusEnum.getByCode(eventCrf.getStatusId(), subjectEventStatusId).getDescription());
-                if (eventCrfStatus.equals("Invalid")) {
-                    eventCrfStatus = "";
-                } else if (eventCrfStatus.equals("Data Entry Complete")) {
-                    eventCrfStatus = "Complete";
-                }
-                discrepancyNoteBean.setCrfStatus(eventCrfStatus);
+
+                discrepancyNoteBean.setEventCrfWorkflowStatus(eventCrf.getWorkflowStatus());
                 studyEventDefinition = studyEvent.getStudyEventDefinition();
                 discrepancyNoteBean.setEventName(studyEventDefinition.getName());
                 discrepancyNoteBean.setEventStart(studyEvent.getDateStart());

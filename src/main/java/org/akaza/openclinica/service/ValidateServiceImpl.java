@@ -222,11 +222,15 @@ public class ValidateServiceImpl implements ValidateService {
                     || (userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
                     || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
                     || (userRole.getRole().equals(Role.COORDINATOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
+                    // for site monitors
+                    || (userRole.getRole().equals(Role.MONITOR) && publicSite.getStudyId() == userRole.getStudyId())
+                    // for study monitors
                     || (userRole.getRole().equals(Role.MONITOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId()))
                 return true;
         }
         return false;
     }
+
     public boolean isUserHas_DM_MON_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOID){
         Study publicStudy = getPublicStudy(studyOID);
         for (StudyUserRoleBean userRole : userRoles) {
@@ -236,6 +240,7 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid) {
@@ -427,6 +432,44 @@ public class ValidateServiceImpl implements ValidateService {
     public void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean, boolean includePII) {
 
     	Study tenantStudy = getTenantStudy(studyOid);
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+
+        if (!isStudyOidValid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+        }
+        if (!isStudyOidValidStudyLevelOid(studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+        }
+        if (!isSiteOidValid(siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
+        }
+        if (!isSiteOidValidSiteLevelOid(siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+        }
+        if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+        }
+        if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        }
+        if (!isParticipateActive(tenantStudy)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+        }
+    }
+
+    /**
+     *  this method is used when get/extract participant information
+     *
+     * @param studyOid
+     * @param siteOid
+     * @param userAccountBean
+     * @param includePII
+     */
+    public void validateStudyAndRolesForExtractParticipantInfo(String studyOid, String siteOid, UserAccountBean userAccountBean, boolean includePII) {
+
+        Study tenantStudy = getTenantStudy(studyOid);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
         if (!isStudyOidValid(studyOid)) {

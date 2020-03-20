@@ -8,12 +8,10 @@ package org.akaza.openclinica.control.managestudy;
  * To change this template use File | Settings | File Templates.
  */
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -23,9 +21,9 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,7 +94,7 @@ public class DeleteStudyEventServlet extends SecureController{
                 logger.info("submit to delete the event from study");
                 // delete event from study
 
-                event.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
+                event.setWorkflowStatus(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
                 sedao.update(event);

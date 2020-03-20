@@ -104,7 +104,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
         seb.setStudyEventDefinition(sedb);
         // A. Hamid mantis issue 5048
-        if (!(currentRole.isDirector() || currentRole.isCoordinator()) && seb.getSubjectEventStatus().isLocked()) {
+        if (!(currentRole.isDirector() || currentRole.isCoordinator()) && (seb.getLocked()!=null && seb.getLocked())) {
             seb.setEditable(false);
         }
         return seb;
@@ -179,7 +179,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         // eventDefinitionCRFs, seb.getSubjectEventStatus());
 
         ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
-                seb.getSubjectEventStatus(), study);
+                seb.getWorkflowStatus(), study);
 
         // Issue 3212 BWP << hide certain CRFs at the site level
         if (currentStudy.isSite()) {

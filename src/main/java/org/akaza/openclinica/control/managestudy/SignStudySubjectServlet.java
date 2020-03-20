@@ -13,7 +13,6 @@ import javax.sql.DataSource;
 import core.org.akaza.openclinica.bean.admin.AuditEventBean;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.admin.StudyEventAuditBean;
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -44,7 +43,6 @@ import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -53,11 +51,12 @@ import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.service.KeycloakUserService;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.KeycloakUserServiceImpl;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -114,8 +113,8 @@ public class SignStudySubjectServlet extends SecureController {
             // construct info needed on view study event page
             DisplayStudyEventBean de = new DisplayStudyEventBean();
             de.setStudyEvent(event);
-            de.setDisplayEventCRFs(getDisplayEventCRFs(study, ds, eventCRFs, ub, currentRole, event.getSubjectEventStatus()));
-            ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus());
+            de.setDisplayEventCRFs(getDisplayEventCRFs(study, ds, eventCRFs, ub, currentRole, event.getWorkflowStatus()));
+            ArrayList al = getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getWorkflowStatus());
             populateUncompletedCRFsWithCRFAndVersions(ds, al);
             de.setUncompletedCRFs(al);
 
@@ -161,8 +160,8 @@ public class SignStudySubjectServlet extends SecureController {
                 // }
                 // }
                 EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), ecrf.getCRFVersionId());
-                if (ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)
-                        || ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) && edcBean.isDoubleEntry() == true) {
+
+                    if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)){
                     sign = false;
                     break;
                 }
@@ -187,7 +186,7 @@ public class SignStudySubjectServlet extends SecureController {
                 studyEvent.setUpdater(ub);
                 Date date = new Date();
                 studyEvent.setUpdatedDate(date);
-                studyEvent.setSubjectEventStatus(SubjectEventStatus.SIGNED);
+                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SIGNED);
                 studyEvent.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
                         + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
                 sedao.update(studyEvent);
@@ -271,7 +270,7 @@ public class SignStudySubjectServlet extends SecureController {
                     ArrayList eventCRFs = ecdao.findAllByStudyEvent(displayEvent.getStudyEvent());
                     ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
                     ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
-                            currentRole, studyEvent.getSubjectEventStatus(), study);
+                            currentRole, studyEvent.getWorkflowStatus(), study);
                     displayEvent.setDisplayEventCRFs(displayEventCRFs);
                 }
 
@@ -339,7 +338,7 @@ public class SignStudySubjectServlet extends SecureController {
             ArrayList eventCRFs = ecdao.findAllByStudyEvent(displayEvent.getStudyEvent());
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
             ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
-                    studyEvent.getSubjectEventStatus(), study);
+                    studyEvent.getWorkflowStatus(), study);
             displayEvent.setDisplayEventCRFs(displayEventCRFs);
         }
 
@@ -437,7 +436,7 @@ public class SignStudySubjectServlet extends SecureController {
      * @return The list of DisplayEventCRFBeans for this study event.
      */
     public static ArrayList getDisplayEventCRFs(Study study, DataSource ds, ArrayList eventCRFs, UserAccountBean ub, StudyUserRoleBean currentRole,
-            SubjectEventStatus status) {
+            StudyEventWorkflowStatusEnum workflowStatus) {
         ArrayList answer = new ArrayList();
 
         // HashMap definitionsById = new HashMap();
@@ -479,18 +478,7 @@ public class SignStudySubjectServlet extends SecureController {
             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
             // below added 092007 tbh
             // rules updated 112007 tbh
-            if (status.equals(SubjectEventStatus.LOCKED) || status.equals(SubjectEventStatus.SKIPPED) || status.equals(SubjectEventStatus.STOPPED)) {
-                ecb.setStage(DataEntryStage.LOCKED);
 
-                // we need to set a SED-wide flag here, because other edcs
-                // in this event can be filled in and change the status, tbh
-            } else if (status.equals(SubjectEventStatus.INVALID)) {
-                ecb.setStage(DataEntryStage.LOCKED);
-            } else if (!cb.getStatus().equals(Status.AVAILABLE)) {
-                ecb.setStage(DataEntryStage.LOCKED);
-            } else if (!cvb.getStatus().equals(Status.AVAILABLE)) {
-                ecb.setStage(DataEntryStage.LOCKED);
-            }
             // above added 092007-102007 tbh
             // TODO need to refactor since this is similar to other code, tbh
             if (edc != null) {
@@ -524,7 +512,7 @@ public class SignStudySubjectServlet extends SecureController {
      *            All of the event CRFs for this study event.
      * @return The list of event definitions for which no event CRF exists.
      */
-    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
+    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, StudyEventWorkflowStatusEnum status) {
         int i;
         HashMap completed = new HashMap();
         HashMap startedButIncompleted = new HashMap();
