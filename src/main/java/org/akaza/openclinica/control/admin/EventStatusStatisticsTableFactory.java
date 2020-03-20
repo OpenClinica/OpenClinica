@@ -8,6 +8,7 @@ import org.akaza.openclinica.control.EventStatusView;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -66,9 +67,6 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
     public void setDataAndLimitVariables(TableFacade tableFacade) {
 
         Limit limit = tableFacade.getLimit();
-        SubjectEventStatus[] subjectEventStatuses =
-            { SubjectEventStatus.SCHEDULED, SubjectEventStatus.DATA_ENTRY_STARTED, SubjectEventStatus.COMPLETED, SubjectEventStatus.SIGNED,
-                SubjectEventStatus.LOCKED, SubjectEventStatus.SKIPPED, SubjectEventStatus.STOPPED };
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
@@ -81,7 +79,7 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
          * variables.
          */
         if (!limit.isComplete()) {
-            int totalRows = subjectEventStatuses.length;
+            int totalRows = StudyEventWorkflowStatusEnum.values().length;
             tableFacade.setTotalRows(totalRows);
         }
 
@@ -90,14 +88,14 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
 
         Integer totalEvents = studyEventDao.getCountofEvents(currentStudy);
 
-        for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
+        for (StudyEventWorkflowStatusEnum workflowStatus : StudyEventWorkflowStatusEnum.values()) {
 
-            Integer totalEventsByEventStatus = studyEventDao.getCountofEventsBasedOnEventStatus(currentStudy, subjectEventStatus);
+            Integer totalEventsByEventStatus = studyEventDao.getCountofEventsBasedOnEventStatus(currentStudy, workflowStatus);
 
             Long percentage = totalEvents == 0 ? 0 : Math.round((totalEventsByEventStatus.doubleValue() / totalEvents.doubleValue()) * 100);
 
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
-            theItem.put("status", subjectEventStatus.getName());
+            theItem.put("status", workflowStatus);
             theItem.put("studySubjects", totalEventsByEventStatus);
             theItem.put("percentage", String.valueOf(percentage) + "%");
             theItems.add(theItem);

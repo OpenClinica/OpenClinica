@@ -289,12 +289,12 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return al;
     }
 
-    public Integer getCountofEventsBasedOnEventStatus(Study currentStudy, SubjectEventStatus subjectEventStatus) {
+    public Integer getCountofEventsBasedOnEventStatus(Study currentStudy, StudyEventWorkflowStatusEnum workflowStatus) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), subjectEventStatus.getId());
+        variables.put(Integer.valueOf(1), workflowStatus);
         String sql = digester.getQuery("getCountofEventsBasedOnEventStatus");
 
         ArrayList rows = this.select(sql, variables);

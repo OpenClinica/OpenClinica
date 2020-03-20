@@ -50,6 +50,7 @@ import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -967,7 +968,6 @@ public class SDVUtil {
                 crfStatusBuilder.append("<center><a title='" + statusTitle + "' alt='" + statusTitle + "' class='" + statusIconClassName + "' accessCheck' border='0'/></center>");
                 tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
             }
-            core.org.akaza.openclinica.domain.datamap.SubjectEventStatus subjectEventStatus = core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.getByCode(eventCrf.getStudyEvent().getSubjectEventStatusId());
             tempSDVBean.setSubjectEventStatus("<center><a title='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' alt='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' class='"+STUDY_EVENT_WORKFLOW_ICONS.get(eventCrf.getStudyEvent().getWorkflowStatus())+"' accessCheck' border='0'/></center>");
 
             // TODO: I18N Date must be formatted properly
@@ -1452,10 +1452,10 @@ public class SDVUtil {
         request.setAttribute("studyEventDefinitions", studyEventDefinitionBeans);
 
         // study event status
-        request.setAttribute("studyEventStatuses", Status.toArrayList());
+        request.setAttribute("studyEventStatuses", StudyEventWorkflowStatusEnum.values());
 
-        // event CRF status
-        request.setAttribute("eventCRFDStatuses", SubjectEventStatus.toArrayList());
+        // event CRF statuseventCRFStatuses
+        request.setAttribute("eventCRFDStatuses", EventCrfWorkflowStatusEnum.values());
 
         StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 

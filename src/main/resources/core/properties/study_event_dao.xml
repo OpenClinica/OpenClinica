@@ -22,7 +22,7 @@
         <name>getCountofEventsBasedOnEventStatus</name>
         <sql>
             select count (*) from study_event se
-            where se.subject_event_status_id = ?
+            where se.workflow_status = ?
         </sql>
     </query>
     <query>
