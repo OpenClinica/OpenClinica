@@ -479,7 +479,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		
 					        FormLayout formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
 					        Role role = Role.RESEARCHASSISTANT;
-					        String mode = PFormCache.VIEW_MODE;
+					        String mode = EnketoAPI.VIEW_MODE;
 					        
 							List<Bind> binds = openRosaServices.getBinds(formLayout,EnketoAPI.QUERY_FLAVOR,studyOID);
 					        boolean formContainsContactData=false;
@@ -546,7 +546,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
     	String accessToken = (String) servletContext.getAttribute("accessToken");
         PFormCache cache = PFormCache.getInstance(servletContext);
         String subjectContextKey = cache.putSubjectContext(studySubjectOID, String.valueOf(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId()), String.valueOf(studyEvent.getSampleOrdinal()),
-                formLayout.getOcOid(),userAccountID ,String.valueOf(studyEvent.getStudyEventId()), studyOID, PFormCache.PARTICIPATE_MODE,accessToken);
+                formLayout.getOcOid(),userAccountID ,String.valueOf(studyEvent.getStudyEventId()), studyOID, EnketoAPI.PARTICIPATE_MODE,accessToken);
       
         return subjectContextKey;
     }

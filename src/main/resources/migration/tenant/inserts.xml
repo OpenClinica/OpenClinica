@@ -1191,6 +1191,35 @@
 		</insert>
 	</changeSet>
 
+	<changeSet author="jkeremian" id="2020-03-19-OC-12403-01">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="59"/>
+			<column name="name" value="study_event_archived"/>
+		</insert>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2020-03-19-OC-12403-02">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="60"/>
+			<column name="name" value="study_event_locked"/>
+		</insert>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2020-03-19-OC-12403-03">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="61"/>
+			<column name="name" value="event_crf_removed"/>
+		</insert>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2020-03-19-OC-12403-04">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="62"/>
+			<column name="name" value="event_crf_archived"/>
+		</insert>
+	</changeSet>
+
+
 	<changeSet author="jkeremian" id="2015-12-08-OC-6847">
 		<comment>Insert a new record in the studyParameter table</comment>
 		<insert tableName="study_parameter">

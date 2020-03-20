@@ -17,7 +17,6 @@ import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import core.org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
-import core.org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import core.org.akaza.openclinica.domain.rule.action.EventActionBean;
 import core.org.akaza.openclinica.domain.rule.action.PropertyBean;
 import core.org.akaza.openclinica.domain.rule.action.RuleActionBean;
@@ -72,7 +71,7 @@ public class BeanPropertyService{
 
     	if (studyEvent != null)
     	{
-	    	switch (SubjectEventStatus.getByCode(studyEvent.getSubjectEventStatusId()))
+	    	switch (studyEvent.getWorkflowStatus())
 	    	{
 	    	case NOT_SCHEDULED:
 	    		if (runOnStatuses.getNot_started()) statusMatch = true;
@@ -93,7 +92,6 @@ public class BeanPropertyService{
 	    		if (runOnStatuses.getStopped()) statusMatch = true;
 	    		break;
 	    	case SIGNED:
-	    	case LOCKED:
 	    	default:
 	    		statusMatch = false;
 	    		break;

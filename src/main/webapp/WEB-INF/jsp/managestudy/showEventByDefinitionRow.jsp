@@ -30,7 +30,7 @@
       </c:choose>
       </td>
 
-      <td class="table_cell"><c:out value="${currRow.bean.subjectEventStatus.name}"/></td>
+      <td class="table_cell"><c:out value="${currRow.bean.workflowStatus.displayValue}"/></td>
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
     <tr>

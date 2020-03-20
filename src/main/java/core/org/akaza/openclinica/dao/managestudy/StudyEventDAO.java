@@ -9,6 +9,7 @@ package core.org.akaza.openclinica.dao.managestudy;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -39,6 +40,8 @@ import core.org.akaza.openclinica.ocobserver.Observer;
 import core.org.akaza.openclinica.ocobserver.StudyEventBeanContainer;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.service.rule.StudyEventBeanListener;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author jxu
@@ -109,6 +112,11 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
         // YW >>
         this.setTypeExpected(16, TypeNames.STRING); // attestation
+        this.setTypeExpected(17, TypeNames.STRING);// workflow_status
+        this.setTypeExpected(18, TypeNames.BOOL);// removed
+        this.setTypeExpected(19, TypeNames.BOOL);// archived
+        this.setTypeExpected(20, TypeNames.BOOL);// locked
+
     }
 
     public void setTypesExpected(boolean withSubject) {
@@ -178,12 +186,21 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         eb.setDateStarted((Date) hm.get("date_start"));
         eb.setDateEnded((Date) hm.get("date_end"));
         // eb.setStatus(eb.getStatus());
-        int subjectEventStatuId = ((Integer) hm.get("subject_event_status_id")).intValue();
-        eb.setSubjectEventStatus(SubjectEventStatus.get(subjectEventStatuId));
         // YW 08-17-2007
         eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
         eb.setEndTimeFlag((Boolean) hm.get("end_time_flag"));
         eb.setAttestation((String) hm.get("attestation"));
+        String workflow = (String) hm.get("workflow_status");
+        if (!StringUtils.isEmpty(workflow)) {
+            eb.setWorkflowStatus((StudyEventWorkflowStatusEnum) StudyEventWorkflowStatusEnum.valueOf(workflow));
+        }
+        Boolean removed=  (Boolean) hm.get("removed");
+        Boolean archived=  (Boolean) hm.get("archived");
+        Boolean locked=  (Boolean) hm.get("locked");
+
+        eb.setRemoved(removed);
+        eb.setArchived(archived);
+        eb.setLocked(locked);
 
         return eb;
     }
@@ -208,7 +225,11 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         eb.setDateEnded((Date) hm.get("date_end"));
         // eb.setStatus(eb.getStatus());
         int subjectEventStatuId = ((Integer) hm.get("subject_event_status_id")).intValue();
-        eb.setSubjectEventStatus(SubjectEventStatus.get(subjectEventStatuId));
+        String workflow = (String) hm.get("workflow_status");
+        if (!StringUtils.isEmpty(workflow)) {
+            eb.setWorkflowStatus((StudyEventWorkflowStatusEnum) StudyEventWorkflowStatusEnum.valueOf(workflow));
+        }
+
         // YW 08-17-2007
         eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
         eb.setEndTimeFlag((Boolean) hm.get("end_time_flag"));
@@ -268,12 +289,12 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return al;
     }
 
-    public Integer getCountofEventsBasedOnEventStatus(Study currentStudy, SubjectEventStatus subjectEventStatus) {
+    public Integer getCountofEventsBasedOnEventStatus(Study currentStudy, StudyEventWorkflowStatusEnum workflowStatus) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), subjectEventStatus.getId());
+        variables.put(Integer.valueOf(1), workflowStatus);
         String sql = digester.getQuery("getCountofEventsBasedOnEventStatus");
 
         ArrayList rows = this.select(sql, variables);
@@ -517,9 +538,9 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         }
         variables.put(Integer.valueOf(7), Integer.valueOf(sb.getOwner().getId()));
         variables.put(Integer.valueOf(8), Integer.valueOf(sb.getStatus().getId()));
-        variables.put(Integer.valueOf(9), Integer.valueOf(sb.getSubjectEventStatus().getId()));
-        variables.put(Integer.valueOf(10), sb.getStartTimeFlag());
-        variables.put(Integer.valueOf(11), sb.getEndTimeFlag());
+        variables.put(Integer.valueOf(9), sb.getStartTimeFlag());
+        variables.put(Integer.valueOf(10), sb.getEndTimeFlag());
+        variables.put(Integer.valueOf(11), sb.getWorkflowStatus().toString());
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -587,15 +608,36 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         // changing date_updated from java.util.Date() into postgres now() statement
         // variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
         variables.put(Integer.valueOf(8), Integer.valueOf(sb.getUpdater().getId()));
-        variables.put(Integer.valueOf(9), Integer.valueOf(sb.getSubjectEventStatus().getId()));
-        variables.put(Integer.valueOf(10), sb.getStartTimeFlag()); // YW
+        variables.put(Integer.valueOf(9), sb.getStartTimeFlag()); // YW
         // 08-17-2007,
         // start_time_flag
-        variables.put(Integer.valueOf(11), sb.getEndTimeFlag()); // YW
+        variables.put(Integer.valueOf(10), sb.getEndTimeFlag()); // YW
         // 08-17-2007,
         // end_time_flag
-        variables.put(Integer.valueOf(12), sb.getAttestation()); // YW
-        variables.put(Integer.valueOf(13), Integer.valueOf(sb.getId()));
+        variables.put(Integer.valueOf(11), sb.getAttestation()); // YW
+
+        variables.put(new Integer(12), sb.getWorkflowStatus().toString());
+
+        if (sb.getRemoved() == null) {
+            nullVars.put(new Integer(13), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(13), null);
+        } else {
+            variables.put(new Integer(13), sb.getRemoved());
+        }
+        if (sb.getArchived() == null) {
+            nullVars.put(new Integer(14), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(14), null);
+        } else {
+            variables.put(new Integer(14), sb.getArchived());
+        }
+
+        if (sb.getLocked() == null) {
+            nullVars.put(new Integer(15), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(15), null);
+        } else {
+            variables.put(new Integer(15), sb.getLocked());
+        }
+        variables.put(Integer.valueOf(16), Integer.valueOf(sb.getId()));
 
         String sql = digester.getQuery("update");
         if (con == null) {
@@ -616,7 +658,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             if (oldStudyEventBean.getDateStarted() != null && sb.getDateStarted() != null)
                 if (oldStudyEventBean.getDateStarted().compareTo(sb.getDateStarted()) != 0)
                     changeDetails.setStartDateChanged(true);
-            if (oldStudyEventBean.getSubjectEventStatus().getId() != sb.getSubjectEventStatus().getId())
+            if (!oldStudyEventBean.getWorkflowStatus().equals(sb.getWorkflowStatus()))
                 changeDetails.setStatusChanged(true);
             changeDetails.setRunningInTransaction(isTransaction);
             StudyEventBeanContainer container = new StudyEventBeanContainer(sb, changeDetails);

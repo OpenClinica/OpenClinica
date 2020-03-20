@@ -46,6 +46,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1055,7 +1056,7 @@ public class ExtractBean {
                 // getStatus
                 // (
                 // )
-                event.setSubjectEventStatus(SubjectEventStatus.get(objev.studyEventSubjectEventStatusId.intValue())); // se
+        //        event.setWorkflowStatus((StudyEventWorkflowEnum) studyEventWorkflowStatus); // se
                 // .
                 // getSubjectEventStatus
                 // (
@@ -1075,7 +1076,7 @@ public class ExtractBean {
                 eventCRF.setInterviewerName(objgrp.interviewerName); // interviewerName
                 eventCRF.setDateCompleted(objgrp.eventCrfDateCompleted); // dateCompleted
                 eventCRF.setDateValidateCompleted(objgrp.eventCrfDateValidateCompleted); // dateValidateCompleted
-                eventCRF.setStatus(Status.get(objgrp.eventCrfStatusId));
+//*************   eventCRF.setStatus(Status.get(objgrp.eventCrfStatusId));
                 // eventCRF.setCreatedDate();//same as interviewed date? NO
                 eventCRF.setDateInterviewed(objgrp.dateInterviewed); // dateInterviewedv
                 // eventCRF.setStatus(status); //this is the one that we want,
@@ -1168,7 +1169,7 @@ public class ExtractBean {
         event.setEndTimeFlag(se.getEndTimeFlag());
         // below needs to be added, tbh
         event.setStatus(se.getStatus());
-        event.setSubjectEventStatus(se.getSubjectEventStatus());
+        event.setWorkflowStatus(se.getWorkflowStatus());
 
         event.setStage(se.getStage());
         logger.info("found stage: " + se.getStage().getName());
@@ -1830,7 +1831,7 @@ public class ExtractBean {
             eventCRF = (EventCRFBean) seb.getEventCRFs().get(0);
         }
         String crfVersionStatus = "";
-        SubjectEventStatus status = SubjectEventStatus.NOT_SCHEDULED;
+        StudyEventWorkflowStatusEnum status = StudyEventWorkflowStatusEnum.NOT_SCHEDULED;
         CRFVersionBean crfv = new CRFVersionBean();
         crfv.setStatus(Status.AVAILABLE);
         // modified stage so that crfVersionStatus could be the same as what it
@@ -1839,7 +1840,7 @@ public class ExtractBean {
         try {
             stage = eventCRF.getStage();
             ecStatus = eventCRF.getStatus();
-            status = seb.getSubjectEventStatus();// SubjectEventStatus.get(
+            status = seb.getWorkflowStatus();// SubjectEventStatus.get(
             // eventCRF
             // .getCompletionStatusId());
             crfv = eventCRF.getCrfVersion();
@@ -1848,7 +1849,7 @@ public class ExtractBean {
         }
         // currentCRF.getStatus().getName();
         //
-        logger.info("event crf stage: " + stage.getName() + ", event crf status: " + ecStatus.getName() + ", STATUS: " + status.getName() + " crf version: "
+        logger.info("event crf stage: " + stage.getName() + ", event crf status: " + ecStatus.getName() + ", STATUS: " + status + " crf version: "
                 + crfv.getStatus().getName() + " data entry stage: " + stage.getName());
 
         if (stage.equals(DataEntryStage.INVALID) || ecStatus.equals(Status.INVALID)) {
@@ -2173,7 +2174,7 @@ public class ExtractBean {
         // }
         // return (completionStatusId > 0 ?
         // SubjectEventStatus.get(completionStatusId).getName() : "");
-        return seb.getSubjectEventStatus().getName();
+        return seb.getWorkflowStatus().toString();
     }
 
     private String getAgeAtEvent(int h, int i, int j) {
@@ -2427,7 +2428,7 @@ public class ExtractBean {
      */
     public void addEntryBASE_EVENTSIDE(Integer pitemDataId, Integer pstudySubjectId, Integer psampleOrdinal, Integer pstudyEvenetDefinitionId,
             String pstudyEventDefinitionName, String pstudyEventLoacation, Timestamp pstudyEventDateStart, Timestamp pstudyEventDateEnd,
-            Boolean pstudyEventStartTimeFlag, Boolean pstudyEventEndTimeFlag, Integer pstudyEventStatusId, Integer pstudyEventSubjectEventStatusId,
+            Boolean pstudyEventStartTimeFlag, Boolean pstudyEventEndTimeFlag, Integer pstudyEventStatusId, String studyEventWorkflowStatus,
             Integer pitemId, Integer pcrfVersionId, Integer peventCrfId, Integer pstudyEventId)
 
     {
@@ -2435,7 +2436,7 @@ public class ExtractBean {
 
         obj.setSQLDatasetBASE_EVENTSIDE(pitemDataId, pstudySubjectId, psampleOrdinal, pstudyEvenetDefinitionId, pstudyEventDefinitionName, pstudyEventLoacation,
                 pstudyEventDateStart, pstudyEventDateEnd, pstudyEventStartTimeFlag, pstudyEventEndTimeFlag, pstudyEventStatusId,
-                pstudyEventSubjectEventStatusId, pitemId, pcrfVersionId, peventCrfId, pstudyEventId);
+                studyEventWorkflowStatus, pitemId, pcrfVersionId, peventCrfId, pstudyEventId);
 
         hBASE_EVENTSIDE.add(obj);
         // TODO - verify that the order is the same
@@ -2475,7 +2476,7 @@ public class ExtractBean {
         public Boolean studyEventStartTimeFlag;
         public Boolean studyEventEndTimeFlag;
         public Integer studyEventStatusId;
-        public Integer studyEventSubjectEventStatusId;
+        public String studyEventWorkflowStatus;
         public Integer itemId;
         public Integer crfVersionId;
         public Integer eventCrfId;
@@ -2488,7 +2489,7 @@ public class ExtractBean {
 
         public void setSQLDatasetBASE_EVENTSIDE(Integer pitemDataId, Integer pstudySubjectId, Integer psampleOrdinal, Integer pstudyEvenetDefinitionId,
                 String pstudyEventDefinitionName, String pstudyEventLoacation, Timestamp pstudyEventDateStart, Timestamp pstudyEventDateEnd,
-                Boolean pstudyEventStartTimeFlag, Boolean pstudyEventEndTimeFlag, Integer pstudyEventStatusId, Integer pstudyEventSubjectEventStatusId,
+                Boolean pstudyEventStartTimeFlag, Boolean pstudyEventEndTimeFlag, Integer pstudyEventStatusId, String studyEventWorkflowStatus,
                 Integer pitemId, Integer pcrfVersionId, Integer peventCrfId, Integer pstudyEventId) {
             // assigns
 
@@ -2506,7 +2507,7 @@ public class ExtractBean {
             studyEventStartTimeFlag = pstudyEventStartTimeFlag;
             studyEventEndTimeFlag = pstudyEventEndTimeFlag;
             studyEventStatusId = pstudyEventStatusId;
-            studyEventSubjectEventStatusId = pstudyEventSubjectEventStatusId;
+            studyEventWorkflowStatus = studyEventWorkflowStatus;
 
             itemId = pitemId;
             crfVersionId = pcrfVersionId;
@@ -2602,10 +2603,10 @@ public class ExtractBean {
             }
             ret = ret + "_";
 
-            if (studyEventSubjectEventStatusId == null) {
+            if (studyEventWorkflowStatus == null) {
                 ret = ret + "null";
             } else {
-                ret = ret + studyEventSubjectEventStatusId.toString();
+                ret = ret + studyEventWorkflowStatus.toString();
             }
             ret = ret + "_";
 

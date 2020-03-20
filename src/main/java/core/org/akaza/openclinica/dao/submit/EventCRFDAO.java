@@ -41,6 +41,7 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.lang.StringUtils;
 
@@ -113,6 +114,11 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         this.setTypeExpected(23, TypeNames.INT); // form_layout_id
         this.setTypeExpected(24, TypeNames.STRING);// sdv_status
         this.setTypeExpected(25, TypeNames.DATE);// date last sdv verified
+        this.setTypeExpected(26, TypeNames.STRING);// workflow
+        this.setTypeExpected(27, TypeNames.BOOL);// removed
+        this.setTypeExpected(28, TypeNames.BOOL);// archived
+
+
         // if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
         // this.setTypeExpected(24, TypeNames.INT); // r
         // }
@@ -178,9 +184,23 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         // @pgawade 22-May-2011 added the sdv updater id variable
         variables.put(new Integer(19), ecb.getSdvUpdateId());
         // variables.put(new Integer(19), new Integer(ecb.getId()));
-        variables.put(new Integer(21), new Integer(ecb.getId()));
         variables.put(new Integer(20), new Integer(ecb.getFormLayoutId()));
+        variables.put(new Integer(21), ecb.getWorkflowStatus().toString());
 
+        if (ecb.getRemoved() == null) {
+            nullVars.put(new Integer(22), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(22), null);
+        } else {
+            variables.put(new Integer(22), ecb.getRemoved());
+        }
+        if (ecb.getArchived() == null) {
+            nullVars.put(new Integer(23), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(23), null);
+        } else {
+            variables.put(new Integer(23), ecb.getArchived());
+        }
+
+        variables.put(new Integer(24), new Integer( ecb.getId()));
         this.execute(digester.getQuery("update"), variables, nullVars);
 
         if (isQuerySuccessful()) {
@@ -259,6 +279,14 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         eb.setFormLayoutId(((Integer) hm.get("form_layout_id")).intValue());
         Integer oldStatusId = (Integer) hm.get("old_status_id");
         eb.setOldStatus(Status.get(oldStatusId));
+        String workflow = (String) hm.get("workflow_status");
+        if (!StringUtils.isEmpty(workflow)) {
+            eb.setWorkflowStatus((EventCrfWorkflowStatusEnum) EventCrfWorkflowStatusEnum.valueOf(workflow));
+        }
+        Boolean removed=  (Boolean) hm.get("removed");
+        Boolean archived=  (Boolean) hm.get("archived");
+        eb.setRemoved(removed);
+        eb.setArchived(archived);
 
         // eb.setStatus(Status.get((Integer) hm.get("status_id"))
         return eb;

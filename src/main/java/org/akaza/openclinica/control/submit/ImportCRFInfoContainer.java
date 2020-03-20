@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -29,10 +28,10 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static core.org.akaza.openclinica.bean.core.DataEntryStage.INITIAL_DATA_ENTRY;
 
@@ -132,9 +131,9 @@ public class ImportCRFInfoContainer {
                                 importCrfInfo.setPreImportStage(DataEntryStage.INVALID);
                             } else if (crfStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName()))
                                 importCrfInfo.setPostImportStage(DataEntryStage.INITIAL_DATA_ENTRY);
-                            if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED))) {
+                            if ((studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
+                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
+                                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED))) {
 
                                 if (!upsert.isNotStarted()) {
                                     importCrfInfo.setProcessImport(false);
