@@ -286,6 +286,8 @@
   }
   #sdv-items_wrapper {
     margin: 0 10px 10px;
+    max-height: 500px;
+    overflow-y: auto;
   }
   #sdv-details {
     padding: 10px;
@@ -503,7 +505,13 @@
       $(verifyButton).click();
     });
 
-    jQuery.blockUI({message: jQuery('#itemsdv'), css:{cursor:'default', left:'75px', top:'100px'}});
+    var deltaWidth = $(document).width() - $('#itemsdv').width();
+    var marginX = (deltaWidth / 2) + 'px';
+    jQuery.blockUI({message: jQuery('#itemsdv'), css:{
+      cursor: 'default', 
+      top: '50px',
+      left: marginX
+    }});
   });
 
   var sdvTableHeaders = $('#sdv > thead').children();
