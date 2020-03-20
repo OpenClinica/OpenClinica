@@ -261,7 +261,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     && se.getExportFormData().get(0).getEventDefinitionCrf().getStatusId() != Status.DELETED.getCode()) {
 
                                 // ***************** OpenClinica:Link REMOVE EVENT **************
-                                if (studyEvent.getRemoved()==null || (studyEvent.getRemoved()!=null && !studyEvent.getRemoved())) {
+                                if ((studyEvent.getRemoved()==null || (studyEvent.getRemoved()!=null && !studyEvent.getRemoved()))
+                                &&  (studyEvent.getArchived()==null || (studyEvent.getArchived()!=null && !studyEvent.getArchived()))) {
                                     if (!role.equals(Role.MONITOR) && studySubject.getStatus().equals(Status.AVAILABLE)
                                             && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                         String removeUrl = "/RemoveStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
@@ -333,7 +334,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     //
                     ArrayList<ExportFormDataBean> forms = se.getExportFormData();
                     for (ExportFormDataBean form : forms) {
-                        if (!odmFilter.isCrossForm() || (odmFilter.isCrossForm() && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
+                        if (!odmFilter.isCrossForm() || (odmFilter.isCrossForm() )) {
 
                             xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
                             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
@@ -422,7 +423,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                                     if (!formLayout.getStatus().equals(Status.LOCKED)
                                             && !role.equals(Role.MONITOR)
-                                            && (eventCrf.getRemoved()==null || (eventCrf.getRemoved()!=null && !eventCrf.getRemoved())) && (eventCrf.getArchived()==null || (eventCrf.getArchived()!=null && !eventCrf.getArchived())) && eventCrf.getStatusId() != Status.LOCKED.getCode()
+                                            && (eventCrf.getRemoved()==null || (eventCrf.getRemoved()!=null && !eventCrf.getRemoved()))
+                                            && (eventCrf.getArchived()==null || (eventCrf.getArchived()!=null && !eventCrf.getArchived()))
                                             && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
                                             && (studyEvent.getRemoved()==null || (studyEvent.getRemoved()!=null && !studyEvent.getRemoved()))
                                             && (studyEvent.getArchived()==null || (studyEvent.getArchived()!=null && !studyEvent.getArchived()))

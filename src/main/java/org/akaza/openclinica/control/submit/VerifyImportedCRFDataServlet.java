@@ -218,7 +218,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         displayItemBean.getData().setEventCRFId(eventCrfBean.getId());
 
                         logger.info("found value here: " + displayItemBean.getData().getValue());
-                        logger.info("found status here: " + eventCrfBean.getStatus().getName());
+                        logger.info("found status here: " + eventCrfBean.getWorkflowStatus());
                         // System.out.println("found event crf bean name here: "
                         // +
                         // eventCrfBean.getEventName()+" id "+eventCrfBean.getId
@@ -311,7 +311,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // "+displayItemBean.getDbData().getName());
 
                         if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
-                                && eventCrfBean.getStatus().isAvailable()) {
+                                && (eventCrfBean.getRemoved()==null || !eventCrfBean.getRemoved())) {
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
                         } else {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);

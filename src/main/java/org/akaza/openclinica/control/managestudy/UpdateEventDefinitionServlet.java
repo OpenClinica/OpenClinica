@@ -324,8 +324,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
             ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
             for (int k = 0; k < ecrfList.size(); k++) {
                 EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
-                ecrfBean.setOldStatus(ecrfBean.getStatus());
-                ecrfBean.setStatus(Status.AUTO_DELETED);
                 ecrfBean.setUpdater(ub);
                 ecrfBean.setUpdatedDate(new Date());
                 ecrfDao.update(ecrfBean);

@@ -38,7 +38,9 @@ public class ParticipantEventService {
         
         for (StudyEventBean studyEvent:studyEvents) {
             // Skip to next event if study event is not in the right status
-            if (studyEvent.getStatus() != Status.AVAILABLE || 
+            if (
+                    (studyEvent.getRemoved()!=null && studyEvent.getRemoved()) ||
+                    (studyEvent.getArchived()!=null && studyEvent.getArchived()) ||
                     (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
                     && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED))) continue;
             
@@ -53,7 +55,7 @@ public class ParticipantEventService {
                     boolean eventCrfExists = false;
                     for (FormLayoutBean formLayout:formLayouts) {
                         EventCRFBean eventCRF = getEventCRFDAO().findByEventFormLayout(studyEvent, formLayout);
-                        if (eventCRF != null && eventCRF.getStatus() == Status.AVAILABLE) return studyEvent;
+                        if (eventCRF != null && (eventCRF.getRemoved()==null || !eventCRF.getRemoved()) && (eventCRF.getArchived()==null || !eventCRF.getArchived())) return studyEvent;
                         else if (eventCRF != null) eventCrfExists = true;
                     }
                     if (!eventCrfExists) return studyEvent;

@@ -394,7 +394,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						if (ecrf.getInterviewerName() != null)
 							dataBean.setInterviewerName(ecrf.getInterviewerName());
 						// dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
-						dataBean.setStatus(fetchEventCRFStatus(ecrf));
 						dataBean.setWorkflowStatus(ecrf.getWorkflowStatus());
 						dataBean.setRemoved(ecrf.getRemoved());
 						dataBean.setArchived(ecrf.getArchived());
@@ -458,50 +457,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	// This logic is taken from eventCRFBean.
-	private String fetchEventCRFStatus(EventCrf ecrf) {
-		String stage = null;
-		Status status = Status.getByCode(ecrf.getStatusId());
 
-		if (ecrf.getEventCrfId() <= 0 || status.getCode() <= 0) {
-			stage = EventCRFStatus.UNCOMPLETED.getI18nDescription(getLocale());
-		}
-
-		if (status.equals(Status.AVAILABLE)) {
-			stage = EventCRFStatus.INITIAL_DATA_ENTRY.getI18nDescription(getLocale());
-		}
-
-		if (status.equals(Status.PENDING)) {
-			if (ecrf.getValidatorId() != 0) {
-				stage = EventCRFStatus.DOUBLE_DATA_ENTRY.getI18nDescription(getLocale());
-			} else {
-				stage = EventCRFStatus.INITIAL_DATA_ENTRY_COMPLETE.getI18nDescription(getLocale());
-			}
-		}
-
-		if (status.equals(Status.UNAVAILABLE)) {
-			stage = EventCRFStatus.DOUBLE_DATA_ENTRY_COMPLETE.getI18nDescription(getLocale());
-		}
-
-		if (status.equals(Status.LOCKED)) {
-			stage = EventCRFStatus.LOCKED.getI18nDescription(getLocale());
-		}
-
-		if (status.equals(Status.DELETED)) {
-			stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
-
-		}
-
-		if (status.equals(Status.AUTO_DELETED)) {
-			stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
-		}
-
-		if (status.equals(Status.RESET)) {
-			stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
-		}
-
-		return stage;
-
-	}
 
 	private ArrayList<ImportItemGroupDataBean> fetchItemData(Set<ItemGroupMetadata> set, int eventCrfId, List<VersioningMap> vms, EventCrf eventCrf) {
 		String groupOID, itemOID;

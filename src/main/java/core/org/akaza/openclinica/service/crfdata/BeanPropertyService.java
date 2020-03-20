@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import core.org.akaza.openclinica.service.rule.expression.ExpressionBeanService;
 import core.org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,10 +154,9 @@ public class BeanPropertyService{
             	StudyEventDefinition sed = getStudyEventDefinitionDao().findByColumnName(eventOID, "oc_oid");
             	studyEvent.setStudyEventDefinition(sed);
             	studyEvent.setStudySubject(ss);
-            	studyEvent.setStatusId(1);
             	studyEvent.setSampleOrdinal(getNewEventOrdinal(eventOID,eow.getStudySubjectBeanId(), sed));
-            	studyEvent.setSubjectEventStatusId(new Integer(1));//The status is changed to started when it doesnt exist. In other cases, the status remains the same. The case of Signed and locked are prevented from validator and are not again checked here.
-            	studyEvent.setStartTimeFlag(false);
+            	studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
+				studyEvent.setStartTimeFlag(false);
             	studyEvent.setEndTimeFlag(false);
                 studyEvent.setDateCreated(new Date());
                 studyEvent.setUserAccount(getUserAccountDao().findById(userId));

@@ -1007,7 +1007,7 @@ public class ImportCRFDataService {
                             if (permittedEventCRF.getStudySubjectId() == eventCRFBean.getStudySubjectId()
                                     && permittedEventCRF.getStudyEventId() == eventCRFBean.getStudyEventId()
                                     && permittedEventCRF.getFormLayoutId() == eventCRFBean.getFormLayoutId()) {
-                                permittedEventCRF.setStatus(eventCRFBean.getStatus());
+                                permittedEventCRF.setWorkflowStatus(eventCRFBean.getWorkflowStatus());
                                 eventCRFBean = permittedEventCRF;
 
                                 for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {

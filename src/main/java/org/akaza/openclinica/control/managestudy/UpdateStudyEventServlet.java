@@ -52,6 +52,7 @@ import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.AuditLogEventService;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -254,7 +255,7 @@ public class UpdateStudyEventServlet extends SecureController {
             for (int uv = 0; uv < getECRFs.size(); uv++) {
                 EventCRFBean existingBean = (EventCRFBean) getECRFs.get(uv);
                 logger.debug("***** found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId() + " "
-                        + existingBean.getCrfVersion().getName() + " " + existingBean.getStatus().getName() + " " + existingBean.getStage().getName());
+                        + existingBean.getCrfVersion().getName() + " " + existingBean.getWorkflowStatus() + " " + existingBean.getStage().getName());
 
                 logger.debug("***** comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
 
@@ -266,7 +267,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 // only case that this will screw up is if there are no crfs
                 // whatsoever
                 // this is addressed in the if-clause above
-                if (!existingBean.getStatus().equals(Status.UNAVAILABLE) && edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent, getStudyDao())) {
+                if (!existingBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent, getStudyDao())) {
 
                     logger.debug("found that " + existingBean.getCrfVersion().getName() + " is required...");
                     // that is, it's not completed but required to complete
@@ -319,7 +320,6 @@ public class UpdateStudyEventServlet extends SecureController {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
-                    ecb.setOldStatus(ecb.getStatus());
                     ecb.setStatus(Status.UNAVAILABLE);
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());

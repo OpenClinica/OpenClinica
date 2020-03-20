@@ -1168,7 +1168,6 @@ public class ExtractBean {
         event.setStartTimeFlag(se.getStartTimeFlag());
         event.setEndTimeFlag(se.getEndTimeFlag());
         // below needs to be added, tbh
-        event.setStatus(se.getStatus());
         event.setWorkflowStatus(se.getWorkflowStatus());
 
         event.setStage(se.getStage());
@@ -1253,7 +1252,7 @@ public class ExtractBean {
         buf.append("study event def id: " + seb.getStudyEventDefinitionId() + " ");
         buf.append("study Event Start Date: " + seb.getDateStarted() != null ? seb.getDateStarted() : "" + " ");
         buf.append("study event date ended: " + seb.getDateEnded() + " ");
-        buf.append("study event status: " + seb.getStatus().getName() + " ");
+        buf.append("study event status: " + seb.getWorkflowStatus() + " ");
         buf.append("***** ***** *****\n");
         logger.info(buf.toString());
         for (int i = 0; i < seb.getEventCRFs().size(); i++) {
@@ -1271,7 +1270,7 @@ public class ExtractBean {
         buf.append("crf version id: " + checkEvent.getCrfVersion().getId() + " ");
         buf.append("crf version name: " + checkEvent.getCrfVersion().getName() + " ");
         buf.append("interview date: " + checkEvent.getCreatedDate() + " ");
-        buf.append("status: " + checkEvent.getStatus().getName() + " ");
+        buf.append("status: " + checkEvent.getWorkflowStatus() + " ");
         buf.append("crf version status: " + checkEvent.getCrfVersion().getStatus().getName() + " ");
         buf.append("completion status id: " + checkEvent.getCompletionStatusId() + " ");
         buf.append("data entry stage: " + checkEvent.getStage().getName() + " ");
@@ -1668,7 +1667,7 @@ public class ExtractBean {
             eventCRF = (EventCRFBean) seb.getEventCRFs().get(0);
         }
 
-        return eventCRF != null ? eventCRF.getStatus().getName() : "";
+        return eventCRF != null ? eventCRF.getWorkflowStatus().toString() : "";
     }
 
     protected String getCRFVersionName(int h, int i, int j) {
@@ -1849,7 +1848,7 @@ public class ExtractBean {
         }
         // currentCRF.getStatus().getName();
         //
-        logger.info("event crf stage: " + stage.getName() + ", event crf status: " + ecStatus.getName() + ", STATUS: " + status + " crf version: "
+        logger.info("event crf stage: " + stage.getName() + ", event crf status: " + ecStatus + ", STATUS: " + status + " crf version: "
                 + crfv.getStatus().getName() + " data entry stage: " + stage.getName());
 
         if (stage.equals(DataEntryStage.INVALID) || ecStatus.equals(Status.INVALID)) {

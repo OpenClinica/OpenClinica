@@ -69,7 +69,7 @@ public class DisplayStudyEventRow extends EntityBeanRow {
             answer = thisEvent.getStudyEvent().getWorkflowStatus().compareTo(argEvent.getStudyEvent().getWorkflowStatus());
             break;
         case COL_STATUS:
-            answer = thisEvent.getStudyEvent().getStatus().compareTo(argEvent.getStudyEvent().getStatus());
+            answer = thisEvent.getStudyEvent().getWorkflowStatus().compareTo(argEvent.getStudyEvent().getWorkflowStatus());
             break;
         }
 

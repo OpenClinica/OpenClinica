@@ -173,7 +173,7 @@ public class EventProcessor implements Processor {
                 } else {
                     for (EventCrf existingEventCrf : existingEventCrfs) {
                         List<ItemData> itemDataList = itemDataDao.findByEventCrfId(existingEventCrf.getEventCrfId());
-                        if (existingEventCrf.getStatusId().equals(Status.AVAILABLE.getCode()) && itemDataList.size() == 0) {
+                        if (!existingEventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && itemDataList.size() == 0) {
                             container.setStudyEvent(existingStudyEvent);
                             container.setEventCrf(existingEventCrf);
                             break;
@@ -202,7 +202,6 @@ public class EventProcessor implements Processor {
         studyEvent.setStudySubject(studySubject);
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(ordinal);
-        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setUserAccount(user);
         studyEvent.setDateStart(currentDate);
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
@@ -290,7 +289,7 @@ public class EventProcessor implements Processor {
             studyEvent.setUpdateId(user.getUserId());
             studyEvent.setDateUpdated(new Date());
             boolean statusChanged=false;
-            if(studyEvent.getWorkflowStatus().equals(newStatus)){
+            if(!studyEvent.getWorkflowStatus().equals(newStatus)){
                 studyEvent.setWorkflowStatus(newStatus);
                 statusChanged=true;
             }

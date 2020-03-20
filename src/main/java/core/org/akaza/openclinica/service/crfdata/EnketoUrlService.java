@@ -213,7 +213,7 @@ public class EnketoUrlService {
 
         CrfVersion crfVersion = eventCrf.getCrfVersion();
         boolean markComplete = true;
-        if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
+        if (eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
             markComplete = false;
         }
 
@@ -682,8 +682,8 @@ public class EnketoUrlService {
 
         CrfVersion crfVersion = eventCrf.getCrfVersion();
         boolean markComplete = true;
-        if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
-            markComplete = false;
+            if (eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                markComplete = false;
         }
 
         // Load populated instance

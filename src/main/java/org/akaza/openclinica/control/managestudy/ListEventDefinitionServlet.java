@@ -207,7 +207,8 @@ public class ListEventDefinitionServlet extends SecureController {
         ArrayList events = (ArrayList) sedao.findAllByDefinition(sed.getId());
         for (int j = 0; j < events.size(); j++) {
             StudyEventBean event = (StudyEventBean) events.get(j);
-            if (!(event.getStatus().equals(Status.AVAILABLE) || event.getStatus().equals(Status.DELETED))) {
+
+                if ((event.getRemoved()!=null && event.getRemoved()) || (event.getArchived()!=null && event.getArchived())) {
                 return false;
             }
 
@@ -215,7 +216,7 @@ public class ListEventDefinitionServlet extends SecureController {
 
             for (int k = 0; k < eventCRFs.size(); k++) {
                 EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                if (!(eventCRF.getStatus().equals(Status.UNAVAILABLE) || eventCRF.getStatus().equals(Status.DELETED))) {
+                if ((eventCRF.getRemoved()!=null && eventCRF.getRemoved()) || (eventCRF.getArchived()!=null && eventCRF.getArchived())) {
                     return false;
                 }
 

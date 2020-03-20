@@ -241,7 +241,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
                 boolean eventCompleted = true;
                 for (int i = 0; i < allCRFs.size(); i++) {
                     EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
-                    if (!ec.getStatus().equals(Status.UNAVAILABLE)) {
+                    if (!ec.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                         eventCompleted = false;
                         break;
                     }

@@ -535,7 +535,10 @@ public class StudyInfoPanel implements Serializable {
 
     public String getTOCLink(DisplayEventCRFBean dec) {
         String answer = "";
-        if (!dec.getEventCRF().getStatus().equals(Status.DELETED) && !dec.getEventCRF().getStatus().equals(Status.AUTO_DELETED)) {
+        if (
+                (dec.getEventCRF().getRemoved() == null || !dec.getEventCRF().getRemoved())
+                        &&
+                        (dec.getEventCRF().getArchived() == null || !dec.getEventCRF().getArchived())) {
             if (dec.isContinueInitialDataEntryPermitted()) {
                 answer = "InitialDataEntry?eventCRFId=" + dec.getEventCRF().getId();
             } else if (dec.isStartDoubleDataEntryPermitted()) {
