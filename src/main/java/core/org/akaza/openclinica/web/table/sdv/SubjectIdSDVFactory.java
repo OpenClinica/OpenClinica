@@ -408,9 +408,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
                 partialOrHundred = true;
             }
             if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)
-                    && eventBean.getSdvStatus() != SdvStatus.VERIFIED &&
-                    (eventBean.getRemoved() != null && eventBean.getRemoved())
-                    && (eventBean.getArchived() != null && eventBean.getArchived())
+                    && eventBean.getSdvStatus() != SdvStatus.VERIFIED && eventBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
             ) {
                 areEventCRFsSDVd = 1;
             }

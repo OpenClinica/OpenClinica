@@ -25,6 +25,7 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
 import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -425,13 +426,14 @@ public class EnketoAPI {
 
             if (((parentStudy.getStatus().equals(Status.LOCKED))
                  || (site != null && site.getStatus().equals(Status.LOCKED)))
-                 ||( studyEvent.getLocked()!=null && studyEvent.getLocked())
-                 || (studyEvent.getRemoved()!=null && studyEvent.getRemoved())
-                 || (studyEvent.getArchived()!=null && studyEvent.getArchived())
+                 || BooleanUtils.isTrue(studyEvent.getLocked())
+                 || BooleanUtils.isTrue(studyEvent.getRemoved())
+                 || BooleanUtils.isTrue(studyEvent.getArchived())
                  || edc.getStatusId().equals(Status.DELETED.getCode())
                  || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
-                 || (eventCrf.getRemoved()!=null && eventCrf.getRemoved())
-                 || (eventCrf.getArchived()!=null && eventCrf.getArchived())) {
+                 || BooleanUtils.isTrue(eventCrf.getRemoved())
+                 || BooleanUtils.isTrue(eventCrf.getArchived())
+                ) {
 
 
 

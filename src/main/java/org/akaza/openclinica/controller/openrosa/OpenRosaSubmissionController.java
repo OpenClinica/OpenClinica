@@ -21,6 +21,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -648,8 +649,9 @@ public class OpenRosaSubmissionController {
         int count=0;
         for (EventCrf evCrf : eventCrfs) {
             if (evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
-                    || (evCrf.getRemoved()!=null && evCrf.getRemoved())
-                    || (evCrf.getArchived()!=null && evCrf.getArchived())){
+                    || BooleanUtils.isTrue(evCrf.getRemoved())
+                    || BooleanUtils.isTrue(evCrf.getArchived())
+                    ){
                 for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
                     if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
                         count++;

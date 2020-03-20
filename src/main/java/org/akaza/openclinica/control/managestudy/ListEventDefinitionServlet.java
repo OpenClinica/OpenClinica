@@ -31,6 +31,7 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.bean.StudyEventDefinitionRow;
+import org.apache.commons.lang.BooleanUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -208,7 +209,8 @@ public class ListEventDefinitionServlet extends SecureController {
         for (int j = 0; j < events.size(); j++) {
             StudyEventBean event = (StudyEventBean) events.get(j);
 
-                if ((event.getRemoved()!=null && event.getRemoved()) || (event.getArchived()!=null && event.getArchived())) {
+                if ( BooleanUtils.isTrue(event.getRemoved())
+                    || BooleanUtils.isTrue(event.getArchived())) {
                 return false;
             }
 
@@ -216,7 +218,7 @@ public class ListEventDefinitionServlet extends SecureController {
 
             for (int k = 0; k < eventCRFs.size(); k++) {
                 EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                if ((eventCRF.getRemoved()!=null && eventCRF.getRemoved()) || (eventCRF.getArchived()!=null && eventCRF.getArchived())) {
+                if (BooleanUtils.isTrue(eventCRF.getRemoved()) || BooleanUtils.isTrue(eventCRF.getArchived())) {
                     return false;
                 }
 

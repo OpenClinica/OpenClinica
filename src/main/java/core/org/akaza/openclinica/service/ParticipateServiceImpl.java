@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
@@ -189,7 +190,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                         boolean validStatus = true;
                         FormLayoutBean formLayout = null;
                         if (eventCRF != null) {
-                            if ((eventCRF.getRemoved()!=null && eventCRF.getRemoved()) || (eventCRF.getArchived()!=null && eventCRF.getArchived()))
+                            if (BooleanUtils.isTrue(eventCRF.getRemoved()) || BooleanUtils.isTrue(eventCRF.getArchived()))
                                 validStatus = false;
                             if (itemDataDAO.findAllByEventCRFId(eventCRF.getId()).size() > 0)
                                 itemDataExists = true;
