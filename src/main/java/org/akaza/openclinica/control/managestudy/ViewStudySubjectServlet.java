@@ -479,16 +479,13 @@ public class ViewStudySubjectServlet extends SecureController {
             // edc, note that on definitionId can be related to multiple
             // eventdefinitioncrfBeans
             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
-            ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) fldao.findAllActiveByCRF(edc.getCrfId());
-            edc.setVersions(versions);
             // below added 092007 tbh
 
             // above added 092007-102007 tbh
             // TODO need to refactor since this is similar to other code, tbh
             if (edc != null) {
-                FormLayoutDAO formLayoutDao = new FormLayoutDAO(ds);
-                    ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) formLayoutDao.findAllActiveByCRF(edc.getCrfId());
-                    edc.setVersions(versions);
+                ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) fldao.findAllActiveByCRF(edc.getCrfId());
+                edc.setVersions(versions);
 
                 // System.out.println("edc is not null, need to set flags");
                 DisplayEventCRFBean dec = new DisplayEventCRFBean();
@@ -694,14 +691,6 @@ public class ViewStudySubjectServlet extends SecureController {
             discBeans.addAll(discrepancyNoteDAO.findAllSubjectByStudyAndId(studyBean, subjectId));
             discBeans.addAll(discrepancyNoteDAO.findAllStudySubjectByStudyAndId(studyBean, studySubId));
         }
-
     }
-
-
-
-
-
-
-
 
 }
