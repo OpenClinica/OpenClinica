@@ -94,6 +94,7 @@ import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -486,7 +487,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
             discrepancyNoteBean.setItemId(idb.getItemId());
 
-            if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
+            if (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                 isCompleted = true;
             }
             loadWarning = generateErrorMessage(ecb);

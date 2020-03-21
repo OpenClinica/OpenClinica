@@ -661,7 +661,6 @@ public class StudyEventServiceImpl implements StudyEventService {
                     if (eventObject instanceof ErrorObj) {
                         return eventObject;
                     } else if (eventObject instanceof StudyEvent) {
-                        SubjectEventStatus subjectEventStatus = SubjectEventStatus.get(((StudyEvent) eventObject).getSubjectEventStatusId());
 
                         studyEventResponseDTO = new StudyEventResponseDTO();
                         studyEventResponseDTO.setSubjectKey(subjectDataBean.getStudySubjectID());
@@ -669,7 +668,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                         studyEventResponseDTO.setStartDate(studyEventDataBean.getStartDate());
                         studyEventResponseDTO.setEndDate(studyEventDataBean.getEndDate());
                         studyEventResponseDTO.setStudyEventRepeatKey(studyEventDataBean.getStudyEventRepeatKey());
-                        studyEventResponseDTO.setEventStatus(subjectEventStatus.getName());
+                        studyEventResponseDTO.setEventStatus(((StudyEvent) eventObject).getWorkflowStatus().toString());
                     }
                 }
             }

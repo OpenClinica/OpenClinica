@@ -23,6 +23,7 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -350,7 +351,6 @@ public class ImportServiceImpl implements ImportService {
                          */
                         if (this.isStudyEventSigned(studyEvent)) {
                             if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
-                                studyEvent.setStatusId(Status.AVAILABLE.getCode());
                                 //OC-11632
                                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
                                 studyEventDao.saveOrUpdate(studyEvent);
@@ -654,7 +654,6 @@ public class ImportServiceImpl implements ImportService {
     private EventCrf updateEventCrf(EventCrf eventCrf, UserAccount userAccount, EventCrfWorkflowStatusEnum workflow, Date dateCompleted) {
         eventCrf.setDateUpdated(new Date());
         eventCrf.setUpdateId(userAccount.getUserId());
-        eventCrf.setOldStatusId(eventCrf.getStatusId());
         eventCrf.setWorkflowStatus(workflow);
         if (dateCompleted != null)
             eventCrf.setDateCompleted(dateCompleted);
@@ -671,7 +670,6 @@ public class ImportServiceImpl implements ImportService {
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(ordinal);
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
-        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
         studyEvent.setUserAccount(userAccount);
@@ -902,7 +900,7 @@ public class ImportServiceImpl implements ImportService {
                         if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
                         // Event Crf has status complete or unavailable
                         // in complete status will not throw out error any more at this stage
-                        if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
+                        if (eventCrf != null  && !isEventCrfCompleted(eventCrf))
                             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
                         /*
@@ -928,7 +926,7 @@ public class ImportServiceImpl implements ImportService {
 
                 // Event Crf has status complete or invalid
                 // in complete status will not throw out error any more at this stage
-                if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
+                if (eventCrf != null  && !isEventCrfCompleted(eventCrf))
                     return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
                 if (eventCrf != null) {     // form exist
@@ -1047,7 +1045,8 @@ public class ImportServiceImpl implements ImportService {
 
         if (studyEvent != null && (
                 // OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet
-                studyEvent.getStatusId() == Status.DELETED.getCode() ||
+                                BooleanUtils.isTrue(studyEvent.getRemoved()) ||
+                                BooleanUtils.isTrue(studyEvent.getArchived()) ||
                         studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)  ||
                         studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED) )) {
 
@@ -1060,7 +1059,8 @@ public class ImportServiceImpl implements ImportService {
 
 
     private boolean isEventCrfCompleted(EventCrf eventCrf) {
-        return eventCrf.getStatusId() == Status.UNAVAILABLE.getCode();
+        return eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED);
+
     }
 
     /**
@@ -1326,7 +1326,7 @@ public class ImportServiceImpl implements ImportService {
 
         // Event Crf has status complete or invalid
         // in complete status will not throw out error any more at this stage
-        if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
+            if (eventCrf != null  && !isEventCrfCompleted(eventCrf))
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
 

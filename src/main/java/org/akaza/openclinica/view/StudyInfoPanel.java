@@ -21,6 +21,7 @@ import core.org.akaza.openclinica.bean.submit.SectionBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.apache.commons.lang.BooleanUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -535,7 +536,10 @@ public class StudyInfoPanel implements Serializable {
 
     public String getTOCLink(DisplayEventCRFBean dec) {
         String answer = "";
-        if (!dec.getEventCRF().getStatus().equals(Status.DELETED) && !dec.getEventCRF().getStatus().equals(Status.AUTO_DELETED)) {
+        if (
+                ( BooleanUtils.isFalse(dec.getEventCRF().getRemoved()))
+                        &&
+                        BooleanUtils.isFalse(dec.getEventCRF().getArchived())) {
             if (dec.isContinueInitialDataEntryPermitted()) {
                 answer = "InitialDataEntry?eventCRFId=" + dec.getEventCRF().getId();
             } else if (dec.isStartDoubleDataEntryPermitted()) {

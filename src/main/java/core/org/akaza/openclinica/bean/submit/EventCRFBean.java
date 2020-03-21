@@ -82,7 +82,6 @@ public class EventCRFBean extends AuditableEntityBean {
         this.dateInterviewed = eventCRFBean.getDateInterviewed();
         this.interviewerName = eventCRFBean.getInterviewerName();
         this.completionStatusId = eventCRFBean.getCompletionStatusId();
-        this.status = eventCRFBean.getStatus();
         this.nexGenStatus = eventCRFBean.getNexGenStatus();
         this.annotations = eventCRFBean.getAnnotations();
         this.dateCompleted = eventCRFBean.getDateCompleted();

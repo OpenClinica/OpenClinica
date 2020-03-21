@@ -32,6 +32,7 @@ import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -188,7 +189,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             //
             for (ExportStudyEventDataBean se : ses) {
 
-                if (!odmFilter.isCrossForm() || (odmFilter.isCrossForm())) {
                     // For developers, please do not change order of properties sorted, it will break OpenRosaService
                     // Manifest Call for odm file
                    StudyEventDefinitionBean sed = seddao.findByOid(se.getStudyEventOID());
@@ -261,7 +261,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     && se.getExportFormData().get(0).getEventDefinitionCrf().getStatusId() != Status.DELETED.getCode()) {
 
                                 // ***************** OpenClinica:Link REMOVE EVENT **************
-                                if (studyEvent.getRemoved()==null || (studyEvent.getRemoved()!=null && !studyEvent.getRemoved())) {
+                                if (BooleanUtils.isFalse(studyEvent.getRemoved())
+                                &&  BooleanUtils.isFalse(studyEvent.getArchived())) {
                                     if (!role.equals(Role.MONITOR) && studySubject.getStatus().equals(Status.AVAILABLE)
                                             && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                         String removeUrl = "/RemoveStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
@@ -306,8 +307,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                                 // ***************** OpenClinica:Link LOCK EVENT **************
 
-                                if ((studyEvent.getRemoved()==null || (studyEvent.getRemoved()!=null && !studyEvent.getRemoved()))
-                                        && (studyEvent.getArchived()==null || (studyEvent.getArchived()!=null && !studyEvent.getArchived()))
+                                if (BooleanUtils.isFalse(studyEvent.getRemoved())
+                                        && BooleanUtils.isFalse(studyEvent.getArchived())
                                         && studySubject.getStatus().equals(Status.AVAILABLE)
                                         && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                     if ((!studyEvent.getStudyEventDefinition().getType().equals(COMMON) && !role.equals(Role.MONITOR))
@@ -333,8 +334,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     //
                     ArrayList<ExportFormDataBean> forms = se.getExportFormData();
                     for (ExportFormDataBean form : forms) {
-                        if (!odmFilter.isCrossForm() || (odmFilter.isCrossForm() && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
-
+                        if (!odmFilter.isCrossForm() ||
+                                (odmFilter.isCrossForm() && !form.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED))) {
                             xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
                             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                                 String formName = form.getFormName();
@@ -422,10 +423,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                                     if (!formLayout.getStatus().equals(Status.LOCKED)
                                             && !role.equals(Role.MONITOR)
-                                            && (eventCrf.getRemoved()==null || (eventCrf.getRemoved()!=null && !eventCrf.getRemoved())) && (eventCrf.getArchived()==null || (eventCrf.getArchived()!=null && !eventCrf.getArchived())) && eventCrf.getStatusId() != Status.LOCKED.getCode()
+                                            && (BooleanUtils.isFalse(eventCrf.getRemoved()))
+                                            && (BooleanUtils.isFalse(eventCrf.getArchived()))
                                             && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                                            && (studyEvent.getRemoved()==null || (studyEvent.getRemoved()!=null && !studyEvent.getRemoved()))
-                                            && (studyEvent.getArchived()==null || (studyEvent.getArchived()!=null && !studyEvent.getArchived()))
+                                            && (BooleanUtils.isFalse(studyEvent.getRemoved()))
+                                            && (BooleanUtils.isFalse(studyEvent.getArchived()))
                                             && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                         xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"edit\" href=\""
                                                 + StringEscapeUtils.escapeXml(formUrl + "&mode=edit") + "\"");
@@ -434,7 +436,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     }
                                     // ***************** OpenClinica:Link REMOVE EVENT CRF **************
                                     if (!studyEvent.getStudyEventDefinition().getType().equals(COMMON)) {
-                                        if ((eventCrf.getRemoved()==null || (eventCrf.getRemoved()!=null && !eventCrf.getRemoved())) && (eventCrf.getArchived()==null || (eventCrf.getArchived()!=null && !eventCrf.getArchived()))) {
+                                        if (BooleanUtils.isFalse(eventCrf.getRemoved()) && BooleanUtils.isFalse(eventCrf.getArchived())) {
                                             if ((!role.equals(Role.MONITOR))
                                                     && studySubject.getStatus().equals(Status.AVAILABLE)
                                                     && studyBean.getStatus().equals(Status.AVAILABLE)) {
@@ -450,8 +452,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                             // ***************** OpenClinica:Link RESTORE EVENT CRF **************
                                             // userRole.manageStudy &&
                                             if ((!role.equals(Role.MONITOR) )
-                                                    && (studyEvent.getRemoved()==null || (studyEvent.getRemoved()!=null && !studyEvent.getRemoved())) && (studyEvent.getArchived()==null || (studyEvent.getArchived()!=null && !studyEvent.getArchived()))
-                                                    && (eventCrf.getRemoved()==null || (eventCrf.getRemoved()!=null && !eventCrf.getRemoved())) && (eventCrf.getArchived()==null || (eventCrf.getArchived()!=null && !eventCrf.getArchived()))
+                                                    && BooleanUtils.isFalse(studyEvent.getRemoved()) && BooleanUtils.isFalse(studyEvent.getArchived())
+                                                    && BooleanUtils.isFalse(eventCrf.getRemoved()) && BooleanUtils.isFalse(studyEvent.getArchived())
                                                     && studySubject.getStatus().equals(Status.AVAILABLE)
                                                     && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                                 String restoreUrl = "/RestoreEventCRF?action=confirm&id=" + eventCrf.getEventCrfId() + "&studySubId="
@@ -620,7 +622,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     }
                     xml.append(indent + indent + indent + "</StudyEventData>");
                     xml.append(nls);
-                }
+
 
             }
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {

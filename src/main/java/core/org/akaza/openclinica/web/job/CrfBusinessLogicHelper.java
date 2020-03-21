@@ -17,6 +17,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,7 @@ public class CrfBusinessLogicHelper {
             // logger.info("found a crf name from event crf bean: " +
             // ec.getCrf().getName());
             logger.info("found a event name from event crf bean: " + ec.getEventName() + " crf version id: " + ec.getCRFVersionId());
-            if (!ec.getStatus().equals(Status.UNAVAILABLE) || allCRFs.size() < allEDCs.size()) {
+            if (!ec.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) || allCRFs.size() < allEDCs.size()) {
                 eventCompleted = false;
                 break;
             }
@@ -105,7 +106,7 @@ public class CrfBusinessLogicHelper {
         for (int i = 0; i < allCRFs.size(); i++) {
             EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
             EventDefinitionCRFBean edcBean = edcDao.findByStudyEventIdAndCRFVersionId(study, seBean.getId(), ec.getCRFVersionId());
-            if (!ec.getStatus().equals(Status.UNAVAILABLE) && edcBean.isRequiredCRF()) {
+            if (!ec.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && edcBean.isRequiredCRF()) {
                 // if it's not done but required, return FALSE
                 eventRequiredCompleted = false;
                 break;

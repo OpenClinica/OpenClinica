@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
@@ -189,7 +190,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                         boolean validStatus = true;
                         FormLayoutBean formLayout = null;
                         if (eventCRF != null) {
-                            if (eventCRF.getStatus().getId() != 1 && eventCRF.getStatus().getId() != 2)
+                            if (BooleanUtils.isTrue(eventCRF.getRemoved()) || BooleanUtils.isTrue(eventCRF.getArchived()))
                                 validStatus = false;
                             if (itemDataDAO.findAllByEventCRFId(eventCRF.getId()).size() > 0)
                                 itemDataExists = true;
@@ -304,19 +305,14 @@ public class ParticipateServiceImpl implements ParticipateService {
         formData.getFormDataElementExtension().add(odmLinks);
 
         if (eventCRFBean == null) {
-            formData.setStatus("Not Started");
+            formData.setStatus(EventCrfWorkflowStatusEnum.NOT_STARTED.toString());
         } else {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
             if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
-                formData.setStatus(DataEntryStage.INITIAL_DATA_ENTRY.getName());
+                formData.setStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.toString());
               //  formData.setStatus("Not Started");
             } else {
-                core.org.akaza.openclinica.bean.core.Status status = core.org.akaza.openclinica.bean.core.Status.get(eventCrf.getStatusId());
-                if (status.equals(core.org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
-                    formData.setStatus(DataEntryStage.INITIAL_DATA_ENTRY.getName());
-                } else {
-                    formData.setStatus(eventCRFBean.getStatus().getName());
-                }
+                formData.setStatus(eventCRFBean.getWorkflowStatus().toString());
             }
 
             if (eventCrf.getDateUpdated() != null) {
@@ -431,7 +427,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                         eventCrf.setDateCompleted(new Date());
                         eventCrfDao.saveOrUpdate(eventCrf);
                         randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
-                    } else if (eventCrf.getStatusId() != Status.UNAVAILABLE.getCode()) completeStudyEvent = false;
+                    } else if (!eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) completeStudyEvent = false;
                 }
             }
             if (!foundEventCrfMatch && !eventDefCrf.getParicipantForm()) completeStudyEvent = false;

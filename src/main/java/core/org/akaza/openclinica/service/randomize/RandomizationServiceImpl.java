@@ -13,6 +13,7 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.ItemData;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.dto.randomize.RandomizationConfiguration;
 import org.akaza.openclinica.dto.randomize.RandomizationDTO;
 import org.akaza.openclinica.dto.randomize.RandomizationTarget;
@@ -361,7 +362,7 @@ public class RandomizationServiceImpl implements RandomizationService {
         // check if all of the items that are specified in the strat factors have values
         if (stratGroups.get(0).size() == randomizeDataList.size()) {
             // are ALL the forms completed?
-            if (randomizeDataList.stream().filter(x -> x.getEventCrf().getStatusId()== Status.UNAVAILABLE.getCode()).count() == randomizeDataList.size())
+            if (randomizeDataList.stream().filter(x -> x.getEventCrf().getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)).count() == randomizeDataList.size())
                 return randomizeDataList;
             else
                 log.debug("<RANDOMIZE> All forms are not completed for ParticipantId: " + studySubjectOID);

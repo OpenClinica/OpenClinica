@@ -146,15 +146,7 @@ public class RestoreEventCRFServlet extends SecureController {
                 ecdao.update(eventCRF);
 
                 // restore all the item data
-                for (int a = 0; a < itemData.size(); a++) {
-                    ItemDataBean item = (ItemDataBean) itemData.get(a);
-                    if (item.getStatus().equals(Status.AUTO_DELETED)) {
-                        item.setStatus(Status.AVAILABLE);
-                        item.setUpdater(ub);
-                        item.setUpdatedDate(new Date());
-                        iddao.update(item);
-                    }
-                }
+
                 /* OC-8797
                     Do not send email notification when data is removed
                     String emailBody =

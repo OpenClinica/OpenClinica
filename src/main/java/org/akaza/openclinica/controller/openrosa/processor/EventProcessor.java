@@ -29,6 +29,7 @@ import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,7 +152,8 @@ public class EventProcessor implements Processor {
                 container.setStudyEvent(createStudyEvent(studySubject, studyEventDefinition, ordinal, container.getUser()));
                 container.setEventCrf(createEventCrf(formLayout, container.getStudyEvent(), container.getSubject(), container.getUser()));
                 break;
-            } else if (!existingStudyEvent.getRemoved() || !existingStudyEvent.getArchived()
+            } else if ( BooleanUtils.isTrue(existingStudyEvent.getRemoved())
+                     || BooleanUtils.isTrue(existingStudyEvent.getArchived())
                     || (!existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
                             && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
                             && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))) {
@@ -173,7 +175,7 @@ public class EventProcessor implements Processor {
                 } else {
                     for (EventCrf existingEventCrf : existingEventCrfs) {
                         List<ItemData> itemDataList = itemDataDao.findByEventCrfId(existingEventCrf.getEventCrfId());
-                        if (existingEventCrf.getStatusId().equals(Status.AVAILABLE.getCode()) && itemDataList.size() == 0) {
+                        if (!existingEventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && itemDataList.size() == 0) {
                             container.setStudyEvent(existingStudyEvent);
                             container.setEventCrf(existingEventCrf);
                             break;
@@ -202,7 +204,6 @@ public class EventProcessor implements Processor {
         studyEvent.setStudySubject(studySubject);
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(ordinal);
-        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setUserAccount(user);
         studyEvent.setDateStart(currentDate);
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
@@ -290,7 +291,7 @@ public class EventProcessor implements Processor {
             studyEvent.setUpdateId(user.getUserId());
             studyEvent.setDateUpdated(new Date());
             boolean statusChanged=false;
-            if(studyEvent.getWorkflowStatus().equals(newStatus)){
+            if(!studyEvent.getWorkflowStatus().equals(newStatus)){
                 studyEvent.setWorkflowStatus(newStatus);
                 statusChanged=true;
             }

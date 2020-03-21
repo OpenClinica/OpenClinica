@@ -294,7 +294,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), workflowStatus);
+        variables.put(Integer.valueOf(1), workflowStatus.toString());
         String sql = digester.getQuery("getCountofEventsBasedOnEventStatus");
 
         ArrayList rows = this.select(sql, variables);
