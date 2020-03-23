@@ -21,10 +21,14 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import core.org.akaza.openclinica.service.randomize.ModuleProcessor;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
@@ -142,7 +146,7 @@ public class ParticipateServiceImpl implements ParticipateService {
 
         StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(),userAccountID, String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
+                formLayout.getOid(),userAccountID, String.valueOf(nextEvent.getId()), studyOID, EnketoAPI.PARTICIPATE_MODE);
 
         String crfOID= formLayout.getOid()+DASH+formLayout.getXform()+PARTICIPATE_FLAVOR;
 
@@ -186,7 +190,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                         boolean validStatus = true;
                         FormLayoutBean formLayout = null;
                         if (eventCRF != null) {
-                            if (eventCRF.getStatus().getId() != 1 && eventCRF.getStatus().getId() != 2)
+                            if (BooleanUtils.isTrue(eventCRF.getRemoved()) || BooleanUtils.isTrue(eventCRF.getArchived()))
                                 validStatus = false;
                             if (itemDataDAO.findAllByEventCRFId(eventCRF.getId()).size() > 0)
                                 itemDataExists = true;
@@ -223,7 +227,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     private String createEditUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid, String userAccountID) throws Exception {
         PFormCache cache = PFormCache.getInstance(context);
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(),userAccountID ,String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
+                formLayout.getOid(),userAccountID ,String.valueOf(nextEvent.getId()), studyOID, EnketoAPI.PARTICIPATE_MODE);
         String editURL = CoreResources.getField("sysURL.base") + "pages/auth/api/editform/" + studyOID + "/url";
 
         String url = editURL + "?" + FORM_CONTEXT + "=" + contextHash;
@@ -301,19 +305,14 @@ public class ParticipateServiceImpl implements ParticipateService {
         formData.getFormDataElementExtension().add(odmLinks);
 
         if (eventCRFBean == null) {
-            formData.setStatus("Not Started");
+            formData.setStatus(EventCrfWorkflowStatusEnum.NOT_STARTED.toString());
         } else {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
             if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
-                formData.setStatus(DataEntryStage.INITIAL_DATA_ENTRY.getName());
+                formData.setStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.toString());
               //  formData.setStatus("Not Started");
             } else {
-                core.org.akaza.openclinica.bean.core.Status status = core.org.akaza.openclinica.bean.core.Status.get(eventCrf.getStatusId());
-                if (status.equals(core.org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
-                    formData.setStatus(DataEntryStage.INITIAL_DATA_ENTRY.getName());
-                } else {
-                    formData.setStatus(eventCRFBean.getStatus().getName());
-                }
+                formData.setStatus(eventCRFBean.getWorkflowStatus().toString());
             }
 
             if (eventCrf.getDateUpdated() != null) {
@@ -424,11 +423,11 @@ public class ParticipateServiceImpl implements ParticipateService {
                 if (eventDefCrf.getCrf().getCrfId() == eventCrf.getFormLayout().getCrf().getCrfId()) {
                     foundEventCrfMatch = true;
                     if (eventDefCrf.getParicipantForm()) {
-                        eventCrf.setStatusId(Status.UNAVAILABLE.getCode());
+                         eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
                         eventCrf.setDateCompleted(new Date());
                         eventCrfDao.saveOrUpdate(eventCrf);
                         randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
-                    } else if (eventCrf.getStatusId() != Status.UNAVAILABLE.getCode()) completeStudyEvent = false;
+                    } else if (!eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) completeStudyEvent = false;
                 }
             }
             if (!foundEventCrfMatch && !eventDefCrf.getParicipantForm()) completeStudyEvent = false;
@@ -437,9 +436,10 @@ public class ParticipateServiceImpl implements ParticipateService {
         // Complete study event only if there are no uncompleted, non-participant forms.
         boolean statusChanged=false;
         if (completeStudyEvent) {
-            if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.COMPLETED.getCode()){
-                studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
-                statusChanged=true;
+
+            if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
+                statusChanged = true;
             }
             StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged,false);
             StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);

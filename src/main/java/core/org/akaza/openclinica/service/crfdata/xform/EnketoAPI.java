@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.core.util.EncryptionUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.Status;
@@ -26,6 +25,7 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
 import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -150,7 +150,7 @@ public class EnketoAPI {
         // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
         if ((parentStudy.getStatus().equals(Status.LOCKED)
                 || (site != null && site.getStatus().equals(Status.LOCKED)))
-                || (studyEvent != null && studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId()))
+                || (studyEvent != null && (studyEvent.getLocked()!=null && studyEvent.getLocked()) )
                 || parentStudy.getStatus().equals(Status.FROZEN) || mode.equals(VIEW_MODE)) {
             eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
             lockOn = false;
@@ -425,14 +425,17 @@ public class EnketoAPI {
             // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
 
             if (((parentStudy.getStatus().equals(Status.LOCKED))
-                    || (site != null && site.getStatus().equals(Status.LOCKED)))
-                 || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())
-                 || studyEvent.getStatusId().equals(Status.DELETED.getCode())
-                 || studyEvent.getStatusId().equals(Status.AUTO_DELETED.getCode())
+                 || (site != null && site.getStatus().equals(Status.LOCKED)))
+                 || BooleanUtils.isTrue(studyEvent.getLocked())
+                 || BooleanUtils.isTrue(studyEvent.getRemoved())
+                 || BooleanUtils.isTrue(studyEvent.getArchived())
                  || edc.getStatusId().equals(Status.DELETED.getCode())
                  || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
-                 || eventCrf.getStatusId().equals(Status.DELETED.getCode())
-                 || eventCrf.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
+                 || BooleanUtils.isTrue(eventCrf.getRemoved())
+                 || BooleanUtils.isTrue(eventCrf.getArchived())
+                ) {
+
+
 
                 eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                 markComplete = false;

@@ -103,7 +103,7 @@
         	ale.new_value, ale.event_crf_id, ua.user_name, alet.name ,ale.study_event_id
 			FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
      		JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
-			WHERE ale.audit_log_event_type_id IN (1,8,9,10,11,12,13,14,15,16,30,32,33,40,41) AND ale.event_crf_id=? 			
+			WHERE ale.audit_log_event_type_id IN (1,8,9,10,11,12,13,14,15,16,30,32,33,40,41,61,62) AND ale.event_crf_id=?
 			)as ale
 			LEFT JOIN item_data id ON ale.audit_log_event_type_id IN (1,12,13,30) and ale.entity_id = id.item_data_id
 			LEFT JOIN item ON id.item_id = item.item_id and ale.entity_name = item.name order by ale.audit_date desc;

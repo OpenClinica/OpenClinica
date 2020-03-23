@@ -7,12 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
@@ -26,17 +20,9 @@ import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import core.org.akaza.openclinica.domain.datamap.CrfBean;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -44,15 +30,24 @@ import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.rule.RuleSetDAO;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.crfdata.HideCRFManager;
-import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
+import org.akaza.openclinica.view.Page;
+
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author ssachs
@@ -109,7 +104,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
         seb.setStudyEventDefinition(sedb);
         // A. Hamid mantis issue 5048
-        if (!(currentRole.isDirector() || currentRole.isCoordinator()) && seb.getSubjectEventStatus().isLocked()) {
+        if (!(currentRole.isDirector() || currentRole.isCoordinator()) && (seb.getLocked()!=null && seb.getLocked())) {
             seb.setEditable(false);
         }
         return seb;
@@ -184,7 +179,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         // eventDefinitionCRFs, seb.getSubjectEventStatus());
 
         ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
-                seb.getSubjectEventStatus(), study);
+                seb.getWorkflowStatus(), study);
 
         // Issue 3212 BWP << hide certain CRFs at the site level
         if (currentStudy.isSite()) {
@@ -211,8 +206,8 @@ public class EnterDataForStudyEventServlet extends SecureController {
         request.setAttribute("eventCRF", ecb);
         // Make available the study
         request.setAttribute("study", currentStudy);
-        Study subjectStudy= getStudyDao().findByPK(studySubjectBean.getStudyId());
-        request.setAttribute("subjectStudy" ,subjectStudy);
+        Study subjectStudy = getStudyDao().findByPK(studySubjectBean.getStudyId());
+        request.setAttribute("subjectStudy", subjectStudy);
         forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT);
     }
 
@@ -246,18 +241,15 @@ public class EnterDataForStudyEventServlet extends SecureController {
     /**
      * Finds all the event definitions for which no event CRF exists - which is
      * the list of event definitions with uncompleted event CRFs.
-     *
-     * @param eventDefinitionCRFs
-     *            All of the event definition CRFs for this study event.
-     * @param eventCRFs
-     *            All of the event CRFs for this study event.
+     * @param eventDefinitionCRFs All of the event definition CRFs for this study event.
+     * @param eventCRFs All of the event CRFs for this study event.
      * @return The list of event definitions for which no event CRF exists.
      */
     private ArrayList getUncompletedCRFs(ArrayList eventDefinitionCRFs, ArrayList eventCRFs, int studyEventId) {
 
         HashMap<Integer, EventDefinitionCRFBean> eventDefinitionsHashMap = new HashMap();
 
-        for (Object eventDefinitionObj : eventDefinitionCRFs){
+        for (Object eventDefinitionObj : eventDefinitionCRFs) {
             EventDefinitionCRFBean eventDefinitionBean = (EventDefinitionCRFBean) eventDefinitionObj;
             eventDefinitionsHashMap.put(eventDefinitionBean.getCrfId(), eventDefinitionBean);
         }
@@ -271,16 +263,16 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
         ArrayList<Integer> listOfCrfVersionsInUse = new ArrayList();
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-        for (EventCRFBean eventCRFBean : listOfActiveEventCRFs){
+        for (EventCRFBean eventCRFBean : listOfActiveEventCRFs) {
             listOfCrfVersionsInUse.add(cvdao.findByPK(eventCRFBean.getCRFVersionId()).getId());
         }
 
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        for (Integer crfVersionId : listOfCrfVersionsInUse){
+        for (Integer crfVersionId : listOfCrfVersionsInUse) {
             eventDefinitionsHashMap.remove(cdao.findByVersionId(crfVersionId).getId());
         }
 
-        for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionsHashMap.values()){
+        for (EventDefinitionCRFBean eventDefinitionCrfBean : eventDefinitionsHashMap.values()) {
             DisplayEventDefinitionCRFBean dedc = new DisplayEventDefinitionCRFBean();
             dedc.setEdc(eventDefinitionCrfBean);
             dedc.setEventCRF(new EventCRFBean());
@@ -291,7 +283,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
     }
 
 
-
     private void populateUncompletedCRFsWithAnOwner(List<DisplayEventDefinitionCRFBean> displayEventDefinitionCRFBeans) {
         if (displayEventDefinitionCRFBeans == null || displayEventDefinitionCRFBeans.isEmpty()) {
             return;
@@ -299,7 +290,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
         UserAccountBean userAccountBean;
         EventCRFBean eventCRFBean;
-        EventDefinitionCRFBean eventDefinitionCRFBean;
 
         for (DisplayEventDefinitionCRFBean dedcBean : displayEventDefinitionCRFBeans) {
 
@@ -398,17 +388,12 @@ public class EnterDataForStudyEventServlet extends SecureController {
     /**
      * Each of the event CRFs with its corresponding CRFBean. Then generates a
      * list of DisplayEventCRFBeans, one for each event CRF.
-     *
-     * @param eventCRFs
-     *            The list of event CRFs for this study event.
-     * @param eventDefinitionCRFs
-     *            The list of event definition CRFs for this study event.
+     * @param eventCRFs The list of event CRFs for this study event.
+     * @param eventDefinitionCRFs The list of event definition CRFs for this study event.
      * @return The list of DisplayEventCRFBeans for this study event.
      */
     private ArrayList getDisplayEventCRFs(ArrayList eventCRFs, ArrayList eventDefinitionCRFs, SubjectEventStatus status) {
-
         ArrayList answer = new ArrayList();
-
         HashMap definitionsByCRFId = new HashMap();
         int i;
 
@@ -489,27 +474,19 @@ public class EnterDataForStudyEventServlet extends SecureController {
      * the DisplayEventCRFBeans will represent uncompleted Event CRFs; others
      * will represent Event CRFs which are in initial data entry, have completed
      * initial data entry, are in double data entry, or have completed double
-     * data entry.
-     *
-     * The list is sorted using the DisplayEventCRFBean's compareTo method (that
+     * data entry. The list is sorted using the DisplayEventCRFBean's compareTo method (that
      * is, using the event definition crf bean's ordinal value.) Also, the
      * setFlags method of each DisplayEventCRFBean object will have been called
      * once.
-     *
-     * @param studyEvent
-     *            The study event for which we want the Event CRFs.
-     * @param ecdao
-     *            An EventCRFDAO from which to grab the study event's Event
-     *            CRFs.
-     * @param edcdao
-     *            An EventDefinitionCRFDAO from which to grab the Event CRF
-     *            Definitions which apply to the study event.
+     * @param studyEvent The study event for which we want the Event CRFs.
+     * @param ecdao An EventCRFDAO from which to grab the study event's Event CRFs.
+     * @param edcdao An EventDefinitionCRFDAO from which to grab the Event CRF. Definitions which apply to the study event.
      * @return A list of DisplayEventCRFBean objects releated to the study
-     *         event, ordered by the EventDefinitionCRF ordinal property, and
-     *         with flags already set.
+     * event, ordered by the EventDefinitionCRF ordinal property, and
+     * with flags already set.
      */
     public static ArrayList getDisplayEventCRFs(StudyEventBean studyEvent, EventCRFDAO ecdao, EventDefinitionCRFDAO edcdao, FormLayoutDAO fldao,
-            UserAccountBean user, StudyUserRoleBean surb) {
+                                                UserAccountBean user, StudyUserRoleBean surb) {
         ArrayList answer = new ArrayList();
         HashMap indexByCRFId = new HashMap();
 
@@ -527,6 +504,9 @@ public class EnterDataForStudyEventServlet extends SecureController {
         // put the event definition crfs inside DisplayEventCRFs
         for (int i = 0; i < eventDefinitionCRFs.size(); i++) {
             EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) eventDefinitionCRFs.get(i);
+            // set number of crf versions
+            ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) fldao.findAllActiveByCRF(edcb.getCrfId());
+            edcb.setVersions(versions);
             DisplayEventCRFBean decb = new DisplayEventCRFBean();
             decb.setEventDefinitionCRF(edcb);
 
@@ -563,8 +543,6 @@ public class EnterDataForStudyEventServlet extends SecureController {
             answer.set(i, decb);
         }
 
-        // TODO: attach crf versions to the DisplayEventCRFs
-
         return answer;
     }
 
@@ -572,9 +550,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
      * If DiscrepancyNoteBeans have a certain column value, then set flags that
      * a JSP will check in the request attribute. This is a convenience method
      * called by the processRequest() method.
-     *
-     * @param discBeans
-     *            A List of DiscrepancyNoteBeans.
+     * @param discBeans A List of DiscrepancyNoteBeans.
      */
     private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
         for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {

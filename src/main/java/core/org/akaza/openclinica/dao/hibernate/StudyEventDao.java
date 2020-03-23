@@ -129,6 +129,22 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
     }
 
+    public ArrayList<StudyEvent> fetchNonArchivedListSEs(String id) {
+        String query = " from StudyEvent se where se.studySubject.ocOid = :id " +
+                "and (se.removed = null or se.removed !=:removed) and (se.archived = null or se.archived !=:archived) " +
+        "order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setString("id", id.toString());
+        q.setParameter("removed", true);
+        q.setParameter("archived", true);
+
+
+
+
+        return (ArrayList<StudyEvent>) q.list();
+
+    }
+
     @Transactional
     public List<StudyEvent> fetchListByStudyEventDefOIDTransactional(String oid, Integer studySubjectId) {
         List<StudyEvent> eventList = null;

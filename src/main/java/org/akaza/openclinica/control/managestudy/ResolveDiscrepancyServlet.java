@@ -92,7 +92,9 @@ import core.org.akaza.openclinica.domain.xform.dto.UserControl;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -121,8 +123,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     private static final String COMMENT = "_comment";
     public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
-    public static final String VIEW_MODE = "view";
-    public static final String EDIT_MODE = "edit";
     public static final String JINI = "jini";
     private static final String VIEW_NOTES = "ViewNotes";
     public static final String FORWARD_SLASH = "/";
@@ -197,13 +197,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         // this is for item data
         else if ("itemdata".equalsIgnoreCase(entityType)) {
-            prepareItemRequest(request, ds, currentStudy, note, module, flavor, loadWarning, isLocked, id);
+            prepareItemRequest(request, ds, currentStudy, note, module, flavor, loadWarning, isLocked, id, EnketoAPI.EDIT_MODE);
         }
         return true;
     }
 
     private void prepareItemRequest(HttpServletRequest request, DataSource ds, Study currentStudy, DiscrepancyNoteBean note,
-            String module, String flavor, String loadWarning, boolean isLocked, int id) throws Exception, IOException {
+            String module, String flavor, String loadWarning, boolean isLocked, int id, String enketoMode) throws Exception, IOException {
         String jini ="false";
         String jiniEnabled =CoreResources.getField("jini.enabled");
         if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
@@ -214,9 +214,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
         ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
         ItemBean item = (ItemBean) idao.findByPK(idb.getItemId());
         ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO<>(ds);
-
-        logger.info("ItemDataBean id: " + Integer.toString(idb.getId()));
-        logger.info("ItemBean id: " + Integer.toString(item.getId()));
 
         EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
@@ -283,7 +280,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
         subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
         subjectContext.setStudyEventId(String.valueOf(seb.getId()));
-        subjectContext.setFormLoadMode(EDIT_MODE);
+        subjectContext.setFormLoadMode(enketoMode);
         String contextHash = cache.putSubjectContext(subjectContext);
         Study parentStudyBean = getParentStudy(currentStudy.getOc_oid(), ds);
         logger.info("Subject Context info *** {} *** ",subjectContext.toString());
@@ -379,13 +376,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
         if (ecb.getId() > 0 ||  (ecb.getId() == 0 && formContainsContactData)) {
             if (isLocked) {
                 formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb, role,
-                        EDIT_MODE, loadWarning, true,formContainsContactData,binds,ub);
+                        enketoMode, loadWarning, true,formContainsContactData,binds,ub);
             } else
                 formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb,
-                        role, EDIT_MODE, loadWarning, false,formContainsContactData,binds,ub);
+                        role, enketoMode, loadWarning, false,formContainsContactData,binds,ub);
         } else {
             String hash = formLayout.getXform();
-            formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOc_oid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
+            formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOc_oid(), flavor, role, enketoMode, hash, loadWarning, isLocked);
         }
         request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
         request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
@@ -406,10 +403,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
         String flavor = fp.getString(FLAVOR);
         String module = (String) session.getAttribute("module");
 
-        logger.info("itemDataId " + Integer.toString(itemDataId));
         if (itemDataId > 0) {
             flavor = QUERY_FLAVOR;
-            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, module, flavor, "SDV Load Item", false, itemDataId);
+            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, module, flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE);
             forwardPage(Page.ENKETO_FORM_SERVLET);
             return;
         }
@@ -482,16 +478,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 isLocked = true;
             } else {
                 // failed to get a lock
-                if ((seb.getSubjectEventStatus().isLocked() != true)
-                        && !lockCRF(ecb))
-                    isLocked = true;
+                    if ((seb.getLocked()==null || (seb.getLocked()!=null && !seb.getLocked())) && !lockCRF(ecb))
+                        isLocked = true;
+
             }
             StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
 
             discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
             discrepancyNoteBean.setItemId(idb.getItemId());
 
-            if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
+            if (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                 isCompleted = true;
             }
             loadWarning = generateErrorMessage(ecb);

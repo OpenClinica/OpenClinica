@@ -92,17 +92,6 @@ public class RemoveStudyEventServlet extends SecureController {
 
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
-                //
-                // if (!event.getStatus().equals(Status.AVAILABLE)) {
-                // addPageMessage(respage.getString("this_event_is_not_available_for_this_study")
-                // + " "
-                // +
-                // respage.getString("please_contact_sysadmin_for_more_information"));
-                // request.setAttribute("id", new
-                // Integer(studySubId).toString());
-                // forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-                // return;
-                // }
 
                 EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
                 // find all crfs in the definition
@@ -123,7 +112,7 @@ public class RemoveStudyEventServlet extends SecureController {
                 logger.info("submit to remove the event from study");
                 // remove event from study
 
-                event.setStatus(Status.DELETED);
+                event.setRemoved(Boolean.TRUE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
                 sedao.update(event);
@@ -136,21 +125,9 @@ public class RemoveStudyEventServlet extends SecureController {
                 ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
                 for (int k = 0; k < eventCRFs.size(); k++) {
                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                    if (!eventCRF.getStatus().equals(Status.DELETED)) {
-                        eventCRF.setOldStatus(eventCRF.getStatus());
-                        eventCRF.setStatus(Status.AUTO_DELETED);
-                        eventCRF.setUpdater(ub);
-                        eventCRF.setUpdatedDate(new Date());
-                        ecdao.update(eventCRF);
-                        // remove all the item data
                         ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
                         for (int a = 0; a < itemDatas.size(); a++) {
                             ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-                            if (!item.getStatus().equals(Status.DELETED)) {
-                                item.setStatus(Status.AUTO_DELETED);
-                                item.setUpdater(ub);
-                                item.setUpdatedDate(new Date());
-                                iddao.update(item);
                                 DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
                                 List dnNotesOfRemovedItem = dnDao.findParentNotesOnlyByItemData(item.getId());
                                 if (!dnNotesOfRemovedItem.isEmpty()) {
@@ -184,8 +161,8 @@ public class RemoveStudyEventServlet extends SecureController {
                                 }
                             }
 
-                        }
-                    }
+
+
                 }
 
                 String emailBody = respage.getString("the_event") + " " + event.getStudyEventDefinition().getName() + " "

@@ -41,6 +41,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -55,7 +56,6 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
@@ -229,25 +229,25 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             for (StudyEventDefinitionBean studyEventDefinition : getStudyEventDefinitions()) {
 
                 List<StudyEventBean> studyEvents = allStudyEventsForStudySubjectBySedId.get(studyEventDefinition.getId());
-                SubjectEventStatus subjectEventStatus = null;
+                StudyEventWorkflowStatusEnum subjectEventStatus = null;
                 HashMap<ResolutionStatus, Integer> discCounts = new HashMap<ResolutionStatus, Integer>();
 
                 studyEvents = studyEvents == null ? new ArrayList<StudyEventBean>() : studyEvents;
                 if (studyEvents.size() < 1) {
-                    subjectEventStatus = SubjectEventStatus.NOT_SCHEDULED;
+                    subjectEventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
                 } else {
                     for (StudyEventBean studyEventBean : studyEvents) {
                         discCounts = countAll(discCounts, studyEventBean, constraints, study.isSite());
                         hasDN = hasDN == false ? discCounts.size() > 0 : hasDN;
                         if (studyEventBean.getSampleOrdinal() == 1) {
-                            subjectEventStatus = studyEventBean.getSubjectEventStatus();
+                            subjectEventStatus = studyEventBean.getWorkflowStatus();
                             // break;
                         }
                     }
 
                 }
                 theItem.put("sed_" + studyEventDefinition.getId() + "_discCounts", discCounts);
-                theItem.put("sed_" + studyEventDefinition.getId(), subjectEventStatus.getId());
+                theItem.put("sed_" + studyEventDefinition.getId(), subjectEventStatus);
                 theItem.put("sed_" + studyEventDefinition.getId() + "_studyEvents", studyEvents);
                 theItem.put("sed_" + studyEventDefinition.getId() + "_object", studyEventDefinition);
 
@@ -266,7 +266,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         boolean isSignable = true;
         boolean isRequiredUncomplete;
         for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
-            if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.DATA_ENTRY_STARTED) {
+            if (studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
                 isSignable = false;
                 break;
             } else {
@@ -844,7 +844,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             eventDiv.bold().append(occurrence_x_of).append("#" + (i + 1) + " of " + studyEventsSize).br();
             if (studyEventBean.getDateStarted() != null)
                 eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
-            eventDiv.append(status + ": " + studyEventBean.getSubjectEventStatus().getName());
+            eventDiv.append(status + ": " + studyEventBean.getWorkflowStatus());
             eventDiv.boldEnd().tdEnd().trEnd(0);
             // <tr><td><table>...</table></td></tr>
             eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_" + (i + 1)).styleClass("display: none").close();
@@ -892,7 +892,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             StudySubjectBean studySubject, StudyEventBean currentEvent) {
 
         Status eventSysStatus = studySubject.getStatus();
-        SubjectEventStatus eventStatus = currentEvent.getSubjectEventStatus();
+        StudyEventWorkflowStatusEnum eventStatus = currentEvent.getWorkflowStatus();
         String studyEventId = String.valueOf(currentEvent.getId());
 
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
@@ -902,7 +902,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus == SubjectEventStatus.COMPLETED) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -918,7 +918,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
                     eventDiv.tdEnd().trEnd(0);
                 }
-            } else if (eventStatus == SubjectEventStatus.LOCKED) {
+            } else if (currentEvent.getLocked()) {
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
@@ -974,7 +974,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         String eventText = resword.getString("event");
         String status = resword.getString("status");
 
-        SubjectEventStatus eventStatus = studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED : studyEvents.get(0).getSubjectEventStatus();
+        StudyEventWorkflowStatusEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowStatusEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
         String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
         String studyEventId = studyEvents.size() == 0 ? "" : String.valueOf(studyEvents.get(0).getId());
         Status eventSysStatus = studySubject.getStatus();
@@ -985,7 +985,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
         if (!sed.isRepeating()) {
-            eventDiv.append(resword.getString("status")).append(":").append(eventStatus.getName()).br();
+            eventDiv.append(resword.getString("status")).append(":").append(eventStatus).br();
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
             linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
@@ -1003,7 +1003,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             if (studyEvents.size() > 0) {
                 if (studyEvents.get(0).getDateStarted() != null)
                     eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
-                eventDiv.append(status + " : " + studyEvents.get(0).getSubjectEventStatus().getName());
+                eventDiv.append(status + " : " + studyEvents.get(0).getWorkflowStatus());
             } else {
                 eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());
             }
@@ -1026,14 +1026,14 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
-            if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && currentRole.getRole() != Role.MONITOR) {
+            if (eventStatus.equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) && currentRole.getRole() != Role.MONITOR) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);
                 eventDiv.tdEnd().trEnd(0);
             }
 
-            else if (eventStatus == SubjectEventStatus.COMPLETED) {
+            else if (eventStatus.equals(StudyEventWorkflowStatusEnum.COMPLETED)  ) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
@@ -1050,7 +1050,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                 }
             }
 
-            else if (eventStatus == SubjectEventStatus.LOCKED) {
+            else if (studyEvents.get(0).getLocked() !=null && studyEvents.get(0).getLocked()) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();

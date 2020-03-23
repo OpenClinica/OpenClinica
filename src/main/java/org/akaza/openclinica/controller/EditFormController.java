@@ -22,6 +22,7 @@ import core.org.akaza.openclinica.domain.xform.dto.*;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -136,7 +137,7 @@ public class EditFormController {
 
         FormLayout formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         Role role = Role.RESEARCHASSISTANT;
-        String mode = PFormCache.PARTICIPATE_MODE;
+        String mode = EnketoAPI.PARTICIPATE_MODE;
 
         List <Bind> binds = openRosaServices.getBinds(formLayout,PARTICIPATE_FLAVOR,studyOID);
         boolean formContainsContactData=false;
