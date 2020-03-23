@@ -18,13 +18,6 @@
     </td>
     <td class="table_cell">
         <fmt:formatDate value="${currRow.bean.studyEvent.dateStarted}" pattern="${dteFormat}"/>
-                        <br>
-                        <br>
-                <c:out value="Removed: ${currRow.bean.studyEvent.removed}"/>
-                        <br>
-                <c:out value="Archived: ${currRow.bean.studyEvent.archived}"/>
-                        <br>
-                <c:out value="Locked  : ${currRow.bean.studyEvent.locked}"/>
     </td>
     <td class="table_cell" width="20">
         <c:out value="${currRow.bean.studyEvent.workflowStatus.displayValue}"/>
@@ -226,10 +219,6 @@
                         <tr>
                             <td class="table_cell" width="180"><c:out value="${dec.eventCRF.crf.name}" /></td>
                             <td class="table_cell" width="100"><c:out value="${dec.eventCRF.formLayout.name}" />
-                             <br>
-                             <c:out value="Removed: ${dec.eventCRF.removed}"/>
-                             <br>
-                             <c:out value="Archived: ${dec.eventCRF.archived}"/>
                             </td>
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
                                 <c:choose>

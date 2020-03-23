@@ -3488,7 +3488,6 @@ public class OdmExtractDAO extends DatasetDAO {
     protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
                                                 String studySubjectIds) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select Distinct ss.oc_oid as\n" +
                 "        study_subject_oid, ss.label, s.unique_identifier, ss.secondary_label, s.gender, s.date_of_birth, ss.status_id, null as sgc_id, null as sgc_name, null as sg_name,  sed.ordinal\n" +
                 "        as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating, se.sample_ordinal as\n" +
@@ -3518,6 +3517,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 "        and ss.study_subject_id in \n" +
                 "        ("+studySubjectIds+")\n" +
                 "        and idata.item_id in "+itemIds +
+                "        and ec.workflow_status "+ ecStatusConstraint+
                 "        and length (value) > 0\n" +
                 "        and (ec.removed  !='true' or ec.removed  IS NULL) "+
                 "        and (ec.archived !='true' or ec.archived IS NULL) "+
@@ -3531,17 +3531,16 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getEventGroupItemSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select cvidata.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
                 + " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id, cvidata.item_data_id"
                 + " from (select ec.event_crf_id, ec.crf_version_id, item.item_id, item.oc_oid as item_oid,"
                 + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id from item,"
-                + " (select event_crf_id, item_id, ordinal, item_data_id, value from item_data where (status_id " + itStatusConstraint + ")"
-                + " and event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
+                + " (select event_crf_id, item_id, ordinal, item_data_id, value from item_data where "
+                + "  event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
                 + " ss.study_subject_id from study_subject ss where ss.study_id in (" + studyIds + ") " + dateConstraint + ") and study_event_id"
                 + " in (select distinct study_event_id from study_event" + " where study_event_definition_id in " + sedIds + " and study_subject_id in ("
                 + " select distinct ss.study_subject_id from study_subject ss where ss.study_id in (" + studyIds + ") " + dateConstraint + "))))idata,"
-                + " (select event_crf_id, crf_version_id from event_crf where status_id " + ecStatusConstraint + ")ec" + " where item.item_id in " + itemIds
+                + " (select event_crf_id, crf_version_id from event_crf ec where ec.workflow_status " + ecStatusConstraint + ")ec" + " where item.item_id in " + itemIds
                 + " and length(idata.value) > 0 and item.item_id = idata.item_id and idata.event_crf_id = ec.event_crf_id"
                 + " order by ec.event_crf_id, ec.crf_version_id, item.item_id, idata.ordinal) cvidata, item_group_metadata igm,"
                 + " item_group ig where cvidata.crf_version_id = igm.crf_version_id and cvidata.item_id = igm.item_id"
@@ -3551,25 +3550,23 @@ public class OdmExtractDAO extends DatasetDAO {
     // should mapped to non-completed
     protected String getEventCrfIdsByItemDataSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds  +
-                " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
+                " and idata.event_crf_id in (select event_crf_id from event_crf ec where study_subject_id in"
                 + " (select ss.study_subject_id from study_subject ss WHERE ss.study_id in (" + studyIds + ") " + dateConstraint + ")"
                 + " and study_event_id in (select study_event_id from study_event where study_event_definition_id in " + sedIds
                 + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_id in (" + studyIds + ") " + dateConstraint + "))"
-                + " and (status_id " + ecStatusConstraint + ")) and length(value) > 0";
+                + " and (ec.workflow_status " + ecStatusConstraint + ")) and length(value) > 0";
     }
 
     protected String getEventCrfIdsByItemDataSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
             String studySubjectIds) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds  +
-                " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
+                " and idata.event_crf_id in (select event_crf_id ec from event_crf where study_subject_id in"
                 + " (select ss.study_subject_id from study_subject ss WHERE ss.study_subject_id in (" + studySubjectIds + ") " + ")"
                 + " and study_event_id in (select study_event_id from study_event where study_event_definition_id in " + sedIds
                 + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ") " + "))"
-                + " and (status_id " + ecStatusConstraint + ")) and length(value) > 0";
+                + " and (ec.workflow_status " + ecStatusConstraint + ")) and length(value) > 0";
     }
 
     protected String getEventDefinitionCrfCondition(int studyId, int parentStudyId, boolean isIncludedSite) {
@@ -3600,7 +3597,6 @@ public class OdmExtractDAO extends DatasetDAO {
     protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
                                                   String studySubjectIds) {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select table1.*, mu.oc_oid as mu_oid \n" +
                 "from       (select \n" +
                 "       ec.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name, \n" +
@@ -3622,6 +3618,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 "       ss.study_subject_id in ("+studySubjectIds+") and \n" +
                 "\n" +
                 "      item.item_id in "+itemIds+"  and length(idata.value) > 0 and\n" +
+                "      ec.workflow_status "+ecStatusConstraint+" and\n" +
                 "      se.study_event_definition_id in  "+sedIds+
                 "      ) table1\n" +
                 "       left join\n" +

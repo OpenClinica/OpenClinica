@@ -30,6 +30,7 @@ import core.org.akaza.openclinica.bean.extract.ExtractBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.cache.EhCacheWrapper;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
@@ -2183,10 +2184,10 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + " 									study_event.study_event_id = event_crf.study_event_id  "
                     + " 								   AND  "
                     + " 									study_event.study_subject_id = event_crf.study_subject_id  "
-                    + " 								   AND " + " 									(event_crf.status_id " + ecStatusConstraint + ") "
+                    + " 								   AND " + " 									(event_crf.workflow_status " + ecStatusConstraint + ") "
                     + " 								   ) " + " 				WHERE " + dateConstraint + " 				    AND "
                     + " 					study_event_definition.study_event_definition_id IN " + sedin + " 			) " + " 			AND "
-                    + " 			(event_crf.status_id " + ecStatusConstraint + ") " + " 	)  " + " 	AND  " + " 	(item_data.status_id " + itStatusConstraint
+                    + " 			(event_crf.workflow_status " + ecStatusConstraint + ") " + " 	)  " + " 	AND  " + " 	(item_data.status_id " + itStatusConstraint
                     + ")  " + " ) SBQONE, item_group_metadata, item_group " + " WHERE  "
                     + " (item_group_metadata.item_id = SBQONE.itemid AND item_group_metadata.crf_version_id = SBQONE.crfversionid) " + " AND "
                     + " (item_group.item_group_id = item_group_metadata.item_group_id) " + "  ORDER BY itemdataid asc ";
@@ -2905,22 +2906,19 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         return dateConstraint;
     }
 
+
     public String getECStatusConstraint(int datasetItemStatusId) {
-        String statusConstraint = "";
-        switch (datasetItemStatusId) {
-        default:
-        case 0:
-        case 1:
-            statusConstraint = "in (2,6)";
-            break;
-        case 2:
-            statusConstraint = "not in (2,6,5,7)";
-            break;
-        case 3:
-            statusConstraint = "not in (5,7)";
-            break;
+       String all = " = ec.workflow_status ";
+
+       switch (datasetItemStatusId) {
+            case 1:
+                return " in ('" + EventCrfWorkflowStatusEnum.COMPLETED.toString() + "')";
+            case 2:
+                return " not in ('" + EventCrfWorkflowStatusEnum.COMPLETED.toString() + "')";
+            case 3:
+                return all;
         }
-        return statusConstraint;
+        return all;
     }
 
     public String getItemDataStatusConstraint(int datasetItemStatusId) {
