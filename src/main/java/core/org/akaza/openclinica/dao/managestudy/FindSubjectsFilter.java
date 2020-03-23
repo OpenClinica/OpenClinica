@@ -47,21 +47,14 @@ public class FindSubjectsFilter implements CriteriaCommand {
                 criteria = criteria + " where ";
                 criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
             } else if (property.startsWith("sed_")) {
-                value = SubjectEventStatus.getSubjectEventStatusIdByName(value.toString()) + "";
+
                 criteria+= " INTERSECT " + mainQuery() +
                         "  JOIN study_event se  ON  se.study_subject_id=ss.study_subject_id ";
 
-                if (!value.equals("2")) {
                     criteria += " and ";
                     criteria += " ( se.study_event_definition_id = " + property.substring(4);
-                    criteria += " and se.subject_event_status_id = " + value + " )";
-                } else {
-                    criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != " + property.substring(4);
-                    criteria += " AND (select count(*) from  study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id";
-                    criteria +=
-                            " where  study_event.study_event_definition_id =" + property.substring(4) + " and ss.study_subject_id = ss1.study_subject_id) =0))";
+                    criteria += " and se.workflow_status = '" + value + "' )";
 
-                }
             } else if (property.startsWith("sgc_")) {
                 int study_group_class_id = Integer.parseInt(property.substring(4));
 

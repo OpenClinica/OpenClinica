@@ -900,8 +900,6 @@ public class ImportServiceImpl implements ImportService {
                         if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
                         // Event Crf has status complete or unavailable
                         // in complete status will not throw out error any more at this stage
-                        if (eventCrf != null  && !isEventCrfCompleted(eventCrf))
-                            return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
                         /*
                          * OC-12136
@@ -926,8 +924,7 @@ public class ImportServiceImpl implements ImportService {
 
                 // Event Crf has status complete or invalid
                 // in complete status will not throw out error any more at this stage
-                if (eventCrf != null  && !isEventCrfCompleted(eventCrf))
-                    return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
+
 
                 if (eventCrf != null) {     // form exist
                     studyEvent = eventCrf.getStudyEvent();
@@ -1183,15 +1180,15 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private StudyEventWorkflowStatusEnum getWorkflowStatus(String workflowStatus) {
-        if (StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+        if (StudyEventWorkflowStatusEnum.SCHEDULED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.SCHEDULED;
-        } else if (StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue().replace("_", " ").equalsIgnoreCase(workflowStatus)) {
+        } else if (StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString().replace("_", " ").equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED;
-        } else if (StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+        } else if (StudyEventWorkflowStatusEnum.COMPLETED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.COMPLETED;
-        } else if (StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+        } else if (StudyEventWorkflowStatusEnum.SKIPPED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.SKIPPED;
-        } else if (StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+        } else if (StudyEventWorkflowStatusEnum.STOPPED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.STOPPED;
        /************** } else if (StudyEventWorkflowEnum.LOCKED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowEnum.LOCKED;*/
@@ -1201,11 +1198,11 @@ public class ImportServiceImpl implements ImportService {
 
 
     public ErrorObj validateEventStatus(String eventStatus) {
-        if (!StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue().equalsIgnoreCase(eventStatus)
-                && !StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue().replace("_", " ").equalsIgnoreCase(eventStatus)
-                && !StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue().equalsIgnoreCase(eventStatus)
-                && !StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue().equalsIgnoreCase(eventStatus)
-                && !StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue().equalsIgnoreCase(eventStatus)
+        if (!StudyEventWorkflowStatusEnum.SCHEDULED.toString().equalsIgnoreCase(eventStatus)
+                && !StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString().replace("_", " ").equalsIgnoreCase(eventStatus)
+                && !StudyEventWorkflowStatusEnum.COMPLETED.toString().equalsIgnoreCase(eventStatus)
+                && !StudyEventWorkflowStatusEnum.SKIPPED.toString().equalsIgnoreCase(eventStatus)
+                && !StudyEventWorkflowStatusEnum.STOPPED.toString().equalsIgnoreCase(eventStatus)
 /********************
                 && !StudyEventWorkflowEnum.LOCKED.getDisplayValue().equalsIgnoreCase(eventStatus)
 */  )
@@ -1326,8 +1323,6 @@ public class ImportServiceImpl implements ImportService {
 
         // Event Crf has status complete or invalid
         // in complete status will not throw out error any more at this stage
-            if (eventCrf != null  && !isEventCrfCompleted(eventCrf))
-            return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
 
         if (eventCrf == null) {

@@ -497,7 +497,7 @@
                                         ><span name="bt_Remove<c:out value="${rowCount}"/>" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>"  hspace="2"></span></a>
                                       </td>
                                     </c:if>
-                                    <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.available && studyEvent.removed != true && studyEvent.archived != true  && dec.eventCRF.removed == true && dec.eventCRF.archived != true}}">
+                                    <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.available && studyEvent.removed != true && studyEvent.archived != true  && dec.eventCRF.removed == true && dec.eventCRF.archived != true}">
                                       <td>
                                         <a class="accessCheck" href="RestoreEventCRF?action=confirm&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                                         onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
