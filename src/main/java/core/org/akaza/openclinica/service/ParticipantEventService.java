@@ -55,7 +55,7 @@ public class ParticipantEventService {
                     boolean eventCrfExists = false;
                     for (FormLayoutBean formLayout:formLayouts) {
                         EventCRFBean eventCRF = getEventCRFDAO().findByEventFormLayout(studyEvent, formLayout);
-                        if (BooleanUtils.isFalse(eventCRF.getRemoved()) && BooleanUtils.isFalse(eventCRF.getArchived())) return studyEvent;
+                        if (BooleanUtils.isNotTrue(eventCRF.getRemoved()) && BooleanUtils.isNotTrue(eventCRF.getArchived())) return studyEvent;
                         else if (eventCRF != null) eventCrfExists = true;
                     }
                     if (!eventCrfExists) return studyEvent;

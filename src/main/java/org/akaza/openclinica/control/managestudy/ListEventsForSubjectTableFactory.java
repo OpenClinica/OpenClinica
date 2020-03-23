@@ -125,7 +125,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         }
 
         configureColumn(row.getColumn(columnNames[index + studyGroupClasses.size()]), resword.getString("event_status"), new EventStatusCellEditor(),
-                new SubjectEventStatusDroplistFilterEditor(), true, false);
+                new StudyEventWorkflowStatusDroplistFilterEditor(), true, false);
         ++index;
         configureColumn(row.getColumn(columnNames[index + studyGroupClasses.size()]), resword.getString("event_date_started"), new EventStartDateCellEditor(), null);
         ++index;
@@ -331,7 +331,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             if ("studySubject.status".equalsIgnoreCase(property)) {
                 value = Status.getByName(value).getId() + "";
             } else if ("event.status".equalsIgnoreCase(property)) {
-                value = SubjectEventStatus.getByName(value).getId() + "";
             } else if (property.startsWith("sgc_")) {
                 int studyGroupClassId = property.endsWith("_") ? 0 : Integer.valueOf(property.split("_")[1]);
                 value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId() + "";
@@ -597,12 +596,14 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         }
     }
 
-    private class SubjectEventStatusDroplistFilterEditor extends DroplistFilterEditor {
+    private class StudyEventWorkflowStatusDroplistFilterEditor extends DroplistFilterEditor {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            for (Object subjectEventStatus : SubjectEventStatus.toArrayList()) {
-                options.add(new Option(((SubjectEventStatus) subjectEventStatus).getName(), ((SubjectEventStatus) subjectEventStatus).getName()));
+            List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
+
+            for (StudyEventWorkflowStatusEnum workflow : eventWorkflowStatuses) {
+                options.add(new Option(workflow.toString(),workflow.getDisplayValue()));
             }
             return options;
         }
@@ -686,7 +687,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     studyEvents.add(studyEvent);
                 }
                 url.append(eventDivBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents, studyEventDefinition, studySubjectBean));
-                url.append("<span class='" + imageIconPaths.get(workflowStatus) + "' border='0' style='position: relative; left: 7px;'>");
+                url.append("<span class='" + imageIconPaths.get(workflowStatus.toString()) + "' border='0' style='position: relative; left: 7px;'>");
                 url.append("</a></td></tr></table>");
             }
 
