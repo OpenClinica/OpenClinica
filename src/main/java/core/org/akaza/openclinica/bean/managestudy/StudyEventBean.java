@@ -16,6 +16,7 @@ import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.ocobserver.Listener;
 import core.org.akaza.openclinica.ocobserver.Observer;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 /**
  * @author jxu
@@ -66,6 +67,11 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
     private boolean endTimeFlag = false;
     private String attestation = "";
     private String additionalNotes;
+    private StudyEventWorkflowStatusEnum workflowStatus;
+    private Boolean removed;
+    private Boolean archived;
+    private Boolean locked;
+
 
     // BWP: for display discrepancy notes in a matrix-type study/event grid; 5/2/2008
     private ArrayList<DiscrepancyNoteBean> discBeanList = new ArrayList<DiscrepancyNoteBean>();
@@ -171,7 +177,7 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
 
     public StudyEventBean() {
         stage = DataEntryStage.UNCOMPLETED;
-        subjectEventStatus = SubjectEventStatus.SCHEDULED;
+        workflowStatus = StudyEventWorkflowStatusEnum.SCHEDULED;
     }
 
     /**
@@ -388,5 +394,37 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
 
     public void setAdditionalNotes(String additionalNotes) {
         this.additionalNotes = additionalNotes;
+    }
+
+    public Boolean getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(Boolean removed) {
+        this.removed = removed;
+    }
+
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
+
+    public StudyEventWorkflowStatusEnum getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
+        this.workflowStatus = workflowStatus;
     }
 }

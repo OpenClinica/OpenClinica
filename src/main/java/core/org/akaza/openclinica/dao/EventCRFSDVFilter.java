@@ -5,7 +5,9 @@ import core.org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
@@ -29,8 +31,8 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         columnMapping.put("eventName", "sed.name");
         columnMapping.put("crfName", "ec.name_id");
         columnMapping.put("sdvRequirementDefinition", "");
-        columnMapping.put("crfStatus", "ec.status_id");
-        columnMapping.put("subjectEventStatus","se.subject_event_status_id");
+        columnMapping.put("crfStatus", "ec.workflow_status");
+        columnMapping.put("subjectEventStatus","se.workflow_status");
     }
 
     public void addFilter(String property, Object value) {
@@ -91,28 +93,12 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                     criteria += " ) )) ";
                 }
             } else if (property.equals("crfStatus")) {
-                if (value.equals("Completed")) {
                     criteria = criteria + " and ";
                     criteria =
-                        criteria + " ( " + columnMapping.get(property)
-                            + " = 2 and  se.subject_event_status_id != 5 and se.subject_event_status_id != 6 and se.subject_event_status_id != 7 ) ";
-                } else {
-                    criteria = criteria + " and ";
-                    criteria =
-                        criteria + " ( " + columnMapping.get(property)
-                            + " = 6 or ( se.subject_event_status_id = 5 or se.subject_event_status_id = 6 or se.subject_event_status_id = 7 ) )";
-                }
+                        criteria + " ( " + columnMapping.get(property) + " = '"+ EventCrfWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "'  ) ";
+
             } else if (property.equals("subjectEventStatus")){
-                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
-                Map<String, SubjectEventStatus> subjectEventStatusMapByDescription = new HashMap<>();
-                for (SubjectEventStatus subjectEventStatus : SubjectEventStatus.values()) {
-                    if (subjectEventStatus != SubjectEventStatus.INVALID) {
-                        String subjectEventStatusDesc = resWords.getString(subjectEventStatus.getDescription());
-                        subjectEventStatusMapByDescription.put(subjectEventStatusDesc, subjectEventStatus);
-                    }
-                }
-                SubjectEventStatus filteredSubjectEventStatus = subjectEventStatusMapByDescription.get(value.toString().trim());
-                criteria = criteria + " and " + columnMapping.get(property)+" = "+filteredSubjectEventStatus.getCode()+" ";
+                criteria = criteria + " and " + columnMapping.get(property)+" = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' ";
 
             }else if(property.equals("openQueries")){
                 String openQueriesQuery ="(select count(*) from discrepancy_note dn " +

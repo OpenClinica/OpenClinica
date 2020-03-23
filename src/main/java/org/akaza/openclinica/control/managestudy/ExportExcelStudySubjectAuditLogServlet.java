@@ -361,7 +361,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 row++;
                 label = new Label(0, row, "Status");
                 excelSheet.addCell(label);
-                label = new Label(1, row, event.getSubjectEventStatus().getName());
+                label = new Label(1, row, event.getWorkflowStatus().toString());
                 excelSheet.addCell(label);
                 row++;
                 label = new Label(0, row, ResourceBundleProvider.getResWord("occurrence_number"));

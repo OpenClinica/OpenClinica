@@ -26,7 +26,6 @@ import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.*;
-import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -41,7 +40,8 @@ import core.org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
@@ -315,13 +315,13 @@ public class OdmExtractDAO extends DatasetDAO {
             // event)
             this.setTypeExpected(18, TypeNames.BOOL);// start_time_flag
             this.setTypeExpected(19, TypeNames.BOOL);// end_time_flag
-            this.setTypeExpected(20, TypeNames.INT);// event_status_id
+            this.setTypeExpected(20, TypeNames.STRING);// event_workflow_status
             this.setTypeExpected(21, TypeNames.INT);// crf_order;
             this.setTypeExpected(22, TypeNames.INT);// edc_id;
             this.setTypeExpected(23, TypeNames.STRING);// crf_version_oid
             this.setTypeExpected(24, TypeNames.STRING);// crf_version
             this.setTypeExpected(25, TypeNames.INT); // cv_status_id
-            this.setTypeExpected(26, TypeNames.INT);// ec_status_id
+            this.setTypeExpected(26, TypeNames.STRING);//  event_crf_workflow_status
             this.setTypeExpected(27, TypeNames.INT);// event_crf_id
             this.setTypeExpected(28, TypeNames.DATE);// date_interviewed
             this.setTypeExpected(29, TypeNames.STRING);// interviewer_name
@@ -2624,21 +2624,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setDetails(details);
                 auditLog.setAuditLogEventTypeId(typeId);
-                if (typeId == 17 || typeId == 18 || typeId == 19 || typeId == 20 || typeId == 21 || typeId == 22 || typeId == 23 || typeId == 31) {
-                    if ("0".equals(newValue)) {
-                        auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
-                    } else {
-                        auditLog.setNewValue(SubjectEventStatus.getFromMap(Integer.parseInt(newValue)).getName());
-                    }
-                    if ("0".equals(oldValue)) {
-                        auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
-                    } else {
-                        auditLog.setOldValue(SubjectEventStatus.getFromMap(Integer.parseInt(oldValue)).getName());
-                    }
-                } else {
-                    auditLog.setNewValue(newValue);
-                    auditLog.setOldValue(oldValue);
-                }
+                auditLog.setNewValue(newValue);
+                auditLog.setOldValue(oldValue);
+
                 AuditLogsBean logs = se.getAuditLogs();
                 if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
                     logs.setEntityID(se.getStudyEventOID());
@@ -2681,39 +2669,17 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setAuditLogEventTypeId(typeId);
-                if (typeId == 8 || typeId == 10 || typeId == 11 || typeId == 14 || typeId == 15 || typeId == 16) {
-                    if ("0".equals(newValue)) {
-                        auditLog.setNewValue(Status.INVALID.getName());
-                    } else {
-                        auditLog.setNewValue(Status.getFromMap(Integer.parseInt(newValue)).getName());
-                    }
-                    if ("0".equals(oldValue)) {
-                        auditLog.setOldValue(Status.INVALID.getName());
-                    } else {
-                        auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
-                    }
-                } // Fix for 0011675: SDV'ed subject is dipslayed as not SDV'ed in the 1.3 Full ODM Extract commenting
+                auditLog.setOldValue(oldValue);
+                auditLog.setNewValue(newValue);
+
+
+                  // Fix for 0011675: SDV'ed subject is dipslayed as not SDV'ed in the 1.3 Full ODM Extract commenting
                   // out the following lines as these are treated like booleans while they are strings
                   // JN:The Oracle still continues to have 1 and 2 for this audit type 32 so enabling the following code
                   // for oracle only, ideally the trigger should be coded same for both postgres and oracle and since
                   // the trigger doesnt do same things, the existing data would still be a problem, so doing this patch
                   // work
 
-                else if ((typeId == 32) && ("oracle".equalsIgnoreCase(dbName))) {
-                    if ("1".equals(newValue)) {
-                        auditLog.setNewValue("TRUE");
-                    } else {
-                        auditLog.setNewValue("FALSE");
-                    }
-                    if ("1".equals(oldValue)) {
-                        auditLog.setOldValue("TRUE");
-                    } else {
-                        auditLog.setOldValue("FALSE");
-                    }
-                } else {
-                    auditLog.setNewValue(newValue);
-                    auditLog.setOldValue(oldValue);
-                }
                 AuditLogsBean logs = form.getAuditLogs();
                 if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
                     logs.setEntityID(form.getFormOID());
@@ -3208,7 +3174,8 @@ public class OdmExtractDAO extends DatasetDAO {
                         }
                     }
                     if (dataset.isShowEventStatus()) {
-                        se.setStatus(SubjectEventStatus.get((Integer) row.get("event_status_id")).getName());
+                        StudyEventWorkflowStatusEnum workflowEnum = StudyEventWorkflowStatusEnum.valueOf((String) row.get("event_workflow_status")) ;
+                        se.setWorkflowStatus(workflowEnum);
                     }
                     // ----- finish adding study event attributes
                     se.setStudyEventRepeatKey(studyEventRepeating ? sampleOrdinal + "" : "1");
@@ -3237,8 +3204,8 @@ public class OdmExtractDAO extends DatasetDAO {
                             form.setCrfVersion((String) row.get("crf_version"));
                         }
                         if (dataset.isShowCRFstatus()) {
-                            form.setStatus(this.getCrfVersionStatus(se.getStatus(), (Integer) row.get("fl_status_id"), (Integer) row.get("ec_status_id"),
-                                    (Integer) row.get("validator_id")));
+                            EventCrfWorkflowStatusEnum workflowEnum = EventCrfWorkflowStatusEnum.valueOf((String) row.get("event_crf_workflow_status")) ;
+                            form.setWorkflowStatus(workflowEnum);
                         }
                         if (dataset.isShowCRFinterviewerName()) {
                             form.setInterviewerName((String) row.get("interviewer_name"));
@@ -3297,60 +3264,6 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    private String getCrfVersionStatus(String seSubjectEventStatus, int cvStatusId, int ecStatusId, int validatorId) {
-        DataEntryStage stage = DataEntryStage.INVALID;
-        Status status = Status.get(ecStatusId);
-
-        // At this time, EventCRFBean stage is not in database.
-        //
-        // if (stage != null) {
-        // if (!stage.equals(DataEntryStage.INVALID)) {
-        // return stage.getName();
-        // }
-        // }
-        //
-        // if (!active || !status.isActive()) {
-        // stage = DataEntryStage.UNCOMPLETED;
-        // }
-        if (stage.equals(DataEntryStage.INVALID) || status.equals(Status.INVALID)) {
-            stage = DataEntryStage.UNCOMPLETED;
-        }
-
-        if (status.equals(Status.AVAILABLE)) {
-            stage = DataEntryStage.INITIAL_DATA_ENTRY;
-        }
-        if (status.equals(Status.PENDING)) {
-            if (validatorId != 0) {
-                stage = DataEntryStage.DOUBLE_DATA_ENTRY;
-            } else {
-                stage = DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE;
-            }
-        }
-        if (status.equals(Status.UNAVAILABLE)) {
-            stage = DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE;
-        }
-        if (status.equals(Status.LOCKED)) {
-            stage = DataEntryStage.LOCKED;
-        }
-
-        try {
-            if (seSubjectEventStatus.equals(SubjectEventStatus.LOCKED.getName()) || seSubjectEventStatus.equals(SubjectEventStatus.SKIPPED.getName())
-                    || seSubjectEventStatus.equals(SubjectEventStatus.STOPPED.getName())) {
-                stage = DataEntryStage.LOCKED;
-            } else if (seSubjectEventStatus.equals(SubjectEventStatus.INVALID.getName())) {
-                stage = DataEntryStage.LOCKED;
-            } else if (cvStatusId != 1) {
-                stage = DataEntryStage.LOCKED;
-            }
-        } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            logger.debug("caught NPE here");
-        }
-
-        logger.debug("returning " + stage.getName());
-
-        return stage.getName();
-    }
 
     protected void setStudyParemeterConfig(Study study) {
         StudyParameterValueBean param = new StudyParameterValueDAO(this.ds).findByHandleAndStudy(study.getStudyId(), "collectDob");
@@ -3546,10 +3459,10 @@ public class OdmExtractDAO extends DatasetDAO {
         return "select ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
                 + " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
                 + " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
-                + " se.end_time_flag, se.subject_event_status_id as event_status_id, edc.ordinal as crf_order,"
-                + " cv.oc_oid as crf_version_oid, cv.name as crf_version, cv.status_id as cv_status_id, ec.status_id as ec_status_id, ec.event_crf_id, ec.date_interviewed,"
+                + " se.end_time_flag, se.workflow_status as event_workflow_status, edc.ordinal as crf_order,"
+                + " cv.oc_oid as crf_version_oid, cv.name as crf_version, cv.status_id as cv_status_id, ec.workflow_status as event_crf_workflow_status , ec.event_crf_id, ec.date_interviewed,"
                 + " ec.interviewer_name, ec.validator_id from (select study_event_id, study_event_definition_id, study_subject_id, location as se_location,"
-                + " sample_ordinal, date_start, date_end, subject_event_status_id, start_time_flag, end_time_flag from study_event "
+                + " sample_ordinal, date_start, date_end, workflow_status, start_time_flag, end_time_flag from study_event "
                 + " where study_event_definition_id in " + sedIds
                 + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_id in (" + studyIds + ") " + dateConstraint
                 + ")) se, ( select st_sub.oc_oid, st_sub.study_subject_id, st_sub.label,"
@@ -3579,9 +3492,9 @@ public class OdmExtractDAO extends DatasetDAO {
         return "select Distinct ss.oc_oid as\n" +
                 "        study_subject_oid, ss.label, s.unique_identifier, ss.secondary_label, s.gender, s.date_of_birth, ss.status_id, null as sgc_id, null as sgc_name, null as sg_name,  sed.ordinal\n" +
                 "        as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating, se.sample_ordinal as\n" +
-                "        sample_ordinal, se.location as se_location, se.date_start, se.date_end, se.start_time_flag, se.end_time_flag, se.subject_event_status_id\n" +
-                "        as event_status_id, edc.ordinal as crf_order, edc.event_definition_crf_id as edc_id, fl.oc_oid as\n" +
-                "        form_layout_oid, fl.name as form_layout_name, fl.status_id as fl_status_id, ec.status_id as ec_status_id, ec.\n" +
+                "        sample_ordinal, se.location as se_location, se.date_start, se.date_end, se.start_time_flag, se.end_time_flag, se.workflow_status \n" +
+                "        as event_workflow_status, edc.ordinal as crf_order, edc.event_definition_crf_id as edc_id, fl.oc_oid as\n" +
+                "        form_layout_oid, fl.name as form_layout_name, fl.status_id as fl_status_id, ec.workflow_status as event_crf_workflow_status, ec.\n" +
                 "        event_crf_id, ec.date_interviewed, ec.interviewer_name, ec.validator_id, sed.name as definition_name\n" +
                 "        from\n" +
                 "        study_event se,\n" +
@@ -3604,8 +3517,12 @@ public class OdmExtractDAO extends DatasetDAO {
                 "        and sed.study_event_definition_id in "+sedIds+" \n" +
                 "        and ss.study_subject_id in \n" +
                 "        ("+studySubjectIds+")\n" +
-                "        and idata.item_id in "+itemIds+" and idata.status_id "+itStatusConstraint+"\n" +
-                "        and ec.status_id "+ecStatusConstraint+" and length (value) > 0\n" +
+                "        and idata.item_id in "+itemIds +
+                "        and length (value) > 0\n" +
+                "        and (ec.removed  !='true' or ec.removed  IS NULL) "+
+                "        and (ec.archived !='true' or ec.archived IS NULL) "+
+                "        and (se.removed  !='true' or se.removed  IS NULL) "+
+                "        and (se.archived !='true' or se.archived IS NULL) "+
                 "        order by ss.oc_oid, sed.ordinal, se.sample_ordinal, edc.ordinal";
 
     }
@@ -3635,8 +3552,8 @@ public class OdmExtractDAO extends DatasetDAO {
     protected String getEventCrfIdsByItemDataSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
-        return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds + " and (idata.status_id " + itStatusConstraint
-                + ")" + " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
+        return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds  +
+                " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
                 + " (select ss.study_subject_id from study_subject ss WHERE ss.study_id in (" + studyIds + ") " + dateConstraint + ")"
                 + " and study_event_id in (select study_event_id from study_event where study_event_definition_id in " + sedIds
                 + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_id in (" + studyIds + ") " + dateConstraint + "))"
@@ -3647,8 +3564,8 @@ public class OdmExtractDAO extends DatasetDAO {
             String studySubjectIds) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
-        return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds + " and (idata.status_id " + itStatusConstraint
-                + ")" + " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
+        return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds  +
+                " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
                 + " (select ss.study_subject_id from study_subject ss WHERE ss.study_subject_id in (" + studySubjectIds + ") " + ")"
                 + " and study_event_id in (select study_event_id from study_event where study_event_definition_id in " + sedIds
                 + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ") " + "))"
@@ -3705,9 +3622,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 "       ss.study_subject_id in ("+studySubjectIds+") and \n" +
                 "\n" +
                 "      item.item_id in "+itemIds+"  and length(idata.value) > 0 and\n" +
-                "      se.study_event_definition_id in  "+sedIds+" and\n" +
-                "      ec.status_id "+ecStatusConstraint+" and\n" +
-                "      idata.status_id "+itStatusConstraint+" \n" +
+                "      se.study_event_definition_id in  "+sedIds+
                 "      ) table1\n" +
                 "       left join\n" +
                 "      measurement_unit mu on      table1.units = mu.name\n" +
@@ -3777,13 +3692,13 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCSubjectDataDNsSql(String studySubjectOids) {
         return "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
-                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name , dn.thread_uuid, dn.thread_number"
+                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name , dn.thread_uuid, dn.thread_number "
                 + " from discrepancy_note dn, dn_subject_map dnsm, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
                 + " where dn.entity_type = 'subject'" + " and dn.discrepancy_note_id = dnsm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids
                 + ") and ss.subject_id = dnsm.subject_id and dn.resolution_status_id = rs.resolution_status_id"
                 + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id) union"
                 + "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
-                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name"
+                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name , dn.thread_uuid, dn.thread_number "
                 + " from discrepancy_note dn, dn_study_subject_map dnssm, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
                 + " where dn.entity_type = 'studySub'" + " and dn.discrepancy_note_id = dnssm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids
                 + ") and ss.study_subject_id = dnssm.study_subject_id and dn.resolution_status_id = rs.resolution_status_id"

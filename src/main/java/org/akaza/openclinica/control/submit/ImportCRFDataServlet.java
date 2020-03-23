@@ -35,6 +35,7 @@ import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
@@ -334,14 +335,12 @@ public class ImportCRFDataServlet extends SecureController {
                 if (!eventCRFBeans.isEmpty()) {
                     for (EventCRFBean eventCRFBean : eventCRFBeans) {
                         DataEntryStage dataEntryStage = eventCRFBean.getStage();
-                        Status eventCRFStatus = eventCRFBean.getStatus();
 
                         logger.info("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
-                                + eventCRFStatus.getName());
-                        if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
-                                || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                                || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
-                                || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                                + eventCRFBean.getWorkflowStatus());
+                        if (!eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)){
+
+
                             // actually want the negative
                             // was status == available and the stage questions, but
                             // when you are at 'data entry complete' your status is

@@ -56,6 +56,7 @@ import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 
 import core.org.akaza.openclinica.web.restful.data.bean.BaseStudyDefinitionBean;
 import core.org.akaza.openclinica.web.restful.data.validator.CRFDataImportValidator;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.checkerframework.checker.units.qual.A;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
@@ -449,11 +450,8 @@ public class DataController {
                   
                     for (EventCRFBean eventCRFBean : tempEventCRFBeans) {
                          DataEntryStage dataEntryStage = eventCRFBean.getStage();
-                         Status eventCRFStatus = eventCRFBean.getStatus();
 
-                         if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
-                                 || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
-                                 || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                         if(!eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)){
                              permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
                          } 
                      }

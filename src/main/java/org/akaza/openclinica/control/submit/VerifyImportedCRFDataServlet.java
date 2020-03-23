@@ -48,6 +48,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import core.org.akaza.openclinica.web.job.ImportSpringJob;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.BooleanUtils;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system and what is not.
@@ -218,7 +219,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         displayItemBean.getData().setEventCRFId(eventCrfBean.getId());
 
                         logger.info("found value here: " + displayItemBean.getData().getValue());
-                        logger.info("found status here: " + eventCrfBean.getStatus().getName());
+                        logger.info("found status here: " + eventCrfBean.getWorkflowStatus());
                         // System.out.println("found event crf bean name here: "
                         // +
                         // eventCrfBean.getEventName()+" id "+eventCrfBean.getId
@@ -311,7 +312,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // "+displayItemBean.getDbData().getName());
 
                         if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
-                                && eventCrfBean.getStatus().isAvailable()) {
+                                && BooleanUtils.isFalse(eventCrfBean.getRemoved()) && BooleanUtils.isFalse(eventCrfBean.getArchived())) {
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
                         } else {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);

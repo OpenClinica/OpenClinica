@@ -182,7 +182,7 @@
             se.study_event_definition_id = sed.study_event_definition_id  AND
             crf.crf_id = cv.crf_id AND edc.crf_id = crf.crf_id AND cv.crf_version_id = ec.crf_version_id AND
             edc.source_data_verification_code != 4 AND edc.study_event_definition_id = sed.study_event_definition_id AND
-            (ec.status_id = 2 or ec.status_id = 6) AND
+            (ec.workflow_status = 'COMPLETED') AND
             (ss.study_id = ? or ss.study_id in (select study_id from study where parent_study_id = ?))
             AND (
 	        ( s.parent_study_id = edc.study_id 
@@ -212,7 +212,7 @@
             se.study_event_definition_id = sed.study_event_definition_id  AND
             crf.crf_id = cv.crf_id AND edc.crf_id = crf.crf_id AND cv.crf_version_id = ec.crf_version_id AND
             edc.source_data_verification_code != 4 AND edc.study_event_definition_id = sed.study_event_definition_id AND
-            (ec.status_id = 2 or ec.status_id = 6) AND
+            (ec.workflow_status='COMPLETED') AND
             (ss.study_id = ? or ss.study_id in (select study_id from study where parent_study_id = ?))
             AND (
 	        ( s.parent_study_id = edc.study_id 
@@ -363,6 +363,10 @@
             , OLD_STATUS_ID=?
             , SDV_UPDATE_ID = ?
             , FORM_LAYOUT_ID=?
+            , WORKFLOW_STATUS=?
+            , REMOVED=?
+            , ARCHIVED=?
+
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>
@@ -375,7 +379,7 @@
     
     <query>
         <name>findAllByStudyEventAndStatus</name>
-        <sql>SELECT * FROM event_crf WHERE study_event_id=? and status_id = ? order by event_crf_id asc</sql>
+        <sql>SELECT * FROM event_crf WHERE study_event_id=? and workflow_status = ? order by event_crf_id asc</sql>
     </query>
     
     <query>

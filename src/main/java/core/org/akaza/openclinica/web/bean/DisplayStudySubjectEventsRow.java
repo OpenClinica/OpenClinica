@@ -62,8 +62,8 @@ public class DisplayStudySubjectEventsRow extends EntityBeanRow {
                 answer = 1;
                 break;
             }
-            answer = ((DisplayStudyEventBean) thisStudy.getStudyEvents().get(0)).getStudyEvent().getSubjectEventStatus()
-                    .compareTo(((DisplayStudyEventBean) argStudy.getStudyEvents().get(0)).getStudyEvent().getSubjectEventStatus());
+            answer = ((DisplayStudyEventBean) thisStudy.getStudyEvents().get(0)).getStudyEvent().getWorkflowStatus()
+                    .compareTo(((DisplayStudyEventBean) argStudy.getStudyEvents().get(0)).getStudyEvent().getWorkflowStatus());
             break;
         case COL_EVENT_DATE:
             if (thisStudy.getStudyEvents() == null || thisStudy.getStudyEvents().isEmpty()) {

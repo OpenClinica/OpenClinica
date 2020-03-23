@@ -42,6 +42,7 @@ import core.org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer
 import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import core.org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import core.org.akaza.openclinica.web.job.TriggerService;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,13 +188,10 @@ public class DataImportService {
 
         for (EventCRFBean eventCRFBean : eventCRFBeans) {
             DataEntryStage dataEntryStage = eventCRFBean.getStage();
-            Status eventCRFStatus = eventCRFBean.getStatus();
 
             logger.debug("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
-                    + eventCRFStatus.getName());
-            if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
-                    || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
-                    || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                    + eventCRFBean.getWorkflowStatus());
+             if(!eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                 permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
             } else {
                 errors.add(respage.getString("your_listed_crf_in_the_file") + " " + eventCRFBean.getEventName());

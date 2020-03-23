@@ -16,9 +16,13 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
 
     public List<EventCrf> findNonArchivedByStudyEventId(int study_event_id) {
         String query = "from " + getDomainClassName()
-                + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid and event_crf.statusId not in (5,7)";
+                + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid " +
+                "and (event_crf.removed = null or event_crf.removed !=:removed) and (event_crf.archived = null or event_crf.archived !=:archived) ";
+
         org.hibernate.query.Query hibernateQuery = getCurrentSession().createQuery(query);
         hibernateQuery.setParameter("studyeventid", study_event_id);
+        hibernateQuery.setParameter("removed", true);
+        hibernateQuery.setParameter("archived", true);
 
         return hibernateQuery.list();
     }
