@@ -5,6 +5,7 @@ import java.util.Date;
 public class SdvItemDTO {
     private int itemDataId;
     private String name;
+    private String description;
     private String briefDescription;
     private int ordinal;
     private boolean isRepeatingGroup;
@@ -31,6 +32,14 @@ public class SdvItemDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getBriefDescription() {

@@ -1509,6 +1509,7 @@ public class SDVUtil {
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
                     sdvItemDTO.setItemDataId(itemData.getItemDataId());
                     sdvItemDTO.setName(itemData.getItem().getName());
+                    sdvItemDTO.setDescription(itemData.getItem().getDescription());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
                     sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());
                     sdvItemDTO.setOrdinal(itemData.getOrdinal());

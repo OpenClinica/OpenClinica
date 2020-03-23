@@ -423,7 +423,7 @@
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
                 itemsTable.rows.add(data.sdvItems.map(function (item) {
-                    item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
+                    item.briefDescriptionItemName = (item.briefDescription || item.description || '') + ' (' + item.name + ')';
                     if (item.repeatingGroup) {
                         item.briefDescriptionItemName += ' ' + item.ordinal;
                     }
@@ -488,6 +488,7 @@
         var colIndex = sdvtColumnTitles.find(':contains(' + columnTitle + ')').closest('td').index();
         var theFilterBox = sdvtFilterBoxes.eq(colIndex).children();
         theFilterBox.wrapInner('<div style="width:' + width + '; overflow:hidden; text-overflow:ellipsis;">');
+        theFilterBox.attr('title', theFilterBox.text());
     }
 
     limitFilterWidth('110px', 'SDV Status');
