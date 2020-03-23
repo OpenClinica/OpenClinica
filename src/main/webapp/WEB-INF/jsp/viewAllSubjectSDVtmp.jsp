@@ -423,7 +423,7 @@
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
                 itemsTable.rows.add(data.sdvItems.map(function (item) {
-                    item.briefDescriptionItemName = item.briefDescription + ' (' + item.name + ')';
+                    item.briefDescriptionItemName = (item.briefDescription || item.description || '') + ' (' + item.name + ')';
                     if (item.repeatingGroup) {
                         item.briefDescriptionItemName += ' ' + item.ordinal;
                     }
