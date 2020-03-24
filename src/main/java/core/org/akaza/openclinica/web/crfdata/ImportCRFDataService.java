@@ -152,8 +152,8 @@ public class ImportCRFDataService {
                     // @pgawade 16-March-2011 Do not allow the data import
                     // if event status is one of the - stopped, signed,
                     // locked
-                    if (BooleanUtils.isTrue(studyEventBean.getLocked())
-                            ||BooleanUtils.isTrue(studyEventBean.getSigned())
+                    if (studyEventBean.isLocked()
+                            ||studyEventBean.isSigned()
                             || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                         return null;
                     }
@@ -539,8 +539,8 @@ public class ImportCRFDataService {
                     // @pgawade 16-March-2011 Do not allow the data import
                     // if event status is one of the - stopped, signed,
                     // locked
-                    if (BooleanUtils.isTrue(studyEventBean.getLocked())
-                            || BooleanUtils.isTrue(studyEventBean.getSigned())
+                    if (studyEventBean.isLocked()
+                            || studyEventBean.isSigned()
                             || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                     	errors.add("Do not allow the data import, if scheduled event is one of the status - stopped, signed,locked");
                         return errors;
@@ -770,8 +770,8 @@ public class ImportCRFDataService {
                 // @pgawade 16-March-2011 Do not allow the data import
                 // if event status is one of the - stopped, signed,
                 // locked
-                if (BooleanUtils.isTrue(studyEventBean.getLocked())
-                 || BooleanUtils.isTrue(studyEventBean.getSigned())
+                if (studyEventBean.isLocked()
+                 || studyEventBean.isSigned()
                         || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                     return true;
                 }

@@ -16,8 +16,6 @@ import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
-import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -1492,7 +1490,7 @@ public class SDVUtil {
             EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), parentStudy.getStudyId());
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
-            if(eventCrf.getStudyEvent().getLocked()!=null && eventCrf.getStudyEvent().getLocked()) {
+            if(eventCrf.getStudyEvent().isCurrentlyLocked()) {
                 sdvDTO.setFormStatus("locked");
             } else
                 sdvDTO.setFormStatus("completed"); //EventCrf Status is checked to be UNAVAVAILABLE (i.e. COMPLETED) at parent If Itself

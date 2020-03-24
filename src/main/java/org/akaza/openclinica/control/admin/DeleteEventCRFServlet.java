@@ -244,7 +244,7 @@ public class DeleteEventCRFServlet extends SecureController {
                     sedao = new StudyEventDAO(sm.getDataSource());
                     sedao.update(event);
                 }
-                if ( BooleanUtils.isTrue(event.getSigned())) {
+                if ( event.isSigned()) {
                     event.setSigned(Boolean.FALSE);
                     event.setUpdater(ub);
                     sedao = new StudyEventDAO(sm.getDataSource());

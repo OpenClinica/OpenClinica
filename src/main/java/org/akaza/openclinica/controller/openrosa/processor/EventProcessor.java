@@ -29,7 +29,6 @@ import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,8 +151,8 @@ public class EventProcessor implements Processor {
                 container.setStudyEvent(createStudyEvent(studySubject, studyEventDefinition, ordinal, container.getUser()));
                 container.setEventCrf(createEventCrf(formLayout, container.getStudyEvent(), container.getSubject(), container.getUser()));
                 break;
-            } else if ( BooleanUtils.isTrue(existingStudyEvent.getRemoved())
-                     || BooleanUtils.isTrue(existingStudyEvent.getArchived())
+            } else if ( existingStudyEvent.isCurrentlyRemoved()
+                     || existingStudyEvent.isCurrentlyArchived()
                     || (!existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
                             && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
                             && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))) {

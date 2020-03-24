@@ -374,7 +374,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 request.setAttribute(EVENT_BEAN, studyEvent);
                 forwardPage(Page.UPDATE_STUDY_EVENT);
 
-            } else if (BooleanUtils.isTrue(studyEvent.getSigned())) {
+            } else if (studyEvent.isSigned()) {
                 // Checks if the status is signed
                 // -----------------
                 request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
@@ -531,7 +531,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 // OC-10834 OC4 - Signature not recorded when signing an event if the event status is already Signed
                 // manually add audit-log-event when user re-signed without any changes
                 Boolean signedStatus = (Boolean)session.getAttribute(PREV_STUDY_EVENT_SIGNED_STATUS);
-                if (BooleanUtils.isTrue(seb.getSigned()) && BooleanUtils.isTrue(signedStatus) ) {
+                if (seb.isSigned() && BooleanUtils.isTrue(signedStatus) ) {
                     AuditLogEvent auditLogEvent = new AuditLogEvent();
                     auditLogEvent.setAuditTable(STUDY_EVENT);
                     auditLogEvent.setEntityId(seb.getId());

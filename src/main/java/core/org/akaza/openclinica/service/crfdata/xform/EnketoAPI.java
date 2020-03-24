@@ -25,7 +25,6 @@ import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
 import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -150,7 +148,7 @@ public class EnketoAPI {
         // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
         if ((parentStudy.getStatus().equals(Status.LOCKED)
                 || (site != null && site.getStatus().equals(Status.LOCKED)))
-                || (studyEvent != null && (studyEvent.getLocked()!=null && studyEvent.getLocked()) )
+                || studyEvent.isCurrentlyLocked()
                 || parentStudy.getStatus().equals(Status.FROZEN) || mode.equals(VIEW_MODE)) {
             eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
             lockOn = false;
@@ -426,13 +424,13 @@ public class EnketoAPI {
 
             if (((parentStudy.getStatus().equals(Status.LOCKED))
                  || (site != null && site.getStatus().equals(Status.LOCKED)))
-                 || BooleanUtils.isTrue(studyEvent.getLocked())
-                 || BooleanUtils.isTrue(studyEvent.getRemoved())
-                 || BooleanUtils.isTrue(studyEvent.getArchived())
+                 || studyEvent.isCurrentlyLocked()
+                 || studyEvent.isCurrentlyRemoved()
+                 || studyEvent.isCurrentlyArchived()
                  || edc.getStatusId().equals(Status.DELETED.getCode())
                  || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
-                 || BooleanUtils.isTrue(eventCrf.getRemoved())
-                 || BooleanUtils.isTrue(eventCrf.getArchived())
+                 || eventCrf.isCurrentlyRemoved()
+                 || eventCrf.isCurrentlyArchived()
                 ) {
 
 

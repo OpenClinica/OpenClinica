@@ -16,7 +16,6 @@ import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -336,7 +335,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     private void updateEventSubjectStatusIfSigned(SubmissionContainer container) {
         StudyEvent studyEvent = container.getEventCrf().getStudyEvent();
-        if (BooleanUtils.isTrue(studyEvent.getSigned())) {
+        if (studyEvent.isCurrentlySigned()) {
             String eventOldworkflowStatus = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString();
             AuditLogEvent eventAuditLogEvent = new AuditLogEvent();
             eventAuditLogEvent.setAuditTable(STUDYEVENT);

@@ -95,5 +95,13 @@
         </sql>
     </changeSet>
 
+    <changeSet author="htaycher " id="2020-03-18-12403-02">
+        <sql splitStatements="false">
+            CREATE TRIGGER study_event_insert
+            AFTER INSERT ON study_event
+            FOR EACH ROW
+            EXECUTE PROCEDURE study_event_trigger_new();
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>

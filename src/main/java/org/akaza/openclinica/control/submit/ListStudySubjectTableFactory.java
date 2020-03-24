@@ -1391,7 +1391,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
                     eventDiv.tdEnd().trEnd(0);
                 }
-            } else if (currentEvent.getLocked()!=null && currentEvent.getLocked()) {
+            } else if ( currentEvent.isLocked()) {
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
@@ -1551,7 +1551,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 }
             }
 
-            else if (studyEvents.size()>0 &&  BooleanUtils.isTrue(studyEvents.get(0).getLocked())) {
+            else if (studyEvents.size()>0 &&  studyEvents.get(0).isLocked()) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();
