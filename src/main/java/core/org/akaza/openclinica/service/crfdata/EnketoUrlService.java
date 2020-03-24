@@ -20,7 +20,6 @@ import core.org.akaza.openclinica.core.form.xform.QueryBean;
 import core.org.akaza.openclinica.core.form.xform.QueryType;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
-import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
@@ -29,7 +28,6 @@ import core.org.akaza.openclinica.service.crfdata.xform.*;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -469,13 +467,13 @@ public class EnketoUrlService {
 
         String instance = wtr.toString();
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrf.getStudyEvent().getStudyEventId());
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)) {
+        if (studyEvent.isCurrentlySigned()) {
             AuditLogEvent auditLogEvent = new AuditLogEvent();
             auditLogEvent.setAuditTable(STUDYEVENT);
             auditLogEvent.setEntityId(studyEvent.getStudyEventId());
-            auditLogEvent.setEntityName("Status");
+            auditLogEvent.setEntityName("Signed");
             auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-            auditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowStatusEnum.SIGNED));
+            auditLogEvent.setNewValue(studyEvent.getSigned().toString());
 
             List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
             for (AuditLogEvent audit : ales) {

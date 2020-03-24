@@ -24,7 +24,6 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import core.org.akaza.openclinica.domain.EventCRFStatus;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -215,10 +214,22 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             xml.append("\" OpenClinica:EndDate=\"" + StringEscapeUtils.escapeXml(endDate));
                         }
 
+                        if (BooleanUtils.isTrue(se.getRemoved()))
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("removed"));
+                        else if (BooleanUtils.isTrue(se.getArchived()))
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("auto-removed"));
+                        else if (BooleanUtils.isTrue(se.getLocked()))
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("locked"));
+                        else if (BooleanUtils.isTrue(se.getSigned()))
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("signed"));
+                        else if (se.getWorkflowStatus() != null)
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(se.getWorkflowStatus().getDisplayValue()));
+
+
                         if(se.getWorkflowStatus()!=null) {
                             StudyEventWorkflowStatusEnum workflow = se.getWorkflowStatus();
                             if (!StringUtils.isEmpty(workflow)) {
-                                xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
+                                xml.append("\" OpenClinica:WorkflowStatus=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
                             }
                         }
 
@@ -240,7 +251,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 xml.append("\" OpenClinica:Locked=\"" + StringEscapeUtils.escapeXml((locked ? "Yes" : "No")));
                             }
                         }
-
+                        if(se.getSigned()!=null) {
+                            boolean signed = se.getSigned();
+                            if (!StringUtils.isEmpty(signed)) {
+                                xml.append("\" OpenClinica:Signed=\"" + StringEscapeUtils.escapeXml((signed ? "Yes" : "No")));
+                            }
+                        }
                         if (se.getAgeAtEvent() != null) {
                             xml.append("\" OpenClinica:SubjectAgeAtEvent=\"" + se.getAgeAtEvent());
                         }
@@ -261,8 +277,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     && se.getExportFormData().get(0).getEventDefinitionCrf().getStatusId() != Status.DELETED.getCode()) {
 
                                 // ***************** OpenClinica:Link REMOVE EVENT **************
-                                if (BooleanUtils.isNotTrue(studyEvent.getRemoved())
-                                &&  BooleanUtils.isNotTrue(studyEvent.getArchived())) {
+                                if (!studyEvent.isCurrentlyRemoved()
+                                &&  !studyEvent.isCurrentlyArchived()) {
                                     if (!role.equals(Role.MONITOR) && studySubject.getStatus().equals(Status.AVAILABLE)
                                             && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                         String removeUrl = "/RemoveStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
@@ -307,8 +323,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                                 // ***************** OpenClinica:Link LOCK EVENT **************
 
-                                if (BooleanUtils.isNotTrue(studyEvent.getRemoved())
-                                        && BooleanUtils.isNotTrue(studyEvent.getArchived())
+                                if (!studyEvent.isCurrentlyRemoved()
+                                        && !studyEvent.isCurrentlyArchived()
                                         && studySubject.getStatus().equals(Status.AVAILABLE)
                                         && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                     if ((!studyEvent.getStudyEventDefinition().getType().equals(COMMON) && !role.equals(Role.MONITOR))
@@ -372,10 +388,18 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     xml.append("\" OpenClinica:UpdatedBy=\"" + StringEscapeUtils.escapeXml(updatedBy));
                                 }
 
+                                if (BooleanUtils.isTrue(form.getRemoved()))
+                                    xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("removed"));
+                                else if (BooleanUtils.isTrue(form.getArchived()))
+                                    xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("auto-removed"));
+                                else if (form.getWorkflowStatus() != null)
+                                    xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(form.getWorkflowStatus().getDisplayValue()));
+
+
                                 if(form.getWorkflowStatus()!=null) {
                                     EventCrfWorkflowStatusEnum workflow = form.getWorkflowStatus();
                                     if (!StringUtils.isEmpty(workflow)) {
-                                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
+                                        xml.append("\" OpenClinica:WorkflowStatus=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
                                     }
                                 }
 
@@ -423,11 +447,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                                     if (!formLayout.getStatus().equals(Status.LOCKED)
                                             && !role.equals(Role.MONITOR)
-                                            && (BooleanUtils.isNotTrue(eventCrf.getRemoved()))
-                                            && (BooleanUtils.isNotTrue(eventCrf.getArchived()))
+                                            && !eventCrf.isCurrentlyRemoved()
+                                            && !eventCrf.isCurrentlyArchived()
                                             && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
-                                            && (BooleanUtils.isNotTrue(studyEvent.getRemoved()))
-                                            && (BooleanUtils.isNotTrue(studyEvent.getArchived()))
+                                            && !studyEvent.isCurrentlyRemoved()
+                                            && !studyEvent.isCurrentlyArchived()
                                             && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                         xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"edit\" href=\""
                                                 + StringEscapeUtils.escapeXml(formUrl + "&mode=edit") + "\"");
@@ -436,7 +460,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     }
                                     // ***************** OpenClinica:Link REMOVE EVENT CRF **************
                                     if (!studyEvent.getStudyEventDefinition().getType().equals(COMMON)) {
-                                        if (BooleanUtils.isNotTrue(eventCrf.getRemoved()) && BooleanUtils.isNotTrue(eventCrf.getArchived())) {
+                                        if (!eventCrf.isCurrentlyRemoved() && !eventCrf.isCurrentlyArchived()) {
                                             if ((!role.equals(Role.MONITOR))
                                                     && studySubject.getStatus().equals(Status.AVAILABLE)
                                                     && studyBean.getStatus().equals(Status.AVAILABLE)) {
@@ -452,8 +476,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                             // ***************** OpenClinica:Link RESTORE EVENT CRF **************
                                             // userRole.manageStudy &&
                                             if ((!role.equals(Role.MONITOR) )
-                                                    && BooleanUtils.isNotTrue(studyEvent.getRemoved()) && BooleanUtils.isNotTrue(studyEvent.getArchived())
-                                                    && BooleanUtils.isNotTrue(eventCrf.getRemoved()) && BooleanUtils.isNotTrue(studyEvent.getArchived())
+                                                    && !studyEvent.isCurrentlyRemoved() && !studyEvent.isCurrentlyArchived()
+                                                    && !eventCrf.isCurrentlyRemoved() && !eventCrf.isCurrentlyArchived()
                                                     && studySubject.getStatus().equals(Status.AVAILABLE)
                                                     && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                                 String restoreUrl = "/RestoreEventCRF?action=confirm&id=" + eventCrf.getEventCrfId() + "&studySubId="
@@ -481,7 +505,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
                                             && (versions.size() > 1 || otherVersionAvailable)
                                             && studyBean.getStatus().equals(Status.AVAILABLE)
-                                            && !(studyEvent.getLocked() || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)) ) {
+                                            && !(studyEvent.isCurrentlyLocked() || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)) ) {
 
                                         String reassignUrl = "/pages/managestudy/chooseCRFVersion?crfId=" + formLayout.getCrf().getCrfId() + "&crfName="
                                                 + formLayout.getCrf().getName() + "&formLayoutId=" + formLayout.getFormLayoutId() + "&formLayoutName="

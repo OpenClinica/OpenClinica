@@ -24,6 +24,7 @@ import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -150,7 +151,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
-        imageIconPaths.put(StudyEventWorkflowStatusEnum.SIGNED.toString(), "icon icon-icon-sign");
     }
 
     @Override
@@ -1391,7 +1391,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
                     eventDiv.tdEnd().trEnd(0);
                 }
-            } else if (currentEvent.getLocked()!=null && currentEvent.getLocked()) {
+            } else if ( currentEvent.isLocked()) {
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
@@ -1551,7 +1551,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 }
             }
 
-            else if (studyEvents.get(0).getLocked() !=null && studyEvents.get(0).getLocked() ) {
+            else if (studyEvents.size()>0 &&  studyEvents.get(0).isLocked()) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();

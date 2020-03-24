@@ -190,7 +190,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                         boolean validStatus = true;
                         FormLayoutBean formLayout = null;
                         if (eventCRF != null) {
-                            if (BooleanUtils.isTrue(eventCRF.getRemoved()) || BooleanUtils.isTrue(eventCRF.getArchived()))
+                            if (eventCRF.isRemoved() || eventCRF.isArchived())
                                 validStatus = false;
                             if (itemDataDAO.findAllByEventCRFId(eventCRF.getId()).size() > 0)
                                 itemDataExists = true;

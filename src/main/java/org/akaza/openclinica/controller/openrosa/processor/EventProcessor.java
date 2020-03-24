@@ -29,7 +29,6 @@ import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,8 +151,8 @@ public class EventProcessor implements Processor {
                 container.setStudyEvent(createStudyEvent(studySubject, studyEventDefinition, ordinal, container.getUser()));
                 container.setEventCrf(createEventCrf(formLayout, container.getStudyEvent(), container.getSubject(), container.getUser()));
                 break;
-            } else if ( BooleanUtils.isTrue(existingStudyEvent.getRemoved())
-                     || BooleanUtils.isTrue(existingStudyEvent.getArchived())
+            } else if ( existingStudyEvent.isCurrentlyRemoved()
+                     || existingStudyEvent.isCurrentlyArchived()
                     || (!existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
                             && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
                             && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))) {
@@ -206,6 +205,7 @@ public class EventProcessor implements Processor {
         studyEvent.setSampleOrdinal(ordinal);
         studyEvent.setUserAccount(user);
         studyEvent.setDateStart(currentDate);
+        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
@@ -230,6 +230,7 @@ public class EventProcessor implements Processor {
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
+        eventCrf.setStatusId(Status.AVAILABLE.getCode());
         eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         eventCrf.setCompletionStatus(completionStatusDao.findByCompletionStatusId(1));// setCompletionStatusId(1);
         eventCrf.setStudySubject(studySubject);

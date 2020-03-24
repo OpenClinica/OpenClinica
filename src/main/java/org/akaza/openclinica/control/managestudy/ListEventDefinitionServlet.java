@@ -209,8 +209,8 @@ public class ListEventDefinitionServlet extends SecureController {
         for (int j = 0; j < events.size(); j++) {
             StudyEventBean event = (StudyEventBean) events.get(j);
 
-                if ( BooleanUtils.isTrue(event.getRemoved())
-                    || BooleanUtils.isTrue(event.getArchived())) {
+                if ( event.isRemoved()
+                    || event.isArchived()) {
                 return false;
             }
 
@@ -218,7 +218,7 @@ public class ListEventDefinitionServlet extends SecureController {
 
             for (int k = 0; k < eventCRFs.size(); k++) {
                 EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                if (BooleanUtils.isTrue(eventCRF.getRemoved()) || BooleanUtils.isTrue(eventCRF.getArchived())) {
+                if (eventCRF.isRemoved() || eventCRF.isArchived()) {
                     return false;
                 }
 

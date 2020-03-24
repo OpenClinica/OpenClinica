@@ -23,7 +23,6 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -669,6 +668,7 @@ public class ImportServiceImpl implements ImportService {
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(ordinal);
+        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
@@ -1042,8 +1042,8 @@ public class ImportServiceImpl implements ImportService {
 
         if (studyEvent != null && (
                 // OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet
-                                BooleanUtils.isTrue(studyEvent.getRemoved()) ||
-                                BooleanUtils.isTrue(studyEvent.getArchived()) ||
+                                studyEvent.isCurrentlyRemoved() ||
+                                studyEvent.isCurrentlyArchived() ||
                         studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)  ||
                         studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED) )) {
 
@@ -1065,7 +1065,7 @@ public class ImportServiceImpl implements ImportService {
      * @return
      */
     private boolean isStudyEventSigned(StudyEvent studyEvent) {
-        return studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED);
+        return studyEvent.isCurrentlySigned();
     }
 
     public ErrorObj validateStartAndEndDateAndOrder(StudyEventDataBean studyEventDataBean) {

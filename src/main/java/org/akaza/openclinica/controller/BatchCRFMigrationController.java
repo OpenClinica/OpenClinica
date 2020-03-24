@@ -353,7 +353,7 @@ public class BatchCRFMigrationController implements Runnable {
         studyEvent.setUpdateId(helperObject.getUserAccountBean().getId());
         studyEvent.setDateUpdated(new Date());
 
-        status_before_update = auditDao().findLastStatus("study_event", studyEvent.getStudyEventId(), StudyEventWorkflowStatusEnum.SIGNED.toString());
+        status_before_update = auditDao().findLastStatus("study_event", studyEvent.getStudyEventId(), studyEvent.getSigned().toString());
         if (status_before_update != null && status_before_update.length() == 1) {
             studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.valueOf(status_before_update));
         }

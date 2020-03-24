@@ -12,6 +12,7 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.apache.commons.lang3.BooleanUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -443,4 +444,13 @@ public class EventCrf extends DataMapDomainObject {
     public void setArchived(Boolean archived) {
         this.archived = archived;
     }
-}
+
+    @Transient
+    public boolean isCurrentlyRemoved() {
+        return BooleanUtils.isTrue(this.getRemoved());
+    }
+    @Transient
+    public boolean isCurrentlyArchived() {
+        return BooleanUtils.isTrue(this.getArchived());
+    }
+  }

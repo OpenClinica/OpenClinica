@@ -426,8 +426,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                 oldValue = StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
                             else if (oldValue.equals("7"))
                                 oldValue = "locked";
-                            else if (oldValue.equals("8") || oldValue.equals(StudyEventWorkflowStatusEnum.SIGNED))
-                                oldValue = StudyEventWorkflowStatusEnum.SIGNED.getDisplayValue();
+                            else if (oldValue.equals("8"))
+                                oldValue = "signed";
 
 
                             if (newValue.equals("1") || newValue.equals(StudyEventWorkflowStatusEnum.SCHEDULED))
@@ -444,8 +444,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                 newValue = StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
                             else if (newValue.equals("7"))
                                 newValue = "locked";
-                            else if (newValue.equals("8") || newValue.equals(StudyEventWorkflowStatusEnum.SIGNED))
-                                newValue = StudyEventWorkflowStatusEnum.SIGNED.getDisplayValue();
+                            else if (newValue.equals("8") )
+                                newValue = "signed";
                         }
                                 excelRow = new String[]{studyEvent.getAuditEventTypeName(), dateTimeFormat(studyEvent.getAuditDate()), studyEvent.getUserName(),
                                     entityName + "(" + studyEvent.getOrdinal() + ")", oldValue, newValue, studyEvent.getDetails()};

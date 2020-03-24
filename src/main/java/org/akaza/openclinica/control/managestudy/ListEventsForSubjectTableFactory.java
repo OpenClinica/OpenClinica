@@ -82,7 +82,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
-        imageIconPaths.put(StudyEventWorkflowStatusEnum.SIGNED.toString(), "icon icon-icon-sign");
 
         crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
         crfColumnImageIconPaths.put(1, "icon icon-doc");
@@ -949,7 +948,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
                     eventDiv.tdEnd().trEnd(0);
                 }
-            }  else if (studyEvents.get(0).getLocked() !=null && studyEvents.get(0).getLocked()) {
+            }  else if (studyEvents.get(0).isLocked()) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();

@@ -34,6 +34,7 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
     private Boolean removed;
     private Boolean archived;
     private Boolean locked;
+    private Boolean signed;
 
     public ExportStudyEventDataBean() {
         super();
@@ -134,5 +135,13 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
 
     public void setLocked(Boolean locked) {
         this.locked = locked;
+    }
+
+    public Boolean getSigned() {
+        return signed;
+    }
+
+    public void setSigned(Boolean signed) {
+        this.signed = signed;
     }
 }

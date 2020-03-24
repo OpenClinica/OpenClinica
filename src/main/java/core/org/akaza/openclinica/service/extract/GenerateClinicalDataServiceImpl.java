@@ -292,6 +292,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				expSEBean.setRemoved(se.getRemoved());
 				expSEBean.setArchived(se.getArchived());
 				expSEBean.setLocked(se.getLocked());
+				expSEBean.setSigned(se.getSigned());
 				if (odmFilter.isIncludeAudit())
 					expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(), "study_event", se.getStudyEventDefinition().getOc_oid(), null));
 				if (odmFilter.isIncludeDN())

@@ -478,7 +478,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 isLocked = true;
             } else {
                 // failed to get a lock
-                    if ((seb.getLocked()==null || (seb.getLocked()!=null && !seb.getLocked())) && !lockCRF(ecb))
+                    if ( !seb.isLocked() && !lockCRF(ecb))
                         isLocked = true;
 
             }

@@ -312,7 +312,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // "+displayItemBean.getDbData().getName());
 
                         if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
-                                && BooleanUtils.isNotTrue(eventCrfBean.getRemoved()) && BooleanUtils.isNotTrue(eventCrfBean.getArchived())) {
+                                && !eventCrfBean.isRemoved() && !eventCrfBean.isArchived()) {
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
                         } else {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);

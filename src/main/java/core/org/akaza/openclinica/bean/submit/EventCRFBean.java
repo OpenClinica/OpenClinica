@@ -17,6 +17,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.apache.commons.lang3.BooleanUtils;
 
 /**
  * <P>
@@ -618,5 +619,13 @@ public class EventCRFBean extends AuditableEntityBean {
 
     public void setArchived(Boolean archived) {
         this.archived = archived;
+    }
+
+    public boolean isRemoved() {
+        return BooleanUtils.isTrue(this.getRemoved());
+    }
+
+    public boolean isArchived() {
+        return BooleanUtils.isTrue(this.getArchived());
     }
 }

@@ -90,7 +90,7 @@ public class EventCrfLayerBuilder {
         // Lock Div
         html.div().id("Lock_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount)
                 .style("position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
-        if (BooleanUtils.isTrue(eventCrfBean.getRemoved()) || BooleanUtils.isTrue(eventCrfBean.getArchived())) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived()) {
             lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid_collapse.gif", "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             lockLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete_collapse.gif", "images/CRF_status_icon_Complete.gif");
@@ -129,7 +129,7 @@ public class EventCrfLayerBuilder {
         html.append("Status").append(": ").append(eventCrfStatus.getName()).br();
         html.tdEnd();
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
-        if (BooleanUtils.isTrue(eventCrfBean.getRemoved()) || BooleanUtils.isTrue(eventCrfBean.getArchived())) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived()) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             linkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete.gif");
@@ -183,7 +183,7 @@ public class EventCrfLayerBuilder {
         Study subjectStudy = studyDao.findByPK(studySubject.getStudyId());
 
 
-        if (BooleanUtils.isTrue(eventCrfBean.getRemoved()) || BooleanUtils.isTrue(eventCrfBean.getArchived())) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived()) {
 
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -348,7 +348,7 @@ public class EventCrfLayerBuilder {
     void buildEnd() {
 
         String studySubjectLabel = studySubject.getLabel();
-        if (BooleanUtils.isTrue(eventCrfBean.getRemoved()) || BooleanUtils.isTrue(eventCrfBean.getArchived())) {
+        if (eventCrfBean.isRemoved() || eventCrfBean.isArchived()) {
             iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Invalid_expand.gif", "images/CRF_status_icon_Invalid.gif");
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
             iconLinkBuilder(html, studySubjectLabel, rowCount, crf, "images/CRF_status_icon_Complete_expand.gif", "images/CRF_status_icon_Complete.gif");

@@ -17,6 +17,7 @@ import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.ocobserver.Listener;
 import core.org.akaza.openclinica.ocobserver.Observer;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang3.BooleanUtils;
 
 /**
  * @author jxu
@@ -71,6 +72,7 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
     private Boolean removed;
     private Boolean archived;
     private Boolean locked;
+    private Boolean signed;
 
 
     // BWP: for display discrepancy notes in a matrix-type study/event grid; 5/2/2008
@@ -420,11 +422,32 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
         this.locked = locked;
     }
 
+    public Boolean getSigned() {
+        return signed;
+    }
+
+    public void setSigned(Boolean signed) {
+        this.signed = signed;
+    }
+
     public StudyEventWorkflowStatusEnum getWorkflowStatus() {
         return workflowStatus;
     }
 
     public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
         this.workflowStatus = workflowStatus;
+    }
+
+    public boolean isRemoved() {
+        return BooleanUtils.isTrue(this.getRemoved());
+    }
+    public boolean isLocked() {
+        return BooleanUtils.isTrue(this.getLocked());
+    }
+    public boolean isArchived() {
+        return BooleanUtils.isTrue(this.getArchived());
+    }
+    public boolean isSigned() {
+        return BooleanUtils.isTrue(this.getSigned());
     }
 }

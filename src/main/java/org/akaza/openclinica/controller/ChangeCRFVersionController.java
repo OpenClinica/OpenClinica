@@ -584,10 +584,10 @@ public class ChangeCRFVersionController {
             seb.setUpdatedDate(new Date());
 
             status_before_update = auditDao.findLastStatus("study_event", seb.getId(), "8");
-            status_before_update_new = auditDao.findLastStatus("study_event", seb.getId(),StudyEventWorkflowStatusEnum.SIGNED.toString());
+            status_before_update_new = auditDao.findLastStatus("Signed", seb.getId(),seb.getSigned().toString());
 
             if (status_before_update != null && (status_before_update.length() == 1 || status_before_update_new.length() == 1)) {
-                seb.setWorkflowStatus(StudyEventWorkflowStatusEnum.SIGNED);
+               seb.setSigned(Boolean.TRUE);
             }
             sed.update(seb, con);
 

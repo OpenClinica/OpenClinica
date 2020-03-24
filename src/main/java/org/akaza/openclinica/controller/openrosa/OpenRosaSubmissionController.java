@@ -21,7 +21,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -604,7 +603,7 @@ public class OpenRosaSubmissionController {
         studyEvent.setDateUpdated(new Date());
         int count = getCountOfEventCrfsInEDC(eventCrfs,eventDefinitionCrfs);
 
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED) ) {
+        if (studyEvent.isCurrentlySigned()) {
 
             if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
                 if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
@@ -649,8 +648,8 @@ public class OpenRosaSubmissionController {
         int count=0;
         for (EventCrf evCrf : eventCrfs) {
             if (evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
-                    || BooleanUtils.isTrue(evCrf.getRemoved())
-                    || BooleanUtils.isTrue(evCrf.getArchived())
+                    || evCrf.isCurrentlyRemoved()
+                    || evCrf.isCurrentlyArchived()
                     ){
                 for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
                     if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
