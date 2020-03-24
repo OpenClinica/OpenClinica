@@ -15,7 +15,7 @@
         <comment>Updating the locked and signed column on study_event table</comment>
         <sql>
             UPDATE study_event SET locked='true' , workflow_status='DATA_ENTRY_STARTED' WHERE subject_event_status_id ='7';
-            UPDATE study_event SET signed='true' , workflow_status='DATA_ENTRY_STARTED' WHERE subject_event_status_id ='8';
+            UPDATE study_event SET signed='true' , workflow_status='DATA_ENTRY_STARTED' WHERE workflow_status ='SIGNED';
         </sql>
     </changeSet>
 
