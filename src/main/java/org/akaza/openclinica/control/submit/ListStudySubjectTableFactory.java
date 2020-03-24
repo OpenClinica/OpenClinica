@@ -24,6 +24,7 @@ import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -1550,7 +1551,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 }
             }
 
-            else if (studyEvents.get(0).getLocked() !=null && studyEvents.get(0).getLocked() ) {
+            else if (studyEvents.size()>0 &&  BooleanUtils.isTrue(studyEvents.get(0).getLocked())) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();
