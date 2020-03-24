@@ -669,6 +669,7 @@ public class ImportServiceImpl implements ImportService {
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(ordinal);
+        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
@@ -1065,7 +1066,7 @@ public class ImportServiceImpl implements ImportService {
      * @return
      */
     private boolean isStudyEventSigned(StudyEvent studyEvent) {
-        return studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED);
+        return BooleanUtils.isTrue(studyEvent.getSigned());
     }
 
     public ErrorObj validateStartAndEndDateAndOrder(StudyEventDataBean studyEventDataBean) {

@@ -68,6 +68,7 @@ import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,8 +152,8 @@ public class ImportCRFDataService {
                     // @pgawade 16-March-2011 Do not allow the data import
                     // if event status is one of the - stopped, signed,
                     // locked
-                    if ((studyEventBean.getLocked()!=null && studyEventBean.getLocked())
-                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)
+                    if (BooleanUtils.isTrue(studyEventBean.getLocked())
+                            ||BooleanUtils.isTrue(studyEventBean.getSigned())
                             || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                         return null;
                     }
@@ -538,8 +539,8 @@ public class ImportCRFDataService {
                     // @pgawade 16-March-2011 Do not allow the data import
                     // if event status is one of the - stopped, signed,
                     // locked
-                    if ((studyEventBean.getLocked()!=null && studyEventBean.getLocked())
-                            || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)
+                    if (BooleanUtils.isTrue(studyEventBean.getLocked())
+                            || BooleanUtils.isTrue(studyEventBean.getSigned())
                             || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                     	errors.add("Do not allow the data import, if scheduled event is one of the status - stopped, signed,locked");
                         return errors;
@@ -769,8 +770,8 @@ public class ImportCRFDataService {
                 // @pgawade 16-March-2011 Do not allow the data import
                 // if event status is one of the - stopped, signed,
                 // locked
-                if ((studyEventBean.getLocked()!=null && studyEventBean.getLocked())
-                        || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)
+                if (BooleanUtils.isTrue(studyEventBean.getLocked())
+                 || BooleanUtils.isTrue(studyEventBean.getSigned())
                         || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)) {
                     return true;
                 }

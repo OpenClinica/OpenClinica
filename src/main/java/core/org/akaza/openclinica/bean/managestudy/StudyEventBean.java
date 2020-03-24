@@ -71,6 +71,7 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
     private Boolean removed;
     private Boolean archived;
     private Boolean locked;
+    private Boolean signed;
 
 
     // BWP: for display discrepancy notes in a matrix-type study/event grid; 5/2/2008
@@ -418,6 +419,14 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
 
     public void setLocked(Boolean locked) {
         this.locked = locked;
+    }
+
+    public Boolean getSigned() {
+        return signed;
+    }
+
+    public void setSigned(Boolean signed) {
+        this.signed = signed;
     }
 
     public StudyEventWorkflowStatusEnum getWorkflowStatus() {

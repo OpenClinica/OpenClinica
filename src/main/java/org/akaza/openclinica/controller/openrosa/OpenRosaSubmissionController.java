@@ -604,7 +604,7 @@ public class OpenRosaSubmissionController {
         studyEvent.setDateUpdated(new Date());
         int count = getCountOfEventCrfsInEDC(eventCrfs,eventDefinitionCrfs);
 
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED) ) {
+        if (BooleanUtils.isTrue(studyEvent.getSigned()) ) {
 
             if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
                 if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {

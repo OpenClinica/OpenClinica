@@ -16,6 +16,7 @@ import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -335,14 +336,14 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     private void updateEventSubjectStatusIfSigned(SubmissionContainer container) {
         StudyEvent studyEvent = container.getEventCrf().getStudyEvent();
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED) ) {
+        if (BooleanUtils.isTrue(studyEvent.getSigned())) {
             String eventOldworkflowStatus = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString();
             AuditLogEvent eventAuditLogEvent = new AuditLogEvent();
             eventAuditLogEvent.setAuditTable(STUDYEVENT);
             eventAuditLogEvent.setEntityId(studyEvent.getStudyEventId());
-            eventAuditLogEvent.setEntityName("Status");
+            eventAuditLogEvent.setEntityName("Signed");
             eventAuditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-            eventAuditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowStatusEnum.SIGNED));
+            eventAuditLogEvent.setNewValue(studyEvent.getSigned().toString());
 
             List<AuditLogEvent> eventAles = auditLogEventDao.findByParam(eventAuditLogEvent);
             for (AuditLogEvent audit : eventAles) {
@@ -365,7 +366,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             subjectAuditLogEvent.setEntityId(studySubject.getStudySubjectId());
             subjectAuditLogEvent.setEntityName("Status");
             subjectAuditLogEvent.setAuditLogEventType(new AuditLogEventType(3));
-            subjectAuditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowStatusEnum.SIGNED));
+            subjectAuditLogEvent.setNewValue("signed");
 
             List<AuditLogEvent> subjectAles = auditLogEventDao.findByParam(subjectAuditLogEvent);
             for (AuditLogEvent audit : subjectAles) {

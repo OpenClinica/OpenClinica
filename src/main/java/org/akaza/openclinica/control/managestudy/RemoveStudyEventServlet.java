@@ -112,6 +112,7 @@ public class RemoveStudyEventServlet extends SecureController {
                 logger.info("submit to remove the event from study");
                 // remove event from study
 
+                event.setStatus(Status.DELETED);
                 event.setRemoved(Boolean.TRUE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());

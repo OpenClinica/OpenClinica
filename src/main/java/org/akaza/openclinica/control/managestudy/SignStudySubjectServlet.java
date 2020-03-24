@@ -186,7 +186,7 @@ public class SignStudySubjectServlet extends SecureController {
                 studyEvent.setUpdater(ub);
                 Date date = new Date();
                 studyEvent.setUpdatedDate(date);
-                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SIGNED);
+                studyEvent.setSigned(Boolean.TRUE);
                 studyEvent.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
                         + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
                 sedao.update(studyEvent);

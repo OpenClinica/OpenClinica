@@ -45,6 +45,7 @@ public class StudyEvent extends DataMapDomainObject  {
 	private Boolean removed;
 	private Boolean archived;
 	private Boolean locked;
+	private Boolean signed;
 
 	public StudyEvent() {
 	}
@@ -304,5 +305,14 @@ public class StudyEvent extends DataMapDomainObject  {
 
 	public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
 		this.workflowStatus = workflowStatus;
+	}
+
+	@Column(name = "signed")
+	public Boolean getSigned() {
+		return signed;
+	}
+
+	public void setSigned(Boolean signed) {
+		this.signed = signed;
 	}
 }

@@ -82,7 +82,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
-        imageIconPaths.put(StudyEventWorkflowStatusEnum.SIGNED.toString(), "icon icon-icon-sign");
 
         crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
         crfColumnImageIconPaths.put(1, "icon icon-doc");

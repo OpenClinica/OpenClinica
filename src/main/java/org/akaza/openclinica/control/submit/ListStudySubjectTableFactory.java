@@ -150,7 +150,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
-        imageIconPaths.put(StudyEventWorkflowStatusEnum.SIGNED.toString(), "icon icon-icon-sign");
     }
 
     @Override

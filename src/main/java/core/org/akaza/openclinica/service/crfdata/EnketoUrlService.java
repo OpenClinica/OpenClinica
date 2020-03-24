@@ -31,6 +31,7 @@ import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.BooleanUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -469,13 +470,13 @@ public class EnketoUrlService {
 
         String instance = wtr.toString();
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrf.getStudyEvent().getStudyEventId());
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)) {
+        if (BooleanUtils.isTrue(studyEvent.getSigned())) {
             AuditLogEvent auditLogEvent = new AuditLogEvent();
             auditLogEvent.setAuditTable(STUDYEVENT);
             auditLogEvent.setEntityId(studyEvent.getStudyEventId());
-            auditLogEvent.setEntityName("Status");
+            auditLogEvent.setEntityName("Signed");
             auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-            auditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowStatusEnum.SIGNED));
+            auditLogEvent.setNewValue(studyEvent.getSigned().toString());
 
             List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
             for (AuditLogEvent audit : ales) {

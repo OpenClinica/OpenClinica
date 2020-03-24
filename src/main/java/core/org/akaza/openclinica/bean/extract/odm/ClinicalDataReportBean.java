@@ -215,10 +215,22 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             xml.append("\" OpenClinica:EndDate=\"" + StringEscapeUtils.escapeXml(endDate));
                         }
 
+                        if (BooleanUtils.isTrue(se.getRemoved()))
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("removed"));
+                        else if (BooleanUtils.isTrue(se.getArchived()))
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("auto-removed"));
+                        else if (BooleanUtils.isTrue(se.getLocked()))
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("locked"));
+                        else if (BooleanUtils.isTrue(se.getSigned()))
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("signed"));
+                        else if (se.getWorkflowStatus() != null)
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(se.getWorkflowStatus().getDisplayValue()));
+
+
                         if(se.getWorkflowStatus()!=null) {
                             StudyEventWorkflowStatusEnum workflow = se.getWorkflowStatus();
                             if (!StringUtils.isEmpty(workflow)) {
-                                xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
+                                xml.append("\" OpenClinica:Workflow_Status=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
                             }
                         }
 
@@ -240,7 +252,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 xml.append("\" OpenClinica:Locked=\"" + StringEscapeUtils.escapeXml((locked ? "Yes" : "No")));
                             }
                         }
-
+                        if(se.getSigned()!=null) {
+                            boolean signed = se.getSigned();
+                            if (!StringUtils.isEmpty(signed)) {
+                                xml.append("\" OpenClinica:Signed=\"" + StringEscapeUtils.escapeXml((signed ? "Yes" : "No")));
+                            }
+                        }
                         if (se.getAgeAtEvent() != null) {
                             xml.append("\" OpenClinica:SubjectAgeAtEvent=\"" + se.getAgeAtEvent());
                         }
@@ -372,10 +389,18 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     xml.append("\" OpenClinica:UpdatedBy=\"" + StringEscapeUtils.escapeXml(updatedBy));
                                 }
 
+                                if (BooleanUtils.isTrue(form.getRemoved()))
+                                    xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("removed"));
+                                else if (BooleanUtils.isTrue(form.getArchived()))
+                                    xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml("auto-removed"));
+                                else if (form.getWorkflowStatus() != null)
+                                    xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(form.getWorkflowStatus().getDisplayValue()));
+
+
                                 if(form.getWorkflowStatus()!=null) {
                                     EventCrfWorkflowStatusEnum workflow = form.getWorkflowStatus();
                                     if (!StringUtils.isEmpty(workflow)) {
-                                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
+                                        xml.append("\" OpenClinica:Workflow_Status=\"" + StringEscapeUtils.escapeXml( workflow.getDisplayValue()));
                                     }
                                 }
 

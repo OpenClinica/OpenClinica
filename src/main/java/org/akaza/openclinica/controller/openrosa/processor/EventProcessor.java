@@ -206,6 +206,7 @@ public class EventProcessor implements Processor {
         studyEvent.setSampleOrdinal(ordinal);
         studyEvent.setUserAccount(user);
         studyEvent.setDateStart(currentDate);
+        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
@@ -230,6 +231,7 @@ public class EventProcessor implements Processor {
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
+        eventCrf.setStatusId(Status.AVAILABLE.getCode());
         eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         eventCrf.setCompletionStatus(completionStatusDao.findByCompletionStatusId(1));// setCompletionStatusId(1);
         eventCrf.setStudySubject(studySubject);

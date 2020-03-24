@@ -92,7 +92,6 @@ public class BeanPropertyService{
 	    	case STOPPED:
 	    		if (runOnStatuses.getStopped()) statusMatch = true;
 	    		break;
-	    	case SIGNED:
 	    	default:
 	    		statusMatch = false;
 	    		break;
