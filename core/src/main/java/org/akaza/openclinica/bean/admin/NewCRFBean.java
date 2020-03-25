@@ -384,12 +384,12 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                     continue;
                 }
                 int parCnt = qo.getSqlParameters().size();
-                
+
                 s = con.prepareStatement(cur_query);
                 for(int i=0;i<parCnt;i++) {
-                	setPreparedStatementParameter(s,i+1,qo.getSqlParameters().get(i));                	
+                	setPreparedStatementParameter(s,i+1,qo.getSqlParameters().get(i));
                 }
-                
+
                // logger.debug(pQuery);
                 s.executeUpdate();
                 s.close();
@@ -413,9 +413,9 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 count = th;
                 s = con.prepareStatement(query);
                 for(int i=0;i < paraCnt;i++) {
-                	setPreparedStatementParameter(s,i+1,qo.getSqlParameters().get(i));                  
+                	setPreparedStatementParameter(s,i+1,qo.getSqlParameters().get(i));
                 }
-                 
+
                 s.executeUpdate();
                 s.close();
                 error.add(query);
