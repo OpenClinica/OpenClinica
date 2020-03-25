@@ -285,7 +285,8 @@ public class ValidateServiceImpl implements ValidateService {
                             String clientId = decodedToken.get("clientId").toString();
                             if (org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
                                     || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)
-                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RULES_ENGINE_CLIENT)){
+                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RULES_ENGINE_CLIENT)
+                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.ODM_SERVICE_CLIENT)){
                                 skipRoleCheck = true;
                             }
 

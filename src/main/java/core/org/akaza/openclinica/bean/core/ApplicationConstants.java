@@ -8,6 +8,8 @@ public class ApplicationConstants {
     public final static String DICOM_USERNAME = "dicom";
     public final static String RULES_ENGINE_CLIENT = "rules-engine";
     public final static String RULES_ENGINE__USERNAME = "rules.engine";
+    public final static String ODM_SERVICE_CLIENT = "odm-service";
+    public final static String ODM_SERVICE_USERNAME = "odm.service";
 
     public static String getDateFormatInItemData() {
         return "yyyy-MM-dd";

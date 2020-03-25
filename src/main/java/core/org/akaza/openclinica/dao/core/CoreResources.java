@@ -974,6 +974,11 @@ public class CoreResources implements InitializingBean {
         return value.concat("/form-service/api");
     }
 
+    public static String getKafkaBrokers() {
+        String value = getField("kafkaBrokers");
+        return value;
+    }
+
     // TODO internationalize
     public static String getExtractField(String key) {
         String value = EXTRACTINFO.getProperty(key);

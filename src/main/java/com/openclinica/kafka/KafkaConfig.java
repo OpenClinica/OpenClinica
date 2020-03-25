@@ -1,5 +1,6 @@
 package com.openclinica.kafka;
 
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -18,7 +19,8 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class KafkaConfig {
-  private static final String KAFKA_BROKER_ADDRESS = "localhost:9092";
+
+  private static final String KAFKA_BROKER_ADDRESS = CoreResources.getKafkaBrokers();
   public static final String FORM_STATUS_CHANGE_TOPIC = "formStatusChange";
   public static final String ITEM_DATA_CHANGE_TOPIC = "itemDataChange";
 
