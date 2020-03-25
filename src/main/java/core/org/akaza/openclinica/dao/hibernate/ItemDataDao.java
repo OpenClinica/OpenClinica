@@ -124,7 +124,7 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
     }
 
     public List<ItemData> findByEventCrfId(Integer eventCrfId) {
-        String query = "from " + getDomainClassName() + " item_data where item_data.eventCrf.eventCrfId = :eventcrfid order by item_data.item.itemId";
+        String query = "from " + getDomainClassName() + " item_data where item_data.eventCrf.eventCrfId = :eventcrfid";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("eventcrfid", eventCrfId);
         return (List<ItemData>) q.list();
