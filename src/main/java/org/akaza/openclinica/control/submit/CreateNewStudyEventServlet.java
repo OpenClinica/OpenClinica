@@ -20,7 +20,6 @@ import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -41,6 +40,7 @@ import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -509,7 +509,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setOwner(ub);
                 studyEvent.setStatus(Status.AVAILABLE);
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
-                studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
 
                 studySubject = unsignSignedParticipant(studySubject);
                 studySubject.setUpdater(ub);
@@ -577,7 +577,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 studyEventScheduled.setOwner(ub);
                                 studyEventScheduled.setStatus(Status.AVAILABLE);
                                 studyEventScheduled.setLocation(fp.getString(INPUT_SCHEDULED_LOCATION[i]));
-                                studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+                                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
 
                                 // subjectsExistingEvents =
                                 // sed.findAllByStudyAndStudySubjectId(

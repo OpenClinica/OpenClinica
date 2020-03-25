@@ -4,22 +4,13 @@ package core.org.akaza.openclinica.domain.datamap;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang3.BooleanUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -51,7 +42,12 @@ public class StudyEvent extends DataMapDomainObject  {
 	private List<DnStudyEventMap> dnStudyEventMaps ;
 	private List<EventCrf> eventCrfs ;
 	private Integer sedOrdinal;
-	
+	private StudyEventWorkflowStatusEnum workflowStatus;
+	private Boolean removed;
+	private Boolean archived;
+	private Boolean locked;
+	private Boolean signed;
+
 	public StudyEvent() {
 	}
 
@@ -275,6 +271,66 @@ public class StudyEvent extends DataMapDomainObject  {
 		this.sedOrdinal = sedOrdinal;
 	}
 */
+	@Column(name = "removed")
+	public Boolean getRemoved() {
+		return removed;
+	}
 
+	public void setRemoved(Boolean removed) {
+		this.removed = removed;
+	}
 
+	@Column(name = "archived")
+	public Boolean getArchived() {
+		return archived;
+	}
+
+	public void setArchived(Boolean archived) {
+		this.archived = archived;
+	}
+
+	@Column(name = "locked")
+	public Boolean getLocked() {
+		return locked;
+	}
+
+	public void setLocked(Boolean locked) {
+		this.locked = locked;
+	}
+
+	@Enumerated( EnumType.STRING )
+	@Column(name = "workflow_status")
+	public StudyEventWorkflowStatusEnum getWorkflowStatus() {
+		return workflowStatus;
+	}
+
+	public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
+		this.workflowStatus = workflowStatus;
+	}
+
+	@Column(name = "signed")
+	public Boolean getSigned() {
+		return signed;
+	}
+
+	public void setSigned(Boolean signed) {
+		this.signed = signed;
+	}
+
+	@Transient
+	public boolean isCurrentlyRemoved() {
+		return BooleanUtils.isTrue(this.getRemoved());
+	}
+	@Transient
+	public boolean isCurrentlyLocked() {
+		return BooleanUtils.isTrue(this.getLocked());
+	}
+	@Transient
+	public boolean isCurrentlyArchived() {
+		return BooleanUtils.isTrue(this.getArchived());
+	}
+	@Transient
+	public boolean isCurrentlySigned() {
+		return BooleanUtils.isTrue(this.getSigned());
+	}
 }

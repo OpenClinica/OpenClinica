@@ -385,8 +385,8 @@ public class ExpressionService {
                     String oid = expression.substring(0, expression.indexOf(this.STATUS));
                     studyEvent = getStudyEventFromOID(oid);
                     if (studyEvent != null) {
-                        logger.debug("Status: " + SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId()));
-                        return SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId());
+                        logger.debug("Status: " + studyEvent.getWorkflowStatus());
+                        return studyEvent.getWorkflowStatus().toString();
                     } else
                         return "";
                 }

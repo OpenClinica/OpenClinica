@@ -132,43 +132,26 @@ public class RemoveStudySubjectServlet extends SecureController {
                     createDiscrepancyNoteBean(description, detailedNotes, parentDiscrepancyNote.getItemId(), study, ub, parentDiscrepancyNote);
                 }
 
-                // remove all study events
-                // remove all event crfs
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
                 for (int j = 0; j < displayEvents.size(); j++) {
                     DisplayStudyEventBean dispEvent = displayEvents.get(j);
                     StudyEventBean event = dispEvent.getStudyEvent();
-                    if (!event.getStatus().equals(Status.DELETED)) {
-                        event.setStatus(Status.AUTO_DELETED);
-                        event.setUpdater(ub);
-                        event.setUpdatedDate(new Date());
-                        sedao.update(event);
 
                         ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
                         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
                         for (int k = 0; k < eventCRFs.size(); k++) {
                             EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                            if (!eventCRF.getStatus().equals(Status.DELETED)) {
-                                eventCRF.setStatus(Status.AUTO_DELETED);
-                                eventCRF.setUpdater(ub);
-                                eventCRF.setUpdatedDate(new Date());
-                                ecdao.update(eventCRF);
-                                // remove all the item data
                                 ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
                                 for (int a = 0; a < itemDatas.size(); a++) {
                                     ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-                                    if (!item.getStatus().equals(Status.DELETED)) {
-                                        item.setStatus(Status.AUTO_DELETED);
-                                        item.setUpdater(ub);
-                                        item.setUpdatedDate(new Date());
-                                        iddao.update(item);
-                                    }
+
+
                                 }
-                            }
+
                         }
-                    }
+
                 }
 
                 String emailBody =

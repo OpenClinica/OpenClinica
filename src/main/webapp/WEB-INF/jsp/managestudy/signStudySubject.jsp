@@ -455,11 +455,7 @@
         <c:set var="rowCount" value="${0}" />
         <c:forEach var="dse" items="${displayStudyEvents}">
         <c:forEach var="dedc" items="${dse.uncompletedCRFs}">
-            <c:choose>
-            <c:when test="${dedc.status.name=='locked'}">
-            &nbsp;
-            </c:when>
-            <c:otherwise>
+
             <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}" />
                 <tr valign="top">
                             <c:set var="repeat" value="${dse.studyEvent.studyEventDefinition.name}(${dse.studyEvent.sampleOrdinal})" />
@@ -542,14 +538,13 @@
 
                     <c:choose>
 
-                    <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
-                    <%--<c:when test="${dedc.status.name=='locked'}">--%>
+                    <c:when test="${studyEvent.locked == true}">
                         <td class="table_cell" bgcolor="#F5F5F5" align="center">
                         <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
                         </td>
                     </c:when>
 
-                    <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+                    <c:when test="${studySubject.status.available }">
                         <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
                     </c:when>
 
@@ -568,12 +563,12 @@
                  <tr>
                  <c:choose>
 
-                    <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
+                    <c:when test="${studyEvent.locked == true}">
 
                         &nbsp;
                     </c:when>
 
-                    <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+                    <c:when test="${studySubject.status.available}">
                             <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${dse.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                             onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                             onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
@@ -594,8 +589,7 @@
                </tr>
 
                 <c:set var="rowCount" value="${rowCount + 1}" />
-                </c:otherwise>
-            </c:choose>
+
 
         </c:forEach>
         <%-- end of for each for dedc, uncompleted event crfs --%>
@@ -613,26 +607,12 @@
                 <td class="table_cell" bgcolor="#F5F5F5" align="center">
 
                   <c:choose>
-                   <c:when test="${dec.stage.initialDE}">
-                     <span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
-                   </c:when>
-                   <c:when test="${dec.stage.initialDE_Complete}">
-                     <span class="icon icon-ok" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
-                   </c:when>
-                   <c:when test="${dec.stage.doubleDE}">
-                     <span class="icon icon-icon-doubleDataEntry orange" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
-                   </c:when>
-                   <c:when test="${dec.stage.doubleDE_Complete}">
-                     <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
-                   </c:when>
-
-                   <c:when test="${dec.stage.admin_Editing}">
-                     <span class="icon icon-pencil" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
-                   </c:when>
-
-                   <c:when test="${dec.stage.locked}">
-                     <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
-                   </c:when>
+                 <c:when test="${dec.eventCRF.workflowStatus == 'INITIAL_DATA_ENTRY'}">
+                           <span class=" icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="data_entry_started" bundle="${resword}"/>">
+                  </c:when>
+                  <c:when test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                        <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
+                  </c:when>
 
                    <c:otherwise>
                      <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
@@ -726,7 +706,7 @@
                             <%-- added above 112007, tbh --%>
                         </c:when>
                         <c:otherwise>
-                            <c:if test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+                            <c:if test="${studySubject.status.available}">
                             <a href="<c:out value="${actionQuery}"/>"
                                 onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                                 onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"

@@ -15,7 +15,9 @@ import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import com.openclinica.kafka.KafkaService;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -239,8 +241,8 @@ public class OpenRosaSubmissionController {
             createItemData(items.get(0), "", eventCrf, userAccount);
         }
 
-        if (!eventCrf.getStatusId().equals(core.org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode())) {
-            eventCrf.setStatusId(core.org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode());
+        if (!eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+            eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
             eventCrf.setUserAccount(userAccount);
             eventCrf.setUpdateId(userAccount.getUserId());
             eventCrf.setDateCompleted(new Date());
@@ -554,7 +556,7 @@ public class OpenRosaSubmissionController {
         eventCrf.setInterviewerName("");
         eventCrf.setDateInterviewed(null);
         eventCrf.setUserAccount(user);
-        eventCrf.setStatusId(core.org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
+        eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         eventCrf.setCompletionStatus(completionStatusDao.findByCompletionStatusId(1));// setCompletionStatusId(1);
         eventCrf.setStudySubject(studySubject);
         eventCrf.setStudyEvent(studyEvent);
@@ -607,31 +609,20 @@ public class OpenRosaSubmissionController {
         boolean statusChanged = false;
         studyEvent.setUpdateId(userAccount.getUserId());
         studyEvent.setDateUpdated(new Date());
-        if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SIGNED.getCode()) {
-            int count = 0;
-            for (EventCrf evCrf : eventCrfs) {
-                if (evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
-                        || evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.DELETED.getCode()
-                        || evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
-                    for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
-                        if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
-                            count++;
-                            break;
-                        }
-                    }
-                }
-            }
+        int count = getCountOfEventCrfsInEDC(eventCrfs,eventDefinitionCrfs);
+
+        if (studyEvent.isCurrentlySigned()) {
 
             if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
-                if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.COMPLETED.getCode()) {
-                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
+                    studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
                     statusChanged = true;
                 }
                 studyEvent.setUserAccount(userAccount);
                 persistStudyEvent(studyEvent, statusChanged);
-            } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
-                if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.DATA_ENTRY_STARTED.getCode()) {
-                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+            } else if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) ) {
+                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED) ) {
+                    studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                     statusChanged = true;
                 }
                 studyEvent.setUserAccount(userAccount);
@@ -640,22 +631,43 @@ public class OpenRosaSubmissionController {
         } else {
             boolean allFormsComplete = true;
             for (EventCrf evCrf : eventCrfs) {
-                if (studyEvent.getId() != evCrf.getId() && !evCrf.getStatusId().equals(SubjectEventStatus.COMPLETED.getCode())) {
+                if (!evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                     allFormsComplete = false;
                 }
             }
             if (allFormsComplete) {
-                if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.COMPLETED.getCode()) {
-                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
-                    statusChanged = true;
+                if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
+                    if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+                        studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
+                        statusChanged = true;
+                    }
                 }
             } else {
-                if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.DATA_ENTRY_STARTED.getCode()) {
-                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED) ) {
+                    studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                     statusChanged = true;
                 }
             }
             persistStudyEvent(studyEvent, statusChanged);
         }
     }
+
+    private int getCountOfEventCrfsInEDC(List<EventCrf> eventCrfs ,List <EventDefinitionCrf> eventDefinitionCrfs){
+        int count=0;
+        for (EventCrf evCrf : eventCrfs) {
+            if (evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
+                    || evCrf.isCurrentlyRemoved()
+                    || evCrf.isCurrentlyArchived()
+                    ){
+                for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
+                    if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
 }

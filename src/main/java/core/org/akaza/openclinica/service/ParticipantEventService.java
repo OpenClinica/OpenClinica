@@ -6,7 +6,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -18,7 +17,8 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.BooleanUtils;
 
 public class ParticipantEventService {
 
@@ -39,9 +39,10 @@ public class ParticipantEventService {
         
         for (StudyEventBean studyEvent:studyEvents) {
             // Skip to next event if study event is not in the right status
-            if (studyEvent.getStatus() != Status.AVAILABLE || 
-                    (studyEvent.getSubjectEventStatus() != SubjectEventStatus.DATA_ENTRY_STARTED
-                    && studyEvent.getSubjectEventStatus() != SubjectEventStatus.SCHEDULED)) continue;
+            if (
+                    (studyEvent.isRemoved() || studyEvent.isArchived()) ||
+                    (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
+                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED))) continue;
             
             List<EventDefinitionCRFBean> eventDefCrfs = getEventDefCrfsForStudyEvent(studySubject, studyEvent);
             
@@ -54,7 +55,7 @@ public class ParticipantEventService {
                     boolean eventCrfExists = false;
                     for (FormLayoutBean formLayout:formLayouts) {
                         EventCRFBean eventCRF = getEventCRFDAO().findByEventFormLayout(studyEvent, formLayout);
-                        if (eventCRF != null && eventCRF.getStatus() == Status.AVAILABLE) return studyEvent;
+                        if (!eventCRF.isRemoved()  && !eventCRF.isArchived()) return studyEvent;
                         else if (eventCRF != null) eventCrfExists = true;
                     }
                     if (!eventCrfExists) return studyEvent;

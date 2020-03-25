@@ -9,17 +9,13 @@ package org.akaza.openclinica.control.submit;
 
 // import core.org.akaza.openclinica.bean.core.Role;
 
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import core.org.akaza.openclinica.bean.core.*;
 import core.org.akaza.openclinica.bean.managestudy.*;
-import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import core.org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.config.StudyParamNames;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -28,12 +24,12 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import core.org.akaza.openclinica.dao.managestudy.*;
-import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.controller.helper.TemplateHelper;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -377,7 +373,7 @@ public class AddNewSubjectServlet extends SecureController {
                 se.setStudyEventDefinitionId(studyEventDefinitionId);
                 se.setStatus(Status.AVAILABLE);
                 se.setStudySubjectId(s.getId());
-                se.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+                se.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
 
 
                 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);

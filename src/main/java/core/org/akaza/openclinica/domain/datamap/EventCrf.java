@@ -10,7 +10,9 @@ import javax.persistence.*;
 import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.apache.commons.lang3.BooleanUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -51,7 +53,15 @@ public class EventCrf extends DataMapDomainObject {
     private List<DnEventCrfMap> dnEventCrfMaps;
     private List<ItemData> itemDatas;
     private Date lastSdvVerifiedDate;
+    private EventCrfWorkflowStatusEnum workflowStatus;
+    private Boolean removed;
+    private Boolean archived;
+
+
     static Comparator<EventCrf> compareByOrdinal;
+
+
+
     public EventCrf() {
     }
 
@@ -68,7 +78,7 @@ public class EventCrf extends DataMapDomainObject {
             CrfVersion crfVersion, Integer statusId, Date dateInterviewed, String interviewerName, String annotations, Date dateCompleted, Integer validatorId,
             Date dateValidate, Date dateValidateCompleted, String validatorAnnotations, String validateString, Date dateCreated, Date dateUpdated,
             Integer updateId, Boolean electronicSignatureStatus, SdvStatus sdvStatus, Integer oldStatusId, Integer sdvUpdateId,
-            List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas, FormLayout formLayout, Date lastSdvVerifiedDate) {
+            List<DnEventCrfMap> dnEventCrfMaps, List<ItemData> itemDatas, FormLayout formLayout, Date lastSdvVerifiedDate ) {
         this.eventCrfId = eventCrfId;
         this.userAccount = userAccount;
         this.completionStatus = completionStatus;
@@ -96,6 +106,7 @@ public class EventCrf extends DataMapDomainObject {
         this.itemDatas = itemDatas;
         this.formLayout = formLayout;
         this.lastSdvVerifiedDate = lastSdvVerifiedDate;
+
     }
 
     @Id
@@ -406,4 +417,40 @@ public class EventCrf extends DataMapDomainObject {
 		EventCrf.compareByOrdinal = compareByOrdinal;
 	}
 
-}
+    @Enumerated( EnumType.STRING )
+    @Column(name = "workflow_status")
+    public EventCrfWorkflowStatusEnum getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(EventCrfWorkflowStatusEnum workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
+    @Column(name = "removed")
+    public Boolean getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(Boolean removed) {
+        this.removed = removed;
+    }
+
+    @Column(name = "archived")
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
+    }
+
+    @Transient
+    public boolean isCurrentlyRemoved() {
+        return BooleanUtils.isTrue(this.getRemoved());
+    }
+    @Transient
+    public boolean isCurrentlyArchived() {
+        return BooleanUtils.isTrue(this.getArchived());
+    }
+  }

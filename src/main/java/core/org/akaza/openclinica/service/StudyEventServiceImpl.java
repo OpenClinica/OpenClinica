@@ -36,6 +36,7 @@ import core.org.akaza.openclinica.domain.enumsupport.JobType;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
@@ -282,7 +283,7 @@ public class StudyEventServiceImpl implements StudyEventService {
             studyEvent.setOwner(ub);
             studyEvent.setStatus(Status.AVAILABLE);
             studyEvent.setStudySubjectId(studySubject.getId());
-            studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+            studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
 
             studySubject = unsignSignedParticipant(studySubject);
             studySubject.setUpdater(ub);
@@ -492,7 +493,7 @@ public class StudyEventServiceImpl implements StudyEventService {
             studyEvent.setOwner(ub);
             studyEvent.setStatus(Status.AVAILABLE);
             studyEvent.setStudySubjectId(studySubject.getId());
-            studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+            studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
 
             studySubject = unsignSignedParticipant(studySubject);
             sdao.update(studySubject);
@@ -660,7 +661,6 @@ public class StudyEventServiceImpl implements StudyEventService {
                     if (eventObject instanceof ErrorObj) {
                         return eventObject;
                     } else if (eventObject instanceof StudyEvent) {
-                        SubjectEventStatus subjectEventStatus = SubjectEventStatus.get(((StudyEvent) eventObject).getSubjectEventStatusId());
 
                         studyEventResponseDTO = new StudyEventResponseDTO();
                         studyEventResponseDTO.setSubjectKey(subjectDataBean.getStudySubjectID());
@@ -668,7 +668,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                         studyEventResponseDTO.setStartDate(studyEventDataBean.getStartDate());
                         studyEventResponseDTO.setEndDate(studyEventDataBean.getEndDate());
                         studyEventResponseDTO.setStudyEventRepeatKey(studyEventDataBean.getStudyEventRepeatKey());
-                        studyEventResponseDTO.setEventStatus(subjectEventStatus.getName());
+                        studyEventResponseDTO.setEventStatus(((StudyEvent) eventObject).getWorkflowStatus().toString());
                     }
                 }
             }
