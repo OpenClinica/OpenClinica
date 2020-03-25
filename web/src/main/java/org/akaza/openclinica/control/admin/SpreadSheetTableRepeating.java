@@ -1178,12 +1178,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // notice that still "\\," in options - jxu-08-31-06
                         logger.debug("resValues before change: " + resValues);
                         // 24-Mar-2020 - modified replacement string to ',' instead of '\\,'
-                        String resOptions1 = resOptions.replaceAll("\\\\,", ",");
-                        String resValues1 = resValues.replaceAll("\\\\,", ",");
-                        rsb.setOptions(stripQuotes(resOptions1), stripQuotes(resValues1));
-                        logger.debug("resValues1: " +resValues1);
-                        logger.debug("((ResponseOptionBean)rsb.getOptions().get(0)).getValue(): " + ((ResponseOptionBean)rsb.getOptions().get(0)).getValue());
-                        //  END 24-Mar-2020 comment
+                        String updatedResOptions = resOptions.replaceAll("\\\\,", "\\,");
+                        String updatedResValues = resValues.replaceAll("\\\\,", "\\,");
+                        rsb.setOptions(stripQuotes(updatedResOptions), stripQuotes(updatedResValues));
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
@@ -1364,8 +1361,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                      "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
                                     		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"+ versionIdString + ")";
                         	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(resOptions)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(resValues)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResOptions)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResValues)));
                               sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
                              
                         }

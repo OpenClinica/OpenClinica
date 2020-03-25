@@ -800,6 +800,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
     }
     
     public void setPreparedStatementParameter(PreparedStatement s, int parameterIndex, SqlParameter sp) {
+        logger.debug("===>>>SqlParameter value: " + sp.getValue());
     	JDBCType type = sp.getType();
     	try {	
 	    	if(type == null) {	    	
