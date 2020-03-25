@@ -17,12 +17,7 @@ import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidationCell;
 import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidationType;
@@ -1181,9 +1176,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // put metadata into item
                         ResponseSetBean rsb = new ResponseSetBean();
                         // notice that still "\\," in options - jxu-08-31-06
-                        String resOptions1 = resOptions.replaceAll("\\\\,", "\\,");
-                        String resValues1 = resValues.replaceAll("\\\\,", "\\,");
+                        logger.debug("resValues before change: " + resValues);
+                        // 24-Mar-2020 - modified replacement string to ',' instead of '\\,'
+                        String resOptions1 = resOptions.replaceAll("\\\\,", ",");
+                        String resValues1 = resValues.replaceAll("\\\\,", ",");
                         rsb.setOptions(stripQuotes(resOptions1), stripQuotes(resValues1));
+                        logger.debug("resValues1: " +resValues1);
+                        logger.debug("((ResponseOptionBean)rsb.getOptions().get(0)).getValue(): " + ((ResponseOptionBean)rsb.getOptions().get(0)).getValue());
+                        //  END 24-Mar-2020 comment
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
@@ -1354,6 +1354,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                              sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
                             
                         } else {
+                            logger.debug("Response Values saved to Postgres: " + resValues);
                             /*sql =
                                 "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, " + "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('"
                                     + stripQuotes(responseLabel) + "', E'" + stripQuotes(resOptions) + "', E'" + stripQuotes(resValues) + "',"
