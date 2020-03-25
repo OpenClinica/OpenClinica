@@ -1508,6 +1508,7 @@ public class SDVUtil {
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_AFTER_VERIFIED)) {
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
                     sdvItemDTO.setItemDataId(itemData.getItemDataId());
+                    sdvItemDTO.setItemId(itemData.getItem().getItemId());
                     sdvItemDTO.setName(itemData.getItem().getName());
                     sdvItemDTO.setDescription(itemData.getItem().getDescription());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
