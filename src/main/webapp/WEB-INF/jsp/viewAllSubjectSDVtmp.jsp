@@ -472,7 +472,7 @@
                     $('#itemsdv').parents().css({
                         left: marginX
                     });
-                }, 100);
+                }, 1);
             });
         }
 
