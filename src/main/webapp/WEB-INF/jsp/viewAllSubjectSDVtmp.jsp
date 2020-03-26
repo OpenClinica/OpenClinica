@@ -222,6 +222,14 @@
         src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
 
 <style>
+    #participantId {
+        width: 400px;
+    }
+
+    #eventName {
+        width: 200px;
+    }
+
     #itemsdv {
         position: relative;
     }
@@ -241,7 +249,7 @@
 
     #sdv-items_wrapper {
         margin: 0 10px 10px;
-        max-height: 500px;
+        max-height: 480px;
         overflow-y: auto;
     }
 
@@ -255,11 +263,13 @@
         font-weight: normal;
         text-align: left;
         padding: 5px;
+        width: 150px;
     }
 
     #sdv-details td {
-        width: 150px;
-        border: 1px solid gray;
+        font-weight: normal;
+        text-align: left;
+        border: none;
         font-weight: bold;
     }
 
@@ -311,16 +321,20 @@
             <td id="participantId"></td>
             <th>Event Name:</th>
             <td id="eventName"></td>
-            <th>Form Name:</th>
-            <td id="formName"></td>
-            <th>SDV Requirement:</th>
-            <td id="sdvRequirement"></td>
         </tr>
         <tr>
             <th>Site Name:</th>
             <td id="siteName"></td>
             <th>Event Start Date:</th>
             <td id="eventStartDate"></td>
+        </tr>
+        <tr>
+            <th>Form Name:</th>
+            <td id="formName"></td>
+            <th>SDV Requirement:</th>
+            <td id="sdvRequirement"></td>
+        </tr>
+        <tr>
             <th>Form Status:</th>
             <td id="formStatus"></td>
             <th>SDV Status:</th>
@@ -451,6 +465,14 @@
                     return item;
                 }));
                 itemsTable.draw();
+                
+                setTimeout(function() {
+                    var deltaWidth = $(document).width() - $('#itemsdv').width();
+                    var marginX = (deltaWidth / 2) + 'px';
+                    $('#itemsdv').parents().css({
+                        left: marginX
+                    });
+                }, 100);
             });
         }
 
@@ -476,7 +498,7 @@
         jQuery.blockUI({
             message: jQuery('#itemsdv'), css: {
                 cursor: 'default',
-                top: '50px',
+                top: '40px',
                 left: marginX
             }
         });
