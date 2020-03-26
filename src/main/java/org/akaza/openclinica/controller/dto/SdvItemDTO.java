@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class SdvItemDTO {
     private int itemDataId;
+    private int itemId;
     private String name;
     private String description;
     private String briefDescription;
@@ -24,6 +25,14 @@ public class SdvItemDTO {
 
     public void setItemDataId(int itemDataId) {
         this.itemDataId = itemDataId;
+    }
+
+    public int getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
     }
 
     public String getName() {

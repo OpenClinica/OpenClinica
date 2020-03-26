@@ -42,7 +42,8 @@ public class ParticipantEventService {
             if (
                     (studyEvent.isRemoved() || studyEvent.isArchived()) ||
                     (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
-                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED))) continue;
+                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)))
+                continue;
             
             List<EventDefinitionCRFBean> eventDefCrfs = getEventDefCrfsForStudyEvent(studySubject, studyEvent);
             
@@ -55,8 +56,10 @@ public class ParticipantEventService {
                     boolean eventCrfExists = false;
                     for (FormLayoutBean formLayout:formLayouts) {
                         EventCRFBean eventCRF = getEventCRFDAO().findByEventFormLayout(studyEvent, formLayout);
-                        if (!eventCRF.isRemoved()  && !eventCRF.isArchived()) return studyEvent;
-                        else if (eventCRF != null) eventCrfExists = true;
+                        if (eventCRF!=null && !eventCRF.isRemoved()  && !eventCRF.isArchived())
+                            return studyEvent;
+                        else if (eventCRF != null)
+                            eventCrfExists = true;
                     }
                     if (!eventCrfExists) return studyEvent;
                     

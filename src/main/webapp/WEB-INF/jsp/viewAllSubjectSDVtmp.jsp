@@ -422,6 +422,9 @@
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
+                data.sdvItems.sort(function(a, b) {
+                    return a.itemId - b.itemId;
+                });
                 itemsTable.rows.add(data.sdvItems.map(function (item) {
                     item.briefDescriptionItemName = (item.briefDescription || item.description || '') + ' (' + item.name + ')';
                     if (item.repeatingGroup) {
@@ -445,7 +448,6 @@
                         item.itemDataId +
                         '"></a>';
 
-                    console.log(item);
                     return item;
                 }));
                 itemsTable.draw();
