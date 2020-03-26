@@ -54,4 +54,15 @@ public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
         q.setParameter("crfversionid", crfVersionId);
         return (List<ItemGroupMetadata>) q.list();
     }
+
+    public ItemGroupMetadata findByItemId(int itemId){
+        String query = "select distinct do from "+ getDomainClassName() +" do where do.item.itemId =:itemId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("itemId", itemId);
+        List<ItemGroupMetadata> itemGroupMetadataList = q.getResultList();
+        if(itemGroupMetadataList != null && itemGroupMetadataList.size() > 0)
+            return itemGroupMetadataList.get(0);
+        else
+            return null;
+    }
 }

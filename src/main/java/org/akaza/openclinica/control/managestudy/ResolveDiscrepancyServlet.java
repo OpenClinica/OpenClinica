@@ -92,7 +92,9 @@ import core.org.akaza.openclinica.domain.xform.dto.UserControl;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
@@ -121,8 +123,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     private static final String COMMENT = "_comment";
     public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
-    public static final String VIEW_MODE = "view";
-    public static final String EDIT_MODE = "edit";
     public static final String JINI = "jini";
     private static final String VIEW_NOTES = "ViewNotes";
     public static final String FORWARD_SLASH = "/";
@@ -197,191 +197,196 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         // this is for item data
         else if ("itemdata".equalsIgnoreCase(entityType)) {
-            String jini ="false";
-            String jiniEnabled =CoreResources.getField("jini.enabled");
-            if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
-                jini = "true";
-            }
-            ItemDataDAO iddao = new ItemDataDAO(ds);
-            ItemDAO idao = new ItemDAO(ds);
-            ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
-            ItemBean item = (ItemBean) idao.findByPK(idb.getItemId());
-            ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO<>(ds);
+            prepareItemRequest(request, ds, currentStudy, note, module, flavor, loadWarning, isLocked, id, EnketoAPI.EDIT_MODE);
+        }
+        return true;
+    }
 
-            EventCRFDAO ecdao = new EventCRFDAO(ds);
-            EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+    private void prepareItemRequest(HttpServletRequest request, DataSource ds, Study currentStudy, DiscrepancyNoteBean note,
+            String module, String flavor, String loadWarning, boolean isLocked, int id, String enketoMode) throws Exception, IOException {
+        String jini ="false";
+        String jiniEnabled =CoreResources.getField("jini.enabled");
+        if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
+            jini = "true";
+        }
+        ItemDataDAO iddao = new ItemDataDAO(ds);
+        ItemDAO idao = new ItemDAO(ds);
+        ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
+        ItemBean item = (ItemBean) idao.findByPK(idb.getItemId());
+        ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO<>(ds);
 
-            FormLayoutDAO fldao = new FormLayoutDAO(ds);
-            FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(ecb.getFormLayoutId());
-            CRFDAO cdao = new CRFDAO(ds);
-            CRFBean crf = cdao.findByLayoutId(formLayout.getId());
+        EventCRFDAO ecdao = new EventCRFDAO(ds);
+        EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
-            StudyEventDAO sedao = new StudyEventDAO(ds);
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
+        FormLayoutDAO fldao = new FormLayoutDAO(ds);
+        FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(ecb.getFormLayoutId());
+        CRFDAO cdao = new CRFDAO(ds);
+        CRFBean crf = cdao.findByLayoutId(formLayout.getId());
 
-            StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-            StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
+        StudyEventDAO sedao = new StudyEventDAO(ds);
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
 
-            ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
-            ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndFormLayoutId(idb.getItemId(), ecb.getFormLayoutId());
+        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
 
-            ItemGroupMetadataBean igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(idb.getItemId(), ecb.getCRFVersionId());
-            ItemGroupDAO igdao = new ItemGroupDAO<>(ds);
-            ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
-            int repeatOrdinal = idb.getOrdinal();
-            ItemDataBean idata = null;
-            if (igmBean.isRepeatingGroup() && repeatOrdinal > 1) {
-                if (idb.isDeleted()) {
-                    repeatOrdinal = 0;
-                } else {
-                    List<ItemGroupMetadataBean> igms = igmdao.findMetaByGroupAndCrfVersion(igBean.getId(), ecb.getCRFVersionId());
+        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
+        ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndFormLayoutId(idb.getItemId(), ecb.getFormLayoutId());
 
-                    for (int i = 0; i < idb.getOrdinal(); i++) {
-                        for (ItemGroupMetadataBean igm : igms) {
-                            idata = iddao.findByItemIdAndEventCRFIdAndOrdinal(igm.getItemId(), ecb.getId(), i + 1);
-                            if (idata != null && idata.isDeleted()) {
-                                repeatOrdinal--;
-                                break;
-                            }
+        ItemGroupMetadataBean igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(idb.getItemId(), ecb.getCRFVersionId());
+        ItemGroupDAO igdao = new ItemGroupDAO<>(ds);
+        ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
+        int repeatOrdinal = idb.getOrdinal();
+        ItemDataBean idata = null;
+        if (igmBean.isRepeatingGroup() && repeatOrdinal > 1) {
+            if (idb.isDeleted()) {
+                repeatOrdinal = 0;
+            } else {
+                List<ItemGroupMetadataBean> igms = igmdao.findMetaByGroupAndCrfVersion(igBean.getId(), ecb.getCRFVersionId());
+
+                for (int i = 0; i < idb.getOrdinal(); i++) {
+                    for (ItemGroupMetadataBean igm : igms) {
+                        idata = iddao.findByItemIdAndEventCRFIdAndOrdinal(igm.getItemId(), ecb.getId(), i + 1);
+                        if (idata != null && idata.isDeleted()) {
+                            repeatOrdinal--;
+                            break;
                         }
                     }
                 }
             }
-
-            EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
-            XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
-            VersioningMapDao versioningMapDao = (VersioningMapDao) SpringServletAccess.getApplicationContext(context).getBean("versioningMapDao");
-            OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
-
-            StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
-            // Cache the subject context for use during xform submission
-            PFormCache cache = PFormCache.getInstance(context);
-            PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
-            subjectContext.setStudySubjectOid(ssb.getOid());
-            subjectContext.setStudyEventDefinitionId(String.valueOf(seb.getStudyEventDefinitionId()));
-            subjectContext.setOrdinal(String.valueOf(seb.getSampleOrdinal()));
-            subjectContext.setFormLayoutOid(formLayout.getOid());
-            subjectContext.setUserAccountId(String.valueOf(ub.getId()));
-            subjectContext.setItemName(item.getName() + COMMENT);
-
-            if(note.getDiscrepancyNoteTypeId() == QueryType.QUERY.getValue()) {
-                subjectContext.setDiscrepancyNoteThreadUuid(note.getThreadUuid());
-            }
-            subjectContext.setItemRepeatOrdinalAdjusted(repeatOrdinal);
-            subjectContext.setItemRepeatOrdinalOriginal(idb.getOrdinal());
-            subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
-            subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
-            subjectContext.setStudyEventId(String.valueOf(seb.getId()));
-            subjectContext.setFormLoadMode(EDIT_MODE);
-            String contextHash = cache.putSubjectContext(subjectContext);
-            Study parentStudyBean = getParentStudy(currentStudy.getOc_oid(), ds);
-            logger.info("Subject Context info *** {} *** ",subjectContext.toString());
-            List<Bind> binds=null;
-
-            String xformOutput = "";
-            int studyFilePath = parentStudyBean.getFilePath();
-            
-            if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-                // This section is for version migration ,where item does not exist in the current formLayout
-                boolean itemExistInFormLayout = false;
-                request.setAttribute(STUDYSUBJECTID, "");
-                List<VersioningMap> vms = versioningMapDao.findByVersionIdAndItemId(ecb.getCRFVersionId(), item.getId());
-                for (VersioningMap vm : vms) {
-                    if (vm.getFormLayout().getFormLayoutId() == formLayout.getId()) {
-                        itemExistInFormLayout = true;
-                        break;
-                    }
-                }
-               // Get Original formLayout file from data directory
-                if (!itemExistInFormLayout) {
-                	formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());                    
-                }                    
-            }
-
-            do {
-                xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOc_oid(), studyFilePath, crf.getOid(), formLayout.getOid(),QUERY_FLAVOR);
-                studyFilePath--;
-            } while (xformOutput.equals("") && studyFilePath > 0);
-
-            // Unmarshal original form layout form
-            Html html = xformParser.unMarshall(xformOutput);
-            Body body = html.getBody();
-            Head head = html.getHead();
-            Model model = head.getModel();
-
-            binds = model.getBind();
-            List<Instance> instances = model.getInstance();
-
-            if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-               
-                binds = getBindElements(binds, item);
-                Itext itext = model.getItext();
-
-                UserControl itemUserControl = null;
-                UserControl itemCommentUserControl = null;
-
-                List<UserControl> userControls = body.getUsercontrol();
-                List<Group> groups = body.getGroup();
-                List<Repeat> repeats = body.getRepeat();
-
-                if (userControls != null) {
-                    itemUserControl = lookForUserControlInUserControl(userControls, item.getName());
-                    itemCommentUserControl = lookForUserControlInUserControl(userControls, item.getName() + COMMENT);
-                }
-                if (groups != null && itemUserControl == null) {
-                    itemUserControl = lookForUserControlInGroup(groups, item.getName(), null);
-                    itemCommentUserControl = lookForUserControlInGroup(groups, item.getName() + COMMENT, null);
-                }
-                if (repeats != null && itemUserControl == null) {
-                    itemUserControl = lookForUserControlInRepeat(repeats, item.getName(), null);
-                    itemCommentUserControl = lookForUserControlInRepeat(repeats, item.getName() + COMMENT, null);
-                }
-
-                if (itemUserControl != null) {
-                    itemUserControl.setRef("/form/group_layout/" + item.getName());
-                }
-                if (itemCommentUserControl != null) {
-                    itemCommentUserControl.setRef("/form/group_layout/" + item.getName() + COMMENT);
-                }
-                List<UserControl> uControls = new ArrayList<>();
-                uControls.add(itemUserControl);
-                uControls.add(itemCommentUserControl);
-
-                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances, seb, ssb, sed, head.getTitle()));
-                xform = xform.substring(0, xform.indexOf("<meta>")) + "<group_layout>" + "<" + item.getName() + "/><" + item.getName() + COMMENT + " "
-                        + FS_QUERY_ATTRIBUTE + "=\"" + item.getName() + "\"/>" + "</group_layout>" + xform.substring(xform.indexOf("<meta>"));
-
-                String attribute = SINGLE_ITEM_FLAVOR + "[" + idb.getId() + "]";
-                context.setAttribute(attribute, xform);
-            } else {
-                request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
-            }
-            StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
-            Role role = currentRole.getRole();
-
-            boolean formContainsContactData=false;
-            if(openRosaServices.isFormContainsContactData(binds))
-                formContainsContactData=true;
-
-
-            FormUrlObject formUrlObject = null;
-            if (ecb.getId() > 0 ||  (ecb.getId() == 0 && formContainsContactData)) {
-                if (isLocked) {
-                    formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb, role,
-                            EDIT_MODE, loadWarning, true,formContainsContactData,binds,ub);
-                } else
-                    formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb,
-                            role, EDIT_MODE, loadWarning, false,formContainsContactData,binds,ub);
-            } else {
-                String hash = formLayout.getXform();
-                formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOc_oid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
-            }
-            request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
-            request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
-            request.setAttribute(JINI, jini);
         }
-        return true;
+
+        EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
+        XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
+        VersioningMapDao versioningMapDao = (VersioningMapDao) SpringServletAccess.getApplicationContext(context).getBean("versioningMapDao");
+        OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
+
+        StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
+        // Cache the subject context for use during xform submission
+        PFormCache cache = PFormCache.getInstance(context);
+        PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
+        subjectContext.setStudySubjectOid(ssb.getOid());
+        subjectContext.setStudyEventDefinitionId(String.valueOf(seb.getStudyEventDefinitionId()));
+        subjectContext.setOrdinal(String.valueOf(seb.getSampleOrdinal()));
+        subjectContext.setFormLayoutOid(formLayout.getOid());
+        subjectContext.setUserAccountId(String.valueOf(ub.getId()));
+        subjectContext.setItemName(item.getName() + COMMENT);
+
+        if (note != null && note.getDiscrepancyNoteTypeId() == QueryType.QUERY.getValue()) {
+            subjectContext.setDiscrepancyNoteThreadUuid(note.getThreadUuid());
+        }
+        subjectContext.setItemRepeatOrdinalAdjusted(repeatOrdinal);
+        subjectContext.setItemRepeatOrdinalOriginal(idb.getOrdinal());
+        subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
+        subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
+        subjectContext.setStudyEventId(String.valueOf(seb.getId()));
+        subjectContext.setFormLoadMode(enketoMode);
+        String contextHash = cache.putSubjectContext(subjectContext);
+        Study parentStudyBean = getParentStudy(currentStudy.getOc_oid(), ds);
+        logger.info("Subject Context info *** {} *** ",subjectContext.toString());
+        List<Bind> binds=null;
+
+        String xformOutput = "";
+        int studyFilePath = parentStudyBean.getFilePath();
+        
+        if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+            // This section is for version migration ,where item does not exist in the current formLayout
+            boolean itemExistInFormLayout = false;
+            request.setAttribute(STUDYSUBJECTID, "");
+            List<VersioningMap> vms = versioningMapDao.findByVersionIdAndItemId(ecb.getCRFVersionId(), item.getId());
+            for (VersioningMap vm : vms) {
+                if (vm.getFormLayout().getFormLayoutId() == formLayout.getId()) {
+                    itemExistInFormLayout = true;
+                    break;
+                }
+            }
+           // Get Original formLayout file from data directory
+            if (!itemExistInFormLayout) {
+            	formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());                    
+            }                    
+        }
+
+        do {
+            xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOc_oid(), studyFilePath, crf.getOid(), formLayout.getOid(),QUERY_FLAVOR);
+            studyFilePath--;
+        } while (xformOutput.equals("") && studyFilePath > 0);
+
+        // Unmarshal original form layout form
+        Html html = xformParser.unMarshall(xformOutput);
+        Body body = html.getBody();
+        Head head = html.getHead();
+        Model model = head.getModel();
+
+        binds = model.getBind();
+        List<Instance> instances = model.getInstance();
+
+        if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+           
+            binds = getBindElements(binds, item);
+            Itext itext = model.getItext();
+
+            UserControl itemUserControl = null;
+            UserControl itemCommentUserControl = null;
+
+            List<UserControl> userControls = body.getUsercontrol();
+            List<Group> groups = body.getGroup();
+            List<Repeat> repeats = body.getRepeat();
+
+            if (userControls != null) {
+                itemUserControl = lookForUserControlInUserControl(userControls, item.getName());
+                itemCommentUserControl = lookForUserControlInUserControl(userControls, item.getName() + COMMENT);
+            }
+            if (groups != null && itemUserControl == null) {
+                itemUserControl = lookForUserControlInGroup(groups, item.getName(), null);
+                itemCommentUserControl = lookForUserControlInGroup(groups, item.getName() + COMMENT, null);
+            }
+            if (repeats != null && itemUserControl == null) {
+                itemUserControl = lookForUserControlInRepeat(repeats, item.getName(), null);
+                itemCommentUserControl = lookForUserControlInRepeat(repeats, item.getName() + COMMENT, null);
+            }
+
+            if (itemUserControl != null) {
+                itemUserControl.setRef("/form/group_layout/" + item.getName());
+            }
+            if (itemCommentUserControl != null) {
+                itemCommentUserControl.setRef("/form/group_layout/" + item.getName() + COMMENT);
+            }
+            List<UserControl> uControls = new ArrayList<>();
+            uControls.add(itemUserControl);
+            uControls.add(itemCommentUserControl);
+
+            String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances, seb, ssb, sed, head.getTitle()));
+            xform = xform.substring(0, xform.indexOf("<meta>")) + "<group_layout>" + "<" + item.getName() + "/><" + item.getName() + COMMENT + " "
+                    + FS_QUERY_ATTRIBUTE + "=\"" + item.getName() + "\"/>" + "</group_layout>" + xform.substring(xform.indexOf("<meta>"));
+
+            String attribute = SINGLE_ITEM_FLAVOR + "[" + idb.getId() + "]";
+            context.setAttribute(attribute, xform);
+        } else {
+            request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
+        }
+        StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
+        Role role = currentRole.getRole();
+
+        boolean formContainsContactData=false;
+        if(openRosaServices.isFormContainsContactData(binds))
+            formContainsContactData=true;
+
+
+        FormUrlObject formUrlObject = null;
+        if (ecb.getId() > 0 ||  (ecb.getId() == 0 && formContainsContactData)) {
+            if (isLocked) {
+                formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb, role,
+                        enketoMode, loadWarning, true,formContainsContactData,binds,ub);
+            } else
+                formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb,
+                        role, enketoMode, loadWarning, false,formContainsContactData,binds,ub);
+        } else {
+            String hash = formLayout.getXform();
+            formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOc_oid(), flavor, role, enketoMode, hash, loadWarning, isLocked);
+        }
+        request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
+        request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
+        request.setAttribute(JINI, jini);
     }
 
     /*
@@ -394,8 +399,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         FormProcessor fp = new FormProcessor(request);
         int noteId = fp.getInt(INPUT_NOTE_ID);
+        int itemDataId = fp.getInt("itemDataId");
         String flavor = fp.getString(FLAVOR);
         String module = (String) session.getAttribute("module");
+
+        if (itemDataId > 0) {
+            flavor = QUERY_FLAVOR;
+            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, module, flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE);
+            forwardPage(Page.ENKETO_FORM_SERVLET);
+            return;
+        }
 
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
 
@@ -465,16 +478,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 isLocked = true;
             } else {
                 // failed to get a lock
-                if ((seb.getSubjectEventStatus().isLocked() != true)
-                        && !lockCRF(ecb))
-                    isLocked = true;
+                    if ( !seb.isLocked() && !lockCRF(ecb))
+                        isLocked = true;
+
             }
             StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
 
             discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
             discrepancyNoteBean.setItemId(idb.getItemId());
 
-            if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
+            if (ecb.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                 isCompleted = true;
             }
             loadWarning = generateErrorMessage(ecb);

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import core.org.akaza.openclinica.bean.core.Role;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.core.util.EncryptionUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.Status;
@@ -36,7 +35,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -128,7 +126,7 @@ public class EnketoAPI {
             return null;
     }
 
-    public FormUrlObject getFormURL(String subjectContextKey, String crfOID, String studyOid, Role role, Study parentStudy, StudyEvent studyEvent,
+    public FormUrlObject getFormURL(String subjectContextKey, String crfOID, Study site, Role role, Study parentStudy, StudyEvent studyEvent,
                                     String mode, String loadWarning, boolean isFormLocked) throws Exception {
         boolean lockOn = false;
         boolean shouldLock = false;
@@ -148,8 +146,9 @@ public class EnketoAPI {
         // https://jira.openclinica.com/browse/OC-7573 Data Manager views XForms.
         // https://jira.openclinica.com/browse/OC-7574 Study Director views XForms.
         // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
-        if (parentStudy.getStatus().equals(Status.LOCKED)
-                || (studyEvent != null && studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId()))
+        if ((parentStudy.getStatus().equals(Status.LOCKED)
+                || (site != null && site.getStatus().equals(Status.LOCKED)))
+                || studyEvent.isCurrentlyLocked()
                 || parentStudy.getStatus().equals(Status.FROZEN) || mode.equals(VIEW_MODE)) {
             eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
             lockOn = false;
@@ -424,14 +423,17 @@ public class EnketoAPI {
             // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
 
             if (((parentStudy.getStatus().equals(Status.LOCKED))
-                    || (site != null && site.getStatus().equals(Status.LOCKED)))
-                 || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())
-                 || studyEvent.getStatusId().equals(Status.DELETED.getCode())
-                 || studyEvent.getStatusId().equals(Status.AUTO_DELETED.getCode())
+                 || (site != null && site.getStatus().equals(Status.LOCKED)))
+                 || studyEvent.isCurrentlyLocked()
+                 || studyEvent.isCurrentlyRemoved()
+                 || studyEvent.isCurrentlyArchived()
                  || edc.getStatusId().equals(Status.DELETED.getCode())
                  || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
-                 || eventCrf.getStatusId().equals(Status.DELETED.getCode())
-                 || eventCrf.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
+                 || eventCrf.isCurrentlyRemoved()
+                 || eventCrf.isCurrentlyArchived()
+                ) {
+
+
 
                 eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                 markComplete = false;

@@ -53,6 +53,8 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -323,8 +325,8 @@ public class BatchCRFMigrationController implements Runnable {
         StudyEvent studyEvent = helperObject.getStudyEventDao().findById(eventCRFBean.getStudyEventId());
         FormLayout formLayout = helperObject.getFormLayoutDao().findById(helperObject.getTargetCrfVersionBean().getId());
         StudySubject studySubject = helperObject.getStudySubjectDao().findById(eventCRFBean.getStudySubjectId());
-
-        eventCrf.setSdvStatus(false);
+        if(eventCrf.getSdvStatus()== SdvStatus.VERIFIED)
+            eventCrf.setSdvStatus(SdvStatus.CHANGED_AFTER_VERIFIED);
         eventCrf.setDateUpdated(new Date());
         eventCrf.setSdvUpdateId(helperObject.getUserAccountBean().getId());
         eventCrf.setUpdateId(helperObject.getUserAccountBean().getId());
@@ -351,11 +353,9 @@ public class BatchCRFMigrationController implements Runnable {
         studyEvent.setUpdateId(helperObject.getUserAccountBean().getId());
         studyEvent.setDateUpdated(new Date());
 
-        status_before_update = auditDao().findLastStatus("study_event", studyEvent.getStudyEventId(), "8");
+        status_before_update = auditDao().findLastStatus("study_event", studyEvent.getStudyEventId(), studyEvent.getSigned().toString());
         if (status_before_update != null && status_before_update.length() == 1) {
-            int status = Integer.parseInt(status_before_update);
-            eventStatus = SubjectEventStatus.get(status);
-            studyEvent.setSubjectEventStatusId(eventStatus.getId());
+            studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.valueOf(status_before_update));
         }
 
         session.saveOrUpdate(studyEvent);

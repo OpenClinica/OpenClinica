@@ -113,27 +113,13 @@
 <% 
     final Logger logger = LoggerFactory.getLogger(getClass().getName());
     ImportDataHelper importDataHelper = new ImportDataHelper();
-	File [] fileObjects = null;
+	
 	String [] fileNames = null;
 	String fname=null;
 		
-    String fileDir = importDataHelper.getPersonalImportFileDir(request);
-	if(importDataHelper.hasDMrole(request)) {
-    		ArrayList<File> fileList = importDataHelper.getPersonalImportLogFile(request,null);
-			fileObjects = new File[fileList.size()];
-			fileObjects = fileList.toArray(fileObjects);
-	}else{
-	    //System.out.println("\nfileDir=============: " + fileDir);
-		File f = new File(fileDir);
-		
-		fileObjects= f.listFiles();
-	}	
-	
     
-	// debug
-	if(fileObjects.length == 0){
-		logger.info("No any log files can be found in file directory : " + fileDir);
-	}
+    ArrayList<File> fileList = importDataHelper.getPersonalImportLogFile(request,null);		
+	
 	
 	BufferedReader readReport;
 	int i = 0;
@@ -149,14 +135,14 @@
         <%
     }
 
-    for (i=0; i < fileObjects.length; i++)
+    for (File file:fileList)
     {
 
-        if(!fileObjects[i].isDirectory())
+        if(!file.isDirectory())
             {
-            fname = fileObjects[i].getName();
-            int pos = fileObjects[i].getParent().indexOf("import");
-			String path = fileObjects[i].getParent().substring(pos+7);
+            fname = file.getName();
+            int pos = file.getParent().indexOf("import");
+			String path = file.getParent().substring(pos+7);
 			
 			pos = path.lastIndexOf(File.separatorChar);
             String parentNm = pos < 0 || pos == path.length() ? "" : path.substring(pos + 1);
@@ -174,16 +160,16 @@
                             </td>
 
                             <td width=12.5% align="center">
-									<%=fileObjects[i].length()%>
+									<%=file.length()%>
                             </td>
 
                             <td width=12.5%  align="center">
-									<%=new java.util.Date(fileObjects[i].lastModified())%>
+									<%=new java.util.Date(file.lastModified())%>
                             </td>
                             
                             <td width=12.5%  align="center">
 							    <%
-								long passTime = System.currentTimeMillis() - fileObjects[i].lastModified();
+								long passTime = System.currentTimeMillis() - file.lastModified();
                                 
    						        if(passTime >= 5000){
 									

@@ -7,7 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
@@ -16,10 +15,8 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -31,14 +28,13 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.bean.DisplayStudySubjectRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -213,7 +209,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
                 }
                 if (!hasDef) {
                     StudyEventBean blank = new StudyEventBean();
-                    blank.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
+                    blank.setWorkflowStatus(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
                     blank.setStudyEventDefinitionId(sed.getId());
                     // how can we set the following:
 
@@ -288,7 +284,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
         for (DisplayStudySubjectBean subject : displayStudySubs) {
             for (Iterator it = subject.getStudyEvents().iterator(); it.hasNext();) {
                 StudyEventBean event = (StudyEventBean) it.next();
-                if (event.getSubjectEventStatus() != null && event.getSubjectEventStatus().getId() == 3) {
+                if (event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED) ) {
                     // disallow the subject from signing any studies
                     subject.setStudySignable(false);
                     break;
@@ -411,9 +407,9 @@ public abstract class ListStudySubjectServlet extends SecureController {
         // construct info needed on view study event page
         DisplayStudyEventBean de = new DisplayStudyEventBean();
         de.setStudyEvent(event);
-        de.setDisplayEventCRFs(ViewStudySubjectServlet.getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole, event.getSubjectEventStatus(),
+        de.setDisplayEventCRFs(ViewStudySubjectServlet.getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole, event.getWorkflowStatus(),
                 study));
-        ArrayList al = ViewStudySubjectServlet.getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getSubjectEventStatus(), event.getId());
+        ArrayList al = ViewStudySubjectServlet.getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getWorkflowStatus(), event.getId());
         // ViewStudySubjectServlet.populateUncompletedCRFsWithCRFAndVersions(ds,
         // al);
         de.setUncompletedCRFs(al);

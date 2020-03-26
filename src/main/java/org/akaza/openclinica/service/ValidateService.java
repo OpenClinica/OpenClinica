@@ -18,7 +18,6 @@ import java.util.List;
 
 /**
  * @author joekeremian
- *
  */
 public interface ValidateService {
 
@@ -29,7 +28,7 @@ public interface ValidateService {
     boolean isStudyOidValidStudyLevelOid(String studyOid);
 
     boolean isSiteOidValid(String siteOid);
-    
+
     boolean isSiteAvailable(String siteOid);
 
     boolean isSiteOidValidSiteLevelOid(String siteOid);
@@ -54,12 +53,29 @@ public interface ValidateService {
 
     boolean isUserHas_DM_DEP_DS_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOid);
 
-    void validateStudyAndRoles(String studyOid,  UserAccountBean userAccountBean);
-     void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean);
-     void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includePII);
+    boolean isUserHas_DM_MON_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOID);
+
+    void validateStudyAndRoles(String studyOid, UserAccountBean userAccountBean);
+
+    void validateStudyAndRoles(String studyOid, String siteOid, UserAccountBean userAccountBean);
+
+    void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean, boolean includePII);
+
+    void validateStudyAndRolesForExtractParticipantInfo(String studyOid, String siteOid, UserAccountBean userAccountBean, boolean includePII);
+
     boolean hasCRFpermissionTag(EventDefinitionCrf edc, List<String> permissionTags);
 
     ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
 
+    void validateStudyAndRolesForPdfCaseBook(String studyOid, String siteOid, UserAccountBean userAccountBean);
 
-    }
+    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int ordinal);
+
+    boolean isCrfPresent(String formOid);
+
+    boolean isEventPresent(String studyEventOid);
+
+    boolean isEventOidAndParticipantIdAreLinked(String studyEventOid, int studySubjectId, int ordinal);
+
+    boolean isStudySubjectPresent(String studySubjectLabel, Study study);
+}

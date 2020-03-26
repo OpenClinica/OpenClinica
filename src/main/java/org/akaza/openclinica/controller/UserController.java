@@ -215,7 +215,7 @@ public class UserController {
         try {
             pageNumber = validatePageNumber(pNumber);
             pageSize = validatePageSize(pSize);
-             validateService.validateStudyAndRolesForRead(studyOid, siteOid, userAccountBean, incRelatedInfo);
+             validateService.validateStudyAndRolesForExtractParticipantInfo(studyOid, siteOid, userAccountBean, incRelatedInfo);
 
         } catch (OpenClinicaSystemException e) {
             String errorMsg = e.getErrorCode();

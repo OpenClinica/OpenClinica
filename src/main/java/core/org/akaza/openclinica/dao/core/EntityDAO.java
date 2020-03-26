@@ -30,6 +30,7 @@ import core.org.akaza.openclinica.bean.extract.ExtractBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.cache.EhCacheWrapper;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
@@ -631,6 +632,8 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                                     // table study_event
                                     if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
                                         hm.put(column, new Boolean(false));
+                                    }else  if (column.equalsIgnoreCase("removed") || column.equalsIgnoreCase("archived") || column.equalsIgnoreCase("locked") || column.equalsIgnoreCase("signed")) {
+                                            hm.put(column, null);
                                     } else {
                                         hm.put(column, new Boolean(true));
                                     }
@@ -1746,7 +1749,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                 }
 
                 // subject_event_status_id
-                Integer vsubject_event_status_id = Integer.valueOf(rs.getInt("subject_event_status_id"));
+                String vsubject_event_status_id = String.valueOf(rs.getInt("subject_event_status_id"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
@@ -1972,7 +1975,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "   SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname, item.description AS itemdesc,  "
                     + "   item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid,  "
                     + "   event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid " + "   FROM item_data, item, event_crf "
-                    + "   JOIN crf_version  ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id " + ecStatusConstraint + ") "
+                    + "   JOIN crf_version  ON event_crf.crf_version_id = crf_version.crf_version_id "
                     + "   WHERE  " + "   item_data.item_id = item.item_id " + "   AND " + "   item_data.event_crf_id = event_crf.event_crf_id " + "   AND "
                     + "   item_data.item_id IN " + it_in + "   AND item_data.event_crf_id IN  " + "   ( " + "       SELECT event_crf_id FROM event_crf "
                     + "       WHERE  " + "           event_crf.study_event_id IN  " + "           ( "
@@ -1998,7 +2001,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                       study_event.study_event_id = event_crf.study_event_id  "
                     + "                                      AND  "
                     + "                                       study_event.study_subject_id = event_crf.study_subject_id  "
-                    + "                                      AND " + "                                       (event_crf.status_id " + ecStatusConstraint + ") "
                     + "                                      ) " + "                   WHERE "
                     + "                       study_event_definition.study_event_definition_id IN " + sedin + "                  )  " + "           ) "
                     + "           AND study_subject_id IN ( " + "               SELECT DISTINCT study_subject.study_subject_id "
@@ -2017,11 +2019,10 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                  ) " + "                JOIN   event_crf       ON ( "
                     + "                                   study_event.study_event_id = event_crf.study_event_id  " + "                                  AND  "
                     + "                                   study_event.study_subject_id = event_crf.study_subject_id  "
-                    + "                                  AND " + "                                   (event_crf.status_id " + ecStatusConstraint + ") "
                     + "                                  ) " + "               WHERE  "
-                    + "                   study_event_definition.study_event_definition_id IN " + sedin + "           ) " + "           AND "
-                    + "           (event_crf.status_id " + ecStatusConstraint + ") " + "   )  " + "   AND  " + "   (item_data.status_id " + itStatusConstraint
-                    + ")  " + " ) AS SBQONE, study_event, study_event_definition " + " WHERE  " + " (study_event.study_event_id = SBQONE.studyeventid) "
+                    + "                   study_event_definition.study_event_definition_id IN " + sedin + "           ) " + "      "
+                    + "   )  "
+                    + " ) AS SBQONE, study_event, study_event_definition " + " WHERE  " + " (study_event.study_event_id = SBQONE.studyeventid) "
                     + " AND " + " (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) " + " ORDER BY itemdataid asc ";
         }
     }// getSQLDatasetBASE_EVENTSIDE
@@ -2183,10 +2184,10 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + " 									study_event.study_event_id = event_crf.study_event_id  "
                     + " 								   AND  "
                     + " 									study_event.study_subject_id = event_crf.study_subject_id  "
-                    + " 								   AND " + " 									(event_crf.status_id " + ecStatusConstraint + ") "
+                    + " 								   AND " + " 									(event_crf.workflow_status " + ecStatusConstraint + ") "
                     + " 								   ) " + " 				WHERE " + dateConstraint + " 				    AND "
                     + " 					study_event_definition.study_event_definition_id IN " + sedin + " 			) " + " 			AND "
-                    + " 			(event_crf.status_id " + ecStatusConstraint + ") " + " 	)  " + " 	AND  " + " 	(item_data.status_id " + itStatusConstraint
+                    + " 			(event_crf.workflow_status " + ecStatusConstraint + ") " + " 	)  " + " 	AND  " + " 	(item_data.status_id " + itStatusConstraint
                     + ")  " + " ) SBQONE, item_group_metadata, item_group " + " WHERE  "
                     + " (item_group_metadata.item_id = SBQONE.itemid AND item_group_metadata.crf_version_id = SBQONE.crfversionid) " + " AND "
                     + " (item_group.item_group_id = item_group_metadata.item_group_id) " + "  ORDER BY itemdataid asc ";
@@ -2905,22 +2906,19 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         return dateConstraint;
     }
 
+
     public String getECStatusConstraint(int datasetItemStatusId) {
-        String statusConstraint = "";
-        switch (datasetItemStatusId) {
-        default:
-        case 0:
-        case 1:
-            statusConstraint = "in (2,6)";
-            break;
-        case 2:
-            statusConstraint = "not in (2,6,5,7)";
-            break;
-        case 3:
-            statusConstraint = "not in (5,7)";
-            break;
+       String all = " = ec.workflow_status ";
+
+       switch (datasetItemStatusId) {
+            case 1:
+                return " in ('" + EventCrfWorkflowStatusEnum.COMPLETED.toString() + "')";
+            case 2:
+                return " not in ('" + EventCrfWorkflowStatusEnum.COMPLETED.toString() + "')";
+            case 3:
+                return all;
         }
-        return statusConstraint;
+        return all;
     }
 
     public String getItemDataStatusConstraint(int datasetItemStatusId) {

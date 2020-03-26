@@ -7,10 +7,10 @@
  */
 package core.org.akaza.openclinica.web.bean;
 
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 
 import java.util.ArrayList;
 
@@ -111,89 +111,9 @@ public class DisplayStudySubjectRow extends EntityBeanRow {
             break;
         case COL_STUDYEVENT:
             // studyEvent status comparision
-            SubjectEventStatus thisSes = ((StudyEventBean) thisStudy.getStudyEvents().get(sortingColumn - 5 - groupSize)).getSubjectEventStatus();
-            SubjectEventStatus argSes = ((StudyEventBean) argStudy.getStudyEvents().get(sortingColumn - 5 - groupSize)).getSubjectEventStatus();
-            /*Subject event status is ordered in this sequence Not Started=2,Scheduled=1,Data Entry Started=3,
-              Stopped=5,Skipped=6, Completed=4,Locked=7,Signed=8*/
-            switch (thisSes.getId()) {
-                //SubjectEventStatus.SCHEDULED
-                case 1:
-                    if (thisSes.getId() == argSes.getId()) {
-                        answer = 0;
-                    } else if ( argSes.getId() == 2) {
-                        answer = 1;
-                    } else {
-                        answer = -1;
-                    }
-                    break;
-                //SubjectEventStatus.NOT_SCHEDULED
-                case 2:
-                    if (thisSes.getId() == argSes.getId()) {
-                        answer = 0;
-                    } else {
-                        answer = -1;
-                    }
-                    break;
-                //SubjectEventStatus.DATA_ENTRY_STARTED
-                case 3:
-                    if (thisSes.getId() == argSes.getId()) {
-                        answer = 0;
-                    } else if (argSes.getId() == 1 || argSes.getId() == 2) {
-                        answer = 1;
-                    } else {
-                        answer = -1;
-                    }
-                    break;
-                //SubjectEventStatus.COMPLETED
-                case 4:
-                    if (thisSes.getId() == argSes.getId()) {
-                        answer = 0;
-                    } else if (argSes.getId() == 7 || argSes.getId() == 8 ) {
-                        answer = -1;
-                    } else {
-                        answer = 1;
-                    }
-                    break;
-                //SubjectEventStatus.STOPPED
-                case 5:
-                    if (thisSes.getId() == argSes.getId()) {
-                        answer = 0;
-                    } else if (argSes.getId() == 1 || argSes.getId() == 2 || argSes.getId() == 3 ) {
-                        answer = 1;
-                    } else {
-                        answer = -1;
-                    }
-                    break;
-                //SubjectEventStatus.SKIPPED
-                case 6:                    
-                    if (thisSes.getId() == argSes.getId()) {
-                        answer = 0;
-                    } else if (argSes.getId() == 4 || argSes.getId() == 7 || argSes.getId() == 8 ) {
-                        answer = -1;
-                    } else {
-                        answer = 1;
-                    }
-                    break;
-                //SubjectEventStatus.LOCKED
-                case 7:
-                    if (thisSes.getId() == argSes.getId()) {
-                        answer = 0;
-                    } else if (argSes.getId() == 8) {
-                        answer = -1;
-                    } else {
-                        answer = 1;
-                    }
-                    break;
-                //SubjectEventStatus.SIGNED
-                case 8:
-                    if (thisSes.getId() == argSes.getId()) {
-                        answer = 0;
-                    } else {
-                        answer = 1;
-                    }
-                default :
-                    answer = 1;
-            }
+            StudyEventWorkflowStatusEnum thisSes = ((StudyEventBean) thisStudy.getStudyEvents().get(sortingColumn - 5 - groupSize)).getWorkflowStatus();
+            StudyEventWorkflowStatusEnum argSes = ((StudyEventBean) argStudy.getStudyEvents().get(sortingColumn - 5 - groupSize)).getWorkflowStatus();
+
         }
         return answer;
     }

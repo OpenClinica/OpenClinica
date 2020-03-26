@@ -1,8 +1,11 @@
 package core.org.akaza.openclinica.dao.hibernate;
 
+import java.util.Date;
 import java.util.List;
 
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 public class EventCrfDao extends AbstractDomainDao<EventCrf> {
 
@@ -13,9 +16,13 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
 
     public List<EventCrf> findNonArchivedByStudyEventId(int study_event_id) {
         String query = "from " + getDomainClassName()
-                + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid and event_crf.statusId not in (5,7)";
+                + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid " +
+                "and (event_crf.removed = null or event_crf.removed !=:removed) and (event_crf.archived = null or event_crf.archived !=:archived) ";
+
         org.hibernate.query.Query hibernateQuery = getCurrentSession().createQuery(query);
         hibernateQuery.setParameter("studyeventid", study_event_id);
+        hibernateQuery.setParameter("removed", true);
+        hibernateQuery.setParameter("archived", true);
 
         return hibernateQuery.list();
     }
@@ -27,6 +34,16 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
         q.setInteger("studyeventid", study_event_id);
         q.setInteger("studysubjectid", study_subject_id);
         q.setInteger("crfversionid", crf_version_id);
+        return (EventCrf) q.uniqueResult();
+    }
+    public EventCrf findByStudyEventOIdStudySubjectOIdCrfOId(String studyEventOID, String studySubjectLabel, String formOID, int ordinal) {
+        String query = "from " + getDomainClassName()
+                + " event_crf where event_crf.crfVersion.crf.ocOid = :formOID and event_crf.studyEvent.studyEventDefinition.oc_oid = :studyEventOID and event_crf.studySubject.label = :studySubjectLabel and event_crf.studyEvent.sampleOrdinal = :ordinal";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyEventOID", studyEventOID);
+        q.setParameter("studySubjectLabel", studySubjectLabel);
+        q.setParameter("formOID", formOID);
+        q.setParameter("ordinal", ordinal);
         return (EventCrf) q.uniqueResult();
     }
 
@@ -69,4 +86,13 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
         return q.list();
     }
 
+    @Transactional
+    public void updateSdvStatus(SdvStatus sdvStatus, int userId, int eventCRFId){
+        EventCrf eventCrf = findByPK(eventCRFId);
+        eventCrf.setSdvStatus(sdvStatus);
+        eventCrf.setUpdateId(userId);
+        if(sdvStatus.equals(SdvStatus.VERIFIED))
+            eventCrf.setLastSdvVerifiedDate(new Date());
+        getCurrentSession().update(eventCrf);
+    }
 }

@@ -27,6 +27,8 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import io.swagger.annotations.ApiParam;
+import org.akaza.openclinica.controller.dto.SdvDTO;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -35,6 +37,7 @@ import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -48,11 +51,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -191,6 +198,8 @@ public class SDVController {
         StudyInfoPanel panel = new StudyInfoPanel();
         panel.reset();
         request.getSession().setAttribute("panel", panel);
+        request.setAttribute("iconInfoShownSDV", true);
+
 
         ModelMap gridMap = new ModelMap();
         //set up request attributes for sidebar
@@ -349,7 +358,7 @@ public class SDVController {
         }
 
 
-        boolean updateCRFs = sdvUtil.setSDVerified(filteredEventCRFIds, getCurrentUser(request).getId(), true);
+        boolean updateCRFs = sdvUtil.setSDVerified(filteredEventCRFIds, getCurrentUser(request).getId(), SdvStatus.VERIFIED);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
@@ -395,7 +404,7 @@ public class SDVController {
 
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), true);
+        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), SdvStatus.VERIFIED);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
@@ -433,7 +442,7 @@ public class SDVController {
         ArrayList<String> pageMessages = new ArrayList<String>();
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
+        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), SdvStatus.NOT_VERIFIED);
 
         if (updateCRFs) {
             pageMessages.add("The application has unset SDV for the Event CRF.");
@@ -465,7 +474,7 @@ public class SDVController {
 
         List<Integer> studySubjectIds = new ArrayList<Integer>();
         studySubjectIds.add(studySubjectId);
-        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(), true);
+        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(), SdvStatus.VERIFIED);
 
         if (updateCRFs) {
             pageMessages.add("The Subject has been source data verified.");
@@ -489,7 +498,7 @@ public class SDVController {
         List<Integer> studySubjectIds = new ArrayList<Integer>();
 
         studySubjectIds.add(studySubjectId);
-        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(), false);
+        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(), SdvStatus.NOT_VERIFIED);
 
         if (updateCRFs) {
             pageMessages.add("The application has unset SDV for the Event CRF.");
@@ -532,7 +541,7 @@ public class SDVController {
 
         }
         List<Integer> studySubjectIds = sdvUtil.getListOfStudySubjectIds(parameterMap.keySet());
-        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(), true);
+        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, getCurrentUser(request).getId(), SdvStatus.VERIFIED);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");

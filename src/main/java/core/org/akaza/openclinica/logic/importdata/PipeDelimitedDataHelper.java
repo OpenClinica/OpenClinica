@@ -690,7 +690,7 @@ public String readFileToString(File file) throws IOException{
        	 while (reader.ready()) {
        		 currentLine = reader.readLine(); 
        		 
-       		 if(currentLine.indexOf("StudyOID=") > 0) {
+       		 if(currentLine.indexOf("StudyOID=") > -1) {
        			String[] tempArray = currentLine.split("=");
        			
        			studyOID = tempArray[1].trim();

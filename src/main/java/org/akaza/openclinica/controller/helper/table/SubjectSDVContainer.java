@@ -1,5 +1,10 @@
 package org.akaza.openclinica.controller.helper.table;
 
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+
+import java.util.Date;
+
 /**
  * The container or bean representing a row in the sdv table.
  */
@@ -20,20 +25,24 @@ public class SubjectSDVContainer {
     private String personId;
     private String secondaryId;
     private String eventName;
-    private String eventDate;
+    private Date eventDate;
     private String enrollmentDate;
     private String studySubjectStatus;
-    private String crfNameVersion;
+    private String crfName;
+    private String crfVersion;
     //100% Required, Partial Required, 100% and Partial, Not Required
     private String sdvRequirementDefinition;
     private String crfStatus;
-    private String studyEventStatus;
-    private String lastUpdatedDate;
+    private String subjectEventStatus;
+    private Date lastUpdatedDate;
     private String lastUpdatedBy;
     private String sdvStatusActions;
     private String numberOfCRFsSDV;
     private String percentageOfCRFsSDV;
     private String group;
+    private String openQueries;
+    private EventCrfWorkflowStatusEnum crfWorkflowStatus;
+    private StudyEventWorkflowStatusEnum eventWorkflowStatus;
 
     public SubjectSDVContainer() {
         sdvStatus = "";
@@ -42,27 +51,30 @@ public class SubjectSDVContainer {
         personId = "";
         secondaryId = "";
         eventName = "";
-        eventDate = "";
+        eventDate = null;
         enrollmentDate = "";
         studySubjectStatus = "";
-        crfNameVersion = "";
+        crfName = "";
         sdvRequirementDefinition = "";
         crfStatus = "";
-        studyEventStatus = "";
-        lastUpdatedDate = "";
+        subjectEventStatus = "";
+        lastUpdatedDate = null;
         lastUpdatedBy = "";
         sdvStatusActions = "";
         numberOfCRFsSDV = "";
         percentageOfCRFsSDV = "";
         group = "";
+        openQueries = "";
+        crfVersion = "";
+
     }
 
-    public String getStudyEventStatus() {
-        return studyEventStatus;
+    public String getSubjectEventStatus() {
+        return subjectEventStatus;
     }
 
-    public void setStudyEventStatus(String studyEventStatus) {
-        this.studyEventStatus = studyEventStatus;
+    public void setSubjectEventStatus(String subjectEventStatus) {
+        this.subjectEventStatus = subjectEventStatus;
     }
 
     public String getStudyIdentifier() {
@@ -105,12 +117,12 @@ public class SubjectSDVContainer {
         this.group = group;
     }
 
-    public String getCrfNameVersion() {
-        return crfNameVersion;
+    public String getCrfName() {
+        return crfName;
     }
 
-    public void setCrfNameVersion(String crfNameVersion) {
-        this.crfNameVersion = crfNameVersion;
+    public void setCrfName(String crfName) {
+        this.crfName = crfName;
     }
 
     public String getStudySubjectId() {
@@ -145,11 +157,11 @@ public class SubjectSDVContainer {
         this.eventName = eventName;
     }
 
-    public String getEventDate() {
+    public Date getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(String eventDate) {
+    public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
     }
 
@@ -177,11 +189,11 @@ public class SubjectSDVContainer {
         this.crfStatus = crfStatus;
     }
 
-    public String getLastUpdatedDate() {
+    public Date getLastUpdatedDate() {
         return lastUpdatedDate;
     }
 
-    public void setLastUpdatedDate(String lastUpdatedDate) {
+    public void setLastUpdatedDate(Date lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
@@ -199,5 +211,37 @@ public class SubjectSDVContainer {
 
     public void setSdvStatusActions(String sdvStatusActions) {
         this.sdvStatusActions = sdvStatusActions;
+    }
+
+    public String getOpenQueries() {
+        return openQueries;
+    }
+
+    public void setOpenQueries(String openQueries) {
+        this.openQueries = openQueries;
+    }
+
+    public String getCrfVersion() {
+        return crfVersion;
+    }
+
+    public void setCrfVersion(String crfVersion) {
+        this.crfVersion = crfVersion;
+    }
+
+    public EventCrfWorkflowStatusEnum getCrfWorkflowStatus() {
+        return crfWorkflowStatus;
+    }
+
+    public void setCrfWorkflowStatus(EventCrfWorkflowStatusEnum crfWorkflowStatus) {
+        this.crfWorkflowStatus = crfWorkflowStatus;
+    }
+
+    public StudyEventWorkflowStatusEnum getEventWorkflowStatus() {
+        return eventWorkflowStatus;
+    }
+
+    public void setEventWorkflowStatus(StudyEventWorkflowStatusEnum eventWorkflowStatus) {
+        this.eventWorkflowStatus = eventWorkflowStatus;
     }
 }

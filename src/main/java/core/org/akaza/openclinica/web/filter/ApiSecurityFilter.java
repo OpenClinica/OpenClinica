@@ -109,7 +109,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             }
 
                             UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((ocUserUuid));
-                            Study publicStudyBean= (Study) studyDao.findByPK(ub.getActiveStudyId());
+                            Study publicStudyBean= (Study) studyDao.findPublicStudyById(ub.getActiveStudyId());
 
                             if (userType.equals(UserType.SYSTEM.getName())){
                                 String clientId = decodedToken.get("clientId").toString();

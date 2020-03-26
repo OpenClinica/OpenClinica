@@ -3,11 +3,15 @@ package core.org.akaza.openclinica.dao;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
+import core.org.akaza.openclinica.domain.datamap.SubjectEventStatus;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.jmesa.view.html.editor.DroplistFilterEditor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class EventCRFSDVFilter implements CriteriaCommand {
 
@@ -25,9 +29,10 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         columnMapping.put("studySubjectId", "ss.label");
         columnMapping.put("studyIdentifier", "s.unique_identifier");
         columnMapping.put("eventName", "sed.name");
+        columnMapping.put("crfName", "ec.name_id");
         columnMapping.put("sdvRequirementDefinition", "");
-        columnMapping.put("crfStatus", "ec.status_id");
-
+        columnMapping.put("crfStatus", "ec.workflow_status");
+        columnMapping.put("subjectEventStatus","se.workflow_status");
     }
 
     public void addFilter(String property, Object value) {
@@ -46,21 +51,29 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         value = StringEscapeUtils.escapeSql(value.toString());
         if (value != null) {
             if (property.equals("sdvStatus")) {
-                String dbType = CoreResources.getDBName();
-                String theTrue = dbType.equals("postgres") ? " true " : " 1 ";
-                String theFalse = dbType.equals("postgres") ? " false " : " 0 ";
-                if (value.equals("complete")) {
-                    criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = " + theTrue;
-                } else {
-                    criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = " + theFalse;
+                ArrayList<String> sdvStatusFilterArray = new ArrayList<>();
+                String sdvStatusString = value.toString().trim();
+                if(sdvStatusString.contains("+")){
+                    for(String sdvStatus: sdvStatusString.split("\\+")){
+                        sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatus.trim()).toString());
+                    }
                 }
+                else
+                    sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatusString).toString());
+                criteria = criteria + " and (";
+
+                for(int i = 0 ; i < sdvStatusFilterArray.size(); i++){
+                    if(i == 0)
+                        criteria = criteria + " " + columnMapping.get(property) + " = '" + sdvStatusFilterArray.get(i) + "'";
+                    else
+                        criteria = criteria + " or " + columnMapping.get(property) + " = '" + sdvStatusFilterArray.get(i) + "'";
+                }
+                criteria = criteria +" ) ";
             } else if (property.equals("sdvRequirementDefinition")) {
                 ArrayList<Integer> reqs = new ArrayList<Integer>();
                 String sdvRequirement = value.toString().trim();
-                if (sdvRequirement.contains("&")) {
-                    for (String requirement : sdvRequirement.split("&")) {
+                if (sdvRequirement.contains("+")) {
+                    for (String requirement : sdvRequirement.split("\\+")) {
                         reqs.add(SourceDataVerification.getByI18nDescription(requirement.trim()).getCode());
                     }
                 } else {
@@ -80,18 +93,27 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                     criteria += " ) )) ";
                 }
             } else if (property.equals("crfStatus")) {
-                if (value.equals("Completed")) {
                     criteria = criteria + " and ";
                     criteria =
-                        criteria + " ( " + columnMapping.get(property)
-                            + " = 2 and  se.subject_event_status_id != 5 and se.subject_event_status_id != 6 and se.subject_event_status_id != 7 ) ";
-                } else {
-                    criteria = criteria + " and ";
-                    criteria =
-                        criteria + " ( " + columnMapping.get(property)
-                            + " = 6 or ( se.subject_event_status_id = 5 or se.subject_event_status_id = 6 or se.subject_event_status_id = 7 ) )";
-                }
-            } else {
+                        criteria + " ( " + columnMapping.get(property) + " = '"+ EventCrfWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "'  ) ";
+
+            } else if (property.equals("subjectEventStatus")){
+                criteria = criteria + " and " + columnMapping.get(property)+" = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' ";
+
+            }else if(property.equals("openQueries")){
+                String openQueriesQuery ="(select count(*) from discrepancy_note dn " +
+                        " join dn_item_data_map didm on didm.discrepancy_note_id = dn.discrepancy_note_id " +
+                        " join discrepancy_note_type dnt on dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id " +
+                        " join item_data id on didm.item_data_id = id.item_data_id " +
+                        " where dn.parent_dn_id is null and dn.discrepancy_note_type_id= 3 " +
+                        " and (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 ) " +
+                        " and id.event_crf_id = ec.event_crf_id ) ";
+                if(value.toString().equals("Yes"))
+                    criteria = criteria +" and "+openQueriesQuery +" > 0 ";
+                else
+                    criteria = criteria +" and "+openQueriesQuery +" = 0 ";
+            }
+            else {
                 criteria = criteria + " and ";
                 criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
             }

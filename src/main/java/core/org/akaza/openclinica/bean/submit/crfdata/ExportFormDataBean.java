@@ -12,6 +12,7 @@ package core.org.akaza.openclinica.bean.submit.crfdata;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 
 /**
  * OpenClinica form attributes have been included in addition to ODM FormData
@@ -24,12 +25,15 @@ public class ExportFormDataBean extends FormDataBean {
     private String crfVersion;
     private String interviewerName;
     private String interviewDate;
-    private String status;
+    private EventCrfWorkflowStatusEnum workflowStatus;
     private String formLayoutName;
     private String formName;
     private FormLayout formLayout;
     private EventCrf eventCrf;
     private EventDefinitionCrf eventDefinitionCrf;
+    private Boolean removed;
+    private Boolean archived;
+    private Boolean locked;
 
     public ExportFormDataBean() {
         super();
@@ -57,14 +61,6 @@ public class ExportFormDataBean extends FormDataBean {
 
     public String getInterviewDate() {
         return this.interviewDate;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getStatus() {
-        return this.status;
     }
 
     public String getFormLayoutName() {
@@ -107,4 +103,35 @@ public class ExportFormDataBean extends FormDataBean {
         this.eventDefinitionCrf = eventDefinitionCrf;
     }
 
+    public EventCrfWorkflowStatusEnum getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(EventCrfWorkflowStatusEnum workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
+    public Boolean getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(Boolean removed) {
+        this.removed = removed;
+    }
+
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
 }
