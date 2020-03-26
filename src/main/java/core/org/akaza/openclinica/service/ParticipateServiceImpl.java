@@ -305,14 +305,14 @@ public class ParticipateServiceImpl implements ParticipateService {
         formData.getFormDataElementExtension().add(odmLinks);
 
         if (eventCRFBean == null) {
-            formData.setStatus(EventCrfWorkflowStatusEnum.NOT_STARTED.toString());
+            formData.setStatus(EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue());
         } else {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
             if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
-                formData.setStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.toString());
+                formData.setStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue());
               //  formData.setStatus("Not Started");
             } else {
-                formData.setStatus(eventCRFBean.getWorkflowStatus().toString());
+                formData.setStatus(eventCRFBean.getWorkflowStatus().getDisplayValue());
             }
 
             if (eventCrf.getDateUpdated() != null) {
