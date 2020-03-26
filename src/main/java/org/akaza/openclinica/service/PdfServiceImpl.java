@@ -153,15 +153,16 @@ public class PdfServiceImpl implements PdfService {
             float footerWidth = font.getStringWidth( footerMessage )*fontSize/1000f;
             // calculate to center of the page
             int rotation = page.getRotation();
+            float margin = 50;
             boolean rotate = rotation == 90 || rotation == 270;
             float pageWidth = rotate ? pageSize.getHeight() : pageSize.getWidth();
             float pageHeight = rotate ? pageSize.getWidth() : pageSize.getHeight();
-            float footerCenterX = rotate ? pageHeight : (pageWidth - footerWidth - footerWidth/2);
-            float footerCenterY = rotate ? (pageWidth - footerWidth) :  10;
+            float footerCenterX = rotate ? pageHeight : (pageWidth - footerWidth - margin*2);
+            float footerCenterY = rotate ? (pageWidth - footerWidth) :  margin/2;
             
             float stringHeight = fontSize; 
-            float headerCenterX = rotate ? 5 : stringHeight+ 5;
-            float headerCenterY = (float) (rotate ? stringHeight+ 10 :  pageHeight - stringHeight*1.4);
+            float headerCenterX = rotate ? margin : stringHeight+ margin;
+            float headerCenterY = (float) (rotate ? stringHeight+ margin :  pageHeight - margin/2);
 
             // append the content to the existing stream
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page, true, true, true))
@@ -175,7 +176,7 @@ public class PdfServiceImpl implements PdfService {
                      *  header's left part
                      *  50*2 is the margin space                   
                      */
-                    float margin = 50;
+                    
                     float space = 5;
                     float rightHeaderWidth = (float) (pageWidth * 0.25 - margin);
                     float leftHeaderStartX = margin;
