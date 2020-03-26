@@ -869,9 +869,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         // put metadata into item
                         ResponseSetBean rsb = new ResponseSetBean();
                         // notice that still "\\," in options - jxu-08-31-06
-                        String resOptions1 = resOptions.replaceAll("\\\\,", "\\,");
-                        String resValues1 = resValues.replaceAll("\\\\,", "\\,");
-                        rsb.setOptions(stripQuotes(resOptions1), stripQuotes(resValues1));
+                        String updatedResOptions = resOptions.replaceAll("\\\\,", "\\,");
+                        String updatedResValues = resValues.replaceAll("\\\\,", "\\,");
+                        rsb.setOptions(stripQuotes(updatedResOptions), stripQuotes(updatedResValues));
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
@@ -1001,8 +1001,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"
                                     		 +  versionIdString + ")";
                         	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(resOptions)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(resValues)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResOptions)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResValues)));
                               sqlParameters.add(new SqlParameter(stripQuotes(stripQuotes(responseType.toLowerCase()))));
                              //in versionIdString there is one parameter:crfId
                               sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
