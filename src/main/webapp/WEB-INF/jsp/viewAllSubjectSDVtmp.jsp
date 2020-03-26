@@ -276,8 +276,8 @@
     #sdv-close-popup {
         float: right;
         position: absolute;
-        right: -25px;
-        top: -25px;
+        right: -10px;
+        top: -10px;
     }
 
     #sdv-close-popup > .icon-cancel::before {
