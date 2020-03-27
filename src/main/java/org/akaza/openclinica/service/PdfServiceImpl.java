@@ -105,11 +105,14 @@ public class PdfServiceImpl implements PdfService {
             PDFmerger.addSource(in);  
             
             file_counter++;
+            
+            logger.debug("load pdf file from enketo to merge: " + file_counter +" and fize size(MB):"+ file.length()/1000000);
         }
 
         //Merging all PDFs
+        logger.debug("************************ merge start!!! ");
         PDFmerger.mergeDocuments(null);
-
+        logger.debug("************************ merge suceefully!!! ");
         //after merge, to close the documents
         for(PDDocument doc:pDDocuments) {
             doc.close();
