@@ -254,15 +254,15 @@
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tr valign="top">
                                         <td>
-                                            <c:if test="${ !userRole.monitor && study.status.available && studySub.status.available && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && dec.eventCRF.removed != true && dec.eventCRF.archived != true   }">
-                                                <c:if test="${dec.continueInitialDataEntryPermitted}">
+                                             <c:if test="${ !userRole.monitor && study.status.available && studySub.status.available && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && dec.eventCRF.removed != true && dec.eventCRF.archived != true   }">
+                                                <c:if test="${dec.eventCRF.workflowStatus != 'COMPLETED'}">
                                                   <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                                   onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                                                   onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
                                                   <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
                                                 </c:if>
 
-                                                <c:if test="${dec.performAdministrativeEditingPermitted}">
+                                                <c:if test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
                                                   <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                                   onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                                                   onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
