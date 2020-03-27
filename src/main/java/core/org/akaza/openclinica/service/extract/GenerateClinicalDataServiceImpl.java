@@ -5,6 +5,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.odmbeans.*;
 import core.org.akaza.openclinica.bean.submit.crfdata.*;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.extract.OdmExtractDAO;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.domain.EventCRFStatus;
@@ -13,6 +14,8 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.PermissionService;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,19 +112,19 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	}
 
-	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID,int userId, ODMFilterDTO odmFilter) {
+	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, int userId, ODMFilterDTO odmFilter) {
 		LinkedHashMap<String, OdmClinicalDataBean> hm = new LinkedHashMap<String, OdmClinicalDataBean>();
 		this.odmFilter = odmFilter;
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 		List<StudySubject> studySubjs = study.getStudySubjects();
 		if (study.getStudies().size() < 1) {
-			hm.put(studyOID, constructClinicalData(study, studySubjs,userId));
+			hm.put(studyOID, constructClinicalData(study, studySubjs, userId));
 		}
 		// return odmClinicalDataBean;
 		else {
-			hm.put(studyOID, constructClinicalData(study, studySubjs,userId));// at study level
+			hm.put(studyOID, constructClinicalData(study, studySubjs, userId));// at study level
 			for (Study s : study.getStudies()) {// all the sites
-				hm.put(s.getOc_oid(), constructClinicalData(s, s.getStudySubjects(),userId));
+				hm.put(s.getOc_oid(), constructClinicalData(s, s.getStudySubjects(), userId));
 			}
 		}
 
@@ -162,13 +165,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		ExportSubjectDataBean expSubjectBean;
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
 		List<String> tagIds = null;
-		if(!odmFilter.isCrossForm()) {
+		if (!odmFilter.isCrossForm()) {
 			Study studyBean = new Study();
 			studyBean.setStudyId(study.getStudyId());
 			studyBean.setStudyEnvUuid(study.getStudyEnvUuid());
 			studyBean.setStudyUuid(study.getStudyUuid());
 			studyBean.setStudyEnvSiteUuid(study.getStudyEnvSiteUuid());
-			if(study.isSite())
+			if (study.isSite())
 				studyBean.setStudy(study.getStudy());
 			tagIds = permissionService.getPermissionTagsList(studyBean, getRequest());
 		}
@@ -194,7 +197,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		// return null;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings( "unchecked" )
 	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOID, int userId, List<String> tagIds) {
 
 		ExportSubjectDataBean exportSubjectDataBean = new ExportSubjectDataBean();
@@ -204,7 +207,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			// exportSubjectDataBean.setAuditLogs(studySubj.getA)
 			if (studySubj.getSubject().getDateOfBirth() != null)
 				exportSubjectDataBean.setDateOfBirth(studySubj.getSubject().getDateOfBirth() + "");
-			exportSubjectDataBean.setSubjectGender(studySubj.getSubject().getGender()!=null?studySubj.getSubject().getGender().toString():"");
+			exportSubjectDataBean.setSubjectGender(studySubj.getSubject().getGender() != null ? studySubj.getSubject().getGender().toString() : "");
 
 			for (SubjectGroupMap subjGrpMap : studySubj.getSubjectGroupMaps()) {
 				SubjectGroupDataBean subjGrpDataBean = new SubjectGroupDataBean();
@@ -230,11 +233,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if (odmFilter.isIncludeDN())
 				exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 
-			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOID, userId, tagIds));
+			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents, formVersionOID, userId, tagIds));
 
 			exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
 
-			exportSubjectDataBean.setEnrollmentDate(studySubj.getEnrollmentDate()!=null?studySubj.getEnrollmentDate().toString():"");
+			exportSubjectDataBean.setEnrollmentDate(studySubj.getEnrollmentDate() != null ? studySubj.getEnrollmentDate().toString() : "");
 
 		}
 		return exportSubjectDataBean;
@@ -298,7 +301,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if (odmFilter.isIncludeDN())
 					expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 
-				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID, userId ,tagIds));
+				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID, userId, tagIds));
 				expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
 				al.add(expSEBean);
 			}
@@ -317,114 +320,115 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
 
 		List<EventCrf> eventCrfs;
-		if (odmFilter.showArchived()){
-			eventCrfs = se.getEventCrfs();}
-		else{
-			eventCrfs = eventCrfDao.findNonArchivedByStudyEventId(se.getStudyEventId());}
+		if (odmFilter.showArchived()) {
+			eventCrfs = se.getEventCrfs();
+		} else {
+			eventCrfs = eventCrfDao.findNonArchivedByStudyEventId(se.getStudyEventId());
+		}
 
 		for (EventCrf ecrf : eventCrfs) {
-				EventDefinitionCrf eventDefinitionCrf = null;
-				List<EventDefinitionCrf> edcs = se.getStudyEventDefinition().getEventDefinitionCrfs();
-				hiddenCrfCheckPassed = true;
-				int siteId = 0;
-				int parentStudyId = 0;
-				if (study.getStudy() != null) {
-					// it is site subject
+			EventDefinitionCrf eventDefinitionCrf = null;
+			List<EventDefinitionCrf> edcs = se.getStudyEventDefinition().getEventDefinitionCrfs();
+			hiddenCrfCheckPassed = true;
+			int siteId = 0;
+			int parentStudyId = 0;
+			if (study.getStudy() != null) {
+				// it is site subject
 
-					if (isActiveRoleAtSite) {
-						siteId = study.getStudyId();
-						parentStudyId = study.checkAndGetParentStudyId();
-						hiddenCrfs = listOfHiddenCrfs(siteId, parentStudyId, edcs, ecrf);
-					} else {
-						parentStudyId = study.checkAndGetParentStudyId();
-						hiddenCrfs = listOfHiddenCrfs(parentStudyId, parentStudyId, edcs, ecrf);
-					}
-
-					if (hiddenCrfs.contains(ecrf.getCrfVersion().getCrf())) {
-						hiddenCrfCheckPassed = false;
-					}
-
-					eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-							se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
-
-					if (eventDefinitionCrf == null) {
-						eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-								se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.checkAndGetParentStudyId());
-					}
-
+				if (isActiveRoleAtSite) {
+					siteId = study.getStudyId();
+					parentStudyId = study.checkAndGetParentStudyId();
+					hiddenCrfs = listOfHiddenCrfs(siteId, parentStudyId, edcs, ecrf);
 				} else {
+					parentStudyId = study.checkAndGetParentStudyId();
+					hiddenCrfs = listOfHiddenCrfs(parentStudyId, parentStudyId, edcs, ecrf);
+				}
+
+				if (hiddenCrfs.contains(ecrf.getCrfVersion().getCrf())) {
+					hiddenCrfCheckPassed = false;
+				}
+
+				eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+						se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
+
+				if (eventDefinitionCrf == null) {
 					eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-							se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
-
+							se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.checkAndGetParentStudyId());
 				}
 
+			} else {
+				eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+						se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
 
-				//UserAccount userAccount = getUserAccountDao().findByUserId(userId);
-				if (odmFilter.isCrossForm()) {
-					tagIds = loadPermissionTags();
+			}
+
+
+			//UserAccount userAccount = getUserAccountDao().findByUserId(userId);
+			if (odmFilter.isCrossForm()) {
+				tagIds = loadPermissionTags();
+			}
+
+			List<EventDefinitionCrfPermissionTag> edcPTagIds =
+					getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(
+							eventDefinitionCrf.getEventDefinitionCrfId(), eventDefinitionCrf.getParentId() != null ? eventDefinitionCrf.getParentId() : 0, tagIds);
+			if (edcPTagIds.size() != 0) {
+				continue;
+			}
+
+
+			// This logic is to use the same method for both S_OID/SS_OID/*/* and full path
+			if (hiddenCrfCheckPassed) {
+				if (!formCheck) {
+					if (ecrf.getCrfVersion().getOcOid().equals(formVersionOID))
+						formCheck = true;
+					else
+						formCheck = false;
 				}
+				if (formCheck) {
+					ExportFormDataBean dataBean = new ExportFormDataBean();
 
-				List<EventDefinitionCrfPermissionTag> edcPTagIds =
-						getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(
-								eventDefinitionCrf.getEventDefinitionCrfId(), eventDefinitionCrf.getParentId() != null ? eventDefinitionCrf.getParentId() : 0, tagIds);
-				if (edcPTagIds.size() != 0) {
-					continue;
-				}
-
-
-				// This logic is to use the same method for both S_OID/SS_OID/*/* and full path
-				if (hiddenCrfCheckPassed) {
-					if (!formCheck) {
-						if (ecrf.getCrfVersion().getOcOid().equals(formVersionOID))
-							formCheck = true;
-						else
-							formCheck = false;
+					dataBean.setEventDefinitionCrf(eventDefinitionCrf);
+					dataBean.setEventCrf(ecrf);
+					dataBean.setFormLayout(ecrf.getFormLayout());
+					dataBean.setFormName(ecrf.getCrfVersion().getCrf().getName());
+					dataBean.setItemGroupData(
+							fetchItemData(ecrf.getCrfVersion().getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf.getCrfVersion().getVersioningMaps(), ecrf));
+					dataBean.setFormOID(ecrf.getCrfVersion().getCrf().getOcOid());
+					if (ecrf.getDateInterviewed() != null)
+						dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
+					if (ecrf.getInterviewerName() != null)
+						dataBean.setInterviewerName(ecrf.getInterviewerName());
+					// dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
+					dataBean.setWorkflowStatus(ecrf.getWorkflowStatus());
+					dataBean.setRemoved(ecrf.getRemoved());
+					dataBean.setArchived(ecrf.getArchived());
+					dataBean.setCreatedDate(ecrf.getDateCreated());
+					dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
+					dataBean.setUpdatedDate(ecrf.getDateUpdated());
+					//UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
+					UserAccountBean updatedUserAccount = null;
+					if (ecrf.getUpdateId() != null) {
+						updatedUserAccount = (UserAccountBean) userAccountDAO.findByPK(ecrf.getUpdateId());
 					}
-					if (formCheck) {
-						ExportFormDataBean dataBean = new ExportFormDataBean();
-
-						dataBean.setEventDefinitionCrf(eventDefinitionCrf);
-						dataBean.setEventCrf(ecrf);
-						dataBean.setFormLayout(ecrf.getFormLayout());
-						dataBean.setFormName(ecrf.getCrfVersion().getCrf().getName());
-						dataBean.setItemGroupData(
-								fetchItemData(ecrf.getCrfVersion().getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf.getCrfVersion().getVersioningMaps(), ecrf));
-						dataBean.setFormOID(ecrf.getCrfVersion().getCrf().getOcOid());
-						if (ecrf.getDateInterviewed() != null)
-							dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
-						if (ecrf.getInterviewerName() != null)
-							dataBean.setInterviewerName(ecrf.getInterviewerName());
-						// dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
-						dataBean.setWorkflowStatus(ecrf.getWorkflowStatus());
-						dataBean.setRemoved(ecrf.getRemoved());
-						dataBean.setArchived(ecrf.getArchived());
-						dataBean.setCreatedDate(ecrf.getDateCreated());
-						dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
-						dataBean.setUpdatedDate(ecrf.getDateUpdated());
-						//UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
-						UserAccountBean updatedUserAccount = null;
-						if (ecrf.getUpdateId() != null) {
-							updatedUserAccount = (UserAccountBean) userAccountDAO.findByPK(ecrf.getUpdateId());
-						}
-						if (updatedUserAccount != null && updatedUserAccount.getId() != 0) {
-							dataBean.setUpdatedBy(updatedUserAccount.getName());
-						} else {
-							// or not set?
-							dataBean.setUpdatedBy(ecrf.getUserAccount().getUserName());
-						}
-
-						if (ecrf.getFormLayout().getName() != null)
-							dataBean.setFormLayoutName(ecrf.getFormLayout().getName());
-						if (odmFilter.isIncludeAudit())
-							dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(), "event_crf", ecrf.getCrfVersion().getCrf().getOcOid(), null));
-						if (odmFilter.isIncludeDN())
-							dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
-
-						formDataBean.add(dataBean);
-						if (formVersionOID != null)
-							formCheck = false;
+					if (updatedUserAccount != null && updatedUserAccount.getId() != 0) {
+						dataBean.setUpdatedBy(updatedUserAccount.getName());
+					} else {
+						// or not set?
+						dataBean.setUpdatedBy(ecrf.getUserAccount().getUserName());
 					}
+
+					if (ecrf.getFormLayout().getName() != null)
+						dataBean.setFormLayoutName(ecrf.getFormLayout().getName());
+					if (odmFilter.isIncludeAudit())
+						dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(), "event_crf", ecrf.getCrfVersion().getCrf().getOcOid(), null));
+					if (odmFilter.isIncludeDN())
+						dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
+
+					formDataBean.add(dataBean);
+					if (formVersionOID != null)
+						formCheck = false;
 				}
+			}
 
 		}
 
@@ -575,13 +579,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						LOGGER.debug("****************user:" + getCurrentUser());
 						LOGGER.debug("schema:" + CoreResources.getRequestSchema());
 						try {
-                            iiDataBean.setItemName(item.getName());
-                        } catch (NullPointerException npe) {
+							iiDataBean.setItemName(item.getName());
+						} catch (NullPointerException npe) {
 							CoreResources.getRequestSchema();
 							Item item1 = itemDao.findByOcOID(itemOid);
 							HttpServletRequest request = getRequest();
-                            throw npe;
-                        }
+							throw npe;
+						}
 						if (odmFilter.isIncludeAudit() || odmFilter.isIncludeDN()) {
 							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID), iiDataBean);
 						}
@@ -598,23 +602,24 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		return iigDataBean;
 	}
-    private HttpServletRequest getRequest() {
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null && requestAttributes.getRequest() != null) {
-            HttpServletRequest request = requestAttributes.getRequest();
-            return request;
-        }
-        return null;
-    }
+
+	private HttpServletRequest getRequest() {
+		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		if (requestAttributes != null && requestAttributes.getRequest() != null) {
+			HttpServletRequest request = requestAttributes.getRequest();
+			return request;
+		}
+		return null;
+	}
 	private String getCurrentUser() {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		HttpServletRequest request = requestAttributes.getRequest();
 		UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
- 		if (userAccountBean != null) {
-				return userAccountBean.getName();
-			}else {
-				  return null;
-			  }
+		if (userAccountBean != null) {
+			return userAccountBean.getName();
+		} else {
+			return null;
+		}
 	}
 
 
@@ -796,18 +801,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
 			auditBean.setDetails(auditLogEvent.getDetails());
 			if (auditLogEvent.getEntityName() != null && auditLogEvent.getEntityName().equals(STATUS)) {
-				/*
-				 * if(auditLogEvent.getAuditTable().equals(EVENT_CRF)){
-				 * auditBean.setNewValue(EventCRFStatus.getByCode(Integer.valueOf(auditLogEvent.getNewValue())).
-				 * getDescription());
-				 * auditBean.setOldValue(EventCRFStatus.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).
-				 * getDescription());
-				 * }
-				 * else
-				 */
-				if (auditLogEvent.getAuditTable().equals(STUDY_EVENT) || auditLogEvent.getAuditTable().equals(EVENT_CRF)) {
-					auditBean.setNewValue(auditLogEvent.getNewValue());
-					auditBean.setOldValue(auditLogEvent.getOldValue());
+				OdmExtractDAO oedao = new OdmExtractDAO(dataSource,studyDao);
+				if (auditLogEvent.getAuditTable().equals(STUDY_EVENT)) {
+					auditBean.setNewValue(oedao.setStudyEventStatus(auditLogEvent.getNewValue()));
+					auditBean.setOldValue(oedao.setStudyEventStatus(auditLogEvent.getOldValue()));
+
+				} else if (auditLogEvent.getAuditTable().equals(EVENT_CRF)) {
+					auditBean.setNewValue(oedao.setEventCrfStatus(auditLogEvent.getNewValue()) );
+					auditBean.setOldValue(oedao.setEventCrfStatus(auditLogEvent.getOldValue()));
 				} else if (auditLogEvent.getAuditTable().equals(SUBJECT_GROUP_MAP)) {
 					auditBean.setNewValue(auditLogEvent.getNewValue());
 					auditBean.setOldValue(auditLogEvent.getOldValue());
@@ -816,9 +817,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					auditBean.setOldValue(Status.getByCode(Integer.valueOf(auditLogEvent.getOldValue())).getI18nDescription(getLocale()));
 				}
 
-			}
-
-			else {
+			} else {
 				auditBean.setNewValue(auditLogEvent.getNewValue() == null ? "" : auditLogEvent.getNewValue());
 				auditBean.setOldValue(auditLogEvent.getOldValue() == null ? "" : auditLogEvent.getOldValue());
 			}
@@ -856,7 +855,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	 * combination of URL parameters, further course is determined.
 	 */
 	@Override
-	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID, Locale locale, int userId , ODMFilterDTO odmFilter) {
+	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID, Locale locale, int userId, ODMFilterDTO odmFilter) {
 		setLocale(locale);
 		this.odmFilter = odmFilter;
 		//setCollectDns(odmFilter.isIncludeDN());
@@ -896,7 +895,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				&& !studyOID.equals(INDICATE_ALL)) {
 			LOGGER.debug("Adding all the study events,formevents as it is a *");
 			LOGGER.debug("study subject is not all and so is study");
-            //  studyEventOid=* ,fromVersionOid=*  (Single Subject , All Events , All FormVersions)
+			//  studyEventOid=* ,fromVersionOid=*  (Single Subject , All Events , All FormVersions)
 			clinicalDataHash.put(studyOID, getClinicalData(studyOID, studySubjectOID, userId, odmFilter));
 
 			return clinicalDataHash;
@@ -911,9 +910,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			// fromVersionOid=*  (Single Subject , Single Event , All FormVersions)
 			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, null, userId));
 			return clinicalDataHash;
-		}
-
-		else if (!studyEventOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL)
+		} else if (!studyEventOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL)
 				&& !formVersionOID.equals(INDICATE_ALL)) {
 			// none =* (Single Subject , Single Event , Single FormVersion)
 			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, formVersionOID, userId));
@@ -958,7 +955,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				}
 			}
 		}
-			return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID, userId);
+		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID, userId);
 	}
 
 	public UserAccountDao getUserAccountDao() {
@@ -1008,12 +1005,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	public void setEventDefinitionCrfPermissionTagDao(EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
 		this.eventDefinitionCrfPermissionTagDao = eventDefinitionCrfPermissionTagDao;
 	}
-	private List <String> loadPermissionTags(){
+	private List<String> loadPermissionTags() {
 		List<EventDefinitionCrfPermissionTag> tags = getEventDefinitionCrfPermissionTagDao().findAll();
 
 		List<String> tagsList = new ArrayList<>();
 		for (EventDefinitionCrfPermissionTag tag : tags) {
-			if(!tagsList.contains(tag.getPermissionTagId())) {
+			if (!tagsList.contains(tag.getPermissionTagId())) {
 				tagsList.add(tag.getPermissionTagId());
 			}
 		}
