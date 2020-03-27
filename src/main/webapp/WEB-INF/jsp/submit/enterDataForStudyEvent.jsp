@@ -453,17 +453,18 @@
                               <td class="table_cell" style="width:180px;">
                                 <c:set var="actionQuery" value="" />
                                 <c:if test="${subjectStudy.status.available}">
-                                  <c:if test="${dec.continueInitialDataEntryPermitted}">
+                                           <c:if test="${dec.eventCRF.workflowStatus != 'COMPLETED'}">
                                     <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
                                   </c:if>
-                                  <c:if test="${dec.performAdministrativeEditingPermitted}">
+                                           <c:if test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
                                     <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
                                   </c:if>
                                 </c:if>
                                 <table>
                                   <tr align="left">
                                     <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.available && studyEvent.removed != true && studyEvent.archived != true  && dec.eventCRF.removed != true && dec.eventCRF.archived != true}">
-                                      <c:if test="${dec.continueInitialDataEntryPermitted}">
+                                           <c:if test="${dec.eventCRF.workflowStatus != 'COMPLETED'}">
+
                                         <td>
                                           <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                           onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
@@ -472,7 +473,7 @@
                                           <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></span></a--></a>
                                         </td>
                                       </c:if>
-                                      <c:if test="${dec.performAdministrativeEditingPermitted}">
+                                           <c:if test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
                                         <td>
                                           <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                           onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
