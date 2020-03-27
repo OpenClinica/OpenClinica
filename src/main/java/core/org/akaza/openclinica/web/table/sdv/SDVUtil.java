@@ -1500,10 +1500,18 @@ public class SDVUtil {
             for (ItemData itemData : getItemDataDao().findByEventCrfId(eventCrf.getEventCrfId())) {
 
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_AFTER_VERIFIED)) {
+                    Set<ItemFormMetadata> itemMetas = itemData.getItem().getItemFormMetadatas();
+                    String label = "";
+                    for (ItemFormMetadata itemMeta: itemMetas) {
+                        label = itemMeta.getLeftItemText();
+                        break;
+                    }
+                    
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
                     sdvItemDTO.setItemDataId(itemData.getItemDataId());
                     sdvItemDTO.setItemId(itemData.getItem().getItemId());
                     sdvItemDTO.setName(itemData.getItem().getName());
+                    sdvItemDTO.setLabel(label);
                     sdvItemDTO.setDescription(itemData.getItem().getDescription());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
                     sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());

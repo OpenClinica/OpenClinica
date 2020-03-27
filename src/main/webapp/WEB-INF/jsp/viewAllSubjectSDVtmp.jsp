@@ -363,7 +363,7 @@
         dom: 't',
         paging: false,
         columns: [
-            {data: 'briefDescriptionItemName'},
+            {data: 'descName'},
             {data: 'value'},
             {data: 'lastVerifiedDate'},
             {data: 'openQueriesCount'},
@@ -426,9 +426,9 @@
                     return a.itemId - b.itemId;
                 });
                 itemsTable.rows.add(data.sdvItems.map(function (item) {
-                    item.briefDescriptionItemName = (item.briefDescription || item.description || '') + ' (' + item.name + ')';
+                    item.descName = (item.briefDescription || item.label || '') + ' (' + item.name + ')';
                     if (item.repeatingGroup) {
-                        item.briefDescriptionItemName += ' ' + item.ordinal;
+                        item.descName += ' (' + item.ordinal + ')';
                     }
 
                     item.lastVerifiedDate = data.lastVerifiedDate;
