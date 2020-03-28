@@ -943,16 +943,14 @@ public class SDVUtil {
                 tempSDVBean.setOpenQueries("<center>" + openQueriesCount + "</center>");
             tempSDVBean.setCrfName(getCRFName(eventCRFBean.getCRFVersionId()));
             tempSDVBean.setCrfVersion(getFormLayoutName(eventCRFBean.getFormLayoutId()));
-            if (eventCRFBean.getStatus() != null) {
-                Integer status = eventCRFBean.getStage().getId();
-
+                String eventCrfWorkflowStatus = eventCRFBean.getWorkflowStatus().toString();
                 StringBuilder crfStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
-                String input = "<input type=\"hidden\" statusId=\"" + status + "\" />";
+                String input = "<input type=\"hidden\" statusId=\"" + eventCrfWorkflowStatus + "\" />";
                 // "<input type=\"hidden\" statusId=\"1\" />"
 //                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
                 String statusTitle = "";
                 String statusIconClassName = "";
-                if (DataEntryStage.get(status).equals(DataEntryStage.LOCKED)) {
+                if(eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.LOCKED)){
                     statusTitle = DataEntryStage.LOCKED.getName();
                     statusIconClassName = FORM_LOCKED_ICON_CLASS_NAME;
                 } else {
@@ -961,7 +959,6 @@ public class SDVUtil {
                 }
                 crfStatusBuilder.append("<center><a title='" + statusTitle + "' alt='" + statusTitle + "' class='" + statusIconClassName + "' accessCheck' border='0'/></center>");
                 tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
-            }
             tempSDVBean.setSubjectEventStatus("<center><a title='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' alt='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' class='"+STUDY_EVENT_WORKFLOW_ICONS.get(eventCrf.getStudyEvent().getWorkflowStatus())+"' accessCheck' border='0'/></center>");
 
             // TODO: I18N Date must be formatted properly
@@ -1065,8 +1062,7 @@ public class SDVUtil {
                 } catch (UnsupportedEncodingException e) {
                     logger.error("Unsupported encoding");
                 }
-                Integer status = eventCRFBean.getStage().getId();
-                actionsBuilder.append(getCRFViewIconPath(status, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
+                actionsBuilder.append(getCRFViewIconPath(eventCrfWorkflowStatus, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
                         eventCRFBean.getStudyEventId(), queryStringEncoded));
             }
 
@@ -1120,7 +1116,7 @@ public class SDVUtil {
         return allRows;
     }
 
-    private String getCRFViewIconPath(int statusId, HttpServletRequest request, int eventDefinitionCRFId,
+    private String getCRFViewIconPath(String eventCrfWorkflowStatus, HttpServletRequest request, int eventDefinitionCRFId,
                                       int formLayoutId, int studyEventId, String redirect) {
 
         HtmlBuilder html = new HtmlBuilder();
@@ -1134,7 +1130,7 @@ public class SDVUtil {
 
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
-        input.append(statusId).append("\" />");
+        input.append(eventCrfWorkflowStatus).append("\" />");
         String href = request.getContextPath() + "/EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId="
                 + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?" + redirect + "&mode=view";
         builder.append(
