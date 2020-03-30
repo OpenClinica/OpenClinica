@@ -693,6 +693,10 @@ public class CreateCRFVersionServlet extends SecureController {
                 String text = rob.getText();
                 String value = rob.getValue();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> 307bf5832... fix to CreateCRFVersionServlet
 =======
 
 >>>>>>> 307bf5832... fix to CreateCRFVersionServlet
