@@ -695,16 +695,7 @@ public class CreateCRFVersionServlet extends SecureController {
                 ResponseOptionBean rob = (ResponseOptionBean) oldOptions.get(i);
                 String text = rob.getText();
                 String value = rob.getValue();
-                logger.debug("rob.getValue BEFORE change: " + value);
 
-                //25-Mar-2020 code block - used to handle response_set values saved in DB as '\\,'
-                //core issue fixed in OC-11768 - Z
-                if(value.contains("\\##")){
-                    value = StringUtils.replace(value, "\\##", "##");
-                }
-                //END 25-Mar-2020 code block - Z
-
-                logger.debug("rob.getValue AFTER change: " + value);
                 for (int j = i; j < newOptions.size(); j++) {// from
                     // spreadsheet
                     ResponseOptionBean rob1 = (ResponseOptionBean) newOptions.get(j);
