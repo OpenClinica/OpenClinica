@@ -1181,15 +1181,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // put metadata into item
                         ResponseSetBean rsb = new ResponseSetBean();
                         // notice that still "\\," in options - jxu-08-31-06
-<<<<<<< HEAD
-                        String resOptions1 = resOptions.replaceAll("\\\\,", "\\,");
-                        String resValues1 = resValues.replaceAll("\\\\,", "\\,");
-                        rsb.setOptions(stripQuotes(resOptions1), stripQuotes(resValues1));
-=======
                         String updatedResOptions = resOptions.replaceAll("\\\\,", "\\,");
                         String updatedResValues = resValues.replaceAll("\\\\,", "\\,");
                         rsb.setOptions(stripQuotes(updatedResOptions), stripQuotes(updatedResValues));
->>>>>>> 9a64c4270... updated comment
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
