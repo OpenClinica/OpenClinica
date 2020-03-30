@@ -692,6 +692,10 @@ public class CreateCRFVersionServlet extends SecureController {
                 ResponseOptionBean rob = (ResponseOptionBean) oldOptions.get(i);
                 String text = rob.getText();
                 String value = rob.getValue();
+<<<<<<< HEAD
+=======
+
+>>>>>>> 307bf5832... fix to CreateCRFVersionServlet
                 for (int j = i; j < newOptions.size(); j++) {// from
                     // spreadsheet
                     ResponseOptionBean rob1 = (ResponseOptionBean) newOptions.get(j);
