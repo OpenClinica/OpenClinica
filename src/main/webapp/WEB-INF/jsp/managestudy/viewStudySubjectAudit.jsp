@@ -136,7 +136,7 @@
 </tr>
 <tr>
     <td class="table_header_column"><c:out value="Status"/></td>
-    <td class="table_header_column"><c:out value="${event.subjectEventStatus.name}"/>&nbsp;</td>
+    <td class="table_header_column"><c:out value="${event.workflowStatus.displayValue}"/>&nbsp;</td>
 </tr>
 <tr>
     <td class="table_header_column"><fmt:message key="occurrence_number" bundle="${resword}"/></td>
