@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -30,7 +29,7 @@ public class EventCrfLayerBuilder {
     SubjectBean subject;
     Integer rowCount;
     List<StudyEventBean> studyEvents;
-    DataEntryStage eventCrfStatus;
+    EventCrfWorkflowStatusEnum eventCrfWorkflowStatus;
     EventCRFBean eventCrfBean = null;
     StudySubjectBean studySubject;
     Study currentStudy;
@@ -44,7 +43,7 @@ public class EventCrfLayerBuilder {
     String contextPath;
     StudyDao studyDao;
 
-    public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, DataEntryStage eventCrfStatus,
+    public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, EventCrfWorkflowStatusEnum eventCrfWorkflowStatus,
                                 EventCRFBean eventCrfBean, StudySubjectBean studySubject, Study currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
                                 EventDefinitionCRFBean eventDefinitionCrf, CRFBean crf, StudyEventDefinitionBean studyEventDefinition, String contextPath, StudyDao studyDao) {
         super();
@@ -52,7 +51,7 @@ public class EventCrfLayerBuilder {
         this.subject = subject;
         this.rowCount = rowCount;
         this.studyEvents = studyEvents;
-        this.eventCrfStatus = eventCrfStatus;
+        this.eventCrfWorkflowStatus = eventCrfWorkflowStatus;
         this.eventCrfBean = eventCrfBean;
         this.studySubject = studySubject;
         this.currentStudy = currentStudy;
@@ -126,7 +125,7 @@ public class EventCrfLayerBuilder {
         html.append(subjectText).append(": ").append(studySubjectLabel).br();
         html.append(crfText).append(": ").append(crf.getName()).br();
 
-        html.append("Status").append(": ").append(eventCrfStatus.getName()).br();
+        html.append("Status").append(": ").append(eventCrfWorkflowStatus.getDisplayValue()).br();
         html.tdEnd();
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
         if (eventCrfBean.isRemoved() || eventCrfBean.isArchived()) {

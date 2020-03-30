@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
  * The EventCrfWorkflowEnum enumeration.
  */
 public enum EventCrfWorkflowStatusEnum {
-    NOT_STARTED ,INITIAL_DATA_ENTRY, COMPLETED;
+    NOT_STARTED ,INITIAL_DATA_ENTRY, COMPLETED ,LOCKED;
 
     public String getDisplayValue() {
         ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();

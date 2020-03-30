@@ -39,9 +39,12 @@ import core.org.akaza.openclinica.job.JobTerminationMonitor;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
+import core.org.akaza.openclinica.service.extract.GenerateClinicalDataService;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
@@ -439,6 +442,8 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.TIMESTAMP); // audit_date
         ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // audit_entity_name
+        ++i;
         this.setTypeExpected(i, TypeNames.STRING); // reason_for_change
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // old_value
@@ -462,6 +467,8 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.INT); // user_id
         ++i;
         this.setTypeExpected(i, TypeNames.TIMESTAMP); // audit_date
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // audit_entity_name
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // reason_for_change
         ++i;
@@ -2595,6 +2602,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String type = (String) row.get("name");
             Integer userId = (Integer) row.get("user_id");
             Date auditDate = (Date) row.get("audit_date");
+            String entity_name = (String) row.get("entity_name");
             String auditReason = (String) row.get("reason_for_change");
             String oldValue = (String) row.get("old_value");
             String newValue = (String) row.get("new_value");
@@ -2624,8 +2632,15 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setDetails(details);
                 auditLog.setAuditLogEventTypeId(typeId);
-                auditLog.setNewValue(newValue);
-                auditLog.setOldValue(oldValue);
+
+                   if(entity_name.equals("Status")) {
+                       auditLog.setOldValue(setStudyEventStatus(oldValue));
+                       auditLog.setNewValue(setStudyEventStatus(newValue));
+                   }else {
+                       auditLog.setOldValue(oldValue);
+                       auditLog.setNewValue(newValue);
+                   }
+
 
                 AuditLogsBean logs = se.getAuditLogs();
                 if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
@@ -2653,6 +2668,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String type = (String) row.get("name");
             Integer userId = (Integer) row.get("user_id");
             Date auditDate = (Date) row.get("audit_date");
+            String entity_name = (String) row.get("entity_name");
             String auditReason = (String) row.get("reason_for_change");
             String oldValue = (String) row.get("old_value");
             String newValue = (String) row.get("new_value");
@@ -2669,9 +2685,13 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setAuditLogEventTypeId(typeId);
+            if(entity_name.equals("Status")) {
+                auditLog.setOldValue(setEventCrfStatus(oldValue));
+                auditLog.setNewValue(setEventCrfStatus(newValue));
+            }else {
                 auditLog.setOldValue(oldValue);
                 auditLog.setNewValue(newValue);
-
+            }
 
                   // Fix for 0011675: SDV'ed subject is dipslayed as not SDV'ed in the 1.3 Full ODM Extract commenting
                   // out the following lines as these are treated like booleans while they are strings
@@ -3664,7 +3684,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCEventDataAuditsSql(String studySubjectOids) {
         return "select ss.oc_oid as study_subject_oid, sed.oc_oid as definition_oid, ale.audit_id,se.sample_ordinal as event_repeat,"
-                + " alet.name, ale.user_id, ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.details," + " ale.audit_log_event_type_id"
+                + " alet.name, ale.user_id, ale.audit_date,ale.entity_name ,ale.reason_for_change, ale.old_value, ale.new_value, ale.details," + " ale.audit_log_event_type_id"
                 + " from audit_log_event ale, study_subject ss, study_event se, study_event_definition sed, audit_log_event_type alet"
                 + " where audit_table = 'study_event' and ss.oc_oid in (" + studySubjectOids + ") and ss.study_subject_id = se.study_subject_id"
                 + " and ale.entity_id = se.study_event_id" + " and se.study_event_definition_id = sed.study_event_definition_id"
@@ -3673,11 +3693,11 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCFormDataAuditsSql(String studySubjectOids, String ecIds) {
         return "select ale.entity_id as event_crf_id, ale.audit_id, alet.name, ale.user_id,"
-                + " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
+                + " ale.audit_date,ale.entity_name, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
                 + " from audit_log_event ale, study_subject ss, event_crf ec, audit_log_event_type alet"
                 + " where audit_table = 'event_crf' and ec.event_crf_id in (" + ecIds + ") and ss.oc_oid in (" + studySubjectOids
                 + ") and ss.study_subject_id = ec.study_subject_id" + " and ale.entity_id = ec.event_crf_id"
-                + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id" + " order by ale.entity_id asc";
+                + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id" + " order by ale.audit_id asc";
     }
 
     protected String getOCItemDataAuditsSql(String idataIds) {
@@ -3885,5 +3905,84 @@ public class OdmExtractDAO extends DatasetDAO {
             //logger.info("permissionTagsLookup : " + permissionTagsLookupNoPermissionTags(edc));
             return (viewRows.size() > 0 ?  true:  false) ;
     }
+    public String setStudyEventStatus(String value) {
+        if (!StringUtils.isEmpty(value)) {
+            return setStudyEventWorkflowStatus(value);
+        } else {
+            return "";
+        }
+    }
 
+    public String setEventCrfStatus(String value) {
+        if (!StringUtils.isEmpty(value)) {
+            return setEventCrfWorkflowStatus(value);
+        } else {
+            return "";
+        }
+    }
+
+
+
+    public String setOriginalEventCrfStatus(String value) {
+        switch (value) {
+            case "1":
+                return EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue();
+            case "2":
+                return EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue();
+            case "5":
+                return "removed";
+            case "6":
+                return "locked";
+            case "7":
+                return "removed";
+            case "11":
+                return EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue();
+            default:
+                return "";
+        }
+    }
+
+
+
+    public String setStudyEventWorkflowStatus(String value) {
+        for (StudyEventWorkflowStatusEnum theEnum : StudyEventWorkflowStatusEnum.values()) {
+            if (value.equals(theEnum.toString())) {
+                return theEnum.getDisplayValue();
+            }
+        }
+        return setOriginalStudyEventStatus(value);
+    }
+
+    public String setEventCrfWorkflowStatus(String value) {
+        for (EventCrfWorkflowStatusEnum theEnum : EventCrfWorkflowStatusEnum.values()) {
+            if (value.equals(theEnum.toString())) {
+                return theEnum.getDisplayValue();
+            }
+        }
+        return setOriginalEventCrfStatus(value);
+
+    }
+
+    public String setOriginalStudyEventStatus(String value) {
+        switch (value) {
+            case "1":
+                return StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue();
+            case "2":
+                return StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue();
+            case "3":
+                return StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue();
+            case "4":
+                return StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue();
+            case "5":
+                return StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue();
+            case "6":
+                return StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
+            case "7":
+                return "locked";
+            case "8":
+                return "signed";
+            default:
+                return "";
+        }
+    }
 }

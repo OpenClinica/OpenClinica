@@ -148,7 +148,7 @@ public class EnketoAPI {
         // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
         if ((parentStudy.getStatus().equals(Status.LOCKED)
                 || (site != null && site.getStatus().equals(Status.LOCKED)))
-                || studyEvent.isCurrentlyLocked()
+                 || (studyEvent != null && studyEvent.isCurrentlyLocked())
                 || parentStudy.getStatus().equals(Status.FROZEN) || mode.equals(VIEW_MODE)) {
             eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
             lockOn = false;

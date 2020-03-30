@@ -1307,7 +1307,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             eventDiv.bold().append(occurrence_x_of).append(" " + (i + 1) + " of " + studyEventsSize).br();
             if (studyEventBean.getDateStarted() != null)
                 eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
-            eventDiv.append(studyEventBean.getWorkflowStatus());
+            eventDiv.append(studyEventBean.getWorkflowStatus().getDisplayValue());
             eventDiv.boldEnd().tdEnd().trEnd(0);
             // <tr><td><table>...</table></td></tr>
             eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_" + (i + 1)).style("display: none").close();
@@ -1495,9 +1495,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             if (studyEvents.size() > 0) {
                 if (studyEvents.get(0).getDateStarted() != null)
                     eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
-                eventDiv.append(studyEvents.get(0).getWorkflowStatus());
+                eventDiv.append(studyEvents.get(0).getWorkflowStatus().getDisplayValue());
             } else {
-                eventDiv.append(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
+                eventDiv.append(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue());
             }
             eventDiv.boldEnd().tdEnd().trEnd(0);
             if (studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {

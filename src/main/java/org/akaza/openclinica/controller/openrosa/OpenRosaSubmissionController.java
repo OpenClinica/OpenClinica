@@ -603,7 +603,7 @@ public class OpenRosaSubmissionController {
     }
 
     public void updateStudyEventStatus(Study study, StudySubject studySubject, StudyEventDefinition sed, StudyEvent studyEvent, UserAccount userAccount) {
-        List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
+        List<EventCrf> eventCrfs=studyEvent.getEventCrfs();
         List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
                 study.getStudyId());
         boolean statusChanged = false;
@@ -633,17 +633,16 @@ public class OpenRosaSubmissionController {
             for (EventCrf evCrf : eventCrfs) {
                 if (!evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                     allFormsComplete = false;
+                    break;
                 }
             }
-            if (allFormsComplete) {
-                if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
-                    if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
-                        studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
-                        statusChanged = true;
-                    }
+            if ((allFormsComplete && count == eventDefinitionCrfs.size()) || sed.getType().equals(COMMON)) {
+                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+                    studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
+                    statusChanged = true;
                 }
             } else {
-                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED) ) {
+                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
                     studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                     statusChanged = true;
                 }
