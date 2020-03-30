@@ -1,7 +1,7 @@
 package com.openclinica.kafka.dto;
 
 public class ItemDataChangeDTO {
-    private String realm;
+    private String customerUuid;
     private String studyOid;
     private String siteOid;
     private String participantId;
@@ -14,9 +14,9 @@ public class ItemDataChangeDTO {
     private String itemName;
     private String itemData;
 
-    public String getRealm() { return realm; }
+    public String getCustomerUuid() { return customerUuid; }
 
-    public void setRealm(String realm) { this.realm = realm; }
+    public void setCustomerUuid(String customerUuid) { this.customerUuid = customerUuid; }
 
     public String getStudyOid() {
         return studyOid;

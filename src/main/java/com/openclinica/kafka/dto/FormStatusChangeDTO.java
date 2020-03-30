@@ -1,7 +1,7 @@
 package com.openclinica.kafka.dto;
 
 public class FormStatusChangeDTO {
-  private String realm;
+  private String customerUuid;
   private String studyOid;
   private String siteOid;
   private String participantId;
@@ -9,9 +9,9 @@ public class FormStatusChangeDTO {
   private String formOid;
   private String eventOid;
 
-  public String getRealm() { return realm; }
+  public String getCustomerUuid() { return customerUuid; }
 
-  public void setRealm(String realm) { this.realm = realm; }
+  public void setCustomerUuid(String customerUuid) { this.customerUuid = customerUuid; }
 
   public String getStudyOid() {
     return studyOid;

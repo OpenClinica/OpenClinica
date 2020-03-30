@@ -33,7 +33,8 @@ public class KafkaService {
       siteOid = study.getOc_oid();
       studyOid = study.getStudy().getOc_oid();
     }
-    formStatusChangeDTO.setRealm(CoreResources.getKeyCloakConfig().getRealm());
+
+    formStatusChangeDTO.setCustomerUuid(CoreResources.getKeyCloakConfig().getRealm());
     formStatusChangeDTO.setStudyOid(studyOid);
     formStatusChangeDTO.setSiteOid(siteOid);
     formStatusChangeDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
@@ -72,7 +73,7 @@ public class KafkaService {
       studyOid = study.getStudy().getOc_oid();
     }
 
-    itemDataChangeDTO.setRealm(CoreResources.getKeyCloakConfig().getRealm());
+    itemDataChangeDTO.setCustomerUuid(CoreResources.getKeyCloakConfig().getRealm());
     itemDataChangeDTO.setStudyOid(studyOid);
     itemDataChangeDTO.setSiteOid(siteOid);
     itemDataChangeDTO.setParticipantId(itemData.getEventCrf().getStudySubject().getLabel());
