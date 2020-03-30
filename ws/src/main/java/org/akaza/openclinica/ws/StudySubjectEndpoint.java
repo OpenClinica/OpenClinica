@@ -225,6 +225,7 @@ public class StudySubjectEndpoint {
             SubjectType subjectType = new SubjectType();
             studySubjectType.setLabel(studySubjectBean.getLabel());
             studySubjectType.setSecondaryLabel(studySubjectBean.getSecondaryLabel());
+            studySubjectType.setSubjectOid(studySubjectBean.getOid());
             if ( studySubjectBean.getEnrollmentDate() != null){
             	studySubjectType.setEnrollmentDate(getXMLGregorianCalendarDate(studySubjectBean.getEnrollmentDate()));
             }
