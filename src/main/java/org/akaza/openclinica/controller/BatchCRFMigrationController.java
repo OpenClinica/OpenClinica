@@ -24,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.StudyEventService;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
@@ -54,7 +55,6 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -112,6 +112,9 @@ public class BatchCRFMigrationController implements Runnable {
     UserAccountBean userAccountBean;
     HttpServletRequest request;
     String urlBase;
+
+    @Autowired
+    StudyEventService studyEventService;
 
     public BatchCRFMigrationController() {
         super();
@@ -339,7 +342,7 @@ public class BatchCRFMigrationController implements Runnable {
         // event signed, check if subject is signed as well
 
         if (studySubject.getStatus() == Status.SIGNED) {
-            status_before_update = auditDao().findLastStatus("study_subject", studySubject.getStudySubjectId(), "8");
+            status_before_update = auditDao().findLastStatus("study_subject","Status" ,studySubject.getStudySubjectId(), "8");
             if (status_before_update != null && status_before_update.length() == 1) {
                 int subject_status = Integer.parseInt(status_before_update);
                 Status status = Status.getByCode(subject_status);
@@ -353,9 +356,9 @@ public class BatchCRFMigrationController implements Runnable {
         studyEvent.setUpdateId(helperObject.getUserAccountBean().getId());
         studyEvent.setDateUpdated(new Date());
 
-        status_before_update = auditDao().findLastStatus("study_event", studyEvent.getStudyEventId(), studyEvent.getSigned().toString());
+        status_before_update = auditDao().findLastStatus("study_event","Status" ,studyEvent.getStudyEventId(), studyEvent.getSigned().toString());
         if (status_before_update != null && status_before_update.length() == 1) {
-            studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.valueOf(status_before_update));
+          studyEventService.convertStudyEventStatus(status_before_update,studyEvent);
         }
 
         session.saveOrUpdate(studyEvent);
