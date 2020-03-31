@@ -1363,8 +1363,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                      "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
                                     		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"+ versionIdString + ")";
                         	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(resOptions)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(resValues)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResOptions)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResValues)));
                               sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
                              
                         }
