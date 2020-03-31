@@ -460,7 +460,7 @@
 	</logger>
 	<!-- OpenClinica logs -->
 	<logger additivity="false" name="org.akaza.openclinica">
-		<level value="${logLevel}" />	
+		<level value="${logLevel}" />
 			<if condition='property("logLocation").equalsIgnoreCase("local") || property("logLocation").equalsIgnoreCase("both")'>
 				<then>
 					<appender-ref ref="LOGFILE-OTHER"/>					
