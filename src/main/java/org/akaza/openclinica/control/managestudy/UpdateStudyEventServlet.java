@@ -52,9 +52,11 @@ import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.AuditLogEventService;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
@@ -95,7 +97,7 @@ public class UpdateStudyEventServlet extends SecureController {
     private WebApplicationContext ctx = null;
     public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String STUDY_EVENT = "study_event";
-    public static final String PREV_STUDY_EVENT_WORKFLOW_STATUS = "prev_study_event_workflow_status";
+    public static final String PREV_STUDY_EVENT_SIGNED_STATUS = "prev_study_event_workflow_status";
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -210,9 +212,6 @@ public class UpdateStudyEventServlet extends SecureController {
         // DiscrepancyNoteDAO(sm.getDataSource());
         ArrayList eventCrfs = studyEvent.getEventCRFs();
 
-        if (!currentRole.isInvestigator()) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SIGNED);
-        }
         // ///End of remove signed status from the list
 
         // BWP: 2735>>keep the DATA_ENTRY_STARTED status
@@ -229,10 +228,7 @@ public class UpdateStudyEventServlet extends SecureController {
         if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
             eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SKIPPED);
         }
-        if ((studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
-                || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) && currentRole.isInvestigator()) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SIGNED);
-        }
+
 
         ArrayList getECRFs = studyEvent.getEventCRFs();
         // above removed tbh 102007, require to get all definitions, no matter
@@ -254,7 +250,7 @@ public class UpdateStudyEventServlet extends SecureController {
             for (int uv = 0; uv < getECRFs.size(); uv++) {
                 EventCRFBean existingBean = (EventCRFBean) getECRFs.get(uv);
                 logger.debug("***** found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId() + " "
-                        + existingBean.getCrfVersion().getName() + " " + existingBean.getStatus().getName() + " " + existingBean.getStage().getName());
+                        + existingBean.getCrfVersion().getName() + " " + existingBean.getWorkflowStatus() + " " + existingBean.getStage().getName());
 
                 logger.debug("***** comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
 
@@ -266,7 +262,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 // only case that this will screw up is if there are no crfs
                 // whatsoever
                 // this is addressed in the if-clause above
-                if (!existingBean.getStatus().equals(Status.UNAVAILABLE) && edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent, getStudyDao())) {
+                if (!existingBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) && edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent, getStudyDao())) {
 
                     logger.debug("found that " + existingBean.getCrfVersion().getName() + " is required...");
                     // that is, it's not completed but required to complete
@@ -311,7 +307,7 @@ public class UpdateStudyEventServlet extends SecureController {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(SUBJECT_EVENT_STATUS_ID));
-            session.setAttribute(PREV_STUDY_EVENT_WORKFLOW_STATUS, studyEvent.getWorkflowStatus());
+            session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
             studyEvent.setWorkflowStatus(ses);
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
@@ -319,7 +315,6 @@ public class UpdateStudyEventServlet extends SecureController {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
-                    ecb.setOldStatus(ecb.getStatus());
                     ecb.setStatus(Status.UNAVAILABLE);
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
@@ -379,7 +374,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 request.setAttribute(EVENT_BEAN, studyEvent);
                 forwardPage(Page.UPDATE_STUDY_EVENT);
 
-            } else if (studyEvent.getWorkflowStatus().equals("SIGNED")) {
+            } else if (studyEvent.isSigned()) {
                 // Checks if the status is signed
                 // -----------------
                 request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
@@ -535,15 +530,15 @@ public class UpdateStudyEventServlet extends SecureController {
 
                 // OC-10834 OC4 - Signature not recorded when signing an event if the event status is already Signed
                 // manually add audit-log-event when user re-signed without any changes
-                String eventWorkflowStatus = (String)session.getAttribute(PREV_STUDY_EVENT_WORKFLOW_STATUS);
-                if (seb.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED) && eventWorkflowStatus.equals(StudyEventWorkflowStatusEnum.SIGNED) ) {
+                Boolean signedStatus = (Boolean)session.getAttribute(PREV_STUDY_EVENT_SIGNED_STATUS);
+                if (seb.isSigned() && BooleanUtils.isTrue(signedStatus) ) {
                     AuditLogEvent auditLogEvent = new AuditLogEvent();
                     auditLogEvent.setAuditTable(STUDY_EVENT);
                     auditLogEvent.setEntityId(seb.getId());
-                    auditLogEvent.setEntityName("Status");
+                    auditLogEvent.setEntityName("Signed");
                     auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-                    auditLogEvent.setNewValue(String.valueOf(StudyEventWorkflowStatusEnum.SIGNED));
-                    auditLogEvent.setOldValue(String.valueOf(StudyEventWorkflowStatusEnum.SIGNED));
+                    auditLogEvent.setNewValue(seb.getSigned().toString());
+                    auditLogEvent.setOldValue(seb.getSigned().toString());
                     auditLogEvent.setDetails(detail);
                     getAuditLogEventService().saveAuditLogEvent(auditLogEvent, ub);
                 }

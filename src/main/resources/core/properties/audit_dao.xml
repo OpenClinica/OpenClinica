@@ -184,7 +184,7 @@
 		<name>findLastStatus</name>
 		<sql>
 		 SELECT old_value FROM audit_log_event
-  			where   audit_table=? and entity_id=? and new_value=? order by audit_date LIMIT 1
+  			where   audit_table=? and entity_name=?  and entity_id=? and new_value=? order by audit_date LIMIT 1
 		</sql>
 	</query>
 	<query>

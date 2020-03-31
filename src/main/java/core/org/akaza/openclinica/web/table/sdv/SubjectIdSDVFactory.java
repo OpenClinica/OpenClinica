@@ -23,6 +23,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.jmesa.core.filter.MatcherKey;
@@ -383,7 +384,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
             studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventBean.getStudyEventId());
             CRFBean crfBean = crfDAO.findByVersionId(eventBean.getCRFVersionId());
             // get number of completed event crfs
-            if (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED) {
+            if (eventBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED) ) {
                 numberOfCompletedEventCRFs++;
             }
             /*
@@ -403,11 +404,12 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
                     eventDefinitionCrfDAO.findForStudyByStudyEventDefinitionIdAndCRFId(studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
             }
             if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)
-                && (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED)) {
+                && (eventBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))) {
                 partialOrHundred = true;
             }
             if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)
-                && eventBean.getSdvStatus() != SdvStatus.VERIFIED && (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED)) {
+                    && eventBean.getSdvStatus() != SdvStatus.VERIFIED && eventBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
+            ) {
                 areEventCRFsSDVd = 1;
             }
 

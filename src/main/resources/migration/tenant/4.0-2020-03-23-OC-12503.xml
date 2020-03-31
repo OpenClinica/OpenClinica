@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="jkeremian" id="2020-03-23-OC-12503-01">
+        <comment>Adding new columns workflow_status , removed , archived and locked  to study_event table</comment>
+        <addColumn tableName="study_event">
+            <column name="signed" type="BOOLEAN" />
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="jkeremian" id="2020-03-23-OC-12503-02">
+        <comment>Updating the locked and signed column on study_event table</comment>
+        <sql>
+            UPDATE study_event SET locked='true' , workflow_status='DATA_ENTRY_STARTED' WHERE subject_event_status_id ='7';
+            UPDATE study_event SET signed='true' , workflow_status='DATA_ENTRY_STARTED' WHERE workflow_status ='SIGNED';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

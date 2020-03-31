@@ -350,7 +350,6 @@ public class ImportServiceImpl implements ImportService {
                          */
                         if (this.isStudyEventSigned(studyEvent)) {
                             if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
-                                studyEvent.setStatusId(Status.AVAILABLE.getCode());
                                 //OC-11632
                                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
                                 studyEventDao.saveOrUpdate(studyEvent);
@@ -654,7 +653,6 @@ public class ImportServiceImpl implements ImportService {
     private EventCrf updateEventCrf(EventCrf eventCrf, UserAccount userAccount, EventCrfWorkflowStatusEnum workflow, Date dateCompleted) {
         eventCrf.setDateUpdated(new Date());
         eventCrf.setUpdateId(userAccount.getUserId());
-        eventCrf.setOldStatusId(eventCrf.getStatusId());
         eventCrf.setWorkflowStatus(workflow);
         if (dateCompleted != null)
             eventCrf.setDateCompleted(dateCompleted);
@@ -670,8 +668,8 @@ public class ImportServiceImpl implements ImportService {
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(ordinal);
-        studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
         studyEvent.setStatusId(Status.AVAILABLE.getCode());
+        studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
         studyEvent.setUserAccount(userAccount);
@@ -843,8 +841,11 @@ public class ImportServiceImpl implements ImportService {
         List<EventCrf> eventCrfs = null;
         for (StudyEvent stEvent : studyEvents) {
             eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(stEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
-            if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
-            break;
+            if (eventCrfs.size() > 0) {
+            	eventCrf = eventCrfs.get(0);
+            	break;
+            }
+            
         }
 
         return eventCrf;
@@ -899,8 +900,6 @@ public class ImportServiceImpl implements ImportService {
                         if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
                         // Event Crf has status complete or unavailable
                         // in complete status will not throw out error any more at this stage
-                        if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
-                            return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
                         /*
                          * OC-12136
@@ -925,8 +924,7 @@ public class ImportServiceImpl implements ImportService {
 
                 // Event Crf has status complete or invalid
                 // in complete status will not throw out error any more at this stage
-                if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
-                    return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
+
 
                 if (eventCrf != null) {     // form exist
                     studyEvent = eventCrf.getStudyEvent();
@@ -938,7 +936,26 @@ public class ImportServiceImpl implements ImportService {
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(studyEvent.getSampleOrdinal()));
                     return studyEvent;
                 } else {
-                    studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
+                	// Repeat Key, if found in xml file, then use it
+                	if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   
+                		eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
+                        if (eventObject instanceof ErrorObj) return eventObject;                                      		              	
+                	}else {
+                		studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));  
+                	}
+                    
+                	//check blank event                	 
+                     studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDataBean.getStudyEventOID(), Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), studySubject.getStudySubjectId());
+
+                     ErrorObj errorObj = checkEventAvailable(studyEvent);
+                     if (errorObj != null) {
+                         return errorObj;
+                     }
+                     
+                     if(studyEvent !=null){
+                    	 return studyEvent;
+                     }
+                	
                     studyEvent = scheduleEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
                     return studyEvent;
                 }
@@ -1025,7 +1042,8 @@ public class ImportServiceImpl implements ImportService {
 
         if (studyEvent != null && (
                 // OC-11780, for visit and just scheduled event(before enter any data),UI side will only update status of StudyEvent,because no CRF yet
-                studyEvent.getStatusId() == Status.DELETED.getCode() ||
+                                studyEvent.isCurrentlyRemoved() ||
+                                studyEvent.isCurrentlyArchived() ||
                         studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)  ||
                         studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED) )) {
 
@@ -1038,7 +1056,8 @@ public class ImportServiceImpl implements ImportService {
 
 
     private boolean isEventCrfCompleted(EventCrf eventCrf) {
-        return eventCrf.getStatusId() == Status.UNAVAILABLE.getCode();
+        return eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED);
+
     }
 
     /**
@@ -1046,7 +1065,7 @@ public class ImportServiceImpl implements ImportService {
      * @return
      */
     private boolean isStudyEventSigned(StudyEvent studyEvent) {
-        return studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED);
+        return studyEvent.isCurrentlySigned();
     }
 
     public ErrorObj validateStartAndEndDateAndOrder(StudyEventDataBean studyEventDataBean) {
@@ -1161,15 +1180,15 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private StudyEventWorkflowStatusEnum getWorkflowStatus(String workflowStatus) {
-        if (StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+        if (StudyEventWorkflowStatusEnum.SCHEDULED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.SCHEDULED;
-        } else if (StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue().replace("_", " ").equalsIgnoreCase(workflowStatus)) {
+        } else if (StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString().replace("_", " ").equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED;
-        } else if (StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+        } else if (StudyEventWorkflowStatusEnum.COMPLETED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.COMPLETED;
-        } else if (StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+        } else if (StudyEventWorkflowStatusEnum.SKIPPED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.SKIPPED;
-        } else if (StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
+        } else if (StudyEventWorkflowStatusEnum.STOPPED.toString().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowStatusEnum.STOPPED;
        /************** } else if (StudyEventWorkflowEnum.LOCKED.getDisplayValue().equalsIgnoreCase(workflowStatus)) {
             return StudyEventWorkflowEnum.LOCKED;*/
@@ -1179,11 +1198,11 @@ public class ImportServiceImpl implements ImportService {
 
 
     public ErrorObj validateEventStatus(String eventStatus) {
-        if (!StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue().equalsIgnoreCase(eventStatus)
-                && !StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue().replace("_", " ").equalsIgnoreCase(eventStatus)
-                && !StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue().equalsIgnoreCase(eventStatus)
-                && !StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue().equalsIgnoreCase(eventStatus)
-                && !StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue().equalsIgnoreCase(eventStatus)
+        if (!StudyEventWorkflowStatusEnum.SCHEDULED.toString().equalsIgnoreCase(eventStatus)
+                && !StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString().replace("_", " ").equalsIgnoreCase(eventStatus)
+                && !StudyEventWorkflowStatusEnum.COMPLETED.toString().equalsIgnoreCase(eventStatus)
+                && !StudyEventWorkflowStatusEnum.SKIPPED.toString().equalsIgnoreCase(eventStatus)
+                && !StudyEventWorkflowStatusEnum.STOPPED.toString().equalsIgnoreCase(eventStatus)
 /********************
                 && !StudyEventWorkflowEnum.LOCKED.getDisplayValue().equalsIgnoreCase(eventStatus)
 */  )
@@ -1304,8 +1323,6 @@ public class ImportServiceImpl implements ImportService {
 
         // Event Crf has status complete or invalid
         // in complete status will not throw out error any more at this stage
-        if (eventCrf != null && eventCrf.getStatusId() != (Status.AVAILABLE.getCode()) && !isEventCrfCompleted(eventCrf))
-            return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_NOT_AVAILABLE);
 
 
         if (eventCrf == null) {

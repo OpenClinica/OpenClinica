@@ -437,7 +437,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 		    
 		   
 		    try {
-		    	
+		    	int fileCnt = 0;
 			    ArrayList<StudyEvent> subjectStudyEvents = studySubjectHibDao.fetchListSEs(studySubjectOID);
 			    for(StudyEvent studyEvent : subjectStudyEvents) {
 
@@ -456,6 +456,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 			    	if(eventCRFs.size() > 1) {			    		
 			    		eventCRFs.sort(EventCrf.getCompareByOrdinal());
 			    	}			    	
+			    	
 			    	
 			    	for(EventCrf eventCrf : eventCRFs) {
 			    		formLayoutOID = eventCrf.getFormLayout().getOcOid();
@@ -502,6 +503,9 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 								pdfHeaders.add(pdfHeader);
 								pdfFooterTime = this.pdfService.preparePdfFooterTime();
 								pdfLeftFooters.add(pdfFooterTime);
+								
+								fileCnt++;
+								logger.debug("******get pdf file back from enketo: " + fileCnt +" and fize size(MB):"+ pdfFile.length()/1000000);
 							}
 			    	    }										
 				        

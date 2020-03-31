@@ -202,7 +202,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
                 for (int v = 0; v < evts.size(); ++v) {
                     StudyEventBean seb = (StudyEventBean) evts.get(v);
-                    if (!(currentRole.isDirector() || currentRole.isCoordinator()) && (seb.getLocked()!=null && seb.getLocked())) {
+                    if (!(currentRole.isDirector() || currentRole.isCoordinator()) &&  seb.isLocked()) {
                         seb.setEditable(false);
                     }
                     events.add(seb);

@@ -661,7 +661,6 @@ public class StudyEventServiceImpl implements StudyEventService {
                     if (eventObject instanceof ErrorObj) {
                         return eventObject;
                     } else if (eventObject instanceof StudyEvent) {
-                        SubjectEventStatus subjectEventStatus = SubjectEventStatus.get(((StudyEvent) eventObject).getSubjectEventStatusId());
 
                         studyEventResponseDTO = new StudyEventResponseDTO();
                         studyEventResponseDTO.setSubjectKey(subjectDataBean.getStudySubjectID());
@@ -669,7 +668,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                         studyEventResponseDTO.setStartDate(studyEventDataBean.getStartDate());
                         studyEventResponseDTO.setEndDate(studyEventDataBean.getEndDate());
                         studyEventResponseDTO.setStudyEventRepeatKey(studyEventDataBean.getStudyEventRepeatKey());
-                        studyEventResponseDTO.setEventStatus(subjectEventStatus.getName());
+                        studyEventResponseDTO.setEventStatus(((StudyEvent) eventObject).getWorkflowStatus().toString());
                     }
                 }
             }
@@ -942,6 +941,51 @@ public class StudyEventServiceImpl implements StudyEventService {
         }
 
 
+    }
+
+public void convertStudyEventStatus(String value, StudyEvent studyEvent){
+        StudyEventWorkflowStatusEnum workflowStatus=convertOriginalStudyEventStatusToWorkflowSatus(value);
+        if (workflowStatus!=null) {
+            studyEvent.setWorkflowStatus(workflowStatus);
+        }else{
+            if (value.equals("7")) {
+                studyEvent.setLocked(Boolean.TRUE);
+            }else if (value.equals("8")){
+                studyEvent.setSigned(Boolean.TRUE);
+            }
+        }
+}
+
+    public void convertStudyEventBeanStatus(String value, StudyEventBean studyEventBean){
+        StudyEventWorkflowStatusEnum workflowStatus=convertOriginalStudyEventStatusToWorkflowSatus(value);
+        if (workflowStatus!=null) {
+            studyEventBean.setWorkflowStatus(workflowStatus);
+        }else{
+            if (value.equals("7")) {
+                studyEventBean.setLocked(Boolean.TRUE);
+            }else if (value.equals("8")){
+                studyEventBean.setSigned(Boolean.TRUE);
+            }
+        }
+    }
+
+    public StudyEventWorkflowStatusEnum convertOriginalStudyEventStatusToWorkflowSatus(String value) {
+        switch (value) {
+            case "1":
+                return StudyEventWorkflowStatusEnum.NOT_SCHEDULED;
+            case "2":
+                return StudyEventWorkflowStatusEnum.SCHEDULED;
+            case "3":
+                return StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED;
+            case "4":
+                return StudyEventWorkflowStatusEnum.COMPLETED;
+            case "5":
+                return StudyEventWorkflowStatusEnum.STOPPED;
+            case "6":
+                return StudyEventWorkflowStatusEnum.SKIPPED;
+            default:
+                return null;
+        }
     }
 
 }

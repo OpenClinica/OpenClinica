@@ -15,7 +15,7 @@ public class SubjectEventStatusFilter extends DroplistFilterEditor {
         List<Option> options = new ArrayList<Option>();
         for (StudyEventWorkflowStatusEnum workflowStatus : StudyEventWorkflowStatusEnum.values()) {
                 String subjectEventStatusDesc = workflowStatus.getDisplayValue();
-                options.add(new Option(subjectEventStatusDesc, subjectEventStatusDesc));
+                options.add(new Option(workflowStatus.toString(), workflowStatus.getDisplayValue()));
         }
         return options;
     }

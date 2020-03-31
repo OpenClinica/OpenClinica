@@ -43,6 +43,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +127,7 @@ public class ImportDataHelper {
         StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(studyEventId);
         // TODO need to replace, can't really replace
 
-        logger.info("found study event status: " + studyEventBean.getStatus().getName());
+        logger.info("found study event status: " + studyEventBean.getWorkflowStatus());
 
         // [study] event should be scheduled, event crf should be not started
 
@@ -239,8 +240,8 @@ public class ImportDataHelper {
                 // there is an event CRF already, only need to update
                 // is the status not started???
 
-                logger.info("*** already-started event CRF with msg: " + eventCrfBean.getStatus().getName());
-                if (eventCrfBean.getStatus().equals(Status.PENDING)) {
+                logger.info("*** already-started event CRF with msg: " + eventCrfBean.getWorkflowStatus());
+                if (eventCrfBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED)) {
                     logger.info("Not Started???");
                 }
                 eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCRFId);

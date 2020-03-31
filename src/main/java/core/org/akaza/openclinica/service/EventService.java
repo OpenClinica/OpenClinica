@@ -73,7 +73,7 @@ public class EventService implements EventServiceInterface {
 		// remove all study events
 		for (int j = 0; j < events.size(); j++) {
 			StudyEventBean event = (StudyEventBean) events.get(j);
-			if (event.getArchived()==null || ( event.getArchived() != null && !event.getArchived())) {
+			if ( !event.isArchived()) {
 				event.setArchived(Boolean.TRUE);
 				event.setUpdater(ub);
 				event.setUpdatedDate(new Date());
@@ -112,7 +112,7 @@ public class EventService implements EventServiceInterface {
 		// restore all study events
 		for (int j = 0; j < events.size(); j++) {
 			StudyEventBean event = (StudyEventBean) events.get(j);
-			if (event.getArchived() != null && event.getArchived()) {
+			if (event.isArchived()) {
 				event.setArchived(Boolean.FALSE);
 				event.setUpdater(ub);
 				event.setUpdatedDate(new Date());

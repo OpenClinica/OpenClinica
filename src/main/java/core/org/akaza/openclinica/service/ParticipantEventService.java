@@ -18,6 +18,7 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.BooleanUtils;
 
 public class ParticipantEventService {
 
@@ -38,9 +39,11 @@ public class ParticipantEventService {
         
         for (StudyEventBean studyEvent:studyEvents) {
             // Skip to next event if study event is not in the right status
-            if (studyEvent.getStatus() != Status.AVAILABLE || 
+            if (
+                    (studyEvent.isRemoved() || studyEvent.isArchived()) ||
                     (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
-                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED))) continue;
+                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)))
+                continue;
             
             List<EventDefinitionCRFBean> eventDefCrfs = getEventDefCrfsForStudyEvent(studySubject, studyEvent);
             
@@ -53,8 +56,10 @@ public class ParticipantEventService {
                     boolean eventCrfExists = false;
                     for (FormLayoutBean formLayout:formLayouts) {
                         EventCRFBean eventCRF = getEventCRFDAO().findByEventFormLayout(studyEvent, formLayout);
-                        if (eventCRF != null && eventCRF.getStatus() == Status.AVAILABLE) return studyEvent;
-                        else if (eventCRF != null) eventCrfExists = true;
+                        if (eventCRF!=null && !eventCRF.isRemoved()  && !eventCRF.isArchived())
+                            return studyEvent;
+                        else if (eventCRF != null)
+                            eventCrfExists = true;
                     }
                     if (!eventCrfExists) return studyEvent;
                     

@@ -116,7 +116,7 @@
         <sql>
             UPDATE study_event SET STUDY_EVENT_DEFINITION_ID=?,STUDY_SUBJECT_ID=?,LOCATION=?,
             SAMPLE_ORDINAL=?, DATE_START=?,DATE_END=?,STATUS_ID=?,DATE_UPDATED=now(),
-            UPDATE_ID=? , start_time_flag=?, end_time_flag=?, attestation=? ,workflow_status=?,removed=?,archived=?,locked=? WHERE STUDY_EVENT_ID=?
+            UPDATE_ID=? , start_time_flag=?, end_time_flag=?, attestation=? ,workflow_status=?,removed=?,archived=?,locked=?, signed=? WHERE STUDY_EVENT_ID=?
         </sql>
     </query>
     <query>

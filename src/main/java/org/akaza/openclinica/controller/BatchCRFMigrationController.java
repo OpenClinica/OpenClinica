@@ -24,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.StudyEventService;
 import io.swagger.annotations.Api;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
@@ -111,6 +112,9 @@ public class BatchCRFMigrationController implements Runnable {
     UserAccountBean userAccountBean;
     HttpServletRequest request;
     String urlBase;
+
+    @Autowired
+    StudyEventService studyEventService;
 
     public BatchCRFMigrationController() {
         super();
@@ -338,7 +342,7 @@ public class BatchCRFMigrationController implements Runnable {
         // event signed, check if subject is signed as well
 
         if (studySubject.getStatus() == Status.SIGNED) {
-            status_before_update = auditDao().findLastStatus("study_subject", studySubject.getStudySubjectId(), "8");
+            status_before_update = auditDao().findLastStatus("study_subject","Status" ,studySubject.getStudySubjectId(), "8");
             if (status_before_update != null && status_before_update.length() == 1) {
                 int subject_status = Integer.parseInt(status_before_update);
                 Status status = Status.getByCode(subject_status);
@@ -352,11 +356,9 @@ public class BatchCRFMigrationController implements Runnable {
         studyEvent.setUpdateId(helperObject.getUserAccountBean().getId());
         studyEvent.setDateUpdated(new Date());
 
-        status_before_update = auditDao().findLastStatus("study_event", studyEvent.getStudyEventId(), "8");
+        status_before_update = auditDao().findLastStatus("study_event","Status" ,studyEvent.getStudyEventId(), studyEvent.getSigned().toString());
         if (status_before_update != null && status_before_update.length() == 1) {
-            int status = Integer.parseInt(status_before_update);
-            eventStatus = SubjectEventStatus.get(status);
-            studyEvent.setSubjectEventStatusId(eventStatus.getId());
+          studyEventService.convertStudyEventStatus(status_before_update,studyEvent);
         }
 
         session.saveOrUpdate(studyEvent);

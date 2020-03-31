@@ -16,8 +16,6 @@ import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
-import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -138,16 +136,12 @@ public class SDVUtil {
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.LOCKED, "icon icon-lock");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SIGNED, "icon con-icon-sign green");
 
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SCHEDULED, "icon icon-clock2");
         STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED, "icon icon-clock");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SCHEDULED, "icon icon-clock2");
         STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED,  "icon icon-pencil-squared orange");
         STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.COMPLETED, "icon icon-checkbox-checked green");
         STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.STOPPED, "icon icon-stop-circle red");
         STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SKIPPED, "icon icon-redo");
-        /*******************
-          STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowEnum.LOCKED, "icon icon-lock");
-          */
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SIGNED, "icon con-icon-sign green");
 
 
 
@@ -949,16 +943,14 @@ public class SDVUtil {
                 tempSDVBean.setOpenQueries("<center>" + openQueriesCount + "</center>");
             tempSDVBean.setCrfName(getCRFName(eventCRFBean.getCRFVersionId()));
             tempSDVBean.setCrfVersion(getFormLayoutName(eventCRFBean.getFormLayoutId()));
-            if (eventCRFBean.getStatus() != null) {
-                Integer status = eventCRFBean.getStage().getId();
-
+                String eventCrfWorkflowStatus = eventCRFBean.getWorkflowStatus().toString();
                 StringBuilder crfStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
-                String input = "<input type=\"hidden\" statusId=\"" + status + "\" />";
+                String input = "<input type=\"hidden\" statusId=\"" + eventCrfWorkflowStatus + "\" />";
                 // "<input type=\"hidden\" statusId=\"1\" />"
 //                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
                 String statusTitle = "";
                 String statusIconClassName = "";
-                if (DataEntryStage.get(status).equals(DataEntryStage.LOCKED)) {
+                if(eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.LOCKED)){
                     statusTitle = DataEntryStage.LOCKED.getName();
                     statusIconClassName = FORM_LOCKED_ICON_CLASS_NAME;
                 } else {
@@ -967,7 +959,6 @@ public class SDVUtil {
                 }
                 crfStatusBuilder.append("<center><a title='" + statusTitle + "' alt='" + statusTitle + "' class='" + statusIconClassName + "' accessCheck' border='0'/></center>");
                 tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
-            }
             tempSDVBean.setSubjectEventStatus("<center><a title='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' alt='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' class='"+STUDY_EVENT_WORKFLOW_ICONS.get(eventCrf.getStudyEvent().getWorkflowStatus())+"' accessCheck' border='0'/></center>");
 
             // TODO: I18N Date must be formatted properly
@@ -1071,8 +1062,7 @@ public class SDVUtil {
                 } catch (UnsupportedEncodingException e) {
                     logger.error("Unsupported encoding");
                 }
-                Integer status = eventCRFBean.getStage().getId();
-                actionsBuilder.append(getCRFViewIconPath(status, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
+                actionsBuilder.append(getCRFViewIconPath(eventCrfWorkflowStatus, request, eventCRFBean.getId(), eventCRFBean.getFormLayoutId(),
                         eventCRFBean.getStudyEventId(), queryStringEncoded));
             }
 
@@ -1126,7 +1116,7 @@ public class SDVUtil {
         return allRows;
     }
 
-    private String getCRFViewIconPath(int statusId, HttpServletRequest request, int eventDefinitionCRFId,
+    private String getCRFViewIconPath(String eventCrfWorkflowStatus, HttpServletRequest request, int eventDefinitionCRFId,
                                       int formLayoutId, int studyEventId, String redirect) {
 
         HtmlBuilder html = new HtmlBuilder();
@@ -1140,7 +1130,7 @@ public class SDVUtil {
 
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
-        input.append(statusId).append("\" />");
+        input.append(eventCrfWorkflowStatus).append("\" />");
         String href = request.getContextPath() + "/EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId="
                 + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?" + redirect + "&mode=view";
         builder.append(
@@ -1481,8 +1471,8 @@ public class SDVUtil {
     public SdvDTO getFormDetailsForSDV(String studyOID, String formOID, String studyEventOID, String studySubjectLabel, int ordinal, boolean changedAfterSdvOnlyFilter) {
 
         EventCrf eventCrf = getEventCrfDao().findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOID, studySubjectLabel, formOID, ordinal);
-        if (eventCrf != null && !Status.get(eventCrf.getStatusId()).equals(Status.UNAVAILABLE))
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENT_CRF_NOT_COMPLETED);
+        if (eventCrf != null && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENT_CRF_NOT_COMPLETED);
         else if (eventCrf != null) {
             SdvDTO sdvDTO = new SdvDTO();
             sdvDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
@@ -1496,9 +1486,7 @@ public class SDVUtil {
             EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), parentStudy.getStudyId());
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
-            core.org.akaza.openclinica.domain.Status status = core.org.akaza.openclinica.domain.Status.getByCode(eventCrf.getStatusId());
-            core.org.akaza.openclinica.domain.datamap.SubjectEventStatus eventStatus = core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.getByCode(eventCrf.getStudyEvent().getSubjectEventStatusId());
-            if(eventCrf.getStudyEvent().getLocked()!=null && eventCrf.getStudyEvent().getLocked()) {
+            if(eventCrf.getStudyEvent().isCurrentlyLocked()) {
                 sdvDTO.setFormStatus("locked");
             } else
                 sdvDTO.setFormStatus("completed"); //EventCrf Status is checked to be UNAVAVAILABLE (i.e. COMPLETED) at parent If Itself
@@ -1508,9 +1496,19 @@ public class SDVUtil {
             for (ItemData itemData : getItemDataDao().findByEventCrfId(eventCrf.getEventCrfId())) {
 
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_AFTER_VERIFIED)) {
+                    Set<ItemFormMetadata> itemMetas = itemData.getItem().getItemFormMetadatas();
+                    String label = "";
+                    for (ItemFormMetadata itemMeta: itemMetas) {
+                        label = itemMeta.getLeftItemText();
+                        break;
+                    }
+                    
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
                     sdvItemDTO.setItemDataId(itemData.getItemDataId());
+                    sdvItemDTO.setItemId(itemData.getItem().getItemId());
                     sdvItemDTO.setName(itemData.getItem().getName());
+                    sdvItemDTO.setLabel(label);
+                    sdvItemDTO.setDescription(itemData.getItem().getDescription());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
                     sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());
                     sdvItemDTO.setOrdinal(itemData.getOrdinal());

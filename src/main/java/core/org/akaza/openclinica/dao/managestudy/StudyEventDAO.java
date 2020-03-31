@@ -116,6 +116,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         this.setTypeExpected(18, TypeNames.BOOL);// removed
         this.setTypeExpected(19, TypeNames.BOOL);// archived
         this.setTypeExpected(20, TypeNames.BOOL);// locked
+        this.setTypeExpected(21, TypeNames.BOOL);// signed
 
     }
 
@@ -197,10 +198,13 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         Boolean removed=  (Boolean) hm.get("removed");
         Boolean archived=  (Boolean) hm.get("archived");
         Boolean locked=  (Boolean) hm.get("locked");
+        Boolean signed=  (Boolean) hm.get("signed");
 
         eb.setRemoved(removed);
         eb.setArchived(archived);
         eb.setLocked(locked);
+        eb.setSigned(signed);
+
 
         return eb;
     }
@@ -294,7 +298,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), workflowStatus);
+        variables.put(Integer.valueOf(1), workflowStatus.toString());
         String sql = digester.getQuery("getCountofEventsBasedOnEventStatus");
 
         ArrayList rows = this.select(sql, variables);
@@ -637,7 +641,14 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         } else {
             variables.put(new Integer(15), sb.getLocked());
         }
-        variables.put(Integer.valueOf(16), Integer.valueOf(sb.getId()));
+        if (sb.getSigned() == null) {
+            nullVars.put(new Integer(16), new Integer(Types.BOOLEAN));
+            variables.put(new Integer(16), null);
+        } else {
+            variables.put(new Integer(16), sb.getSigned());
+        }
+
+        variables.put(Integer.valueOf(17), Integer.valueOf(sb.getId()));
 
         String sql = digester.getQuery("update");
         if (con == null) {

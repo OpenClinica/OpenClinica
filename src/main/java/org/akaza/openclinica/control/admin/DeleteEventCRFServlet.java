@@ -41,6 +41,7 @@ import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.BooleanUtils;
 
 /**
  * @author jxu
@@ -180,6 +181,11 @@ public class DeleteEventCRFServlet extends SecureController {
                 // getDynamicsItemFormMetadataDao().delete(eventCRFId);
                 // getDynamicsItemGroupMetadataDao().delete(eventCRFId);
 
+                eventCRF.setOldStatus(eventCRF.getStatus());
+                eventCRF.setStatus(Status.RESET);
+                eventCRF.setUpdater(ub);
+                eventCRF.setDateCompleted(null);
+                ecdao.update(eventCRF);
 
 
                 for (ItemDataBean itemdata : itemData) {
@@ -232,8 +238,14 @@ public class DeleteEventCRFServlet extends SecureController {
                 eventCRF.setDateCompleted(null);
                 ecdao.update(eventCRF);
 
-                if (event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) || event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED)) {
+                if (event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
                     event.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+                    event.setUpdater(ub);
+                    sedao = new StudyEventDAO(sm.getDataSource());
+                    sedao.update(event);
+                }
+                if ( event.isSigned()) {
+                    event.setSigned(Boolean.FALSE);
                     event.setUpdater(ub);
                     sedao = new StudyEventDAO(sm.getDataSource());
                     sedao.update(event);

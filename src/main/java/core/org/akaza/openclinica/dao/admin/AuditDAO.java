@@ -576,16 +576,18 @@ public class AuditDAO extends EntityDAO {
     // where audit_table=? and entity_id=?
     // and new_value=? order by audit_date LIMIT 1
 
-    public String findLastStatus(String audit_table, int entity_id, String new_value) {
+    public String findLastStatus(String audit_table,String entity_name, int entity_id, String new_value) {
         this.setTypesExpected();
-        this.setTypeExpected(1, TypeNames.STRING); // crf name
-        this.setTypeExpected(2, TypeNames.INT); // crf name
-        this.setTypeExpected(3, TypeNames.STRING); // crf name
+        this.setTypeExpected(1, TypeNames.STRING); // audit_table
+        this.setTypeExpected(2, TypeNames.STRING); // entity_name
+        this.setTypeExpected(3, TypeNames.INT); // entity_id
+        this.setTypeExpected(4, TypeNames.STRING); // new_value
 
         HashMap variables = new HashMap();
         variables.put(1, audit_table);
-        variables.put(2, entity_id);
-        variables.put(3, new_value);
+        variables.put(2, entity_name);
+        variables.put(3, entity_id);
+        variables.put(4, new_value);
 
         String sql = digester.getQuery("findLastStatus");
         ArrayList rows = this.select(sql, variables);

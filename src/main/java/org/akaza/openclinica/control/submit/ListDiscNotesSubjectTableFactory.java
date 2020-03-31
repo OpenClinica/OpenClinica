@@ -1050,7 +1050,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                 }
             }
 
-            else if (studyEvents.get(0).getLocked() !=null && studyEvents.get(0).getLocked()) {
+            else if ( studyEvents.get(0).isLocked()) {
                 eventDiv.tdEnd().trEnd(0);
                 if (currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) {
                     eventDiv.tr(0).valign("top").close();

@@ -10,6 +10,7 @@ import core.org.akaza.openclinica.domain.DataMapDomainObject;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang3.BooleanUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -45,6 +46,7 @@ public class StudyEvent extends DataMapDomainObject  {
 	private Boolean removed;
 	private Boolean archived;
 	private Boolean locked;
+	private Boolean signed;
 
 	public StudyEvent() {
 	}
@@ -304,5 +306,31 @@ public class StudyEvent extends DataMapDomainObject  {
 
 	public void setWorkflowStatus(StudyEventWorkflowStatusEnum workflowStatus) {
 		this.workflowStatus = workflowStatus;
+	}
+
+	@Column(name = "signed")
+	public Boolean getSigned() {
+		return signed;
+	}
+
+	public void setSigned(Boolean signed) {
+		this.signed = signed;
+	}
+
+	@Transient
+	public boolean isCurrentlyRemoved() {
+		return BooleanUtils.isTrue(this.getRemoved());
+	}
+	@Transient
+	public boolean isCurrentlyLocked() {
+		return BooleanUtils.isTrue(this.getLocked());
+	}
+	@Transient
+	public boolean isCurrentlyArchived() {
+		return BooleanUtils.isTrue(this.getArchived());
+	}
+	@Transient
+	public boolean isCurrentlySigned() {
+		return BooleanUtils.isTrue(this.getSigned());
 	}
 }

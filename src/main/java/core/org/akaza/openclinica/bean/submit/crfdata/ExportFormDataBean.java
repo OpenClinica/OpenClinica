@@ -25,7 +25,6 @@ public class ExportFormDataBean extends FormDataBean {
     private String crfVersion;
     private String interviewerName;
     private String interviewDate;
-    private String status;
     private EventCrfWorkflowStatusEnum workflowStatus;
     private String formLayoutName;
     private String formName;
@@ -62,14 +61,6 @@ public class ExportFormDataBean extends FormDataBean {
 
     public String getInterviewDate() {
         return this.interviewDate;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getStatus() {
-        return this.status;
     }
 
     public String getFormLayoutName() {

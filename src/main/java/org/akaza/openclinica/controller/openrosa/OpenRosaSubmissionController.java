@@ -234,7 +234,7 @@ public class OpenRosaSubmissionController {
             createItemData(items.get(0), "", eventCrf, userAccount);
         }
 
-        if (!eventCrf.getStatusId().equals(core.org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode())) {
+        if (!eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
             eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
             eventCrf.setUserAccount(userAccount);
             eventCrf.setUpdateId(userAccount.getUserId());
@@ -595,26 +595,15 @@ public class OpenRosaSubmissionController {
     }
 
     public void updateStudyEventStatus(Study study, StudySubject studySubject, StudyEventDefinition sed, StudyEvent studyEvent, UserAccount userAccount) {
-        List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
+        List<EventCrf> eventCrfs=studyEvent.getEventCrfs();
         List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
                 study.getStudyId());
         boolean statusChanged = false;
         studyEvent.setUpdateId(userAccount.getUserId());
         studyEvent.setDateUpdated(new Date());
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SIGNED) ) {
-            int count = 0;
-            for (EventCrf evCrf : eventCrfs) {
-                if (evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
-                        || evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.DELETED.getCode()
-                        || evCrf.getStatusId() == core.org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
-                    for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
-                        if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
-                            count++;
-                            break;
-                        }
-                    }
-                }
-            }
+        int count = getCountOfEventCrfsInEDC(eventCrfs,eventDefinitionCrfs);
+
+        if (studyEvent.isCurrentlySigned()) {
 
             if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
                 if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
@@ -634,17 +623,18 @@ public class OpenRosaSubmissionController {
         } else {
             boolean allFormsComplete = true;
             for (EventCrf evCrf : eventCrfs) {
-                if (studyEvent.getId() != evCrf.getId() && !evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                if (!evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                     allFormsComplete = false;
+                    break;
                 }
             }
-            if (allFormsComplete) {
-                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
+            if ((allFormsComplete && count == eventDefinitionCrfs.size()) || sed.getType().equals(COMMON)) {
+                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
                     studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
                     statusChanged = true;
                 }
             } else {
-                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED) ) {
+                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
                     studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                     statusChanged = true;
                 }
@@ -652,4 +642,23 @@ public class OpenRosaSubmissionController {
             persistStudyEvent(studyEvent, statusChanged);
         }
     }
+
+    private int getCountOfEventCrfsInEDC(List<EventCrf> eventCrfs ,List <EventDefinitionCrf> eventDefinitionCrfs){
+        int count=0;
+        for (EventCrf evCrf : eventCrfs) {
+            if (evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
+                    || evCrf.isCurrentlyRemoved()
+                    || evCrf.isCurrentlyArchived()
+                    ){
+                for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
+                    if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
 }

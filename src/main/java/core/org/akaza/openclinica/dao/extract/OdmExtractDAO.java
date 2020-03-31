@@ -39,9 +39,12 @@ import core.org.akaza.openclinica.job.JobTerminationMonitor;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import core.org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
+import core.org.akaza.openclinica.service.extract.GenerateClinicalDataService;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
@@ -439,6 +442,8 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.TIMESTAMP); // audit_date
         ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // audit_entity_name
+        ++i;
         this.setTypeExpected(i, TypeNames.STRING); // reason_for_change
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // old_value
@@ -462,6 +467,8 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.INT); // user_id
         ++i;
         this.setTypeExpected(i, TypeNames.TIMESTAMP); // audit_date
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // audit_entity_name
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // reason_for_change
         ++i;
@@ -2178,6 +2185,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return nullValueCVs;
     }
 
+    // Gets Clinical Data for xml dataset extract
     public void getClinicalData(Study study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType , String permissionTagsString) {
         String dbName = CoreResources.getDBName();
         String subprev = "";
@@ -2595,6 +2603,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String type = (String) row.get("name");
             Integer userId = (Integer) row.get("user_id");
             Date auditDate = (Date) row.get("audit_date");
+            String entity_name = (String) row.get("entity_name");
             String auditReason = (String) row.get("reason_for_change");
             String oldValue = (String) row.get("old_value");
             String newValue = (String) row.get("new_value");
@@ -2624,8 +2633,15 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setDetails(details);
                 auditLog.setAuditLogEventTypeId(typeId);
-                auditLog.setNewValue(newValue);
-                auditLog.setOldValue(oldValue);
+
+                   if(entity_name.equals("Status")) {
+                       auditLog.setOldValue(setStudyEventStatus(oldValue));
+                       auditLog.setNewValue(setStudyEventStatus(newValue));
+                   }else {
+                       auditLog.setOldValue(oldValue);
+                       auditLog.setNewValue(newValue);
+                   }
+
 
                 AuditLogsBean logs = se.getAuditLogs();
                 if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
@@ -2653,6 +2669,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String type = (String) row.get("name");
             Integer userId = (Integer) row.get("user_id");
             Date auditDate = (Date) row.get("audit_date");
+            String entity_name = (String) row.get("entity_name");
             String auditReason = (String) row.get("reason_for_change");
             String oldValue = (String) row.get("old_value");
             String newValue = (String) row.get("new_value");
@@ -2669,9 +2686,13 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setAuditLogEventTypeId(typeId);
+            if(entity_name.equals("Status")) {
+                auditLog.setOldValue(setEventCrfStatus(oldValue));
+                auditLog.setNewValue(setEventCrfStatus(newValue));
+            }else {
                 auditLog.setOldValue(oldValue);
                 auditLog.setNewValue(newValue);
-
+            }
 
                   // Fix for 0011675: SDV'ed subject is dipslayed as not SDV'ed in the 1.3 Full ODM Extract commenting
                   // out the following lines as these are treated like booleans while they are strings
@@ -3488,7 +3509,6 @@ public class OdmExtractDAO extends DatasetDAO {
     protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
                                                 String studySubjectIds) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select Distinct ss.oc_oid as\n" +
                 "        study_subject_oid, ss.label, s.unique_identifier, ss.secondary_label, s.gender, s.date_of_birth, ss.status_id, null as sgc_id, null as sgc_name, null as sg_name,  sed.ordinal\n" +
                 "        as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating, se.sample_ordinal as\n" +
@@ -3518,6 +3538,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 "        and ss.study_subject_id in \n" +
                 "        ("+studySubjectIds+")\n" +
                 "        and idata.item_id in "+itemIds +
+                "        and ec.workflow_status "+ ecStatusConstraint+
                 "        and length (value) > 0\n" +
                 "        and (ec.removed  !='true' or ec.removed  IS NULL) "+
                 "        and (ec.archived !='true' or ec.archived IS NULL) "+
@@ -3531,17 +3552,16 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getEventGroupItemSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select cvidata.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
                 + " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id, cvidata.item_data_id"
                 + " from (select ec.event_crf_id, ec.crf_version_id, item.item_id, item.oc_oid as item_oid,"
                 + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id from item,"
-                + " (select event_crf_id, item_id, ordinal, item_data_id, value from item_data where (status_id " + itStatusConstraint + ")"
-                + " and event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
+                + " (select event_crf_id, item_id, ordinal, item_data_id, value from item_data where "
+                + "  event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
                 + " ss.study_subject_id from study_subject ss where ss.study_id in (" + studyIds + ") " + dateConstraint + ") and study_event_id"
                 + " in (select distinct study_event_id from study_event" + " where study_event_definition_id in " + sedIds + " and study_subject_id in ("
                 + " select distinct ss.study_subject_id from study_subject ss where ss.study_id in (" + studyIds + ") " + dateConstraint + "))))idata,"
-                + " (select event_crf_id, crf_version_id from event_crf where status_id " + ecStatusConstraint + ")ec" + " where item.item_id in " + itemIds
+                + " (select event_crf_id, crf_version_id from event_crf ec where ec.workflow_status " + ecStatusConstraint + ")ec" + " where item.item_id in " + itemIds
                 + " and length(idata.value) > 0 and item.item_id = idata.item_id and idata.event_crf_id = ec.event_crf_id"
                 + " order by ec.event_crf_id, ec.crf_version_id, item.item_id, idata.ordinal) cvidata, item_group_metadata igm,"
                 + " item_group ig where cvidata.crf_version_id = igm.crf_version_id and cvidata.item_id = igm.item_id"
@@ -3551,25 +3571,23 @@ public class OdmExtractDAO extends DatasetDAO {
     // should mapped to non-completed
     protected String getEventCrfIdsByItemDataSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds  +
-                " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
+                " and idata.event_crf_id in (select event_crf_id from event_crf ec where study_subject_id in"
                 + " (select ss.study_subject_id from study_subject ss WHERE ss.study_id in (" + studyIds + ") " + dateConstraint + ")"
                 + " and study_event_id in (select study_event_id from study_event where study_event_definition_id in " + sedIds
                 + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_id in (" + studyIds + ") " + dateConstraint + "))"
-                + " and (status_id " + ecStatusConstraint + ")) and length(value) > 0";
+                + " and (ec.workflow_status " + ecStatusConstraint + ")) and length(value) > 0";
     }
 
     protected String getEventCrfIdsByItemDataSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
             String studySubjectIds) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds  +
-                " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
+                " and idata.event_crf_id in (select event_crf_id ec from event_crf where study_subject_id in"
                 + " (select ss.study_subject_id from study_subject ss WHERE ss.study_subject_id in (" + studySubjectIds + ") " + ")"
                 + " and study_event_id in (select study_event_id from study_event where study_event_definition_id in " + sedIds
                 + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ") " + "))"
-                + " and (status_id " + ecStatusConstraint + ")) and length(value) > 0";
+                + " and (ec.workflow_status " + ecStatusConstraint + ")) and length(value) > 0";
     }
 
     protected String getEventDefinitionCrfCondition(int studyId, int parentStudyId, boolean isIncludedSite) {
@@ -3600,7 +3618,6 @@ public class OdmExtractDAO extends DatasetDAO {
     protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
                                                   String studySubjectIds) {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
-        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select table1.*, mu.oc_oid as mu_oid \n" +
                 "from       (select \n" +
                 "       ec.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name, \n" +
@@ -3621,7 +3638,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 "      \n" +
                 "       ss.study_subject_id in ("+studySubjectIds+") and \n" +
                 "\n" +
-                "      item.item_id in "+itemIds+"  and length(idata.value) > 0 and\n" +
+                "      item.item_id in "+itemIds+" and\n" +
+                "      ec.workflow_status "+ecStatusConstraint+" and\n" +
                 "      se.study_event_definition_id in  "+sedIds+
                 "      ) table1\n" +
                 "       left join\n" +
@@ -3667,7 +3685,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCEventDataAuditsSql(String studySubjectOids) {
         return "select ss.oc_oid as study_subject_oid, sed.oc_oid as definition_oid, ale.audit_id,se.sample_ordinal as event_repeat,"
-                + " alet.name, ale.user_id, ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.details," + " ale.audit_log_event_type_id"
+                + " alet.name, ale.user_id, ale.audit_date,ale.entity_name ,ale.reason_for_change, ale.old_value, ale.new_value, ale.details," + " ale.audit_log_event_type_id"
                 + " from audit_log_event ale, study_subject ss, study_event se, study_event_definition sed, audit_log_event_type alet"
                 + " where audit_table = 'study_event' and ss.oc_oid in (" + studySubjectOids + ") and ss.study_subject_id = se.study_subject_id"
                 + " and ale.entity_id = se.study_event_id" + " and se.study_event_definition_id = sed.study_event_definition_id"
@@ -3676,11 +3694,11 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCFormDataAuditsSql(String studySubjectOids, String ecIds) {
         return "select ale.entity_id as event_crf_id, ale.audit_id, alet.name, ale.user_id,"
-                + " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
+                + " ale.audit_date,ale.entity_name, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
                 + " from audit_log_event ale, study_subject ss, event_crf ec, audit_log_event_type alet"
                 + " where audit_table = 'event_crf' and ec.event_crf_id in (" + ecIds + ") and ss.oc_oid in (" + studySubjectOids
                 + ") and ss.study_subject_id = ec.study_subject_id" + " and ale.entity_id = ec.event_crf_id"
-                + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id" + " order by ale.entity_id asc";
+                + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id" + " order by ale.audit_id asc";
     }
 
     protected String getOCItemDataAuditsSql(String idataIds) {
@@ -3888,5 +3906,84 @@ public class OdmExtractDAO extends DatasetDAO {
             //logger.info("permissionTagsLookup : " + permissionTagsLookupNoPermissionTags(edc));
             return (viewRows.size() > 0 ?  true:  false) ;
     }
+    public String setStudyEventStatus(String value) {
+        if (!StringUtils.isEmpty(value)) {
+            return setStudyEventWorkflowStatus(value);
+        } else {
+            return "";
+        }
+    }
 
+    public String setEventCrfStatus(String value) {
+        if (!StringUtils.isEmpty(value)) {
+            return setEventCrfWorkflowStatus(value);
+        } else {
+            return "";
+        }
+    }
+
+
+
+    public String setOriginalEventCrfStatus(String value) {
+        switch (value) {
+            case "1":
+                return EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue();
+            case "2":
+                return EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue();
+            case "5":
+                return "removed";
+            case "6":
+                return "locked";
+            case "7":
+                return "removed";
+            case "11":
+                return EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue();
+            default:
+                return "";
+        }
+    }
+
+
+
+    public String setStudyEventWorkflowStatus(String value) {
+        for (StudyEventWorkflowStatusEnum theEnum : StudyEventWorkflowStatusEnum.values()) {
+            if (value.equals(theEnum.toString())) {
+                return theEnum.getDisplayValue();
+            }
+        }
+        return setOriginalStudyEventStatus(value);
+    }
+
+    public String setEventCrfWorkflowStatus(String value) {
+        for (EventCrfWorkflowStatusEnum theEnum : EventCrfWorkflowStatusEnum.values()) {
+            if (value.equals(theEnum.toString())) {
+                return theEnum.getDisplayValue();
+            }
+        }
+        return setOriginalEventCrfStatus(value);
+
+    }
+
+    public String setOriginalStudyEventStatus(String value) {
+        switch (value) {
+            case "1":
+                return StudyEventWorkflowStatusEnum.NOT_SCHEDULED.getDisplayValue();
+            case "2":
+                return StudyEventWorkflowStatusEnum.SCHEDULED.getDisplayValue();
+            case "3":
+                return StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.getDisplayValue();
+            case "4":
+                return StudyEventWorkflowStatusEnum.COMPLETED.getDisplayValue();
+            case "5":
+                return StudyEventWorkflowStatusEnum.STOPPED.getDisplayValue();
+            case "6":
+                return StudyEventWorkflowStatusEnum.SKIPPED.getDisplayValue();
+            case "7":
+                return "locked";
+            case "8":
+                return "signed";
+            default:
+                return "";
+        }
+    }
 }

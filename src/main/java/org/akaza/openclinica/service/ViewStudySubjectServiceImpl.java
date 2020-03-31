@@ -241,7 +241,6 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(maxOrdinal + 1);
         studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
-        studyEvent.setStatusId(Status.AVAILABLE.getCode());
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
         studyEvent.setUserAccount(userAccount);
