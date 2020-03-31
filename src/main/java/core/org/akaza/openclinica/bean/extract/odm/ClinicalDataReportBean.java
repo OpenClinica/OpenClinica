@@ -842,7 +842,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             }
         }
 
-        if (dn.getThreadNumber() != null && dn.getThreadNumber()!=0) {
+        if (dn.getThreadNumber() != null && dn.getThreadNumber() != 0) {
             String s = String.valueOf(dn.getThreadNumber());
             if (s.length() > 0) {
                 xml.append("QueryID=\"" + s + "\" ");
