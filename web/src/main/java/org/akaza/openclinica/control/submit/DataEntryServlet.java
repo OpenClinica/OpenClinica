@@ -40,6 +40,7 @@ import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
@@ -5717,4 +5718,51 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
             ins.itemsInstantUpdate(section.getDisplayItemGroups(), nonRepOri);
         }
     }
+    
+    /**
+     * 
+     * @param request
+     * @throws InsufficientPermissionException
+     */
+    public void checkUpdateDataPermission(HttpServletRequest request) throws InsufficientPermissionException {
+        Boolean auth = true;
+        UserAccountBean userBean =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+
+        int currentStudyParentId; //used to hold the id of the study/site the user is in
+        if(currentStudy.getParentStudyId() == 0){//user is at the Study level
+            currentStudyParentId =  currentStudy.getId();
+        }else{//user is at the site level
+            currentStudyParentId = currentStudy.getParentStudyId();
+        }
+
+        ArrayList userRoles = userBean.getRoles();
+        String submitted =(String) request.getParameter("submitted");
+        String checkInputs = (String)request.getParameter("checkInputs");
+
+        if(submitted !=null && submitted.equals("1") && checkInputs!=null && checkInputs.equals("1")) {
+            for (int i = 0; i < userRoles.size(); i++) {
+                StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
+
+                if(studyRole.getRole().equals(Role.MONITOR) && studyRole.getStudyId() == currentStudy.getId())
+                {
+                    auth = false;
+
+                    break;
+                }
+            }
+
+            // continue to check the left open tab, it  maybe in different study
+            String studyId = (String)request.getParameter("sid");
+            //The study id is always the study level id of the study, never the site.
+            if(studyId !=null && Integer.parseInt(studyId) != currentStudyParentId) {
+                 auth = false;
+            }
+        }
+
+        if(!auth) {
+             addPageMessage(respage.getString("you_not_have_permission_update_a_CRF"), request);
+             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("no_permission_to_perform_data_entry"), "1");
+        }
+	}
 }

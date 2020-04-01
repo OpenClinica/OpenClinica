@@ -449,10 +449,8 @@ public class CreateCRFVersionServlet extends SecureController {
                     }
 
                     if (htab.isRepeating()) {
-                        logger.debug("===>>>htab IS repeating");
                         nib = htab.toNewCRF(sm.getDataSource(), respage);
                     } else {
-                        logger.debug("===>>>htab IS NOT repeating");
                         nib = sstc.toNewCRF(sm.getDataSource(), respage);
                     }
 
@@ -695,7 +693,6 @@ public class CreateCRFVersionServlet extends SecureController {
                 ResponseOptionBean rob = (ResponseOptionBean) oldOptions.get(i);
                 String text = rob.getText();
                 String value = rob.getValue();
-
                 for (int j = i; j < newOptions.size(); j++) {// from
                     // spreadsheet
                     ResponseOptionBean rob1 = (ResponseOptionBean) newOptions.get(j);
@@ -705,7 +702,6 @@ public class CreateCRFVersionServlet extends SecureController {
                     String text1 = restoreQuotes(rob1.getText());
 
                     String value1 = restoreQuotes(rob1.getValue());
-                    logger.debug("in hasDifferentOption value1: " + value1);
 
                     if (StringUtil.isBlank(text1) && StringUtil.isBlank(value1)) {
                         // this response label appears in the spreadsheet

@@ -83,7 +83,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         HttpSession session = request.getSession();
         locale = LocaleResolver.getLocale(request);
-
+        this.checkUpdateDataPermission(request);
 
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
