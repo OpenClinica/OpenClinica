@@ -1349,7 +1349,6 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                              sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
                             
                         } else {
-                            logger.debug("Response Values saved to Postgres: " + resValues);
                             /*sql =
                                 "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, " + "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('"
                                     + stripQuotes(responseLabel) + "', E'" + stripQuotes(resOptions) + "', E'" + stripQuotes(resValues) + "',"
