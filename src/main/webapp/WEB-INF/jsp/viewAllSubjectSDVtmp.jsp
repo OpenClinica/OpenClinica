@@ -368,8 +368,7 @@
         <tbody>
         </tbody>
     </table>
-    <input type="button" id="sdvVerify" name="sdvVerify" value="Verify" onclick="submitSdv(document.sdvForm, 2)"
-           data-eventcrfid="2" data-formlayoutid="1" data-studyeventid="1">
+    <input type="button" id="sdvVerify" name="sdvVerify" value="Verify">
 </div>
 
 <script>
@@ -496,7 +495,7 @@
             getItems();
         }).change();
 
-        var verifyButton = $(this).siblings()[3];
+        var verifyButton = $(this).siblings('[name=sdvVerify]');
         $('#sdvVerify').off('click').click(function () {
             $(verifyButton).click();
         });
