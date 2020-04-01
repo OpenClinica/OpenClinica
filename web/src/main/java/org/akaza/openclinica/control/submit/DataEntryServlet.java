@@ -5725,57 +5725,44 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
      * @throws InsufficientPermissionException
      */
     public void checkUpdateDataPermission(HttpServletRequest request) throws InsufficientPermissionException {
-		  Boolean auth = true;
-		  UserAccountBean userBean =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-		  StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
-		  LOGGER.debug("===>>>current study oid: " + currentStudy.getOid());
-		  //Introduced to fix OC-12586 /////////////////////////
-          int currentStudyParentId; //used to hold the id of the study/site the user is in
-          int currentSiteId;
-          if(currentStudy.getParentStudyId() == 0){//user is at the Study level
-              LOGGER.debug("user is at the study level");
-              currentStudyParentId =  currentStudy.getId();;
-              currentSiteId =  0;
-          }else{//user is at the site level
-              LOGGER.debug("user is at the site level");
-              currentStudyParentId = currentStudy.getParentStudyId();
-              currentSiteId = currentStudy.getId();
-          }
-          LOGGER.debug("===>>>currentStudyParentId:       " + currentStudyParentId);
-          LOGGER.debug("===>>>currentSiteId:              " + currentSiteId);
-          //// END fix of OC-12586 - Z //////////////////////////
-		  ArrayList userRoles = userBean.getRoles();
-		  String submitted =(String) request.getParameter("submitted");
-		  String checkInputs = (String)request.getParameter("checkInputs");
+        Boolean auth = true;
+        UserAccountBean userBean =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
 
-		  if(submitted !=null && submitted.equals("1") && checkInputs!=null && checkInputs.equals("1")) {
-			  for (int i = 0; i < userRoles.size(); i++) {
-		            StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
+        int currentStudyParentId; //used to hold the id of the study/site the user is in
+        if(currentStudy.getParentStudyId() == 0){//user is at the Study level
+            currentStudyParentId =  currentStudy.getId();
+        }else{//user is at the site level
+            currentStudyParentId = currentStudy.getParentStudyId();
+        }
 
-                    //Check if the user is a monitor and if the user is in the site or study the form is in
-                    LOGGER.debug("===>>>studyRole.getStudyId():     " + studyRole.getStudyId());
-                    if(studyRole.getRole().getId() == Role.MONITOR.getId() &&
-                          (studyRole.getStudyId() == currentStudyParentId || studyRole.getStudyId() == currentSiteId))
-					  {
-						auth = false;
-						
-						break;
-					  }
-			  }
-			
-			  // continue to check the left open tab, it  maybe in different study
-			  String studyId = (String)request.getParameter("sid");
-			  LOGGER.debug("===>>>studyId from request param sid:   " + studyId);
-			  //The study id is always the study level id of the study, never the site.
-			  if(studyId !=null && Integer.parseInt(studyId) != currentStudyParentId) {
-					 auth = false;				
-			  }
-		  }
-	     		
-		 LOGGER.debug("===>>>auth: " + auth);
-		if(!auth) {
-			 addPageMessage(respage.getString("you_not_have_permission_update_a_CRF"), request);
+        ArrayList userRoles = userBean.getRoles();
+        String submitted =(String) request.getParameter("submitted");
+        String checkInputs = (String)request.getParameter("checkInputs");
+
+        if(submitted !=null && submitted.equals("1") && checkInputs!=null && checkInputs.equals("1")) {
+            for (int i = 0; i < userRoles.size(); i++) {
+                StudyUserRoleBean studyRole = (StudyUserRoleBean) userRoles.get(i);
+
+                if(studyRole.getRole().equals(Role.MONITOR) && studyRole.getStudyId() == currentStudy.getId())
+                {
+                    auth = false;
+
+                    break;
+                }
+            }
+
+            // continue to check the left open tab, it  maybe in different study
+            String studyId = (String)request.getParameter("sid");
+            //The study id is always the study level id of the study, never the site.
+            if(studyId !=null && Integer.parseInt(studyId) != currentStudyParentId) {
+                 auth = false;
+            }
+        }
+
+        if(!auth) {
+             addPageMessage(respage.getString("you_not_have_permission_update_a_CRF"), request);
              throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("no_permission_to_perform_data_entry"), "1");
-		}
+        }
 	}
 }
