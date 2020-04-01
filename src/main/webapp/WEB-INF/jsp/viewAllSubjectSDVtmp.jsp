@@ -408,10 +408,10 @@
 
     function formatDate(date) {
         date = moment(date);
-        if (date.hours === 0 && date.minutes === 0 && date.seconds === 0) {
-            return date.format('MM/DD/YYYY');
+        if ((date.hours === 0 || date.hours === 12) && date.minutes === 0 && date.seconds === 0) {
+            return date.format('DD-MMM-YYYY');
         } else {
-            return date.format('MM/DD/YYYY hh:mm:ss');
+            return date.format('DD-MMM-YYYY hh:mm');
         }
     }
 
