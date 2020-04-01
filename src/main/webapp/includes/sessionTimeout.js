@@ -109,10 +109,13 @@ function processUserData(inputPromise) {
             console.log("setting current user to:" + userName);
             console.log("resetting firstTimeLogin to false");
             storage.set(CURRENT_USER, userName).then(function() {
-                jQuery.get(myContextPath + '/pages/resetFirstLogin')
-                    .error(function (jqXHR, textStatus, errorThrown) {
-                        "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
-                    });
+                const resetPromise = jQuery.get(myContextPath + '/pages/resetFirstLogin');
+                if (jQuery.get().error)
+                    resetPromise.error(function (jqXHR, textStatus, errorThrown) {
+                            "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
+                        });
+                else
+                    resetPromise.fail(function () { "Error calling :" + myContextPath + '/pages/resetFirstLogin' });
             });
         } else {
             var thisUser = res;
@@ -122,10 +125,13 @@ function processUserData(inputPromise) {
                 window.location.replace (myContextPath + '/pages/invalidateKeycloakToken');
 
             } else if (firstLoginCheck === "true") {
-                jQuery.get(myContextPath + '/pages/resetFirstLogin')
-                    .error(function (jqXHR, textStatus, errorThrown) {
-                        "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
-                    });
+                const resetPromise = jQuery.get(myContextPath + '/pages/resetFirstLogin');
+                if (jQuery.get().error)
+                    resetPromise.error(function (jqXHR, textStatus, errorThrown) {
+                            "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
+                        });
+                else
+                    resetPromise.fail(function () { "Error calling :" + myContextPath + '/pages/resetFirstLogin' });
             }
         }
     }).then(function(res) {
@@ -170,10 +176,13 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
                         console.log("setting newExpiration:" + newExpiration);
                         return storage.set(ocAppTimeoutKey, newExpiration);
                     }
-                    jQuery.get(myContextPath + '/pages/keepAlive')
-                        .error(function (jqXHR, textStatus, errorThrown) {
-                            "Error calling :" + myContextPath + '/pages/keepAlive' + " " + textStatus + " " + errorThrown
-                        });
+                    const keepPromise = jQuery.get(myContextPath + '/pages/keepAlive');
+                    if (jQuery.get().error)
+                        keepPromise.error(function (jqXHR, textStatus, errorThrown) {
+                                "Error calling :" + myContextPath + '/pages/keepAlive' + " " + textStatus + " " + errorThrown
+                            });
+                    else
+                        keepPromise.fail(function () { "Error calling :" + myContextPath + '/pages/keepAlive' });
                 }
             }
     }).then(function(res) {
