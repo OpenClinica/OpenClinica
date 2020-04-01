@@ -2185,6 +2185,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return nullValueCVs;
     }
 
+    // Gets Clinical Data for xml dataset extract
     public void getClinicalData(Study study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType , String permissionTagsString) {
         String dbName = CoreResources.getDBName();
         String subprev = "";
@@ -3637,7 +3638,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 "      \n" +
                 "       ss.study_subject_id in ("+studySubjectIds+") and \n" +
                 "\n" +
-                "      item.item_id in "+itemIds+"  and length(idata.value) > 0 and\n" +
+                "      item.item_id in "+itemIds+" and\n" +
                 "      ec.workflow_status "+ecStatusConstraint+" and\n" +
                 "      se.study_event_definition_id in  "+sedIds+
                 "      ) table1\n" +

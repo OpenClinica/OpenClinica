@@ -720,10 +720,10 @@ public class XsltTransformJob extends QuartzJobBean {
         }
 
         // since zip is successful, deleting the endfile.
-        logger.info("About to delete file" + EndFile.getName());
+        logger.info("About to delete file: " + EndFile.getName());
         boolean deleted = EndFile.delete();
-        logger.info("deleted?" + deleted);
-        logger.info("Does the file exist still?" + EndFile.exists());
+        logger.info("deleted? " + deleted);
+        logger.info("Does the file exist still? " + EndFile.exists());
         return deleteFilesList;
 
     }

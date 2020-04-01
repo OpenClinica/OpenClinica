@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.File;
@@ -50,21 +51,21 @@ import static org.akaza.openclinica.service.UserService.BULK_JOBS;
 import static org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
 
 @Service("ParticipantService")
-@Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
 public class ParticipantServiceImpl implements ParticipantService {
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String PARTICIPANT_IMPORT = "_Participant_Import";
 
     private SubjectDAO subjectDao;
-	private StudyParameterValueDAO studyParameterValueDAO;		
-	private StudySubjectDAO studySubjectDao;
+    private StudyParameterValueDAO studyParameterValueDAO;
+    private StudySubjectDAO studySubjectDao;
     private StudySubjectDAO ssDao;
 
     @Autowired
     private StudyDao studyDao;
 
     @Autowired
-	private UserAccountDAO userAccountDao;
+    private UserAccountDAO userAccountDao;
 
     @Autowired
     private UserAccountDao userAccountHibDao;
@@ -85,48 +86,47 @@ public class ParticipantServiceImpl implements ParticipantService {
     private UtilService utilService;
 
     @Autowired
-	@Qualifier("dataSource")
-	private DataSource dataSource;
+    @Qualifier("dataSource")
+    private DataSource dataSource;
 
-    
+
     public List<StudySubjectBean> getStudySubject(Study study) {
         return getStudySubjectDao().findAllByStudy(study);
 
     }
 
-   /**
-    * 
-    * @param subjectTransfer
-    * @param currentStudy
-    * @return
-    * @throws OpenClinicaException
-    */
-    public String createParticipant(SubjectTransferBean subjectTransfer,Study currentStudy,String accessToken,
-                                    String realm,String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
+    /**
+     * @param subjectTransfer
+     * @param currentStudy
+     * @return
+     * @throws OpenClinicaException
+     */
+    public String createParticipant(SubjectTransferBean subjectTransfer, Study currentStudy, String accessToken,
+                                    String realm, String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
 
 
         // create subject
         Study siteStudy = subjectTransfer.getSiteStudy();
-        StudySubject studySubject=null;
+        StudySubject studySubject = null;
 
-        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getStudyId());
+        StudySubjectBean studySubjectBean = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getStudyId());
 
         StudySubjectBean studySubjectBeanInParent = new StudySubjectBean();
         if (currentStudy.isSite()) {
             studySubjectBeanInParent = getStudySubjectDao().findByLabelAndStudyForCreatingParticipant(subjectTransfer.getPersonId(), currentStudy.getStudy().getStudyId());
         }
-        if(!validateService.isStudyAvailable(currentStudy.getOc_oid()))
+        if (!validateService.isStudyAvailable(currentStudy.getOc_oid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
 
 
-        if(!validateService.isSiteAvailable(siteStudy.getOc_oid()))
+        if (!validateService.isSiteAvailable(siteStudy.getOc_oid()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
 
-        if(!utilService.isParticipantUniqueToSite(siteStudy.getOc_oid(),subjectTransfer.getStudySubjectId()))
+        if (!utilService.isParticipantUniqueToSite(siteStudy.getOc_oid(), subjectTransfer.getStudySubjectId()))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
 
 
-        if(studySubjectBean==null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
+        if (studySubjectBean == null || (!studySubjectBean.isActive() && !studySubjectBeanInParent.isActive())) {
             // Create New Study Subject
             SubjectBean subjectBean = new SubjectBean();
             subjectBean.setStatus(Status.AVAILABLE);
@@ -155,27 +155,27 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         }
         // OC-11095 Adding Contact information Through Rest API on a signed participant is failing
-        if(studySubjectBean!=null && !(studySubjectBean.getStatus().equals(Status.AVAILABLE) || studySubjectBean.getStatus().equals(Status.SIGNED)))
+        if (studySubjectBean != null && !(studySubjectBean.getStatus().equals(Status.AVAILABLE) || studySubjectBean.getStatus().equals(Status.SIGNED)))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
 
-        studySubject = saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,userAccountBean);
+        studySubject = saveOrUpdateStudySubjectDetails(studySubjectBean, subjectTransfer, userAccountBean);
 
-        if (!studySubjectBean.isActive() || studySubject==null) {
+        if (!studySubjectBean.isActive() || studySubject == null) {
             throw new OpenClinicaException("Could not create study subject", "4");
         }
 
-       //update subject account
-       if(siteStudy != null) {
-    	   //update at site level
-    	   updateStudySubjectSize(subjectTransfer.getSiteStudy());
-    	   // update at parent level
-    	   updateStudySubjectSize(currentStudy);
-       }else {
-    	   updateStudySubjectSize(currentStudy);
-       }
+        //update subject account
+        if (siteStudy != null) {
+            //update at site level
+            updateStudySubjectSize(subjectTransfer.getSiteStudy());
+            // update at parent level
+            updateStudySubjectSize(currentStudy);
+        } else {
+            updateStudySubjectSize(currentStudy);
+        }
 
 
-        if(subjectTransfer.isRegister()) {
+        if (subjectTransfer.isRegister()) {
             OCParticipantDTO oCParticipantDTO = new OCParticipantDTO();
             oCParticipantDTO.setFirstName(subjectTransfer.getFirstName());
             oCParticipantDTO.setLastName(subjectTransfer.getLastName());
@@ -184,21 +184,22 @@ public class ParticipantServiceImpl implements ParticipantService {
             oCParticipantDTO.setIdentifier(subjectTransfer.getIdentifier());
             ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(locale);
             userService.connectParticipant(currentStudy.getOc_oid(), subjectTransfer.getPersonId(),
-                    oCParticipantDTO, accessToken, userAccountBean, realm,customerUuid, textsBundle);
+                    oCParticipantDTO, accessToken, userAccountBean, realm, customerUuid, textsBundle);
         }
 
 
         return studySubject.getLabel();
-   }
+    }
 
-/**
- * @param currentStudy
- */
-private void updateStudySubjectSize(Study currentStudy) {
-	int subjectCount = getSubjectCount(currentStudy);
-	   currentStudy.setSubjectCount(subjectCount+1);
-	   studyDao.update(currentStudy);
-}
+    /**
+     * @param currentStudy
+     */
+    private void updateStudySubjectSize(Study currentStudy) {
+        int subjectCount = getSubjectCount(currentStudy);
+        currentStudy.setSubjectCount(subjectCount + 1);
+        studyDao.update(currentStudy);
+    }
+
     /**
      * Validate the listStudySubjectsInStudy request.
      * @param studyOid
@@ -206,31 +207,30 @@ private void updateStudySubjectSize(Study currentStudy) {
      * @param request
      * @return
      */
-    public Study validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request) throws OpenClinicaSystemException{
+    public Study validateRequestAndReturnStudy(String studyOid, String siteOid, HttpServletRequest request) throws OpenClinicaSystemException {
 
         String userName = getUserAccount(request).getName();
         Study study = null;
         Study site = null;
-        
+
         if (studyOid == null && siteOid == null) {
             throw new OpenClinicaSystemException("errorCode.invalidStudyAndSiteIdentifier", "Provide a valid study/site.");
-        }else if (studyOid != null && siteOid == null) {
+        } else if (studyOid != null && siteOid == null) {
             study = studyDao.findByOcOID(studyOid);
             if (study == null) {
                 throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier", "The study identifier you provided is not valid.");
             }
 
-
             StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
             if (studyLevelRole == null) {
                 throw new OpenClinicaSystemException("errorCode.noRoleSetUp",
                         "You do not have sufficient privileges to proceed with this operation.");
-            }else if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
-            	throw new OpenClinicaSystemException("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
-            } 
-            
-            
-        }else if (studyOid != null && siteOid != null) {
+            } else if (studyLevelRole.getId() == 0) {
+                throw new OpenClinicaSystemException("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+            }
+
+
+        } else if (studyOid != null && siteOid != null) {
             study = studyDao.findByOcOID(studyOid);
             site = studyDao.findByOcOID(siteOid);
             if (study == null) {
@@ -250,53 +250,52 @@ private void updateStudySubjectSize(Study currentStudy) {
              */
             StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
             if (studyLevelRole == null) {
-            	/**
+                /**
                  * continue to check site level
                  */
                 StudyUserRoleBean siteLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(getUserAccount(request).getName(), siteOid);
                 if (siteLevelRole == null) {
                     throw new OpenClinicaSystemException("errorCode.noRoleSetUp",
-                    		"You do not have any role set up for user " + userName + " in study site " + siteOid );
-                }else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {
-                	throw new OpenClinicaSystemException("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+                            "You do not have any role set up for user " + userName + " in study site " + siteOid);
+                } else if (siteLevelRole.getId() == 0) {
+                    throw new OpenClinicaSystemException("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
                 }
-            }else if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
-            	throw new OpenClinicaSystemException("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
-            }  		                           
-           
-   		}
-        
-       
+            } else if (studyLevelRole.getId() == 0) {
+                throw new OpenClinicaSystemException("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+            }
+
+        }
+
+
         return study;
-        
+
     }
 
-    
+
     /**
      * Helper Method to get the user account
-     * 
      * @return UserAccountBean
      */
     public UserAccountBean getUserAccount(HttpServletRequest request) {
-    	UserAccountBean userBean;    
-    	
-    	if(request.getSession().getAttribute("userBean") != null) {
-    		userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-    		
-    	}else {
-    		 Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	        String username = null;
-    	        if (principal instanceof UserDetails) {
-    	            username = ((UserDetails) principal).getUsername();
-    	        } else {
-    	            username = principal.toString();
-    	        }
-    	        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-    	        userBean = (UserAccountBean) userAccountDao.findByUserName(username);
-    	}
-    	
-    	return userBean;
-       
+        UserAccountBean userBean;
+
+        if (request.getSession().getAttribute("userBean") != null) {
+            userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+
+        } else {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String username = null;
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            } else {
+                username = principal.toString();
+            }
+            UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+            userBean = (UserAccountBean) userAccountDao.findByUserName(username);
+        }
+
+        return userBean;
+
     }
 
     /**
@@ -306,7 +305,7 @@ private void updateStudySubjectSize(Study currentStudy) {
         subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
         return subjectDao;
     }
-    
+
     public StudyParameterValueDAO getStudyParameterValueDAO() {
         return this.studyParameterValueDAO != null ? studyParameterValueDAO : new StudyParameterValueDAO(dataSource);
     }
@@ -335,8 +334,7 @@ private void updateStudySubjectSize(Study currentStudy) {
     }
 
     /**
-     * @param dataSource
-     *            the datasource to set
+     * @param dataSource the datasource to set
      */
     public void setDatasource(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -348,7 +346,7 @@ private void updateStudySubjectSize(Study currentStudy) {
         if (studyBean != null)
             subjectCount = studyBean.getSubjectCount();
 
-        if(subjectCount==0) {
+        if (subjectCount == 0) {
             StudySubjectDAO ssdao = this.getStudySubjectDao();
             ArrayList ss = ssdao.findAllBySiteId(currentStudy.getStudyId());
             if (ss != null) {
@@ -357,7 +355,7 @@ private void updateStudySubjectSize(Study currentStudy) {
         }
         return subjectCount;
     }
- 
+
     public StudySubjectDAO getStudySubjectDAO() {
         ssDao = ssDao != null ? ssDao : new StudySubjectDAO(dataSource);
         return ssDao;
@@ -372,7 +370,7 @@ private void updateStudySubjectSize(Study currentStudy) {
         try {
             writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            logger.error("Error while accessing file: ",e);
+            logger.error("Error while accessing file: ", e);
         } finally {
             writer.print(writeToStringBuffer(participateImportDTOS));
             closeFile(writer);
@@ -380,9 +378,8 @@ private void updateStudySubjectSize(Study currentStudy) {
     }
 
 
-
     public String getFilePath(JobType jobType) {
-        String dirPath= CoreResources.getField("filePath") + BULK_JOBS + File.separator+ jobType.toString().toLowerCase();
+        String dirPath = CoreResources.getField("filePath") + BULK_JOBS + File.separator + jobType.toString().toLowerCase();
         File directory = new File(dirPath);
         if (!directory.exists()) {
             directory.mkdirs();
@@ -418,7 +415,7 @@ private void updateStudySubjectSize(Study currentStudy) {
         stringBuffer.append(SEPERATOR);
         stringBuffer.append('\n');
 
-        participateImportDTOs.forEach(p->{
+        participateImportDTOs.forEach(p -> {
             stringBuffer.append(p.getRow());
             stringBuffer.append(SEPERATOR);
             stringBuffer.append(p.getParticipantId() != null ? p.getParticipantId() : "");
@@ -442,7 +439,7 @@ private void updateStudySubjectSize(Study currentStudy) {
     }
 
     private StudySubject saveOrUpdateStudySubjectDetails(StudySubjectBean studySubjectBean, SubjectTransferBean subjectTransfer,
-                                                          UserAccountBean userAccountBean) throws Exception {
+                                                         UserAccountBean userAccountBean) throws Exception {
         StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getSubjectId());
 
         studySubjectBean.setUpdater(userAccountBean);
@@ -476,21 +473,21 @@ private void updateStudySubjectSize(Study currentStudy) {
         return studySubject;
 
     }
-    
+
     public StudyParticipantDetailDTO buildStudyParticipantDetailDTO(StudySubject studySubject) {
-    	StudyParticipantDetailDTO spDTO = new StudyParticipantDetailDTO();
-        
+        StudyParticipantDetailDTO spDTO = new StudyParticipantDetailDTO();
+
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
         spDTO.setSubjectKey(studySubject.getLabel());
-    	spDTO.setSubjectOid(studySubject.getOcOid());
-		
+        spDTO.setSubjectOid(studySubject.getOcOid());
+
         spDTO.setFirstName(studySubjectDetail.getFirstName());
         spDTO.setLastName(studySubjectDetail.getLastName());
         spDTO.setEmail(studySubjectDetail.getEmail());
-        spDTO.setMobileNumber(studySubjectDetail.getPhone());           
+        spDTO.setMobileNumber(studySubjectDetail.getPhone());
         spDTO.setSecondaryID(studySubject.getSecondaryLabel());
         spDTO.setStatus(studySubject.getUserStatus().name());
-    
+
         return spDTO;
     }
 

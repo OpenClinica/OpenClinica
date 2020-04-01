@@ -145,8 +145,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     public ListStudySubjectTableFactory(boolean showMoreLink) {
         this.showMoreLink = showMoreLink;
-        imageIconPaths.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.toString(), "icon icon-clock2");
-        imageIconPaths.put(StudyEventWorkflowStatusEnum.SCHEDULED.toString(), "icon icon-clock");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.toString(), "icon icon-clock");
+        imageIconPaths.put(StudyEventWorkflowStatusEnum.SCHEDULED.toString(), "icon icon-clock2");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString(), "icon icon-pencil-squared orange");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
