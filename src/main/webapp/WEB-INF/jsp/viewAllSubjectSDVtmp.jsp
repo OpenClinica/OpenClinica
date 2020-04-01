@@ -223,11 +223,11 @@
 
 <style>
     #participantId {
-        width: 400px;
+        width: 300px;
     }
 
     #eventName {
-        width: 200px;
+        width: 300px;
     }
 
     #itemsdv {
@@ -415,6 +415,20 @@
         }
     }
 
+    function calcPopupPos() {
+        var deltaWidth = $(window).width() - $('#itemsdv').width();
+        var marginX = (deltaWidth / 2) + 'px';
+        return marginX;
+    }
+
+    function setPopupPos() {
+        var marginX = calcPopupPos();
+        $('#itemsdv').parents().css({
+            left: marginX,
+            right: marginX
+        });
+    }
+
     $('#sdv').on('click', '.popupSdv', function () {
         var data = $(this).data();
         var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
@@ -466,13 +480,7 @@
                 }));
                 itemsTable.draw();
                 
-                setTimeout(function() {
-                    var deltaWidth = $(document).width() - $('#itemsdv').width();
-                    var marginX = (deltaWidth / 2) + 'px';
-                    $('#itemsdv').parents().css({
-                        left: marginX
-                    });
-                }, 1);
+                setTimeout(setPopupPos, 1);
             });
         }
 
@@ -493,15 +501,17 @@
             $(verifyButton).click();
         });
 
-        var deltaWidth = $(document).width() - $('#itemsdv').width();
-        var marginX = (deltaWidth / 2) + 'px';
         jQuery.blockUI({
             message: jQuery('#itemsdv'), css: {
                 cursor: 'default',
                 top: '40px',
-                left: marginX
+                left: calcPopupPos(),
+                right: calcPopupPos(),
+                'min-width': '900px',
+                'max-width': $(document).width() - 100 + 'px'
             }
         });
+        setTimeout(setPopupPos, 1);
     });
 
     var sdvTableHeaders = $('#sdv > thead').children();
@@ -517,5 +527,7 @@
 
     limitFilterWidth('110px', 'SDV Status');
     limitFilterWidth('110px', 'SDV Requirement');
+
+    $(window).resize(setPopupPos);
 
 </script>
