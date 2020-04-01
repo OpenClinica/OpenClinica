@@ -208,7 +208,7 @@
          <c:when test="${(studyEvent.locked == true && userRole.researchAssistant) ||(studyEvent.locked == true && userRole.researchAssistant2)}">
            <c:set var="status1" value="${studyEvent.workflowStatus}"/>
            <select class="formfieldM" name="statusId" disabled="true">
-                 <option value="<c:out value="${studyEvent.workflowStatus}"/>" selected><c:out value="${event.workflowStatus}"/>
+                 <option value="<c:out value="${studyEvent.workflowStatus.displayValue}"/>" selected><c:out value="${event.workflowStatus.displayValue}"/>
            </select>
         </c:when>
         <c:otherwise>
