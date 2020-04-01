@@ -65,6 +65,8 @@ import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
+
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -281,13 +283,19 @@ public class ImportCRFDataService {
                             
                         }else {
                         	if(!(studyEventDefinitionBean.isRepeating())) {
-                        		//OC-10365
-                        		if(!(studyEventDataBean.getStudyEventRepeatKey().equals("1"))) {
-                        			// if same sample ordinal, NOT update at this time(current requirements), return same error 
-                    				String err_msg ="For Non-Repeating event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID();                                                                          
-                                    
-                                    throw new OpenClinicaException(err_msg,"");
+                        		//import data may have no repeat key provided, so default to 1 for non repeating
+                        		if(studyEventDataBean.getStudyEventRepeatKey() == null) {
+                        			studyEventDataBean.setStudyEventRepeatKey("1");
+                        		}else {
+                        			//OC-10365
+                            		if(!(studyEventDataBean.getStudyEventRepeatKey().equals("1"))) {
+                            			// if same sample ordinal, NOT update at this time(current requirements), return same error 
+                        				String err_msg ="For Non-Repeating event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID();                                                                          
+                                        
+                                        throw new OpenClinicaException(err_msg,"");
+                            		}
                         		}
+                        		
                         		
                         	}
                         }
@@ -1689,6 +1697,7 @@ public class ImportCRFDataService {
         // filler
         newEventCrfBean.setStatus(core.org.akaza.openclinica.bean.core.Status.AVAILABLE);
         newEventCrfBean.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
+        newEventCrfBean.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
         return newEventCrfBean;
     }
     
