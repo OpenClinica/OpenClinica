@@ -274,7 +274,12 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         eb.setValidateString((String) hm.get("validate_string"));
         eb.setStudySubjectId(((Integer) hm.get("study_subject_id")).intValue());
         String sdvStatus = (String) hm.get("sdv_status");
-        eb.setSdvStatus((SdvStatus) SdvStatus.valueOf(sdvStatus));
+        if(sdvStatus !=null && !(sdvStatus.isEmpty())) {
+        	eb.setSdvStatus((SdvStatus) SdvStatus.valueOf(sdvStatus));
+        }else {
+        	eb.setSdvStatus((SdvStatus) SdvStatus.NOT_VERIFIED);
+        }
+        
         eb.setSdvUpdateId((Integer) hm.get("sdv_update_id"));
         eb.setFormLayoutId(((Integer) hm.get("form_layout_id")).intValue());
         Integer oldStatusId = (Integer) hm.get("old_status_id");
