@@ -30,11 +30,10 @@ import java.util.*;
 
 /**
  * This Service class is used with View Study Subject Page
- *
  * @author joekeremian
  */
 
-@Service( "validateService" )
+@Service("validateService")
 public class ValidateServiceImpl implements ValidateService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String ENABLED = "enabled";
@@ -43,7 +42,7 @@ public class ValidateServiceImpl implements ValidateService {
     private static final String ADVANCE_SEARCH = "contactsModule";
 
     @Autowired
-    @Qualifier( "dataSource" )
+    @Qualifier("dataSource")
     private BasicDataSource dataSource;
 
     @Autowired
@@ -88,7 +87,7 @@ public class ValidateServiceImpl implements ValidateService {
         return false;
     }
 
-    
+
     public boolean isSiteAvailable(String siteOid) {
         Study publicStudy = getPublicStudy(siteOid);
         if (publicStudy != null && publicStudy.getStatus().equals(Status.AVAILABLE) && publicStudy.isSite()) {
@@ -96,7 +95,6 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
-
 
 
     public boolean isStudyOidValidStudyLevelOid(String studyOid) {
@@ -132,8 +130,6 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
-
-
 
 
     public boolean isUserHasTechAdminRole(UserAccount userAccount) {
@@ -231,12 +227,16 @@ public class ValidateServiceImpl implements ValidateService {
         return false;
     }
 
-    public boolean isUserHas_DM_MON_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOID){
+    public boolean isUserHas_DM_MON_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOID) {
         Study publicStudy = getPublicStudy(studyOID);
         for (StudyUserRoleBean userRole : userRoles) {
-             if ((userRole.getRole().equals(Role.MONITOR) && publicStudy.getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.COORDINATOR) && publicStudy.getStudyId() == userRole.getStudyId()))
-                return true;
+            for (Study currStudy : publicStudy.getStudies())
+                //for study monitor
+                if ((userRole.getRole().equals(Role.MONITOR) && publicStudy.getStudyId() == userRole.getStudyId())
+                        //for site monitor
+                        || (userRole.getRole().equals(Role.MONITOR) && currStudy.getStudyId() == userRole.getStudyId())
+                        || (userRole.getRole().equals(Role.COORDINATOR) && publicStudy.getStudyId() == userRole.getStudyId()))
+                    return true;
         }
         return false;
     }
@@ -268,7 +268,7 @@ public class ValidateServiceImpl implements ValidateService {
         return false;
     }
 
-    public boolean isUserSystemUser(HttpServletRequest request){
+    public boolean isUserSystemUser(HttpServletRequest request) {
         boolean skipRoleCheck = false;
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && !authHeader.isEmpty()) {
@@ -281,10 +281,10 @@ public class ValidateServiceImpl implements ValidateService {
                     if (accessToken != null && !accessToken.isEmpty()) {
                         LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
                         String userType = (String) userContextMap.get("userType");
-                        if (userType.equals(core.org.akaza.openclinica.service.UserType.SYSTEM.getName())){
+                        if (userType.equals(core.org.akaza.openclinica.service.UserType.SYSTEM.getName())) {
                             String clientId = decodedToken.get("clientId").toString();
                             if (org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
-                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)){
+                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)) {
                                 skipRoleCheck = true;
                             }
 
@@ -333,7 +333,7 @@ public class ValidateServiceImpl implements ValidateService {
         }
 
     }
-    
+
     public void validateStudyAndRolesForPdfCaseBook(String studyOid, String siteOid, UserAccountBean userAccountBean) {
 
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
@@ -348,39 +348,39 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isStudyOidValidStudyLevelOid(studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
         }
-              
+
         if (siteOid != null) {
-        	if(!isSiteOidValid(siteOid)) {        
-	            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
-	        }
-        	
-	        if (!isSiteOidValidSiteLevelOid(siteOid)) {
-	            throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
-	        }
-       
-	        if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
-	            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
-	        }
-	       //only check site level
-	        if (!isUserHasAccessToSite(userRoles, siteOid)) {
-	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-	        } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
-	            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-	        }
-        }else {
-        	//only check study level
-        	 if (!isUserHasAccessToStudy(userRoles, studyOid)) {
-                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-             }
+            if (!isSiteOidValid(siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
+            }
+
+            if (!isSiteOidValidSiteLevelOid(siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+            }
+
+            if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+            }
+            //only check site level
+            if (!isUserHasAccessToSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+            } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+            }
+        } else {
+            //only check study level
+            if (!isUserHasAccessToStudy(userRoles, studyOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+            }
         }
 
     }
 
     /**
-     *  this is used by case book PDF process
-     *  studyOid only at study level
+     * this is used by case book PDF process
+     * studyOid only at study level
      */
-    public void validateStudyAndRoles(String studyOid,  UserAccountBean userAccountBean) {
+    public void validateStudyAndRoles(String studyOid, UserAccountBean userAccountBean) {
 
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
         if (studyOid != null)
@@ -394,20 +394,20 @@ public class ValidateServiceImpl implements ValidateService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
         }
 
-        
+
         if (!isUserHasAccessToStudy(userRoles, studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
         }
 
     }
 
-    public boolean hasCRFpermissionTag(EventDefinitionCrf edc,List<String> permissionTags) {
-        boolean formIsTagged= isFormTagged(edc);
-        if(formIsTagged) {
-            List<EventDefinitionCrfPermissionTag> list = eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getEventDefinitionCrfId(), edc.getParentId() !=null ? edc.getParentId():0, permissionTags);
+    public boolean hasCRFpermissionTag(EventDefinitionCrf edc, List<String> permissionTags) {
+        boolean formIsTagged = isFormTagged(edc);
+        if (formIsTagged) {
+            List<EventDefinitionCrfPermissionTag> list = eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getEventDefinitionCrfId(), edc.getParentId() != null ? edc.getParentId() : 0, permissionTags);
 
-            return (list.size() > 0 ?  true:  false) ;
-        }else {
+            return (list.size() > 0 ? true : false);
+        } else {
             return true;
         }
 
@@ -418,12 +418,11 @@ public class ValidateServiceImpl implements ValidateService {
         logger.debug("Begin to permissionTagsLookup");
         ArrayList list = (ArrayList) eventDefinitionCrfPermissionTagDao.findTagsForEDC(edc);
 
-        return (list.size() > 0 ?  true:  false) ;
+        return (list.size() > 0 ? true : false);
     }
 
     /**
-     *  this method is used when get/extract participant information
-     *  
+     * this method is used when get/extract participant information
      * @param studyOid
      * @param siteOid
      * @param userAccountBean
@@ -431,7 +430,7 @@ public class ValidateServiceImpl implements ValidateService {
      */
     public void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean, boolean includePII) {
 
-    	Study tenantStudy = getTenantStudy(studyOid);
+        Study tenantStudy = getTenantStudy(studyOid);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
         if (!isStudyOidValid(studyOid)) {
@@ -460,8 +459,7 @@ public class ValidateServiceImpl implements ValidateService {
     }
 
     /**
-     *  this method is used when get/extract participant information
-     *
+     * this method is used when get/extract participant information
      * @param studyOid
      * @param siteOid
      * @param userAccountBean
@@ -500,48 +498,50 @@ public class ValidateServiceImpl implements ValidateService {
     private Study getTenantStudy(String studyOid) {
         return studyDao.findByOcOID(studyOid);
     }
-    
+
     public ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid) {
         String errorMsg = e.getErrorCode();
         HashMap<String, String> map = new HashMap<>();
         map.put("studyOid", studyOid);
         map.put("siteOid", siteOid);
-      return  new ParameterizedErrorVM(errorMsg, map);
+        return new ParameterizedErrorVM(errorMsg, map);
     }
 
-    public boolean isStudySubjectPresent(String studySubjectLabel,Study study){
+    public boolean isStudySubjectPresent(String studySubjectLabel, Study study) {
         StudySubject studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectLabel, study);
         return studySubject != null;
     }
-    public boolean isEventPresent(String studyEventOid){
+
+    public boolean isEventPresent(String studyEventOid) {
         return studyEventDefinitionDao.findByOcOID(studyEventOid) != null;
     }
 
-    public boolean isEventOidAndParticipantIdAreLinked( String studyEventOid, int studySubjectId, int ordinal){
+    public boolean isEventOidAndParticipantIdAreLinked(String studyEventOid, int studySubjectId, int ordinal) {
         return studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventOid, ordinal, studySubjectId) != null;
     }
-    public  boolean isCrfPresent(String formOid){
+
+    public boolean isCrfPresent(String formOid) {
         return crfDao.findByOcOID(formOid) != null;
     }
 
-    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int oridinal){
+    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int oridinal) {
 
-        if(!isStudyOidValidStudyLevelOid(studyOid))
+        if (!isStudyOidValidStudyLevelOid(studyOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
         if (!isStudyAvailable(studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
         }
-        if(!isUserHas_DM_MON_RoleInStudy(userAccount.getRoles(),studyOid))
+        if (!isUserHas_DM_MON_RoleInStudy(userAccount.getRoles(), studyOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         Study study = studyDao.findByOid(studyOid);
-        if(!isStudySubjectPresent(studySubjectLabel, study))
+        if (!isStudySubjectPresent(studySubjectLabel, study))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
         int studySubjectId = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectLabel, study).getStudySubjectId();
-        if(!isEventPresent(studyEventOid))
+        if (!isEventPresent(studyEventOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENTOID_NOT_EXIST_IN_THIS_STUDY);
-        if(!isEventOidAndParticipantIdAreLinked(studyEventOid, studySubjectId, oridinal))
+        if (!isEventOidAndParticipantIdAreLinked(studyEventOid, studySubjectId, oridinal))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_DOES_NOT_HAVE_THIS_EVENT_IN_THIS_STUDY);
-        if(!isCrfPresent(formOid))
+        if (!isCrfPresent(formOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_FORMOID_NOT_EXIST_IN_THIS_STUDY);
     }
 }
