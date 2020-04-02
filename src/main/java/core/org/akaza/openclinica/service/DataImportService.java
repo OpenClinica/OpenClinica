@@ -334,10 +334,10 @@ public class DataImportService {
 
                         if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
                                 && eventCrfBean.getStatus().isAvailable()) {
-                        	eventCrfBean.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
+                        	
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean, true);
                         } else {
-                        	eventCrfBean.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
+                        	
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean, true);
                         }
                         eventCrfInts.add(new Integer(eventCrfBean.getId()));
