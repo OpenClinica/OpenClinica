@@ -162,7 +162,7 @@ public class FormLayoutDAO<K extends String, V extends ArrayList> extends Audita
         eb.setXform((String) hm.get("xform"));
         eb.setXformName((String) hm.get("xform_name"));
         eb.setUrl((String) hm.get("url"));
-
+        eb.setStatusId(((Integer) hm.get("status_id")).intValue());
         return eb;
     }
 

@@ -6,13 +6,14 @@ import java.util.HashMap;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import core.org.akaza.openclinica.domain.datamap.FormLayout;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 
 public interface EventServiceInterface {
-
-	public HashMap<String, String> scheduleEvent(UserAccountBean user, Date startDateTime, Date endDateTime, String location, String studyUniqueId,
-			String siteUniqueId, String eventDefinitionOID, String studySubjectId) throws OpenClinicaSystemException;
 
 	/**
 	 * This method will remove Study Event Definition
@@ -20,7 +21,7 @@ public interface EventServiceInterface {
 	 * @param defId
 	 * @param userId
 	 */
-	public void removeStudyEventDefn(int defId, int userId,Study study);
+	public void archiveEventDefinition(StudyEventDefinition sed, UserAccount userAccount, Study study);
 
 	/**
 	 * This method will restore Study Event Definition
@@ -28,7 +29,7 @@ public interface EventServiceInterface {
 	 * @param defId
 	 * @param userId
 	 */
-	public void restoreStudyEventDefn(int defId, int userId);
+	public void unArchiveEventDefinition(StudyEventDefinition sed, UserAccount userAccount);
 
 	/**
 	 * This method will remove Event Crf definition that will cascade down to events and items
@@ -38,7 +39,7 @@ public interface EventServiceInterface {
 	 * @param userId
 	 * @param studyId
 	 */
-	public void removeCrfFromEventDefinition(int eventDefnCrfId, int defId, int userId, int studyId);
+	public void archiveEventForm(EventDefinitionCrf edc, UserAccount userAccount, Study study);
 
 	/**
 	 * This method will restore Event Crf definition that will cascade down to events and items
@@ -47,7 +48,7 @@ public interface EventServiceInterface {
 	 * @param defId
 	 * @param userId
 	 */
-	public void restoreCrfFromEventDefinition(int eventDefnCrfId, int defId, int userId);
+	public void unArchiveEventForm(EventDefinitionCrf edc, UserAccount userAccount);
 
 	/**
 	 * This method will make all items available in each event passed in.
@@ -56,16 +57,7 @@ public interface EventServiceInterface {
 	 * @param sed
 	 * @param ub
 	 */
-	public void restoreAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub);
 
-	/**
-	 * This method will make all items unavailable in each event passed in.
-	 * 
-	 * @param edc
-	 * @param sed
-	 * @param ub
-	 * @param study
-	 */
-	public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub, Study study);
+	public void archiveFormLayout( FormLayout formLayout, UserAccount userAccount);
 
-}
+	}

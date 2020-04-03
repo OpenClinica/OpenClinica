@@ -73,9 +73,11 @@ public class OdmImportController {
         List<Page> pages = publishDTO.getPages();
         Instant start = Instant.now();
         String accessToken = (String) request.getSession().getAttribute("accessToken");
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        UserAccount userAccount = userAccountDao.findByUserId(userAccountBean.getId());
 
         try {
-            Map<String, Object> map = odmImportService.importOdm(odm, pages, boardId, accessToken);
+            Map<String, Object> map = odmImportService.importOdm(odm, pages, boardId, accessToken,userAccount);
             Study study = (Study) map.get("study");
             Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
             odmImportService.updatePublicStudyPublishedFlag(publicStudy);
@@ -105,7 +107,7 @@ public class OdmImportController {
         study = studyDao.findByStudyEnvUuid(studyEnvUuid);
         Study site = studyDao.findByOcOID(studyOid);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-        UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
+        UserAccount userAccount = userAccountDao.findByUserId(userAccountBean.getId());
 
         //check publish status of study so no 2 processes can occur at the same time
         List<JobDetail> jobsInProgress = jobDetailDao.findByStudyIdAndStatusAndJobType(study.getStudyId(), JobStatus.IN_PROGRESS, JobType.PUBLISH_STUDY);
@@ -131,7 +133,7 @@ public class OdmImportController {
             List<Page> pages = publishDTO.getPages();
             try {
                 CoreResources.tenantSchema.set("public");
-                map = odmImportService.importOdm(odm, pages, publishDTO.getBoardId(), accessToken);
+                map = odmImportService.importOdm(odm, pages, publishDTO.getBoardId(), accessToken,userAccount);
             } catch (Exception e) {
                 userService.persistJobFailed(jobDetail, null);
                 throw new CompletionException(e);

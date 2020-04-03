@@ -117,21 +117,20 @@ public class OdmImportServiceImpl implements OdmImportService {
 		}
 	}
 
-	public Map<String, Object> importOdm(ODM odm, List <Page> pages, String boardId, String accessToken) throws Exception {
+	public Map<String, Object> importOdm(ODM odm, List <Page> pages, String boardId, String accessToken,UserAccount userAccount) throws Exception {
 		// since this is a new thread, add it to the ResourceBundle
         ResourceBundleProvider.updateLocale(Locale.US);
 		logger.info("Thread name in importOdm:" + Thread.currentThread());
-		Map<String, Object> map = importOdmToOC(odm, pages, boardId, accessToken);
+		Map<String, Object> map = importOdmToOC(odm, pages, boardId, accessToken,userAccount);
 		return map;
 	}
 
-	public Map<String, Object> importOdmToOC(ODM odm, List <Page> pages, String boardId, String accessToken) {
+	public Map<String, Object> importOdmToOC(ODM odm, List <Page> pages, String boardId, String accessToken,UserAccount userAccount) {
 		DataBinder dataBinder = new DataBinder(new Study());
 		errors = dataBinder.getBindingResult();
 		printOdm(odm);
 		studyBuildService.setRequestSchemaByStudy(odm.getStudy().get(0).getOID());
 
-		UserAccount userAccount = getCurrentUser();
 
 		saveOrUpdatePageLayout(pages, userAccount);
 		// TODO add validation to all entities
@@ -183,8 +182,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 								eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(eventDefinitionCrf);
 								restoreSiteDefinitions(eventDefinitionCrf.getEventDefinitionCrfId(), userAccount.getUserId());
 								logger.info("Restoring event definition crf and cascade down to events,forms and items...{} - {}",eventDefinitionCrf.getStudyEventDefinition().getName(),eventDefinitionCrf.getCrf().getName());
-								eventService.restoreCrfFromEventDefinition(eventDefinitionCrf.getEventDefinitionCrfId(),
-										studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
+								eventService.unArchiveEventForm(eventDefinitionCrf, userAccount);
 								logger.info("Completed Restoring event definition crf and cascade down to events,forms and items...{} - {}",eventDefinitionCrf.getStudyEventDefinition().getName(),eventDefinitionCrf.getCrf().getName());
 
 							}
@@ -251,8 +249,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 							ocEventDefCrf = getEventDefinitionCrfDao().saveOrUpdate(ocEventDefCrf);
 							removeSiteDefinitions(ocEventDefCrf.getEventDefinitionCrfId(), userAccount.getUserId());
 							logger.info("Archiving event definition crf and cascade down to events,forms and items...{} - {}",ocEventDefCrf.getStudyEventDefinition().getName(),ocEventDefCrf.getCrf().getName());
-							eventService.removeCrfFromEventDefinition(ocEventDefCrf.getEventDefinitionCrfId(), studyEventDefinition.getStudyEventDefinitionId(),
-									userAccount.getUserId(), study.getStudyId());
+							eventService.archiveEventForm(ocEventDefCrf, userAccount, study);
 							logger.info("Completed Archiving event definition crf and cascade down to events,forms and items...{} - {}",ocEventDefCrf.getStudyEventDefinition().getName(),ocEventDefCrf.getCrf().getName());
 						}
 					}
@@ -304,7 +301,10 @@ public class OdmImportServiceImpl implements OdmImportService {
 			eventDefinitionCrf = new EventDefinitionCrf();
 			edcObj.setEventDefinitionCrf(eventDefinitionCrf);
 			edcObj.getEventDefinitionCrf().setStatusId(core.org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
-			eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(populateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj)));
+			eventDefinitionCrf=populateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj));
+			edcObj.getEventDefinitionCrf().setUserAccount(edcObj.getUserAccount());
+			edcObj.getEventDefinitionCrf().setDateCreated(new Date());
+			eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(eventDefinitionCrf);
 		} else {
 			eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(updateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj)));
 		}
@@ -335,10 +335,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 				List<FormLayout> formLayouts = getFormLayoutDao().findAllByCrfId(crfBean.getCrfId());
 				for (FormLayout formLayout : formLayouts) {
 					if (!jsonLayoutOids.contains(formLayout.getName()) && !formLayout.getStatus().equals(Status.LOCKED)) {
-						formLayout.setStatus(Status.LOCKED);
-						formLayout.setUserAccount(userAccount);
-						formLayout.setDateCreated(new Date());
-						getFormLayoutDao().saveOrUpdate(formLayout);
+					     eventService.archiveFormLayout(formLayout,userAccount);
 					}
 				}
 			}
@@ -373,12 +370,15 @@ public class OdmImportServiceImpl implements OdmImportService {
 				studyEventDefinition = new StudyEventDefinition();
 				studyEventDefinition.setOc_oid(odmStudyEventDef.getOID());
 				studyEventDefinition.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
-				studyEventDefinition = getStudyEventDefDao().saveOrUpdate(populateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study));
+				studyEventDefinition = populateStudyEventDefn(odmStudyEventDef, userAccount, studyEventDefinition, study);
+				studyEventDefinition.setUserAccount(userAccount);
+				studyEventDefinition.setDateCreated(new Date());
+				studyEventDefinition = getStudyEventDefDao().saveOrUpdate(studyEventDefinition);
 			} else {
 				if (!studyEventDefinition.getStatus().equals(Status.AVAILABLE)) {
 					// restore study event defn
 					logger.info("Restoring study event {}",studyEventDefinition.getName());
-					eventService.restoreStudyEventDefn(studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
+					eventService.unArchiveEventDefinition(studyEventDefinition, userAccount);
 					studyEventDefinition.setStatus(Status.AVAILABLE);
 					logger.info("Completed Restoring study event {}",studyEventDefinition.getName());
 				}
@@ -391,7 +391,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 			if (!jsonEventList.contains(ocEvent)) {
 				// remove study event defn
 				logger.info("Removing study event {}",ocEvent.getName());
-				eventService.removeStudyEventDefn(ocEvent.getStudyEventDefinitionId(), userAccount.getUserId(),study);
+				eventService.archiveEventDefinition(ocEvent, userAccount ,study);
 				logger.info("Completed Removing study event {}",ocEvent.getName());
 			}
 		}
@@ -412,7 +412,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		return study;
 	}
 
-	private StudyEventDefinition populateEvent(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
+	private StudyEventDefinition populateStudyEventDefn(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
 			StudyEventDefinition studyEventDefinition, Study study) {
 		studyEventDefinition.setName(odmStudyEventDef.getName());
 
@@ -423,7 +423,6 @@ public class OdmImportServiceImpl implements OdmImportService {
 		}
 		studyEventDefinition.setType(odmStudyEventDef.getType().toString().toLowerCase());
 		studyEventDefinition.setStudy(study);
-		studyEventDefinition.setUserAccount(userAccount);
 		if (odmStudyEventDef.getStudyEventDefElementExtension().size() != 0) {
 			OCodmComplexTypeDefinitionEventDefinitionDetails eventDetails = odmStudyEventDef.getStudyEventDefElementExtension().get(0);
 			if (eventDetails != null && eventDetails.getCategory() != null) {
@@ -459,22 +458,17 @@ public class OdmImportServiceImpl implements OdmImportService {
 			logger.info(studyEventDefinition.getName() + " cannot change to Visit-Based; event has been published to Production as Common - FAILED");
 		}
 
-		studyEventDefinition = populateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study);
+		studyEventDefinition = populateStudyEventDefn(odmStudyEventDef, userAccount, studyEventDefinition, study);
 		studyEventDefinition.setUpdateId(userAccount.getUserId());
 		studyEventDefinition.setDateUpdated(new Date());
 		return studyEventDefinition;
 	}
 
-	private UserAccount getCurrentUser() {
-		UserAccount ub = getUserDaoDomain().findById(1);
-		return ub;
-	}
 
 	private EventDefinitionCrf populateEventDefinitionCrf(EventDefinitionCrfDTO edcObj) {
 		edcObj.getEventDefinitionCrf().setStudy(edcObj.getStudy());
 		edcObj.getEventDefinitionCrf().setStudyEventDefinition(edcObj.getStudyEventDefinition());
 		edcObj.getEventDefinitionCrf().setCrf(edcObj.getCrf());
-		edcObj.getEventDefinitionCrf().setUserAccount(edcObj.getUserAccount());
 		edcObj.getEventDefinitionCrf().setFormLayout(edcObj.getFormLayout());
 		edcObj.getEventDefinitionCrf().setDoubleEntry(false);
 		edcObj.getEventDefinitionCrf().setElectronicSignature(false);
