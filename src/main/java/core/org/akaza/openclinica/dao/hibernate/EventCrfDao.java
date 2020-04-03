@@ -96,4 +96,19 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
             eventCrf.setLastSdvVerifiedDate(new Date());
         getCurrentSession().update(eventCrf);
     }
+    public List <EventCrf> findallByStudyEventOIdAndCrfOId(String studyEventOID, String formOID) {
+        String query = "from " + getDomainClassName()
+                + " event_crf where event_crf.formLayout.crf.ocOid = :formOID and event_crf.studyEvent.studyEventDefinition.oc_oid = :studyEventOID ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyEventOID", studyEventOID);
+        q.setParameter("formOID", formOID);
+        return (List<EventCrf>) q.list();
+    }
+    public List<EventCrf> findAllByStudyEvent(Integer studyEventId) {
+        String query = "from " + getDomainClassName()
+                + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyeventid", studyEventId);
+        return q.list();
+    }
 }

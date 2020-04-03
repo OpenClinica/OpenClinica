@@ -106,6 +106,14 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
     }
 
+    public List<StudyEvent> findAllByEventDefinition(String oid) {
+        String query = " from StudyEvent se where se.studyEventDefinition.oc_oid = :oid ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setString("oid", oid);
+        return (List<StudyEvent>) q.list();
+    }
+
+
     public List<StudyEvent> fetchStudyEvents(int studyEventOrdinal, String oid, String subjectOID) {
         List<StudyEvent> eventList = null;
 
