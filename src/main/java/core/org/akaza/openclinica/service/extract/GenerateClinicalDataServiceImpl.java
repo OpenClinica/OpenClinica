@@ -327,6 +327,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			eventCrfs = se.getEventCrfs();
 		} else {
 			eventCrfs = eventCrfDao.findNonArchivedByStudyEventId(se.getStudyEventId());
+			for (EventCrf eventCrf : new ArrayList<EventCrf>(eventCrfs)) {
+				if (eventCrf.getFormLayout().getStatus().equals(Status.DELETED) ||
+						eventCrf.getFormLayout().getStatus().equals(Status.AUTO_DELETED)) {
+					eventCrfs.remove(eventCrf);
+				}
+			}
 		}
 
 		for (EventCrf ecrf : eventCrfs) {

@@ -249,7 +249,6 @@
 
     #sdv-items_wrapper {
         margin: 0 10px 10px;
-        max-height: 480px;
         overflow-y: auto;
     }
 
@@ -291,8 +290,8 @@
     }
 
     #sdv-close-popup > .icon-cancel::before {
-        border-radius: 50px;
-        color: white;
+        color: black;
+        background-color: transparent;
     }
 
     #clear-filter {
@@ -415,9 +414,18 @@
     }
 
     function calcPopupPos() {
-        var deltaWidth = $(window).width() - $('#itemsdv').width();
-        var marginX = (deltaWidth / 2) + 'px';
-        return marginX;
+        var winWidth = $(window).width();
+        if (winWidth < 900) {
+            return '0';
+        }
+        else if (winWidth > 1000) {
+            return '50px';
+        }
+        else {
+            var deltaWidth = winWidth - 900;
+            var marginX = (deltaWidth / 2) + 'px';
+            return marginX;
+        }
     }
 
     function setPopupPos() {
@@ -426,6 +434,13 @@
             left: marginX,
             right: marginX
         });
+        var maxHeight = $(window).height() - $('#sdv-items_wrapper').position().top - 130;
+        if ($('#sdv-items').height() > maxHeight) {
+            $('#sdv-items_wrapper').css('height', maxHeight + 'px');
+        }
+        else {
+            $('#sdv-items_wrapper').css('height', $('#sdv-items').height() + 30 + 'px');
+        }
     }
 
     $('#sdv').on('click', '.popupSdv', function () {
@@ -505,9 +520,7 @@
                 cursor: 'default',
                 top: '40px',
                 left: calcPopupPos(),
-                right: calcPopupPos(),
-                'min-width': '900px',
-                'max-width': $(document).width() - 100 + 'px'
+                right: calcPopupPos()
             }
         });
         setTimeout(setPopupPos, 1);

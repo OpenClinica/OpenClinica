@@ -3854,6 +3854,7 @@ public class OdmExtractDAO extends DatasetDAO {
             element = new ElementRefBean();
             element.setName(formLayout.getName());
             element.setUrl(formLayout.getUrl());
+            element.setStatus(  core.org.akaza.openclinica.domain.Status.getByCode(formLayout.getStatusId()).getName());
             elementRefs.add(element);
         }
         return elementRefs;

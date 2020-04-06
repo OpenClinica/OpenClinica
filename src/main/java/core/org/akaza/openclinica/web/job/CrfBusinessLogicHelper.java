@@ -448,6 +448,7 @@ public class CrfBusinessLogicHelper {
 
         ecb.setUpdater(ub);
         ecb.setUpdatedDate(new Date());
+        ecb.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY);
 
       //**************  ecb.setStatus(newStatus);
         ecb.setStage(newStage);
@@ -517,6 +518,7 @@ public class CrfBusinessLogicHelper {
          */
      //**************   ecb.setStatus(newStatus);
         ecb.setStage(newStage);
+        ecb.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
         ecb = (EventCRFBean) eventCrfDao.update(ecb);
         logger.debug("just updated event crf id: " + ecb.getId());
         // note the below statement only updates the DATES, not the STATUS
