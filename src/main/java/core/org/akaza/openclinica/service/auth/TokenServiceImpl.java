@@ -71,4 +71,15 @@ public class TokenServiceImpl implements TokenService {
         String userType = (String) userContextMap.get("userType");
         return userType;
     }
+
+    public String getCustomerUuid(String token) {
+        Map<String, Object> decodedToken = decodeAndVerify(token);
+        if (MapUtils.isEmpty(decodedToken))
+            return null;
+        LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
+        if (MapUtils.isEmpty(userContextMap))
+            return null;
+        String userType = (String) userContextMap.get("customerUuid");
+        return userType;
+    }
 }

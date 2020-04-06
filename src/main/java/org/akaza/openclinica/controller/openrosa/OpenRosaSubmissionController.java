@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import com.openclinica.jwtverifier.utils.AuthenticationUtils;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.rule.FileProperties;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -12,6 +13,8 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import com.openclinica.kafka.KafkaService;
@@ -107,6 +110,11 @@ public class OpenRosaSubmissionController {
     private StudyBuildService studyBuildService;
     @Autowired
     private KafkaService kafkaService;
+
+    @Autowired
+    private UtilService utilService;
+    @Autowired
+    TokenService tokenService;
 
     @Autowired
     private NewTopic formStatusChange;
@@ -248,8 +256,9 @@ public class OpenRosaSubmissionController {
             eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
             eventCrfDao.saveOrUpdate(eventCrf);
-            kafkaService.sendFormCompleteMessage(eventCrf);
-//            checkRandomization(subjectContext, studyOID, studySubjectOID);
+            String customerUuid = tokenService.getCustomerUuid((String) request.getSession().getAttribute("accessToken"));
+            kafkaService.sendFormCompleteMessage(customerUuid, eventCrf);
+//          checkRandomization(subjectContext, studyOID, studySubjectOID);
         }
 
         updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount);

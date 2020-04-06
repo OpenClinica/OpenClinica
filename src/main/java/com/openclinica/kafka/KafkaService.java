@@ -19,22 +19,30 @@ public class KafkaService {
   @Autowired
   private KafkaTemplate kafkaTemplate;
 
-  public void sendFormCompleteMessage(EventCrf eventCrf) throws Exception {
+  public void sendFormCompleteMessage(String customerUuid, EventCrf eventCrf) throws Exception {
     Study study = eventCrf.getStudySubject().getStudy();
     FormStatusChangeDTO formStatusChangeDTO = new FormStatusChangeDTO();
     String studyOid;
     String siteOid;
+    String studyUuid;
+    String studyEnvUuid;
     if (study.getStudy() == null) {
       // Study-level
       studyOid = study.getOc_oid();
       siteOid = null;
+      studyUuid = study.getStudyUuid();
+      studyEnvUuid = study.getStudyEnvUuid();
     } else {
       // Site-level
       siteOid = study.getOc_oid();
       studyOid = study.getStudy().getOc_oid();
+      studyUuid = study.getStudy().getStudyUuid();
+      studyEnvUuid = study.getStudy().getStudyEnvUuid();
     }
 
-    formStatusChangeDTO.setCustomerUuid(CoreResources.getKeyCloakConfig().getRealm());
+    formStatusChangeDTO.setCustomerUuid(customerUuid);
+    formStatusChangeDTO.setStudyUuid(studyUuid);
+    formStatusChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
     formStatusChangeDTO.setStudyOid(studyOid);
     formStatusChangeDTO.setSiteOid(siteOid);
     formStatusChangeDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
@@ -57,8 +65,10 @@ public class KafkaService {
     kafkaTemplate.send(producerRecord);
   }
 
+  // Removed for now. Will likely be removed?
   public void sendItemDataChangeMessage(ItemData itemData) throws Exception {
-    Study study = itemData.getEventCrf().getStudySubject().getStudy();
+
+/*    Study study = itemData.getEventCrf().getStudySubject().getStudy();
     ItemDataChangeDTO itemDataChangeDTO = new ItemDataChangeDTO();
 
     String studyOid;
@@ -100,7 +110,7 @@ public class KafkaService {
       }
     });
     ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
+    kafkaTemplate.send(producerRecord);*/
   }
 
 }
