@@ -404,12 +404,16 @@
         return trans[str] || str;
     }
 
-    function formatDate(date) {
-        date = moment(date);
-        if ((date.hours === 0 || date.hours === 12) && date.minutes === 0 && date.seconds === 0) {
-            return date.format('DD-MMM-YYYY');
-        } else {
-            return date.format('DD-MMM-YYYY hh:mm');
+    function formatDateTime(date) {
+        return moment(date).format('DD-MMM-YYYY hh:mm');
+    }
+
+    function formatDate(date, withTime) {
+        if (withTime) {
+            return formatDateTime(date)
+        }
+        else {
+            return moment(date).format('DD-MMM-YYYY');
         }
     }
 
@@ -460,7 +464,7 @@
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
                 $('#siteName').text(data.siteName);
-                $('#eventStartDate').text(formatDate(data.eventStartDate));
+                $('#eventStartDate').text(formatDate(data.eventStartDate, data.eventStartDateHasTime));
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
@@ -480,9 +484,9 @@
                     if (!item.lastVerifiedDate) {
                         item.lastVerifiedDate = 'Never';
                     } else {
-                        item.lastVerifiedDate = formatDate(item.lastVerifiedDate);
+                        item.lastVerifiedDate = formatDateTime(item.lastVerifiedDate);
                     }
-                    item.lastModifiedDate = formatDate(item.lastModifiedDate);
+                    item.lastModifiedDate = formatDateTime(item.lastModifiedDate);
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
 
                     item.actions =
