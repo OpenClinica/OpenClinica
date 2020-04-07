@@ -197,13 +197,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         // this is for item data
         else if ("itemdata".equalsIgnoreCase(entityType)) {
-            prepareItemRequest(request, ds, currentStudy, note, module, flavor, loadWarning, isLocked, id, EnketoAPI.EDIT_MODE);
+            prepareItemRequest(request, ds, currentStudy, note, viewNotesUrl(module), flavor, loadWarning, isLocked, id, EnketoAPI.EDIT_MODE);
         }
         return true;
     }
 
     private void prepareItemRequest(HttpServletRequest request, DataSource ds, Study currentStudy, DiscrepancyNoteBean note,
-            String module, String flavor, String loadWarning, boolean isLocked, int id, String enketoMode) throws Exception, IOException {
+            String originatingPage, String flavor, String loadWarning, boolean isLocked, int id, String enketoMode) throws Exception, IOException {
         String jini ="false";
         String jiniEnabled =CoreResources.getField("jini.enabled");
         if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
@@ -385,7 +385,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOc_oid(), flavor, role, enketoMode, hash, loadWarning, isLocked);
         }
         request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
-        request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
+        request.setAttribute(ORIGINATING_PAGE, originatingPage);
         request.setAttribute(JINI, jini);
     }
 
@@ -405,7 +405,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         if (itemDataId > 0) {
             flavor = QUERY_FLAVOR;
-            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, module, flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE);
+            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, request.getHeader("referer"), flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE);
             forwardPage(Page.ENKETO_FORM_SERVLET);
             return;
         }
