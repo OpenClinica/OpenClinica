@@ -605,7 +605,6 @@ public class ImportServiceImpl implements ImportService {
         itemData.setValue(itemDataBean.getValue());
         itemData.setUserAccount(userAccount);
         itemData.setDateCreated(new Date());
-        itemData.setStatus(Status.AVAILABLE);
         itemData.setOrdinal(groupRepeatKey);
         logger.debug("Creating new Item Data");
         itemData = itemDataDao.saveOrUpdate(itemData);
@@ -614,7 +613,6 @@ public class ImportServiceImpl implements ImportService {
 
     private ItemData updateItemData(ItemData itemData, UserAccount userAccount, String value) {
         itemData.setValue(value);
-        itemData.setOldStatus(itemData.getStatus());
         itemData.setDateUpdated(new Date());
         itemData.setUpdateId(userAccount.getUserId());
         itemData = itemDataDao.saveOrUpdate(itemData);

@@ -332,12 +332,6 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 // remove all the item data
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
-                    if (!item.getStatus().equals(Status.DELETED)) {
-                        item.setOldStatus(item.getStatus());
-                        item.setStatus(Status.AUTO_DELETED);
-                        item.setUpdater(ub);
-                        item.setUpdatedDate(new Date());
-                        iddao.update(item);
                         DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
                         List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(item.getId());
                         if (!dnNotesOfRemovedItem.isEmpty()) {
@@ -368,7 +362,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
                             itemParentNote.setDetailedNotes(detailedNotes);
                             dnDao.update(itemParentNote);
                         }
-                    }
+
                 }
             }
         }

@@ -39,13 +39,11 @@ public class ItemData extends DataMapDomainObject {
     private UserAccount userAccount;
     private EventCrf eventCrf;
     private Item item;
-    private Status status;
     private String value;
     private Date dateCreated;
     private Date dateUpdated;
     private Integer updateId;
     private Integer ordinal;
-    private Status oldStatus;
     private Boolean deleted;
     private String instanceId;
     private List<DnItemDataMap> dnItemDataMaps;
@@ -58,13 +56,12 @@ public class ItemData extends DataMapDomainObject {
         this.item = item;
     }
 
-    public ItemData(int itemDataId, UserAccount userAccount, EventCrf eventCrf, Item item, Status status, String value, Date dateCreated, Date dateUpdated,
+    public ItemData(int itemDataId, UserAccount userAccount, EventCrf eventCrf, Item item, String value, Date dateCreated, Date dateUpdated,
             Integer updateId, Integer ordinal, Boolean ocformDeleted, List<DnItemDataMap> dnItemDataMaps) {
         this.itemDataId = itemDataId;
         this.userAccount = userAccount;
         this.eventCrf = eventCrf;
         this.item = item;
-        this.status = status;
         this.value = value;
         this.dateCreated = dateCreated;
         this.dateUpdated = dateUpdated;
@@ -116,18 +113,6 @@ public class ItemData extends DataMapDomainObject {
         this.item = item;
     }
 
-    @Type(type = "status")
-    @Column(name = "status_id")
-    public Status getStatus() {
-        if (status != null) {
-            return status;
-        } else
-            return Status.AVAILABLE;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     @Column(name = "value", length = 4000)
     public String getValue() {
@@ -170,16 +155,6 @@ public class ItemData extends DataMapDomainObject {
     @Column(name = "ordinal")
     public Integer getOrdinal() {
         return this.ordinal;
-    }
-
-    @Type(type = "status")
-    @Column(name = "old_status_id")
-    public Status getOldStatus() {
-        return oldStatus;
-    }
-
-    public void setOldStatus(Status oldStatus) {
-        this.oldStatus = oldStatus;
     }
 
     public void setOrdinal(Integer ordinal) {

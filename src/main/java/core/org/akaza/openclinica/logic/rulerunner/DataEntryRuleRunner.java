@@ -97,7 +97,7 @@ public class DataEntryRuleRunner extends RuleRunner {
                                 RuleActionBean ruleActionBean = itr.next();
                                 if(ruleActionBean.getActionType()==ActionType.INSERT) {
                                     request.setAttribute("insertAction", true);
-                                    if(phase==Phase.DOUBLE_DATA_ENTRY && itemData.getStatus().getId()==4 
+                                    if(phase==Phase.DOUBLE_DATA_ENTRY
                                             && request.getAttribute(firstDDE)==null) {
                                         request.setAttribute(firstDDE, true);
                                     }

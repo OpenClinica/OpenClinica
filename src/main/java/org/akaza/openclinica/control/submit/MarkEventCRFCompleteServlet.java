@@ -227,7 +227,6 @@ public class MarkEventCRFCompleteServlet extends SecureController {
                 ecdao.markComplete(ecb, ide);
 
                 ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-                iddao.updateStatusByEventCRF(ecb, newStatus);
 
                 // change status for event
                 StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());

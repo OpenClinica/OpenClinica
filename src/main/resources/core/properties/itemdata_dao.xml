@@ -11,34 +11,34 @@
 	</query>
 	<query>
 		<name>create</name>
-		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, STATUS_ID, VALUE,
-		OWNER_ID, DATE_CREATED,ORDINAL,OLD_STATUS_ID,DELETED)
+		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID,  VALUE,
+		OWNER_ID, DATE_CREATED,ORDINAL,DELETED)
 		VALUES (?,?,?,?,?,?,NOW(),?,?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
-		<sql>UPDATE ITEM_DATA SET EVENT_CRF_ID=?,ITEM_ID=?,STATUS_ID=?,
-		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =?, OLD_STATUS_ID=?, DELETED=? WHERE
+		<sql>UPDATE ITEM_DATA SET EVENT_CRF_ID=?,ITEM_ID=?,
+		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =?,  DELETED=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
 	<!-- added tbh 09/03/2008 -->
 	<query>
 		<name>upsert</name>
-		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, STATUS_ID, VALUE,
+		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, VALUE,
 		OWNER_ID, DATE_CREATED, ORDINAL, DATE_UPDATED, UPDATE_ID, DELETED)
 		VALUES (?,?,?,?,?,?,NOW(),?,NOW(),?,?)</sql>
 	</query>
 	<!-- added tbh 09/2008 -->
 	<query>
 		<name>updateValue</name>
-		<sql>UPDATE ITEM_DATA SET STATUS_ID=?,
+		<sql>UPDATE ITEM_DATA SET
 		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
 	
 		<query>
 		<name>updateValueForRemoved</name>
-		<sql>UPDATE ITEM_DATA SET STATUS_ID=?,
+		<sql>UPDATE ITEM_DATA SET
 		VALUE=?,UPDATE_ID=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
@@ -65,7 +65,6 @@
 	<query>
 		<name>updateStatusByEventCRF</name>
 		<sql>UPDATE item_data SET status_id=? WHERE event_crf_id=?
-		and status_id != 5
 		</sql>
 	</query>
 	<query>
@@ -92,7 +91,6 @@
 		<sql>
 			SELECT d.* FROM item_data d, item_form_metadata m
 			WHERE d.item_id = m.item_id AND m.section_id = ? AND d.event_crf_id=?
-			and d.status_id != 5 and d.status_id != 7
 			order by d.ordinal
 		</sql>
 	</query>
@@ -116,7 +114,7 @@
 	</query>
 	<query>
         <name>findAllByEventCRFIdAndItemId</name>
-        <sql>select * from item_data where event_crf_id=? and item_id = ? and status_id!=5 and status_id!=7 Order by item_data.ordinal asc </sql>
+        <sql>select * from item_data where event_crf_id=? and item_id = ?  Order by item_data.ordinal asc </sql>
     </query>
     
     <query>
@@ -202,7 +200,7 @@
 	<query>
 		<name>getGroupSize</name>
 		<sql>SELECT count(*) From item_data id
-		WHERE id.item_id = ? and id.event_crf_id = ? and id.status_id!=5 and id.status_id!=7
+		WHERE id.item_id = ? and id.event_crf_id = ?
 		</sql>
 	</query>
 	<query>
@@ -215,7 +213,7 @@
              where event_crf.study_event_id=?
              and item.oc_oid= ?
              and item_group.oc_oid=?
-             and item_data.status_id != ? and item_data.status_id != ? order by item_data.item_data_id asc
+              order by item_data.item_data_id asc
         </sql>
     </query>
 	<query>
