@@ -451,7 +451,7 @@ public class ValidateServiceImpl implements ValidateService {
         }
         if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-        } else if (!isUserHas_CRC_INV_DM_DEP_DS_SM_RoleInSite(userRoles, siteOid)) {
+        } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         }
         if (!isParticipateActive(tenantStudy)) {
