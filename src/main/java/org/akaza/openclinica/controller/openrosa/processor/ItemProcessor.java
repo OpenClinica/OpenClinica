@@ -183,7 +183,6 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                         newItemData.setOrdinal(itemDataDao.getMaxGroupRepeat(container.getEventCrf().getEventCrfId(), item.getItemId()) + 1);
                         groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                     }
-                    newItemData.setStatus(Status.UNAVAILABLE);
                     newItemData.setInstanceId(container.getInstanceId());
                     itemDataDao.saveOrUpdate(newItemData);
 
@@ -248,9 +247,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                 if (!groupOrdinalMapping.get(itemGroupId).contains(itemData.getOrdinal()) && !itemData.isDeleted()) {
                     itemData.setDeleted(true);
                     itemData.setValue("");
-                    itemData.setOldStatus(itemData.getStatus());
                     itemData.setUserAccount(container.getUser());
-                    itemData.setStatus(Status.AVAILABLE);
                     itemData.setUpdateId(container.getUser().getUserId());
                     itemData.setInstanceId(container.getInstanceId());
                     itemData = itemDataDao.saveOrUpdate(itemData);

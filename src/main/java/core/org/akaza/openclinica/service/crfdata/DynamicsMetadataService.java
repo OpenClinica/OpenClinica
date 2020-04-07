@@ -502,7 +502,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     public void insert(ItemDataBean itemDataBean, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,List<StratificationFactorBean> stratificationFactorBeans) {
-        insert(itemDataBean.getId(), properties, ub, ruleSet, itemDataBean.getStatus(), stratificationFactorBeans);
+        insert(itemDataBean.getId(), properties, ub, ruleSet, null, stratificationFactorBeans);
     }
 
     public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet,List<StratificationFactorBean> stratificationFactorBeans) {
@@ -569,7 +569,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
 
-                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
             // If A is not repeating group & B is a repeating group with no index selected
@@ -578,7 +577,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
                 for (ItemDataBean oidBasedItemData : oidBasedItemDatas) {
                     oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
-                    if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                     getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
                 }
             }
@@ -588,7 +586,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupBOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
-                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
             // If A is repeating/ non repeating group & B is a repeating group with index selected as END
@@ -596,7 +593,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 ItemDataBean oidBasedItemData =
                     oneToEndMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
-                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
             // If A is repeating group with index & B is a repeating group with index selected
@@ -605,7 +601,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupBOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
-                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
             // If A is repeating group with index & B is a repeating group with no index selected
@@ -614,7 +609,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupAOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA,stratificationFactorBeans));
-                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, getDateFormat(propertyBean));
             }
 //            // If A is repeating group with index & B is none-repeating group

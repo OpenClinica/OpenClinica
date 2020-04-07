@@ -8,20 +8,11 @@
 package core.org.akaza.openclinica.dao.submit;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.sql.DataSource;
 
-import core.org.akaza.openclinica.bean.core.ApplicationConstants;
-import core.org.akaza.openclinica.bean.core.EntityBean;
-import core.org.akaza.openclinica.bean.core.ItemDataType;
-import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.Utils;
+import core.org.akaza.openclinica.bean.core.*;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
@@ -132,15 +123,15 @@ public class ItemDataDAO extends AuditableEntityDAO {
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.INT);
         this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.INT);
-        this.setTypeExpected(5, TypeNames.STRING);
+//        this.setTypeExpected(4, TypeNames.INT);
+        this.setTypeExpected(4, TypeNames.STRING);
+        this.setTypeExpected(5, TypeNames.DATE);
         this.setTypeExpected(6, TypeNames.DATE);
-        this.setTypeExpected(7, TypeNames.DATE);
-        this.setTypeExpected(8, TypeNames.INT);// owner id
-        this.setTypeExpected(9, TypeNames.INT);// update id
-        this.setTypeExpected(10, TypeNames.INT);// ordinal
-        this.setTypeExpected(11, TypeNames.INT);// old_status_id
-        this.setTypeExpected(12, TypeNames.BOOL);// ocform_deleted
+        this.setTypeExpected(7, TypeNames.INT);// owner id
+        this.setTypeExpected(8, TypeNames.INT);// update id
+        this.setTypeExpected(9, TypeNames.INT);// ordinal
+//        this.setTypeExpected(11, TypeNames.INT);// old_status_id
+        this.setTypeExpected(10, TypeNames.BOOL);// ocform_deleted
     }
 
     public EntityBean update(EntityBean eb) {
@@ -159,13 +150,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
         variables.put(new Integer(1), new Integer(idb.getEventCRFId()));
         variables.put(new Integer(2), new Integer(idb.getItemId()));
-        variables.put(new Integer(3), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(4), idb.getValue());
-        variables.put(new Integer(5), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(6), new Integer(idb.getOrdinal()));
-        variables.put(new Integer(7), new Integer(idb.getOldStatus().getId()));
-        variables.put(new Integer(8), new Boolean(idb.isDeleted()));
-        variables.put(new Integer(9), new Integer(idb.getId()));
+        variables.put(new Integer(3), idb.getValue());
+        variables.put(new Integer(4), new Integer(idb.getUpdaterId()));
+        variables.put(new Integer(5), new Integer(idb.getOrdinal()));
+        variables.put(new Integer(6), new Boolean(idb.isDeleted()));
+        variables.put(new Integer(7), new Integer(idb.getId()));
         this.execute(digester.getQuery("update"), variables);
 
         if (isQuerySuccessful()) {
@@ -195,10 +184,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
         idb.setActive(false);
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(2), idb.getValue());
-        variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(4), new Integer(idb.getId()));
+        variables.put(new Integer(1), idb.getValue());
+        variables.put(new Integer(2), new Integer(idb.getUpdaterId()));
+        variables.put(new Integer(3), new Integer(idb.getId()));
         this.execute(digester.getQuery("updateValue"), variables);
 
         if (isQuerySuccessful()) {
@@ -222,10 +210,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
         idb.setActive(false);
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(2), idb.getValue());
-        variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(4), new Integer(idb.getId()));
+        variables.put(new Integer(1), idb.getValue());
+        variables.put(new Integer(2), new Integer(idb.getUpdaterId()));
+        variables.put(new Integer(3), new Integer(idb.getId()));
         this.execute(digester.getQuery("updateValueForRemoved"), variables);
 
         if (isQuerySuccessful()) {
@@ -238,20 +225,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
     /**
      * this will update item data status
      */
-    public EntityBean updateStatus(EntityBean eb) {
-        ItemDataBean idb = (ItemDataBean) eb;
-        idb.setActive(false);
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(2), new Integer(idb.getId()));
-        this.execute(digester.getQuery("updateStatus"), variables);
 
-        if (isQuerySuccessful()) {
-            idb.setActive(true);
-        }
-
-        return idb;
-    }
 
     /*
      * current_df_string= yyyy-MM-dd oc_df_string = yyyy-mm-dd local_df_string = dd-MMM-yyyy
@@ -280,10 +254,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
         idb.setActive(false);
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(2), idb.getValue());
-        variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(4), new Integer(idb.getId()));
+        variables.put(new Integer(1), idb.getValue());
+        variables.put(new Integer(2), new Integer(idb.getUpdaterId()));
+        variables.put(new Integer(3), new Integer(idb.getId()));
         this.execute(digester.getQuery("updateValue"), variables);
 
         if (isQuerySuccessful()) {
@@ -326,12 +299,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(id));
         variables.put(new Integer(2), new Integer(idb.getEventCRFId()));
         variables.put(new Integer(3), new Integer(idb.getItemId()));
-        variables.put(new Integer(4), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(5), idb.getValue());
-        variables.put(new Integer(6), new Integer(idb.getOwnerId()));
-        variables.put(new Integer(7), new Integer(idb.getOrdinal()));
-        variables.put(new Integer(8), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(9), new Boolean(idb.isDeleted()));
+        variables.put(new Integer(4), idb.getValue());
+        variables.put(new Integer(5), new Integer(idb.getOwnerId()));
+        variables.put(new Integer(6), new Integer(idb.getOrdinal()));
+        variables.put(new Integer(7), new Boolean(idb.isDeleted()));
         this.execute(digester.getQuery("create"), variables);
 
         if (isQuerySuccessful()) {
@@ -357,12 +328,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(id));
         variables.put(new Integer(2), new Integer(idb.getEventCRFId()));
         variables.put(new Integer(3), new Integer(idb.getItemId()));
-        variables.put(new Integer(4), new Integer(idb.getStatus().getId()));
-        variables.put(new Integer(5), idb.getValue());
-        variables.put(new Integer(6), new Integer(idb.getOwnerId()));
-        variables.put(new Integer(7), new Integer(idb.getOrdinal()));
-        variables.put(new Integer(8), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(9), new Boolean(idb.isDeleted()));
+        variables.put(new Integer(4), idb.getValue());
+        variables.put(new Integer(5), new Integer(idb.getOwnerId()));
+        variables.put(new Integer(6), new Integer(idb.getOrdinal()));
+        variables.put(new Integer(7), new Integer(idb.getUpdaterId()));
+        variables.put(new Integer(8), new Boolean(idb.isDeleted()));
         this.execute(digester.getQuery("upsert"), variables);
 
         if (isQuerySuccessful()) {
@@ -436,7 +406,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
     public Object getEntityFromHashMap(HashMap hm) {
         ItemDataBean eb = new ItemDataBean();
-        this.setEntityAuditInformation(eb, hm);
+        this.setItemDataAuditInformation(eb, hm);
         eb.setId(((Integer) hm.get("item_data_id")).intValue());
         eb.setEventCRFId(((Integer) hm.get("event_crf_id")).intValue());
         eb.setItemId(((Integer) hm.get("item_id")).intValue());
@@ -453,10 +423,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
                 eb.setValue(reFormatPDate(eb.getValue()));
             }
         }
-        eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
         eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
         eb.setDeleted(((Boolean) hm.get("deleted")).booleanValue());
-        eb.setOldStatus(Status.get(hm.get("old_status_id") == null ? 1 : ((Integer) hm.get("old_status_id")).intValue()));
         return eb;
     }
 
@@ -468,8 +436,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), studyEventId);
         variables.put(new Integer(2), itemOid);
         variables.put(new Integer(3), itemGroupOid);
-        variables.put(new Integer(4), Status.DELETED.getId());
-        variables.put(new Integer(5), Status.AUTO_DELETED.getId());
+
 
         ArrayList<ItemDataBean> dataItems = this.executeFindAllQuery("findByStudyEventAndOIDs", variables);
         return dataItems;
@@ -615,16 +582,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return !itemDataBeans.isEmpty() && itemDataBeans.size() == 1 ? itemDataBeans.get(0) : null;
     }
 
-    public void updateStatusByEventCRF(EventCRFBean eventCRF, Status s) {
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), new Integer(s.getId()));
-        variables.put(new Integer(2), new Integer(eventCRF.getId()));
-
-        String sql = digester.getQuery("updateStatusByEventCRF");
-        execute(sql, variables);
-
-        return;
-    }
 
     public ItemDataBean findByItemIdAndEventCRFId(int itemId, int eventCRFId) {
         setTypesExpected();
@@ -944,5 +901,22 @@ public class ItemDataDAO extends AuditableEntityDAO {
         }
        
         return matchCriterias;
+    }
+
+    public void setItemDataAuditInformation(AuditableEntityBean aeb, HashMap hm) {
+        // grab the required information from the table
+        // so that we don't have to repeat this in every single dao
+        Date dateCreated = (Date) hm.get("date_created");
+        Date dateUpdated = (Date) hm.get("date_updated");
+        Integer ownerId = (Integer) hm.get("owner_id");
+        Integer updateId = (Integer) hm.get("update_id");
+
+        if (aeb != null) {
+            aeb.setCreatedDate(dateCreated);
+            aeb.setUpdatedDate(dateUpdated);
+            //This was throwing a ClassCastException : BWP altered in 4/2009
+            aeb.setOwnerId(ownerId.intValue());
+            aeb.setUpdaterId(updateId.intValue());
+        }
     }
 }
