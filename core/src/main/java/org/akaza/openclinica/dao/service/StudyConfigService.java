@@ -200,7 +200,11 @@ public class StudyConfigService {
 
             } else if (parameter.equalsIgnoreCase("adminForcedReasonForChange")) {
                 study.getStudyParameterConfig().setAdminForcedReasonForChange(spvb.getValue());
-            }
+                
+              //secondaryLabelViewable  
+            } else if (parameter.equalsIgnoreCase("secondaryLabelViewable")) {
+	            study.getStudyParameterConfig().setSecondaryLabelViewable(spvb.getValue());
+	        }
         }
         return study;
 
