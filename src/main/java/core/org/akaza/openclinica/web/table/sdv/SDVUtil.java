@@ -1483,16 +1483,14 @@ public class SDVUtil {
             sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
             sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
             Study study = studyDao.findByOcOID(studyOID);
-            logger.error("NOSDV");
-            logger.error("STUDYOID " + studyOID);
             EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), study.getStudy() != null ? study.getStudy().getStudyId() : study.getStudyId());
-            logger.error("EventDefinitionCrf " + (eventCrf == null ? "NULL" : "VERICODE=" + eventDefinitionCrf.getSourceDataVerificationCode()));
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
             if(eventCrf.getStudyEvent().isCurrentlyLocked()) {
                 sdvDTO.setFormStatus("locked");
-            } else
+            } else {
                 sdvDTO.setFormStatus("completed"); //EventCrf Status is checked to be UNAVAVAILABLE (i.e. COMPLETED) at parent If Itself
+            }
             sdvDTO.setLastVerifiedDate(eventCrf.getLastSdvVerifiedDate());
             sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
             List<SdvItemDTO> sdvItemDTOS = new ArrayList<>();
