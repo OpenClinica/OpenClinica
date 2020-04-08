@@ -56,16 +56,17 @@ public class SdvApiController {
             changedAfterSdvOnlyFilterFlag = false;
         SdvDTO responseDTO = null;
         try {
-                if (ordinal == null)
-                    ordinalValue = 1;
-                else if(ordinal.matches("^[0-9]*$") && Integer.parseInt(ordinal) > 0)
-                    ordinalValue = Integer.parseInt(ordinal);
-                else
-                    throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_IS_INCORRECT);
+            if (ordinal == null)
+                ordinalValue = 1;
+            else if(ordinal.matches("^[0-9]*$") && Integer.parseInt(ordinal) > 0)
+                ordinalValue = Integer.parseInt(ordinal);
+            else
+                throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_IS_INCORRECT);
             validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean,ordinalValue);
             responseDTO = sdvUtil.getFormDetailsForSDV(studyOID, formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
         }
         catch(OpenClinicaSystemException e) {
+            e.printStackTrace();
             return new ResponseEntity<>(validateService.getResponseForException(e, studyOID, ""), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
