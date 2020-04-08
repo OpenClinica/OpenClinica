@@ -1071,7 +1071,7 @@ public class SDVUtil {
             actionsBuilder
                 .append("<button style='padding:.4em 0.9em' class='accessCheck popupSdv' title='" + resWords.getString("view_sdv_item_data_hover") + "'")
                 .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
-                .append(" data-study-oid='").append(eventDef.getStudy().getOc_oid()).append("'")
+                .append(" data-study-oid='").append(studyBean.getOc_oid()).append("'")
                 .append(" data-event-oid='").append(eventDef.getOc_oid()).append("'")
                 .append(" data-event-ordinal='").append(event.getSampleOrdinal() > 0 ? event.getSampleOrdinal() : 1).append("'")
                 .append(" data-form-oid='").append(eventCrf.getFormLayout().getCrf().getOcOid()).append("'")
@@ -1483,7 +1483,10 @@ public class SDVUtil {
             sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
             sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
             Study study = studyDao.findByOcOID(studyOID);
-            EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), study.getStudyId());
+            logger.error("NOSDV");
+            logger.error("STUDYOID " + studyOID);
+            EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), study.getStudy() != null ? study.getStudy().getStudyId() : study.getStudyId());
+            logger.error("EventDefinitionCrf " + (eventCrf == null ? "NULL" : "VERICODE=" + eventDefinitionCrf.getSourceDataVerificationCode()));
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
             if(eventCrf.getStudyEvent().isCurrentlyLocked()) {
