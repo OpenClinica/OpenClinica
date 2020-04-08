@@ -230,8 +230,8 @@ public class ValidateServiceImpl implements ValidateService {
     public boolean isUserHas_DM_MON_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOID){
         Study publicStudy = getPublicStudy(studyOID);
         for (StudyUserRoleBean userRole : userRoles) {
-             if ((userRole.getRole().equals(Role.MONITOR) && publicStudy.getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.COORDINATOR) && publicStudy.getStudyId() == userRole.getStudyId()))
+            if ((userRole.getRole().equals(Role.MONITOR) && publicStudy.getStudyId() == userRole.getStudyId())
+                || (userRole.getRole().equals(Role.COORDINATOR) && publicStudy.getStudyId() == userRole.getStudyId()))
                 return true;
         }
         return false;
@@ -483,22 +483,37 @@ public class ValidateServiceImpl implements ValidateService {
 
     public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int oridinal){
 
-        if(!isStudyOidValidStudyLevelOid(studyOid))
+        if (!isStudyOidValid(studyOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
-        if (!isStudyAvailable(studyOid)) {
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
-        }
-        if(!isUserHas_DM_MON_RoleInStudy(userAccount.getRoles(),studyOid))
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+
         Study study = studyDao.findByOid(studyOid);
-        if(!isStudySubjectPresent(studySubjectLabel, study))
+        Study parentStudy = study.getStudy();
+        if (parentStudy != null) { // at site-level
+            Study site = study;
+            String siteOid = site.getOc_oid();
+            if (!isSiteOidValid(siteOid))
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+            if (!isSiteAvailable(siteOid))
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
+            if (!isUserHas_CRC_INV_DM_DEP_DS_SM_RoleInSite(userAccount.getRoles(),siteOid))
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        }
+        else { // at study-level
+            if (!isStudyOidValidStudyLevelOid(studyOid))
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+            if (!isStudyAvailable(studyOid))
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
+            if (!isUserHas_DM_MON_RoleInStudy(userAccount.getRoles(), studyOid))
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        }
+        if (!isStudySubjectPresent(studySubjectLabel, study))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_ID_NOT_AVAILABLE);
-        int studySubjectId = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectLabel, study).getStudySubjectId();
-        if(!isEventPresent(studyEventOid))
+        if (!isEventPresent(studyEventOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENTOID_NOT_EXIST_IN_THIS_STUDY);
-        if(!isEventOidAndParticipantIdAreLinked(studyEventOid, studySubjectId, oridinal))
+        int studySubjectId = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectLabel, study).getStudySubjectId();
+        if (!isEventOidAndParticipantIdAreLinked(studyEventOid, studySubjectId, oridinal))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_DOES_NOT_HAVE_THIS_EVENT_IN_THIS_STUDY);
-        if(!isCrfPresent(formOid))
+        if (!isCrfPresent(formOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_FORMOID_NOT_EXIST_IN_THIS_STUDY);
     }
 }
