@@ -1,6 +1,8 @@
 package com.openclinica.kafka;
 
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import com.openclinica.kafka.dto.ItemDataChangeDTO;
+import com.openclinica.kafka.dto.StudyPublishDTO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.ItemData;
@@ -62,6 +64,48 @@ public class KafkaService {
       }
     });
     ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_STATUS_CHANGE_TOPIC, null, null, null, formStatusChangeDTO, headers);
+    kafkaTemplate.send(producerRecord);
+  }
+
+  public void sendEventAttributeChangeMessage(String customerUuid, EventCrf eventCrf) throws Exception {
+    EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
+
+    Headers headers = new RecordHeaders();
+    headers.add(new Header() {
+      @Override
+      public String key() {
+        return "__TypeId__";
+      }
+
+      @Override
+      public byte[] value() {
+        return "com.openclinica.kafka.dto.EventAttributeChangeDTO".getBytes();
+      }
+    });
+    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
+    kafkaTemplate.send(producerRecord);
+  }
+
+  public void sendStudyPublishMessage(String customerUuid, Study study) throws Exception {
+    StudyPublishDTO studyPublishDTO = new StudyPublishDTO();
+
+    studyPublishDTO.setCustomerUuid(customerUuid);
+    studyPublishDTO.setStudyUuid(study.getStudyUuid());
+    studyPublishDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
+
+    Headers headers = new RecordHeaders();
+    headers.add(new Header() {
+      @Override
+      public String key() {
+        return "__TypeId__";
+      }
+
+      @Override
+      public byte[] value() {
+        return "com.openclinica.kafka.dto.StudyPublishDTO".getBytes();
+      }
+    });
+    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.STUDY_PUBLISH_TOPIC, null, null, null, studyPublishDTO, headers);
     kafkaTemplate.send(producerRecord);
   }
 
