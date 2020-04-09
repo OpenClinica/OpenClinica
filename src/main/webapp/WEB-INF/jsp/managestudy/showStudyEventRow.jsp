@@ -128,6 +128,25 @@
                                             </c:choose>
                                         </c:forEach>
                                       </select>
+<SCRIPT LANGUAGE="JavaScript">
+    function changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>() {
+        var qer = document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.value;
+        document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.formLayoutId.value=qer;
+        document.getElementById('ide1-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href =
+            buildUrl(qer,'<c:out value="${currRow.bean.studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>' ,'<c:out value="edit"/>');
+        document.getElementById('ide2-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href =
+            buildUrl(qer,'<c:out value="${currRow.bean.studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>','<c:out value="view"/>' );
+    }
+
+    function buildUrl(formLayoutId, studyEventId, eventCRFId, originatingPage,mode){
+        return "EnketoFormServlet?formLayoutId="+ formLayoutId +
+               "&studyEventId=" + studyEventId +
+               "&eventCrfId=" + eventCRFId +
+               "&originatingPage=" + originatingPage+
+               "&mode=" + mode;
+    }
+</SCRIPT>
+
                                     </c:when>
                                     <c:otherwise>
                                         <c:out value="${dedc.eventCRF.formLayout.name}"/>
@@ -181,7 +200,7 @@
                                                 <td>
                                                     <c:if test="${!userRole.monitor && study.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true  && currRow.bean.studyEvent.workflowStatus != 'SKIPPED' && currRow.bean.studyEvent.workflowStatus != 'STOPPED'}">
                                                         <c:choose>
-                                                            <c:when test="${dedc.eventCRF.status.id != 0}">
+                                                            <c:when test="${dedc.eventCRF.id != 0}">
                                                                 <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                                                   onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                                                                   onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
@@ -337,21 +356,3 @@
     </td>
 </tr>
 
-<SCRIPT LANGUAGE="JavaScript">
-    function changeQuery<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>() {
-        var qer = document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.value;
-        document.startForm<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>.formLayoutId.value=qer;
-        document.getElementById('ide1-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href =
-            buildUrl(qer,'<c:out value="${currRow.bean.studyEvent.id}"/>','<c:out value="${dedc.eventCRF.status.id}"/>','<c:out value="${originatingPage}"/>' ,'<c:out value="edit"/>');
-        document.getElementById('ide2-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href =
-            buildUrl(qer,'<c:out value="${currRow.bean.studyEvent.id}"/>','<c:out value="${dedc.eventCRF.status.id}"/>','<c:out value="${originatingPage}"/>','<c:out value="view"/>' );
-    }
-
-    function buildUrl(formLayoutId, studyEventId, eventCRFId, originatingPage,mode){
-        return "EnketoFormServlet?formLayoutId="+ formLayoutId +
-               "&studyEventId=" + studyEventId +
-               "&eventCrfId=" + eventCRFId +
-               "&originatingPage=" + originatingPage+
-               "&mode=" + mode;
-    }
-</SCRIPT>

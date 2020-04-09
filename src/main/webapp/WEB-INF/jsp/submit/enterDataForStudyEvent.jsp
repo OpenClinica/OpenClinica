@@ -311,9 +311,7 @@
                                               </option>
                                             </c:when>
                                             <c:otherwise>
-                                              <option value="
-                                              <c:out value="${version.id}"/>
-                                              ">
+                                              <option value="<c:out value="${version.id}"/>">
                                               <c:out value="${version.name}"/>
                                               </option>
                                             </c:otherwise>
@@ -384,7 +382,7 @@
                                         <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && studyEvent.removed !=true && studyEvent.archived !=true && studyEvent.locked !=true  && studyEvent.workflowStatus != 'SKIPPED' && studyEvent.workflowStatus != 'STOPPED'}">
                                           <td >
                                             <c:choose>
-                                              <c:when test="${dedc.eventCRF.status.id != 0}">
+                                              <c:when test="${dedc.eventCRF.id != 0}">
                                                 <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                                    onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                                                    onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','icon icon-pencil-squared');"

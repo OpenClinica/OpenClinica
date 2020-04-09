@@ -116,7 +116,6 @@ public abstract class AbstractItemProcessor {
         itemData.setEventCrf(container.getEventCrf());
         itemData.setValue(itemValue);
         itemData.setDateCreated(new Date());
-        itemData.setStatus(Status.AVAILABLE);
         itemData.setOrdinal(itemOrdinal);
         itemData.setUserAccount(container.getUser());
         itemData.setDeleted(false);

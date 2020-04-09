@@ -275,7 +275,6 @@ public class QueryServiceImpl implements QueryService {
         itemData.setEventCrf(helperBean.getContainer().getEventCrf());
         itemData.setValue("");
         itemData.setDateCreated(new Date());
-        itemData.setStatus(Status.AVAILABLE);
         // TODO this value should change once you have an ordinal attribute specified in the query
         itemData.setOrdinal(helperBean.getItemOrdinal());
         itemData.setUserAccount(helperBean.getUserAccount());

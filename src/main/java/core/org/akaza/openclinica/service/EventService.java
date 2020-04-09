@@ -200,7 +200,7 @@ public class EventService implements EventServiceInterface {
                 childDiscrepancyNote.setParentDiscrepancyNote(parentDiscrepancyNote);
                 childDiscrepancyNote.setDiscrepancyNoteType(parentDiscrepancyNote.getDiscrepancyNoteType());
                 childDiscrepancyNote.setThreadUuid(parentDiscrepancyNote.getThreadUuid());
-                childDiscrepancyNote.setResolutionStatus(closedResolutionStatus);  // closed_modified
+                childDiscrepancyNote.setResolutionStatus(closedModifiedresolutionStatus);  // closed_modified
                 childDiscrepancyNote.setStudy(study);
                 childDiscrepancyNote.setUserAccount(userAccount);
                 childDiscrepancyNote.setUserAccountByOwnerId(userAccount);
@@ -211,7 +211,7 @@ public class EventService implements EventServiceInterface {
                 saveQueryItemDatamap(childDiscrepancyNote, itemData);
 
                 parentDiscrepancyNote.setDetailedNotes(detailedNotes);
-                parentDiscrepancyNote.setResolutionStatus(closedResolutionStatus);// closed_modified
+                parentDiscrepancyNote.setResolutionStatus(closedModifiedresolutionStatus);// closed_modified
                 discrepancyNoteDao.saveOrUpdate(parentDiscrepancyNote);
                 logger.debug("Closing Queries for item data {}", itemData.getItemDataId());
             }

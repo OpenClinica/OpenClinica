@@ -3174,11 +3174,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         idb.setItemId(dib.getItem().getId());
         idb.setEventCRFId(ecb.getId());
 
-        if (idb.getValue().equals("")) {
-            idb.setStatus(getBlankItemStatus());
-        } else {
-            idb.setStatus(getNonBlankItemStatus(request));
-        }
+
         if (StringUtils.isBlank(dib.getEditFlag())) {
 
             if (!idb.isActive()) {
@@ -4094,7 +4090,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ecdao.markComplete(ecb, ide);
 
         // update all the items' status to complete
-        iddao.updateStatusByEventCRF(ecb, newStatus);
 
         // change status for study event
         StudyEventDAO sedao = new StudyEventDAO(getDataSource());
@@ -4248,11 +4243,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     idb.setCreatedDate(new Date());
                     idb.setOrdinal(1);
                     idb.setOwner(ub);
-                    if (completeStatus != null) {// to avoid null exception
-                        idb.setStatus(completeStatus);
-                    } else {
-                        idb.setStatus(Status.UNAVAILABLE);
-                    }
+
                     idb.setValue("");
                     boolean save = true;
                     if(itemBean.size()>0) save = false;

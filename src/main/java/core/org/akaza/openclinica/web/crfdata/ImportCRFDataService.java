@@ -1234,7 +1234,6 @@ public class ImportCRFDataService {
         itemDataBean.setEventCRFId(eventCrfBean.getId());
         itemDataBean.setOrdinal(ordinal);
         itemDataBean.setOwner(ub);
-        itemDataBean.setStatus(core.org.akaza.openclinica.bean.core.Status.UNAVAILABLE);
         itemDataBean.setValue(value);
 
         return itemDataBean;

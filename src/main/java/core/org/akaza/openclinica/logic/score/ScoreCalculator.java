@@ -292,7 +292,6 @@ public class ScoreCalculator {
                                     err.append(parser.getErrors());
                                     if (idb.isActive()) {
                                         idb.setValue("<erased>");
-                                        idb.setStatus(Status.UNAVAILABLE);
                                         idb = (ItemDataBean) iddao.update(idb);
                                         if (!idb.isActive()) {
                                             String key = i + 1 > 1 ? ifmb.getLeftItemText() + "_" + (i + 1) : ifmb.getLeftItemText();
@@ -347,7 +346,6 @@ public class ScoreCalculator {
                                 err.append(parser.getErrors());
                                 if (idb.isActive()) {
                                     idb.setValue("<erased>");
-                                    idb.setStatus(Status.UNAVAILABLE);
                                     idb = (ItemDataBean) iddao.update(idb);
                                     if (!idb.isActive()) {
                                         updateFailedItems.add(ifmb.getLeftItemText());
@@ -403,7 +401,6 @@ public class ScoreCalculator {
             idb.setValue(this.getMathContextValue(value, ifm, idt, err));
         }
 
-        idb.setStatus(Status.UNAVAILABLE);
         // idb.setNeedsRecalc(false);
         if (!idb.isActive()) {
             // will this need to change for double data entry?

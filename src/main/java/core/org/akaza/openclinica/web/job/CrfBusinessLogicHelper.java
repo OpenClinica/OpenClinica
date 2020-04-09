@@ -303,7 +303,6 @@ public class CrfBusinessLogicHelper {
         eventCrfDao.markComplete(ecb, ide);
 
         // update all the items' status to complete
-        itemDataDao.updateStatusByEventCRF(ecb, newStatus);
 
         // change status for study event
         StudyEventDAO sedao = new StudyEventDAO(ds);
@@ -525,7 +524,6 @@ public class CrfBusinessLogicHelper {
         eventCrfDao.markComplete(ecb, ide);
 
         // update all the items' status to complete
-        itemDataDao.updateStatusByEventCRF(ecb, newStatus);
 
         // change status for study event
         StudyEventDAO sedao = new StudyEventDAO(ds);

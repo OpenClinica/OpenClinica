@@ -588,7 +588,6 @@ public class OpenRosaSubmissionController {
         itemData.setEventCrf(eventCrf);
         itemData.setValue(itemValue);
         itemData.setDateCreated(new Date());
-        itemData.setStatus(core.org.akaza.openclinica.domain.Status.AVAILABLE);
         itemData.setOrdinal(1);
         itemData.setUserAccount(userAccount);
         itemData.setDeleted(false);

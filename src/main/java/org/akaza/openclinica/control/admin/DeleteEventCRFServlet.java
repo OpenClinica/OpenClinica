@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.admin;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
@@ -223,11 +224,8 @@ public class DeleteEventCRFServlet extends SecureController {
                     // Default Values are not addressed
 
                     itemdata.setValue("");
-                    itemdata.setOldStatus(itemdata.getStatus());
-                    itemdata.setOwner(ub);
-                    itemdata.setStatus(Status.AVAILABLE);
+                    itemdata.setUpdatedDate(new Date());
                     itemdata.setUpdater(ub);
-                    iddao.updateUser(itemdata);
                     iddao.update(itemdata);
 
                 }

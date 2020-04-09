@@ -2233,7 +2233,7 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setSubjectEventFormDataTypesExpected(odmVersion);
             ArrayList viewRows = select(getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
-            this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType,permissionTagsString);
+            this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType, permissionTagsString);
         } else {
             logger.info("getSubjectEventFormSql=" + getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected();
@@ -2359,8 +2359,6 @@ public class OdmExtractDAO extends DatasetDAO {
                     }else if(formIsTagged && (permissionTagsString == null || permissionTagsString.length()==0)){
                         ClinicalDataCollector.datasetFiltered="YES";
                     }
-
-
 
                     if (oidPoses.containsKey(ecId) && !formIsTagged) {
                         goon = true;
@@ -3160,8 +3158,6 @@ public class OdmExtractDAO extends DatasetDAO {
             subOidPoses.put(studySubjectLabel, oidPos);
 
 
-
-
             if(!sedIsTagged) {
                 ExportStudyEventDataBean se = new ExportStudyEventDataBean();
                 // key += sedOID + sampleOrdinal;
@@ -3539,7 +3535,6 @@ public class OdmExtractDAO extends DatasetDAO {
                 "        ("+studySubjectIds+")\n" +
                 "        and idata.item_id in "+itemIds +
                 "        and ec.workflow_status "+ ecStatusConstraint+
-                "        and length (value) > 0\n" +
                 "        and (ec.removed  !='true' or ec.removed  IS NULL) "+
                 "        and (ec.archived !='true' or ec.archived IS NULL) "+
                 "        and (se.removed  !='true' or se.removed  IS NULL) "+

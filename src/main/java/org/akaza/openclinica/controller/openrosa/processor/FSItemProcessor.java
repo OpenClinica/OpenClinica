@@ -199,9 +199,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 if (existingItemData != null) {
                     existingItemData.setDeleted(true);
                     existingItemData.setValue("");
-                    existingItemData.setOldStatus(existingItemData.getStatus());
                     existingItemData.setUserAccount(container.getUser());
-                    existingItemData.setStatus(Status.AVAILABLE);
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setInstanceId(container.getInstanceId());
                     existingItemData = itemDataDao.saveOrUpdate(existingItemData);
@@ -272,7 +270,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
                 ItemData randomizeDataCheck = null;
                 if (existingItemData == null) {
-                    newItemData.setStatus(Status.UNAVAILABLE);
                     itemDataDao.saveOrUpdate(newItemData);
                     kafkaService.sendItemDataChangeMessage(newItemData);
                     updateEventSubjectStatusIfSigned(container);
