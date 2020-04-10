@@ -239,13 +239,13 @@ public class DeleteEventCRFServlet extends SecureController {
                 if (event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
                     event.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                     event.setUpdater(ub);
-                    sedao = new StudyEventDAO(sm.getDataSource());
+                    event.setUpdatedDate(new Date());
                     sedao.update(event);
                 }
                 if ( event.isSigned()) {
                     event.setSigned(Boolean.FALSE);
                     event.setUpdater(ub);
-                    sedao = new StudyEventDAO(sm.getDataSource());
+                    event.setUpdatedDate(new Date());
                     sedao.update(event);
                 }
 
