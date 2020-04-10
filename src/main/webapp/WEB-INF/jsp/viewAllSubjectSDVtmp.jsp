@@ -405,7 +405,7 @@
     }
 
     function formatDateTime(date) {
-        return moment(date).format('DD-MMM-YYYY hh:mm');
+        return moment(date).format('DD-MMM-YYYY HH:mm');
     }
 
     function formatDate(date, withTime) {
