@@ -212,6 +212,24 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
+
+    public boolean isUserHas_CRC_INV_DM_DEP_DS_SM_RoleInSite(List<StudyUserRoleBean> userRoles, String siteOid) {
+        Study publicSite = getPublicStudy(siteOid);
+        for (StudyUserRoleBean userRole : userRoles) {
+            if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudyId() == userRole.getStudyId())
+                    || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudyId() == userRole.getStudyId())
+                    || (userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
+                    || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
+                    || (userRole.getRole().equals(Role.COORDINATOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
+                    // for site monitors
+                    || (userRole.getRole().equals(Role.MONITOR) && publicSite.getStudyId() == userRole.getStudyId())
+                    // for study monitors
+                    || (userRole.getRole().equals(Role.MONITOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId()))
+                return true;
+        }
+        return false;
+    }
+
     public boolean isUserHas_DM_MON_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOID){
         Study publicStudy = getPublicStudy(studyOID);
         for (StudyUserRoleBean userRole : userRoles) {
