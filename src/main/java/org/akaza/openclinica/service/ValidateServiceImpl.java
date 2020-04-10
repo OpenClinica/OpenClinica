@@ -204,26 +204,11 @@ public class ValidateServiceImpl implements ValidateService {
         for (StudyUserRoleBean userRole : userRoles) {
             if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudyId() == userRole.getStudyId())
                     || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.COORDINATOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId()))
+                    || (userRole.getRole().equals(Role.RESEARCHASSISTANT) && (publicSite.getStudy().getStudyId() == userRole.getStudyId()))
+                    || (userRole.getRole().equals(Role.INVESTIGATOR) && (publicSite.getStudy().getStudyId() == userRole.getStudyId()))
+                    || (userRole.getRole().equals(Role.COORDINATOR) && (publicSite.getStudy().getStudyId() == userRole.getStudyId())))
                 return true;
-        }
-        return false;
-    }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public boolean isUserHas_CRC_INV_DM_DEP_DS_SM_RoleInSite(List<StudyUserRoleBean> userRoles, String siteOid) {
-        Study publicSite = getPublicStudy(siteOid);
-        for (StudyUserRoleBean userRole : userRoles) {
-            if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.COORDINATOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId())
-                    || (userRole.getRole().equals(Role.MONITOR) && publicSite.getStudy().getStudyId() == userRole.getStudyId()))
-                return true;
         }
         return false;
     }
@@ -298,6 +283,7 @@ public class ValidateServiceImpl implements ValidateService {
             studyOid = studyOid.toUpperCase();
         if (siteOid != null)
             siteOid = siteOid.toUpperCase();
+
 
         if (!isStudyOidValid(studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
@@ -422,9 +408,9 @@ public class ValidateServiceImpl implements ValidateService {
      * @param studyOid
      * @param siteOid
      * @param userAccountBean
-     * @param includePII
+     * @param includeAccessCode
      */
-    public void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean, boolean includePII) {
+    public void validateStudyAndRolesForRead(String studyOid, String siteOid, UserAccountBean userAccountBean,boolean includePII) {
 
     	Study tenantStudy = getTenantStudy(studyOid);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
@@ -441,17 +427,23 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isSiteOidValidSiteLevelOid(siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
         }
+       
         if (!isStudyToSiteRelationValid(studyOid, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
         }
+
         if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-        } else if (!isUserHas_CRC_INV_DM_DEP_DS_SM_RoleInSite(userRoles, siteOid)) {
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        } else {
+            if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+            }
         }
+        
         if (!isParticipateActive(tenantStudy)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
         }
+
     }
 
     private Study getTenantStudy(String studyOid) {
