@@ -3,11 +3,14 @@ package org.akaza.openclinica.controller.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class SdvDTO {
     private String participantId;
     private String siteName;
     private String eventName;
-    private String eventStartDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    private Date eventStartDate;
     private Boolean eventStartDateHasTime;
     private int eventOrdinal;
     private boolean isRepeatingEvent;
@@ -42,11 +45,11 @@ public class SdvDTO {
         this.eventName = eventName;
     }
 
-    public String getEventStartDate() {
+    public Date getEventStartDate() {
         return eventStartDate;
     }
 
-    public void setEventStartDate(String eventStartDate) {
+    public void setEventStartDate(Date eventStartDate) {
         this.eventStartDate = eventStartDate;
     }
 

@@ -1479,7 +1479,7 @@ public class SDVUtil {
             sdvDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
             sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
             sdvDTO.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
-            sdvDTO.setEventStartDate(eventCrf.getStudyEvent().getDateStart().toLocaleString());
+            sdvDTO.setEventStartDate(eventCrf.getStudyEvent().getDateStart());
             sdvDTO.setEventStartDateHasTime(eventCrf.getStudyEvent().getStartTimeFlag());
             sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
             sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
