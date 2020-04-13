@@ -116,7 +116,10 @@ public class RemoveStudyEventServlet extends SecureController {
                 event.setRemoved(Boolean.TRUE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
-                sedao.update(event);
+                if (event.isSigned()) {
+                    event.setSigned(Boolean.FALSE);
+                }
+                    sedao.update(event);
 
                 // remove all event crfs
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());

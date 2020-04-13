@@ -174,6 +174,13 @@ public class RemoveEventCRFServlet extends SecureController {
                 eventCRF.setUpdatedDate(new Date());
                 ecdao.update(eventCRF);
 
+                if (event.isSigned()) {
+                    event.setSigned(Boolean.FALSE);
+                    event.setUpdater(ub);
+                    event.setUpdatedDate(new Date());
+                    sedao.update(event);
+                }
+
                 // remove all the item data
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
