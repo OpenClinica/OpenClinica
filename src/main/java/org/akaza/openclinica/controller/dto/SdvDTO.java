@@ -7,7 +7,7 @@ public class SdvDTO {
     private String participantId;
     private String siteName;
     private String eventName;
-    private Date eventStartDate;
+    private String eventStartDate;
     private Boolean eventStartDateHasTime;
     private int eventOrdinal;
     private boolean isRepeatingEvent;
@@ -42,8 +42,12 @@ public class SdvDTO {
         this.eventName = eventName;
     }
 
-    public Date getEventStartDate() {
+    public String getEventStartDate() {
         return eventStartDate;
+    }
+
+    public void setEventStartDate(String eventStartDate) {
+        this.eventStartDate = eventStartDate;
     }
 
     public void setEventStartDateHasTime(Boolean eventStartDateHasTime) {
@@ -52,10 +56,6 @@ public class SdvDTO {
 
     public Boolean getEventStartDateHasTime() {
         return eventStartDateHasTime;
-    }
-
-    public void setEventStartDate(Date eventStartDate) {
-        this.eventStartDate = eventStartDate;
     }
 
     public int getEventOrdinal() {
