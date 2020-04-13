@@ -409,7 +409,7 @@
     }
 
     function formatDateTime(date) {
-        return moment(date).format('DD-MMM-YYYY hh:mm');
+        return moment(date).utc().format('DD-MMM-YYYY hh:mm');
     }
 
     function formatDate(date, withTime) {
@@ -417,7 +417,7 @@
             return formatDateTime(date)
         }
         else {
-            return moment(date).format('DD-MMM-YYYY');
+            return moment(date).utc().format('DD-MMM-YYYY');
         }
     }
 
