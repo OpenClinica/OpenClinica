@@ -49,16 +49,16 @@ public class SdvDTO {
         return eventStartDate;
     }
 
-    public void setEventStartDate(Date eventStartDate) {
-        this.eventStartDate = eventStartDate;
-    }
-
     public void setEventStartDateHasTime(Boolean eventStartDateHasTime) {
         this.eventStartDateHasTime = eventStartDateHasTime;
     }
 
     public Boolean getEventStartDateHasTime() {
         return eventStartDateHasTime;
+    }
+
+    public void setEventStartDate(Date eventStartDate) {
+        this.eventStartDate = eventStartDate;
     }
 
     public int getEventOrdinal() {
