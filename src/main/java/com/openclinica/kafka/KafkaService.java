@@ -1,13 +1,10 @@
 package com.openclinica.kafka;
 
-import com.openclinica.kafka.dto.EventAttributeChangeDTO;
-import com.openclinica.kafka.dto.ItemDataChangeDTO;
-import com.openclinica.kafka.dto.StudyPublishDTO;
+import com.openclinica.kafka.dto.*;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.ItemData;
 import core.org.akaza.openclinica.domain.datamap.Study;
-import com.openclinica.kafka.dto.FormStatusChangeDTO;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
@@ -66,6 +63,54 @@ public class KafkaService {
     ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_STATUS_CHANGE_TOPIC, null, null, null, formStatusChangeDTO, headers);
     kafkaTemplate.send(producerRecord);
   }
+
+  public void sendFormClosureMessage(String customerUuid, EventCrf eventCrf) throws Exception {
+    Study study = eventCrf.getStudySubject().getStudy();
+    FormClosureDTO formClosureDTO = new FormClosureDTO();
+    String studyOid;
+    String siteOid;
+    String studyUuid;
+    String studyEnvUuid;
+    if (study.getStudy() == null) {
+      // Study-level
+      studyOid = study.getOc_oid();
+      siteOid = null;
+      studyUuid = study.getStudyUuid();
+      studyEnvUuid = study.getStudyEnvUuid();
+    } else {
+      // Site-level
+      siteOid = study.getOc_oid();
+      studyOid = study.getStudy().getOc_oid();
+      studyUuid = study.getStudy().getStudyUuid();
+      studyEnvUuid = study.getStudy().getStudyEnvUuid();
+    }
+
+    formClosureDTO.setCustomerUuid(customerUuid);
+    formClosureDTO.setStudyUuid(studyUuid);
+    formClosureDTO.setStudyEnvironmentUuid(studyEnvUuid);
+    formClosureDTO.setStudyOid(studyOid);
+    formClosureDTO.setSiteOid(siteOid);
+    formClosureDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
+    formClosureDTO.setParticipantOid(eventCrf.getStudySubject().getOcOid());
+    formClosureDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
+    formClosureDTO.setEventOid(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid());
+    Headers headers = new RecordHeaders();
+    headers.add(new Header() {
+      @Override
+      public String key() {
+        return "__TypeId__";
+      }
+
+      @Override
+      public byte[] value() {
+        return "com.openclinica.kafka.dto.FormClosureDTO".getBytes();
+      }
+    });
+    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_CLOSURE_TOPIC, null, null, null, formClosureDTO, headers);
+    kafkaTemplate.send(producerRecord);
+  }
+
+
 
   public void sendEventAttributeChangeMessage(String customerUuid, EventCrf eventCrf) throws Exception {
     EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
