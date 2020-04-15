@@ -412,15 +412,6 @@
         return moment(date).format('DD-MMM-YYYY hh:mm');
     }
 
-    function formatDate(date, withTime) {
-        if (withTime) {
-            return formatDateTime(date)
-        }
-        else {
-            return moment(date).format('DD-MMM-YYYY');
-        }
-    }
-
     function calcPopupPos() {
         var winWidth = $(window).width();
         if (winWidth < 900) {
@@ -468,7 +459,7 @@
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
                 $('#siteName').text(data.siteName);
-                $('#eventStartDate').text(formatDate(data.eventStartDate, data.eventStartDateHasTime));
+                $('#eventStartDate').text(data.eventStartDate);
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
