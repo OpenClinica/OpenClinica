@@ -61,7 +61,16 @@ public class EnketoFormServlet extends SecureController {
         int formLayoutId = Integer.valueOf(request.getParameter(FORM_LAYOUT_ID));
         int studyEventId = Integer.valueOf(request.getParameter(STUDY_EVENT_ID));
         int eventCrfId = Integer.valueOf(request.getParameter(EVENT_CRF_ID));
+        EventCrf eventCrf = null;
 
+        if(eventCrfId>0) {
+            eventCrf = eventCrfDao.findByPK(eventCrfId);
+            logger.info("Event Crf in Edit Mode {} ",eventCrf.getEventCrfId());
+            if (eventCrf != null) {
+                formLayoutId = eventCrf.getFormLayout().getFormLayoutId();
+                studyEventId = eventCrf.getStudyEvent().getStudyEventId();
+            }
+        }
 
         FormUrlObject formUrlObject = null;
 
@@ -90,7 +99,6 @@ public class EnketoFormServlet extends SecureController {
         Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOc_oid());
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role role = currentRole.getRole();
-        EventCrf eventCrf = null;
         boolean preview=false;
         if(eventCrfId==0 && studyEvent==null){
             preview=true;
