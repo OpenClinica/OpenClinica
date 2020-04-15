@@ -2,12 +2,14 @@ package org.akaza.openclinica.controller.dto;
 
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class SdvDTO {
     private String participantId;
     private String siteName;
     private String eventName;
     private Date eventStartDate;
+    private TimeZone timezone = TimeZone.getDefault();
     private Boolean eventStartDateHasTime;
     private int eventOrdinal;
     private boolean isRepeatingEvent;
@@ -56,6 +58,14 @@ public class SdvDTO {
 
     public void setEventStartDate(Date eventStartDate) {
         this.eventStartDate = eventStartDate;
+    }
+
+    public TimeZone getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(TimeZone timezone) {
+        this.timezone = timezone;
     }
 
     public int getEventOrdinal() {

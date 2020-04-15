@@ -408,16 +408,16 @@
         return trans[str] || str;
     }
 
-    function formatDateTime(date) {
-        return moment(date).format('DD-MMM-YYYY hh:mm');
+    function formatDateTime(date, timezone) {
+        return moment(date).tz(timezone).format('DD-MMM-YYYY hh:mm');
     }
 
-    function formatDate(date, withTime) {
+    function formatDate(date, timezone, withTime) {
         if (withTime) {
-            return formatDateTime(date)
+            return formatDateTime(date, timezone);
         }
         else {
-            return moment(date).format('DD-MMM-YYYY');
+            return moment(date).tz(timezone).format('DD-MMM-YYYY');
         }
     }
 
