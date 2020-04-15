@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
@@ -47,29 +50,37 @@ public class SdvApiController {
                                                         @PathVariable(value = "Ordinal") String ordinal,
                                                         @PathVariable("ParticipantId") String studySubjectLabel,
                                                         @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
-        studyBuildService.setRequestSchemaByStudyOrParentStudy(studyOID);
-            UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-        boolean changedAfterSdvOnlyFilterFlag=true;
-        int ordinalValue ;
-
-        if(changedAfterSdvOnlyFilter.equals("n"))
-            changedAfterSdvOnlyFilterFlag = false;
-        SdvDTO responseDTO = null;
         try {
-            if (ordinal == null)
-                ordinalValue = 1;
-            else if(ordinal.matches("^[0-9]*$") && Integer.parseInt(ordinal) > 0)
-                ordinalValue = Integer.parseInt(ordinal);
-            else
-                throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_IS_INCORRECT);
-            validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean,ordinalValue);
-            responseDTO = sdvUtil.getFormDetailsForSDV(studyOID, formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
+            studyBuildService.setRequestSchemaByStudyOrParentStudy(studyOID);
+            UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+            boolean changedAfterSdvOnlyFilterFlag=true;
+            int ordinalValue ;
+    
+            if(changedAfterSdvOnlyFilter.equals("n"))
+                changedAfterSdvOnlyFilterFlag = false;
+            SdvDTO responseDTO = null;
+            try {
+                if (ordinal == null)
+                    ordinalValue = 1;
+                else if(ordinal.matches("^[0-9]*$") && Integer.parseInt(ordinal) > 0)
+                    ordinalValue = Integer.parseInt(ordinal);
+                else
+                    throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_IS_INCORRECT);
+                validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean,ordinalValue);
+                responseDTO = sdvUtil.getFormDetailsForSDV(studyOID, formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
+            }
+            catch(OpenClinicaSystemException e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(validateService.getResponseForException(e, studyOID, ""), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);    
         }
-        catch(OpenClinicaSystemException e) {
+        catch (Exception e) {
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
             e.printStackTrace();
-            return new ResponseEntity<>(validateService.getResponseForException(e, studyOID, ""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errors.toString(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
 }
