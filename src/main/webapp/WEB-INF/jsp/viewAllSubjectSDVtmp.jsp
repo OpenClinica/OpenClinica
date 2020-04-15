@@ -468,7 +468,7 @@
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
                 $('#siteName').text(data.siteName);
-                $('#eventStartDate').text(formatDate(data.eventStartDate, data.eventStartDateHasTime));
+                $('#eventStartDate').text(formatDate(data.eventStartDate, data.timezone, data.eventStartDateHasTime));
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
@@ -488,9 +488,9 @@
                     if (!item.lastVerifiedDate) {
                         item.lastVerifiedDate = 'Never';
                     } else {
-                        item.lastVerifiedDate = formatDateTime(item.lastVerifiedDate);
+                        item.lastVerifiedDate = formatDateTime(item.lastVerifiedDate, data.timezone);
                     }
-                    item.lastModifiedDate = formatDateTime(item.lastModifiedDate);
+                    item.lastModifiedDate = formatDateTime(item.lastModifiedDate, data.timezone);
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
 
                     item.actions =
