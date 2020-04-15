@@ -252,6 +252,10 @@
         overflow-y: auto;
     }
 
+    #sdv_row1 > td:last-child {
+        white-space: nowrap;
+    }
+
     #sdv-details {
         padding: 10px;
         background-color: lightgray;

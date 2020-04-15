@@ -52,6 +52,7 @@ import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
+import org.apache.commons.lang.ArrayUtils;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
@@ -1495,20 +1496,32 @@ public class SDVUtil {
             sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
             List<SdvItemDTO> sdvItemDTOS = new ArrayList<>();
             for (ItemData itemData : getItemDataDao().findByEventCrfId(eventCrf.getEventCrfId())) {
-
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_AFTER_VERIFIED)) {
+                    SdvItemDTO sdvItemDTO = new SdvItemDTO();
                     Set<ItemFormMetadata> itemMetas = itemData.getItem().getItemFormMetadatas();
-                    String label = "";
                     for (ItemFormMetadata itemMeta: itemMetas) {
-                        label = itemMeta.getLeftItemText();
+                        sdvItemDTO.setLabel(itemMeta.getLeftItemText());
+                        ResponseSet responseSet = itemMeta.getResponseSet();
+                        int responseType = responseSet.getResponseType().getResponseTypeId();
+                        if (responseType == 5 || // radio
+                            responseType == 6 || // single-select
+                            responseType == 7    // multi-select
+                        ) {
+                            String[] optionsText = responseSet.getOptionsText().split(",");
+                            String[] optionsValues = responseSet.getOptionsValues().split(",");
+                            String value = itemData.getValue();
+                            int valueIndex = ArrayUtils.indexOf(optionsValues, value);
+                            String text = optionsText[valueIndex];
+                            sdvItemDTO.setValue(text);
+                        }
+                        else {
+                            sdvItemDTO.setValue(itemData.getValue());
+                        }
                         break;
                     }
-                    
-                    SdvItemDTO sdvItemDTO = new SdvItemDTO();
                     sdvItemDTO.setItemDataId(itemData.getItemDataId());
                     sdvItemDTO.setItemId(itemData.getItem().getItemId());
                     sdvItemDTO.setName(itemData.getItem().getName());
-                    sdvItemDTO.setLabel(label);
                     sdvItemDTO.setDescription(itemData.getItem().getDescription());
                     sdvItemDTO.setBriefDescription(itemData.getItem().getBriefDescription());
                     sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());
@@ -1516,7 +1529,6 @@ public class SDVUtil {
                     ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemId(itemData.getItem().getItemId());
                     if (itemGroupMetadata != null)
                         sdvItemDTO.setRepeatingGroup(itemGroupMetadata.isRepeatingGroup());
-                    sdvItemDTO.setValue(itemData.getValue());
                     if (itemData.getDateUpdated() != null)
                         sdvItemDTO.setLastModifiedDate(itemData.getDateUpdated());
                     else

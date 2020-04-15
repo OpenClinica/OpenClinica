@@ -491,6 +491,7 @@
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>

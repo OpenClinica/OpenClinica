@@ -47,12 +47,12 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping( value = "/auth/api" )
-@Api( value = "Job", tags = {"Job"}, description = "REST API for Job" )
+@RequestMapping(value = "/auth/api")
+@Api(value = "Job", tags = {"Job"}, description = "REST API for Job")
 public class JobController {
 
     @Autowired
-    @Qualifier( "dataSource" )
+    @Qualifier("dataSource")
     private BasicDataSource dataSource;
 
     @Autowired
@@ -80,9 +80,9 @@ public class JobController {
     }
 
 
-    @ApiOperation( value = "To get all jobs by site", hidden = true )
-    @RequestMapping( value = "/studies/{studyOID}/sites/{siteOID}/jobs", method = RequestMethod.GET )
-    public ResponseEntity<List<JobDetailDTO>> getAllJobsBySite(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
+    @ApiOperation(value = "To get all jobs by site", hidden = true)
+    @RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/jobs", method = RequestMethod.GET)
+    public ResponseEntity<List<JobDetailDTO>> getAllJobsBySite(HttpServletRequest request, @PathVariable("studyOID") String studyOid, @PathVariable("siteOID") String siteOid) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
@@ -107,25 +107,25 @@ public class JobController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
-        if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToSite(userRoles,siteOid)) {
+        if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && !validateService.isUserHasAccessToSite(userRoles, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-        }else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles,siteOid)) {
+        } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_SM_RoleInSite(userRoles, siteOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         }
 
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-        List<JobDetailDTO> jobDetailDTOS=jobService.findAllNonDeletedJobsBySiteExceptPublishedStudies(tenantSite,userAccountBean);
+        List<JobDetailDTO> jobDetailDTOS = jobService.findAllNonDeletedJobsBySiteExceptPublishedStudies(tenantSite, userAccountBean);
         logger.debug("REST request to get all JobDetails by site");
 
-        return new ResponseEntity<List<JobDetailDTO>>(jobDetailDTOS,HttpStatus.OK);
+        return new ResponseEntity<List<JobDetailDTO>>(jobDetailDTOS, HttpStatus.OK);
     }
 
 
-    @ApiOperation( value = "To get all jobs by study", hidden = true )
-    @RequestMapping( value = "/studies/{studyOID}/jobs", method = RequestMethod.GET )
-    public ResponseEntity<List<JobDetailDTO>> getAllJobsByStudy(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) throws InterruptedException {
+    @ApiOperation(value = "To get all jobs by study", hidden = true)
+    @RequestMapping(value = "/studies/{studyOID}/jobs", method = RequestMethod.GET)
+    public ResponseEntity<List<JobDetailDTO>> getAllJobsByStudy(HttpServletRequest request, @PathVariable("studyOID") String studyOid) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
 
@@ -140,19 +140,19 @@ public class JobController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
-        if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) ) {
+        if (!validateService.isUserHasAccessToStudy(userRoles, studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-        }else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles,studyOid)) {
+        } else if (!validateService.isUserHas_DM_DEP_DS_SM_RoleInStudy(userRoles, studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         }
 
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-        List<JobDetailDTO> jobDetailDTOS=  jobService.findAllNonDeletedJobsByStudyExceptPublishedStudies(tenantStudy,userAccountBean);
+        List<JobDetailDTO> jobDetailDTOS = jobService.findAllNonDeletedJobsByStudyExceptPublishedStudies(tenantStudy, userAccountBean);
         logger.debug("REST request to get all JobDetails By study");
 
-        return new ResponseEntity<List<JobDetailDTO>>(jobDetailDTOS,HttpStatus.OK);
+        return new ResponseEntity<List<JobDetailDTO>>(jobDetailDTOS, HttpStatus.OK);
     }
 
 
@@ -161,79 +161,79 @@ public class JobController {
     }
 
 
-    @ApiOperation( value = "To download job files ", notes = "Will download job file" )
-    @RequestMapping( value = "/jobs/{uuid}/downloadFile", method = RequestMethod.GET )
-    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, @RequestParam(required = false) String open, HttpServletResponse response) throws Exception { UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+    @ApiOperation(value = "To download job files ", notes = "Will download job file")
+    @RequestMapping(value = "/jobs/{uuid}/downloadFile", method = RequestMethod.GET)
+    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable("uuid") String uuid, @RequestParam(required = false) String open, HttpServletResponse response) throws Exception {
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
         String studyOid;
         if (publicStudy.getStudy() == null) {
             studyOid = publicStudy.getOc_oid();
-        } else{
+        } else {
             studyOid = publicStudy.getStudy().getOc_oid();
-         }
-         utilService.setSchemaFromStudyOid(studyOid);
+        }
+        utilService.setSchemaFromStudyOid(studyOid);
 
-        JobDetail jobDetail=jobDetailDao.findByUuid(uuid);
-        if (jobDetail==null) {
+        JobDetail jobDetail = jobDetailDao.findByUuid(uuid);
+        if (jobDetail == null) {
             return new ResponseEntity(ErrorConstants.ERR_INVALID_UUID, org.springframework.http.HttpStatus.NOT_FOUND);
-        }else if (jobDetail.getCreatedBy().getUserId() != userAccountBean.getId()) {
+        } else if (jobDetail.getCreatedBy().getUserId() != userAccountBean.getId()) {
             return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, org.springframework.http.HttpStatus.OK);
-        }else if(jobDetail.getStatus().equals(JobStatus.DELETED)){
+        } else if (jobDetail.getStatus().equals(JobStatus.DELETED)) {
             return new ResponseEntity(ErrorConstants.ERR_INVALID_UUID, HttpStatus.NOT_FOUND);
-        }else if(jobDetail.getStatus().equals(JobStatus.IN_PROGRESS)){
+        } else if (jobDetail.getStatus().equals(JobStatus.IN_PROGRESS)) {
             return new ResponseEntity(ErrorConstants.ERR_JOB_IN_PROGRESS, org.springframework.http.HttpStatus.OK);
-        }else {
+        } else {
 
-        InputStream inputStream = null;
-        try {
-            String logFileName = getFilePath(jobDetail.getType()) + File.separator + jobDetail.getLogPath();
-            File fileToDownload = new File(logFileName);
-            inputStream = new FileInputStream(fileToDownload);
-            if (!"true".equals(open)) {
-                response.setContentType("application/force-download");
-                String fileName = URLEncoder.encode(jobDetail.getLogPath(), "UTF-8").replace("+", "%20");
-                String userAgent = request.getHeader("user-agent");
+            InputStream inputStream = null;
+            try {
+                String logFileName = getFilePath(jobDetail.getType()) + File.separator + jobDetail.getLogPath();
+                File fileToDownload = new File(logFileName);
+                inputStream = new FileInputStream(fileToDownload);
+                if (!"true".equals(open)) {
+                    response.setContentType("application/force-download");
+                    String fileName = URLEncoder.encode(jobDetail.getLogPath(), "UTF-8").replace("+", "%20");
+                    String userAgent = request.getHeader("user-agent");
 
-                if (userAgent.contains("Firefox") || userAgent.contains("Safari")) {
-                    response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + fileName);
-                } else {
-                    response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    if (userAgent.contains("Firefox") || userAgent.contains("Safari")) {
+                        response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + fileName);
+                    } else {
+                        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    }
                 }
-                }
-            IOUtils.copy(inputStream, response.getOutputStream());
-            response.flushBuffer();
-        } catch (Exception e) {
-            logger.debug("Request could not be completed at this moment. Please try again.");
-            logger.debug(e.getStackTrace().toString());
-            return new ResponseEntity(ErrorConstants.ERR_NO_LOG_FILE_FOUND, org.springframework.http.HttpStatus.OK);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.debug(e.getStackTrace().toString());
-                    throw e;
+                IOUtils.copy(inputStream, response.getOutputStream());
+                response.flushBuffer();
+            } catch (Exception e) {
+                logger.debug("Request could not be completed at this moment. Please try again.");
+                logger.debug(e.getStackTrace().toString());
+                return new ResponseEntity(ErrorConstants.ERR_NO_LOG_FILE_FOUND, org.springframework.http.HttpStatus.OK);
+            } finally {
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        logger.debug(e.getStackTrace().toString());
+                        throw e;
+                    }
                 }
             }
-           }
         }
         return new ResponseEntity(org.springframework.http.HttpStatus.OK);
 
     }
 
     private String getFilePath(JobType jobType) {
-        return CoreResources.getField("filePath") + userService.BULK_JOBS + File.separator+jobType.toString().toLowerCase();
+        return CoreResources.getField("filePath") + userService.BULK_JOBS + File.separator + jobType.toString().toLowerCase();
     }
 
 
     /**
      * DELETE  /jobs /:uuid : delete the "uuid" job.
-     *
      * @param uuid the uuid of the jobDetail to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @ApiOperation( value = "Delete Job ")
-    @DeleteMapping( "/jobs/{uuid}" )
+    @ApiOperation(value = "Delete Job ")
+    @DeleteMapping("/jobs/{uuid}")
     public ResponseEntity<Void> deleteJob(HttpServletRequest request, @PathVariable String uuid) {
         logger.debug("REST request to delete Job : {}", uuid);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
@@ -244,7 +244,7 @@ public class JobController {
         if (jobDetail.getCreatedBy().getUserId() != userAccountBean.getId()) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INCORRECT_USER, "Incorrect User. The user is not the owner of this log file")).body(null);
         }
-        jobService.deleteJob(jobDetail,userAccountBean);
+        jobService.deleteJob(jobDetail, userAccountBean);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, String.valueOf(uuid))).build();
     }
 
