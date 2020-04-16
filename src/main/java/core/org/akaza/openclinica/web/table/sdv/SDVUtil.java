@@ -1510,16 +1510,25 @@ public class SDVUtil {
                         sdvItemDTO.setLabel(itemMeta.getLeftItemText());
                         ResponseSet responseSet = itemMeta.getResponseSet();
                         int responseType = responseSet.getResponseType().getResponseTypeId();
-                        if (responseType == 5 || // radio
+
+                        if (responseType == 3 || // checkbox
+                            responseType == 5 || // radio
                             responseType == 6 || // single-select
                             responseType == 7    // multi-select
                         ) {
                             String[] optionsText = responseSet.getOptionsText().split(",");
                             String[] optionsValues = responseSet.getOptionsValues().split(",");
-                            String value = itemData.getValue();
-                            int valueIndex = ArrayUtils.indexOf(optionsValues, value);
-                            String text = optionsText[valueIndex];
-                            sdvItemDTO.setValue(text);
+                            String[] values = itemData.getValue().split(",");
+                            String display = "";
+                            for (String value: values) {
+                                int valueIndex = ArrayUtils.indexOf(optionsValues, value);
+                                String text = optionsText[valueIndex];
+                                if (!display.isEmpty()) {
+                                    display += ", ";
+                                }
+                                display += text;
+                            }
+                            sdvItemDTO.setValue(display);
                         }
                         else {
                             sdvItemDTO.setValue(itemData.getValue());
