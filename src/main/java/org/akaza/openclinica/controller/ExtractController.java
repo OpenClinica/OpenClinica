@@ -123,9 +123,8 @@ public class ExtractController {
         // set the job in motion
         String[] files = epBean.getFileName();
         String exportFileName;
-        int fileSize = files.length;
         int  cnt = 0;
-        SimpleTrigger simpleTrigger = null;
+        SimpleTrigger simpleTrigger;
         //TODO: if files and export names size is not same... throw an error
         dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
         String[] exportFiles= epBean.getExportFileName();
@@ -324,6 +323,7 @@ public class ExtractController {
         ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
         beanFactory.registerSingleton(schema, sFBean);
     }
+
     /**
      * @deprecated Use {@link #setAllProps(ExtractPropertyBean,DatasetBean,SimpleDateFormat,ExtractUtils)} instead
      */

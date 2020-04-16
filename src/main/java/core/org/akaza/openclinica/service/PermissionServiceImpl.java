@@ -233,7 +233,7 @@ public class PermissionServiceImpl implements PermissionService {
     private List<String> getPermissionTags(HttpServletRequest request) {
         return (List<String>) request.getSession().getAttribute("userPermissionTags");
     }
-    public String getPermissionTagsString(Study study,HttpServletRequest request) {
+    public String getPermissionTagsString(Study study, HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(study ,request);
         return getTagsString(tagsList);    }
 

@@ -99,8 +99,6 @@ public class StudyUserRoleBean extends AuditableEntityBean {
         this.role = role;
         super.setId(role.getId());
         super.setName(role.getName());
-        // roleName=='coordinator' || roleName=='director' || roleName=='ra' ||
-        // roleName=='investigator'}
         this.canSubmitData =
             this.role == Role.COORDINATOR || this.role == Role.STUDYDIRECTOR || this.role == Role.RESEARCHASSISTANT || this.role == Role.RESEARCHASSISTANT2 || this.role == Role.INVESTIGATOR;
         this.canExtractData = this.role == Role.COORDINATOR || this.role == Role.STUDYDIRECTOR || this.role == Role.INVESTIGATOR;

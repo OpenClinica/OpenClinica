@@ -1,14 +1,16 @@
 package org.akaza.openclinica.control.admin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 import core.org.akaza.openclinica.bean.admin.TriggerBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.job.AutowiringSpringBeanJobFactory;
+import core.org.akaza.openclinica.job.JobExecutionExceptionListener;
+import core.org.akaza.openclinica.job.JobTriggerListener;
+import core.org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -19,21 +21,27 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.bean.TriggerRow;
 import core.org.akaza.openclinica.web.job.ExampleSpringJob;
-import org.quartz.JobDataMap;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
+import org.apache.commons.lang.StringUtils;
+import org.quartz.*;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
+import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
 /**
- * 
  * @author thickerson purpose: to generate the list of jobs and allow us to view them
  */
 public class ViewJobServlet extends SecureController {
-
-    private static String SCHEDULER = "schedulerFactoryBean";
-    private StdScheduler scheduler;
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
@@ -51,6 +59,7 @@ public class ViewJobServlet extends SecureController {
         return scheduler;
     }
 
+
     @Override
     protected void processRequest() throws Exception {
         // TODO single stage servlet where we get the list of jobs
@@ -59,15 +68,23 @@ public class ViewJobServlet extends SecureController {
         // and eventually links to view and edit the jobs as well
         FormProcessor fp = new FormProcessor(request);
         // First we must get a reference to a scheduler
+        ApplicationContext context = null;
         scheduler = getScheduler();
+        Scheduler jobScheduler;
+        try {
+            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
+        } catch (SchedulerException e) {
+            logger.error("Error in receiving application context: ", e);
+        }
+        jobScheduler = getSchemaScheduler(request, context, scheduler);
         XsltTriggerService xsltTriggerSrvc = new XsltTriggerService();
 
-        Set<TriggerKey> triggerKeySet = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
+        Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
         TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
 
         ArrayList triggerBeans = new ArrayList();
         for (TriggerKey triggerKey : triggerKeys) {
-            Trigger trigger = scheduler.getTrigger(triggerKey);
+            Trigger trigger = jobScheduler.getTrigger(triggerKey);
             try {
                 logger.debug("prev fire time " + trigger.getPreviousFireTime().toString());
                 logger.debug("next fire time " + trigger.getNextFireTime().toString());
@@ -97,7 +114,7 @@ public class ViewJobServlet extends SecureController {
                 triggerBean.setStudyName(study.getName());
             }
             logger.debug("Trigger Priority: " + trigger.getKey().getName() + " " + trigger.getPriority());
-            if (scheduler.getTriggerState(triggerKey) == Trigger.TriggerState.PAUSED) {
+            if (jobScheduler.getTriggerState(triggerKey) == Trigger.TriggerState.PAUSED) {
                 triggerBean.setActive(false);
                 logger.debug("setting active to false for trigger: " + trigger.getKey().getName());
             } else {
@@ -112,8 +129,8 @@ public class ViewJobServlet extends SecureController {
 
         EntityBeanTable table = fp.getEntityBeanTable();
         String[] columns =
-            { resword.getString("name"), resword.getString("previous_fire_time"), resword.getString("next_fire_time"), resword.getString("description"),
-                resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"), resword.getString("actions") };
+                {resword.getString("name"), resword.getString("previous_fire_time"), resword.getString("next_fire_time"), resword.getString("description"),
+                        resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"), resword.getString("actions")};
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(3);
         table.hideColumnLink(7);

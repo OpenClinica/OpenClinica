@@ -4,20 +4,21 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
+import core.org.akaza.openclinica.service.PermissionService;
+import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -32,22 +33,18 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.job.ExampleSpringJob;
-import org.quartz.JobDataMap;
-import org.quartz.JobKey;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 public class UpdateJobExportServlet extends SecureController {
 
     private static String SCHEDULER = "schedulerFactoryBean";
 
-    private StdScheduler scheduler;
     private SimpleTrigger trigger;
     private JobDataMap dataMap;
     public static final String PERIOD = "periodToRun";
@@ -60,21 +57,19 @@ public class UpdateJobExportServlet extends SecureController {
     public static final String USER_ID = "user_id";
     public static final String STUDY_NAME = "study_name";
     public static final String TRIGGER_GROUP_JOB = "XsltTriggersExportJobs";
+    private PermissionService permissionService;
+
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
+
         if (ub.isSysAdmin() || ub.isTechAdmin()) {
             return;
         }
-//        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
-//            return;
-//        }
-        // should it be only study directors and admins, not coordinators?
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
         // above copied from create dataset servlet, needs to be changed to
         // allow only admin-level users
-
     }
 
     private StdScheduler getScheduler() {
@@ -82,11 +77,16 @@ public class UpdateJobExportServlet extends SecureController {
         return scheduler;
     }
 
+    private PermissionService getPermissionService() {
+        return permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+    }
+
     private void setUpServlet(Trigger trigger) {
         FormProcessor fp2 = new FormProcessor(request);
 
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
         Collection dsList = dsdao.findAllOrderByStudyIdAndName();
+
         // TODO will have to dress this up to allow for sites then datasets
         request.setAttribute("datasets", dsList);
         request.setAttribute(CreateJobExportServlet.JOB_NAME, trigger.getKey().getName());
@@ -133,8 +133,16 @@ public class UpdateJobExportServlet extends SecureController {
         String action = fp.getString("action");
         String triggerName = fp.getString("tname");
         scheduler = getScheduler();
+        permissionService = getPermissionService();
+        ApplicationContext context = null;
+        try {
+            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
+        } catch (SchedulerException e) {
+            logger.error("Error in receiving application context: ", e);
+        }
+        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
         ExtractUtils extractUtils = new ExtractUtils();
-        Trigger updatingTrigger = scheduler.getTrigger(new TriggerKey(triggerName.trim(), XsltTriggerService.TRIGGER_GROUP_NAME));
+        Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), XsltTriggerService.TRIGGER_GROUP_NAME));
         if (StringUtil.isBlank(action)) {
             setUpServlet(updatingTrigger);
             forwardPage(Page.UPDATE_JOB_EXPORT);
@@ -143,8 +151,7 @@ public class UpdateJobExportServlet extends SecureController {
             // validate first
             // then update or send back
             String name = XsltTriggerService.TRIGGER_GROUP_NAME;
-
-            Set<TriggerKey> triggerKeySet = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(name));
+            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(name));
             TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
             HashMap errors = validateForm(fp, request, triggerKeys, updatingTrigger.getKey().getName());
             if (!errors.isEmpty()) {
@@ -157,7 +164,7 @@ public class UpdateJobExportServlet extends SecureController {
                 // change trigger, update in database
                 Study study = (Study) getStudyBuildService().getPublicStudy(sm.getUserBean().getActiveStudyId());
                 DatasetDAO datasetDao = new DatasetDAO(sm.getDataSource());
-                CoreResources cr =  new CoreResources();
+                CoreResources cr = new CoreResources();
                 UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
                 int datasetId = fp.getInt(DATASET_ID);
@@ -169,20 +176,19 @@ public class UpdateJobExportServlet extends SecureController {
                 Integer exportFormatId = fp.getInt(FORMAT_ID);
 
                 ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
-                DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
+                DatasetBean dsBean = (DatasetBean) datasetDao.findByPK(new Integer(datasetId).intValue());
                 String[] files = epBean.getFileName();
                 String exportFileName;
-                int fileSize = files.length;
-                int  cnt = 0;
+                int cnt = 0;
                 dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
-                String[] exportFiles= epBean.getExportFileName();
-                 String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
-                 SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
-                int i =0;
+                String[] exportFiles = epBean.getExportFileName();
+                String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
+                SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
+                int i = 0;
                 String[] temp = new String[exportFiles.length];
                 //JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
-                String datasetFilePath = SQLInitServlet.getField("filePath")+"datasets";
-                while (i<exportFiles.length) {
+                String datasetFilePath = SQLInitServlet.getField("filePath") + "datasets";
+                while (i < exportFiles.length) {
                     temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, sdfDir, datasetFilePath);
                     i++;
                 }
@@ -194,12 +200,12 @@ public class UpdateJobExportServlet extends SecureController {
                 generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
                 exportFileName = epBean.getExportFileName()[cnt];
 
-                String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator +files[cnt];
+                String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
                 String endFilePath = epBean.getFileLocation();
-                endFilePath  = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
-              //  exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
+                endFilePath = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
+                //  exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
                 if (epBean.getPostProcExportName() != null) {
-                    String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir, datasetFilePath);
+                    String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, sdfDir, datasetFilePath);
                     epBean.setPostProcExportName(preProcExportPathName);
                 }
                 if (epBean.getPostProcLocation() != null) {
@@ -207,53 +213,78 @@ public class UpdateJobExportServlet extends SecureController {
                     epBean.setPostProcLocation(prePocLoc);
                 }
                 extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
-                SimpleTrigger trigger = null;
+                SimpleTrigger trigger;
+                String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
+                String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
+                List<String> permissionTagsList = permissionService.getPermissionTagsList((Study) request.getSession().getAttribute("study"), request);
+                ODMFilterDTO odmFilter = new ODMFilterDTO();
 
-                trigger = xsltService.generateXsltTrigger(scheduler, xsltPath,
+                try {
+                    jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
+                    jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
+                    jobScheduler.getContext().put("permissionTagsList", permissionTagsList);
+                    jobScheduler.getContext().put("odmFilter", odmFilter);
+                } catch (SchedulerException e) {
+                    logger.error("Error in setting the permissions: ", e);
+                }
+
+                ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
+                archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
+                archivedDatasetFileBean.setFormat(epBean.getFormatDescription());
+                archivedDatasetFileBean.setOwnerId(userBean.getId());
+                archivedDatasetFileBean.setDatasetId(dsBean.getId());
+                archivedDatasetFileBean.setDateCreated(new Date());
+                archivedDatasetFileBean.setExportFormatId(1);
+                archivedDatasetFileBean.setFileReference("");
+                ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
+                archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
+
+                trigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                         generalFileDir, // xml_file_path
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, 
-                        userBean, 
+                        epBean,
+                        userBean,
                         LocaleResolver.getLocale(request).getLanguage(),
-                        cnt,  
-                        SQLInitServlet.getField("filePath") + "xslt", 
+                        cnt,
+                        SQLInitServlet.getField("filePath") + "xslt",
                         TRIGGER_GROUP_JOB,
                         currentPublicStudy,
-                        currentStudy,null);
+                        currentStudy, archivedDatasetFileBean);
 
                 //Updating the original trigger with user given inputs
                 trigger = trigger.getTriggerBuilder()
-                    .withIdentity(jobName, xsltService.getTriggerGroupNameForExportJobs())
-                    .withDescription(jobDesc)
-                    .startAt(startDateTime)
-                    .forJob(jobName, xsltService.getTriggerGroupNameForExportJobs())
-                    .withSchedule(simpleSchedule()
-                    .withIntervalInSeconds(XsltTriggerService.getIntervalTimeInSeconds(period))
-                    .withRepeatCount(64000)
-                    .withMisfireHandlingInstructionNextWithExistingCount())
-                    .build();
+                        .withIdentity(jobName, xsltService.getTriggerGroupNameForExportJobs())
+                        .withDescription(jobDesc)
+                        .startAt(startDateTime)
+                        .forJob(jobName, xsltService.getTriggerGroupNameForExportJobs())
+                        .withSchedule(simpleSchedule()
+                                .withIntervalInSeconds(XsltTriggerService.getIntervalTimeInSeconds(period))
+                                .withRepeatCount(64000)
+                                .withMisfireHandlingInstructionNextWithExistingCount())
+                        .build();
                 trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
                 trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
 
-                JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
-                JobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
-                JobDetailFactoryBean.setName(trigger.getKey().getName());
-                JobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
-                JobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
-                JobDetailFactoryBean.setDurability(true); // need durability?
-                JobDetailFactoryBean.afterPropertiesSet();
+                JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
+                jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
+                jobDetailFactoryBean.setName(trigger.getKey().getName());
+                jobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
+                jobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
+                jobDetailFactoryBean.setDurability(true); // need durability?
+                jobDetailFactoryBean.afterPropertiesSet();
+
                 try {
-                    scheduler.deleteJob(new JobKey(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME));
-                    Date dataStart = scheduler.scheduleJob(JobDetailFactoryBean.getObject(), trigger);
+                    jobScheduler.deleteJob(new JobKey(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME));
+                    Date dataStart = jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), trigger);
                     addPageMessage("Your job has been successfully modified.");
                     forwardPage(Page.VIEW_JOB_SERVLET);
                 } catch (SchedulerException se) {
-                    logger.error("Job is not able to be deleted: ",se);
+                    logger.error("Job is not able to be deleted: ", se);
                     // set a message here with the exception message
                     setUpServlet(trigger);
                     addPageMessage("There was an unspecified error with your creation, please contact an administrator.");
