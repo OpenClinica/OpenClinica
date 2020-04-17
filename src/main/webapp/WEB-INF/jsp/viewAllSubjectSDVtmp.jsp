@@ -443,6 +443,7 @@
     }
 
     $('#sdv').on('click', '.popupSdv', function () {
+        var popupIndex = $('#sdv button.popupSdv').index(this);
         var data = $(this).data();
         var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
 
@@ -485,8 +486,9 @@
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
 
                     item.actions =
-                        '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy?itemDataId=' +
-                        item.itemDataId +
+                        '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy' +
+                        '?itemDataId=' + item.itemDataId +
+                        '&popupIndex=' + popupIndex +
                         '"></a>';
 
                     return item;
@@ -540,5 +542,14 @@
     limitFilterWidth('110px', 'SDV Requirement');
 
     $(window).resize(setPopupPos);
+
+    var popupIndex = new URLSearchParams(location.search).get('popupIndex');
+    if (popupIndex) {
+        $(function() {
+            setTimeout(function() {
+                $('#sdv button.popupSdv').eq(popupIndex).click();
+            }, 1);
+        });
+    }
 
 </script>
