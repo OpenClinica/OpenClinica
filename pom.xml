@@ -798,6 +798,13 @@
             <version>2.0.17</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>expiringmap</artifactId>
+            <version>0.5.9</version>
+        </dependency>
+
+
     </dependencies>
 
     <!-- These dependencies are used by _all_ child projects -->

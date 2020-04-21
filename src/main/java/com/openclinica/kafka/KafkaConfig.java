@@ -23,8 +23,7 @@ public class KafkaConfig {
   private static final String KAFKA_BROKER_ADDRESS = CoreResources.getKafkaBrokers();;
   public static final String STUDY_PUBLISH_TOPIC = "studyPublish";
   public static final String EVENT_ATTRIBUTE_CHANGE_TOPIC = "eventAttributeChange";
-  public static final String FORM_CLOSURE_TOPIC = "formClosure";
-  public static final String FORM_STATUS_CHANGE_TOPIC = "formStatusChange";
+  public static final String FORM_CHANGE_TOPIC = "formChange";
   public static final String ITEM_DATA_CHANGE_TOPIC = "itemDataChange";
 
   @Bean
@@ -55,27 +54,22 @@ public class KafkaConfig {
 
   @Bean
   public NewTopic studyPublishEvent() {
-    return new NewTopic(STUDY_PUBLISH_TOPIC, 3, (short) 1);
+    return new NewTopic(STUDY_PUBLISH_TOPIC, 1, (short) 1);
   }
 
   @Bean
   public NewTopic eventAttributeChange() {
-    return new NewTopic(EVENT_ATTRIBUTE_CHANGE_TOPIC, 3, (short) 1);
-  }
-
-  @Bean
-  public NewTopic formStatusChange() {
-    return new NewTopic(FORM_STATUS_CHANGE_TOPIC, 10, (short) 3);
+    return new NewTopic(EVENT_ATTRIBUTE_CHANGE_TOPIC, 1, (short) 1);
   }
 
   @Bean
   public NewTopic formClosure() {
-    return new NewTopic(FORM_CLOSURE_TOPIC, 3, (short) 3);
+    return new NewTopic(FORM_CHANGE_TOPIC, 3, (short) 1);
   }
 
   @Bean
   public NewTopic itemDataChange() {
-    return new NewTopic(ITEM_DATA_CHANGE_TOPIC, 3, (short) 1);
+    return new NewTopic(ITEM_DATA_CHANGE_TOPIC, 1, (short) 1);
   }
 
 }

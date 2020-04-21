@@ -1,6 +1,6 @@
 package com.openclinica.kafka.dto;
 
-public class FormClosureDTO {
+public class FormChangeDTO {
     private String customerUuid;
     private String studyUuid;
     private String studyEnvironmentUuid;

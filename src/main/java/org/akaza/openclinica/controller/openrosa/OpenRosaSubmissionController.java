@@ -1,6 +1,6 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import com.openclinica.jwtverifier.utils.AuthenticationUtils;
+import com.openclinica.kafka.dto.FormChangeDTO;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.rule.FileProperties;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -21,6 +21,7 @@ import com.openclinica.kafka.KafkaService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.service.FormCacheServiceImpl;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -110,14 +111,13 @@ public class OpenRosaSubmissionController {
     private StudyBuildService studyBuildService;
     @Autowired
     private KafkaService kafkaService;
+    @Autowired
+    FormCacheServiceImpl formCacheService;
 
     @Autowired
     private UtilService utilService;
     @Autowired
     TokenService tokenService;
-
-    @Autowired
-    private NewTopic formStatusChange;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
@@ -190,7 +190,6 @@ public class OpenRosaSubmissionController {
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processRequest(study, subjectContext, requestBody, errors, locale, listOfUploadFilePaths,
                     SubmissionContainer.FieldRequestTypeEnum.FORM_FIELD,userAccount);
-
         } catch (Exception e) {
             logger.error("Exception while processing xform submission.");
             logger.error(e.getMessage());
@@ -256,8 +255,13 @@ public class OpenRosaSubmissionController {
             eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
             eventCrfDao.saveOrUpdate(eventCrf);
-            String customerUuid = tokenService.getCustomerUuid((String) request.getSession().getAttribute("accessToken"));
-            kafkaService.sendFormCompleteMessage(customerUuid, eventCrf);
+
+            if (!formCacheService.expireAndRemoveForm(ecid)){
+                String customerUuid = tokenService.getCustomerUuid((String) request.getSession().getAttribute("accessToken"));
+                FormChangeDTO formChangeDTO = kafkaService.constructEditFormDTO(customerUuid, eventCrf);
+                kafkaService.sendFormChangeMessage(formChangeDTO);
+            }
+            //TODO Re-enable randomize.
 //          checkRandomization(subjectContext, studyOID, studySubjectOID);
         }
 
@@ -352,6 +356,17 @@ public class OpenRosaSubmissionController {
             PFormCache cache = PFormCache.getInstance(context);
             subjectContext = cache.getSubjectContext(ecid);
             UserAccount userAccount = getUserAccount(subjectContext);
+
+            if (!formCacheService.resetExpiration(ecid)){
+                logger.info("Updating expiration failed, re-adding entry in expiration map for: " + ecid);
+                String customerUuid = tokenService.getCustomerUuid(subjectContext.get("accessToken"));
+                int studyEventId = Integer.parseInt(subjectContext.get("studyEventID"));
+                StudyEvent studyEvent = studyEventDao.findById(studyEventId);
+                String formLayoutOid = subjectContext.get("formLayoutOID");
+                FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
+                //TODO Public study is not "current study" so we're not getting the site if the user is at the site level. Do we actually need the site OID for this DTO? It is getting set as null for now.
+                formCacheService.addNewFormToFormCache(ecid, customerUuid, publicStudy, studyEvent, formLayout);
+            }
 
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processFieldSubmissionRequest(study, subjectContext, instanceId, requestBody, errors, locale, listOfUploadFilePaths,

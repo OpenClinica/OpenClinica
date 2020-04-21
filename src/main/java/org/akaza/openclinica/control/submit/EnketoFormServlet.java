@@ -3,6 +3,7 @@ package org.akaza.openclinica.control.submit;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import core.org.akaza.openclinica.core.LockInfo;
@@ -15,11 +16,11 @@ import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.akaza.openclinica.service.FormCacheServiceImpl;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
@@ -54,6 +55,8 @@ public class EnketoFormServlet extends SecureController {
         EnketoCredentials enketoCredentials = (EnketoCredentials) SpringServletAccess.getApplicationContext(context).getBean("enketoCredentials");
         XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
         OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
+        FormCacheServiceImpl formCacheService = (FormCacheServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("formCacheServiceImpl");
+        TokenService tokenService = (TokenService)  SpringServletAccess.getApplicationContext(context).getBean("tokenService");
 
         String mode = request.getParameter(MODE);
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
@@ -146,6 +149,14 @@ public class EnketoFormServlet extends SecureController {
         if (!isFormLocked && formUrlObject.isLockOn()) {
             getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId(), request.getSession().getId());
         }
+
+        String customerUuid = tokenService.getCustomerUuid((String) request.getSession().getAttribute("accessToken"));
+        if (eventCrf != null) {
+            formCacheService.addEditFormToFormCache(contextHash, customerUuid, eventCrf);
+        } else {
+            formCacheService.addNewFormToFormCache(contextHash, customerUuid, currentStudy, studyEvent, formLayout);
+        }
+
         request.setAttribute(FORM_URL, formUrlObject.getFormUrl());
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         forwardPage(Page.ENKETO_FORM_SERVLET);
