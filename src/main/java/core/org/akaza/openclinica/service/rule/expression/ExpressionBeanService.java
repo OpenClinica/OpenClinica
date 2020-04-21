@@ -96,8 +96,8 @@ public class ExpressionBeanService {
         String oid = null;
         int index = 0;
         // TODO fix this
-        logger.debug("Test :: {}", test);
-
+        logger.info("Test :: {}", test);
+        logger.info("In ExpressionBeanService.evaluateExpression() method,Value : {}" ,test);
         if(checkIfForScheduling(test)){
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//TODO: get the format from data format properties.??
         	index = test.indexOf(".");

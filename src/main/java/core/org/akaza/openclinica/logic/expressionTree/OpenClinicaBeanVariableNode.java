@@ -101,6 +101,7 @@ public class OpenClinicaBeanVariableNode extends ExpressionNode {
         	if(variableValue!=null)
         		return variableValue;
         }
+        logger.info("In OpenClinicaBeanVariableNode.calculate() method {}",number);
         return getExpressionBeanService().evaluateExpression(number);
     }
 

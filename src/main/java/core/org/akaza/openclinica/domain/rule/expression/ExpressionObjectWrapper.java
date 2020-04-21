@@ -187,6 +187,19 @@ public class ExpressionObjectWrapper {
 	public void setExpressionContext(String expressionContext) {
 		this.expressionContext = expressionContext;
 	}
-	
-	
+
+    @Override
+    public String toString() {
+        return "ExpressionObjectWrapper{" +
+                "ds=" + ds +
+                ", studyBean=" + studyBean +
+                ", expressionBean=" + expressionBean +
+                ", ruleSet=" + ruleSet +
+                ", eventCrf=" + eventCrf +
+                ", expressionContext='" + expressionContext + '\'' +
+                ", itemsAndTheirValues=" + itemsAndTheirValues +
+                ", studyEventDaoHib=" + studyEventDaoHib +
+                ", StudySubjectId=" + StudySubjectId +
+                '}';
+    }
 }

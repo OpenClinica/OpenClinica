@@ -215,6 +215,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		ParticipantDTO pDTO = null;
 		String[] listOfEmails = emailList.split(",");
+		logger.info("Email List : {}",emailList);
 		OCUserDTO userDTO=null;
 
 		String participateStatus = currentStudy.getParticipantPortal(); // enabled , disabled
@@ -365,6 +366,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 				}
 			}
 		} else {
+			logger.error ("StudySubject is null");
 			return null;
 		}
 

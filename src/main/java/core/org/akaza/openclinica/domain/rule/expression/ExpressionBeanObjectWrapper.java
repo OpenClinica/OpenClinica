@@ -191,4 +191,20 @@ public class ExpressionBeanObjectWrapper {
     public void setStudySubjectBeanId(Integer studySubjectBeanId) {
         this.studySubjectBeanId = studySubjectBeanId;
     }
+
+    @Override
+    public String toString() {
+        return "ExpressionBeanObjectWrapper{" +
+                "ds=" + ds +
+                ", studyBean=" + studyBean +
+                ", expressionBean=" + expressionBean +
+                ", ruleSet=" + ruleSet +
+                ", eventCrf=" + eventCrf +
+                ", studySubjectBeanId=" + studySubjectBeanId +
+                ", userAccountBean=" + userAccountBean +
+                ", studyEventDaoHib=" + studyEventDaoHib +
+                ", studyEventDefDaoHib=" + studyEventDefDaoHib +
+                ", itemsAndTheirValues=" + itemsAndTheirValues +
+                '}';
+    }
 }

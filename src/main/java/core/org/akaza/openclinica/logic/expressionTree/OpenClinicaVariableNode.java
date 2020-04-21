@@ -152,6 +152,7 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         if (variableValue != null) {
             return variableValue;
         }
+        logger.info("In OpenClinicaVariableNode.calculate() method {}",number);
         return getExpressionService().evaluateExpression(number);
     }
 

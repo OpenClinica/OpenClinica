@@ -63,7 +63,7 @@ public class NotificationService  {
             if (moduleConfigDTO != null) {
                 ModuleConfigAttributeDTO moduleConfigAttributeDTO = getModuleConfigAttribute(moduleConfigDTO.getAttributes(), studyBean);
                 if (moduleConfigAttributeDTO != null) {
-                    logger.info("Participant Access Link is :{}",moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
+                    logger.info("Participant Access Link is :{}",moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL );
                     ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();
                     participantAccessDTO.setAccessCode(accessCode);
                     participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
@@ -104,8 +104,10 @@ public class NotificationService  {
         restTemplate.setMessageConverters(converters);
         ResponseEntity<List<ModuleConfigDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<ModuleConfigDTO>>() {
         });
-        if (response == null)
+        if (response == null) {
+            logger.error("ModuleConfig from Study Service is Null");
             return null;
+        }
 
         return response.getBody();
     }

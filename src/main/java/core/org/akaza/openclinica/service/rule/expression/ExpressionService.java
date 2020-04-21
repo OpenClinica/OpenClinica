@@ -361,7 +361,7 @@ public class ExpressionService {
     public String evaluateExpression(String expression) throws OpenClinicaSystemException {
         String value = null;
         Map<Integer, ItemBean> itemBeansI = new HashMap<Integer, ItemBean>();
-
+        logger.info("In ExpressionService.evaluateExpression method, Value : {}" ,expression);
         if (items != null) {
             Iterator<ItemBean> iter = items.values().iterator();
             while (iter.hasNext()) {
@@ -377,7 +377,7 @@ public class ExpressionService {
                     String oid = expression.substring(0, expression.indexOf(this.STARTDATE));
                     studyEvent = getStudyEventFromOID(oid);
                     if (studyEvent != null && studyEvent.getDateStart() != null) {
-                        logger.debug("Study Event Start Date: " + studyEvent.getDateStart().toString().substring(0, 10).trim());
+                        logger.info("Event Start Date: {} " , studyEvent.getDateStart().toString().substring(0, 10).trim());
                         return studyEvent.getDateStart().toString().substring(0, 10).trim();
                     } else
                         return "";
@@ -385,7 +385,7 @@ public class ExpressionService {
                     String oid = expression.substring(0, expression.indexOf(this.STATUS));
                     studyEvent = getStudyEventFromOID(oid);
                     if (studyEvent != null) {
-                        logger.debug("Status: " + SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId()));
+                        logger.info("Event Status: {} " , SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId()));
                         return SubjectEventStatus.getSubjectEventStatusName(studyEvent.getSubjectEventStatusId());
                     } else
                         return "";

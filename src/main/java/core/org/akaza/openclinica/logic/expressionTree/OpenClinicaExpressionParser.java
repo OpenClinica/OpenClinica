@@ -135,7 +135,7 @@ public class OpenClinicaExpressionParser {
                 // previous terms into a bigger expression tree.
                 // char op = textIO.getAnyChar();
                 String op = textIO.peek() == 'o' ? textIO.getAnyString(3) : textIO.getAnyString(4);
-                logger.debug("Operator" + op);
+                logger.info("Operator" + op);
                 ExpressionNode nextTerm = termTree3();
                 exp = ExpressionNodeFactory.getExpNode(Operator.getByDescription(op), exp, nextTerm);
                 textIO.skipBlanks();
@@ -249,7 +249,9 @@ public class OpenClinicaExpressionParser {
             return exp;
         } else if (String.valueOf(ch).matches("\\w+")) {
             String k = textIO.getWord();
-            logger.debug("TheWord 1 is : " + k);
+            logger.info("TheWord 1 is : " + k);
+            logger.info("ExpressionWrapper : {}",expressionWrapper!=null? expressionWrapper.toString():null);
+            logger.info("ExpressionBeanWrapper : {}",expressionBeanWrapper!=null? expressionBeanWrapper.toString():null);
             if(null != expressionWrapper){
                return new OpenClinicaVariableNode(k, expressionWrapper, this);
             }else{

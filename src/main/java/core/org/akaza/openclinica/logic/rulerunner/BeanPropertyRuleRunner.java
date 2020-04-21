@@ -86,9 +86,10 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 							OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(ew);
 							// eow.setUserAccountBean(ub);
 							eow.setStudyBean(currentStudy);
+							logger.info("Rule Expression: {}",rule.getExpression().getValue());
 							result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 							// sw.stop();
-							logger.debug( "Rule Expression Evaluation Result: " + result);
+							logger.info( "Rule Expression Evaluation Result: " + result);
 							// Actions
 							List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result.toString());
 
@@ -97,8 +98,10 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 								if (ruleActionBean instanceof EventActionBean){
 									beanPropertyService.runAction(ruleActionBean,eow,userId,changeDetails.getRunningInTransaction());
 								}else if (ruleActionBean instanceof NotificationActionBean){
+									logger.info("Start Running notification Action");
 									notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule);
 									notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(), currentStudyForStudySubject, eventOrdinal,notificationService, keycloakClientImpl);
+									logger.info("End Running notification Action");
 								}
 							}
 						}catch (OpenClinicaSystemException osa) {
