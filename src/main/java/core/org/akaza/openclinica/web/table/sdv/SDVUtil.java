@@ -1479,8 +1479,15 @@ public class SDVUtil {
             sdvDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
             sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
             sdvDTO.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
-            sdvDTO.setEventStartDate(eventCrf.getStudyEvent().getDateStart());
-            sdvDTO.setEventStartDateHasTime(eventCrf.getStudyEvent().getStartTimeFlag());
+            Date startDate = eventCrf.getStudyEvent().getDateStart();
+            SimpleDateFormat dateFormat;
+            if (eventCrf.getStudyEvent().getStartTimeFlag()) {
+                dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
+            }
+            else {
+                dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+            }
+            sdvDTO.setEventStartDate(dateFormat.format(startDate));
             sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
             sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
             Study study = studyDao.findByOcOID(studyOID);
@@ -1503,16 +1510,25 @@ public class SDVUtil {
                         sdvItemDTO.setLabel(itemMeta.getLeftItemText());
                         ResponseSet responseSet = itemMeta.getResponseSet();
                         int responseType = responseSet.getResponseType().getResponseTypeId();
-                        if (responseType == 5 || // radio
+
+                        if (responseType == 3 || // checkbox
+                            responseType == 5 || // radio
                             responseType == 6 || // single-select
                             responseType == 7    // multi-select
                         ) {
                             String[] optionsText = responseSet.getOptionsText().split(",");
                             String[] optionsValues = responseSet.getOptionsValues().split(",");
-                            String value = itemData.getValue();
-                            int valueIndex = ArrayUtils.indexOf(optionsValues, value);
-                            String text = optionsText[valueIndex];
-                            sdvItemDTO.setValue(text);
+                            String[] values = itemData.getValue().split(",");
+                            String display = "";
+                            for (String value: values) {
+                                int valueIndex = ArrayUtils.indexOf(optionsValues, value);
+                                String text = optionsText[valueIndex];
+                                if (!display.isEmpty()) {
+                                    display += ", ";
+                                }
+                                display += text;
+                            }
+                            sdvItemDTO.setValue(display);
                         }
                         else {
                             sdvItemDTO.setValue(itemData.getValue());

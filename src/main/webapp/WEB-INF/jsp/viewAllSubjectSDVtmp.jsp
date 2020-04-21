@@ -303,6 +303,14 @@
         margin: 5px 10px;
     }
 
+    .text-left {
+        text-align: left;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
     .blockOverlay {
         cursor: default !important;
     }
@@ -386,7 +394,14 @@
             {data: 'lastModifiedDate'},
             {data: 'lastModifiedBy'},
             {data: 'actions'}
-        ]
+        ],
+        columnDefs: [{
+            targets: 0,
+            className: 'text-left'
+        }, {
+            targets: 1,
+            className: 'text-right'
+        }]
     });
 
     function clearFilter() {
@@ -410,15 +425,6 @@
 
     function formatDateTime(date) {
         return moment(date).format('DD-MMM-YYYY hh:mm');
-    }
-
-    function formatDate(date, withTime) {
-        if (withTime) {
-            return formatDateTime(date)
-        }
-        else {
-            return moment(date).format('DD-MMM-YYYY');
-        }
     }
 
     function calcPopupPos() {
@@ -452,6 +458,7 @@
     }
 
     $('#sdv').on('click', '.popupSdv', function () {
+        var popupIndex = $('#sdv button.popupSdv').index(this);
         var data = $(this).data();
         var url = 'auth/api/sdv/studies/' + data.studyOid + '/events/' + data.eventOid + '/occurrences/' + data.eventOrdinal + '/forms/' + data.formOid + '/participants/' + data.participantId + '/sdvItems';
 
@@ -468,7 +475,7 @@
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
                 $('#siteName').text(data.siteName);
-                $('#eventStartDate').text(formatDate(data.eventStartDate, data.eventStartDateHasTime));
+                $('#eventStartDate').text(data.eventStartDate);
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
@@ -491,11 +498,12 @@
                         item.lastVerifiedDate = formatDateTime(item.lastVerifiedDate);
                     }
                     item.lastModifiedDate = formatDateTime(item.lastModifiedDate);
-                    item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName + ' (' + item.lastModifiedUserName + ')';
+                    item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName;
 
                     item.actions =
-                        '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy?itemDataId=' +
-                        item.itemDataId +
+                        '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy' +
+                        '?itemDataId=' + item.itemDataId +
+                        '&popupIndex=' + popupIndex +
                         '"></a>';
 
                     return item;
@@ -549,5 +557,14 @@
     limitFilterWidth('110px', 'SDV Requirement');
 
     $(window).resize(setPopupPos);
+
+    var popupIndex = new URLSearchParams(location.search).get('popupIndex');
+    if (popupIndex) {
+        $(function() {
+            setTimeout(function() {
+                $('#sdv button.popupSdv').eq(popupIndex).click();
+            }, 1);
+        });
+    }
 
 </script>

@@ -101,6 +101,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * @author ssachs
@@ -404,8 +405,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
         String module = (String) session.getAttribute("module");
 
         if (itemDataId > 0) {
+            String popupIndex = fp.getString("popupIndex");
+            String referer = request.getHeader("referer");
+            String redirectTo = UriComponentsBuilder.fromUriString(referer).replaceQueryParam("popupIndex", popupIndex).toUriString();
             flavor = QUERY_FLAVOR;
-            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, request.getHeader("referer"), flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE);
+            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, redirectTo, flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE);
             forwardPage(Page.ENKETO_FORM_SERVLET);
             return;
         }
