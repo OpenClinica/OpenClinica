@@ -99,6 +99,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
             } else {
                 return Page.ADMIN_EDIT_SERVLET;
             }
+
+            //POSSIBLE SOLUTION TO OC-1231
+            /*if (currentRole.getRole().equals(Role.MONITOR)) {
+                return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
+                // ViewSectionDataEntry?eventDefinitionCRFId=&ecId=1&tabId=1&studySubjectId=1
+            }else if(!isCompleted){
+                return Page.INITIAL_DATA_ENTRY_SERVLET;
+            }else {
+                return Page.ADMIN_EDIT_SERVLET;
+            }*/
             // eventCRFId=51&sectionId=14
         }
         return null;
@@ -260,7 +270,18 @@ public class ResolveDiscrepancyServlet extends SecureController {
         if (p == null) {
             throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, resexception
                     .getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
-        } else {
+        }else if(p.getFileName().contains("InitialDataEntry")){ //Open form in data entry mode from dn page
+            /*ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+            ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
+            *//*EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+
+            EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+            StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());*//*
+            p.setFileName(p.getFileName() + "?eventCRFId=" + idb.getEventCRFId() +
+                                            "&exitTo=" + Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET.getFileName());*/
+            /*String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
+            setPopUpURL(createNoteURL);*/
+        }else {
             if(p.getFileName().contains("?")) {
                 if(!p.getFileName().contains("fromViewNotes=1")) {
                     p.setFileName(p.getFileName()+"&fromViewNotes=1");
