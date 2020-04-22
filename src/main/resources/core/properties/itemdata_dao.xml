@@ -13,7 +13,7 @@
 		<name>create</name>
 		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID,  VALUE,
 		OWNER_ID, DATE_CREATED,ORDINAL,DELETED)
-		VALUES (?,?,?,?,?,?,NOW(),?,?,?)</sql>
+		VALUES (?,?,?,?,?,NOW(),?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
