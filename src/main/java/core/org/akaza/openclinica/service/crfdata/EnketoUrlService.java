@@ -680,7 +680,7 @@ public class EnketoUrlService {
 
         CrfVersion crfVersion = eventCrf.getCrfVersion();
         boolean markComplete = true;
-            if (eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+        if (eventCrf.getWorkflowStatus() !=null && eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
                 markComplete = false;
         }
 
