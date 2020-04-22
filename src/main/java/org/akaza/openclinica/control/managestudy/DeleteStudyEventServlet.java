@@ -8,6 +8,7 @@ package org.akaza.openclinica.control.managestudy;
  * To change this template use File | Settings | File Templates.
  */
 import core.org.akaza.openclinica.bean.core.Role;
+import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -98,6 +99,14 @@ public class DeleteStudyEventServlet extends SecureController{
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
                 sedao.update(event);
+
+                if(studySub.getStatus().equals(Status.SIGNED)){
+                    studySub.setStatus(Status.AVAILABLE);
+                    studySub.setUpdater(ub);
+                    studySub.setUpdatedDate(new Date());
+                    subdao.update(studySub);
+                }
+
                 String emailBody =
                     respage.getString("the_event") + " " + event.getStudyEventDefinition().getName() + " "
                         + respage.getString("has_been_removed_from_the_subject_record_for") + " " + studySub.getLabel() + " "
