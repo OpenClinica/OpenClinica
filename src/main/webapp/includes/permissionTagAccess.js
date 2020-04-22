@@ -7,7 +7,10 @@ $(document).ready(function() {
         event.preventDefault();
         validateResourceAccess(ecId, formLayoutId, studyEventId).done(function(data){
             if (data.status == true) {
-                location.href = btn.attr('href');
+                var href = btn.attr('href');
+                if (href) {
+                    location.href = href;
+                }
                 var onclick = btn.data('onclick');
                 if (onclick) {
                     onclick.call(this, event || window.event);
@@ -25,6 +28,8 @@ $(document).ready(function() {
 });
 function getParameterByName(name, btn) {
     var data = btn.data(name.toLowerCase());
+    if (data) return data;
+    data = btn.data(name);
     if (data) return data;
     var url = btn.attr('href') || window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');
