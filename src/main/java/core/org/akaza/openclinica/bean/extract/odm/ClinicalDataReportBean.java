@@ -86,14 +86,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         Role role = null; // OpenClinica:
         StudyUserRoleBean userRole = null;
-        Study publicStudyBean = studyDao.getPublicStudy(userBean.getActiveStudyId());
+        Study publicStudyBean = studyDao.findPublicStudyById(userBean.getActiveStudyId());
         userRole = userBean.getRoleByStudy(publicStudyBean.getStudyId());
         if (userRole == null || !userRole.isActive())
             userRole = userBean.getRoleByStudy(publicStudyBean.checkAndGetParentStudyId());
 
         role = userRole.getRole();
 
-        Study userRoleStudy = studyDao.getPublicStudy(userRole.getStudyId());
+        Study userRoleStudy = studyDao.findPublicStudyById(userRole.getStudyId());
         if (userRoleStudy != null)
             setRoleDescription(role, userRoleStudy);
 

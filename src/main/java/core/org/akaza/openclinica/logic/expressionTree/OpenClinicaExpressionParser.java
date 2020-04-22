@@ -249,7 +249,7 @@ public class OpenClinicaExpressionParser {
             return exp;
         } else if (String.valueOf(ch).matches("\\w+")) {
             String k = textIO.getWord();
-            logger.debug("TheWord 1 is : " + k);
+            logger.info("TheWord 1 is : " + k);
             if(null != expressionWrapper){
                return new OpenClinicaVariableNode(k, expressionWrapper, this);
             }else{
