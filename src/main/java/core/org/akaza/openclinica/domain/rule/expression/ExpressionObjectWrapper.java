@@ -3,6 +3,7 @@ package core.org.akaza.openclinica.domain.rule.expression;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 
 import java.util.HashMap;
@@ -13,6 +14,7 @@ public class ExpressionObjectWrapper {
 
     DataSource ds;
     Study studyBean;
+    StudyEvent studyEvent;
     ExpressionBean expressionBean;
     RuleSetBean ruleSet;
     EventCRFBean eventCrf; // used only in data entry based rule executions
@@ -187,6 +189,12 @@ public class ExpressionObjectWrapper {
 	public void setExpressionContext(String expressionContext) {
 		this.expressionContext = expressionContext;
 	}
-	
-	
+
+    public StudyEvent getStudyEvent() {
+        return studyEvent;
+    }
+
+    public void setStudyEvent(StudyEvent studyEvent) {
+        this.studyEvent = studyEvent;
+    }
 }

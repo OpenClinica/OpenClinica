@@ -88,6 +88,7 @@ public class EqualityOpNode extends ExpressionNode {
     }
 
     private String calc(String x, String y) throws OpenClinicaSystemException {
+     logger.info("Comparing left expression value: {} against the right expression value: {} ",x,y);
         switch (op) {
         case EQUAL:
             return String.valueOf(x.equals(y));

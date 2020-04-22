@@ -179,6 +179,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, Study currentStudy, int eventOrdinal,NotificationService notificationService, KeycloakClientImpl keycloakClientImpl) {
 		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
+		logger.info("List of Emails to be Executed : {}",emailList);
 		String message = ((NotificationActionBean) ruleActionBean).getMessage();
 		String emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
 
@@ -290,6 +291,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 			// Send Email thru Local Mail Server
 			if(email!=null) {
+				logger.info("Start of executing Email action : {}", email);
 				execute(ExecutionMode.SAVE, ruleActionBean, pDTO, email.trim());
 				logger.info(pDTO.getMessage() + "  (Email sent to email address from OC Mail Server :  " + email + ")");
 			}else{
