@@ -280,7 +280,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             p.setFileName(p.getFileName()+ "?eventCRFId=" + idb.getEventCRFId() + "&exitTo=ViewNotes");
 
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
-            session.setAttribute("viewNotesURL", createNoteURL); //used in the DataEntryServlet
+            setPopUpURL(createNoteURL);
         }else {
             if(p.getFileName().contains("?")) {
                 if(!p.getFileName().contains("fromViewNotes=1")) {
