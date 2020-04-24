@@ -277,7 +277,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
-            p.setFileName(p.getFileName()+ "?eventCRFId=" + idb.getEventCRFId() + "&exitTo=ViewNotes");
+            p.setFileName(p.getFileName()+ "?eventCRFId=" + idb.getEventCRFId() + "&exitTo=ViewNotes&fromViewNotes=1");
 
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
             setPopUpURL(createNoteURL);

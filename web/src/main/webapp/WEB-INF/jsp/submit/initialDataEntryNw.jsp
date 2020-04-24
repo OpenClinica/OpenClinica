@@ -55,7 +55,9 @@
     <!-- End -->
 
 </head>
-<body class="aka_bodywidth" onload=" document.getElementById('here').style.display='none'; document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
+<body class="aka_bodywidth" onload="
+                            <c:if test='${popUpURL != ""}'>
+                            openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>document.getElementById('here').style.display='none'; document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
 
 <c:import url="../submit/showItemInputToolTipsJS.jsp"></c:import>
 
