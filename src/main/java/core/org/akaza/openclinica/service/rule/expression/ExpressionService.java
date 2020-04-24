@@ -377,7 +377,7 @@ public class ExpressionService {
                     String oid = expression.substring(0, expression.indexOf(this.STARTDATE));
                     studyEvent = getStudyEventFromOID(oid);
                     if (studyEvent != null && studyEvent.getDateStart() != null) {
-                        logger.debug("Study Event Start Date: " + studyEvent.getDateStart().toString().substring(0, 10).trim());
+                        logger.info("Event Start Date: {} " , studyEvent.getDateStart().toString().substring(0, 10).trim());
                         return studyEvent.getDateStart().toString().substring(0, 10).trim();
                     } else
                         return "";
@@ -385,7 +385,7 @@ public class ExpressionService {
                     String oid = expression.substring(0, expression.indexOf(this.STATUS));
                     studyEvent = getStudyEventFromOID(oid);
                     if (studyEvent != null) {
-                        logger.debug("Status: " + studyEvent.getWorkflowStatus());
+                        logger.info("Event Status: {} " , studyEvent.getWorkflowStatus());
                         return studyEvent.getWorkflowStatus().toString().toLowerCase();
                     } else
                         return "";
@@ -492,16 +492,18 @@ public class ExpressionService {
     }
 
     public StudyEvent getStudyEventFromOID(String oid) {
-        Integer subjectId = expressionWrapper.getStudySubjectId();
-        StudyEvent studyEvent = null;
+        StudyEvent studyEvent = expressionWrapper.getStudyEvent();
+        int ordinal = 0;
         if (oid.contains("[")) {
             int leftBracketIndex = oid.indexOf("[");
             int rightBracketIndex = oid.indexOf("]");
-            int ordinal = Integer.valueOf(oid.substring(leftBracketIndex + 1, rightBracketIndex));
-            studyEvent = getStudyEventFromDb(oid.substring(0, leftBracketIndex), ordinal, subjectId);
-        } else
-            studyEvent = getStudyEventFromDb(oid, 1, subjectId);
-        return studyEvent;
+            ordinal = Integer.valueOf(oid.substring(leftBracketIndex + 1, rightBracketIndex));
+            oid = oid.substring(0, leftBracketIndex);
+        }
+        if (studyEvent.getStudyEventDefinition().getOc_oid().endsWith(oid) && ordinal!=0?studyEvent.getSampleOrdinal()==ordinal:true){
+            return studyEvent;
+        }
+        return null;
     }
 
     private StudyEvent getStudyEventFromDb(String oid, Integer ordinal, Integer studySubjectId) {

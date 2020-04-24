@@ -81,14 +81,16 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 							// StopWatch sw = new StopWatch();
 							ExpressionObjectWrapper ew = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet);
 							ew.setStudyEventDaoHib(studyEventDaoHib);
+							ew.setStudyEvent(studyEvent);
 							ew.setStudySubjectId(studySubjectBeanId);
 							ew.setExpressionContext(ExpressionObjectWrapper.CONTEXT_EXPRESSION);
 							OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(ew);
 							// eow.setUserAccountBean(ub);
 							eow.setStudyBean(currentStudy);
+							logger.info("The Rule expression to be parsed and evaluated is {} ",rule.getExpression().getValue());
 							result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 							// sw.stop();
-							logger.debug( "Rule Expression Evaluation Result: " + result);
+							logger.info( "Rule Expression Evaluation Result: " + result);
 							// Actions
 							List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result.toString());
 
@@ -97,6 +99,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 								if (ruleActionBean instanceof EventActionBean){
 									beanPropertyService.runAction(ruleActionBean,eow,userId,changeDetails.getRunningInTransaction());
 								}else if (ruleActionBean instanceof NotificationActionBean){
+									logger.info( "Start of Notification Action processor");
 									notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule);
 									notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(), currentStudyForStudySubject, eventOrdinal,notificationService, keycloakClientImpl);
 								}
