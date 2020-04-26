@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller.openrosa.processor;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
@@ -199,7 +200,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setInstanceId(container.getInstanceId());
                     existingItemData = itemDataDao.saveOrUpdate(existingItemData);
-                    updateEventSubjectStatusIfSigned(container);
+                    updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                     resetSdvStatus(container);
 
                     // Close discrepancy notes
@@ -208,7 +209,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     ItemData newItemData = createItemData(ig.getItem(), "", itemOrdinal, container);
                     newItemData.setDeleted(true);
                     newItemData = itemDataDao.saveOrUpdate(newItemData);
-                    updateEventSubjectStatusIfSigned(container);
+                    updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                 }
             }
             return;
@@ -265,7 +266,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 ItemData randomizeDataCheck = null;
                 if (existingItemData == null) {
                     itemDataDao.saveOrUpdate(newItemData);
-                    updateEventSubjectStatusIfSigned(container);
+                    updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                     resetSdvStatus(container);
                     randomizeDataCheck = newItemData;
                 } else if (!existingItemData.getValue().equals(newItemData.getValue())) {
@@ -275,7 +276,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
                     itemDataDao.saveOrUpdate(existingItemData);
-                    updateEventSubjectStatusIfSigned(container);
+                    updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                     resetSdvStatus(container);
                     randomizeDataCheck = existingItemData;
                 }
@@ -330,51 +331,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         eventCrfDao.saveOrUpdate(eventCrf);
     }
 
-    private void updateEventSubjectStatusIfSigned(SubmissionContainer container) {
-        StudyEvent studyEvent = container.getEventCrf().getStudyEvent();
-        if (studyEvent.isCurrentlySigned()) {
-            String eventOldworkflowStatus = StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString();
-            AuditLogEvent eventAuditLogEvent = new AuditLogEvent();
-            eventAuditLogEvent.setAuditTable(STUDYEVENT);
-            eventAuditLogEvent.setEntityId(studyEvent.getStudyEventId());
-            eventAuditLogEvent.setEntityName("Signed");
-            eventAuditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-            eventAuditLogEvent.setNewValue(studyEvent.getSigned().toString());
 
-            List<AuditLogEvent> eventAles = auditLogEventDao.findByParam(eventAuditLogEvent);
-            for (AuditLogEvent audit : eventAles) {
-                eventOldworkflowStatus = audit.getOldValue();
-                break;
-            }
-            studyEvent.setUpdateId(container.getUser().getUserId());
-            studyEvent.setDateUpdated(new Date());
-            studyEventDao.saveOrUpdate(studyEvent);
-        }
-        StudySubject studySubject = container.getSubject();
-
-        // This code previously existed within the above if block. This resulted in a bug where if an event was scheduled
-        // for a participant that was already signed then entering data in that new event would bypass the logic. By moving
-        // it here the subject status should be properly updated, regardless of the status of any other events.
-        if (studySubject.getStatus() == Status.SIGNED) {
-            String subjectOldStatusId = "1";
-            AuditLogEvent subjectAuditLogEvent = new AuditLogEvent();
-            subjectAuditLogEvent.setAuditTable(STUDYSUBJECT);
-            subjectAuditLogEvent.setEntityId(studySubject.getStudySubjectId());
-            subjectAuditLogEvent.setEntityName("Status");
-            subjectAuditLogEvent.setAuditLogEventType(new AuditLogEventType(3));
-            subjectAuditLogEvent.setNewValue("signed");
-
-            List<AuditLogEvent> subjectAles = auditLogEventDao.findByParam(subjectAuditLogEvent);
-            for (AuditLogEvent audit : subjectAles) {
-                subjectOldStatusId = audit.getOldValue();
-                break;
-            }
-            studySubject.setStatus(Status.getByCode(Integer.valueOf(subjectOldStatusId)));
-            studySubject.setUpdateId(container.getUser().getUserId());
-            studySubject.setDateUpdated(new Date());
-            studySubjectDao.saveOrUpdate(studySubject);
-        }
-    }
 
     public void saveOrUpdateRepeatCount(SubmissionContainer container, String itemName, String itemValue) {
         RepeatCount repeatCount = repeatCountDao.findByEventCrfIdAndRepeatName(container.getEventCrf().getEventCrfId(), itemName);
@@ -440,5 +397,19 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     }
 
+    public void updateEventAndSubjectStatusIfSigned(StudyEvent studyEvent, StudySubject studySubject, UserAccount userAccount) {
+        if (studyEvent.isCurrentlySigned()) {
+            studyEvent.setSigned(Boolean.FALSE);
+            studyEvent.setUpdateId(userAccount.getUserId());
+            studyEvent.setDateUpdated(new Date());
+            studyEventDao.saveOrUpdate(studyEvent);
+        }
 
+        if (studySubject.getStatus().equals(Status.SIGNED)) {
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject.setUpdateId(userAccount.getUserId());
+            studySubject.setDateUpdated(new Date());
+            studySubjectDao.saveOrUpdate(studySubject);
+        }
+    }
 }

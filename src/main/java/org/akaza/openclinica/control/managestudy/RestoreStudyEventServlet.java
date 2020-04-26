@@ -135,6 +135,12 @@ public class RestoreStudyEventServlet extends SecureController {
                 event.setUpdatedDate(new Date());
                 sedao.update(event);
 
+                if(studySub.getStatus().equals(Status.SIGNED)){
+                    studySub.setStatus(Status.AVAILABLE);
+                    studySub.setUpdater(ub);
+                    studySub.setUpdatedDate(new Date());
+                    subdao.update(studySub);
+                }
                 // restore event crfs
 
 

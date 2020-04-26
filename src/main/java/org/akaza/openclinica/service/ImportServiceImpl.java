@@ -125,7 +125,7 @@ public class ImportServiceImpl implements ImportService {
     public static final String UNDERSCORE = "_";
     public static final String INITIAL_DATA_ENTRY = "initial data entry";
     public static final String DATA_ENTRY_COMPLETE = "data entry complete";
-    public static final String COMPLETE = "complete";
+    public static final String COMPLETED = "completed";
     public static final String DATA_ENTRY_STARTED = "data entry started";
 
     public static final String FAILED = "Failed";
@@ -348,38 +348,25 @@ public class ImportServiceImpl implements ImportService {
                          *  if no data get updated/imported, even have successful process, still need to keep the event as signed,
                          *  so this need to skip the existing set event status logic
                          */
-                        if (this.isStudyEventSigned(studyEvent)) {
-                            if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
-                                //OC-11632
-                                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
-                                studyEventDao.saveOrUpdate(studyEvent);
+                        if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {
+                            updateEventAndSubjectStatusIfSigned(studyEvent, studySubject, userAccount);
+                        }
+
+                        if ((formDataBean.getEventCRFStatus().equals(COMPLETED) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE))) {
+                            if (itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
+                                // update eventcrf status into Complete\
+                                eventCrf = updateEventCrf(eventCrf, userAccount, EventCrfWorkflowStatusEnum.COMPLETED, new Date());
+                                openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
+                                logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
                             }
 
-                        } else {
-                            if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE))) {
-
-                                if (itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
-                                    // update eventcrf status into Complete\
-                                    eventCrf = updateEventCrf(eventCrf, userAccount, EventCrfWorkflowStatusEnum.COMPLETED, new Date());
-                                    openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
-
-                                    logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
-                                } else {
-                                    // event in COMPLETE, but during import process may still get some item updated
-                                    ;
-                                }
-
-
-                            } else if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {                         // update eventcrf status into data entry status
-
-                                //AC3: Complete forms with data imported into them must stay in Complete status at the conclusion of the import.
-                                if (this.isEventCrfCompleted(eventCrf)) {
-                                    ;
-                                } else {
-                                    // Update Event Crf Status into Initial Data Entry
-                                    eventCrf = updateEventCrf(eventCrf, userAccount, EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY, null);
-                                }
-
+                        } else if (itemCountInForm.getInsertedUpdatedItemCountInForm() > 0) {                         // update eventcrf status into data entry status
+                            //AC3: Complete forms with data imported into them must stay in Complete status at the conclusion of the import.
+                            if (this.isEventCrfCompleted(eventCrf)) {
+                                ;
+                            } else {
+                                // Update Event Crf Status into Initial Data Entry
+                                eventCrf = updateEventCrf(eventCrf, userAccount, EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY, null);
                             }
                         }
 
@@ -1062,9 +1049,6 @@ public class ImportServiceImpl implements ImportService {
      * @param studyEvent
      * @return
      */
-    private boolean isStudyEventSigned(StudyEvent studyEvent) {
-        return studyEvent.isCurrentlySigned();
-    }
 
     public ErrorObj validateStartAndEndDateAndOrder(StudyEventDataBean studyEventDataBean) {
         if (studyEventDataBean.getStartDate() == null)
@@ -1563,7 +1547,7 @@ public class ImportServiceImpl implements ImportService {
         // Form Status is not acceptable
         if (!formDataBean.getEventCRFStatus().equalsIgnoreCase(INITIAL_DATA_ENTRY) &&
                 !formDataBean.getEventCRFStatus().equalsIgnoreCase(DATA_ENTRY_COMPLETE) &&
-                !formDataBean.getEventCRFStatus().equalsIgnoreCase(COMPLETE)) {
+                !formDataBean.getEventCRFStatus().equalsIgnoreCase(COMPLETED)) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
         }
 
@@ -1578,5 +1562,20 @@ public class ImportServiceImpl implements ImportService {
             }
         }
         return false;
+    }
+    public void updateEventAndSubjectStatusIfSigned(StudyEvent studyEvent, StudySubject studySubject, UserAccount userAccount) {
+        if (studyEvent.isCurrentlySigned()) {
+            studyEvent.setSigned(Boolean.FALSE);
+            studyEvent.setUpdateId(userAccount.getUserId());
+            studyEvent.setDateUpdated(new Date());
+            studyEventDao.saveOrUpdate(studyEvent);
+        }
+
+        if (studySubject.getStatus().equals(Status.SIGNED)) {
+            studySubject.setStatus(Status.AVAILABLE);
+            studySubject.setUpdateId(userAccount.getUserId());
+            studySubject.setDateUpdated(new Date());
+            studySubjectDao.saveOrUpdate(studySubject);
+        }
     }
 }

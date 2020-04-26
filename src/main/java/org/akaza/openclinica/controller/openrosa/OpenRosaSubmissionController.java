@@ -246,9 +246,6 @@ public class OpenRosaSubmissionController {
 
         updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount);
 
-        studySubject = unsignSignedParticipant(studySubject);
-        studySubjectDao.saveOrUpdate(studySubject);
-
         String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
         return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
     }
@@ -260,13 +257,6 @@ public class OpenRosaSubmissionController {
         randomizationService.processRandomization(parentPublicStudy, accessToken, subjectOid);
     }
 
-    private StudySubject unsignSignedParticipant(StudySubject studySubject) {
-        Status subjectStatus = studySubject.getStatus();
-        if (subjectStatus.equals(Status.SIGNED)){
-            studySubject.setStatus(Status.AVAILABLE);
-        }
-        return studySubject;
-    }
 
     /**
      * @api {post} /pages/api/v2/editform/:studyOid/fieldsubmission Submit form data
@@ -594,51 +584,30 @@ public class OpenRosaSubmissionController {
     }
 
     public void updateStudyEventStatus(Study study, StudySubject studySubject, StudyEventDefinition sed, StudyEvent studyEvent, UserAccount userAccount) {
-        List<EventCrf> eventCrfs=studyEvent.getEventCrfs();
+        List<EventCrf> eventCrfs = studyEvent.getEventCrfs();
         List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
                 study.getStudyId());
-        boolean statusChanged = false;
         studyEvent.setUpdateId(userAccount.getUserId());
         studyEvent.setDateUpdated(new Date());
-        int count = getCountOfEventCrfsInEDC(eventCrfs,eventDefinitionCrfs);
+        int countOfEventCrfsInEDC = getCountOfEventCrfsInEDC(eventCrfs, eventDefinitionCrfs);
 
-        if (studyEvent.isCurrentlySigned()) {
-
-            if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
-                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
-                    studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
-                    statusChanged = true;
-                }
-                studyEvent.setUserAccount(userAccount);
-                persistStudyEvent(studyEvent, statusChanged);
-            } else if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) ) {
-                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED) ) {
-                    studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
-                    statusChanged = true;
-                }
-                studyEvent.setUserAccount(userAccount);
-                persistStudyEvent(studyEvent, statusChanged);
+        boolean allFormsComplete = true;
+        for (EventCrf evCrf : eventCrfs) {
+            if (!evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                allFormsComplete = false;
+                break;
+            }
+        }
+        if ((allFormsComplete && countOfEventCrfsInEDC == eventDefinitionCrfs.size()) || sed.getType().equals(COMMON)) {
+            if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
+                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
+                persistStudyEvent(studyEvent, true);
             }
         } else {
-            boolean allFormsComplete = true;
-            for (EventCrf evCrf : eventCrfs) {
-                if (!evCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
-                    allFormsComplete = false;
-                    break;
-                }
+            if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
+                studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+                persistStudyEvent(studyEvent, true);
             }
-            if ((allFormsComplete && count == eventDefinitionCrfs.size()) || sed.getType().equals(COMMON)) {
-                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)) {
-                    studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.COMPLETED);
-                    statusChanged = true;
-                }
-            } else {
-                if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
-                    studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
-                    statusChanged = true;
-                }
-            }
-            persistStudyEvent(studyEvent, statusChanged);
         }
     }
 
