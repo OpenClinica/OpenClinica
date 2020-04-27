@@ -273,9 +273,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
         }else if(p.getFileName().contains("InitialDataEntry")){ //Open form in data entry mode from dn page
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
-            EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
 
             p.setFileName(p.getFileName()+ "?eventCRFId=" + idb.getEventCRFId() + "&exitTo=ViewNotes&fromViewNotes=1");
 
