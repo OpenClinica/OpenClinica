@@ -510,16 +510,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setStatus(Status.AVAILABLE);
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
-
-                studySubject = unsignSignedParticipant(studySubject);
-                studySubject.setUpdater(ub);
-                sdao.update(studySubject);
-
-                // ArrayList subjectsExistingEvents =
-                // sed.findAllByStudyAndStudySubjectId(currentStudy,
-                // studySubject.getId());
                 studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(definition, studySubject) + 1);
-
                 studyEvent = (StudyEventBean) sed.create(studyEvent);
                 // getRuleSetService().runRulesInBeanProperty(createRuleSet(studySubject,definition),currentStudy,ub,request,studySubject);
 
@@ -623,14 +614,6 @@ public class CreateNewStudyEventServlet extends SecureController {
                 return;
             }
         }
-    }
-
-    private StudySubjectBean unsignSignedParticipant(StudySubjectBean studySubject) {
-        Status subjectStatus = studySubject.getStatus();
-        if (subjectStatus.equals(Status.SIGNED)){
-            studySubject.setStatus(Status.AVAILABLE);
-        }
-        return studySubject;
     }
 
     @Override

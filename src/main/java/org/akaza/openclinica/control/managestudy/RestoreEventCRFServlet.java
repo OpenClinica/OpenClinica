@@ -145,6 +145,20 @@ public class RestoreEventCRFServlet extends SecureController {
                 eventCRF.setUpdatedDate(new Date());
                 ecdao.update(eventCRF);
 
+                if (event.isSigned()) {
+                    event.setSigned(Boolean.FALSE);
+                    event.setUpdater(ub);
+                    event.setUpdatedDate(new Date());
+                    sedao.update(event);
+                }
+
+                if(studySub.getStatus().equals(Status.SIGNED)){
+                    studySub.setStatus(Status.AVAILABLE);
+                    studySub.setUpdater(ub);
+                    studySub.setUpdatedDate(new Date());
+                    subdao.update(studySub);
+                }
+
                 // restore all the item data
 
                 /* OC-8797
