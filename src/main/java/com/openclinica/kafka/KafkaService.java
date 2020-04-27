@@ -74,7 +74,7 @@ public class KafkaService {
     kafkaTemplate.send(producerRecord);
   }
 
-  // Removed for now. Will likely be removed?
+  // Removed temporarily until ODM updates are in.
   public void sendItemDataChangeMessage(ItemData itemData) throws Exception {
 
 /*    Study study = itemData.getEventCrf().getStudySubject().getStudy();

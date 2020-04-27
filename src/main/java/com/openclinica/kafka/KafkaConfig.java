@@ -63,7 +63,7 @@ public class KafkaConfig {
   }
 
   @Bean
-  public NewTopic formClosure() {
+  public NewTopic formChange() {
     return new NewTopic(FORM_CHANGE_TOPIC, 3, (short) 1);
   }
 
