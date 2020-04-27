@@ -514,21 +514,8 @@
   		  EXECUTE PROCEDURE repeating_item_data_trigger();
 	 </sql>
     </changeSet>
+   
     <changeSet author="pgawade (generated)" id="1235684743487-372">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>     
-	 <sql splitStatements="false">
-	 	CREATE TRIGGER global_user_insert_update
-		  AFTER INSERT OR UPDATE
-		  ON public.user_account
-		  FOR EACH ROW
-		  EXECUTE PROCEDURE public.global_user_trigger();
-
-	 </sql>
-    </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-375">
     	<preConditions onFail="MARK_RAN">
     		<dbms type="postgresql" />
     		<!--<runningAs username="clinica" />-->
@@ -568,6 +555,20 @@
 				
 			  LANGUAGE plpgsql;
     	</sql>
+    </changeSet>
+     <changeSet author="pgawade (generated)" id="1235684743487-375">
+    	<preConditions onFail="MARK_RAN">
+		 	<dbms type="postgresql" />
+			<!--<runningAs username="clinica" />-->
+		</preConditions>     
+		 <sql splitStatements="false">
+		 	CREATE TRIGGER global_user_insert_update
+			  AFTER INSERT OR UPDATE
+			  ON public.user_account
+			  FOR EACH ROW
+			  EXECUTE PROCEDURE public.global_user_trigger();
+	
+		 </sql>
     </changeSet>
 <!-- Oracle database specific sequnces, triggers, packages -->   
 <!-- TRIGGERS -->
