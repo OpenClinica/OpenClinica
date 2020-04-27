@@ -284,12 +284,7 @@ public class StudyEventServiceImpl implements StudyEventService {
             studyEvent.setStatus(Status.AVAILABLE);
             studyEvent.setStudySubjectId(studySubject.getId());
             studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
-
-            studySubject = unsignSignedParticipant(studySubject);
-            studySubject.setUpdater(ub);
-            sdao.update(studySubject);
             studyEvent.setSampleOrdinal(sampleOrdinal);
-
             studyEvent = (StudyEventBean) sed.create(studyEvent);
 
             if (!studyEvent.isActive()) {
@@ -494,11 +489,7 @@ public class StudyEventServiceImpl implements StudyEventService {
             studyEvent.setStatus(Status.AVAILABLE);
             studyEvent.setStudySubjectId(studySubject.getId());
             studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
-
-            studySubject = unsignSignedParticipant(studySubject);
-            sdao.update(studySubject);
             studyEvent.setSampleOrdinal(sampleOrdinal);
-
             studyEvent = (StudyEventBean) sed.create(studyEvent);
 
             if (!studyEvent.isActive()) {
@@ -562,13 +553,6 @@ public class StudyEventServiceImpl implements StudyEventService {
         return true;
     }
 
-    private StudySubjectBean unsignSignedParticipant(StudySubjectBean studySubject) {
-        Status subjectStatus = studySubject.getStatus();
-        if (subjectStatus.equals(Status.SIGNED)) {
-            studySubject.setStatus(Status.AVAILABLE);
-        }
-        return studySubject;
-    }
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
