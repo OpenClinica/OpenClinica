@@ -1517,18 +1517,24 @@ public class SDVUtil {
                             responseType == 6 || // single-select
                             responseType == 7    // multi-select
                         ) {
+                            String display = "";
                             String[] optionsText = responseSet.getOptionsText().split(",");
                             String[] optionsValues = responseSet.getOptionsValues().split(",");
-                            String[] values = itemData.getValue().split(",");
-                            String display = "";
-                            for (String value: values) {
-                                int valueIndex = ArrayUtils.indexOf(optionsValues, value);
-                                String text = optionsText[valueIndex];
-                                if (!display.isEmpty()) {
-                                    display += ", ";
+                            String itemValue = itemData.getValue();
+                            if (itemValue != null && !itemValue.isEmpty()) {
+                                String[] values = itemValue.split(",");
+                                for (String value: values) {
+                                    int valueIndex = ArrayUtils.indexOf(optionsValues, value);
+                                    String text = valueIndex > -1 ? optionsText[valueIndex] : value;
+                                    if (!display.isEmpty()) {
+                                        display += ", ";
+                                    }
+                                    display += text;    
                                 }
-                                display += text;
                             }
+                            logger.debug("ItemData " + itemData.getItemDataId() + " lookup value: " + itemValue +
+                                    "; optionsText: " + responseSet.getOptionsText() + "; optionsValues: " + responseSet.getOptionsValues() +
+                                    "; result: " + display);
                             sdvItemDTO.setValue(display);
                         }
                         else {
