@@ -125,7 +125,7 @@ public class ImportServiceImpl implements ImportService {
     public static final String UNDERSCORE = "_";
     public static final String INITIAL_DATA_ENTRY = "initial data entry";
     public static final String DATA_ENTRY_COMPLETE = "data entry complete";
-    public static final String COMPLETED = "completed";
+    public static final String COMPLETE = "complete";
     public static final String DATA_ENTRY_STARTED = "data entry started";
 
     public static final String FAILED = "Failed";
@@ -352,7 +352,7 @@ public class ImportServiceImpl implements ImportService {
                             updateEventAndSubjectStatusIfSigned(studyEvent, studySubject, userAccount);
                         }
 
-                        if ((formDataBean.getEventCRFStatus().equals(COMPLETED) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE))) {
+                        if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE))) {
                             if (itemCountInForm.getInsertedUpdatedSkippedItemCountInForm() == itemCountInForm.getItemCountInFormData()) {
                                 // update eventcrf status into Complete\
                                 eventCrf = updateEventCrf(eventCrf, userAccount, EventCrfWorkflowStatusEnum.COMPLETED, new Date());
@@ -1547,7 +1547,7 @@ public class ImportServiceImpl implements ImportService {
         // Form Status is not acceptable
         if (!formDataBean.getEventCRFStatus().equalsIgnoreCase(INITIAL_DATA_ENTRY) &&
                 !formDataBean.getEventCRFStatus().equalsIgnoreCase(DATA_ENTRY_COMPLETE) &&
-                !formDataBean.getEventCRFStatus().equalsIgnoreCase(COMPLETED)) {
+                !formDataBean.getEventCRFStatus().equalsIgnoreCase(COMPLETE)) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
         }
 
