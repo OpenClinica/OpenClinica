@@ -17,14 +17,6 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.job.AutowiringSpringBeanJobFactory;
-import core.org.akaza.openclinica.job.JobExecutionExceptionListener;
-import core.org.akaza.openclinica.job.JobTriggerListener;
-import core.org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
-import org.akaza.openclinica.config.StudyParamNames;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.controller.KeycloakController;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.EventCRFLocker;
 import core.org.akaza.openclinica.core.SessionManager;
@@ -36,40 +28,37 @@ import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.*;
-import core.org.akaza.openclinica.dao.service.StudyConfigService;
-import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
-import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import core.org.akaza.openclinica.web.InconsistentStateException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.controller.KeycloakController;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
-import core.org.akaza.openclinica.web.InconsistentStateException;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import core.org.akaza.openclinica.web.SQLInitServlet;
-import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.apache.commons.lang.StringUtils;
-import org.quartz.*;
+import org.quartz.JobKey;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -77,7 +66,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -100,11 +88,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
-
 /**
  * This class enhances the Controller in several ways.
- * <p>
  * <ol>
  * <li>The method mayProceed, for which the class is named, is declared abstract and is called before processRequest.
  * This
@@ -118,33 +103,27 @@ import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenant
  * be redirected in order to be informed that he has insufficient permission, and the process method enforces this
  * redirection
  * by catching an InsufficientPermissionException object.
- * <p>
  * <li>Four new members, session, request, response, and the UserAccountBean object ub have been declared protected, and
  * are
  * set in the process method. This allows developers to avoid passing these objects between methods, and moreover it
  * accurately encodes the fact that these objects represent the state of the servlet.
- * <p>
  * <br/>
  * In particular, please note that it is no longer necessary to generate a bean for the session manager, the current
  * user or
  * the current study.
- * <p>
  * <li>The method processRequest has been declared abstract. This change is unlikely to affect most code, since by
  * custom
  * processRequest is declared in each subclass anyway.
- * <p>
  * <li>The standard try-catch block within most processRequest methods has been included in the process method, which
  * calls
  * the processRequest method. Therefore, subclasses may throw an Exception in the processRequest method without having
  * to
  * handle it.
- * <p>
  * <li>The addPageMessage method has been declared to streamline the process of setting page-level messages. The
  * accompanying
  * showPageMessages.jsp file in jsp/include/ automatically displays all of the page messages; the developer need only
  * include
  * this file in the jsp.
- * <p>
  * <li>The addEntityList method makes it easy to add a Collection of EntityBeans to the request. Note that this method
  * should
  * only be used for Collections from which one EntityBean must be selected by the user. If the Collection is empty, this
@@ -1586,75 +1565,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
 
         return subjectCount;
-    }
-
-    public Scheduler getSchemaScheduler(HttpServletRequest request, ApplicationContext context, Scheduler jobScheduler) {
-        if (request.getAttribute(CURRENT_TENANT_ID) != null) {
-            String schema = (String) request.getAttribute(CURRENT_TENANT_ID);
-            if (StringUtils.isNotEmpty(schema) &&
-                    (schema.equalsIgnoreCase("public") != true)) {
-                try {
-                    jobScheduler = (Scheduler) context.getBean(schema);
-                    logger.debug("Existing schema scheduler found:" + schema);
-                } catch (NoSuchBeanDefinitionException e) {
-                    createSchedulerFactoryBean(context, schema);
-                    try {
-                        jobScheduler = (Scheduler) context.getBean(schema);
-                    } catch (BeansException e1) {
-                        logger.error("Bean for scheduler is not able to accessed after creating scheduled factory bean: ", e1);
-
-                    }
-                } catch (BeansException e) {
-                    logger.error("Bean for scheduler is not able to accessed: ", e);
-
-                }
-            }
-        }
-        return jobScheduler;
-    }
-
-    public void createSchedulerFactoryBean(ApplicationContext context, String schema) {
-        logger.debug("Creating a new schema scheduler:" + schema);
-        OpenClinicaSchedulerFactoryBean sFBean = new OpenClinicaSchedulerFactoryBean();
-        sFBean.setSchedulerName(schema);
-        Properties properties = new Properties();
-        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
-        jobFactory.setApplicationContext(context);
-        sFBean.setJobFactory(jobFactory);
-        sFBean.setDataSource((DataSource) context.getBean("dataSource"));
-        sFBean.setTransactionManager((PlatformTransactionManager) context.getBean("transactionManager"));
-        sFBean.setApplicationContext(context);
-        sFBean.setApplicationContextSchedulerContextKey("applicationContext");
-        sFBean.setGlobalJobListeners(new JobExecutionExceptionListener());
-        sFBean.setGlobalTriggerListeners(new JobTriggerListener());
-
-        // use global Quartz properties
-        properties.setProperty("org.quartz.jobStore.misfireThreshold",
-                CoreResources.getField("org.quartz.jobStore.misfireThreshold"));
-        properties.setProperty("org.quartz.jobStore.class",
-                CoreResources.getField("org.quartz.jobStore.class"));
-        properties.setProperty("org.quartz.jobStore.driverDelegateClass",
-                CoreResources.getField("org.quartz.jobStore.driverDelegateClass"));
-        properties.setProperty("org.quartz.jobStore.useProperties",
-                CoreResources.getField("org.quartz.jobStore.useProperties"));
-        properties.setProperty("org.quartz.jobStore.tablePrefix", schema + "." +
-                CoreResources.getField("org.quartz.jobStore.tablePrefix"));
-        properties.setProperty("org.quartz.threadPool.class",
-                CoreResources.getField("org.quartz.threadPool.class"));
-        properties.setProperty("org.quartz.threadPool.threadCount",
-                CoreResources.getField("org.quartz.threadPool.threadCount"));
-        properties.setProperty("org.quartz.threadPool.threadPriority",
-                CoreResources.getField("org.quartz.threadPool.threadPriority"));
-        sFBean.setQuartzProperties(properties);
-        try {
-            sFBean.afterPropertiesSet();
-        } catch (Exception e) {
-            logger.error("Error creating the scheduler bean:" + schema, e.getMessage(), e);
-            return;
-        }
-        sFBean.start();
-        ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
-        beanFactory.registerSingleton(schema, sFBean);
     }
 
     protected StudyBuildService getStudyBuildService() {

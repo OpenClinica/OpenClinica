@@ -1,13 +1,9 @@
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.*;
-import org.quartz.impl.StdScheduler;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -18,28 +14,7 @@ import org.springframework.context.ApplicationContext;
  * for other things.
  * @author Tom Hickerson, 2009
  */
-public class PauseJobServlet extends SecureController {
-
-    private static String groupImportName = "importTrigger";
-
-    @Override
-    protected void mayProceed() throws InsufficientPermissionException {
-        // TODO copied from CreateJobExport - DRY? tbh
-        if (ub.isSysAdmin() || ub.isTechAdmin()) {
-            return;
-        }
-
-        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
-        // above copied from create dataset servlet, needs to be changed to
-        // allow only admin-level users
-
-    }
-
-    private StdScheduler getScheduler() {
-        scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(context).getBean(SCHEDULER);
-        return scheduler;
-    }// also perhaps DRY, tbh
+public class PauseJobServlet extends ScheduleJobServlet {
 
     @Override
     protected void processRequest() throws Exception {
@@ -51,18 +26,17 @@ public class PauseJobServlet extends SecureController {
         if ("".equals(gName) || "0".equals(gName)) {
             finalGroupName = XsltTriggerService.TRIGGER_GROUP_NAME;
         } else {// should equal 1
-            finalGroupName = groupImportName;
+            finalGroupName = TRIGGER_IMPORT_GROUP;
         }
         String deleteMe = fp.getString("del");
         ApplicationContext context = null;
         scheduler = getScheduler();
-        Scheduler jobScheduler;
         try {
             context = (ApplicationContext) scheduler.getContext().get("applicationContext");
         } catch (SchedulerException e) {
             logger.error("Error in receiving application context: ", e);
         }
-        jobScheduler = getSchemaScheduler(request, context, scheduler);
+        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
         Trigger trigger = jobScheduler.getTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
         try {
             if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {

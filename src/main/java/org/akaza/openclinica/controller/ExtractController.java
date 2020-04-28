@@ -188,7 +188,6 @@ public class ExtractController {
         List<String> permissionTagsList =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
         ODMFilterDTO odmFilter = new ODMFilterDTO();
 
-
         try {
             jobScheduler.getContext().put("permissionTagsString",permissionTagsString);
             jobScheduler.getContext().put("permissionTagsStringArray",permissionTagsStringArray);
@@ -197,8 +196,6 @@ public class ExtractController {
         } catch (SchedulerException e) {
             logger.error("Error in setting the permissions: ",e);
         }
-
-
 
         ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
         archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());

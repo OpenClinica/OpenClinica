@@ -48,7 +48,4 @@
 </c:import>
 
 <br><br>
-<input type="button" onclick="confirmExit('ViewAllJobs');" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>
-
-<br><br>
 <jsp:include page="../include/footer.jsp"/>

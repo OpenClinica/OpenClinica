@@ -4,50 +4,23 @@ import core.org.akaza.openclinica.bean.admin.AuditEventBean;
 import core.org.akaza.openclinica.bean.admin.TriggerBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import core.org.akaza.openclinica.web.bean.AuditEventRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.job.ExampleSpringJob;
-import core.org.akaza.openclinica.service.extract.XsltTriggerService;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.view.Page;
 import org.quartz.*;
-import org.quartz.impl.StdScheduler;
 import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class ViewSingleJobServlet extends SecureController {
-
-    // DRY consolidate from other servlet?
-    private static String TRIGGER_IMPORT_GROUP = "importTrigger";
-
-    @Override
-    protected void mayProceed() throws InsufficientPermissionException {
-        // TODO copied from CreateJobExport - DRY? tbh
-        if (ub.isSysAdmin() || ub.isTechAdmin()) {
-            return;
-        }
-
-        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
-        // above copied from create dataset servlet, needs to be changed to
-        // allow only admin-level users
-
-    }
-
-    private StdScheduler getScheduler() {
-        scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(context).getBean(SCHEDULER);
-        return scheduler;
-    }
+public class ViewSingleJobServlet extends ScheduleJobServlet {
 
     @Override
     protected void processRequest() throws Exception {
@@ -64,13 +37,12 @@ public class ViewSingleJobServlet extends SecureController {
         // << tbh 09/03/2009 #4143
         ApplicationContext context = null;
         scheduler = getScheduler();
-        Scheduler jobScheduler;
         try {
             context = (ApplicationContext) scheduler.getContext().get("applicationContext");
         } catch (SchedulerException e) {
             logger.error("Error in receiving application context: ", e);
         }
-        jobScheduler = getSchemaScheduler(request, context, scheduler);
+        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
         Trigger trigger = jobScheduler.getTrigger(new TriggerKey(triggerName, groupName));
 
         // trigger bean is a wrapper for the trigger, to serve as a link btw

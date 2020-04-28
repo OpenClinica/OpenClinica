@@ -1,85 +1,36 @@
 package org.akaza.openclinica.control.admin;
 
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Calendar;
-
-import javax.servlet.http.HttpServletRequest;
-
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
-import core.org.akaza.openclinica.service.PermissionService;
-import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import core.org.akaza.openclinica.service.extract.ExtractUtils;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
-import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.job.ExampleSpringJob;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.view.Page;
 import org.quartz.*;
-import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
-public class UpdateJobExportServlet extends SecureController {
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.*;
 
-    private static String SCHEDULER = "schedulerFactoryBean";
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 
-    private SimpleTrigger trigger;
-    private JobDataMap dataMap;
-    public static final String PERIOD = "periodToRun";
-    public static final String FORMAT_ID = "formatId";
-    public static final String DATASET_ID = "dsId";
-    public static final String DATE_START_JOB = "job";
-    public static final String EMAIL = "contactEmail";
-    public static final String JOB_NAME = "jobName";
-    public static final String JOB_DESC = "jobDesc";
-    public static final String USER_ID = "user_id";
-    public static final String STUDY_NAME = "study_name";
-    public static final String TRIGGER_GROUP_JOB = "XsltTriggersExportJobs";
-    private PermissionService permissionService;
-
-    @Override
-    protected void mayProceed() throws InsufficientPermissionException {
-
-        if (ub.isSysAdmin() || ub.isTechAdmin()) {
-            return;
-        }
-
-        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
-        // above copied from create dataset servlet, needs to be changed to
-        // allow only admin-level users
-    }
-
-    private StdScheduler getScheduler() {
-        scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(context).getBean(SCHEDULER);
-        return scheduler;
-    }
-
-    private PermissionService getPermissionService() {
-        return permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
-    }
+public class UpdateJobExportServlet extends ScheduleJobServlet {
 
     private void setUpServlet(Trigger trigger) {
         FormProcessor fp2 = new FormProcessor(request);
@@ -89,13 +40,12 @@ public class UpdateJobExportServlet extends SecureController {
 
         // TODO will have to dress this up to allow for sites then datasets
         request.setAttribute("datasets", dsList);
-        request.setAttribute(CreateJobExportServlet.JOB_NAME, trigger.getKey().getName());
-        request.setAttribute(CreateJobExportServlet.JOB_DESC, trigger.getDescription());
+        request.setAttribute(JOB_NAME, trigger.getKey().getName());
+        request.setAttribute(JOB_DESC, trigger.getDescription());
 
-        dataMap = trigger.getJobDataMap();
+        JobDataMap dataMap = trigger.getJobDataMap();
         String contactEmail = dataMap.getString(ExampleSpringJob.EMAIL);
         int dsId = dataMap.getInt(XsltTriggerService.DATASET_ID);
-        int userId = dataMap.getInt(XsltTriggerService.USER_ID);
         String period = dataMap.getString(XsltTriggerService.PERIOD);
         int exportFormatId = dataMap.getInt(XsltTriggerService.EXPORT_FORMAT_ID);
 
@@ -106,24 +56,16 @@ public class UpdateJobExportServlet extends SecureController {
         request.setAttribute(DATASET_ID, dsId);
         request.setAttribute("extractProperties", CoreResources.getExtractProperties());
 
-        // DatasetBean dataset = (DatasetBean)dsdao.findByPK(dsId);
-        // >> tbh 5639: collate the correct study id
-        // request.setAttribute("study_id", dataset.getStudyId());
         Date jobDate = trigger.getNextFireTime();
         HashMap presetValues = new HashMap();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(jobDate);
-        presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
-        presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
-        presetValues.put(CreateJobExportServlet.DATE_START_JOB + "Date", local_df.format(jobDate));
-        // (calendar.get(Calendar.MONTH) + 1) + "/" +
-        // calendar.get(Calendar.DATE) + "/"
-        // + calendar.get(Calendar.YEAR));
+        presetValues.put(DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
+        presetValues.put(DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
+        presetValues.put(DATE_START_JOB + "Date", local_df.format(jobDate));
         fp2.setPresetValues(presetValues);
         setPresetValues(fp2.getPresetValues());
-        // request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB +
-        // "Date"));
-        // EMAIL, TAB, CDISC, SPSS, PERIOD, DATE_START_JOB
+
         // TODO pick out the datasets and the date
     }
 
@@ -213,16 +155,15 @@ public class UpdateJobExportServlet extends SecureController {
                     epBean.setPostProcLocation(prePocLoc);
                 }
                 extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
-                SimpleTrigger trigger;
                 String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
                 String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
-                List<String> permissionTagsList = permissionService.getPermissionTagsList((Study) request.getSession().getAttribute("study"), request);
+//                List<String> permissionTagsList = permissionService.getPermissionTagsList((Study) request.getSession().getAttribute("study"), request);
                 ODMFilterDTO odmFilter = new ODMFilterDTO();
 
                 try {
                     jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
                     jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
-                    jobScheduler.getContext().put("permissionTagsList", permissionTagsList);
+//                    jobScheduler.getContext().put("permissionTagsList", permissionTagsList);
                     jobScheduler.getContext().put("odmFilter", odmFilter);
                 } catch (SchedulerException e) {
                     logger.error("Error in setting the permissions: ", e);
@@ -239,7 +180,7 @@ public class UpdateJobExportServlet extends SecureController {
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 
-                trigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
+                SimpleTrigger trigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                         generalFileDir, // xml_file_path
                         endFilePath + File.separator,
                         exportFileName,
@@ -249,7 +190,7 @@ public class UpdateJobExportServlet extends SecureController {
                         LocaleResolver.getLocale(request).getLanguage(),
                         cnt,
                         SQLInitServlet.getField("filePath") + "xslt",
-                        TRIGGER_GROUP_JOB,
+                        xsltService.getTriggerGroupNameForExportJobs(),
                         currentPublicStudy,
                         currentStudy, archivedDatasetFileBean);
 
@@ -292,36 +233,5 @@ public class UpdateJobExportServlet extends SecureController {
                 }
             }
         }
-    }
-
-    public HashMap validateForm(FormProcessor fp, HttpServletRequest request, TriggerKey[] triggerKeys, String properName) {
-        Validator v = new Validator(request);
-        v.addValidation(JOB_NAME, Validator.NO_BLANKS);
-        v.addValidation(JOB_NAME, Validator.NO_LEADING_OR_TRAILING_SPACES);
-        // need to be unique too
-        v.addValidation(JOB_DESC, Validator.NO_BLANKS);
-        v.addValidation(EMAIL, Validator.IS_A_EMAIL);
-        v.addValidation(PERIOD, Validator.NO_BLANKS);
-        v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
-        // v.addValidation(DATE_START_JOB + "Date", new Date(), Validator.DATE_IS_AFTER_OR_EQUAL);
-        // TODO job names will have to be unique, tbh
-
-        int formatId = fp.getInt(FORMAT_ID);
-        Date jobDate = fp.getDateTime(DATE_START_JOB);
-        HashMap errors = v.validate();
-        if (formatId == 0) {
-            // throw an error here, at least one should work
-            // errors.put(TAB, "Error Message - Pick one of the below");
-            v.addError(errors, FORMAT_ID, "Please pick at least one.");
-        }
-        for (TriggerKey triggerKey : triggerKeys) {
-            if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && !triggerKey.getName().equals(properName)) {
-                v.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
-            }
-        }
-        if (jobDate.before(new Date())) {
-            v.addError(errors, DATE_START_JOB + "Date", "This date needs to be later than the present time.");
-        }
-        return errors;
     }
 }
