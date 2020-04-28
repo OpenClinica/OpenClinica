@@ -165,7 +165,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
 
                         if (studyBean.getStudy() == null || studyBean.getStudy().getStudyId() == 0 || (studyBean.getStudy().getStudyId() != 0 && !edc.isHideCrf())) {
-                            if (sed.getType().equals(COMMON) && !sub.getStatus().equals("removed")) {
+                            if (sed.getType().equals(COMMON) && !sed.getStatus().equals(core.org.akaza.openclinica.bean.core.Status.DELETED) && !sub.getStatus().equals("removed")) {
                                 if (sed.isRepeating() || (!sed.isRepeating() && validateAddNewForNonRepeating(sub, crf, sed))) {
                                     xml.append(indent + indent + indent + indent + "<OpenClinica:Link rel=\"common-add-new\" tag=\""
                                             + StringEscapeUtils.escapeXml(sed.getOid() + "." + crf.getOid()) + "\"" + " href=\"/pages/api/addAnotherForm?studyoid="
