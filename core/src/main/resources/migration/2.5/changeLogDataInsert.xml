@@ -1173,5 +1173,17 @@
 	    <column name="definition"/>
 	    <column name="reference"/>
 	</insert>
-   </changeSet>  
+   </changeSet>
+    <changeSet author="pgawade (generated)" id="1235684743487-358">
+	<insert tableName="audit_log_event_type">
+	    <column name="audit_log_event_type_id" valueNumeric="42"/>
+	    <column name="name" value="User created"/>
+	</insert>
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="1235684743487-359">
+	<insert tableName="audit_log_event_type">
+	    <column name="audit_log_event_type_id" valueNumeric="43"/>
+	    <column name="name" value="User status changed"/>
+	</insert>
+    </changeSet>  
 </databaseChangeLog>

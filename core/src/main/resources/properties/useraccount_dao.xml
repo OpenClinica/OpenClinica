@@ -52,7 +52,7 @@
 	</query>
 	<query>
 		<name>delete</name>
-		<sql>update user_account set status_id = 5, enabled = FALSE, update_id=? where user_id = ?</sql>
+		<sql>update user_account set status_id = 5, enabled = FALSE, update_id=? ,date_updated=now() where user_id = ?</sql>
 	</query>
 	<query>
 		<name>deleteStudyUserRolesByUserID</name>

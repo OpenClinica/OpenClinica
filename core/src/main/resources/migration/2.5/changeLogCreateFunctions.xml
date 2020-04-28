@@ -514,6 +514,62 @@
   		  EXECUTE PROCEDURE repeating_item_data_trigger();
 	 </sql>
     </changeSet>
+   
+    <changeSet author="pgawade (generated)" id="1235684743487-372">
+    	<preConditions onFail="MARK_RAN">
+    		<dbms type="postgresql" />
+    		<!--<runningAs username="clinica" />-->
+		</preConditions>
+    	<sql splitStatements="false">
+    		CREATE OR REPLACE FUNCTION global_user_trigger() RETURNS "trigger"
+			    AS 'DECLARE
+				pk INTEGER;
+				entity_name_value TEXT;
+			
+				BEGIN
+					IF (TG_OP = ''INSERT'') THEN
+						/*---------------*/
+						 /*User created*/
+						SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+						INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id)
+							VALUES (pk, ''42'', now(), NEW.owner_id, ''user_account'', NEW.user_id);
+						RETURN NULL; /*return values ignored for ''after'' triggers*/
+						/*---------------*/
+					ELSIF (TG_OP = ''UPDATE'') THEN
+						IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN
+						/*---------------*/
+						 /*User status changed*/
+						SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+						SELECT INTO entity_name_value ''Status'';
+						INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+							VALUES (pk, ''43'', now(), NEW.update_id, ''user_account'', NEW.user_id, entity_name_value, OLD.status_id, NEW.status_id);
+						/*---------------*/
+						END IF;
+				
+						
+						
+					RETURN NULL;  /*return values ignored for ''after'' triggers*/
+					END IF;
+				END;
+				'
+				
+			  LANGUAGE plpgsql;
+    	</sql>
+    </changeSet>
+     <changeSet author="pgawade (generated)" id="1235684743487-375">
+    	<preConditions onFail="MARK_RAN">
+		 	<dbms type="postgresql" />
+			<!--<runningAs username="clinica" />-->
+		</preConditions>     
+		 <sql splitStatements="false">
+		 	CREATE TRIGGER global_user_insert_update
+			  AFTER INSERT OR UPDATE
+			  ON public.user_account
+			  FOR EACH ROW
+			  EXECUTE PROCEDURE public.global_user_trigger();
+	
+		 </sql>
+    </changeSet>
 <!-- Oracle database specific sequnces, triggers, packages -->   
 <!-- TRIGGERS -->
 	<changeSet author="pgawade (generated)" id="1235684743487-93">
