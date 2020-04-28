@@ -2325,6 +2325,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             errors.add(resPageMsg.getString("section_label_length_error"));
                         }
 
+                        //OC-716 possible solution
+                        if(secLabel.contains("'")){
+                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SECTION_LABEL_column")
+                                    + " value " + secLabel + " has an invalid character "+ "\" ' \""+". Please remove invalid character and try upload again.");
+                        }
+
                         if (secNames.contains(secLabel)) {
                             // errors.add("The SECTION_LABEL column was a
                             // duplicate of " + secLabel + " at row " + k
