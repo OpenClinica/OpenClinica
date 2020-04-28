@@ -1548,6 +1548,8 @@ function moveObject( obj, e ) {
     var offsety = 10;
     var objHolder = obj;
 
+	hideObjects( obj );
+
     // step 2
     obj = getObject( obj );
     if (obj==null) return;
@@ -1588,6 +1590,26 @@ function displayObject( obj, show ) {
     // step 2
     obj.style.display = show ? 'block' : 'none';
     obj.style.visibility = show ? 'visible' : 'hidden';
+}
+
+var prevObject = null;
+function hideObjects( obj ) {
+	    // hide others object when opening new one(OC-12668)
+        if ( prevObject == null ) {
+            prevObject = obj;
+        } else {
+                getObject( prevObject ).querySelector( 'a' ).click();
+                // make sure the options show up correctly
+                setTimeout(()=> {
+                    const menuOn = getObject( obj.replace('Lock', 'Menu_on').replace('Event', 'Menu_on') );
+                    const menuOff = getObject( obj.replace('Lock', 'Menu_off').replace('Event', 'Menu_off') );
+                    if ( menuOn && menuOn.style.display === "none" ) {
+                        menuOn.style.display =  "";
+                        menuOff.style.display = "none";
+                    }
+                }, 10);
+            prevObject = obj;
+        }
 }
 
 function createRequestObject(){

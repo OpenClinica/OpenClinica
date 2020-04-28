@@ -679,7 +679,7 @@ public class EventCrfLayerBuilder {
         builder.a().href(href1 + href2);
         builder.onclick(onmouseover + onClick1 + onClick2 + onClick3 + onClick4);
         builder.close();
-        builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("144").close().aEnd();
+        builder.img().src("images/spacer.gif").border("0").append("height=\"30\"").width("inherit").close().aEnd(); // reduce the width to make sure it doesn't overlap other icon
 
     }
 
