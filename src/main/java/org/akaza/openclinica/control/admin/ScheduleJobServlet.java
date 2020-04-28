@@ -31,7 +31,7 @@ import java.util.Properties;
 
 import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
-public class ScheduleJobServlet extends SecureController {
+public abstract class ScheduleJobServlet extends SecureController {
     protected static final String PERIOD = "periodToRun";
     protected static final String FORMAT_ID = "formatId";
     protected static final String DATASET_ID = "dsId";
@@ -42,6 +42,9 @@ public class ScheduleJobServlet extends SecureController {
     protected static final String USER_ID = "user_id";
     protected static String TRIGGER_IMPORT_GROUP = "importTrigger";
     protected PermissionService permissionService;
+
+    @Override
+    protected abstract void processRequest() throws Exception;
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
@@ -60,10 +63,6 @@ public class ScheduleJobServlet extends SecureController {
 
     protected PermissionService getPermissionService() {
         return permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
-    }
-
-    @Override
-    protected void processRequest() throws Exception {
     }
 
     public Scheduler getSchemaScheduler(HttpServletRequest request, ApplicationContext context, Scheduler jobScheduler) {
