@@ -106,6 +106,13 @@ public class DownloadAttachedFileServlet extends SecureController {
         File file = new File(filePathName);
         if (!file.exists() || file.length() <= 0) {
             addPageMessage("File " + filePathName + " " + respage.getString("not_exist"));
+            
+            // try to use the passed in the existing file
+        	file = new File(fileName);
+        }
+        
+        if (!file.exists() || file.length() <= 0) {
+            addPageMessage("File " + filePathName + " " + respage.getString("not_exist"));
         } else {
 //            response.setContentType("application/octet-stream");
             response.setHeader("Content-disposition", "attachment; filename=\"" + fileName + "\";");
