@@ -145,7 +145,6 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
                 String endFilePath = epBean.getFileLocation();
                 endFilePath = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
-                //  exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
                 if (epBean.getPostProcExportName() != null) {
                     String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, sdfDir, datasetFilePath);
                     epBean.setPostProcExportName(preProcExportPathName);
@@ -157,13 +156,11 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
                 String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
                 String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
-//                List<String> permissionTagsList = permissionService.getPermissionTagsList((Study) request.getSession().getAttribute("study"), request);
                 ODMFilterDTO odmFilter = new ODMFilterDTO();
 
                 try {
                     jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
                     jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
-//                    jobScheduler.getContext().put("permissionTagsList", permissionTagsList);
                     jobScheduler.getContext().put("odmFilter", odmFilter);
                 } catch (SchedulerException e) {
                     logger.error("Error in setting the permissions: ", e);
