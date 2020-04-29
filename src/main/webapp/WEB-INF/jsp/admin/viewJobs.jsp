@@ -4,6 +4,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 
 
 <jsp:include page="../include/admin-header.jsp"/>
@@ -13,38 +14,30 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
+        <fmt:message key="instructions" bundle="${resword}"/>
+        <div class="sidebar_tab_content"></div>
+    </td>
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
 
-		<fmt:message key="instructions" bundle="${resword}"/>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
-
-		</div>
-
-		</td>
-
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
-
-		<fmt:message key="instructions" bundle="${resword}"/>
-
-		</td>
-  </tr>
+    </td>
+</tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
 <h1><span class="title_manage"><fmt:message key="scheduled_export_data_jobs" bundle="${resword}"/><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/brief-overview/jobs#content-title-4363')"><span class="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
-<div class="homebox_bullets"><a href="CreateJobExport">Create a new Export Data Job</a></div>
-<%-- <div class="homebox_bullets"><a href="CreateJobImport">Create a new Import Data Job</a></div> --%>
+<div class="homebox_bullets"><a href="CreateJobExport">Create New Scheduled Extract</a></div>
+
 <p></p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />
@@ -55,8 +48,4 @@
 </c:import>
 
 <br><br>
-<input type="button" onclick="confirmExit('ViewAllJobs');" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>
-
-<br><br>
-
 <jsp:include page="../include/footer.jsp"/>

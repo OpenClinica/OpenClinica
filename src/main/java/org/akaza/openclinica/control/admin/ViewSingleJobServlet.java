@@ -4,61 +4,23 @@ import core.org.akaza.openclinica.bean.admin.AuditEventBean;
 import core.org.akaza.openclinica.bean.admin.TriggerBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import core.org.akaza.openclinica.web.bean.AuditEventRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.job.ExampleSpringJob;
-import core.org.akaza.openclinica.service.extract.XsltTriggerService;
-import org.quartz.JobDataMap;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
-import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.view.Page;
+import org.quartz.*;
+import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class ViewSingleJobServlet extends SecureController {
-
-    // DRY consolidate from other servlet?
-    private static String TRIGGER_GROUP = "DEFAULT";
-    private static String TRIGGER_IMPORT_GROUP = "importTrigger";
-    private static String SCHEDULER = "schedulerFactoryBean";
-    private static String EXPORT_TRIGGER = "exportTrigger";
-
-    private SchedulerFactoryBean schedulerFactoryBean;
-    private StdScheduler scheduler;
-
-    @Override
-    protected void mayProceed() throws InsufficientPermissionException {
-        // TODO copied from CreateJobExport - DRY? tbh
-        if (ub.isSysAdmin() || ub.isTechAdmin()) {
-            return;
-        }
-//        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {// ?
-//             ?
-//            return;
-//        }
-
-        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
-        // above copied from create dataset servlet, needs to be changed to
-        // allow only admin-level users
-
-    }
-
-    private StdScheduler getScheduler() {
-        scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(context).getBean(SCHEDULER);
-        return scheduler;
-    }
+public class ViewSingleJobServlet extends ScheduleJobServlet {
 
     @Override
     protected void processRequest() throws Exception {
@@ -73,8 +35,15 @@ public class ViewSingleJobServlet extends SecureController {
             groupName = TRIGGER_IMPORT_GROUP;
         }
         // << tbh 09/03/2009 #4143
+        ApplicationContext context = null;
         scheduler = getScheduler();
-        Trigger trigger = scheduler.getTrigger(new TriggerKey(triggerName, groupName));
+        try {
+            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
+        } catch (SchedulerException e) {
+            logger.error("Error in receiving application context: ", e);
+        }
+        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        Trigger trigger = jobScheduler.getTrigger(new TriggerKey(triggerName, groupName));
 
         // trigger bean is a wrapper for the trigger, to serve as a link btw
         // quartz classes and oc classes
@@ -82,14 +51,14 @@ public class ViewSingleJobServlet extends SecureController {
 
         if (trigger == null) {
             groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
-            trigger = scheduler.getTrigger(new TriggerKey(triggerName.trim(), groupName));
+            trigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), groupName));
         }
         // << tbh 09/03/2009 #4143
         // above is a hack, if we add more trigger groups this will have
         // to be redone
         logger.debug("found trigger name: " + triggerName);
         logger.debug("found group name: " + groupName);
-          TriggerBean triggerBean = new TriggerBean();
+        TriggerBean triggerBean = new TriggerBean();
         JobDataMap dataMap = new JobDataMap();
         AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource(), getStudyDao());
 
@@ -98,7 +67,7 @@ public class ViewSingleJobServlet extends SecureController {
             triggerBean.setPreviousDate(trigger.getPreviousFireTime());
             triggerBean.setNextDate(trigger.getNextFireTime());
             // >> set active here, tbh 10/08/2009
-            if (scheduler.getTriggerState(new TriggerKey(triggerName, groupName)) == Trigger.TriggerState.PAUSED) {
+            if (jobScheduler.getTriggerState(new TriggerKey(triggerName, groupName)) == Trigger.TriggerState.PAUSED) {
                 triggerBean.setActive(false);
                 logger.debug("setting active to false for trigger: " + trigger.getKey().getName());
             } else {
@@ -145,10 +114,10 @@ public class ViewSingleJobServlet extends SecureController {
                 ArrayList allRows = AuditEventRow.generateRowsFromBeans(triggerLogs);
 
                 EntityBeanTable table = fp.getEntityBeanTable();
-                String[] columns = { resword.getString("date_and_time"), resword.getString("action_message"), resword.getString("entity_operation"),
-                // resword.getString("study_site"),
-                    // resword.getString("study_subject_ID"),
-                    resword.getString("changes_and_additions"), resword.getString("actions") };
+                String[] columns = {resword.getString("date_and_time"), resword.getString("action_message"), resword.getString("entity_operation"),
+                        // resword.getString("study_site"),
+                        // resword.getString("study_subject_ID"),
+                        resword.getString("changes_and_additions"), resword.getString("actions")};
 
                 table.setColumns(new ArrayList(Arrays.asList(columns)));
                 table.setAscendingSort(false);

@@ -237,12 +237,6 @@ public class StudyParticipantController {
 
 	}
 
-
-
-
-
-
-
 	@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 	@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 	public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {

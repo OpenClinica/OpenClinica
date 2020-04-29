@@ -124,7 +124,7 @@
    </td>
    <td>
    <form action='CreateJobExport' method="POST">
-    <input type="submit" name="submit" value="<fmt:message key="create_a_new_export_data_job" bundle="${resword}"/>" class="button_long">
+    <input type="submit" name="submit" value="<fmt:message key="create_new_scheduled_extract" bundle="${resword}"/>" class="button_long">
    </form>
    </td>
 <td>

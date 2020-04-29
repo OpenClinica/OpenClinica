@@ -491,6 +491,9 @@
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+                <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
+                    <div class="taskLink"><a href="${urlPrefix}ViewJob"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
+                </c:if>
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
@@ -514,7 +517,7 @@
                 <c:if test="${study.status.available}">
                     <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
                 </c:if>
-                <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_bulk_actions_log" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
         </c:if>
@@ -534,13 +537,16 @@
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available}">
                     <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
-                    <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_bulk_actions_log" bundle="${resword}"/></a></div>
                 </c:if>
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+                <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
+                    <div class="taskLink"><a href="${urlPrefix}ViewJob"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
+                </c:if>
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
@@ -564,7 +570,7 @@
                 <c:if test="${study.status.available}">
                     <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
                 </c:if>
-                <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}Jobs"><fmt:message key="nav_bulk_actions_log" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
             <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
@@ -598,6 +604,9 @@
             <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+                <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
+                    <div class="taskLink"><a href="${urlPrefix}ViewJob"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
+                </c:if>
             </div>
             <div class="taskRightColumn">
                 <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>

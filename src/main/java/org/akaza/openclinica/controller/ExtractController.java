@@ -123,9 +123,8 @@ public class ExtractController {
         // set the job in motion
         String[] files = epBean.getFileName();
         String exportFileName;
-        int fileSize = files.length;
         int  cnt = 0;
-        SimpleTrigger simpleTrigger = null;
+        SimpleTrigger simpleTrigger;
         //TODO: if files and export names size is not same... throw an error
         dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
         String[] exportFiles= epBean.getExportFileName();
@@ -189,7 +188,6 @@ public class ExtractController {
         List<String> permissionTagsList =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
         ODMFilterDTO odmFilter = new ODMFilterDTO();
 
-
         try {
             jobScheduler.getContext().put("permissionTagsString",permissionTagsString);
             jobScheduler.getContext().put("permissionTagsStringArray",permissionTagsStringArray);
@@ -198,8 +196,6 @@ public class ExtractController {
         } catch (SchedulerException e) {
             logger.error("Error in setting the permissions: ",e);
         }
-
-
 
         ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
         archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
@@ -324,6 +320,7 @@ public class ExtractController {
         ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
         beanFactory.registerSingleton(schema, sFBean);
     }
+
     /**
      * @deprecated Use {@link #setAllProps(ExtractPropertyBean,DatasetBean,SimpleDateFormat,ExtractUtils)} instead
      */

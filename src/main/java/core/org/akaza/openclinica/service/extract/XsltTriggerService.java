@@ -17,7 +17,6 @@ import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 public class XsltTriggerService {
 
     public XsltTriggerService() {
-
     }
 
     private static final Logger logger= LoggerFactory.getLogger(XsltTriggerService.class);
@@ -64,13 +63,13 @@ public class XsltTriggerService {
 
         //WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
         ApplicationContext context = null;
+
         try {
             context = (ApplicationContext) scheduler.getContext().get("applicationContext");
         } catch (SchedulerException e) {
             logger.error("Cannot reach applicationContext: ",e);
         }
-        SimpleTriggerFactoryBean triggerFactoryBean = context.getBean(
-                SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath, currentPublicStudy, currentStudy,archivedDatasetFileBean);
+        SimpleTriggerFactoryBean triggerFactoryBean = context.getBean(SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath, currentPublicStudy, currentStudy, archivedDatasetFileBean);
         SimpleTrigger trigger = triggerFactoryBean.getObject();
 
         return trigger;

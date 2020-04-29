@@ -1,101 +1,45 @@
 package org.akaza.openclinica.control.admin;
 
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
+import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import core.org.akaza.openclinica.service.extract.ExtractUtils;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
-import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
-import core.org.akaza.openclinica.web.job.TriggerService;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.view.Page;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.TriggerKey;
-import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+
 /**
- *
  * @author thickerson
- *
  */
-public class CreateJobExportServlet extends SecureController {
-    public static final String PERIOD = "periodToRun";
-    public static final String FORMAT_ID = "formatId";
-    public static final String DATASET_ID = "dsId";
-    public static final String DATE_START_JOB = "job";
-    public static final String EMAIL = "contactEmail";
-    public static final String JOB_NAME = "jobName";
-    public static final String JOB_DESC = "jobDesc";
-    public static final String USER_ID = "user_id";
-    public static final String STUDY_NAME = "study_name";
-
-    private static String SCHEDULER = "schedulerFactoryBean";
-    // faking out DRY - should we create a super class, Job Servlet, which
-    // captures the scheduler?
-    private StdScheduler scheduler;
-
-    // private SimpleTrigger trigger;
-    // private JobDataMap jobDataMap;
-
-    // private FormProcessor fp;
-
-    @Override
-    protected void mayProceed() throws InsufficientPermissionException {
-        if (ub.isSysAdmin() || ub.isTechAdmin()) {
-            return;
-        }
-//        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {// ?
-//            // ?
-//            return;
-//        }
-
-        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
-        // above copied from create dataset servlet, needs to be changed to
-        // allow only admin-level users
-
-    }
-
-    private StdScheduler getScheduler() {
-        scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(context).getBean(SCHEDULER);
-        return scheduler;
-    }
+public class CreateJobExportServlet extends ScheduleJobServlet {
 
     private void setUpServlet() {
 
         // TODO find all the form items and re-populate them if necessary
         FormProcessor fp2 = new FormProcessor(request);
-        // Enumeration enumeration = request.getAttributeNames();
-        // while (enumeration.hasMoreElements()) {
-        // String attrName = (String)enumeration.nextElement();
-        // if (fp.getString(attrName) != null) {
-        // request.setAttribute(attrName, fp.getString(attrName));
-        // }
-        // // possible error with dates? yep
-        // }
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
         Collection dsList = dsdao.findAllOrderByStudyIdAndName();
         // TODO will have to dress this up to allow for sites then datasets
@@ -114,8 +58,6 @@ public class CreateJobExportServlet extends SecureController {
         presetValues.put(DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
         presetValues.put(DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
         presetValues.put(DATE_START_JOB + "Date", local_df.format(jobDate));
-        // (calendar.get(Calendar.MONTH) + 1) + "/" +
-        // calendar.get(Calendar.DATE) + "/" + calendar.get(Calendar.YEAR));
         fp2.setPresetValues(presetValues);
         setPresetValues(fp2.getPresetValues());
         request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB + "Date"));
@@ -128,20 +70,26 @@ public class CreateJobExportServlet extends SecureController {
         // TODO multi stage servlet which will create export jobs
         // will accept, create, and return the ViewJob servlet
         FormProcessor fp = new FormProcessor(request);
-        TriggerService triggerService = new TriggerService();
         scheduler = getScheduler();
+        ApplicationContext context = null;
+        try {
+            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
+        } catch (SchedulerException e) {
+            logger.error("Error in receiving application context: ", e);
+        }
+        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        permissionService = getPermissionService();
         String action = fp.getString("action");
         ExtractUtils extractUtils = new ExtractUtils();
         if (StringUtil.isBlank(action)) {
             // set up list of data sets
             // select by ... active study
             setUpServlet();
-
             forwardPage(Page.CREATE_JOB_EXPORT);
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // collect form information
             XsltTriggerService xsltService = new XsltTriggerService();
-            Set<TriggerKey> triggerKeySet = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltService.getTriggerGroupNameForExportJobs()));
+            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltService.getTriggerGroupNameForExportJobs()));
             TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
             HashMap errors = validateForm(fp, request, triggerKeys, "");
 
@@ -151,99 +99,108 @@ public class CreateJobExportServlet extends SecureController {
                 logger.info("has validation errors in the first section");
                 logger.info("errors found: " + errors.toString());
                 setUpServlet();
-
                 forwardPage(Page.CREATE_JOB_EXPORT);
             } else {
                 logger.info("found no validation errors, continuing");
-
                 DatasetDAO datasetDao = new DatasetDAO(sm.getDataSource());
 
                 UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-                CoreResources cr =  new CoreResources();
+                CoreResources cr = new CoreResources();
                 int datasetId = fp.getInt(DATASET_ID);
                 String period = fp.getString(PERIOD);
                 String email = fp.getString(EMAIL);
                 String jobName = fp.getString(JOB_NAME);
                 String jobDesc = fp.getString(JOB_DESC);
                 Date startDateTime = fp.getDateTime(DATE_START_JOB);
-
                 Integer exportFormatId = fp.getInt(FORMAT_ID);
 
                 ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
-                DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
+                DatasetBean dsBean = (DatasetBean) datasetDao.findByPK(new Integer(datasetId).intValue());
 
                 // set the job in motion
                 String[] files = epBean.getFileName();
-                String exportFileName;
-                int fileSize = files.length;
-                int  cnt = 0;
+                int cnt = 0;
                 dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
-                String[] exportFiles= epBean.getExportFileName();
-                 String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
-                 SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
-                int i =0;
+                String[] exportFiles = epBean.getExportFileName();
+                String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
+                SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
+                int i = 0;
                 String[] temp = new String[exportFiles.length];
                 //JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
-                String datasetFilePath = SQLInitServlet.getField("filePath")+"datasets";
+                String datasetFilePath = SQLInitServlet.getField("filePath") + "datasets";
 
-                while(i<exportFiles.length)
-                {
-                    temp[i] = extractUtils.resolveVars(exportFiles[i],dsBean,sdfDir, datasetFilePath);
+                while (i < exportFiles.length) {
+                    temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, sdfDir, datasetFilePath);
                     i++;
                 }
                 epBean.setDoNotDelFiles(temp);
                 epBean.setExportFileName(temp);
 
                 String generalFileDir = SQLInitServlet.getField("filePath");
-
                 generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
-
-                exportFileName = epBean.getExportFileName()[cnt];
-
+                String exportFileName = epBean.getExportFileName()[cnt];
 
                 // need to set the dataset path here, tbh
                 // next, can already run jobs, translations, and then add a message to be notified later
                 //JN all the properties need to have the variables...
-                String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator +files[cnt];
+                String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
                 String endFilePath = epBean.getFileLocation();
-                endFilePath  =  extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
-              //  exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
-                if(epBean.getPostProcExportName()!=null)
-                {
-                    //String preProcExportPathName = getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
-                    String preProcExportPathName =  extractUtils.resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir, datasetFilePath);
+                endFilePath = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
+                if (epBean.getPostProcExportName() != null) {
+                    String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, sdfDir, datasetFilePath);
                     epBean.setPostProcExportName(preProcExportPathName);
                 }
-                if(epBean.getPostProcLocation()!=null)
-                {
+                if (epBean.getPostProcLocation() != null) {
                     String prePocLoc = extractUtils.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
                     epBean.setPostProcLocation(prePocLoc);
                 }
                 extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
-                SimpleTrigger trigger = null;
+                String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
+                String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
+                ODMFilterDTO odmFilter = new ODMFilterDTO();
 
-                trigger = xsltService.generateXsltTrigger(scheduler, xsltPath,
+
+                try {
+                    jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
+                    jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
+                    jobScheduler.getContext().put("odmFilter", odmFilter);
+                } catch (SchedulerException e) {
+                    logger.error("Error in setting the permissions: ", e);
+                }
+
+                ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
+                archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
+                archivedDatasetFileBean.setFormat(epBean.getFormatDescription());
+                archivedDatasetFileBean.setOwnerId(userBean.getId());
+                archivedDatasetFileBean.setDatasetId(dsBean.getId());
+                archivedDatasetFileBean.setDateCreated(new Date());
+                archivedDatasetFileBean.setExportFormatId(1);
+                archivedDatasetFileBean.setFileReference("");
+                ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
+                archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
+
+                SimpleTrigger trigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                         generalFileDir, // xml_file_path
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, 
-                        userBean, 
+                        epBean,
+                        userBean,
                         LocaleResolver.getLocale(request).getLanguage(),
-                        cnt,  
-                        SQLInitServlet.getField("filePath") + "xslt", 
+                        cnt,
+                        SQLInitServlet.getField("filePath") + "xslt",
                         xsltService.getTriggerGroupNameForExportJobs(),
                         currentPublicStudy,
-                        currentStudy,null);
+                        currentStudy, archivedDatasetFileBean);
 
                 //Updating the original trigger with user given inputs
                 trigger = trigger.getTriggerBuilder()
                         .withIdentity(jobName, xsltService.getTriggerGroupNameForExportJobs())
                         .withSchedule(simpleSchedule().withRepeatCount(64000)
-                        .withIntervalInSeconds(XsltTriggerService.getIntervalTimeInSeconds(period))
-                        .withMisfireHandlingInstructionNextWithExistingCount())
+                                .withIntervalInSeconds(XsltTriggerService.getIntervalTimeInSeconds(period))
+                                .withMisfireHandlingInstructionNextWithExistingCount())
                         .startAt(startDateTime)
-                        .forJob(jobName,xsltService.getTriggerGroupNameForExportJobs())
+                        .forJob(jobName, xsltService.getTriggerGroupNameForExportJobs())
                         .withDescription(jobDesc)
                         .build();
                 trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
@@ -251,23 +208,23 @@ public class CreateJobExportServlet extends SecureController {
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
-				trigger.getJobDataMap().put("job_type", "exportJob");
+                trigger.getJobDataMap().put("job_type", "exportJob");
 
-                JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
-                JobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
-                JobDetailFactoryBean.setName(jobName);
-                JobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
-                JobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
-                JobDetailFactoryBean.setDurability(true); // need durability?
-                JobDetailFactoryBean.afterPropertiesSet();
+                JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
+                jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
+                jobDetailFactoryBean.setName(jobName);
+                jobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
+                jobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
+                jobDetailFactoryBean.setDurability(true); // need durability?
+                jobDetailFactoryBean.afterPropertiesSet();
 
                 // set to the scheduler
                 try {
-                    Date dateStart = scheduler.scheduleJob(JobDetailFactoryBean.getObject(), trigger);
+                    Date dateStart = jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), trigger);
                     logger.info("== found job date: " + dateStart.toString());
                     // set a success message here
                 } catch (SchedulerException se) {
-                    logger.error("Scheduler is not able to schedule the job correctly: ",se);
+                    logger.error("Scheduler is not able to schedule the job correctly: ", se);
                     setUpServlet();
                     addPageMessage("Error creating Job.");
                     forwardPage(Page.VIEW_JOB_SERVLET);
@@ -284,41 +241,4 @@ public class CreateJobExportServlet extends SecureController {
         }
     }
 
-    public HashMap validateForm(FormProcessor fp, HttpServletRequest request, TriggerKey[] triggerKeys, String properName) {
-        Validator v = new Validator(request);
-        v.addValidation(JOB_NAME, Validator.NO_BLANKS);
-        v.addValidation(JOB_NAME, Validator.NO_LEADING_OR_TRAILING_SPACES);
-        // need to be unique too
-        v.addValidation(JOB_DESC, Validator.NO_BLANKS);
-        v.addValidation(EMAIL, Validator.IS_A_EMAIL);
-        v.addValidation(PERIOD, Validator.NO_BLANKS);
-        v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
-        // v.addValidation(DATE_START_JOB + "Date", new Date(), Validator.DATE_IS_AFTER_OR_EQUAL);
-        // TODO job names will have to be unique, tbh
-
-        int formatId = fp.getInt(FORMAT_ID);
-        Date jobDate = fp.getDateTime(DATE_START_JOB);
-        HashMap errors = v.validate();
-        if (formatId == 0) {
-            // throw an error here, at least one should work
-            // errors.put(TAB, "Error Message - Pick one of the below");
-            v.addError(errors, FORMAT_ID, "Please pick at least one.");
-        }
-        for (TriggerKey triggerKey : triggerKeys) {
-            if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && !triggerKey.getName().equals(properName)) {
-                v.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
-            }
-        }
-        if (jobDate.before(new Date())) {
-            v.addError(errors, DATE_START_JOB + "Date", "This date needs to be later than the present time.");
-        }
-        // @pgawade 20-April-2011 Limit the job description to 250 characters
-        String jobDesc = fp.getString(JOB_DESC);
-        if (null != jobDesc && !jobDesc.equals("")) {
-            if (jobDesc.length() > 250) {
-                v.addError(errors, JOB_DESC, "A job description cannot be more than 250 characters.");
-            }
-        }
-        return errors;
-    }
 }

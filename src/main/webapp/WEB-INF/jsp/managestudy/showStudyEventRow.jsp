@@ -423,6 +423,10 @@
 			title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
 		 </td>
 		 </c:if>
+		 				  <c:set var="versionCount" value="0"/>
+         				  <c:forEach var="version" items="${dec.eventDefinitionCRF.versions}">
+         				      <c:set var="versionCount" value="${versionCount+1}"/>
+         				  </c:forEach>
 
 		    <c:if test="${ (userRole.director || userRole.coordinator) &&
  (subjectStudy.status.available ) && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped) && !(dec.stage.invalid)}">
