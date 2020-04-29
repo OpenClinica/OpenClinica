@@ -608,7 +608,13 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         } else {
             variables.put(Integer.valueOf(6), new Timestamp(sb.getDateEnded().getTime()));
         }
-        variables.put(Integer.valueOf(7), Integer.valueOf(sb.getStatus().getId()));
+        if (sb.getStatus().getId() > 0) {
+            variables.put(Integer.valueOf(7), Integer.valueOf(sb.getStatus().getId()));
+        }
+        else {
+            variables.put(Integer.valueOf(7), null);
+            nullVars.put(new Integer(7), new Integer(Types.INTEGER));
+        }
         // changing date_updated from java.util.Date() into postgres now() statement
         // variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
         variables.put(Integer.valueOf(8), Integer.valueOf(sb.getUpdater().getId()));

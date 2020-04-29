@@ -13,7 +13,7 @@ public enum EventCrfWorkflowStatusEnum {
 
     public String getDisplayValue() {
         ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
-        return resterm.getString(this.toString().toLowerCase());
+        return resterm.getString(this.toString().equals(COMPLETED.toString())? "DATA_ENTRY_COMPLETE".toLowerCase():this.toString().toLowerCase());
     }
 
     public static EventCrfWorkflowStatusEnum getByI18nDescription(String description) {
