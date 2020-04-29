@@ -93,10 +93,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
             // UpdateStudyEvent?event_id=12&ss_id=12
         } else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
-            if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
-                 return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
+
+            if (currentRole.getRole().equals(Role.MONITOR)) {
+                return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
                 // ViewSectionDataEntry?eventDefinitionCRFId=&ecId=1&tabId=1&studySubjectId=1
-            } else {
+            }else if(!isCompleted){
+                return Page.INITIAL_DATA_ENTRY_SERVLET;
+            }else {
                 return Page.ADMIN_EDIT_SERVLET;
             }
             // eventCRFId=51&sectionId=14
@@ -260,7 +263,15 @@ public class ResolveDiscrepancyServlet extends SecureController {
         if (p == null) {
             throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, resexception
                     .getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
-        } else {
+        }else if(p.getFileName().contains("InitialDataEntry")){ //Open form in data entry mode from dn page
+            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+            ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
+
+            p.setFileName(p.getFileName()+ "?eventCRFId=" + idb.getEventCRFId() + "&exitTo=ViewNotes&fromViewNotes=1");
+
+            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
+            setPopUpURL(createNoteURL);
+        }else {
             if(p.getFileName().contains("?")) {
                 if(!p.getFileName().contains("fromViewNotes=1")) {
                     p.setFileName(p.getFileName()+"&fromViewNotes=1");

@@ -388,6 +388,8 @@ function initmb(){
 }
 
 window.onload = initmb;
+                <c:if test='${popUpURL != ""}'>
+                openDNoteWindow('${popUpURL}');</c:if>
 
 //-->
 </script>
