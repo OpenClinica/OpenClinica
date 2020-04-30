@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -147,12 +148,39 @@ public class RestoreEventCRFServlet extends SecureController {
             } else {
                 logger.info("submit to restore the event CRF from study");
 
-                eventCRF.setStatus(Status.AVAILABLE);
-                eventCRF.setUpdater(ub);
-                eventCRF.setUpdatedDate(new Date());
+                //OC2739 set status of eventCRF depending on previous status
+                //check if the CRF should be in a data entry complete stage
+                //  check if the date_completed field is populated
+                //      set status to UNAVAILABLE
+                //      set stage to DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE based on
+                //          whether or not double data entry is enabled or not
+                if(eventCRF.getDateCompleted() != null){
+                    Status restoredStatus = null;
+                    if(edc.isDoubleEntry()){
+                        //similar to what is going on in DataEntryServlet.markCRFComplete
+                        restoredStatus = Status.PENDING;
+                        eventCRF.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
+                    }else{
+                        restoredStatus = Status.UNAVAILABLE;
+                        eventCRF.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
+                    }
+                    eventCRF.setUpdater(ub);
+                    eventCRF.setUpdatedDate(new Date());
+                    eventCRF.setStatus(restoredStatus);
+
+                    //Reset the DisplayEventCRFBean
+                    dec.setEventCRF(eventCRF);
+                    dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
+                }else {//do the following existing code
+                    eventCRF.setStatus(Status.AVAILABLE);
+                    eventCRF.setUpdater(ub);
+                    eventCRF.setUpdatedDate(new Date());
+                    //ecdao.update(eventCRF);
+                }
                 ecdao.update(eventCRF);
 
-                // restore all the item data
+                // restore all the item data to the appropriate status based on form status
+                //Not sure what status the items are when event crf is marked complete
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
                     if (item.getStatus().equals(Status.AUTO_DELETED)) {
