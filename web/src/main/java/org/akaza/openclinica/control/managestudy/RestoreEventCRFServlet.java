@@ -154,8 +154,8 @@ public class RestoreEventCRFServlet extends SecureController {
                 //      set status to UNAVAILABLE
                 //      set stage to DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE based on
                 //          whether or not double data entry is enabled or not
+                Status restoredStatus = null;
                 if(eventCRF.getDateCompleted() != null){
-                    Status restoredStatus = null;
                     if(edc.isDoubleEntry()){
                         //similar to what is going on in DataEntryServlet.markCRFComplete
                         restoredStatus = Status.PENDING;
@@ -164,19 +164,24 @@ public class RestoreEventCRFServlet extends SecureController {
                         restoredStatus = Status.UNAVAILABLE;
                         eventCRF.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
                     }
+                    /*eventCRF.setStatus(restoredStatus);
                     eventCRF.setUpdater(ub);
-                    eventCRF.setUpdatedDate(new Date());
-                    eventCRF.setStatus(restoredStatus);
+                    eventCRF.setUpdatedDate(new Date());*/
 
                     //Reset the DisplayEventCRFBean
                     dec.setEventCRF(eventCRF);
                     dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
                 }else {//do the following existing code
-                    eventCRF.setStatus(Status.AVAILABLE);
+                    restoredStatus = Status.AVAILABLE;
+                    /*eventCRF.setStatus(Status.AVAILABLE);
                     eventCRF.setUpdater(ub);
-                    eventCRF.setUpdatedDate(new Date());
+                    eventCRF.setUpdatedDate(new Date());*/
                     //ecdao.update(eventCRF);
                 }
+                eventCRF.setStatus(restoredStatus);
+                eventCRF.setUpdater(ub);
+                eventCRF.setUpdatedDate(new Date());
+
                 ecdao.update(eventCRF);
 
                 // restore all the item data to the appropriate status based on form status
