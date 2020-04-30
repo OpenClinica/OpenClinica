@@ -1481,14 +1481,16 @@ public class SDVUtil {
             sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
             sdvDTO.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
             Date startDate = eventCrf.getStudyEvent().getDateStart();
-            SimpleDateFormat dateFormat;
-            if (eventCrf.getStudyEvent().getStartTimeFlag()) {
-                dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
+            if (startDate != null) {
+                SimpleDateFormat dateFormat;
+                if (eventCrf.getStudyEvent().getStartTimeFlag()) {
+                    dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
+                }
+                else {
+                    dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+                }
+                sdvDTO.setEventStartDate(dateFormat.format(startDate));    
             }
-            else {
-                dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-            }
-            sdvDTO.setEventStartDate(dateFormat.format(startDate));
             sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
             sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
             Study study = studyDao.findByOcOID(studyOID);
