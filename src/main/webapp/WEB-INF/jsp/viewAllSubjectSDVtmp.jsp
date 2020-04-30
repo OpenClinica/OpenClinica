@@ -424,7 +424,7 @@
     }
 
     function formatDateTime(date) {
-        return moment(date).format('DD-MMM-YYYY hh:mm');
+        return moment(date).utc().format('DD-MMM-YYYY hh:mm');
     }
 
     function calcPopupPos() {
