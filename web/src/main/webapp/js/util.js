@@ -15,7 +15,7 @@ var debug = function (logText, logLevel) {
  */ 
 function util_ensureArray(jsonObjectToTest) {
   if (jsonObjectToTest == undefined) { 
-    return jsonObjectToTest;	
+	  return new Array();			
   }
   if (jsonObjectToTest[0] == undefined) { 
     var jsonArray = new Array();
