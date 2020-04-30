@@ -148,44 +148,12 @@ public class RestoreEventCRFServlet extends SecureController {
             } else {
                 logger.info("submit to restore the event CRF from study");
 
-                //OC2739 set status of eventCRF depending on previous status
-                //check if the CRF should be in a data entry complete stage
-                //  check if the date_completed field is populated
-                //      set status to UNAVAILABLE
-                //      set stage to DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE based on
-                //          whether or not double data entry is enabled or not
-                Status restoredStatus = null;
-                if(eventCRF.getDateCompleted() != null){
-                    if(edc.isDoubleEntry()){
-                        //similar to what is going on in DataEntryServlet.markCRFComplete
-                        restoredStatus = Status.PENDING;
-                        eventCRF.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
-                    }else{
-                        restoredStatus = Status.UNAVAILABLE;
-                        eventCRF.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
-                    }
-                    /*eventCRF.setStatus(restoredStatus);
-                    eventCRF.setUpdater(ub);
-                    eventCRF.setUpdatedDate(new Date());*/
-
-                    //Reset the DisplayEventCRFBean
-                    dec.setEventCRF(eventCRF);
-                    dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
-                }else {//do the following existing code
-                    restoredStatus = Status.AVAILABLE;
-                    /*eventCRF.setStatus(Status.AVAILABLE);
-                    eventCRF.setUpdater(ub);
-                    eventCRF.setUpdatedDate(new Date());*/
-                    //ecdao.update(eventCRF);
-                }
-                eventCRF.setStatus(restoredStatus);
-                eventCRF.setUpdater(ub);
-                eventCRF.setUpdatedDate(new Date());
-
+                //Set crf status to AVAILABLE to allow data
+                //to be repopulated in the form properly
+                eventCRF.setStatus(Status.AVAILABLE);
                 ecdao.update(eventCRF);
 
-                // restore all the item data to the appropriate status based on form status
-                //Not sure what status the items are when event crf is marked complete
+                // restore all the item data to the appropriate status
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
                     if (item.getStatus().equals(Status.AUTO_DELETED)) {
@@ -195,6 +163,28 @@ public class RestoreEventCRFServlet extends SecureController {
                         iddao.update(item);
                     }
                 }
+
+                Status restoredStatus = null;
+                if(eventCRF.getDateCompleted() != null){
+                    if(edc.isDoubleEntry() && eventCRF.getDateValidateCompleted() == null){
+                        restoredStatus = Status.PENDING;
+                        eventCRF.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
+                    }else{
+                        restoredStatus = Status.UNAVAILABLE;
+                        eventCRF.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
+                    }
+
+                    //Reset the DisplayEventCRFBean
+                    dec.setEventCRF(eventCRF);
+                    dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
+                }else {
+                    restoredStatus = Status.AVAILABLE;
+                }
+                eventCRF.setStatus(restoredStatus);
+                eventCRF.setUpdater(ub);
+                eventCRF.setUpdatedDate(new Date());
+
+                ecdao.update(eventCRF);
 
                 String emailBody =
                     respage.getString("the_event_CRF") + cb.getName() + " " + respage.getString("has_been_restored_to_the_event") + " "
