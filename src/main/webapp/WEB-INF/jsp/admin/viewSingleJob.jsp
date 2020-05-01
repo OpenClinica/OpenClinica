@@ -127,8 +127,6 @@
     <input type="submit" name="submit" value="<fmt:message key="create_new_scheduled_extract" bundle="${resword}"/>" class="button_long">
    </form>
    </td>
-<td>
-<input type="button" onclick="confirmExit('ViewJob');" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>   </td>
    <td>
    </td>
 </c:when>
@@ -143,8 +141,6 @@
     <input type="submit" name="submit" value="<fmt:message key="create_a_new_import_data_job" bundle="${resword}"/>" class="button_long">
    </form>
    </td>
-<td>
-<input type="button" onclick="confirmExit('ViewImportJob');" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>   </td>
    <td>
    </td>
 </c:otherwise>

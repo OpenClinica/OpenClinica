@@ -89,7 +89,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // collect form information
             XsltTriggerService xsltService = new XsltTriggerService();
-            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltService.getTriggerGroupNameForExportJobs()));
+            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME));
             TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
             HashMap errors = validateForm(fp, request, triggerKeys, "");
 
@@ -157,12 +157,14 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
                 String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
                 String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
+                List<String> permissionTagsList = permissionService.getPermissionTagsList((Study) request.getSession().getAttribute("study"), request);
                 ODMFilterDTO odmFilter = new ODMFilterDTO();
 
 
                 try {
                     jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
                     jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
+                    jobScheduler.getContext().put("permissionTagsList", permissionTagsList);
                     jobScheduler.getContext().put("odmFilter", odmFilter);
                 } catch (SchedulerException e) {
                     logger.error("Error in setting the permissions: ", e);
