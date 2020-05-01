@@ -245,6 +245,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
             discrepancyNoteBean.setItemId(idb.getItemId());
+            discrepancyNoteBean.setEventCRFId(idb.getEventCRFId()); //set to open in View Within Record
 
             if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
                 isCompleted = true;
@@ -264,10 +265,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
             throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, resexception
                     .getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
         }else if(p.getFileName().contains("InitialDataEntry")){ //Open form in data entry mode from dn page
-            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-            ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
 
-            p.setFileName(p.getFileName()+ "?eventCRFId=" + idb.getEventCRFId() + "&exitTo=ViewNotes&fromViewNotes=1");
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(discrepancyNoteBean.getEventCRFId());
+
+            request.setAttribute("event", ecb);
+
+            p.setFileName(p.getFileName()+ "?eventCRFId=" + discrepancyNoteBean.getEventCRFId() + "&exitTo=ViewNotes&fromViewNotes=1");
 
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
             setPopUpURL(createNoteURL);
