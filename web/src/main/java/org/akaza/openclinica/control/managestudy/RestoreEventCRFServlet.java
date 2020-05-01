@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -147,12 +148,12 @@ public class RestoreEventCRFServlet extends SecureController {
             } else {
                 logger.info("submit to restore the event CRF from study");
 
+                //Set crf status to AVAILABLE to allow data
+                //to be repopulated in the form properly
                 eventCRF.setStatus(Status.AVAILABLE);
-                eventCRF.setUpdater(ub);
-                eventCRF.setUpdatedDate(new Date());
                 ecdao.update(eventCRF);
 
-                // restore all the item data
+                // restore all the item data to the appropriate status
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
                     if (item.getStatus().equals(Status.AUTO_DELETED)) {
@@ -162,6 +163,28 @@ public class RestoreEventCRFServlet extends SecureController {
                         iddao.update(item);
                     }
                 }
+
+                Status restoredStatus = null;
+                if(eventCRF.getDateCompleted() != null){
+                    if(edc.isDoubleEntry() && eventCRF.getDateValidateCompleted() == null){
+                        restoredStatus = Status.PENDING;
+                        eventCRF.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
+                    }else{
+                        restoredStatus = Status.UNAVAILABLE;
+                        eventCRF.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
+                    }
+
+                    //Reset the DisplayEventCRFBean
+                    dec.setEventCRF(eventCRF);
+                    dec.setFlags(eventCRF, ub, currentRole, edc.isDoubleEntry());
+                }else {
+                    restoredStatus = Status.AVAILABLE;
+                }
+                eventCRF.setStatus(restoredStatus);
+                eventCRF.setUpdater(ub);
+                eventCRF.setUpdatedDate(new Date());
+
+                ecdao.update(eventCRF);
 
                 String emailBody =
                     respage.getString("the_event_CRF") + cb.getName() + " " + respage.getString("has_been_restored_to_the_event") + " "
