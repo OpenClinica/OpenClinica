@@ -252,7 +252,7 @@
         overflow-y: auto;
     }
 
-    #sdv_row1 > td:last-child {
+    #sdv td:last-child {
         white-space: nowrap;
     }
 
