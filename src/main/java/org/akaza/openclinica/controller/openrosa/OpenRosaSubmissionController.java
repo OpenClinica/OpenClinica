@@ -257,8 +257,7 @@ public class OpenRosaSubmissionController {
             eventCrfDao.saveOrUpdate(eventCrf);
 
             if (!formCacheService.expireAndRemoveForm(ecid)){
-                String customerUuid = tokenService.getCustomerUuid((String) request.getSession().getAttribute("accessToken"));
-                FormChangeDTO formChangeDTO = kafkaService.constructEditFormDTO(customerUuid, eventCrf);
+                FormChangeDTO formChangeDTO = kafkaService.constructEditFormDTO(eventCrf);
                 kafkaService.sendFormChangeMessage(formChangeDTO);
             }
             //TODO Re-enable randomize.
@@ -349,13 +348,12 @@ public class OpenRosaSubmissionController {
 
             if (!formCacheService.resetExpiration(ecid)){
                 logger.info("Updating expiration failed, re-adding entry in expiration map for: " + ecid);
-                String customerUuid = tokenService.getCustomerUuid(subjectContext.get("accessToken"));
                 int studyEventId = Integer.parseInt(subjectContext.get("studyEventID"));
                 StudyEvent studyEvent = studyEventDao.findById(studyEventId);
                 String formLayoutOid = subjectContext.get("formLayoutOID");
                 FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
                 //TODO Public study is not "current study" so we're not getting the site if the user is at the site level. Do we actually need the site OID for this DTO? It is getting set as null for now.
-                formCacheService.addNewFormToFormCache(ecid, customerUuid, publicStudy, studyEvent, formLayout);
+                formCacheService.addNewFormToFormCache(ecid, publicStudy, studyEvent, formLayout);
             }
 
             // Execute save as Hibernate transaction to avoid partial imports

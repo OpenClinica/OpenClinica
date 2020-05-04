@@ -10,6 +10,8 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import com.openclinica.kafka.KafkaService;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
@@ -21,6 +23,7 @@ import core.org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import core.org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -78,6 +81,8 @@ public class StudyEventServiceImpl implements StudyEventService {
 
     @Autowired
     private CSVService csvService;
+    @Autowired
+    private KafkaService kafkaService;
 
     @Autowired
     private StudyBuildService studyBuildService;
@@ -657,7 +662,18 @@ public class StudyEventServiceImpl implements StudyEventService {
                 }
             }
         }
+
+        processKafkaMessage(studySubject, studyEventResponseDTO);
+
         return studyEventResponseDTO;
+    }
+
+    private void processKafkaMessage(StudySubject studySubject, StudyEventResponseDTO studyEventResponseDTO) {
+        try {
+            kafkaService.sendEventAttributeChangeMessage(studyEventResponseDTO.getStudyEventOID(), studySubject);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

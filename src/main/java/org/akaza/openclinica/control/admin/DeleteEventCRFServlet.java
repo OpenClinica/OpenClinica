@@ -62,7 +62,7 @@ public class DeleteEventCRFServlet extends SecureController {
     ItemFormMetadataDAO ifmdao;
     ItemDataDAO iddao;
     ItemGroupMetadataDAO igmdao;
-    StudyEventDAO sedao;
+    private StudyEventDAO studyEventDAO;
 
     /**
      * 
@@ -86,7 +86,7 @@ public class DeleteEventCRFServlet extends SecureController {
 
         String action = request.getParameter("action");
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         request.setAttribute("errorData", null);
@@ -126,9 +126,9 @@ public class DeleteEventCRFServlet extends SecureController {
             // DisplayEventCRFBean.setFlags
             int studyEventId = eventCRF.getStudyEventId();
 
-            StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
-            int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);
             event.setStudyEventDefinition(sed);
@@ -240,13 +240,13 @@ public class DeleteEventCRFServlet extends SecureController {
                     event.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
                     event.setUpdater(ub);
                     event.setUpdatedDate(new Date());
-                    sedao.update(event);
+                    studyEventDAO.update(event);
                 }
                 if ( event.isSigned()) {
                     event.setSigned(Boolean.FALSE);
                     event.setUpdater(ub);
                     event.setUpdatedDate(new Date());
-                    sedao.update(event);
+                    studyEventDAO.update(event);
                 }
                 if(studySub.getStatus().equals(Status.SIGNED)){
                     studySub.setStatus(Status.AVAILABLE);

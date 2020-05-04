@@ -20,6 +20,7 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -48,6 +49,8 @@ import java.util.Date;
  */
 public class RemoveStudyServlet extends SecureController {
 
+    private StudyEventDAO studyEventDAO;
+
     /**
      *
      */
@@ -67,6 +70,8 @@ public class RemoveStudyServlet extends SecureController {
 
         FormProcessor fp = new FormProcessor(request);
         int studyId = fp.getInt("id");
+
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
 
         Study study = (Study) getStudyDao().findByPK(studyId);
         // find all sites
@@ -203,7 +208,6 @@ public class RemoveStudyServlet extends SecureController {
 
                 // remove all event definitions and event
                 EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-                StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
                 for (int i = 0; i < definitions.size(); i++) {
                     StudyEventDefinitionBean definition = (StudyEventDefinitionBean) definitions.get(i);
                     if (!definition.getStatus().equals(Status.DELETED)) {
@@ -222,8 +226,7 @@ public class RemoveStudyServlet extends SecureController {
                             }
                         }
 
-                        ArrayList events = (ArrayList) sedao.findAllByDefinition(definition.getId());
-                        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+                        ArrayList events = (ArrayList) studyEventDAO.findAllByDefinition(definition.getId());
 
                         for (int j = 0; j < events.size(); j++) {
                             StudyEventBean event = (StudyEventBean) events.get(j);

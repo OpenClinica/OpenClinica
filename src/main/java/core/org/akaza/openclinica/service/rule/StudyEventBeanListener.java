@@ -23,15 +23,14 @@ import org.springframework.context.ApplicationContextAware;
 
 public class StudyEventBeanListener implements Observer,ApplicationContextAware {
 
-    protected final Logger LOGGER = LoggerFactory.getLogger(getClass().getName());
+    protected final Logger log = LoggerFactory.getLogger(getClass().getName());
 	private StudyEventDAO studyEventDao;
 	private DataSource dataSource;
 
 	private static ApplicationContext cntxt;
 	private static RuleSetDao ruleSetDao;
 	private static RuleSetService ruleSetService;
-	
-	
+
 	public static synchronized RuleSetDao getRuleSetDao() {
 		ruleSetDao = cntxt.getBean("ruleSetDao",RuleSetDao.class);
 		return ruleSetDao;
@@ -43,17 +42,15 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 		RuleSetService ruleSetService=cntxt.getBean("ruleSetService",RuleSetService.class);
 		return ruleSetService;
 	}
-	
 	public StudyEventBeanListener(StudyEventDAO seDAO){
 		this.studyEventDao = seDAO;
 		studyEventDao.setObserver(this);
 	}
 	@Override
 	public void update(Listener lstnr) {
-		LOGGER.info("Checking for rules related to this StudyEvent");
 //	System.out.println("Triggering the rules based on event updates");
 		StudyEventBeanContainer studyEventBeanContainer = (StudyEventBeanContainer)lstnr;
-		
+
 //	if (studyEventBeanContainer.getChangeDetails().getStartDateChanged() || studyEventBeanContainer.getChangeDetails().getStatusChanged()){
 		
 		Integer studyEventDefId = studyEventBeanContainer.getEvent().getStudyEventDefinitionId();
@@ -73,7 +70,6 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 			ruleSet.addExpression(getRuleSetService().replaceSEDOrdinal(ruleSet.getTarget(), studyEvent));
 			ruleSetBeans.add(ruleSet);
 
-			// for (RuleSetBean ruleSet : ruleSetBeans){
 			String targetProperty = ruleSet.getTarget().getValue().substring(ruleSet.getTarget().getValue().indexOf("."));
 
 			if ((targetProperty.contains(ExpressionService.STARTDATE + ".A.B") && studyEventBeanContainer.getChangeDetails().getStartDateChanged())
@@ -82,10 +78,7 @@ public class StudyEventBeanListener implements Observer,ApplicationContextAware 
 				getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId, studyEventBeanContainer.getChangeDetails(), studyEventOrdinal);
 			}
 		}
-//	}
-		
-	
-		
+
 	}
 	private List<RuleSetBean> createRuleSet(Integer studyEventDefId) {
 	    List<RuleSetBean> ruleSetsDB = getRuleSetDao().findAllByStudyEventDefIdWhereItemIsNull(studyEventDefId);

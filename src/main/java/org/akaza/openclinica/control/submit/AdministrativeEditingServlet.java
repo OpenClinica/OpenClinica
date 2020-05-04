@@ -165,14 +165,6 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
 
-
-        // <
-        // resexception=ResourceBundle.getBundle(
-        // "core.org.akaza.openclinica.i18n.exceptions",locale);
-        // < respage =
-        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",
-        // locale);
-
         getInputBeans(request);
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
@@ -185,16 +177,6 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         }
         request.setAttribute("fromResolvingNotes", fromResolvingNotes);
         LOGGER.debug(" +++++++++++++++++++ " + ecb.getStudyEventId());
-        // StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-        // StudyEventBean sEvent = (StudyEventBean)
-        // sedao.findByPK(ecb.getStudyEventId());
-        // if (sEvent.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED))
-        // {
-        // sEvent.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-        // sEvent.setUpdater(ub);
-        // sEvent.setUpdatedDate(new Date());
-        // sedao.update(sEvent);
-        // }
         DataEntryStage stage = ecb.getStage();
         Role r = currentRole.getRole();
         session.setAttribute("mayProcessUploading", "true");

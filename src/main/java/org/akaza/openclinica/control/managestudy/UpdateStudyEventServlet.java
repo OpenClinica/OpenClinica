@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.managestudy;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.*;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -69,25 +70,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *         Performs updating study event action
  */
 public class UpdateStudyEventServlet extends SecureController {
+
     public static final String EVENT_ID = "event_id";
-
     public static final String STUDY_SUBJECT_ID = "ss_id";
-
     public static final String EVENT_BEAN = "studyEvent";
-
     public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
-
     public static final String EVENT_WORKFLOW_STATUS = "workflowStatus";
     public static final String SUBJECT_EVENT_STATUS_ID = "statusId";
-
     public static final String INPUT_STARTDATE_PREFIX = "start";
-
-    // YW, 3-12-2008, for 2220 fix <<
     public static final String INPUT_ENDDATE_PREFIX = "end";
-    // YW >>
-
     public static final String INPUT_LOCATION = "location";
-
     public final static String HAS_LOCATION_NOTE = "hasLocationNote";
     public final static String LOCATION_NOTE = "locationNote";
     public final static String HAS_START_DATE_NOTE = "hasStartDateNote";
@@ -99,6 +91,8 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String STUDY_EVENT = "study_event";
     public static final String PREV_STUDY_EVENT_SIGNED_STATUS = "prev_study_event_workflow_status";
 
+    private StudyEventDAO studyEventDAO;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
@@ -108,12 +102,13 @@ public class UpdateStudyEventServlet extends SecureController {
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
-
     }
 
     @Override
     public void processRequest() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(context);
+
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
 
         FormDiscrepancyNotes discNotes = null;
         FormProcessor fp = new FormProcessor(request);
@@ -162,10 +157,10 @@ public class UpdateStudyEventServlet extends SecureController {
         // YW
 
         request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+        //StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         EventCRFDAO ecrfdao = new EventCRFDAO(sm.getDataSource());
 
-        StudyEventBean studyEvent = (StudyEventBean) sedao.findByPK(studyEventId);
+        StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
         studyEvent.setEventCRFs(ecrfdao.findAllByStudyEvent(studyEvent));
 
@@ -403,7 +398,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 studyEvent.setUpdater(ub);
                 studyEvent.setUpdatedDate(new Date());
                 updateClosedQueriesForUpdatedStudySubjectFields(studyEvent);
-                StudyEventBean updatedStudyEvent = (StudyEventBean) sedao.update(studyEvent);
+                StudyEventBean updatedStudyEvent = (StudyEventBean) studyEventDAO.update(studyEvent);
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -449,7 +444,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 seb.setUpdater(ub);
                 seb.setUpdatedDate(date);
                 seb.setAttestation(detail);
-                sedao.update(seb);
+                studyEventDAO.update(seb);
 
                 // OC-10834 OC4 - Signature not recorded when signing an event if the event status is already Signed
                 // manually add audit-log-event when user re-signed without any changes
@@ -524,6 +519,7 @@ public class UpdateStudyEventServlet extends SecureController {
                         + fp.getString(INPUT_ENDDATE_PREFIX + "Minute") + "%26endHalf=" + fp.getString(INPUT_ENDDATE_PREFIX + "Half") + "%26statusId="
                         + studyEvent.getWorkflowStatus();
 
+                // Failed to sign?
                 request.setAttribute(ORIGINATING_PAGE, originationUrl);
                 forwardPage(Page.UPDATE_STUDY_EVENT_SIGNED);
             }
@@ -618,8 +614,7 @@ public class UpdateStudyEventServlet extends SecureController {
     }
 
     private void updateClosedQueriesForUpdatedStudySubjectFields(StudyEventBean updatedStudyEvent) {
-        StudyEventDAO seDAO = new StudyEventDAO(sm.getDataSource());
-        StudyEventBean existingStudyEvent = (StudyEventBean) seDAO.findByPK(updatedStudyEvent.getId());
+        StudyEventBean existingStudyEvent = (StudyEventBean) studyEventDAO.findByPK(updatedStudyEvent.getId());
         DiscrepancyNoteDAO dnDAO = new DiscrepancyNoteDAO(sm.getDataSource());
         List<DiscrepancyNoteBean> existingNotes = dnDAO.findExistingNoteForStudyEvent(existingStudyEvent);
 

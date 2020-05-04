@@ -91,6 +91,9 @@ public class ChangeCRFVersionController {
     private PermissionService permissionService;
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    @Qualifier("studyeventdaojdbc")
+    private StudyEventDAO studyEventDAO;
 
     @Autowired
     StudyEventService studyEventService;
@@ -168,8 +171,7 @@ public class ChangeCRFVersionController {
             redirect(request, response, "/NoAccess?originatingPage="+ originatingPage);
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(dataSource);
-        StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+        StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
         request.setAttribute("eventCreateDate", formatDate(seb.getCreatedDate()));
         if (sedb.isRepeating()) {
             request.setAttribute("eventOrdinal", seb.getSampleOrdinal());

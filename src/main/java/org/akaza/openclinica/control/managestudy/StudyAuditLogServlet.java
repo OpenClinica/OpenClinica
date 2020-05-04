@@ -61,17 +61,9 @@ public class StudyAuditLogServlet extends SecureController {
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-        AuditDAO adao = new AuditDAO(sm.getDataSource());
         UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
 
         FormProcessor fp = new FormProcessor(request);
-
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 
         StudyAuditLogTableFactory factory = new StudyAuditLogTableFactory();
         factory.setSubjectDao(sdao);

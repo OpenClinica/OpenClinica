@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
 
 
     public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,
-                                        UserAccountBean userAccountBean, String realm, String customerUuid, ResourceBundle restext) {
+                                        UserAccountBean userAccountBean, String realm, ResourceBundle restext) {
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
         String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
@@ -172,7 +172,7 @@ public class UserServiceImpl implements UserService {
                     auditLogEventService.saveAuditLogEvent(auditLogEventDTO, userAccountBean);
 
                     // create participant user Account In Keycloak
-                    String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, realm, customerUuid);
+                    String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, realm);
                     // create participant user Account In Runtime
                     pUserAccount = createUserAccount(participantDTO, studySubject, userAccountBean, username, publicStudy, keycloakUserId);
                     // create study subject detail Account

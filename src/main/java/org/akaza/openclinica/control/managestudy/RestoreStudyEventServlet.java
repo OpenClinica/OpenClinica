@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.openclinica.kafka.KafkaService;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
@@ -26,6 +28,8 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.auth.TokenService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -48,6 +52,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *         Restores a removed study event and all its data
  */
 public class RestoreStudyEventServlet extends SecureController {
+
+    private KafkaService kafkaService;
+    private TokenService tokenService;
     /**
      *
      */
@@ -74,6 +81,8 @@ public class RestoreStudyEventServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
+        kafkaService = (KafkaService) SpringServletAccess.getApplicationContext(context).getBean("kafkaService");
+        tokenService = (TokenService) SpringServletAccess.getApplicationContext(context).getBean("tokenService");
 
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
@@ -149,6 +158,9 @@ public class RestoreStudyEventServlet extends SecureController {
                         + respage.getString("has_been_restored_to_the_study") + " " + study.getName() + ".";
 
                 addPageMessage(emailBody);
+
+                kafkaService.sendEventAttributeChangeMessage(event.getStudyEventDefinition().getOid(), studySub);
+
                 // sendEmail(emailBody);
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
@@ -209,8 +221,6 @@ public class RestoreStudyEventServlet extends SecureController {
     /**
      * Send email to director and administrator
      *
-     * @param request
-     * @param response
      */
     private void sendEmail(String emailBody) throws Exception {
 

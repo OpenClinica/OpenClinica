@@ -115,11 +115,10 @@ public class UserController {
         utilService.setSchemaFromStudyOid(studyOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
-        String customerUuid = utilService.getCustomerUuidFromRequest(request);
         ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
-        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
+        String realm = keycloakClient.getRealmName(accessToken);
 
-        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, realm, customerUuid,textsBundle);
+        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, realm, textsBundle);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
@@ -162,9 +161,8 @@ public class UserController {
 
         utilService.setSchemaFromStudyOid(studyOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
-        String customerUuid = utilService.getCustomerUuidFromRequest(request);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
+        String realm = keycloakClient.getRealmName(accessToken);
 
         ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, realm, userAccountBean,incldAccessCode,incldAccessCode);
         if (participantAccessDTO == null) {
@@ -229,8 +227,7 @@ public class UserController {
 
         isStudyLevelUser = utilService.checkStudyLevelUser(userAccountBean.getRoles(), siteOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
-        String customerUuid = utilService.getCustomerUuidFromRequest(request);
-        String realm = keycloakClient.getRealmName(accessToken, customerUuid);
+        String realm = keycloakClient.getRealmName(accessToken);
 
         String uuid = startExtractJob(studyOid, siteOid, accessToken, realm, userAccountBean, incRelatedInfo, pageNumber, pageSize, isStudyLevelUser);
 

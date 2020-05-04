@@ -120,6 +120,8 @@ public class MainMenuServlet extends SecureController {
         request.setAttribute("iconInfoShown", true);
         request.setAttribute("closeInfoShowIcons", false);
 
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
             forwardPage(Page.MENU, false);
@@ -226,7 +228,7 @@ public class MainMenuServlet extends SecureController {
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setStudyDao(getStudyDao());
         factory.setCurrentStudy(currentStudy);
-        factory.setStudyEventDao(getStudyEventDAO());
+        factory.setStudyEventDao(studyEventDAO);
         String subjectEventStatusStatistics = factory.createTable(request, response).render();
         request.setAttribute("subjectEventStatusStatistics", subjectEventStatusStatistics);
     }
@@ -259,7 +261,7 @@ public class MainMenuServlet extends SecureController {
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
-        factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyDAO(getStudyDao());
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
@@ -306,11 +308,6 @@ public class MainMenuServlet extends SecureController {
     public SubjectGroupMapDAO getSubjectGroupMapDAO() {
         subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
         return subjectGroupMapDAO;
-    }
-
-    public StudyEventDAO getStudyEventDAO() {
-        studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-        return studyEventDAO;
     }
 
     public EventCRFDAO getEventCRFDAO() {

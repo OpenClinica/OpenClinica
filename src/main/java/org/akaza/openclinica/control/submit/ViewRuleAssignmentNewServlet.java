@@ -84,10 +84,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
     }
 
     private void createStudyEventForInfoPanel() {
-
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ItemDAO itemdao = new ItemDAO(sm.getDataSource());
         Study studyWithEventDefinitions = currentStudy;
         if (currentStudy.isSite()) {

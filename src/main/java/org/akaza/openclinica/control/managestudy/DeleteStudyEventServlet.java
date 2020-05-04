@@ -7,6 +7,8 @@ package org.akaza.openclinica.control.managestudy;
  * Time: 8:33:54 PM
  * To change this template use File | Settings | File Templates.
  */
+import com.openclinica.kafka.KafkaService;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
@@ -14,6 +16,8 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.auth.TokenService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -30,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class DeleteStudyEventServlet extends SecureController{
+
+    private StudyEventDAO studyEventDAO;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
@@ -53,8 +60,8 @@ public class DeleteStudyEventServlet extends SecureController{
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
         if (studyEventId == 0) {
@@ -63,7 +70,7 @@ public class DeleteStudyEventServlet extends SecureController{
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
 
-            StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             request.setAttribute("studySub", studySub);
@@ -88,7 +95,6 @@ public class DeleteStudyEventServlet extends SecureController{
                 de.setStudyEvent(event);
 
                 request.setAttribute("displayEvent", de);
-//                request.setAttribute("crfs", eventDefinitionCRFs);
 
                 forwardPage(Page.DELETE_STUDY_EVENT);
             } else {
@@ -98,7 +104,7 @@ public class DeleteStudyEventServlet extends SecureController{
                 event.setWorkflowStatus(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
-                sedao.update(event);
+                studyEventDAO.update(event);
 
                 if(studySub.getStatus().equals(Status.SIGNED)){
                     studySub.setStatus(Status.AVAILABLE);
@@ -113,7 +119,6 @@ public class DeleteStudyEventServlet extends SecureController{
                         + respage.getString("in_the_study") + " " + study.getName() + ".";
 
                 addPageMessage(emailBody);
-//                sendEmail(emailBody);
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }

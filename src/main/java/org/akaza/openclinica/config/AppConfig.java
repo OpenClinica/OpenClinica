@@ -1,8 +1,11 @@
 package org.akaza.openclinica.config;
 
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+import core.org.akaza.openclinica.web.rest.client.impl.CustomerServiceClientImpl;
+import org.akaza.openclinica.service.CoreUtilServiceImpl;
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
@@ -11,8 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -30,6 +36,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +44,7 @@ import java.util.Map;
 @KeycloakConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
-
+@EnableAspectJAutoProxy
 public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -48,6 +55,10 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     private KeycloakClientImpl keycloakClient;
     @Autowired
     private RandomizationService randomizationService;
+    @Autowired
+    private CoreUtilServiceImpl coreUtilService;
+    @Autowired
+    private CustomerServiceClientImpl customerServiceClient;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -105,6 +116,17 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
             }
         };
     }
+
+    @Bean
+    public SmartInitializingSingleton setInstanceCustomerUuid() {
+        return () -> {
+            String accessToken = keycloakClient.getSystemToken();
+            String customerUuid = customerServiceClient.getCustomerUuid(accessToken);
+            coreUtilService.setCustomerUuid(customerUuid);
+            logger.info("Customer UUID: " + customerUuid);
+        };
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);

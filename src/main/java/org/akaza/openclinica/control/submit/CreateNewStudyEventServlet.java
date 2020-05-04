@@ -18,12 +18,17 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
+import com.openclinica.kafka.KafkaService;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -43,44 +48,28 @@ import core.org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 // TODO: support YYYY-MM-DD HH:MM time formats
 
+@Component
 public class CreateNewStudyEventServlet extends SecureController {
 
     Locale locale;
     // < ResourceBundlerestext,respage,resexception;
 
     public static final String INPUT_STUDY_EVENT_DEFINITION = "studyEventDefinition";
-
-    // public static final String INPUT_STUDY_EVENT_DEFINITION_SCHEDULED =
-    // "studyEventDefinitionScheduled";
-
     public static final String INPUT_STUDY_SUBJECT = "studySubject";
-
     public static final String INPUT_STUDY_SUBJECT_LABEL = "studySubjectLabel";
-
     public static final String INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT = "studySubjectId";
-
     public static final String INPUT_EVENT_DEF_ID_FROM_VIEWSUBJECT = "eventDefId";
-
     public static final String INPUT_STARTDATE_PREFIX = "start";
-
     public static final String INPUT_ENDDATE_PREFIX = "end";
-
-    // public static final String INPUT_STARTDATE_PREFIX_SCHEDULED =
-    // "startScheduled";
-
-    // public static final String INPUT_ENDDATE_PREFIX_SCHEDULED =
-    // "endScheduled";
-
     public static final String INPUT_REQUEST_STUDY_SUBJECT = "requestStudySubject";
 
     public static final String INPUT_LOCATION = "location";
     private final String COMMON = "common";
-
-    // public static final String INPUT_SCHEDULED_LOCATION =
-    // "locationScheduled";
 
     private FormProcessor fp;
 
@@ -92,8 +81,12 @@ public class CreateNewStudyEventServlet extends SecureController {
     public final static String[] DISPLAY_SCHEDULED = { "display0", "display1", "display2", "display3" };
     public final static int ADDITIONAL_SCHEDULED_NUM = 4;
 
+    private KafkaService kafkaService;
+
     @Override
     protected void processRequest() throws Exception {
+        kafkaService = (KafkaService) SpringServletAccess.getApplicationContext(context).getBean("kafkaService");
+
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
         panel.setStudyInfoShown(false);
         fp = new FormProcessor(request);
@@ -527,7 +520,6 @@ public class CreateNewStudyEventServlet extends SecureController {
                 for (String element : eventFields) {
                     AddNewSubjectServlet.saveFieldNotes(element, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
                 }
-                // logger.debug("here ok 3333333333333333");
                 if (hasScheduledEvent) {
                     for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 
@@ -602,6 +594,8 @@ public class CreateNewStudyEventServlet extends SecureController {
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(studyEvent.getId()));
                 ArrayList<String> pMessage = (ArrayList<String>) request.getAttribute(SecureController.PAGE_MESSAGE);
+
+                kafkaService.sendEventAttributeChangeMessage(null, studySubject);
 
                 String url = response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
                 response.sendRedirect(url);

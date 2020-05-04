@@ -267,8 +267,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 			throw new CustomRuntimeException("There are errors with publishing", errList);
 		}
 		try {
-			String customerUuid = tokenService.getCustomerUuid(accessToken);
-			kafkaService.sendStudyPublishMessage(customerUuid, study);
+			kafkaService.sendStudyPublishMessage(study);
 		} catch (Exception e) {
 			logger.error("Could not update Kafka of study Publish: ", e);
 		}

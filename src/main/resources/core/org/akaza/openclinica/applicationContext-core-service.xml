@@ -3,11 +3,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:aop="http://www.springframework.org/schema/aop"
         xsi:schemaLocation="http://www.springframework.org/schema/beans
                             http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
                             http://www.springframework.org/schema/context 
-                            http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+                            http://www.springframework.org/schema/context/spring-context-4.3.xsd
+                            http://www.springframework.org/schema/aop
+                            http://www.springframework.org/schema/aop/spring-aop.xsd">
 
+    <aop:aspectj-autoproxy/>
 
     <!--  Service layer supports legacy DAOs via constructor injection of dataSource
           and Hibernate DAO injection via autowiring -->
@@ -59,9 +63,13 @@
     <bean id="datasetDao" class="core.org.akaza.openclinica.dao.extract.DatasetDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
-   
+
     <bean id="studyeventdaojdbc" class="core.org.akaza.openclinica.dao.managestudy.StudyEventDAO">
        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="auditStudyEventAspect" class="org.akaza.openclinica.service.aspect.AuditStudyEventAspect">
+        <!-- configure properties of aspect here as normal -->
     </bean>
 
     <bean id="studyEventBeanListener" class="core.org.akaza.openclinica.service.rule.StudyEventBeanListener">

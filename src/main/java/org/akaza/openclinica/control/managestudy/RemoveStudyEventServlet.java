@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.openclinica.kafka.KafkaService;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Role;
@@ -23,6 +25,8 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.auth.TokenService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -44,6 +48,9 @@ public class RemoveStudyEventServlet extends SecureController {
     /**
      *
      */
+
+    private KafkaService kafkaService;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
@@ -67,6 +74,7 @@ public class RemoveStudyEventServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
+        kafkaService = (KafkaService) SpringServletAccess.getApplicationContext(context).getBean("kafkaService");
 
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
@@ -78,6 +86,7 @@ public class RemoveStudyEventServlet extends SecureController {
         } else {
 
             StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            event.getStudyEventDefinition().getOid();
 
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             request.setAttribute("studySub", studySub);
@@ -179,6 +188,9 @@ public class RemoveStudyEventServlet extends SecureController {
 
                 addPageMessage(emailBody);
                 // sendEmail(emailBody);
+
+                kafkaService.sendEventAttributeChangeMessage(event.getStudyEventDefinition().getOid(), studySub);
+
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
