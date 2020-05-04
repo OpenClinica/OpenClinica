@@ -149,6 +149,7 @@ public abstract class ScheduleJobServlet extends SecureController {
 
         int formatId = fp.getInt(FORMAT_ID);
         Date jobDate = fp.getDateTime(DATE_START_JOB);
+        int datasetId = fp.getInt(DATASET_ID);
         HashMap errors = v.validate();
         if (formatId == 0) {
             // throw an error here, at least one should work
@@ -169,6 +170,9 @@ public abstract class ScheduleJobServlet extends SecureController {
             if (jobDesc.length() > 250) {
                 v.addError(errors, JOB_DESC, "A job description cannot be more than 250 characters.");
             }
+        }
+        if (datasetId == 0) {
+            v.addError(errors, DATASET_ID, "Please pick a dataset.");
         }
         return errors;
     }
