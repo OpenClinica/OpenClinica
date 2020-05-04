@@ -738,8 +738,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
                     }
                     note = (DiscrepancyNoteBean) dndao.create(note);
-                    //OC7166 solution here
-                    //set the note's entity ID
                     note.setEntityId(entityId);
                     dndao.createMapping(note);
 
