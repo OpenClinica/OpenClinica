@@ -737,23 +737,6 @@
         <servlet-class>org.akaza.openclinica.control.extract.ApplyFilterServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>CreateFiltersOne</display-name>
-
-        <servlet-name>CreateFiltersOneServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.extract.CreateFiltersOneServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>CreateFiltersTwo</display-name>
-
-        <servlet-name>CreateFiltersTwoServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.extract.CreateFiltersTwoServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>CreateFiltersThree</display-name>
-        <servlet-name>CreateFiltersThreeServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.extract.CreateFiltersThreeServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>ViewCRFVersion</display-name>
 
         <servlet-name>ViewCRFVersionServlet</servlet-name>
@@ -761,7 +744,6 @@
     </servlet>
     <servlet>
         <display-name>ViewEventCRF</display-name>
-
         <servlet-name>ViewEventCRFServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventCRFServlet</servlet-class>
     </servlet>
@@ -1242,21 +1224,9 @@
         <url-pattern>/RestoreDataset</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>CreateFiltersOneServlet</servlet-name>
-        <url-pattern>/CreateFiltersOne</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateFiltersTwoServlet</servlet-name>
-        <url-pattern>/CreateFiltersTwo</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>AccessFileServlet</servlet-name>
         <url-pattern>/AccessFile</url-pattern>
     </servlet-mapping>
-    <!--<servlet-mapping>
-        <servlet-name>EnterpriseServlet</servlet-name>
-        <url-pattern>/Enterprise</url-pattern>
-    </servlet-mapping>-->
     <servlet-mapping>
         <servlet-name>ShowFileServlet</servlet-name>
         <url-pattern>/ShowFile</url-pattern>
@@ -1272,10 +1242,6 @@
     <servlet-mapping>
         <servlet-name>AuditLogStudyServlet</servlet-name>
         <url-pattern>/AuditLogStudy</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateFiltersThreeServlet</servlet-name>
-        <url-pattern>/CreateFiltersThree</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RequestPasswordServlet</servlet-name>

@@ -199,24 +199,9 @@ public class RuleRunner {
         return crfDao;
     }
 
-    RuleSetRuleDAO getRuleSetRuleDao() {
-        ruleSetRuleDao = this.ruleSetRuleDao != null ? ruleSetRuleDao : new RuleSetRuleDAO(ds);
-        return ruleSetRuleDao;
-    }
-
-    RuleActionDAO getRuleActionDao() {
-        ruleActionDao = this.ruleActionDao != null ? ruleActionDao : new RuleActionDAO(ds);
-        return ruleActionDao;
-    }
-
     StudyEventDAO getStudyEventDao() {
         studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(ds);
         return studyEventDao;
-    }
-
-    ItemDataDAO getItemDataDao() {
-        itemDataDao = this.itemDataDao != null ? itemDataDao : new ItemDataDAO(ds);
-        return itemDataDao;
     }
 
     EventCRFDAO getEventCrfDao() {

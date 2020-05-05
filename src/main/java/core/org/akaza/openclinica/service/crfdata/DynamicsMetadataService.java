@@ -247,11 +247,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     public void show(Integer itemDataId, List<PropertyBean> properties, RuleSetBean ruleSet) {
         ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
         EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
-        StudyEventBean studyEventBeanA = (StudyEventBean) getStudyEventDAO().findByPK(eventCrfBeanA.getStudyEventId());
         ItemGroupMetadataBean itemGroupMetadataBeanA =
             (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByItemAndCrfVersion(itemDataBeanA.getItemId(), eventCrfBeanA.getCRFVersionId());
-        Boolean isGroupARepeating = isGroupRepeating(itemGroupMetadataBeanA);
-        String itemGroupAOrdinal = getExpressionService().getGroupOrdninalCurated(ruleSet.getTarget().getValue());
 
         for (PropertyBean propertyBean : properties) {
             String oid = propertyBean.getOid();
@@ -1022,7 +1019,6 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     public StudyEventDAO getStudyEventDAO() {
-        //studyEventDAO = this.studyEventDAO != null ? studyEventDAO : new StudyEventDAO(ds);
         return new StudyEventDAO(ds);
     }
 

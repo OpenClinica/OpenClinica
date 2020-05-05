@@ -169,28 +169,6 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         Collection<SubjectAggregateContainer> items = getFilteredItems(studySubjectSDVFilter, studySubjectSDVSort, rowStart, rowEnd);
         tableFacade.setItems(items);
 
-        /*
-        
-
-        Limit limit = tableFacade.getLimit();
-        FilterSet filterSet = limit.getFilterSet();
-        WebContext context = tableFacade.getWebContext();
-        if (context != null) {
-            studyId = Integer.parseInt(context.getParameter("studyId"));
-            contextPath = context.getContextPath();
-        }
-        int totalRows = getTotalRowCount();
-
-        tableFacade.setTotalRows(totalRows);
-        SortSet sortSet = limit.getSortSet();
-        int rowStart = limit.getRowSelect().getRowStart();
-        int rowEnd = limit.getRowSelect().getRowEnd();
-        Collection<SubjectAggregateContainer> items = getFilteredItems(filterSet, sortSet, rowStart, rowEnd);
-        ;
-
-        tableFacade.setItems(items);
-        */
-
     }
 
     protected StudySubjectSDVFilter getStudySubjectSDVFilter(Limit limit) {
@@ -332,39 +310,6 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         row.setActions(actions.toString());
 
         return row;
-
-    }
-
-    private int getNumberCompletedEventCRFs(List<EventCRFBean> eventCRFBeans) {
-
-        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-        StudyEventBean studyEventBean = null;
-        int counter = 0;
-        int statusId = 0;
-
-        for (EventCRFBean eventBean : eventCRFBeans) {
-
-            studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventBean.getStudyEventId());
-            if (studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
-                counter++;
-            }
-
-        }
-        return counter;
-    }
-
-    private int getNumberSDVdEventCRFs(List<EventCRFBean> eventCRFBeans) {
-
-        int counter = 0;
-
-        for (EventCRFBean eventBean : eventCRFBeans) {
-
-            if (eventBean.getSdvStatus() == SdvStatus.VERIFIED) {
-                counter++;
-            }
-
-        }
-        return counter;
 
     }
 

@@ -996,7 +996,6 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     private StudyEventDAO getStudyEventDao() {
-      //  studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
         return new StudyEventDAO(dataSource);
     }
 
