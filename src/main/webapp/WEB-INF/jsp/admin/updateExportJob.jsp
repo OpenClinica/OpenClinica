@@ -77,7 +77,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="text"><b><fmt:message key="please_pick_a_dataset_to_export" bundle="${resword}"/>:</b></td>
+		<td class="text"><b><fmt:message key="please_pick_a_dataset_to_export" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dsId"/></jsp:include></td>
 		<td class="text"><select name="dsId">
 			<c:forEach var="dataset" items="${datasets}">
 				<option value="<c:out value="${dataset.id}"/>"
