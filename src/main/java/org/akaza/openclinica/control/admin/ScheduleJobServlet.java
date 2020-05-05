@@ -149,9 +149,7 @@ public abstract class ScheduleJobServlet extends SecureController {
         int datasetId = fp.getInt(DATASET_ID);
         HashMap errors = v.validate();
         if (formatId == 0) {
-            // throw an error here, at least one should work
-            // errors.put(TAB, "Error Message - Pick one of the below");
-            v.addError(errors, FORMAT_ID, "Please pick at least one.");
+            v.addError(errors, FORMAT_ID, "Please pick a file format.");
         }
         for (TriggerKey triggerKey : triggerKeys) {
             if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && !triggerKey.getName().equals(properName)) {
