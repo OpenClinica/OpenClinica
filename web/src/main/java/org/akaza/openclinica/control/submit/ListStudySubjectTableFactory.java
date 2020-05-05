@@ -94,9 +94,34 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     // To avoid showing title in other pages, the request element is used to determine where the request came from.
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
         locale = LocaleResolver.getLocale(request);
-        session = request.getSession();
-        TableFacade tableFacade = getTableFacadeImpl(request, response);
-        tableFacade.setStateAttr("restore");
+        session = request.getSession();      
+     
+        // new setting
+        TableFacade tableFacade = null;
+        String matchedStudyOID = null;
+        if(request.getParameter("maxRows") != null) {        	
+        	tableFacade = prepareNewTableFacade(request, response);
+        }else {
+        	// restore from the session   	        	 
+        	 TableFacade tableFacadeInSession = (TableFacade) request.getSession().getAttribute("LSStableFacade");
+        	 tableFacade = getTableFacadeImpl(request, response);
+        	 matchedStudyOID = (String) request.getSession().getAttribute("matchedStudyOID");
+        	 String currentStudyOID = getStudyBean().getOid();
+        	 
+        	 if(matchedStudyOID != null && matchedStudyOID.equals(currentStudyOID)) {
+        		 if(tableFacadeInSession != null) {
+            		 Limit limitInSession = tableFacadeInSession.getLimit();
+        	         
+            		 tableFacade.setStateAttr("restore");
+            		 tableFacade.setLimit(limitInSession);        		
+            	 }  
+        	 }else {
+        		tableFacade = prepareNewTableFacade(request, response); 
+        	 }
+        	 
+        	      	
+        }        
+      
         setDataAndLimitVariables(tableFacade);
         configureTableFacade(response, tableFacade);
         if (!tableFacade.getLimit().isExported()) {
@@ -110,6 +135,23 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         }
         return tableFacade;
     }
+
+	/**
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	private TableFacade prepareNewTableFacade(HttpServletRequest request, HttpServletResponse response) {
+		TableFacade tableFacade;
+		String matchedStudyOID;
+		tableFacade = getTableFacadeImpl(request, response);
+		tableFacade.setStateAttr("restore");        
+		
+		request.getSession().setAttribute("LSStableFacade",tableFacade);
+		matchedStudyOID = getStudyBean().getOid();
+		request.getSession().setAttribute("matchedStudyOID",matchedStudyOID);
+		return tableFacade;
+	}
 
     public ListStudySubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "images/icon_Scheduled.gif");
