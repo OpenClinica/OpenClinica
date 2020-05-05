@@ -580,7 +580,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             // set the user account id for the user who completed data entry
             forwardPage(Page.ADD_DISCREPANCY_NOTE);
 
-        } else {
+        } else { //Submit and Close the Discrepancy note
             FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             FormDiscrepancyNotes noteTree_RFC_REPEAT = (FormDiscrepancyNotes) session.getAttribute(FLAG_DISCREPANCY_RFC);;
     
@@ -738,7 +738,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
                     }
                     note = (DiscrepancyNoteBean) dndao.create(note);
-
+                    note.setEntityId(entityId);
                     dndao.createMapping(note);
 
                     request.setAttribute(DIS_NOTE, note);
