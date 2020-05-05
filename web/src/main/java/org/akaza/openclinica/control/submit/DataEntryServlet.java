@@ -5753,9 +5753,11 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
             }
 
             // continue to check the left open tab, it  maybe in different study
+            //This value comes from the event_definition_crf table to handle site-specific crfs
             String studyId = (String)request.getParameter("sid");
-            //The study id is always the study level id of the study, never the site.
-            if(studyId !=null && Integer.parseInt(studyId) != currentStudyParentId) {
+            //This checks both study and site ids against the event_definition_crf table's study_id value
+            //since crf's can be assigned to a specific site - zique
+            if(studyId !=null && Integer.parseInt(studyId) != currentStudyParentId && Integer.parseInt(studyId) != currentStudy.getId()) {
                  auth = false;
             }
         }
