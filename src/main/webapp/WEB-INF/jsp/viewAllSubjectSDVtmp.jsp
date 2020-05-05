@@ -252,7 +252,7 @@
         overflow-y: auto;
     }
 
-    #sdv_row1 > td:last-child {
+    #sdv td:last-child {
         white-space: nowrap;
     }
 
@@ -298,9 +298,12 @@
         background-color: transparent;
     }
 
-    #clear-filter {
-        float: left;
-        margin: 5px 10px;
+    .sdvCheck {
+        margin-top: 7px !important;
+    }
+
+    .icon.icon-icon-SDV-doubleCheck {
+        margin-top: 1px;
     }
 
     .text-left {
@@ -317,6 +320,11 @@
 
     .blockUI.blockMsg.blockPage {
         padding: 0 !important;
+    }
+
+    #clear-filter {
+        float: left;
+        margin: 5px 10px;
     }
 
 </style>
