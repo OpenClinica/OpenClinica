@@ -515,16 +515,6 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ListEventDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>InitUpdateEventDefinition</display-name>
-        <servlet-name>InitUpdateEventDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.InitUpdateEventDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>UpdateEventDefinition</display-name>
-        <servlet-name>UpdateEventDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateEventDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>RemoveCRFFromDefinition</display-name>
         <servlet-name>RemoveCRFFromDefinitionServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RemoveCRFFromDefinitionServlet</servlet-class>
@@ -568,12 +558,6 @@
         <servlet-class>org.akaza.openclinica.control.admin.CreateXformCRFVersionServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>InitCreateCRFVersion</display-name>
-
-        <servlet-name>InitCreateCRFVersionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.InitCreateCRFVersionServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>ExtractDatasetsMain</display-name>
 
         <servlet-name>ExtractDatasetsMainServlet</servlet-name>
@@ -610,11 +594,6 @@
         <servlet-class>org.akaza.openclinica.control.admin.UpdateCRFServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>InitUpdateCRF</display-name>
-        <servlet-name>InitUpdateCRFServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.InitUpdateCRFServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>AdminSystem</display-name>
         <servlet-name>AdminSystemServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.AdminSystemServlet</servlet-class>
@@ -643,26 +622,6 @@
         <display-name>ViewSite</display-name>
         <servlet-name>ViewSiteServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewSiteServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>RemoveEventDefinition</display-name>
-        <servlet-name>RemoveEventDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveEventDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>RestoreEventDefinition</display-name>
-        <servlet-name>RestoreEventDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreEventDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>LockEventDefinition</display-name>
-        <servlet-name>LockEventDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.LockEventDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>UnlockEventDefinition</display-name>
-        <servlet-name>UnlockEventDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UnlockEventDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ListStudyUser</display-name>
@@ -857,11 +816,6 @@
         <servlet-class>org.akaza.openclinica.control.admin.ViewStudyServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>RemoveCRF</display-name>
-        <servlet-name>RemoveCRFServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.RemoveCRFServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>RestoreCRF</display-name>
         <servlet-name>RestoreCRFServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.RestoreCRFServlet</servlet-class>
@@ -875,16 +829,6 @@
         <display-name>RestoreSubject</display-name>
         <servlet-name>RestoreSubjectServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.RestoreSubjectServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>RemoveCRFVersion</display-name>
-        <servlet-name>RemoveCRFVersionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.RemoveCRFVersionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>RestoreCRFVersion</display-name>
-        <servlet-name>RestoreCRFVersionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.RestoreCRFVersionServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ViewSubjectVersion</display-name>
@@ -902,16 +846,6 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudySubjectAuditLogServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>ChangeDefinitionOrdinal</display-name>
-        <servlet-name>ChangeDefinitionOrdinalServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ChangeDefinitionOrdinalServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>ChangeDefinitionCRFOrdinal</display-name>
-        <servlet-name>ChangeDefinitionCRFOrdinalServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ChangeDefinitionCRFOrdinalServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>UpdateStudyEvent</display-name>
         <servlet-name>UpdateStudyEventServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.UpdateStudyEventServlet</servlet-class>
@@ -920,11 +854,6 @@
         <display-name>ViewStudyEvents</display-name>
         <servlet-name>ViewStudyEventsServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudyEventsServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>DeleteCRFVersion</display-name>
-        <servlet-name>DeleteCRFVersionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.DeleteCRFVersionServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>DeleteEventCRF</display-name>
@@ -955,11 +884,6 @@
         <display-name>DownloadStudyMetadata</display-name>
         <servlet-name>DownloadStudyMetadataServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.DownloadStudyMetadataServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>DownloadVersionSpreadSheet</display-name>
-        <servlet-name>DownloadVersionSpreadSheetServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.DownloadVersionSpreadSheetServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>DownloadAttachedFile</display-name>
@@ -1100,19 +1024,6 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.SignStudySubjectServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>LockCRFVersion</display-name>
-        <servlet-name>LockCRFVersionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.LockCRFVersionServlet</servlet-class>
-    </servlet>
-
-    <servlet>
-        <display-name>UnlockCRFVersion</display-name>
-        <servlet-name>UnlockCRFVersionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.UnlockCRFVersionServlet</servlet-class>
-    </servlet>
-
-
-    <servlet>
         <display-name>MatchPasswordServlet</display-name>
         <servlet-name>MatchPasswordServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.MatchPasswordServlet</servlet-class>
@@ -1149,16 +1060,6 @@
         <servlet-name>ViewDicomServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewDicomServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>LockCRFVersionServlet</servlet-name>
-        <url-pattern>/LockCRFVersion</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>UnlockCRFVersionServlet</servlet-name>
-        <url-pattern>/UnlockCRFVersion</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>SignStudySubjectServlet</servlet-name>
         <url-pattern>/SignStudySubject</url-pattern>
@@ -1469,14 +1370,6 @@
         <url-pattern>/ListEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>InitUpdateEventDefinitionServlet</servlet-name>
-        <url-pattern>/InitUpdateEventDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UpdateEventDefinitionServlet</servlet-name>
-        <url-pattern>/UpdateEventDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>AdminSystemServlet</servlet-name>
         <url-pattern>/AdminSystem</url-pattern>
     </servlet-mapping>
@@ -1533,10 +1426,6 @@
         <url-pattern>/CreateXformCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>InitCreateCRFVersionServlet</servlet-name>
-        <url-pattern>/InitCreateCRFVersion</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ExtractDatasetsMainServlet</servlet-name>
         <url-pattern>/ExtractDatasetsMain</url-pattern>
     </servlet-mapping>
@@ -1561,10 +1450,6 @@
         <url-pattern>/BatchCRFMigration</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>InitUpdateCRFServlet</servlet-name>
-        <url-pattern>/InitUpdateCRF</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>UpdateCRFServlet</servlet-name>
         <url-pattern>/UpdateCRF</url-pattern>
     </servlet-mapping>
@@ -1579,22 +1464,6 @@
     <servlet-mapping>
         <servlet-name>ViewSiteServlet</servlet-name>
         <url-pattern>/ViewSite</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RemoveEventDefinitionServlet</servlet-name>
-        <url-pattern>/RemoveEventDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RestoreEventDefinitionServlet</servlet-name>
-        <url-pattern>/RestoreEventDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LockEventDefinitionServlet</servlet-name>
-        <url-pattern>/LockEventDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UnlockEventDefinitionServlet</servlet-name>
-        <url-pattern>/UnlockEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ListStudyUserServlet</servlet-name>
@@ -1689,20 +1558,8 @@
         <url-pattern>/ViewStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveCRFServlet</servlet-name>
-        <url-pattern>/RemoveCRF</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>RestoreCRFServlet</servlet-name>
         <url-pattern>/RestoreCRF</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RemoveCRFVersionServlet</servlet-name>
-        <url-pattern>/RemoveCRFVersion</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RestoreCRFVersionServlet</servlet-name>
-        <url-pattern>/RestoreCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RemoveSubjectServlet</servlet-name>
@@ -1739,14 +1596,6 @@
         <url-pattern>/ExportExcelStudySubjectAuditLog</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ChangeDefinitionOrdinalServlet</servlet-name>
-        <url-pattern>/ChangeDefinitionOrdinal</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ChangeDefinitionCRFOrdinalServlet</servlet-name>
-        <url-pattern>/ChangeDefinitionCRFOrdinal</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>CheckCRFLocked</servlet-name>
         <url-pattern>/CheckCRFLocked</url-pattern>
     </servlet-mapping>
@@ -1757,10 +1606,6 @@
     <servlet-mapping>
         <servlet-name>ViewStudyEventsServlet</servlet-name>
         <url-pattern>/ViewStudyEvents</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DeleteCRFVersionServlet</servlet-name>
-        <url-pattern>/DeleteCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DeleteEventCRFServlet</servlet-name>
@@ -1785,10 +1630,6 @@
     <servlet-mapping>
         <servlet-name>DownloadStudyMetadataServlet</servlet-name>
         <url-pattern>/DownloadStudyMetadata</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DownloadVersionSpreadSheetServlet</servlet-name>
-        <url-pattern>/DownloadVersionSpreadSheet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DownloadAttachedFileServlet</servlet-name>

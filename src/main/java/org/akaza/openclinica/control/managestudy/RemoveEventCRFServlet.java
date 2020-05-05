@@ -53,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RemoveEventCRFServlet extends SecureController {
 
+    private StudyEventDAO studyEventDAO;
     /**
      * 
      */
@@ -76,12 +77,12 @@ public class RemoveEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
@@ -116,9 +117,9 @@ public class RemoveEventCRFServlet extends SecureController {
             // DisplayEventCRFBean.setFlags
             int studyEventId = eventCRF.getStudyEventId();
 
-            StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
-            int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);
             event.setStudyEventDefinition(sed);
@@ -178,7 +179,7 @@ public class RemoveEventCRFServlet extends SecureController {
                     event.setSigned(Boolean.FALSE);
                     event.setUpdater(ub);
                     event.setUpdatedDate(new Date());
-                    sedao.update(event);
+                    studyEventDAO.update(event);
                 }
                 if(studySub.getStatus().equals(Status.SIGNED)){
                     studySub.setStatus(Status.AVAILABLE);

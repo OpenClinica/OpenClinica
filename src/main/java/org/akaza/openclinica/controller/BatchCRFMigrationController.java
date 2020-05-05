@@ -62,6 +62,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -99,6 +100,10 @@ public class BatchCRFMigrationController implements Runnable {
     @Autowired
     private StudyBuildService studyBuildService;
     private HelperObject helperObject;
+
+    @Autowired
+    @Qualifier("studyeventdaojdbc")
+    private StudyEventDAO studyEventDAO;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -511,10 +516,6 @@ public class BatchCRFMigrationController implements Runnable {
         return new EventCRFDAO(dataSource);
     }
 
-    private StudyEventDAO sedao() {
-        return new StudyEventDAO(dataSource);
-    }
-
     @SuppressWarnings("rawtypes")
     private StudyEventDefinitionDAO seddao() {
         return new StudyEventDefinitionDAO(dataSource);
@@ -725,7 +726,7 @@ public class BatchCRFMigrationController implements Runnable {
 
             StudySubjectBean ssBean = (StudySubjectBean) ssdao().findByPK(eventCrfToMigrate.getStudySubjectId());
             Study sBean = (Study) studyDao.findByPK(ssBean.getStudyId());
-            StudyEventBean seBean = (StudyEventBean) sedao().findByPK(eventCrfToMigrate.getStudyEventId());
+            StudyEventBean seBean = (StudyEventBean) studyEventDAO.findByPK(eventCrfToMigrate.getStudyEventId());
             StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao().findByPK(seBean.getStudyEventDefinitionId());
             reportLog.getLogs()
                     .add(cBean.getName() + "," + helperObject.getSourceCrfVersionBean().getName() + "," + helperObject.getTargetCrfVersionBean().getName() + ","

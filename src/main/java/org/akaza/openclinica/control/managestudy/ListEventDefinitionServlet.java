@@ -16,6 +16,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
@@ -51,6 +52,7 @@ import java.util.Map;
 public class ListEventDefinitionServlet extends SecureController {
 
     Locale locale;
+    private StudyEventDAO studyEventDAO;
 
     // < ResourceBundleresword, resworkflow, respage,resexception;
 
@@ -96,17 +98,13 @@ public class ListEventDefinitionServlet extends SecureController {
     public void processRequest() throws Exception {
 
         StudyEventDefinitionDAO edao = new StudyEventDefinitionDAO(sm.getDataSource());
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         UserAccountDAO sdao = new UserAccountDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         CRFDAO crfDao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(sm.getDataSource());
         ArrayList seds = edao.findAllByStudy(currentStudy);
 
-        // request.setAttribute("seds", seds);
-
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
         for (int i = 0; i < seds.size(); i++) {
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
             Collection eventDefinitionCRFlist = edcdao.findAllParentsByDefinition(sed.getId());
@@ -124,7 +122,7 @@ public class ListEventDefinitionServlet extends SecureController {
                 sed.setUpdater(sed.getOwner());
                 sed.setUpdatedDate(sed.getCreatedDate());
             }
-            if (isPopulated(sed, sedao)) {
+            if (isPopulated(sed)) {
                 sed.setPopulated(true);
             }
         }
@@ -177,7 +175,7 @@ public class ListEventDefinitionServlet extends SecureController {
      * @param sed
      * @return
      */
-    private boolean isPopulated(StudyEventDefinitionBean sed, StudyEventDAO sedao) {
+    private boolean isPopulated(StudyEventDefinitionBean sed) {
         /*
         // checks study event
         ArrayList events = (ArrayList) sedao.findAllByDefinition(sed.getId());
@@ -189,51 +187,11 @@ public class ListEventDefinitionServlet extends SecureController {
         }
         return false;
         */
-        if(sedao.countNotRemovedEvents(sed.getId())>0) {
+        if(studyEventDAO.countNotRemovedEvents(sed.getId())>0) {
             return true;
         } else {
             return false;
         }
-    }
-
-    /**
-     * Checked whether a definition is available to be locked
-     *
-     * @param sed
-     * @return
-     */
-    private boolean isLockable(StudyEventDefinitionBean sed, StudyEventDAO sedao, EventCRFDAO ecdao, ItemDataDAO iddao) {
-
-        // checks study event
-        ArrayList events = (ArrayList) sedao.findAllByDefinition(sed.getId());
-        for (int j = 0; j < events.size(); j++) {
-            StudyEventBean event = (StudyEventBean) events.get(j);
-
-                if ( event.isRemoved()
-                    || event.isArchived()) {
-                return false;
-            }
-
-            ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-            for (int k = 0; k < eventCRFs.size(); k++) {
-                EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                if (eventCRF.isRemoved() || eventCRF.isArchived()) {
-                    return false;
-                }
-
-                ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
-                for (int a = 0; a < itemDatas.size(); a++) {
-                    ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-                    if (!(item.getStatus().equals(Status.UNAVAILABLE) || item.getStatus().equals(Status.DELETED))) {
-                        return false;
-                    }
-
-                }
-            }
-        }
-
-        return true;
     }
 
 }

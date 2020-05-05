@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -81,6 +82,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         if (fp.getString("showMoreLink").equals("")) {
             showMoreLink = true;
         } else {
@@ -122,7 +124,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
-        factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
@@ -173,11 +175,6 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public SubjectGroupMapDAO getSubjectGroupMapDAO() {
         subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
         return subjectGroupMapDAO;
-    }
-
-    public StudyEventDAO getStudyEventDAO() {
-        studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-        return studyEventDAO;
     }
 
     public EventCRFDAO getEventCRFDAO() {

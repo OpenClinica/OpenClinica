@@ -20,6 +20,7 @@ import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
@@ -59,6 +60,7 @@ public class ViewStudyEventsServlet extends SecureController {
 
     public static final String PRINT = "print";
     private final String COMMON = "common";
+    private StudyEventDAO studyEventDAO;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -85,6 +87,7 @@ public class ViewStudyEventsServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         // checks which module requests are from
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
@@ -181,7 +184,7 @@ public class ViewStudyEventsServlet extends SecureController {
      * @return
      */
     private ArrayList genTables(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, int statusId) {
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ArrayList allEvents = new ArrayList();
         definitions = findDefinitionById(definitions, definitionId);
@@ -198,7 +201,7 @@ public class ViewStudyEventsServlet extends SecureController {
             ArrayList events = new ArrayList();
             for (int s = 0; s < studySubjects.size(); ++s) {
                 StudySubjectBean ssb = (StudySubjectBean) studySubjects.get(s);
-                ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
+                ArrayList evts = studyEventDAO.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
 
                 for (int v = 0; v < evts.size(); ++v) {
                     StudyEventBean seb = (StudyEventBean) evts.get(v);
@@ -319,7 +322,6 @@ public class ViewStudyEventsServlet extends SecureController {
      * @return
      */
     private ArrayList genEventsForPrint(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, int statusId) {
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ArrayList allEvents = new ArrayList();
         definitions = findDefinitionById(definitions, definitionId);
@@ -337,7 +339,7 @@ public class ViewStudyEventsServlet extends SecureController {
             ArrayList events = new ArrayList();
             for (int s = 0; s < studySubjects.size(); ++s) {
                 StudySubjectBean ssb = (StudySubjectBean) studySubjects.get(s);
-                ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
+                ArrayList evts = studyEventDAO.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
 
                 for (int v = 0; v < evts.size(); ++v) {
                     events.add(evts.get(v));

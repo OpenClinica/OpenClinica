@@ -9,6 +9,7 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListDiscNotesForCRFTableFactory;
@@ -95,6 +96,7 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         // Determine whether to limit the displayed DN's to a certain DN type
         int resolutionStatus = 0;
         try {
@@ -161,7 +163,7 @@ public class ListDiscNotesForCRFServlet extends SecureController {
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
-        factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyDao(getStudyDao());
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
@@ -210,11 +212,6 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     public SubjectGroupMapDAO getSubjectGroupMapDAO() {
         subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
         return subjectGroupMapDAO;
-    }
-
-    public StudyEventDAO getStudyEventDAO() {
-        studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-        return studyEventDAO;
     }
 
     public EventCRFDAO getEventCRFDAO() {

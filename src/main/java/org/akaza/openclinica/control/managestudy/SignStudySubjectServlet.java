@@ -30,6 +30,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -70,6 +71,7 @@ public class SignStudySubjectServlet extends SecureController {
     public static final String ORIGINATING_PAGE = "originatingPage";
 
     private StudyEventDAO studyEventDAO;
+    private StudySubjectService studySubjectService;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -201,6 +203,7 @@ public class SignStudySubjectServlet extends SecureController {
     public void processRequest() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(context);
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
 
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
@@ -270,7 +273,7 @@ public class SignStudySubjectServlet extends SecureController {
                     StudyEventBean studyEvent = displayEvent.getStudyEvent();
                     ArrayList eventCRFs = ecdao.findAllByStudyEvent(displayEvent.getStudyEvent());
                     ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
-                    ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
+                    ArrayList displayEventCRFs = studySubjectService.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
                             currentRole, studyEvent.getWorkflowStatus(), study);
                     displayEvent.setDisplayEventCRFs(displayEventCRFs);
                 }
@@ -337,7 +340,7 @@ public class SignStudySubjectServlet extends SecureController {
             StudyEventBean studyEvent = displayEvent.getStudyEvent();
             ArrayList eventCRFs = ecdao.findAllByStudyEvent(displayEvent.getStudyEvent());
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
-            ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
+            ArrayList displayEventCRFs = studySubjectService.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
                     studyEvent.getWorkflowStatus(), study);
             displayEvent.setDisplayEventCRFs(displayEventCRFs);
         }

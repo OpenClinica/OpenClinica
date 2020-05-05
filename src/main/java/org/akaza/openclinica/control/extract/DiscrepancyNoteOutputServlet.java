@@ -82,12 +82,14 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
     private StudyEventDefinitionDao studyEventDefinitionDao;
+    private StudyEventDAO studyEventDAO;
 
     /* Handle the HTTP Get or Post request. */
     @Override
     protected void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         // the fileName contains any subject id and study unique protocol id;
         // see: chooseDownloadFormat.jsp
         String fileName = request.getParameter("fileName");
@@ -309,7 +311,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
@@ -397,7 +398,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                         }
                     }
                 } else if (entityType.equalsIgnoreCase("eventCRF")) {
-                    StudyEventBean se = (StudyEventBean) sedao.findByPK(dnb.getEntityId());
+                    StudyEventBean se = (StudyEventBean) studyEventDAO.findByPK(dnb.getEntityId());
                     StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
 
                     EventCRFBean ecb = (EventCRFBean) aeb;
@@ -443,7 +444,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     // }
                 } else if (entityType.equalsIgnoreCase("studyEvent")) {
                     // allNotes.add(dnb);
-                    StudyEventBean se = (StudyEventBean) sedao.findByPK(dnb.getEntityId());
+                    StudyEventBean se = (StudyEventBean) studyEventDAO.findByPK(dnb.getEntityId());
                     StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
                     se.setName(sedb.getName());
                     dnb.setEntityName(dnb.getEntityName());
@@ -492,7 +493,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setStageId(ec.getStage().getId());
                     dnb.setEntityValue(idb.getValue());
 
-                    StudyEventBean se = (StudyEventBean) sedao.findByPK(ec.getStudyEventId());
+                    StudyEventBean se = (StudyEventBean) studyEventDAO.findByPK(ec.getStudyEventId());
 
                     StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
 

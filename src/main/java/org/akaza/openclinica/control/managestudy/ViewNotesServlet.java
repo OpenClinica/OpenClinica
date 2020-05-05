@@ -1,45 +1,36 @@
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import core.org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.managestudy.CustomColumn;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.service.Component;
+import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import core.org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import core.org.akaza.openclinica.service.PermissionService;
+import core.org.akaza.openclinica.service.managestudy.ViewNotesService;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDAO;
-import core.org.akaza.openclinica.dao.submit.SubjectDAO;
-import core.org.akaza.openclinica.service.managestudy.ViewNotesService;
+import org.akaza.openclinica.service.Component;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang3.StringUtils;
 import org.jmesa.facade.TableFacade;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import java.util.*;
 
 /**
  *
@@ -173,12 +164,8 @@ public class ViewNotesServlet extends SecureController {
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
 
         UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
-        CRFVersionDAO crfVersionDao = new CRFVersionDAO(sm.getDataSource());
-        CRFDAO crfDao = new CRFDAO(sm.getDataSource());
-        StudyEventDAO studyEventDao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO eventDefinitionCRFDao = new EventDefinitionCRFDAO(sm.getDataSource());
-        ItemDAO itemDao = new ItemDAO(sm.getDataSource());
         EventCRFDAO eventCRFDao = new EventCRFDAO(sm.getDataSource());
 
         ListNotesTableFactory factory = new ListNotesTableFactory(showMoreLink, getPermissionTagsList());
@@ -301,10 +288,6 @@ public class ViewNotesServlet extends SecureController {
         return result;
     }
 
-    /**
-     * @param resolveViewNotesService
-     * @return
-     */
     private Map<String, Map<String, String>> generateDiscrepancyNotesSummary(DiscrepancyNotesSummary summary) {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
         for (ResolutionStatus resStatus : ResolutionStatus.list) {

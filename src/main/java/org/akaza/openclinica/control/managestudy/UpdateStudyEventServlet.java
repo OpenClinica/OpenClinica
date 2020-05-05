@@ -13,6 +13,7 @@ import java.util.*;
 import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.*;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
@@ -24,6 +25,8 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -63,6 +66,8 @@ import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.util.HttpResponseException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.sql.DataSource;
 
 /**
  * @author jxu
@@ -491,7 +496,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
                 populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
-                ArrayList<DisplayEventCRFBean> displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
+                ArrayList<DisplayEventCRFBean> displayEventCRFs = getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
                         eventDefinitionCRFs, ub, currentRole, studyEvent.getWorkflowStatus(), study);
 
                 DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
@@ -610,6 +615,81 @@ public class UpdateStudyEventServlet extends SecureController {
             forwardPage(Page.UPDATE_STUDY_EVENT);
         } // else
 
+    }
+
+    public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
+                                         StudyUserRoleBean currentRole, StudyEventWorkflowStatusEnum workflowStatus, Study study) {
+        ArrayList answer = new ArrayList();
+
+        // HashMap definitionsById = new HashMap();
+        int i;
+        /*
+         * for (i = 0; i < eventDefinitionCRFs.size(); i++) {
+         * EventDefinitionCRFBean edc = (EventDefinitionCRFBean)
+         * eventDefinitionCRFs.get(i); definitionsById.put(new
+         * Integer(edc.getStudyEventDefinitionId()), edc); }
+         */
+
+        CRFDAO cdao = new CRFDAO(ds);
+        CRFVersionDAO cvdao = new CRFVersionDAO(ds);
+        FormLayoutDAO fldao = new FormLayoutDAO(ds);
+        ItemDataDAO iddao = new ItemDataDAO(ds);
+        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
+
+        for (i = 0; i < eventCRFs.size(); i++) {
+            EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
+
+            // populate the event CRF with its crf bean
+            int crfVersionId = ecb.getCRFVersionId();
+            int formLayoutId = ecb.getFormLayoutId();
+            CRFBean cb = cdao.findByLayoutId(formLayoutId);
+            ecb.setCrf(cb);
+
+            CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
+            ecb.setCrfVersion(cvb);
+            FormLayoutBean flb = (FormLayoutBean) fldao.findByPK(formLayoutId);
+            ecb.setFormLayout(flb);
+
+            // then get the definition so we can call
+            // DisplayEventCRFBean.setFlags
+            int studyEventId = ecb.getStudyEventId();
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
+
+            // EventDefinitionCRFBean edc = (EventDefinitionCRFBean)
+            // definitionsById.get(new Integer(
+            // studyEventDefinitionId));
+            // fix problem of the above code(commented out), find the correct
+            // edc, note that on definitionId can be related to multiple
+            // eventdefinitioncrfBeans
+            EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
+            // below added 092007 tbh
+
+            // above added 092007-102007 tbh
+            // TODO need to refactor since this is similar to other code, tbh
+            if (edc != null) {
+                ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) fldao.findAllActiveByCRF(edc.getCrfId());
+                edc.setVersions(versions);
+
+                // System.out.println("edc is not null, need to set flags");
+                DisplayEventCRFBean dec = new DisplayEventCRFBean();
+                dec.setEventDefinitionCRF(edc);
+                // System.out.println("edc.isDoubleEntry()" +
+                // edc.isDoubleEntry() + ecb.getId());
+                dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
+
+                if (dec.isLocked()) {
+                    // System.out.println("*** found a locked DEC:
+                    // "+edc.getCrfName());
+                }
+                ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
+                if (!idata.isEmpty()) {
+                    // consider an event crf started only if item data get
+                    // created
+                    answer.add(dec);
+                }
+            }
+        }
+        return answer;
     }
 
     private void updateClosedQueriesForUpdatedStudySubjectFields(StudyEventBean updatedStudyEvent) {

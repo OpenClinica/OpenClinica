@@ -13,6 +13,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.AuditDAO;
@@ -41,6 +42,7 @@ import java.util.Locale;
 public class AuditLogStudyServlet extends SecureController {
 
     Locale locale;
+    private StudyEventDAO studyEventDAO;
 
     // <ResourceBundle resword,resexception,respage;
 
@@ -67,22 +69,17 @@ public class AuditLogStudyServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        int studyId = currentStudy.getStudyId();
 
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         AuditDAO adao = new AuditDAO(sm.getDataSource());
 
         FormProcessor fp = new FormProcessor(request);
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 
-        HashMap eventCRFAuditsHashMap = new HashMap();
         HashMap eventsHashMap = new HashMap();
         HashMap studySubjectAuditsHashMap = new HashMap();
         HashMap subjectHashMap = new HashMap();
@@ -93,7 +90,6 @@ public class AuditLogStudyServlet extends SecureController {
 
         for (int ss = 0; ss < studySubjects.size(); ss++) {
             ArrayList studySubjectAudits = new ArrayList();
-            ArrayList eventCRFAudits = new ArrayList();
 
             StudySubjectBean studySubject = (StudySubjectBean) studySubjects.get(ss);
             // request.setAttribute("studySub"+ss, studySubject);
@@ -121,7 +117,7 @@ public class AuditLogStudyServlet extends SecureController {
             // studySubjectAudits);
 
             // Get the list of events
-            ArrayList events = sedao.findAllByStudySubject(studySubject);
+            ArrayList events = studyEventDAO.findAllByStudySubject(studySubject);
             for (int i = 0; i < events.size(); i++) {
                 // Link study event definitions
                 StudyEventBean studyEvent = (StudyEventBean) events.get(i);

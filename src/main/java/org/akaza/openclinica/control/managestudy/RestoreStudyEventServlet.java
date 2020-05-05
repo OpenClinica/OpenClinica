@@ -53,8 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RestoreStudyEventServlet extends SecureController {
 
-    private KafkaService kafkaService;
-    private TokenService tokenService;
+    private StudyEventDAO studyEventDAO;
     /**
      *
      */
@@ -79,12 +78,10 @@ public class RestoreStudyEventServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
-        kafkaService = (KafkaService) SpringServletAccess.getApplicationContext(context).getBean("kafkaService");
-        tokenService = (TokenService) SpringServletAccess.getApplicationContext(context).getBean("tokenService");
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
         if (studyEventId == 0) {
@@ -106,7 +103,7 @@ public class RestoreStudyEventServlet extends SecureController {
             }
             // YW
 
-            StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
             request.setAttribute("studySub", studySub);
 
@@ -142,7 +139,7 @@ public class RestoreStudyEventServlet extends SecureController {
                 event.setRemoved(Boolean.FALSE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
-                sedao.update(event);
+                studyEventDAO.update(event);
 
                 if(studySub.getStatus().equals(Status.SIGNED)){
                     studySub.setStatus(Status.AVAILABLE);
@@ -159,9 +156,6 @@ public class RestoreStudyEventServlet extends SecureController {
 
                 addPageMessage(emailBody);
 
-                kafkaService.sendEventAttributeChangeMessage(event.getStudyEventDefinition().getOid(), studySub);
-
-                // sendEmail(emailBody);
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
@@ -188,7 +182,6 @@ public class RestoreStudyEventServlet extends SecureController {
             definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 
@@ -206,7 +199,7 @@ public class RestoreStudyEventServlet extends SecureController {
             // then get the definition so we can call
             // DisplayEventCRFBean.setFlags
             int studyEventId = ecb.getStudyEventId();
-            int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
 
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
 
@@ -217,19 +210,4 @@ public class RestoreStudyEventServlet extends SecureController {
 
         return answer;
     }
-
-    /**
-     * Send email to director and administrator
-     *
-     */
-    private void sendEmail(String emailBody) throws Exception {
-
-        logger.info("Sending email...");
-        // to study director
-        sendEmail(ub.getEmail().trim(), respage.getString("restore_event_to_study"), emailBody, false);
-        // to admin
-        sendEmail(EmailEngine.getAdminEmail(), respage.getString("restore_event_to_study"), emailBody, false, false);
-        logger.info("Sending email done..");
-    }
-
 }

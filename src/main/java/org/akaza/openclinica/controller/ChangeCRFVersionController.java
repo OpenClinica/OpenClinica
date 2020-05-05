@@ -551,11 +551,10 @@ public class ChangeCRFVersionController {
         // update event_crf_id table
         try {
             EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-            StudyEventDAO sed = new StudyEventDAO(dataSource);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             Study currentPublicStudy = (Study) session.getAttribute("publicStudy");
             EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
-            StudyEventBean seb = (StudyEventBean) sed.findByPK(ecb.getStudyEventId());
+            StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
             if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
                     + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
                 String errorData = getErrorData(request, ecb, currentPublicStudy);
@@ -589,7 +588,7 @@ public class ChangeCRFVersionController {
             if (status_before_update != null && status_before_update.length() == 1) {
                studyEventService.convertStudyEventBeanStatus(status_before_update,seb);
             }
-            sed.update(seb, con);
+            studyEventDAO.update(seb, con);
 
             con.commit();
             con.setAutoCommit(true);

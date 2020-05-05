@@ -136,6 +136,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private final String ITEM_ID = "itemId";
     private final String PARENT_ID = "parentId";// parent note id
 
+    private StudyEventDAO studyEventDAO;
+
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
         request.setAttribute("fromResolvingNotes", "yes");
@@ -200,7 +202,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
         CRFDAO cdao = new CRFDAO(ds);
         CRFBean crf = cdao.findByLayoutId(formLayout.getId());
 
-        StudyEventDAO sedao = new StudyEventDAO(ds);
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
 
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
@@ -237,7 +238,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         VersioningMapDao versioningMapDao = (VersioningMapDao) SpringServletAccess.getApplicationContext(context).getBean("versioningMapDao");
         OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
 
-        StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+        StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
         // Cache the subject context for use during xform submission
         PFormCache cache = PFormCache.getInstance(context);
@@ -375,6 +376,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     protected void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         int noteId = fp.getInt(INPUT_NOTE_ID);
         int itemDataId = fp.getInt("itemDataId");
         String flavor = fp.getString(FLAVOR);
@@ -451,8 +453,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
-            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-            StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+            StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
 
             if (isCRFLocked(ecb)) {
                 isLocked = true;

@@ -104,7 +104,6 @@ public class StudyEventServiceImpl implements StudyEventService {
      */
     private StudySubjectDAO msStudySubjectDAO = null;
     private StudyEventDefinitionDAO sedDao = null;
-    private StudyEventDAO seDao = null;
     private final String COMMON = "common";
     public static final String UNSCHEDULED = "unscheduled";
     SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
@@ -232,8 +231,7 @@ public class StudyEventServiceImpl implements StudyEventService {
             /**
              *  step 5 basic check: sampleOrdinal
              */
-            StudyEventDAO sed = this.getSeDao();
-            int sampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
+            int sampleOrdinal = studyEventDAO.getMaxSampleOrdinal(definition, studySubject) + 1;
 
             if (definition.getType().equals(COMMON)) {
                 errMsg = "The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is not a visit based event.";
@@ -291,7 +289,7 @@ public class StudyEventServiceImpl implements StudyEventService {
             studyEvent.setStudySubjectId(studySubject.getId());
             studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
             studyEvent.setSampleOrdinal(sampleOrdinal);
-            studyEvent = (StudyEventBean) sed.create(studyEvent);
+            studyEvent = (StudyEventBean) studyEventDAO.create(studyEvent);
 
             if (!studyEvent.isActive()) {
                 logger.info("Event is not scheduled -- because it's not active");
@@ -438,8 +436,7 @@ public class StudyEventServiceImpl implements StudyEventService {
             /**
              *  Step 5 basic check : get sampleOrdinal
              */
-            StudyEventDAO sed = this.getSeDao();
-            int sampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
+            int sampleOrdinal = studyEventDAO.getMaxSampleOrdinal(definition, studySubject) + 1;
 
             if (definition.getType().equals(COMMON)) {
                 errMsg = "The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is not a visit based event.";
@@ -496,7 +493,7 @@ public class StudyEventServiceImpl implements StudyEventService {
             studyEvent.setStudySubjectId(studySubject.getId());
             studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
             studyEvent.setSampleOrdinal(sampleOrdinal);
-            studyEvent = (StudyEventBean) sed.create(studyEvent);
+            studyEvent = (StudyEventBean) studyEventDAO.create(studyEvent);
 
             if (!studyEvent.isActive()) {
                 logger.info("Event is not scheduled -- because it's not active");
@@ -589,18 +586,6 @@ public class StudyEventServiceImpl implements StudyEventService {
     public void setSedDao(StudyEventDefinitionDAO sedDao) {
         this.sedDao = sedDao;
     }
-
-    public StudyEventDAO getSeDao() {
-        if (seDao == null) {
-            seDao = new StudyEventDAO(dataSource);
-        }
-        return seDao;
-    }
-
-    public void setSeDao(StudyEventDAO seDao) {
-        this.seDao = seDao;
-    }
-
 
     public Object studyEventProcess(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String methodType) {
         Object subjectObject = null;

@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.ListDiscNotesSubjectTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -45,10 +46,12 @@ public class ListDiscNotesSubjectServlet extends SecureController {
     public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
     public static final String FILTER_SUMMARY = "filterSummary";
     Locale locale;
+    private StudyEventDAO studyEventDAO;
 
     // < ResourceBundleresexception,respage;
     @Override
     protected void processRequest() throws Exception {
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
 
         String module = request.getParameter("module");
         String moduleStr = "manage";
@@ -127,7 +130,6 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
 
         StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
@@ -142,7 +144,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         factory.setStudyEventDefinitionDao(seddao);
         factory.setSubjectDAO(subdao);
         factory.setStudySubjectDAO(sdao);
-        factory.setStudyEventDAO(sedao);
+        factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyBean(currentStudy);
         factory.setStudyDao(getStudyDao());
         factory.setStudyGroupClassDAO(sgcdao);

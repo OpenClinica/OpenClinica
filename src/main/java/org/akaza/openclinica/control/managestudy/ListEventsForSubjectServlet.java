@@ -19,6 +19,8 @@ import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -37,6 +39,7 @@ import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DisplayStudySubjectEventsRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +52,8 @@ import java.util.Locale;
 public class ListEventsForSubjectServlet extends SecureController {
 
     Locale locale;
+    private StudySubjectService studySubjectService;
+    private StudyEventDAO studyEventDAO;
 
     // < ResourceBundleresword;
     /*
@@ -79,6 +84,8 @@ public class ListEventsForSubjectServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
+        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         // checks which module the requests are from
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
@@ -114,7 +121,6 @@ public class ListEventsForSubjectServlet extends SecureController {
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(definitionId);
 
         StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 
         SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
@@ -187,12 +193,12 @@ public class ListEventsForSubjectServlet extends SecureController {
             ArrayList displaySubjectEvents = new ArrayList();
 
             ArrayList<DisplayStudyEventBean> displayEvents = new ArrayList<DisplayStudyEventBean>();
-            ArrayList events = sedao.findAllByStudySubjectAndDefinition(studySub, sed);
+            ArrayList events = studyEventDAO.findAllByStudySubjectAndDefinition(studySub, sed);
 
             for (int k = 0; k < events.size(); k++) {
                 StudyEventBean seb = (StudyEventBean) events.get(k);
                 DisplayStudyEventBean dseb =
-                    ListStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, seb, sm.getDataSource(), ub, currentRole, this.currentStudy);
+                        studySubjectService.getDisplayStudyEventsForStudySubject(studySub, seb, sm.getDataSource(), ub, currentRole, this.currentStudy);
 
                 // ArrayList eventCRFs = ecdao.findAllByStudyEvent(seb);
                 // ArrayList al =

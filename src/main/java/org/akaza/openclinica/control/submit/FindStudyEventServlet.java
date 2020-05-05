@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.submit;
 
 import core.org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -50,6 +51,7 @@ public class FindStudyEventServlet extends SecureController {
     public static final String BEAN_ENTITY_WITH_STUDY_EVENTS = "entityWithStudyEvents";
 
     public static final int NUM_ENTITIES_PER_PAGE = 10;
+    private StudyEventDAO studyEventDAO;
 
     /*
      * (non-Javadoc)
@@ -59,6 +61,7 @@ public class FindStudyEventServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
 
         String browseBy = fp.getString(INPUT_BROWSEBY);
         int id = fp.getInt(INPUT_ID);
@@ -110,17 +113,16 @@ public class FindStudyEventServlet extends SecureController {
 
         // User is coming from Step 2, is going to Step 3
         else {
-            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
             ArrayList events = new ArrayList();
 
             EntityBean entityWithStudyEvents;
             if (browseBy.equals(ARG_BROWSEBY_SUBJECT)) {
-                events = sedao.findAllByStudyAndStudySubjectId(currentStudy, id);
+                events = studyEventDAO.findAllByStudyAndStudySubjectId(currentStudy, id);
 
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
                 entityWithStudyEvents = ssdao.findByPK(id);
             } else {
-                events = sedao.findAllByStudyAndEventDefinitionId(currentStudy, id);
+                events = studyEventDAO.findAllByStudyAndEventDefinitionId(currentStudy, id);
 
                 StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
                 entityWithStudyEvents = seddao.findByPK(id);

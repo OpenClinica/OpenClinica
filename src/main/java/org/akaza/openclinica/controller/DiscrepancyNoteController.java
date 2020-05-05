@@ -56,6 +56,9 @@ public class DiscrepancyNoteController {
     @Autowired
     StudyDao sdao;
     DiscrepancyNoteDAO dnDao;
+    @Autowired
+    @Qualifier("studyeventdaojdbc")
+    private StudyEventDAO studyEventDAO;
 
     @RequestMapping(value = "/dnote", method = RequestMethod.POST)
     public ResponseEntity buidDiscrepancyNote(@RequestBody HashMap<String, String> map, HttpServletRequest request) throws Exception {
@@ -79,7 +82,6 @@ public class DiscrepancyNoteController {
         UserAccountDAO udao = new UserAccountDAO(dataSource);
         StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
-        StudyEventDAO sedao = new StudyEventDAO(dataSource);
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(dataSource);
 
         UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(assignedUser);
@@ -87,7 +89,7 @@ public class DiscrepancyNoteController {
         StudySubjectBean ssBean = ssdao.findByOid(studySubjectOid);
         StudyEventDefinitionBean sedBean = seddao.findByOid(se_oid);
         Study studyBean = getStudy(sedBean.getStudyId());
-        StudyEventBean seBean = (StudyEventBean) sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(ssBean.getId(), sedBean.getId(), Integer.valueOf(ordinal));
+        StudyEventBean seBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(ssBean.getId(), sedBean.getId(), Integer.valueOf(ordinal));
         String entityType = "studyEvent";
 
         DiscrepancyNoteBean parent = (DiscrepancyNoteBean) dndao.findByPK(Integer.valueOf(dn_id));

@@ -49,7 +49,7 @@ public class RemoveStudyEventServlet extends SecureController {
      *
      */
 
-    private KafkaService kafkaService;
+    private StudyEventDAO studyEventDAO;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -74,9 +74,8 @@ public class RemoveStudyEventServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
-        kafkaService = (KafkaService) SpringServletAccess.getApplicationContext(context).getBean("kafkaService");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
         if (studyEventId == 0) {
@@ -85,7 +84,7 @@ public class RemoveStudyEventServlet extends SecureController {
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
 
-            StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
             event.getStudyEventDefinition().getOid();
 
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
@@ -125,7 +124,7 @@ public class RemoveStudyEventServlet extends SecureController {
                 event.setRemoved(Boolean.TRUE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
-                sedao.update(event);
+                studyEventDAO.update(event);
 
                 if(studySub.getStatus().equals(Status.SIGNED)){
                     studySub.setStatus(Status.AVAILABLE);
@@ -189,8 +188,6 @@ public class RemoveStudyEventServlet extends SecureController {
                 addPageMessage(emailBody);
                 // sendEmail(emailBody);
 
-                kafkaService.sendEventAttributeChangeMessage(event.getStudyEventDefinition().getOid(), studySub);
-
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
@@ -217,7 +214,6 @@ public class RemoveStudyEventServlet extends SecureController {
             definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 
@@ -235,7 +231,7 @@ public class RemoveStudyEventServlet extends SecureController {
             // then get the definition so we can call
             // DisplayEventCRFBean.setFlags
             int studyEventId = ecb.getStudyEventId();
-            int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
 
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
 

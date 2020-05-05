@@ -64,7 +64,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         this.userBean = userBean;
         this.permissionTagsStringArray = permissionTagsStringArray;
         this.odmFilter = odmFilter;
-
     }
 
     /**

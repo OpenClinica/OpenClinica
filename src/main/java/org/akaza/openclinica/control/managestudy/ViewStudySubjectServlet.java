@@ -18,6 +18,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
@@ -80,6 +81,8 @@ public class ViewStudySubjectServlet extends SecureController {
 
     public final static String visitBasedEventItempath=CoreResources.getField("visitBasedEventItem");
 
+    private StudyEventDAO studyEventDAO;
+
     /**
      * Checks whether the user has the right permission to proceed function
      */
@@ -101,15 +104,14 @@ public class ViewStudySubjectServlet extends SecureController {
         throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, resexception.getString("not_study_director"), "1");
     }
 
-    public static ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub, DataSource ds, UserAccountBean ub,
+    public ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub, DataSource ds, UserAccountBean ub,
             StudyUserRoleBean currentRole, StudyDao studyDao) {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-        StudyEventDAO sedao = new StudyEventDAO(ds);
         EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
 
-        ArrayList events = sedao.findAllByStudySubject(studySub);
+        ArrayList events = studyEventDAO.findAllByStudySubject(studySub);
         studySub = (StudySubjectBean) ssdao.findByPK(studySub.getSubjectId());
 
         ArrayList displayEvents = new ArrayList();
@@ -133,7 +135,7 @@ public class ViewStudySubjectServlet extends SecureController {
             populateUncompletedCRFsWithCRFAndVersions(ds, al);
             de.setUncompletedCRFs(al);
 
-            de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySub));
+            de.setMaximumSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(sed, studySub));
 
             Status status = de.getStudyEvent().getStatus();
             if (status == Status.AVAILABLE || status == Status.AUTO_DELETED)
@@ -148,6 +150,7 @@ public class ViewStudySubjectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
@@ -279,7 +282,6 @@ public class ViewStudySubjectServlet extends SecureController {
             request.setAttribute("children", children);
 
             // find study events
-            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 
             StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
@@ -390,7 +392,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 AuditEventBean avb = (AuditEventBean) logs.get(i);
                 StudyEventAuditBean sea = new StudyEventAuditBean();
                 sea.setAuditEvent(avb);
-                StudyEventBean se = (StudyEventBean) sedao.findByPK(avb.getEntityId());
+                StudyEventBean se = (StudyEventBean) studyEventDAO.findByPK(avb.getEntityId());
                 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
                 sea.setDefinition(sed);
                 String old = avb.getOldValue().trim();
@@ -433,7 +435,7 @@ public class ViewStudySubjectServlet extends SecureController {
      *            The list of event definition CRFs for this study event.
      * @return The list of DisplayEventCRFBeans for this study event.
      */
-    public static ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
+    public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
                                                 StudyUserRoleBean currentRole, StudyEventWorkflowStatusEnum workflowStatus, Study study) {
         ArrayList answer = new ArrayList();
 
@@ -446,7 +448,6 @@ public class ViewStudySubjectServlet extends SecureController {
          * Integer(edc.getStudyEventDefinitionId()), edc); }
          */
 
-        StudyEventDAO sedao = new StudyEventDAO(ds);
         CRFDAO cdao = new CRFDAO(ds);
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
         FormLayoutDAO fldao = new FormLayoutDAO(ds);
@@ -470,7 +471,7 @@ public class ViewStudySubjectServlet extends SecureController {
             // then get the definition so we can call
             // DisplayEventCRFBean.setFlags
             int studyEventId = ecb.getStudyEventId();
-            int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
 
             // EventDefinitionCRFBean edc = (EventDefinitionCRFBean)
             // definitionsById.get(new Integer(
@@ -506,7 +507,6 @@ public class ViewStudySubjectServlet extends SecureController {
                 }
             }
         }
-
         return answer;
     }
 
@@ -520,7 +520,7 @@ public class ViewStudySubjectServlet extends SecureController {
      *            All of the event CRFs for this study event.
      * @return The list of event definitions for which no event CRF exists.
      */
-    public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, StudyEventWorkflowStatusEnum workflowStatus, int studyEventId) {
+    public ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, StudyEventWorkflowStatusEnum workflowStatus, int studyEventId) {
 
         HashMap<Integer, EventDefinitionCRFBean> eventDefinitionsHashMap = new HashMap();
 
