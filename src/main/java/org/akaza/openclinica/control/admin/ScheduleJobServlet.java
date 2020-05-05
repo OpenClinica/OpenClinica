@@ -139,13 +139,10 @@ public abstract class ScheduleJobServlet extends SecureController {
         Validator v = new Validator(request);
         v.addValidation(JOB_NAME, Validator.NO_BLANKS);
         v.addValidation(JOB_NAME, Validator.NO_LEADING_OR_TRAILING_SPACES);
-        // need to be unique too
         v.addValidation(JOB_DESC, Validator.NO_BLANKS);
         v.addValidation(EMAIL, Validator.IS_A_EMAIL);
         v.addValidation(PERIOD, Validator.NO_BLANKS);
         v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
-        // v.addValidation(DATE_START_JOB + "Date", new Date(), Validator.DATE_IS_AFTER_OR_EQUAL);
-        // TODO job names will have to be unique, tbh
 
         int formatId = fp.getInt(FORMAT_ID);
         Date jobDate = fp.getDateTime(DATE_START_JOB);
