@@ -657,7 +657,6 @@ public enum Page {
     VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT ("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp",
             "View default crf versions print"),
      MANAGE_STUDY_MODULE ( "/pages/studymodule",null),
-     VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL ("/ViewSectionDataEntryRESTUrlServlet", "View Section Data Entry Servlet for REST Url call"),
      PARTICIPANT_FORM_SERVLET("/WEB-INF/jsp/submit/participantFormServlet.jsp","Participant Form Servlet"),
      UPLOAD_CRF_DATA_TO_MIRTH ("/WEB-INF/jsp/submit/uploadFileToMirth.jsp", "Upload CRF Data To Mirth"),
      ENKETO_FORM_SERVLET("/WEB-INF/jsp/submit/enketoFormServlet.jsp","Enketo Form Servlet");

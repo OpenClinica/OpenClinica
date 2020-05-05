@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
@@ -41,6 +42,8 @@ public class DeleteCRFVersionServlet extends SecureController {
 
     public static final String VERSION_TO_DELETE = "version";
 
+    private StudyEventDAO studyEventDAO;
+
     /**
      *
      */
@@ -58,6 +61,7 @@ public class DeleteCRFVersionServlet extends SecureController {
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         int versionId = fp.getInt(VERSION_ID, true);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         String action = request.getParameter("action");
         if (versionId == 0) {
             addPageMessage(respage.getString("please_choose_a_CRF_version_to_delete"));
@@ -67,7 +71,6 @@ public class DeleteCRFVersionServlet extends SecureController {
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
             StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
@@ -88,7 +91,7 @@ public class DeleteCRFVersionServlet extends SecureController {
             	   
             	   StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(eCRF.getStudySubjectId());
             	   eCRF.setStudySubject(ssBean);
-                   StudyEventBean seBean = (StudyEventBean) seDao.findByPK(eCRF.getStudyEventId());
+                   StudyEventBean seBean = (StudyEventBean) studyEventDAO.findByPK(eCRF.getStudyEventId());
                    StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) sedDao.findByPK(seBean.getStudyEventDefinitionId());
                    seBean.setStudyEventDefinition(sedBean);
                    eCRF.setStudyEvent(seBean);

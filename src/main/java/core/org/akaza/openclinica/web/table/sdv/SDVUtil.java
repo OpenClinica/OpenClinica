@@ -73,6 +73,7 @@ import org.jmesa.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * A utility class that implements the details of the Source Data Verification (SDV) Jmesa tables.
@@ -94,6 +95,10 @@ public class SDVUtil {
     private UserAccountDao userAccountDao;
     @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
+    @Autowired
+    @Qualifier("studyeventdaojdbc")
+    private StudyEventDAO studyEventDAO;
+
     private static final Logger logger = LoggerFactory.getLogger(SDVUtil.class);
     private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
     private final static String VIEW_ICON_FORSUBJECT_SUFFIX = "\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-serach\" name=\"bt_View1\"/></a>";
@@ -337,7 +342,6 @@ public class SDVUtil {
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         /*
-         * StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
          *
          * StudyDAO studyDAO = new StudyDAO(dataSource);
          * StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
@@ -418,7 +422,6 @@ public class SDVUtil {
                                                                     int studySubjectId, HttpServletRequest request) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
 
         String label = "";
@@ -892,7 +895,6 @@ public class SDVUtil {
 
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         SubjectDAO subjectDAO = new SubjectDAO(dataSource);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 
         EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(dataSource);
         ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
@@ -974,8 +976,7 @@ public class SDVUtil {
             }
             // TODO: I18N Date must be formatted properly
             // Fix OC 1888
-            StudyEventDAO sedao = new StudyEventDAO(dataSource);
-            StudyEventBean seBean = (StudyEventBean) sedao.findByPK(eventCRFBean.getStudyEventId());
+            StudyEventBean seBean = (StudyEventBean) studyEventDAO.findByPK(eventCRFBean.getStudyEventId());
             if (seBean.getDateStarted() != null)
                 tempSDVBean.setEventDate(seBean.getDateStarted());
 
@@ -1224,7 +1225,6 @@ public class SDVUtil {
         if (eventCRFBeans == null || eventCRFBeans.isEmpty())
             return;
 
-        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(dataSource);
 
         StudyEventBean studyEventBean = null;
@@ -1351,7 +1351,6 @@ public class SDVUtil {
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(dataSource);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
         CRFDAO crfDAO = new CRFDAO(dataSource);
 
         if (studySubjectIds == null || studySubjectIds.isEmpty()) {
@@ -1448,8 +1447,6 @@ public class SDVUtil {
 
         // event CRF statuseventCRFStatuses
         request.setAttribute("eventCRFDStatuses", EventCrfWorkflowStatusEnum.values());
-
-        StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
 
         List<StudyEventBean> studyEventBeans = studyEventDAO.findAllByStudy(studyBean);
         List<EventCRFBean> eventCRFBeans = getAllEventCRFs(studyEventBeans);

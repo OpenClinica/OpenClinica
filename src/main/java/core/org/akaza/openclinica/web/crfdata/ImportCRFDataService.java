@@ -74,6 +74,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 public class ImportCRFDataService {
 
@@ -97,6 +98,10 @@ public class ImportCRFDataService {
     private StudyEventDao studyEventDao;
 
     @Autowired
+    @Qualifier("studyeventdaojdbc")
+    private StudyEventDAO studyEventDAO;
+
+    @Autowired
     private StudyDao studyDao;
     public ImportCRFDataService(DataSource ds) {
         this.ds = ds;
@@ -114,7 +119,6 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
         if (upsert == null)
@@ -438,7 +442,6 @@ public class ImportCRFDataService {
             formLayoutBean = (FormLayoutBean)formLayoutDAO.findByPK(formLayoutId);
         }
 
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         List<StudyEventBean> studyEvents = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
         Integer maxOrdinal;
         StudyEventBean studyEvent;
@@ -486,7 +489,7 @@ public class ImportCRFDataService {
      * 
      * @param odmContainer
      * @param ub
-     * @param persistEventCrfs
+     * @param request
      * @return
      */
     @SuppressWarnings("rawtypes")
@@ -504,7 +507,6 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
         if (upsert == null)
@@ -737,7 +739,6 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
         if (upsert == null)
@@ -843,7 +844,6 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
         Study studyBean = studyDao.findByOcOID(studyOID);
@@ -941,7 +941,6 @@ public class ImportCRFDataService {
         // create a second Validator, this one for hard edit checks
         HashMap<String, String> hardValidator = new HashMap<String, String>();
 
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         Study studyBean = studyDao.findByOcOID(odmContainer.getCrfDataPostImportContainer().getStudyOID());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
@@ -1516,7 +1515,6 @@ public class ImportCRFDataService {
 
             StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
             StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-            StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
             FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
             ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
             ItemDAO itemDAO = new ItemDAO(ds);
@@ -1708,7 +1706,6 @@ public class ImportCRFDataService {
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
         Study studyBean = studyDao.findByOcOID(studyOID);
@@ -1767,7 +1764,6 @@ public class ImportCRFDataService {
         // create a second Validator, this one for hard edit checks
         HashMap<String, String> hardValidator = new HashMap<String, String>();
 
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         Study studyBean = studyDao.findByOcOID(odmContainer.getCrfDataPostImportContainer().getStudyOID());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
@@ -2204,13 +2200,14 @@ public class ImportCRFDataService {
 		and i.oc_oid in ( 'I_MEDIC_DIAGNOSIS','I_MEDIC_ONGOING')
 		
      * @param request
+     * @param studyOID
      * @param subjectOID
-     * @param eventOID
+     * @param studyEventOID
      * @return
      * @throws OpenClinicaException
      */
     
-    public String buildSkipMatchCriteriaSql(HttpServletRequest request,  String studyOID,String subjectOID, String studyEventOID)
+    public String buildSkipMatchCriteriaSql(HttpServletRequest request, String studyOID,String subjectOID, String studyEventOID)
     		throws OpenClinicaException {
     	String finalSqlStr = null;
     	String baseSqlStr =" select se.study_event_id,i.oc_oid, id.value \r\n" + 
@@ -2488,7 +2485,6 @@ public class ImportCRFDataService {
 
 	public ArrayList<StudyEventBean> creatStudyEvent(ArrayList<StudyEventBean> studyEventBeans) {
 		ArrayList<StudyEventBean> studyEventBeanCreatedList = new ArrayList<>();
-		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 		
 		for(StudyEventBean tempStudyEventBean:studyEventBeans) {
 			StudyEventBean e = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
@@ -2516,7 +2512,6 @@ public class ImportCRFDataService {
 	}
 	
 	public StudyEventBean creatStudyEvent(StudyEventBean tempStudyEventBean) {
-		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
 		StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
 		
 		ArrayList<EventCRFBean> eventCRFBeans = tempStudyEventBean.getEventCRFs();
@@ -2556,8 +2551,7 @@ public class ImportCRFDataService {
 		DiscrepancyValidator discValidator = new DiscrepancyValidator(request, discNotes);
 		
 		HashMap<String, String> hardValidator = new HashMap<String, String>();
-		
-		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+
 		Study studyBean = studyDao.findByOcOID(odmContainer.getCrfDataPostImportContainer().getStudyOID());
 		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
 		StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);

@@ -81,11 +81,11 @@ public class CreateNewStudyEventServlet extends SecureController {
     public final static String[] DISPLAY_SCHEDULED = { "display0", "display1", "display2", "display3" };
     public final static int ADDITIONAL_SCHEDULED_NUM = 4;
 
-    private KafkaService kafkaService;
+    private StudyEventDAO studyEventDAO;
 
     @Override
     protected void processRequest() throws Exception {
-        kafkaService = (KafkaService) SpringServletAccess.getApplicationContext(context).getBean("kafkaService");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
 
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
         panel.setStudyInfoShown(false);
@@ -162,7 +162,6 @@ public class CreateNewStudyEventServlet extends SecureController {
         ArrayList eventDefinitionsScheduled = new ArrayList(eventDefinitions);
 
         if (!fp.isSubmitted()) {
-            // StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
             // sed.updateSampleOrdinals_v092();
 
             HashMap presetValues = new HashMap();
@@ -468,7 +467,6 @@ public class CreateNewStudyEventServlet extends SecureController {
                 forwardPage(Page.CREATE_NEW_STUDY_EVENT);
             } else {
                 logger.debug("error is empty");
-                StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
 
                 StudyEventBean studyEvent = new StudyEventBean();
                 studyEvent.setStudyEventDefinitionId(definition.getId());
@@ -503,8 +501,8 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setStatus(Status.AVAILABLE);
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
-                studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(definition, studySubject) + 1);
-                studyEvent = (StudyEventBean) sed.create(studyEvent);
+                studyEvent.setSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(definition, studySubject) + 1);
+                studyEvent = (StudyEventBean) studyEventDAO.create(studyEvent);
                 // getRuleSetService().runRulesInBeanProperty(createRuleSet(studySubject,definition),currentStudy,ub,request,studySubject);
 
                 if (!studyEvent.isActive()) {
@@ -566,9 +564,9 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 // sed.findAllByStudyAndStudySubjectId(
                                 // currentStudy,
                                 // studySubject.getId());
-                                studyEventScheduled.setSampleOrdinal(sed.getMaxSampleOrdinal(definitionScheduleds.get(i), studySubject) + 1);
+                                studyEventScheduled.setSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(definitionScheduleds.get(i), studySubject) + 1);
                                 // System.out.println("create scheduled events");
-                                studyEventScheduled = (StudyEventBean) sed.create(studyEventScheduled);
+                                studyEventScheduled = (StudyEventBean) studyEventDAO.create(studyEventScheduled);
                                 if (!studyEventScheduled.isActive()) {
                                     throw new OpenClinicaException(restext.getString("scheduled_event_not_created_in_database"), "2");
                                 }
@@ -594,8 +592,6 @@ public class CreateNewStudyEventServlet extends SecureController {
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(studyEvent.getId()));
                 ArrayList<String> pMessage = (ArrayList<String>) request.getAttribute(SecureController.PAGE_MESSAGE);
-
-                kafkaService.sendEventAttributeChangeMessage(null, studySubject);
 
                 String url = response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
                 response.sendRedirect(url);
@@ -651,7 +647,7 @@ public class CreateNewStudyEventServlet extends SecureController {
      * @return <code>true</code> if the subject may receive an additional study
      *         event, <code>false</code> otherwise.
      */
-    public static boolean subjectMayReceiveStudyEvent(DataSource ds, StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject) {
+    public boolean subjectMayReceiveStudyEvent(DataSource ds, StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject) {
 
         if (studyEventDefinition.isRepeating()) {
             // System.out.println("this def is repeating" +
@@ -659,8 +655,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             return true;
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(ds);
-        ArrayList allEvents = sedao.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
+        ArrayList allEvents = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
 
         if (allEvents.size() > 0) {
             // System.out.println("this non-repeating def has event already" +

@@ -81,11 +81,12 @@ public class StudyEventServiceImpl implements StudyEventService {
 
     @Autowired
     private CSVService csvService;
-    @Autowired
-    private KafkaService kafkaService;
 
     @Autowired
     private StudyBuildService studyBuildService;
+    @Autowired
+    @Qualifier("studyeventdaojdbc")
+    private StudyEventDAO studyEventDAO;
 
     private RestfulServiceHelper restfulServiceHelper;
 
@@ -536,10 +537,9 @@ public class StudyEventServiceImpl implements StudyEventService {
      * @return <code>true</code> if the subject may receive an additional study
      * event, <code>false</code> otherwise.
      */
-    public static boolean subjectMayReceiveStudyEvent(DataSource ds, StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject, int ordinal) throws OpenClinicaException {
+    public boolean subjectMayReceiveStudyEvent(DataSource ds, StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject, int ordinal) throws OpenClinicaException {
 
-        StudyEventDAO sedao = new StudyEventDAO(ds);
-        ArrayList<StudyEventBean> allEvents = sedao.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
+        ArrayList<StudyEventBean> allEvents = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
 
         if (studyEventDefinition.isRepeating()) {
             for (StudyEventBean studyEvent : allEvents) {
@@ -663,19 +663,8 @@ public class StudyEventServiceImpl implements StudyEventService {
             }
         }
 
-        processKafkaMessage(studySubject, studyEventResponseDTO);
-
         return studyEventResponseDTO;
     }
-
-    private void processKafkaMessage(StudySubject studySubject, StudyEventResponseDTO studyEventResponseDTO) {
-        try {
-            kafkaService.sendEventAttributeChangeMessage(studyEventResponseDTO.getStudyEventOID(), studySubject);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     private Object validateStudyEventToSchedule(StudyEventDataBean studyEventDataBean, StudySubject studySubject, UserAccount userAccount) {
         Object eventObject = null;

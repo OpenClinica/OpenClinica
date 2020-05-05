@@ -46,7 +46,6 @@ import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
-import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
@@ -823,18 +822,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         try {
             // Added 01/19/2005 for breadcrumbs, tbh
             if (checkTrail) {
-                BreadcrumbTrail bt = new BreadcrumbTrail();
                 if (session != null) {// added bu jxu, fixed bug for log out
-                    /*
-                     * ArrayList trail = (ArrayList) session.getAttribute("trail");
-                     * if (trail == null) {
-                     * trail = bt.generateTrail(jspPage, request);
-                     * } else {
-                     * bt.setTrail(trail);
-                     * trail = bt.generateTrail(jspPage, request);
-                     * }
-                     * session.setAttribute("trail", trail);
-                     */
+
                     panel = (StudyInfoPanel) session.getAttribute(STUDY_INFO_PANEL);
                     if (panel == null) {
                         panel = new StudyInfoPanel();
@@ -1217,92 +1206,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             url += "?" + query;
         }
         return url;
-    }
-
-    public DiscrepancyNoteBean getNoteInfo(DiscrepancyNoteBean note) {
-        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-        if ("itemData".equalsIgnoreCase(note.getEntityType())) {
-            int itemDataId = note.getEntityId();
-            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-            ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
-            ItemDAO idao = new ItemDAO(sm.getDataSource());
-            if (StringUtil.isBlank(note.getEntityName())) {
-                ItemBean item = (ItemBean) idao.findByPK(itemData.getItemId());
-                note.setEntityName(item.getName());
-                request.setAttribute("item", item);
-            }
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
-
-            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
-            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
-
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-            note.setEventName(sed.getName());
-            if (event.getDateStarted() != null)
-                note.setEventStart(event.getDateStarted());
-
-            CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
-            note.setCrfName(crf.getName());
-            note.setEventCRFId(ec.getId());
-
-            if (StringUtil.isBlank(note.getSubjectName())) {
-                StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
-                note.setSubjectName(ss.getName());
-            }
-
-            if (note.getDiscrepancyNoteTypeId() == 0) {
-                note.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());// default
-                // value
-            }
-
-        } else if ("eventCrf".equalsIgnoreCase(note.getEntityType())) {
-            int eventCRFId = note.getEntityId();
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
-
-            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
-            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
-
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-            note.setEventName(sed.getName());
-            note.setEventStart(event.getDateStarted());
-
-            CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
-            note.setCrfName(crf.getName());
-            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
-            note.setSubjectName(ss.getName());
-            note.setEventCRFId(ec.getId());
-
-        } else if ("studyEvent".equalsIgnoreCase(note.getEntityType())) {
-            int eventId = note.getEntityId();
-            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
-            StudyEventBean event = (StudyEventBean) svdao.findByPK(eventId);
-
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-            note.setEventName(sed.getName());
-            note.setEventStart(event.getDateStarted());
-
-            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
-            note.setSubjectName(ss.getName());
-
-        } else if ("studySub".equalsIgnoreCase(note.getEntityType())) {
-            int studySubjectId = note.getEntityId();
-            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(studySubjectId);
-            note.setSubjectName(ss.getName());
-
-        } else if ("Subject".equalsIgnoreCase(note.getEntityType())) {
-            int subjectId = note.getEntityId();
-            StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, currentPublicStudy);
-            note.setSubjectName(ss.getName());
-        }
-
-        return note;
     }
 
     public void checkRoleByUserAndStudy(UserAccountBean ub, Study tenantStudy) {

@@ -157,7 +157,6 @@ public class UpdateStudyEventServlet extends SecureController {
         // YW
 
         request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
-        //StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         EventCRFDAO ecrfdao = new EventCRFDAO(sm.getDataSource());
 
         StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);

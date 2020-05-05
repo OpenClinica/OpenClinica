@@ -17,6 +17,7 @@ import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
@@ -39,9 +40,9 @@ import java.util.Date;
  * @author jxu
  */
 public class RemoveCRFServlet extends SecureController {
-    /**
-     *
-     */
+
+    private StudyEventDAO studyEventDAO;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
         if (ub.isSysAdmin()) {
@@ -62,6 +63,7 @@ public class RemoveCRFServlet extends SecureController {
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
 
         // checks which module the requests are from
         String module = fp.getString(MODULE);
@@ -84,10 +86,9 @@ public class RemoveCRFServlet extends SecureController {
 
             EventCRFDAO evdao = new EventCRFDAO(sm.getDataSource());
             ArrayList eventCRFs = evdao.findAllByCRF(crfId);
-            StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
             StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
             for (Object ecBean: eventCRFs) {
-                StudyEventBean seBean = (StudyEventBean) seDao.findByPK(((EventCRFBean)ecBean).getStudyEventId());
+                StudyEventBean seBean = (StudyEventBean) studyEventDAO.findByPK(((EventCRFBean)ecBean).getStudyEventId());
                 StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean)sedDao.findByPK(seBean.getStudyEventDefinitionId());
                 ((EventCRFBean)ecBean).setEventName(sedBean.getName());
             }

@@ -39,15 +39,14 @@ import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
 import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet;
 import org.akaza.openclinica.control.submit.EnketoFormServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
-import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import core.org.akaza.openclinica.core.LockInfo;
 import core.org.akaza.openclinica.core.form.xform.QueryType;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
@@ -128,6 +127,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String VIEW_NOTES = "ViewNotes";
     public static final String FORWARD_SLASH = "/";
 
+    private final String ENTITY_TYPE = "name";
+    private final String ENTITY_COLUMN = "column";
+    private final String ENTITY_ID = "id";
+    private final String WRITE_TO_DB = "writeToDB";
+    private final String PRESET_RES_STATUS = "strResStatus";
+    private final String SUBJECT_ID = "subjectId";
+    private final String ITEM_ID = "itemId";
+    private final String PARENT_ID = "parentId";// parent note id
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -166,38 +173,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                                                String module, String flavor, String loadWarning, boolean isLocked) throws Exception {
         String entityType = note.getEntityType().toLowerCase();
         int id = note.getEntityId();
-        if ("subject".equalsIgnoreCase(entityType)) {
-            StudySubjectDAO ssdao = new StudySubjectDAO(ds);
-            StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(id, currentStudy);
-
-            request.setAttribute("action", "show");
-            request.setAttribute("id", String.valueOf(note.getEntityId()));
-            request.setAttribute("studySubId", String.valueOf(ssb.getId()));
-        } else if ("studysub".equalsIgnoreCase(entityType)) {
-            request.setAttribute("action", "show");
-            request.setAttribute("id", String.valueOf(note.getEntityId()));
-        } else if ("eventcrf".equalsIgnoreCase(entityType)) {
-            request.setAttribute("editInterview", "1");
-
-            EventCRFDAO ecdao = new EventCRFDAO(ds);
-            EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(id);
-            request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN, ecb);
-            // If the request is passed along to ViewSectionDataEntryServlet,
-            // that code needs
-            // an event crf id; the (ecb.getId()+"") is necessary because
-            // FormProcessor throws
-            // a ClassCastException without the casting to a String
-            request.setAttribute(ViewSectionDataEntryServlet.EVENT_CRF_ID, ecb.getId() + "");
-        } else if ("studyevent".equalsIgnoreCase(entityType)) {
-            StudyEventDAO sedao = new StudyEventDAO(ds);
-            StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
-            request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(id));
-            request.setAttribute(UpdateStudyEventServlet.EVENT_ID, String.valueOf(id));
-            request.setAttribute(UpdateStudyEventServlet.STUDY_SUBJECT_ID, String.valueOf(seb.getStudySubjectId()));
-        }
-
-        // this is for item data
-        else if ("itemdata".equalsIgnoreCase(entityType)) {
+        if ("itemdata".equalsIgnoreCase(entityType)) {
             prepareItemRequest(request, ds, currentStudy, note, viewNotesUrl(module), flavor, loadWarning, isLocked, id, EnketoAPI.EDIT_MODE);
         }
         return true;
@@ -517,7 +493,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             } else {
                 p.setFileName(p.getFileName() + "?fromViewNotes=1");
             }
-            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
+            String createNoteURL = getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
             setPopUpURL("");
         }
 
@@ -672,7 +648,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 // processing Servlet will initiate.
                 // 'true' parameter means that ViewDiscrepancyNote is the
                 // handling Servlet.
-                createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
+                createNoteURL = getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
                 request.setAttribute(POP_UP_URL, createNoteURL);
 
                 try {
@@ -687,6 +663,35 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
         }
 
+    }
+
+    private String getAddChildURL(DiscrepancyNoteBean note, ResolutionStatus preset, boolean toView) {
+        ArrayList<String> arguments = new ArrayList<String>();
+
+        arguments.add(ENTITY_TYPE + "=" + note.getEntityType());
+        arguments.add(ENTITY_ID + "=" + note.getEntityId());
+        arguments.add(WRITE_TO_DB + "=" + "1");
+        arguments.add("monitor" + "=" + 1);// of course, when resolving a note,
+        // we have monitor privilege
+
+        if (preset.isActive()) {
+            arguments.add(PRESET_RES_STATUS + "=" + String.valueOf(preset.getId()));
+        }
+
+        if (toView) {
+            // BWP 3/19/2009 3166: <<
+            String columnValue = "".equalsIgnoreCase(note.getColumn()) ? "value" : note.getColumn();
+            // >>
+            arguments.add(ENTITY_COLUMN + "=" + columnValue);
+            arguments.add(SUBJECT_ID + "=" + note.getSubjectId());
+            arguments.add(ITEM_ID + "=" + note.getItemId());
+            String queryString = StringUtil.join("&", arguments);
+            return "ViewDiscrepancyNote?" + queryString;
+        } else {
+            arguments.add(PARENT_ID + "=" + note.getId());
+            String queryString = StringUtil.join("&", arguments);
+            return "CreateDiscrepancyNote?" + queryString;
+        }
     }
 
     private Html buildSingleItemForm(ItemBean item, List<UserControl> userControls, List<Bind> binds, Itext itext, List<Instance> instances, StudyEventBean seb,

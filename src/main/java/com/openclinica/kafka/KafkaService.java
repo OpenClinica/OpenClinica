@@ -302,6 +302,7 @@ public class KafkaService {
     return formChangeDTO;
   }
 
+  //TODO This is crashing if I open/view from a non-participant source since the study subject is null.
   public FormChangeDTO constructNewFormDTO(Study currentStudy, StudyEvent studyEvent, FormLayout formLayout){
     FormChangeDTO formChangeDTO = new FormChangeDTO();
 

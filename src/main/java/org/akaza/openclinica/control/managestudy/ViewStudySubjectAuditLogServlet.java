@@ -52,6 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 
 public class ViewStudySubjectAuditLogServlet extends SecureController {
+    private StudyEventDAO studyEventDAO;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -59,20 +60,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        // if (SubmitDataServlet.mayViewData(ub, currentRole)) {
-        // return;
-        // }
-        // if (ub.isSysAdmin()) {
-        // return;
-        // }
-        // Role r = currentRole.getRole();
-        // if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
-        // return;
-        // }
-        // addPageMessage(respage.getString("no_have_correct_privilege_current_study") +
-        // respage.getString("change_study_contact_sysadmin"));
-        // throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
-        // "1");
         if (ub.isSysAdmin()) {
             return;
         }
@@ -89,13 +76,13 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao = (EventDefinitionCrfPermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfPermissionTagDao");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         AuditDAO adao = new AuditDAO(sm.getDataSource());
 
         FormProcessor fp = new FormProcessor(request);
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
@@ -192,7 +179,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             request.setAttribute("studySubjectAudits", studySubjectAudits);
 
             // Get the list of events
-            ArrayList events = sedao.findAllByStudySubject(studySubject);
+            ArrayList events = studyEventDAO.findAllByStudySubject(studySubject);
             for (int i = 0; i < events.size(); i++) {
                 // Link study event definitions
                 StudyEventBean studyEvent = (StudyEventBean) events.get(i);

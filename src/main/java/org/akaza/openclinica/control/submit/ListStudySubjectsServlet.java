@@ -98,6 +98,7 @@ public class ListStudySubjectsServlet extends SecureController {
     protected void processRequest() throws Exception {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         boolean showMoreLink;
         if(currentStudy !=null && currentStudy.getStudyId() > 0){
             session.setAttribute("study", currentStudy);
@@ -168,7 +169,7 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
-        factory.setStudyEventDAO(getStudyEventDAO());
+        factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyDAO(getStudyDao());
         factory.setStudyBean(currentStudy);
         factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
@@ -256,11 +257,6 @@ public class ListStudySubjectsServlet extends SecureController {
     public SubjectGroupMapDAO getSubjectGroupMapDAO() {
         subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
         return subjectGroupMapDAO;
-    }
-
-    public StudyEventDAO getStudyEventDAO() {
-        studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-        return studyEventDAO;
     }
 
     public EventCRFDAO getEventCRFDAO() {

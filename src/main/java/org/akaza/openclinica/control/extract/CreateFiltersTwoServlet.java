@@ -302,14 +302,6 @@ public class CreateFiltersTwoServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
 
         locale = LocaleResolver.getLocale(request);
-        // < resword =
-        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
-        // < restext =
-        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
-        // < respage =
-        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",locale);
-        // <
-        // resexception=ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.exceptions",locale);
 
         if (ub.isSysAdmin()) {
             return;

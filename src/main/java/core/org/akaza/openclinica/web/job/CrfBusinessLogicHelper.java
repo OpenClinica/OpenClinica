@@ -187,7 +187,6 @@ public class CrfBusinessLogicHelper {
         Study study = studyDao.findByStudySubjectId(ecb.getStudySubjectId());
         EventDefinitionCRFBean edcb = getEventDefinitionCrfByStudyEventAndCrfVersion(ecb, study);
 
-        // StudyEventDAO studyEventDao = new StudyEventDAO(ds);
         // StudyEventBean studyEventBean = (StudyEventBean)
         // studyEventDao.findByPK(ecb.getStudyEventId());
         // Status studyEventStatus = studyEventBean.getStatus();

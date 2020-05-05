@@ -20,6 +20,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -44,6 +45,7 @@ import java.util.Date;
  * Processes request of 'restore an event CRF from a event'
  */
 public class RestoreEventCRFServlet extends SecureController {
+    private StudyEventDAO studyEventDAO;
 
     /**
      * 
@@ -66,10 +68,10 @@ public class RestoreEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
         int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
@@ -108,9 +110,9 @@ public class RestoreEventCRFServlet extends SecureController {
             // DisplayEventCRFBean.setFlags
             int studyEventId = eventCRF.getStudyEventId();
 
-            StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
-            int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);
             event.setStudyEventDefinition(sed);
@@ -149,7 +151,7 @@ public class RestoreEventCRFServlet extends SecureController {
                     event.setSigned(Boolean.FALSE);
                     event.setUpdater(ub);
                     event.setUpdatedDate(new Date());
-                    sedao.update(event);
+                    studyEventDAO.update(event);
                 }
 
                 if(studySub.getStatus().equals(Status.SIGNED)){
