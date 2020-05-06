@@ -27,15 +27,6 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
         return hibernateQuery.list();
     }
 
-    public EventCrf findByStudyEventIdStudySubjectIdCrfVersionId(int study_event_id, int study_subject_id, int crf_version_id) {
-        String query = "from " + getDomainClassName()
-                + " event_crf where event_crf.crfVersion.crfVersionId = :crfversionid and event_crf.studyEvent.studyEventId = :studyeventid and event_crf.studySubject.studySubjectId= :studysubjectid";
-        org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyeventid", study_event_id);
-        q.setInteger("studysubjectid", study_subject_id);
-        q.setInteger("crfversionid", crf_version_id);
-        return (EventCrf) q.uniqueResult();
-    }
     public EventCrf findByStudyEventOIdStudySubjectOIdCrfOId(String studyEventOID, String studySubjectLabel, String formOID, int ordinal) {
         String query = "from " + getDomainClassName()
                 + " event_crf where event_crf.crfVersion.crf.ocOid = :formOID and event_crf.studyEvent.studyEventDefinition.oc_oid = :studyEventOID and event_crf.studySubject.label = :studySubjectLabel and event_crf.studyEvent.sampleOrdinal = :ordinal";

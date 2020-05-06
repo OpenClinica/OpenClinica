@@ -474,8 +474,7 @@ public class SDVUtil {
     /*
      * private int getTotalRowCount(FilterSet filterSet, int studyId) {
      *
-     *
-     * EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+
      *
      * if (filterSet.getFilters().size() == 0) {
      * return eventCRFDAO.countEventCRFsByStudy(studyId, studyId);

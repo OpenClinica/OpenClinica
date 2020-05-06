@@ -113,8 +113,8 @@ public class ImportSpringJob extends QuartzJobBean {
     private DataSource dataSource;
     private OpenClinicaMailSender mailSender;
     private ImportCRFDataService dataService;
-    private ItemDataDAO itemDataDao;// = new ItemDataDAO(sm.getDataSource());
-    private EventCRFDAO eventCrfDao;// = new EventCRFDAO(sm.getDataSource());
+    private ItemDataDAO itemDataDao;
+    private EventCRFDAO eventCrfDao;
     private AuditEventDAO auditEventDAO;
     private TriggerService triggerService;
     private StudyDao studyDao;

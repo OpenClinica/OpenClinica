@@ -998,26 +998,6 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         }
     }
 
-    public Integer countEventCRFsByEventDate(int studyId, String eventDate) {
-
-        this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-
-        HashMap variables = new HashMap();
-        variables.put(1, studyId);
-        variables.put(2, eventDate);
-        String sql = digester.getQuery("countEventCRFsByEventDate");
-        ArrayList rows = this.select(sql, variables);
-        Iterator it = rows.iterator();
-
-        if (it.hasNext()) {
-            return (Integer) ((HashMap) it.next()).get("count");
-
-        } else {
-            return 0;
-        }
-    }
-
     public Map<Integer, SortedSet<EventCRFBean>> buildEventCrfListByStudyEvent(Integer studySubjectId) {
         this.setTypesExpected(); // <== Must be called first
 
@@ -1067,36 +1047,6 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         }
 
         return result;
-    }
-
-    public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id) {
-        Connection con = null;
-        updateCRFVersionID(event_crf_id, crf_version_id, user_id, con);
-    }
-
-    /* this function allows to run transactional updates for an action */
-
-    public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id, Connection con) {
-        this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-        this.setTypeExpected(2, TypeNames.INT);
-        this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.STRING);
-        this.setTypeExpected(3, TypeNames.INT);
-
-        HashMap variables = new HashMap();
-        variables.put(1, crf_version_id);
-        variables.put(2, user_id);
-        variables.put(3, user_id);
-        variables.put(4, SdvStatus.NOT_VERIFIED.toString());
-        variables.put(5, event_crf_id);
-        String sql = digester.getQuery("updateCRFVersionID");
-        // this is the way to make the change transactional
-        if (con == null) {
-            this.execute(sql, variables);
-        } else {
-            this.execute(sql, variables, con);
-        }
     }
 
     public void updateFormLayoutID(int event_crf_id, int form_layout_id, int user_id, Connection con) {

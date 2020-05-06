@@ -503,8 +503,7 @@ public class ImportCRFDataService {
     	
     	HashMap<String,String> commonNonRepeatingEventSubjectKeys = new HashMap<>();
     	String commonNonRepeatingEventSubjectKey = null;
-                
-        EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
+
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
@@ -946,7 +945,6 @@ public class ImportCRFDataService {
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
         CRFDAO crfDAO = new CRFDAO(ds);
         CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
 
         HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
         String hardValidatorErrorMsgs = "";

@@ -68,7 +68,7 @@
        <constructor-arg ref="dataSource"/>
     </bean>
 
-    <bean id="auditStudyEventAspect" class="org.akaza.openclinica.service.aspect.AuditStudyEventAspect">
+    <bean id="auditStudyEventAspect" class="com.openclinica.aop.AuditStudyEventAspect">
         <!-- configure properties of aspect here as normal -->
     </bean>
 

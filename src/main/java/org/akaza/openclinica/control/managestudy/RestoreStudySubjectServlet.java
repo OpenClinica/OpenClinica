@@ -109,8 +109,6 @@ public class RestoreStudySubjectServlet extends SecureController {
 
                 // restore all study events
                 // restore all event crfs
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
 
                 String emailBody =
                     respage.getString("the_subject") + " " + studySub.getName() + " " + respage.getString("has_been_restored_to_the_study") + " "

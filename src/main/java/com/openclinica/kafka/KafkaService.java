@@ -4,6 +4,7 @@ import com.openclinica.kafka.dto.*;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.UtilService;
@@ -21,9 +22,9 @@ public class KafkaService {
   @Autowired
   private KafkaTemplate kafkaTemplate;
   @Autowired
-  private KafkaDTOService kafkaDTOService;
-  @Autowired
   private StudySubjectDao studySubjectDao;
+  @Autowired
+  private StudyEventDefinitionDao studyEventDefinitionDao;
   @Autowired
   private CoreUtilServiceImpl coreUtilService;
 
@@ -43,19 +44,10 @@ public class KafkaService {
     kafkaTemplate.send(producerRecord);
   }
 
-  public void sendEventAttributeChangeMessage(String eventOid, StudySubjectBean studySubjectBean) throws Exception {
+  public void sendEventAttributeChangeMessage(StudyEvent studyEvent) throws Exception {
     Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
 
-    EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(eventOid, studySubjectBean);
-
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
-  }
-
-  public void sendEventAttributeChangeMessage(String eventOid, StudySubject studySubject) throws Exception {
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
-
-    EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(eventOid, studySubject);
+    EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEvent);
 
     ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
     kafkaTemplate.send(producerRecord);
@@ -182,14 +174,17 @@ public class KafkaService {
 
     formChangeDTO.setParticipantId(studySubject.getLabel());
     formChangeDTO.setParticipantOid(studySubject.getOcOid());
-    formChangeDTO.setEventOid(studyEventBean.getStudyEventDefinition().getOid());
+    if (studyEventBean.getStudyEventDefinitionId() != 0){
+      StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByStudyEventDefinitionId(studyEventBean.getStudyEventDefinitionId());
+      formChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
+    }
 
     return formChangeDTO;
   }
 
-  private EventAttributeChangeDTO constructEventChangeDTO(String eventOid, StudySubjectBean studySubjectBean){
+  private EventAttributeChangeDTO constructEventChangeDTO(StudyEvent studyEvent){
     EventAttributeChangeDTO formChangeDTO = new EventAttributeChangeDTO();
-    StudySubject studySubject = studySubjectDao.findById(studySubjectBean.getId());
+    StudySubject studySubject = studySubjectDao.findById(studyEvent.getStudySubject().getStudySubjectId());
     Study study = studySubject.getStudy();
     String studyOid;
     String siteOid;
@@ -219,48 +214,8 @@ public class KafkaService {
 
     formChangeDTO.setParticipantId(studySubject.getLabel());
     formChangeDTO.setParticipantOid(studySubject.getOcOid());
-    // Could this be optional, in the event of scheduling multiple events?
-    if (eventOid != null){
-      formChangeDTO.setEventOid(eventOid);
-    }
-
-    return formChangeDTO;
-  }
-
-  private EventAttributeChangeDTO constructEventChangeDTO(String eventOid, StudySubject studySubject){
-    EventAttributeChangeDTO formChangeDTO = new EventAttributeChangeDTO();
-    Study study = studySubject.getStudy();
-    String studyOid;
-    String siteOid;
-    String studyUuid;
-    String studyEnvUuid;
-    if (study.getStudy() == null) {
-      // Study-level
-      studyOid = study.getOc_oid();
-      siteOid = null;
-      studyUuid = study.getStudyUuid();
-      studyEnvUuid = study.getStudyEnvUuid();
-    } else {
-      // Site-level
-      siteOid = study.getOc_oid();
-      studyOid = study.getStudy().getOc_oid();
-      studyUuid = study.getStudy().getStudyUuid();
-      studyEnvUuid = study.getStudy().getStudyEnvUuid();
-    }
-
-    String customerUuid = coreUtilService.getCustomerUuid();
-
-    formChangeDTO.setCustomerUuid(customerUuid);
-    formChangeDTO.setStudyUuid(studyUuid);
-    formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
-    formChangeDTO.setStudyOid(studyOid);
-    formChangeDTO.setSiteOid(siteOid);
-
-    formChangeDTO.setParticipantId(studySubject.getLabel());
-    formChangeDTO.setParticipantOid(studySubject.getOcOid());
-    // Could this be optional, in the event of scheduling multiple events?
-    if (eventOid != null){
-      formChangeDTO.setEventOid(eventOid);
+    if (studyEvent.getStudyEventDefinition().getOc_oid() != null){
+      formChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
     }
 
     return formChangeDTO;

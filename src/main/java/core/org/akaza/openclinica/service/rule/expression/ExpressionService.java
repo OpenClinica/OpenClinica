@@ -1394,9 +1394,6 @@ public class ExpressionService {
     }
 
     private EventCRFDAO getEventCRFDao() {
-        // eventCRFDao = this.eventCRFDao != null ? eventCRFDao : new
-        // EventCRFDAO(ds);
-        // return eventCRFDao;
         return new EventCRFDAO(ds);
     }
 
