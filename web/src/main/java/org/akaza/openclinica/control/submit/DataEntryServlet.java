@@ -5729,13 +5729,6 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
         UserAccountBean userBean =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
 
-        int currentStudyParentId; //used to hold the id of the study/site the user is in
-        if(currentStudy.getParentStudyId() == 0){//user is at the Study level
-            currentStudyParentId =  currentStudy.getId();
-        }else{//user is at the site level
-            currentStudyParentId = currentStudy.getParentStudyId();
-        }
-
         ArrayList userRoles = userBean.getRoles();
         String submitted =(String) request.getParameter("submitted");
         String checkInputs = (String)request.getParameter("checkInputs");
@@ -5752,14 +5745,46 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
                 }
             }
 
+            boolean currentStudyIsStudy = false;
+
+            if(currentStudy.getParentStudyId() == 0){
+                currentStudyIsStudy = true;
+            }
+
             // continue to check the left open tab, it  maybe in different study
             //This value comes from the event_definition_crf table to handle site-specific crfs
+            //This value also changes depending on if the eventDefinitionCrf is assigned to site
             String studyId = (String)request.getParameter("sid");
-            //This checks both study and site ids against the event_definition_crf table's study_id value
-            //since crf's can be assigned to a specific site - zique
-            if(studyId !=null && Integer.parseInt(studyId) != currentStudyParentId && Integer.parseInt(studyId) != currentStudy.getId()) {
-                 auth = false;
+
+            //retrieve study bean with PK matching studyId
+            StudyDAO studydao = new StudyDAO(getDataSource());
+            StudyBean studyIdStudy = (StudyBean)studydao.findByPK(Integer.parseInt(studyId));
+
+            boolean studyIdIsStudy = false;
+            if(studyIdStudy.getParentStudyId() == 0){
+                studyIdIsStudy = true;
             }
+
+            //The following logic handles cases where the user is interacting with a
+            //site-assigned crf
+            if(currentStudyIsStudy && studyIdIsStudy){ //user is at study level wth non-assigned crf
+                if(currentStudy.getId() != studyIdStudy.getId()){
+                    auth = false;
+                }
+            }else if(!currentStudyIsStudy && studyIdIsStudy){ //user is at site level with non-assigned crf
+                if(currentStudy.getParentStudyId() != studyIdStudy.getId()){
+                    auth = false;
+                }
+            }else if(currentStudyIsStudy && !studyIdIsStudy){ //user is at study level with site-assigned crf
+                if(currentStudy.getId() != studyIdStudy.getParentStudyId()){
+                    auth = false;
+                }
+            }else{ //user is at site level with site-assigned crf
+                if(currentStudy.getParentStudyId() != studyIdStudy.getParentStudyId()){
+                    auth = false;
+                }
+            }
+
         }
 
         if(!auth) {
