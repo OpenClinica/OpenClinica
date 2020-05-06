@@ -53,7 +53,7 @@
 <jsp:useBean id="now" class="java.util.Date" />
 <P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
 
-<p class="text"><br/><fmt:message key="field_required" bundle="${resword}"/></p>
+<p class="text"><br/><span style="color:Orange;">*</span>&nbsp;<fmt:message key="field_required_without_asterisk" bundle="${resword}"/></p>
 
 <table>
 	<tr>
