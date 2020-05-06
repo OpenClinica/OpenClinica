@@ -387,7 +387,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (n.length() > 0) {
                 	String newValue = StringEscapeUtils.escapeXml(n);
                     if(newValue != null && newValue.indexOf("&#") >-1) {
-                   	 	newValue = o;
+                   	 	newValue = n;
                     } 
                     xml.append(nls);
                     xml.append(currentIndent + "                      NewValue=\"" + newValue + "\"");
