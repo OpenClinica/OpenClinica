@@ -117,7 +117,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 String[] columns = {resword.getString("date_and_time"), resword.getString("action_message"), resword.getString("entity_operation"),
                         // resword.getString("study_site"),
                         // resword.getString("study_subject_ID"),
-                        resword.getString("changes_and_additions"), resword.getString("actions")};
+                        resword.getString("changes_and_additions")};
 
                 table.setColumns(new ArrayList(Arrays.asList(columns)));
                 table.setAscendingSort(false);
