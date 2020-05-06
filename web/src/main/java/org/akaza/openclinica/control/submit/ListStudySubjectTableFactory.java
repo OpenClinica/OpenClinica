@@ -87,6 +87,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private final ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
     private StudyParameterValueDAO studyParameterValueDAO;
     private ParticipantPortalRegistrar participantPortalRegistrar;
+    
+    private static final String LIST_SUBJECTS_TABLE_FACADE = "LSStableFacade";
+    private static final String MATCHED_STUDY_OID = "matchedStudyOID";
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
@@ -103,9 +106,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         	tableFacade = prepareNewTableFacade(request, response);
         }else {
         	// restore from the session   	        	 
-        	 TableFacade tableFacadeInSession = (TableFacade) request.getSession().getAttribute("LSStableFacade");
+        	 TableFacade tableFacadeInSession = (TableFacade) request.getSession().getAttribute(LIST_SUBJECTS_TABLE_FACADE);
         	 tableFacade = getTableFacadeImpl(request, response);
-        	 matchedStudyOID = (String) request.getSession().getAttribute("matchedStudyOID");
+        	 matchedStudyOID = (String) request.getSession().getAttribute(MATCHED_STUDY_OID);
         	 String currentStudyOID = getStudyBean().getOid();
         	 
         	 if(matchedStudyOID != null && matchedStudyOID.equals(currentStudyOID)) {
@@ -147,9 +150,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 		tableFacade = getTableFacadeImpl(request, response);
 		tableFacade.setStateAttr("restore");        
 		
-		request.getSession().setAttribute("LSStableFacade",tableFacade);
+		request.getSession().setAttribute(LIST_SUBJECTS_TABLE_FACADE,tableFacade);
 		matchedStudyOID = getStudyBean().getOid();
-		request.getSession().setAttribute("matchedStudyOID",matchedStudyOID);
+		request.getSession().setAttribute(MATCHED_STUDY_OID,matchedStudyOID);
 		return tableFacade;
 	}
 
