@@ -474,6 +474,8 @@
         function getItems() {
             var sinceLastVerified = $('#sdv-show-type input:checked').val();
             $.get(url + '?changedAfterSdvOnlyFilter=' + sinceLastVerified, function (data) {
+                if (!data.lastVerifiedDate)
+                    data.sdvStatus = 'NOT_VERIFIED';
 
                 $('#participantId').text(data.participantId);
                 if (data.repeatingEvent) {
