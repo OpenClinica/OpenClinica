@@ -20,8 +20,14 @@
         <fmt:formatDate value="${currRow.bean.studyEvent.dateStarted}" pattern="${dteFormat}"/>
     </td>
     <td class="table_cell" width="20">
-        <c:out value="${currRow.bean.studyEvent.workflowStatus.displayValue}"/>
-
+        <c:choose>
+            <c:when test="${currRow.bean.studyEvent.removed == true}">
+                <fmt:message key="removed" bundle="${resword}"/>
+            </c:when>
+            <c:otherwise>
+                <c:out value="${currRow.bean.studyEvent.workflowStatus.displayValue}"/>
+            </c:otherwise>
+        </c:choose>
     </td>
     <td class="table_cell">
         <table border="0" cellpadding="0" cellspacing="0">
@@ -240,23 +246,29 @@
                             <td class="table_cell" width="100"><c:out value="${dec.eventCRF.formLayout.name}" />
                             </td>
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
-                                <c:choose>
+                              <c:choose>
+                                <c:when test="${ dec.eventCRF.removed == true || currRow.bean.studyEvent.removed ==true}">
+                                        <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+                                </c:when>
+                                <c:otherwise>
+
+                                  <c:choose>
                                     <c:when test="${ dec.eventCRF.workflowStatus == 'NOT_STARTED'}">
-                                        <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
+                                        <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
                                     </c:when>
                                     <c:when test="${dec.eventCRF.workflowStatus == 'INITIAL_DATA_ENTRY'}">
                                         <span class=" icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="data_entry_started" bundle="${resword}"/>">
                                     </c:when>
                                     <c:when test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
-                                      <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
-                               		  </c:when>
-                               		  <c:when test="${ dec.locked}">
-                               		      <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
-                               		  </c:when>
+                                         <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
+                               		</c:when>
                                     <c:otherwise>
                                         <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
                                     </c:otherwise>
-                                </c:choose>
+                                  </c:choose>
+
+                                </c:otherwise>
+                              </c:choose>
                             </td>
                             <td class="table_cell" width="80">
                                 <c:choose>
