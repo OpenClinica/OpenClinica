@@ -22,7 +22,7 @@
         <property name="studyEventDomainDao" ref="studyEventDaoDomain"/>
         <property name="studyEventDefDomainDao" ref="studyEventDefDaoDomain"/>
         <property name="ruleActionRunLogDao" ref="ruleActionRunLogDao"/>
-        <property name="studyDao" ref="studyDaoDomain"></property>
+        <property name="studyDao" ref="studyDaoDomain"/>
     </bean>
     
     <bean id="rulesPostImportContainerService" class="core.org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">
@@ -64,8 +64,12 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
-    <bean id="studyeventdaojdbc" class="core.org.akaza.openclinica.dao.managestudy.StudyEventDAO">
+    <bean id="studyEventJDBCDao" class="core.org.akaza.openclinica.dao.managestudy.StudyEventDAO">
        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="eventCRFJDBCDao" class="core.org.akaza.openclinica.dao.submit.EventCRFDAO">
+        <constructor-arg ref="dataSource"/>
     </bean>
 
     <bean id="auditStudyEventAspect" class="com.openclinica.aop.AuditStudyEventAspect">
@@ -73,7 +77,7 @@
     </bean>
 
     <bean id="studyEventBeanListener" class="core.org.akaza.openclinica.service.rule.StudyEventBeanListener">
-        <constructor-arg ref="studyeventdaojdbc"></constructor-arg>
+        <constructor-arg ref="studyEventJDBCDao"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
 

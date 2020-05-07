@@ -83,13 +83,15 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
     private StudyEventDefinitionDao studyEventDefinitionDao;
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     /* Handle the HTTP Get or Post request. */
     @Override
     protected void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         // the fileName contains any subject id and study unique protocol id;
         // see: chooseDownloadFormat.jsp
         String fileName = request.getParameter("fileName");
@@ -314,7 +316,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
         ItemDAO idao = new ItemDAO(sm.getDataSource());
         ItemGroupMetadataDAO<String, ArrayList> igmdao = new ItemGroupMetadataDAO<String, ArrayList>(sm.getDataSource());
@@ -476,7 +477,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     ItemDataBean idb = (ItemDataBean) iddao.findByPK(dnb.getEntityId());
                     ItemBean ib = (ItemBean) idao.findByPK(idb.getItemId());
 
-                    EventCRFBean ec = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+                    EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(idb.getEventCRFId());
 
                     CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ec.getCRFVersionId());
                     CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());

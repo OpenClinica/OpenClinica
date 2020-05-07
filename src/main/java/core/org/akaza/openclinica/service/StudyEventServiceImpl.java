@@ -85,7 +85,7 @@ public class StudyEventServiceImpl implements StudyEventService {
     @Autowired
     private StudyBuildService studyBuildService;
     @Autowired
-    @Qualifier("studyeventdaojdbc")
+    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
 
     private RestfulServiceHelper restfulServiceHelper;

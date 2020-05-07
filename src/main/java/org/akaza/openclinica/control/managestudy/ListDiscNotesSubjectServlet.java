@@ -47,11 +47,13 @@ public class ListDiscNotesSubjectServlet extends SecureController {
     public static final String FILTER_SUMMARY = "filterSummary";
     Locale locale;
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     // < ResourceBundleresexception,respage;
     @Override
     protected void processRequest() throws Exception {
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         String module = request.getParameter("module");
         String moduleStr = "manage";
@@ -134,7 +136,6 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
         StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-        EventCRFDAO edao = new EventCRFDAO(sm.getDataSource());
         EventDefinitionCRFDAO eddao = new EventDefinitionCRFDAO(sm.getDataSource());
         SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
         DiscrepancyNoteDAO dnDAO = new DiscrepancyNoteDAO(sm.getDataSource());
@@ -150,7 +151,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         factory.setSubjectGroupMapDAO(sgmdao);
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
-        factory.setEventCRFDAO(edao);
+        factory.setEventCRFDAO(eventCRFDAO);
         factory.setEventDefintionCRFDAO(eddao);
         factory.setStudyGroupDAO(sgdao);
         factory.setDiscrepancyNoteDAO(dnDAO);

@@ -37,6 +37,7 @@ import java.util.Date;
 public class RemoveSubjectServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
     /**
      *
      */
@@ -56,7 +57,8 @@ public class RemoveSubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int subjectId = fp.getInt("id");
@@ -99,8 +101,6 @@ public class RemoveSubjectServlet extends SecureController {
                     }
                 }
 
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
                 for (int j = 0; j < events.size(); j++) {
                     StudyEventBean event = (StudyEventBean) events.get(j);
                     if (!event.getStatus().equals(Status.DELETED)) {
@@ -109,7 +109,7 @@ public class RemoveSubjectServlet extends SecureController {
                         event.setUpdatedDate(new Date());
                         studyEventDAO.update(event);
 
-                        ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                        ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
                         for (int k = 0; k < eventCRFs.size(); k++) {
@@ -118,7 +118,7 @@ public class RemoveSubjectServlet extends SecureController {
                                 eventCRF.setStatus(Status.AUTO_DELETED);
                                 eventCRF.setUpdater(ub);
                                 eventCRF.setUpdatedDate(new Date());
-                                ecdao.update(eventCRF);
+                                eventCRFDAO.update(eventCRF);
                                 // remove all the item data
                                 ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
                                 for (int a = 0; a < itemDatas.size(); a++) {

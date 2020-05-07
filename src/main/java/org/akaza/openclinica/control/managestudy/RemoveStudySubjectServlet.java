@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.UserStatus;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.view.Page;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -44,6 +45,7 @@ public class RemoveStudySubjectServlet extends SecureController {
 
     DiscrepancyNoteDAO dnDao;
     private StudySubjectService studySubjectService;
+    private EventCRFDAO eventCRFDAO;
 
     /**
      *
@@ -72,6 +74,7 @@ public class RemoveStudySubjectServlet extends SecureController {
         String subIdString = request.getParameter("subjectId");
         String studyIdString = request.getParameter("studyId");
         studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
@@ -128,13 +131,12 @@ public class RemoveStudySubjectServlet extends SecureController {
                     createDiscrepancyNoteBean(description, detailedNotes, parentDiscrepancyNote.getItemId(), study, ub, parentDiscrepancyNote);
                 }
 
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
                 for (int j = 0; j < displayEvents.size(); j++) {
                     DisplayStudyEventBean dispEvent = displayEvents.get(j);
                     StudyEventBean event = dispEvent.getStudyEvent();
 
-                        ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                        ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
                         for (int k = 0; k < eventCRFs.size(); k++) {
@@ -155,11 +157,6 @@ public class RemoveStudySubjectServlet extends SecureController {
                         + ".";
 
                 addPageMessage(emailBody);
-//                try{
-//                    sendEmail(emailBody);    
-//                }catch(Exception ex){
-//                    addPageMessage(respage.getString("mail_cannot_be_sent_to_admin"));
-//                }
                 forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
             }
         }

@@ -57,12 +57,9 @@ public class DeleteEventCRFServlet extends SecureController {
     public static String EVENT_CRF_ID = "eventCrfId";
     DiscrepancyNoteDAO dnDao;
     RuleActionRunLogDao ruleActionRunLogDao;
-    DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
-    DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
     ItemFormMetadataDAO ifmdao;
-    ItemDataDAO iddao;
-    ItemGroupMetadataDAO igmdao;
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     /**
      * 
@@ -86,9 +83,9 @@ public class DeleteEventCRFServlet extends SecureController {
 
         String action = request.getParameter("action");
 
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         request.setAttribute("errorData", null);
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
@@ -100,7 +97,7 @@ public class DeleteEventCRFServlet extends SecureController {
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
 
-            EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            EventCRFBean eventCRF = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
             final EventCrf ec = eventCrfDao.findById(eventCRFId);
 
             if (hasFormAccess(ec) != true) {
@@ -186,7 +183,7 @@ public class DeleteEventCRFServlet extends SecureController {
                 eventCRF.setStatus(Status.RESET);
                 eventCRF.setUpdater(ub);
                 eventCRF.setDateCompleted(null);
-                ecdao.update(eventCRF);
+                eventCRFDAO.update(eventCRF);
 
 
                 for (ItemDataBean itemdata : itemData) {
@@ -234,7 +231,7 @@ public class DeleteEventCRFServlet extends SecureController {
                 eventCRF.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED);
                 eventCRF.setUpdater(ub);
                 eventCRF.setDateCompleted(null);
-                ecdao.update(eventCRF);
+                eventCRFDAO.update(eventCRF);
 
                 if (event.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED) ) {
                     event.setWorkflowStatus(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
@@ -300,26 +297,10 @@ public class DeleteEventCRFServlet extends SecureController {
         return dnDao;
     }
 
-    public void setDnDao(DiscrepancyNoteDAO dnDao) {
-        this.dnDao = dnDao;
-    }
-
     private RuleActionRunLogDao getRuleActionRunLogDao() {
         ruleActionRunLogDao = this.ruleActionRunLogDao != null ? ruleActionRunLogDao
                 : (RuleActionRunLogDao) SpringServletAccess.getApplicationContext(context).getBean("ruleActionRunLogDao");
         return ruleActionRunLogDao;
-    }
-
-    private DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
-        dynamicsItemFormMetadataDao = this.dynamicsItemFormMetadataDao != null ? dynamicsItemFormMetadataDao
-                : (DynamicsItemFormMetadataDao) SpringServletAccess.getApplicationContext(context).getBean("dynamicsItemFormMetadataDao");
-        return dynamicsItemFormMetadataDao;
-    }
-
-    private DynamicsItemGroupMetadataDao getDynamicsItemGroupMetadataDao() {
-        dynamicsItemGroupMetadataDao = this.dynamicsItemGroupMetadataDao != null ? dynamicsItemGroupMetadataDao
-                : (DynamicsItemGroupMetadataDao) SpringServletAccess.getApplicationContext(context).getBean("dynamicsItemGroupMetadataDao");
-        return dynamicsItemGroupMetadataDao;
     }
 
 }

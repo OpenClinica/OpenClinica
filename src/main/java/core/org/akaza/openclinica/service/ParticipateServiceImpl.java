@@ -89,6 +89,9 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     @Autowired
     private StudyBuildService studyBuildService;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
 
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
@@ -166,7 +169,6 @@ public class ParticipateServiceImpl implements ParticipateService {
 
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
         CRFDAO crfDAO = new CRFDAO(dataSource);
         List<ODMcomplexTypeDefinitionFormData> formDatas = new ArrayList<>();
@@ -178,7 +180,7 @@ public class ParticipateServiceImpl implements ParticipateService {
             if (nextEvent != null) {
                 logger.debug("Found event: " + nextEvent.getName() + " - ID: " + nextEvent.getId());
 
-                List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
+                List<EventCRFBean> eventCrfs = eventCrfDAO.findAllByStudyEvent(nextEvent);
                 Study study = studyDao.findByOcOID(studyOID);
 
 

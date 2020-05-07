@@ -54,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class RemoveEventCRFServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
     /**
      * 
      */
@@ -77,22 +78,22 @@ public class RemoveEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         if (eventCRFId == 0) {
             addPageMessage(respage.getString("please_choose_an_event_CRF_to_remove"));
             request.setAttribute("id", new Integer(studySubId).toString());
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
-            EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            EventCRFBean eventCRF = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
             final EventCrf ec = eventCrfDao.findById(eventCRFId);
 
             if (hasFormAccess(ec) != true) {
@@ -173,7 +174,7 @@ public class RemoveEventCRFServlet extends SecureController {
                 eventCRF.setRemoved(Boolean.TRUE);
                 eventCRF.setUpdater(ub);
                 eventCRF.setUpdatedDate(new Date());
-                ecdao.update(eventCRF);
+                eventCRFDAO.update(eventCRF);
 
                 if (event.isSigned()) {
                     event.setSigned(Boolean.FALSE);
@@ -226,33 +227,10 @@ public class RemoveEventCRFServlet extends SecureController {
 
                 }
 
-                /* OC-8797
-                    Do not send email notification when data is removed
-                    String emailBody = respage.getString("the_event_CRF") + " " + cb.getName() + " " + respage.getString("has_been_removed_from_the_event")
-                            + event.getStudyEventDefinition().getName() + ". " + respage.getString("has_been_removed_from_the_event_cont");
-
-                    addPageMessage(emailBody);
-                    sendEmail(emailBody);
-                */
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
         }
-    }
-
-    /**
-     * Send email to director and administrator
-     * 
-     * @param emailBody
-     */
-    private void sendEmail(String emailBody) throws Exception {
-
-        logger.info("Sending email...");
-        // to study director
-
-        sendEmail(ub.getEmail().trim(), respage.getString("remove_event_CRF_from_event"), emailBody, false);
-        // sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_event_CRF_from_event"), emailBody, false);
-        logger.info("Sending email done..");
     }
 
 }

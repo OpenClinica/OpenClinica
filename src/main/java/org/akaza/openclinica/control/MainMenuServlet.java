@@ -54,63 +54,11 @@ public class MainMenuServlet extends SecureController {
     private StudyEventDAO studyEventDAO;
     private StudyGroupClassDAO studyGroupClassDAO;
     private SubjectGroupMapDAO subjectGroupMapDAO;
-    private EventCRFDAO eventCRFDAO;
-    private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
-    private StudyParameterValueDAO studyParameterValueDAO;
-
-    // ResourceBundle respage;
 
     @Override public void mayProceed() throws InsufficientPermissionException {
         locale = LocaleResolver.getLocale(request);
-        // < respage =
-        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.page_messages",locale);
-    }
-
-    public String getQueryStrCookie(HttpServletRequest request, HttpServletResponse response) {
-        String queryStr = "";
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equalsIgnoreCase("queryStr")) {
-                try {
-                    queryStr = URLDecoder.decode(cookie.getValue(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    logger.error("Error decoding redirect URL from queryStr cookie:" + e.getMessage());
-                }
-                cookie.setValue(null);
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                if (response != null)
-                    response.addCookie(cookie);
-                break;
-            }
-        }
-        return queryStr;
-    }
-
-    public String getTimeoutReturnToCookie(HttpServletRequest request, HttpServletResponse response) {
-        String queryStr = "";
-        if (ub == null || StringUtils.isEmpty(ub.getName()))
-            return queryStr;
-
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equalsIgnoreCase("bridgeTimeoutReturn-" + ub.getName())) {
-                try {
-                    queryStr = URLDecoder.decode(cookie.getValue(), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    logger.error("Error decoding redirect URL from queryStr cookie:" + e.getMessage());
-                }
-                cookie.setValue(null);
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                if (response != null)
-                    response.addCookie(cookie);
-                break;
-            }
-        }
-        return queryStr;
     }
 
     @Override public void processRequest() throws Exception {
@@ -120,7 +68,7 @@ public class MainMenuServlet extends SecureController {
         request.setAttribute("iconInfoShown", true);
         request.setAttribute("closeInfoShowIcons", false);
 
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
 
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
@@ -204,14 +152,6 @@ public class MainMenuServlet extends SecureController {
         forwardPage(Page.MENU);
     }
 
-    private void setupSubjectSDVTable() {
-
-   //     request.setAttribute("studyId", currentStudy.getId());
-   //     request.setAttribute("showMoreLink", "true");
-   //     String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
-   //     request.setAttribute("sdvMatrix", sdvMatrix);
-    }
-
     private void setupStudySubjectStatusStatisticsTable() {
 
         StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
@@ -255,36 +195,6 @@ public class MainMenuServlet extends SecureController {
 
     }
 
-    private void setupListStudySubjectTable() {
-
-        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
-        factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
-        factory.setSubjectDAO(getSubjectDAO());
-        factory.setStudySubjectDAO(getStudySubjectDAO());
-        factory.setStudyEventDAO(studyEventDAO);
-        factory.setStudyDAO(getStudyDao());
-        factory.setStudyBean(currentStudy);
-        factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
-        factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
-        factory.setCurrentRole(currentRole);
-        factory.setCurrentUser(ub);
-        factory.setEventCRFDAO(getEventCRFDAO());
-        factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
-        factory.setStudyGroupDAO(getStudyGroupDAO());
-        factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
-        String findSubjectsHtml = factory.createTable(request, response).render();
-        request.setAttribute("findSubjectsHtml", findSubjectsHtml);
-    }
-
-    public StudyParameterValueDAO getStudyParameterValueDAO() {
-        studyParameterValueDAO = this.studyParameterValueDAO == null ? new StudyParameterValueDAO(sm.getDataSource()) : studyParameterValueDAO;
-        return studyParameterValueDAO;
-    }
-
-    public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
-        studyParameterValueDAO = studyParameterValueDAO;
-    }
-
     public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
         studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource()) : studyEventDefinitionDAO;
         return studyEventDefinitionDAO;
@@ -308,16 +218,6 @@ public class MainMenuServlet extends SecureController {
     public SubjectGroupMapDAO getSubjectGroupMapDAO() {
         subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
         return subjectGroupMapDAO;
-    }
-
-    public EventCRFDAO getEventCRFDAO() {
-        eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-        return eventCRFDAO;
-    }
-
-    public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-        eventDefintionCRFDAO = this.eventDefintionCRFDAO == null ? new EventDefinitionCRFDAO(sm.getDataSource()) : eventDefintionCRFDAO;
-        return eventDefintionCRFDAO;
     }
 
     public StudyGroupDAO getStudyGroupDAO() {

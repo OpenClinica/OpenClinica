@@ -58,6 +58,7 @@ import org.apache.commons.lang.BooleanUtils;
 public class VerifyImportedCRFDataServlet extends SecureController {
 
     Locale locale;
+    private EventCRFDAO eventCRFDAO;
 
     /**
      *
@@ -80,54 +81,12 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
     }
 
-    public static DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message, EventCRFBean eventCrfBean, DisplayItemBean displayItemBean,
-            Integer parentId, UserAccountBean uab, DataSource ds, Study study) {
-        // DisplayItemBean displayItemBean) {
-        DiscrepancyNoteBean note = new DiscrepancyNoteBean();
-        StudySubjectDAO ssdao = new StudySubjectDAO(ds);
-        note.setDescription(message);
-        note.setDetailedNotes("Failed Validation Check");
-        note.setOwner(uab);
-        note.setCreatedDate(new Date());
-        note.setResolutionStatusId(ResolutionStatus.OPEN.getId());
-        note.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());
-        if (parentId != null) {
-            note.setParentDnId(parentId);
-        }
-
-        note.setField(itemBean.getName());
-        note.setStudyId(study.getStudyId());
-        note.setEntityName(itemBean.getName());
-        note.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
-        note.setEntityValue(displayItemBean.getData().getValue());
-
-        note.setEventName(eventCrfBean.getName());
-        note.setEventStart(eventCrfBean.getCreatedDate());
-        note.setCrfName(displayItemBean.getEventDefinitionCRF().getCrfName());
-
-        StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(eventCrfBean.getStudySubjectId());
-        note.setSubjectName(ss.getName());
-
-        note.setEntityId(displayItemBean.getData().getId());
-        note.setColumn("value");
-
-        DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(ds);
-        note = (DiscrepancyNoteBean) dndao.create(note);
-        // so that the below method works, need to set the entity above
-        // System.out.println("trying to create mapping with " + note.getId() +
-        // " " + note.getEntityId() + " " + note.getColumn() + " " +
-        // note.getEntityType());
-        dndao.createMapping(note);
-        // System.out.println("just created mapping");
-        return note;
-    }
-
     @Override
     @SuppressWarnings(value = "unchecked")
     public void processRequest() throws Exception {
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource());
         itemDataDao.setFormatDates(false);
-        EventCRFDAO eventCrfDao = new EventCRFDAO(sm.getDataSource());
         CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(sm.getDataSource(), getStudyDao());
         String action = request.getParameter("action");
 
@@ -192,7 +151,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                 }
 
                 if (eventCrfBean.getId() == 0) {
-                    eventCrfDao.create(eventCrfBean);
+                    eventCRFDAO.create(eventCrfBean);
                 }
 
                 // TODO : tom , the wrapper object has all the necessary data -
@@ -321,7 +280,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                     }
                     // Alter the SDV status if item data has been changed or added
                     if (eventCrfBean != null && resetSDV && eventCrfBean.getSdvStatus() == SdvStatus.VERIFIED)
-                        eventCrfDao.setSDVStatus(SdvStatus.CHANGED_AFTER_VERIFIED, ub.getId(), eventCrfBean.getId());
+                        eventCRFDAO.setSDVStatus(SdvStatus.CHANGED_AFTER_VERIFIED, ub.getId(), eventCrfBean.getId());
 
                     // end of item datas, tbh
                     // crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);

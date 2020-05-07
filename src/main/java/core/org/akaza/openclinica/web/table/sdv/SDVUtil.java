@@ -96,8 +96,11 @@ public class SDVUtil {
     @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     @Autowired
-    @Qualifier("studyeventdaojdbc")
+    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
 
     private static final Logger logger = LoggerFactory.getLogger(SDVUtil.class);
     private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
@@ -191,10 +194,8 @@ public class SDVUtil {
 
     public int getTotalRowCountSubjects(FilterSet filterSet, int studyId, int studySubjectId) {
 
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-
         if (filterSet.getFilters().size() == 0) {
-            return eventCRFDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
+            return eventCrfDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
         }
 
         int count = 0;
@@ -231,7 +232,7 @@ public class SDVUtil {
         }
 
         if (eventNameValue.length() > 0) {
-            return eventCRFDAO.countEventCRFsByEventNameSubjectLabel(eventNameValue, label);
+            return eventCrfDAO.countEventCRFsByEventNameSubjectLabel(eventNameValue, label);
         }
 
         if (eventDateValue.length() > 0) {
@@ -248,7 +249,7 @@ public class SDVUtil {
             // ("complete".equalsIgnoreCase(sdvStatus)));
         }
 
-        return eventCRFDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
+        return eventCrfDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
     }
 
     public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request, String[] permissionTags) {
@@ -303,9 +304,7 @@ public class SDVUtil {
     }
 
     public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId, String[] permissionTags) {
-
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-        Integer count = eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter, permissionTags);
+        Integer count = eventCrfDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter, permissionTags);
         return count != null ? count : 0;
 
     }
@@ -340,7 +339,6 @@ public class SDVUtil {
     private Collection<SubjectSDVContainer> getFilteredItems(EventCRFSDVFilter filterSet, EventCRFSDVSort sortSet, int rowStart, int rowEnd, int studyId,
                                                              HttpServletRequest request, String[] permissionTags) {
 
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         /*
          *
@@ -414,7 +412,7 @@ public class SDVUtil {
          *
          * }
          */
-        eventCRFBeans = eventCRFDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd, permissionTags);
+        eventCRFBeans = eventCrfDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd, permissionTags);
         return getSubjectRows(eventCRFBeans, request);
     }
 
@@ -422,7 +420,6 @@ public class SDVUtil {
     private Collection<SubjectSDVContainer> getFilteredItemsSubject(FilterSet filterSet, SortSet sortSet, int rowStart, int rowEnd, int studyId,
                                                                     int studySubjectId, HttpServletRequest request) {
 
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
 
         String label = "";
@@ -434,7 +431,7 @@ public class SDVUtil {
         if (filterSet.getFilter("studySubjectId") != null) {
 
             label = filterSet.getFilter("studySubjectId").getValue().trim();
-            eventCRFBeans = eventCRFDAO.getEventCRFsByStudySubjectLabelLimit(label, studyId, studyId, rowEnd - rowStart, rowStart);
+            eventCRFBeans = eventCrfDAO.getEventCRFsByStudySubjectLabelLimit(label, studyId, studyId, rowEnd - rowStart, rowStart);
 
         } else if (filterSet.getFilter("eventName") != null) {
 
@@ -464,7 +461,7 @@ public class SDVUtil {
             // rowEnd-rowStart,rowStart);
 
         } else {
-            eventCRFBeans = eventCRFDAO.getEventCRFsByStudySubjectLimit(studySubjectId, studyId, studyId, rowEnd - rowStart, rowStart);
+            eventCRFBeans = eventCrfDAO.getEventCRFsByStudySubjectLimit(studySubjectId, studyId, studyId, rowEnd - rowStart, rowStart);
 
         }
 
@@ -1295,10 +1292,8 @@ public class SDVUtil {
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         List<EventCRFBean> studyEventCRFBeans = new ArrayList<EventCRFBean>();
 
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-
         for (StudyEventBean studyEventBean : studyEventBeans) {
-            eventCRFBeans = eventCRFDAO.findAllByStudyEvent(studyEventBean);
+            eventCRFBeans = eventCrfDAO.findAllByStudyEvent(studyEventBean);
             if (eventCRFBeans != null && !eventCRFBeans.isEmpty()) {
                 studyEventCRFBeans.addAll(eventCRFBeans);
             }
@@ -1348,7 +1343,6 @@ public class SDVUtil {
 
     public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, int userId, SdvStatus sdvStatus) {
 
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         EventDefinitionCRFDAO eventDefinitionCrfDAO = new EventDefinitionCRFDAO(dataSource);
         CRFDAO crfDAO = new CRFDAO(dataSource);
@@ -1358,7 +1352,7 @@ public class SDVUtil {
         }
 
         for (Integer studySubjectId : studySubjectIds) {
-            ArrayList<EventCRFBean> eventCrfs = eventCRFDAO.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
+            ArrayList<EventCRFBean> eventCrfs = eventCrfDAO.getEventCRFsByStudySubjectCompleteOrLocked(studySubjectId);
             StudySubjectBean studySubject = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
             for (EventCRFBean eventCRFBean : eventCrfs) {
                 CRFBean crfBean = crfDAO.findByVersionId(eventCRFBean.getCRFVersionId());
@@ -1392,8 +1386,6 @@ public class SDVUtil {
         if (eventCRFIds == null || eventCRFIds.isEmpty()) {
             return true;
         }
-
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 
         for (Integer eventCrfId : eventCRFIds) {
             try {

@@ -53,8 +53,6 @@ public class ListEventsForSubjectsServlet extends SecureController {
     private CRFDAO crfDAO;
     Locale locale;
     private boolean showMoreLink;
-    private Object crfVersionDAO;
-    private FormLayoutDAO formLayoutDAO;
 
     /*
      * (non-Javadoc)
@@ -82,7 +80,8 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         if (fp.getString("showMoreLink").equals("")) {
             showMoreLink = true;
         } else {
@@ -131,7 +130,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         factory.setStudyGroupDAO(getStudyGroupDAO());
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
-        factory.setEventCRFDAO(getEventCRFDAO());
+        factory.setEventCRFDAO(eventCRFDAO);
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyDao(getStudyDao());
         factory.setCrfDAO(getCrfDAO());
@@ -175,11 +174,6 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public SubjectGroupMapDAO getSubjectGroupMapDAO() {
         subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
         return subjectGroupMapDAO;
-    }
-
-    public EventCRFDAO getEventCRFDAO() {
-        eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-        return eventCRFDAO;
     }
 
     public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {

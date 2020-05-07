@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes,
@@ -54,6 +55,9 @@ public class DiscrepancyNoteUtil {
 
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
 
     // These two variables are to arrange the Summary Statistics accordingly
     // Mantis Issue: 7771
@@ -113,7 +117,6 @@ public class DiscrepancyNoteUtil {
         boolean hasResolutionStatus = this.checkResolutionStatus(resolutionStatusIds);
         boolean hasDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
 
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
 
         StudyEventBean studyEventBean;
@@ -123,7 +126,7 @@ public class DiscrepancyNoteUtil {
         for (DisplayStudyEventBean dStudyEventBean : displayStudyBeans) {
             studyEventBean = dStudyEventBean.getStudyEvent();
             // All EventCRFs for a study event
-            eventCRFBeans = eventCRFDAO.findAllByStudyEvent(studyEventBean);
+            eventCRFBeans = eventCrfDAO.findAllByStudyEvent(studyEventBean);
 
             for (EventCRFBean eventCrfBean : eventCRFBeans) {
                 // Find ItemData type notes associated with an event crf

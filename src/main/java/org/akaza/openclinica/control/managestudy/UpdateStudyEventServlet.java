@@ -7,27 +7,36 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.*;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.ResolutionStatus;
+import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import core.org.akaza.openclinica.dao.managestudy.*;
+import core.org.akaza.openclinica.dao.rule.RuleSetDAO;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import core.org.akaza.openclinica.domain.datamap.AuditLogEventType;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.rule.RuleSetBean;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.AuditLogEventService;
+import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import core.org.akaza.openclinica.service.rule.RuleSetService;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -36,30 +45,9 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.rule.RuleSetDAO;
-import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
-import core.org.akaza.openclinica.domain.datamap.AuditLogEvent;
-import core.org.akaza.openclinica.domain.datamap.AuditLogEventType;
-import core.org.akaza.openclinica.domain.rule.RuleSetBean;
-import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.service.AuditLogEventService;
-import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import core.org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
@@ -68,6 +56,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.sql.DataSource;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author jxu
@@ -97,6 +87,7 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String PREV_STUDY_EVENT_SIGNED_STATUS = "prev_study_event_workflow_status";
 
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -113,7 +104,8 @@ public class UpdateStudyEventServlet extends SecureController {
     public void processRequest() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(context);
 
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         FormDiscrepancyNotes discNotes = null;
         FormProcessor fp = new FormProcessor(request);
@@ -162,11 +154,10 @@ public class UpdateStudyEventServlet extends SecureController {
         // YW
 
         request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
-        EventCRFDAO ecrfdao = new EventCRFDAO(sm.getDataSource());
 
         StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
-        studyEvent.setEventCRFs(ecrfdao.findAllByStudyEvent(studyEvent));
+        studyEvent.setEventCRFs(eventCRFDAO.findAllByStudyEvent(studyEvent));
 
         // only owner, admins, and study director/coordinator can update
         // if (ub.getId() != studyEvent.getOwnerId()) {
@@ -308,8 +299,7 @@ public class UpdateStudyEventServlet extends SecureController {
             StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(SUBJECT_EVENT_STATUS_ID));
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
             studyEvent.setWorkflowStatus(ses);
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+            ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
             if (ses.equals(StudyEventWorkflowStatusEnum.SKIPPED) ) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
@@ -317,14 +307,14 @@ public class UpdateStudyEventServlet extends SecureController {
                     ecb.setStatus(Status.UNAVAILABLE);
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
-                    ecdao.update(ecb);
+                    eventCRFDAO.update(ecb);
                 }
             } else {
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
-                    ecdao.update(ecb);
+                    eventCRFDAO.update(ecb);
                 }
             }
             // YW 3-12-2008, 2220 fix
@@ -485,8 +475,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
                 // prepare to figure out what the display should look like
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+                ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
 

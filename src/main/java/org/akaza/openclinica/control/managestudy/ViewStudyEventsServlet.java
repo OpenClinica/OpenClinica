@@ -61,6 +61,7 @@ public class ViewStudyEventsServlet extends SecureController {
     public static final String PRINT = "print";
     private final String COMMON = "common";
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -87,7 +88,8 @@ public class ViewStudyEventsServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         // checks which module requests are from
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
@@ -185,7 +187,6 @@ public class ViewStudyEventsServlet extends SecureController {
      */
     private ArrayList genTables(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, int statusId) {
 
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ArrayList allEvents = new ArrayList();
         definitions = findDefinitionById(definitions, definitionId);
         // YW <<
@@ -242,7 +243,7 @@ public class ViewStudyEventsServlet extends SecureController {
                 if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
                     subjectScheduled++;
                     if (se.getDateStarted().before(new Date())) {
-                        ArrayList eventCRFs = ecdao.findAllByStudyEvent(se);
+                        ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(se);
                         if (eventCRFs.isEmpty()) {
                             se.setScheduledDatePast(true);
                         }
@@ -322,7 +323,6 @@ public class ViewStudyEventsServlet extends SecureController {
      * @return
      */
     private ArrayList genEventsForPrint(FormProcessor fp, ArrayList definitions, Date startDate, Date endDate, int sedId, int definitionId, int statusId) {
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ArrayList allEvents = new ArrayList();
         definitions = findDefinitionById(definitions, definitionId);
         // YW <<
@@ -377,7 +377,7 @@ public class ViewStudyEventsServlet extends SecureController {
                 if (se.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
                     subjectScheduled++;
                     if (se.getDateStarted().before(new Date())) {
-                        ArrayList eventCRFs = ecdao.findAllByStudyEvent(se);
+                        ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(se);
                         if (eventCRFs.isEmpty()) {
                             se.setScheduledDatePast(true);
                         }

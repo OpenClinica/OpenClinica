@@ -20,9 +20,10 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig {
 
-  private static final String KAFKA_BROKER_ADDRESS = CoreResources.getKafkaBrokers();;
+  private static final String KAFKA_BROKER_ADDRESS = CoreResources.getKafkaBrokers();
   public static final String STUDY_PUBLISH_TOPIC = "studyPublish";
   public static final String EVENT_ATTRIBUTE_CHANGE_TOPIC = "eventAttributeChange";
+  public static final String FORM_ATTRIBUTE_CHANGE_TOPIC = "formAttributeChange";
   public static final String FORM_CHANGE_TOPIC = "formChange";
   public static final String ITEM_DATA_CHANGE_TOPIC = "itemDataChange";
 
@@ -60,6 +61,11 @@ public class KafkaConfig {
   @Bean
   public NewTopic eventAttributeChange() {
     return new NewTopic(EVENT_ATTRIBUTE_CHANGE_TOPIC, 1, (short) 1);
+  }
+
+  @Bean
+  public NewTopic formAttributeChange() {
+    return new NewTopic(FORM_ATTRIBUTE_CHANGE_TOPIC, 1, (short) 1);
   }
 
   @Bean

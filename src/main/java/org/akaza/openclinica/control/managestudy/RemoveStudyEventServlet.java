@@ -50,6 +50,7 @@ public class RemoveStudyEventServlet extends SecureController {
      */
 
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -74,7 +75,8 @@ public class RemoveStudyEventServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
@@ -105,8 +107,7 @@ public class RemoveStudyEventServlet extends SecureController {
                 // find all crfs in the definition
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllByEventDefinitionId(study, sed.getId());
 
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                 // construct info needed on view study event page
                 DisplayStudyEventBean de = new DisplayStudyEventBean();
@@ -133,10 +134,7 @@ public class RemoveStudyEventServlet extends SecureController {
                     subdao.update(studySub);
                 }
 
-                // remove all event crfs
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
-                ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                 ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
                 for (int k = 0; k < eventCRFs.size(); k++) {

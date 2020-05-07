@@ -85,7 +85,7 @@ public class ListEventsForSubjectServlet extends SecureController {
 
         FormProcessor fp = new FormProcessor(request);
         studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         // checks which module the requests are from
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);

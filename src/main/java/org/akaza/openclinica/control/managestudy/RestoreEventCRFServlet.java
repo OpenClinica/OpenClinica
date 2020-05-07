@@ -46,6 +46,7 @@ import java.util.Date;
  */
 public class RestoreEventCRFServlet extends SecureController {
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     /**
      * 
@@ -68,19 +69,19 @@ public class RestoreEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
         if (eventCRFId == 0) {
             addPageMessage(respage.getString("please_choose_an_event_CRF_to_restore"));
             request.setAttribute("id", new Integer(studySubId).toString());
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
-            EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            EventCRFBean eventCRF = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
 
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             // YW 11-07-2007, an event CRF could not be restored if its study
@@ -145,7 +146,7 @@ public class RestoreEventCRFServlet extends SecureController {
                 eventCRF.setRemoved(Boolean.FALSE);
                 eventCRF.setUpdater(ub);
                 eventCRF.setUpdatedDate(new Date());
-                ecdao.update(eventCRF);
+                eventCRFDAO.update(eventCRF);
 
                 if (event.isSigned()) {
                     event.setSigned(Boolean.FALSE);
@@ -163,32 +164,10 @@ public class RestoreEventCRFServlet extends SecureController {
 
                 // restore all the item data
 
-                /* OC-8797
-                    Do not send email notification when data is removed
-                    String emailBody =
-                        respage.getString("the_event_CRF") + cb.getName() + " " + respage.getString("has_been_restored_to_the_event") + " "
-                            + event.getStudyEventDefinition().getName() + ".";
-
-                    addPageMessage(emailBody);
-                    sendEmail(emailBody);
-                */
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
         }
-    }
-
-    /**
-     * Send email to director and administrator
-     *
-     */
-    private void sendEmail(String emailBody) throws Exception {
-
-        logger.info("Sending email...");
-        sendEmail(ub.getEmail().trim(), respage.getString("restore_event_CRF_to_event"), emailBody, false);
-        // to admin
-        sendEmail(EmailEngine.getAdminEmail(), respage.getString("restore_event_CRF_to_event"), emailBody, false);
-        logger.info("Sending email done..");
     }
 
 }

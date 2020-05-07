@@ -1,14 +1,5 @@
 package core.org.akaza.openclinica.web.crfdata;
 
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.ItemDataType;
@@ -19,27 +10,22 @@ import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
-import core.org.akaza.openclinica.bean.submit.DisplayItemBean;
-import core.org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
-import core.org.akaza.openclinica.bean.submit.EventCRFBean;
-import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
-import core.org.akaza.openclinica.bean.submit.ItemBean;
-import core.org.akaza.openclinica.bean.submit.ItemDataBean;
-import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import core.org.akaza.openclinica.bean.submit.ItemGroupBean;
-import core.org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
-import core.org.akaza.openclinica.bean.submit.crfdata.UpsertOnBean;
+import core.org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.bean.submit.crfdata.*;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import core.org.akaza.openclinica.dao.submit.*;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.exception.OpenClinicaException;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -47,34 +33,21 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import core.org.akaza.openclinica.dao.hibernate.UserAccountDao;
-import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
-import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
-import core.org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import core.org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import core.org.akaza.openclinica.domain.user.UserAccount;
-import core.org.akaza.openclinica.exception.OpenClinicaException;
-import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
-
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ImportCRFDataService {
 
@@ -89,17 +62,14 @@ public class ImportCRFDataService {
     @Autowired
     private StudyBuildService studyBuildService;
     @Autowired
-    private ViewStudySubjectService viewStudySubjectService;
-
-    @Autowired
     private UserAccountDao userAccountDao;
 
     @Autowired
-    private StudyEventDao studyEventDao;
-
-    @Autowired
-    @Qualifier("studyeventdaojdbc")
+    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
 
     @Autowired
     private StudyDao studyDao;
@@ -116,7 +86,6 @@ public class ImportCRFDataService {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         //StudyEventBean List to hold new common event
         ArrayList<StudyEventBean> studyEventBeans = new ArrayList<StudyEventBean>();
-        EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
@@ -391,7 +360,6 @@ public class ImportCRFDataService {
                                                  UserAccount userAccount, Study study) {
 
         final String COMMON = "common";
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
         EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 
@@ -458,7 +426,7 @@ public class ImportCRFDataService {
         if (!studyEventDefinition.isRepeating()) {
             logger.debug("StudyEventDefinition with Oid {} is Non Repeating", studyEventDefinition.getOid());
             for (StudyEventBean stEvent : studyEvents) {
-                ArrayList<EventCRFBean> eventCRFBeans = eventCRFDAO.findByEventSubjectFormLayout(stEvent, studySubject, formLayoutBean);
+                ArrayList<EventCRFBean> eventCRFBeans = eventCrfDAO.findByEventSubjectFormLayout(stEvent, studySubject, formLayoutBean);
                 if (eventCRFBeans != null && eventCRFBeans.size() > 0) {
                     eventCrf = eventCRFBeans.get(0);
                     eventCrfId = eventCrf.getId();
@@ -733,9 +701,6 @@ public class ImportCRFDataService {
      * purpose: returns false if any of the forms/EventCRFs fail the UpsertOnBean rules.
      */
     public synchronized boolean eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub) throws OpenClinicaException {
-        ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
-        ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
-        EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
@@ -840,7 +805,6 @@ public class ImportCRFDataService {
      */
     public HashMap<String, String> fetchEventCRFStatuses(ODMContainer odmContainer) {
         HashMap<String, String> eventCRFStatuses = new HashMap<String, String>();
-        EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
 
@@ -1701,7 +1665,6 @@ public class ImportCRFDataService {
      * created for "Not Started" forms.
      */
     public void fetchEventCRFStatuses(ODMContainer odmContainer, HashMap<Integer, String> importedCRFStatuses) {
-        EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
 
@@ -1866,7 +1829,6 @@ public class ImportCRFDataService {
                     Map<String,Integer> groupMaxOrdinals = new HashMap<String,Integer>();
                     displayItemBeanWrapper = null;
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
-                    EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
                     ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByFormOid(formDataBean.getFormOID());
                     ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
 
@@ -1884,7 +1846,7 @@ public class ImportCRFDataService {
                     // may be the point where we cut off item groups etc and
                     // instead work on sections
                     
-                    EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+                    EventCRFBean eventCRFBean = eventCrfDAO.findByEventCrfVersion(studyEvent, crfVersion);
                     
                     if(eventCRFBean == null && studyEvent.getId()==0) {
                     	ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
@@ -2520,7 +2482,6 @@ public class ImportCRFDataService {
 	
 	public ArrayList<EventCRFBean> creatEventCRFBeans(ArrayList<EventCRFBean> eventCRFBeans) {
 		ArrayList<EventCRFBean> eventCRFBeansCreated = new  ArrayList<>();
-		EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
 		
 		for(EventCRFBean newEventCrfBean:eventCRFBeans) {
 			if(newEventCrfBean != null) {
@@ -2591,7 +2552,6 @@ public class ImportCRFDataService {
 			Map<String,Integer> groupMaxOrdinals = new HashMap<String,Integer>();
 			displayItemBeanWrapper = null;
 			CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
-			EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
 			ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByFormOid(formDataBean.getFormOID());
 			ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
 			
@@ -2604,7 +2564,7 @@ public class ImportCRFDataService {
 			}
 			CRFVersionBean crfVersion = crfVersionBeans.get(0);
 			
-			EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+			EventCRFBean eventCRFBean = eventCrfDAO.findByEventCrfVersion(studyEvent, crfVersion);
 				
 			EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 			EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),

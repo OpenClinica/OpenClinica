@@ -60,8 +60,11 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     private DataSource dataSource;
 
     @Autowired
-    @Qualifier("studyeventdaojdbc")
+    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
 
     @Transactional
     @Override
@@ -71,7 +74,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
-        EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
         CRFDAO crfDao = new CRFDAO(dataSource);
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(dataSource);
 
@@ -87,11 +89,11 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                     study.getStudyId(), study.checkAndGetParentStudyId());
         }
 
-        Map<Integer, SortedSet<EventCRFBean>> eventCrfListByStudyEvent = eventCrfDao.buildEventCrfListByStudyEvent(studySubject.getId());
+        Map<Integer, SortedSet<EventCRFBean>> eventCrfListByStudyEvent = eventCrfDAO.buildEventCrfListByStudyEvent(studySubject.getId());
 
         Map<Integer, Integer> maxOrdinalByStudyEvent = studyEventDefinitionDao.buildMaxOrdinalByStudyEvent(studySubject.getId());
 
-        Set<Integer> nonEmptyEventCrf = eventCrfDao.buildNonEmptyEventCrfIds(studySubject.getId());
+        Set<Integer> nonEmptyEventCrf = eventCrfDAO.buildNonEmptyEventCrfIds(studySubject.getId());
 
         Map<Integer, FormLayoutBean> formLayoutById = formLayoutDAO.buildFormLayoutById(studySubject.getId());
 
@@ -136,7 +138,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     public ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub, DataSource ds, UserAccountBean ub,
                                                                                  StudyUserRoleBean currentRole, StudyDao studyDao) {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-        EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
 
@@ -154,7 +155,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             // find all active crfs in the definition
             Study study = (Study) studyDao.findByPK(studySub.getStudyId());
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
-            ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+            ArrayList eventCRFs = eventCrfDAO.findAllByStudyEvent(event);
 
             // construct info needed on view study event page
             DisplayStudyEventBean de = new DisplayStudyEventBean();
@@ -180,7 +181,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     public DisplayStudyEventBean getDisplayStudyEventsForStudySubject(StudySubjectBean studySub, StudyEventBean event, DataSource ds,
                                                                       UserAccountBean ub, StudyUserRoleBean currentRole, Study study) {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-        EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
 
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
@@ -189,7 +189,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         // find all active crfs in the definition
         ArrayList eventDefinitionCRFs = edcdao.findAllActiveByEventDefinitionId(sed.getId());
 
-        ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+        ArrayList eventCRFs = eventCrfDAO.findAllByStudyEvent(event);
 
         // construct info needed on view study event page
         DisplayStudyEventBean de = new DisplayStudyEventBean();
@@ -430,11 +430,10 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         }
 
         ArrayList answer = new ArrayList();
-        EventCRFDAO ecdao = new EventCRFDAO(ds);
 
         StudyEventBean studyEventBean = new StudyEventBean();
         studyEventBean.setId(studyEventId);
-        ArrayList<EventCRFBean> listOfActiveEventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
+        ArrayList<EventCRFBean> listOfActiveEventCRFs = eventCrfDAO.findAllByStudyEvent(studyEventBean);
 
         ArrayList<Integer> listOfCrfVersionsInUse = new ArrayList();
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
@@ -476,11 +475,10 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         }
 
         ArrayList answer = new ArrayList();
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
         StudyEventBean studyEventBean = new StudyEventBean();
         studyEventBean.setId(studyEventId);
-        ArrayList<EventCRFBean> listOfActiveEventCRFs = ecdao.findAllByStudyEvent(studyEventBean);
+        ArrayList<EventCRFBean> listOfActiveEventCRFs = eventCrfDAO.findAllByStudyEvent(studyEventBean);
 
         ArrayList<Integer> listOfCrfVersionsInUse = new ArrayList();
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());

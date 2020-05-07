@@ -96,7 +96,8 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         // Determine whether to limit the displayed DN's to a certain DN type
         int resolutionStatus = 0;
         try {
@@ -171,7 +172,7 @@ public class ListDiscNotesForCRFServlet extends SecureController {
         factory.setStudyGroupDAO(getStudyGroupDAO());
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
-        factory.setEventCRFDAO(getEventCRFDAO());
+        factory.setEventCRFDAO(eventCRFDAO);
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setCrfDAO(getCrfDAO());
         factory.setDiscrepancyNoteDAO(getDiscrepancyNoteDAO());
@@ -212,11 +213,6 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     public SubjectGroupMapDAO getSubjectGroupMapDAO() {
         subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
         return subjectGroupMapDAO;
-    }
-
-    public EventCRFDAO getEventCRFDAO() {
-        eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-        return eventCRFDAO;
     }
 
     public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {

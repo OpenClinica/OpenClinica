@@ -92,8 +92,11 @@ public class ChangeCRFVersionController {
     @Autowired
     private StudyDao studyDao;
     @Autowired
-    @Qualifier("studyeventdaojdbc")
+    @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
 
     @Autowired
     StudyEventService studyEventService;
@@ -164,8 +167,7 @@ public class ChangeCRFVersionController {
         StudyEventDefinitionBean sedb = sfed.findByEventDefinitionCRFId(eventDefinitionCRFId);
         request.setAttribute("eventName", sedb.getName());
 
-        EventCRFDAO ecdao = new EventCRFDAO(dataSource);
-        EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
+        EventCRFBean ecb = (EventCRFBean) eventCrfDAO.findByPK(eventCRFId);
         final EventCrf ec = eventCrfDao.findById(eventCRFId);
         if (permissionService.hasFormAccess(ec, formLayoutId, 0, request) != true) {
             redirect(request, response, "/NoAccess?originatingPage="+ originatingPage);
@@ -550,10 +552,9 @@ public class ChangeCRFVersionController {
         HttpSession session = request.getSession();
         // update event_crf_id table
         try {
-            EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             Study currentPublicStudy = (Study) session.getAttribute("publicStudy");
-            EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
+            EventCRFBean ecb = (EventCRFBean) eventCrfDAO.findByPK(eventCRFId);
             StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
             if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
                     + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
@@ -563,7 +564,7 @@ public class ChangeCRFVersionController {
             }
             Connection con = dataSource.getConnection();
             con.setAutoCommit(false);
-            eventCRFDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
+            eventCrfDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
 
             String status_before_update = null;
             Status subjectStatus = null;

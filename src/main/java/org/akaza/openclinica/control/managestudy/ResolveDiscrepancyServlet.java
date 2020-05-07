@@ -137,6 +137,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private final String PARENT_ID = "parentId";// parent note id
 
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -194,8 +195,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         ItemBean item = (ItemBean) idao.findByPK(idb.getItemId());
         ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO<>(ds);
 
-        EventCRFDAO ecdao = new EventCRFDAO(ds);
-        EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+        EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(idb.getEventCRFId());
 
         FormLayoutDAO fldao = new FormLayoutDAO(ds);
         FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(ecb.getFormLayoutId());
@@ -376,7 +376,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     protected void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         int noteId = fp.getInt(INPUT_NOTE_ID);
         int itemDataId = fp.getInt("itemDataId");
         String flavor = fp.getString(FLAVOR);
@@ -450,9 +450,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
 
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
-            EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+            EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(idb.getEventCRFId());
             StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
 
             if (isCRFLocked(ecb)) {

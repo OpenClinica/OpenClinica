@@ -98,7 +98,7 @@ public class ListEventDefinitionServlet extends SecureController {
     public void processRequest() throws Exception {
 
         StudyEventDefinitionDAO edao = new StudyEventDefinitionDAO(sm.getDataSource());
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         UserAccountDAO sdao = new UserAccountDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         CRFDAO crfDao = new CRFDAO(sm.getDataSource());

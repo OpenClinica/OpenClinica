@@ -61,7 +61,7 @@ public class FindStudyEventServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
 
         String browseBy = fp.getString(INPUT_BROWSEBY);
         int id = fp.getInt(INPUT_ID);

@@ -61,6 +61,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
     public static String FILTER_KEYWORD = "ebl_filterKeyword";
     public static String SEARCH_SUBMITTED = "submitted";
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     // >>
 
@@ -69,7 +70,8 @@ public abstract class ListStudySubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         locale = LocaleResolver.getLocale(request);
         // < resword =
         // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
@@ -373,7 +375,6 @@ public abstract class ListStudySubjectServlet extends SecureController {
         if (studyEvent == null)
             return false;
 
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(sm.getDataSource());
         EventDefinitionCRFDAO eventDefinitionDAO = new EventDefinitionCRFDAO(sm.getDataSource());
         List<EventCRFBean> crfBeans = new ArrayList<EventCRFBean>();
 

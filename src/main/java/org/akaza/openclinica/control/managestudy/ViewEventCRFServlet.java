@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
@@ -38,6 +39,8 @@ public class ViewEventCRFServlet extends SecureController {
     /**
      *
      */
+    private EventCRFDAO eventCRFDAO;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
@@ -46,11 +49,11 @@ public class ViewEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         int eventCRFId = fp.getInt("id", true);
         int studySubId = fp.getInt("studySubId", true);
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
         ItemDAO idao = new ItemDAO(sm.getDataSource());
         ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
@@ -64,7 +67,7 @@ public class ViewEventCRFServlet extends SecureController {
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             request.setAttribute("studySub", studySub);
 
-            EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            EventCRFBean eventCRF = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
             CRFBean crf = cdao.findByVersionId(eventCRF.getCRFVersionId());
             request.setAttribute("crf", crf);
 

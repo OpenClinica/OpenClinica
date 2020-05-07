@@ -53,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class ViewStudySubjectAuditLogServlet extends SecureController {
     private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -76,7 +77,8 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao = (EventDefinitionCrfPermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfPermissionTagDao");
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         AuditDAO adao = new AuditDAO(sm.getDataSource());
@@ -85,7 +87,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
 
@@ -187,7 +188,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 studyEvent.setStudyEventDefinition(sedBean);
 
                 // Link event CRFs
-                studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
+                studyEvent.setEventCRFs(eventCRFDAO.findAllByStudyEvent(studyEvent));
 
                 // Find deleted Event CRFs
                 List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEventByEventCRFStatus(studyEvent.getId());

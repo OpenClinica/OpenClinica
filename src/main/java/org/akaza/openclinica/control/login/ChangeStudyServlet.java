@@ -57,19 +57,8 @@ public class ChangeStudyServlet extends SecureController {
      * Checks whether the user has the correct privilege
      */
     Locale locale;
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
-    private SubjectDAO subjectDAO;
     private StudySubjectDAO studySubjectDAO;
     private StudyEventDAO studyEventDAO;
-    private StudyGroupClassDAO studyGroupClassDAO;
-    private SubjectGroupMapDAO subjectGroupMapDAO;
-//    private StudyDAO studyDAO;
-    private EventCRFDAO eventCRFDAO;
-    private EventDefinitionCRFDAO eventDefintionCRFDAO;
-    private StudyGroupDAO studyGroupDAO;
-    private DiscrepancyNoteDAO discrepancyNoteDAO;
-    private StudyParameterValueDAO studyParameterValueDAO;
-    private StudyBuildService studyBuildService;
 
     // < ResourceBundlerestext;
 
@@ -77,9 +66,6 @@ public class ChangeStudyServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
 
         locale = LocaleResolver.getLocale(request);
-        // < restext =
-        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
-
     }
 
 
@@ -87,7 +73,7 @@ public class ChangeStudyServlet extends SecureController {
     public void processRequest() throws Exception {
 
         String action = request.getParameter("action");// action sent by user
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         request.setAttribute("requestSchema", "public");
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource(), getStudyDao());
         Map<Integer, Study> allStudies = getStudyDao().findAll().stream().collect(Collectors.toMap(s->s.getStudyId(),s-> s));
@@ -415,19 +401,9 @@ public class ChangeStudyServlet extends SecureController {
         request.setAttribute("studyStatistics", studyStatistics);
     }
 
-    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-        studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource()) : studyEventDefinitionDAO;
-        return studyEventDefinitionDAO;
-    }
-
     public StudySubjectDAO getStudySubjectDAO() {
         studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
         return studySubjectDAO;
-    }
-
-    public EventCRFDAO getEventCRFDAO() {
-        eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-        return eventCRFDAO;
     }
 
     public StudyBuildService getStudyBuildService() {

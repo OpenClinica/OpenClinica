@@ -525,11 +525,6 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreCRFFromDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>AddCRFToDefinition</display-name>
-        <servlet-name>AddCRFToDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.AddCRFToDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>ViewEventDefinition</display-name>
         <servlet-name>ViewEventDefinitionServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionServlet</servlet-class>
@@ -544,18 +539,6 @@
 
         <servlet-name>CreateCRFServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.CreateCRFServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>CreateCRFVersion</display-name>
-
-        <servlet-name>CreateCRFVersionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.CreateCRFVersionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>CreateXformCRFVersion</display-name>
-
-        <servlet-name>CreateXformCRFVersionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.CreateXformCRFVersionServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ExtractDatasetsMain</display-name>
@@ -1368,10 +1351,6 @@
         <url-pattern>/RestoreCRFFromDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>AddCRFToDefinitionServlet</servlet-name>
-        <url-pattern>/AddCRFToDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ViewEventDefinitionServlet</servlet-name>
         <url-pattern>/ViewEventDefinition</url-pattern>
     </servlet-mapping>
@@ -1382,14 +1361,6 @@
     <servlet-mapping>
         <servlet-name>CreateCRFServlet</servlet-name>
         <url-pattern>/CreateCRF</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateCRFVersionServlet</servlet-name>
-        <url-pattern>/CreateCRFVersion</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateXformCRFVersionServlet</servlet-name>
-        <url-pattern>/CreateXformCRFVersion</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ExtractDatasetsMainServlet</servlet-name>

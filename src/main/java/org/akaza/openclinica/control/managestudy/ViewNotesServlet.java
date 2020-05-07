@@ -55,7 +55,6 @@ public class ViewNotesServlet extends SecureController {
     private ItemDao itemDao;
     private ItemDataDao itemDataDao;
     private ItemFormMetadataDao itemFormMetadataDao;
-    private ResponseSetDao responseSetDao;
     private EventCrfDao eventCrfDao;
     private StudyEventDao studyEventDao;
     private CrfDao crfDao;
@@ -63,6 +62,7 @@ public class ViewNotesServlet extends SecureController {
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private EventDefinitionCrfPermissionTagDao permissionTagDao;
     private StudyEventDefinitionDao studyEventDefinitionDao;
+    private EventCRFDAO eventCRFDAO;
 
 
     /*
@@ -72,6 +72,7 @@ public class ViewNotesServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         String module = request.getParameter("module");
         String moduleStr = "manage";
         String study_oid = request.getParameter("study_oid");
@@ -166,7 +167,6 @@ public class ViewNotesServlet extends SecureController {
         UserAccountDAO uadao = new UserAccountDAO(sm.getDataSource());
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO eventDefinitionCRFDao = new EventDefinitionCRFDAO(sm.getDataSource());
-        EventCRFDAO eventCRFDao = new EventCRFDAO(sm.getDataSource());
 
         ListNotesTableFactory factory = new ListNotesTableFactory(showMoreLink, getPermissionTagsList());
         factory.setSubjectDao(sdao);
@@ -179,7 +179,7 @@ public class ViewNotesServlet extends SecureController {
         factory.setStudyEventDao(getStudyEventDao());
         factory.setStudyEventDefinitionDao(studyEventDefinitionDao);
         factory.setEventDefinitionCRFDao(eventDefinitionCRFDao);
-        factory.setEventCRFDao(eventCRFDao);
+        factory.setEventCRFDao(eventCRFDAO);
         factory.setModule(moduleStr);
         factory.setDiscNoteType(discNoteType);
         factory.setResolutionStatus(resolutionStatus);

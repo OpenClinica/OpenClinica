@@ -70,6 +70,7 @@ public class SignStudySubjectServlet extends SecureController {
     private WebApplicationContext ctx = null;
     public static final String ORIGINATING_PAGE = "originatingPage";
 
+    private EventCRFDAO eventCRFDAO;
     private StudyEventDAO studyEventDAO;
     private StudySubjectService studySubjectService;
 
@@ -96,7 +97,6 @@ public class SignStudySubjectServlet extends SecureController {
     public ArrayList getDisplayStudyEventsForStudySubject(Study study, StudySubjectBean studySub, DataSource ds, UserAccountBean ub,
                                                                  StudyUserRoleBean currentRole) {
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-        EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
 
@@ -112,7 +112,7 @@ public class SignStudySubjectServlet extends SecureController {
             // find all active crfs in the definition
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, sed.getId());
 
-            ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+            ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
             // construct info needed on view study event page
             DisplayStudyEventBean de = new DisplayStudyEventBean();
@@ -136,14 +136,13 @@ public class SignStudySubjectServlet extends SecureController {
 
     public boolean permitSign(StudySubjectBean studySub, DataSource ds,StudyDao sdao) {
         boolean sign = true;
-        EventCRFDAO ecdao = new EventCRFDAO(ds);
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
         Study studyBean = (Study) sdao.findByPK(studySub.getStudyId());
         // DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(ds);
         ArrayList studyEvents = studyEventDAO.findAllByStudySubject(studySub);
         for (int l = 0; l < studyEvents.size(); l++) {
             StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(l);
-            ArrayList eventCrfs = ecdao.findAllByStudyEvent(studyEvent);
+            ArrayList eventCrfs = eventCRFDAO.findAllByStudyEvent(studyEvent);
             for (int i = 0; i < eventCrfs.size(); i++) {
                 EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
                 // ArrayList discList =
@@ -197,7 +196,8 @@ public class SignStudySubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(context);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
 
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
@@ -261,12 +261,11 @@ public class SignStudySubjectServlet extends SecureController {
                 EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
                 // find all eventcrfs for each event
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
                 ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(study, studySub, sm.getDataSource(), ub, currentRole);
 
                 for (DisplayStudyEventBean displayEvent : displayEvents) {
                     StudyEventBean studyEvent = displayEvent.getStudyEvent();
-                    ArrayList eventCRFs = ecdao.findAllByStudyEvent(displayEvent.getStudyEvent());
+                    ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(displayEvent.getStudyEvent());
                     ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
                     ArrayList displayEventCRFs = studySubjectService.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
                             currentRole, studyEvent.getWorkflowStatus(), study);
@@ -327,13 +326,12 @@ public class SignStudySubjectServlet extends SecureController {
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
         // find all eventcrfs for each event
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
         ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(study, studySub, sm.getDataSource(), ub, currentRole);
 
         for (DisplayStudyEventBean displayEvent : displayEvents) {
             StudyEventBean studyEvent = displayEvent.getStudyEvent();
-            ArrayList eventCRFs = ecdao.findAllByStudyEvent(displayEvent.getStudyEvent());
+            ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(displayEvent.getStudyEvent());
             ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
             ArrayList displayEventCRFs = studySubjectService.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
                     studyEvent.getWorkflowStatus(), study);

@@ -60,7 +60,6 @@ public class ListStudySubjectsServlet extends SecureController {
     private ItemDao itemDao;
     private ItemDataDao itemDataDao;
     private ItemFormMetadataDao itemFormMetadataDao;
-    private ResponseSetDao responseSetDao;
     private EventCrfDao eventCrfDao;
     private StudyEventDao studyEventDao;
     private CrfDao crfDao;
@@ -98,7 +97,8 @@ public class ListStudySubjectsServlet extends SecureController {
     protected void processRequest() throws Exception {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
         FormProcessor fp = new FormProcessor(request);
-        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyeventdaojdbc");
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         boolean showMoreLink;
         if(currentStudy !=null && currentStudy.getStudyId() > 0){
             session.setAttribute("study", currentStudy);
@@ -176,7 +176,7 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
-        factory.setEventCRFDAO(getEventCRFDAO());
+        factory.setEventCRFDAO(eventCRFDAO);
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
         factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
@@ -257,11 +257,6 @@ public class ListStudySubjectsServlet extends SecureController {
     public SubjectGroupMapDAO getSubjectGroupMapDAO() {
         subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
         return subjectGroupMapDAO;
-    }
-
-    public EventCRFDAO getEventCRFDAO() {
-        eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-        return eventCRFDAO;
     }
 
     public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
