@@ -309,6 +309,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             studyMap.put(getStudyBean().getStudyId(), getStudyBean());
         Study study = null;
 
+        String [] tableColumns= getViewStudySubjectService().getTableColumns(PAGE_NAME,COMPONENT_NAME);
         for (StudySubjectBean studySubjectBean : items) {
             if(studyMap.get(studySubjectBean.getStudyId()) == null)
                 studyMap.put(studySubjectBean.getStudyId() ,(Study) getStudyDAO().findByPK(studySubjectBean.getStudyId()));
@@ -323,9 +324,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("studySubject.status", studySubjectBean.getStatus());
             theItem.put("enrolledAt", study.getUniqueIdentifier());
 
-
-
-            String [] tableColumns= getViewStudySubjectService().getTableColumns(PAGE_NAME,COMPONENT_NAME);
             if (tableColumns != null) {
                 for (String column : tableColumns) {
                     String itemValue = null;

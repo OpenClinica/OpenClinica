@@ -3,9 +3,9 @@ package com.openclinica.kafka;
 import com.openclinica.kafka.dto.*;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.CoreUtilServiceImpl;
@@ -24,6 +24,8 @@ public class KafkaService {
   @Autowired
   private StudySubjectDao studySubjectDao;
   @Autowired
+  StudyEventDao studyEventDao;
+  @Autowired
   private StudyEventDefinitionDao studyEventDefinitionDao;
   @Autowired
   private CoreUtilServiceImpl coreUtilService;
@@ -32,6 +34,24 @@ public class KafkaService {
     Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
 
     ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_CHANGE_TOPIC, null, null, null, formChangeDTO, headers);
+    kafkaTemplate.send(producerRecord);
+  }
+
+  public void sendFormAttributeChangeMessage(EventCrf eventCrf) throws Exception {
+    Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
+
+    FormChangeDTO formAttributeChangeDTO = constructEditFormDTO(eventCrf);
+
+    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
+    kafkaTemplate.send(producerRecord);
+  }
+
+  public void sendFormAttributeChangeMessage(EventCRFBean eventCrfBean) throws Exception {
+    Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
+
+    FormChangeDTO formAttributeChangeDTO = constructEventCrfAttributeChangeDTO(eventCrfBean);
+
+    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
     kafkaTemplate.send(producerRecord);
   }
 
@@ -221,7 +241,45 @@ public class KafkaService {
     return formChangeDTO;
   }
 
-  public FormChangeDTO constructEditFormDTO( EventCrf eventCrf){
+  public FormChangeDTO constructEventCrfAttributeChangeDTO(EventCRFBean eventCrfBean){
+    FormChangeDTO formChangeDTO = new FormChangeDTO();
+
+    StudyEventDefinition studyEventDefinition = studyEventDao.findById(eventCrfBean.getStudyEventId()).getStudyEventDefinition();
+    StudySubject studySubject = studySubjectDao.findById(eventCrfBean.getStudySubjectId());
+    Study study = studySubject.getStudy();
+    String studyOid;
+    String siteOid;
+    String studyUuid;
+    String studyEnvUuid;
+    if (study.getStudy() == null) {
+      // Study-level
+      studyOid = study.getOc_oid();
+      siteOid = null;
+      studyUuid = study.getStudyUuid();
+      studyEnvUuid = study.getStudyEnvUuid();
+    } else {
+      // Site-level
+      siteOid = study.getOc_oid();
+      studyOid = study.getStudy().getOc_oid();
+      studyUuid = study.getStudy().getStudyUuid();
+      studyEnvUuid = study.getStudy().getStudyEnvUuid();
+    }
+    String customerUuid = coreUtilService.getCustomerUuid();
+
+    formChangeDTO.setCustomerUuid(customerUuid);
+    formChangeDTO.setStudyUuid(studyUuid);
+    formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
+    formChangeDTO.setStudyOid(studyOid);
+    formChangeDTO.setSiteOid(siteOid);
+    formChangeDTO.setParticipantId(String.valueOf(studySubject.getLabel()));
+    formChangeDTO.setParticipantOid(studySubject.getOcOid());
+    formChangeDTO.setFormOid(eventCrfBean.getCrf().getOid());
+    formChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
+
+    return formChangeDTO;
+  }
+
+  public FormChangeDTO constructEditFormDTO(EventCrf eventCrf){
     FormChangeDTO formChangeDTO = new FormChangeDTO();
 
     Study study = eventCrf.getStudySubject().getStudy();

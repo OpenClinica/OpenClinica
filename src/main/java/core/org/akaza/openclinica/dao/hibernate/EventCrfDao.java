@@ -1,5 +1,6 @@
 package core.org.akaza.openclinica.dao.hibernate;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -102,4 +103,10 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
         q.setInteger("studyeventid", studyEventId);
         return q.list();
     }
+
+    @Transactional
+    public EventCrf saveOrUpdate(EventCrf eventCrf) {
+        return super.saveOrUpdate(eventCrf);
+    }
+
 }

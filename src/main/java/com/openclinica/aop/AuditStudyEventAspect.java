@@ -23,10 +23,9 @@ public class AuditStudyEventAspect {
         this.kafkaService = kafkaService;
     }
 
-    // This should be working now. Triggered on schedule event via API.
     @AfterReturning("execution(* core.org.akaza.openclinica.dao.hibernate.StudyEventDao.saveOrUpdate(..))")
     public void onStudyEventDaoSaveOrUpdate(JoinPoint joinPoint) {
-        log.info("============= Hitting the onStudyEventDaoSaveOrUpdate pointcut");
+        log.info("AoP: onStudyEventDaoSaveOrUpdate triggered");
         try {
             kafkaService.sendEventAttributeChangeMessage((StudyEvent) joinPoint.getArgs()[0]);
         } catch (Exception e) {
@@ -34,14 +33,10 @@ public class AuditStudyEventAspect {
         }
     }
 
-   // @AfterReturning("execution(* core.org.akaza.openclinica.dao.managestudy.StudyEventDAO.update(core.org.akaza.openclinica.bean.core.EntityBean, java.sql.Connection, boolean))")
-    //@AfterReturning("execution(* core.org.akaza.openclinica.dao.managestudy.StudyEventDAO.update(core.org.akaza.openclinica.bean.managestudy.StudyEventBean, java.sql.Connection, boolean))")
-    //@AfterReturning("execution(core.org.akaza.openclinica.bean.core.EntityBean core.org.akaza.openclinica.dao.managestudy.StudyEventDAO.update(..))")
-    //@AfterReturning("execution(core.org.akaza.openclinica.bean.core.EntityBean core.org.akaza.openclinica.dao.managestudy.StudyEventDAO.update(core.org.akaza.openclinica.bean.core.EntityBean, java.sql.Connection, boolean))")
     @AfterReturning("execution(* core.org.akaza.openclinica.dao.managestudy.StudyEventDAO.update(..))")
     public void onStudyEventDAOUpdate(JoinPoint joinPoint) {
         StudyEventBean studyEventBean = (StudyEventBean) joinPoint.getArgs()[0];
-        log.info("============= Hitting the * onStudyEventDAOUpdate pointcut");
+        log.info("AoP: onStudyEventDAOUpdate triggered");
         try {
             kafkaService.sendEventAttributeChangeMessage(studyEventBean);
         } catch (Exception e) {
@@ -52,7 +47,7 @@ public class AuditStudyEventAspect {
     @AfterReturning("execution(* core.org.akaza.openclinica.dao.managestudy.StudyEventDAO.create(..))")
     public void onStudyEventDAOCreate(JoinPoint joinPoint) {
         StudyEventBean studyEventBean = (StudyEventBean) joinPoint.getArgs()[0];
-        log.info("============= Hitting the * onStudyEventDAOCreate pointcut");
+        log.info("AoP: onStudyEventDAOCreate triggered");
         try {
             kafkaService.sendEventAttributeChangeMessage(studyEventBean);
         } catch (Exception e) {
