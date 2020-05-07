@@ -300,7 +300,8 @@ public class SDVUtil {
     public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId, String[] permissionTags) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-        return eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter, permissionTags);
+        Integer count = eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter, permissionTags);
+        return count != null ? count : 0;
 
     }
 
@@ -669,7 +670,7 @@ public class SDVUtil {
 
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "openQueries"), new OpenQueriesMatcher());
 
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new OpenQueriesMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new CrfNameMatcher());
 
         this.setDataAndLimitVariables(tableFacade, studyId, request, permissionTags);
 

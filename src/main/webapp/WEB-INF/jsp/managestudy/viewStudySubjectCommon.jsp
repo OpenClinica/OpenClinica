@@ -556,9 +556,9 @@ $(function() {
 
                     var form = studyEvent.forms[formRef];
                     if (form) {
-                        if (odm.ClinicalData.SubjectData['@OpenClinica:Status'] === 'Available')
+                        if (odm.ClinicalData.SubjectData['@OpenClinica:Status'] !== 'Removed')
                             form.addNew = link['@href'];
-                        form.showMe = studyEvent.showMe = true;                        
+                        form.showMe = studyEvent.showMe = true;
                     }
                     else {
                         logError('Unable to reference Common Event Form: ' + formRef, formRef, studyEvent);
