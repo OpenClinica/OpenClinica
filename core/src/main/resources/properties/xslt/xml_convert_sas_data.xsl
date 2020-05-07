@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd">
 	<xsl:output encoding="utf-8" indent="yes" method="xml" name="xml"/>
+	<xsl:variable name="dobExist"
+				  select="//odm:SubjectData/@OpenClinica:DateOfBirth" />
+	<xsl:variable name="dobYearExist"
+				  select="//odm:SubjectData/@OpenClinica:YearOfBirth" />
 	<xsl:template match="/">
 		<!-- Get the parent study oid, which is listed first. -->
 		<xsl:variable name="vStudyName" select="substring(concat('S',substring(//odm:Study[position()=1]/@OID, 3)),1,8)"/>
@@ -10,6 +14,16 @@
 					<xsl:element name="SubjectID">
 						<xsl:value-of select="../../../@OpenClinica:StudySubjectID"/>
 					</xsl:element>
+					<xsl:if test="$dobExist">
+						<xsl:element name="DateofBirth">
+							<xsl:value-of select="../../../@OpenClinica:DateOfBirth"/>
+						</xsl:element>
+					</xsl:if>
+					<xsl:if test="$dobYearExist">
+						<xsl:element name="YearofBirth">
+							<xsl:value-of select="../../../@OpenClinica:YearOfBirth"/>
+						</xsl:element>
+					</xsl:if>
 					<xsl:variable name="vStudyEventOID">
 						<xsl:value-of select="../../@StudyEventOID"/>
 					</xsl:variable>
