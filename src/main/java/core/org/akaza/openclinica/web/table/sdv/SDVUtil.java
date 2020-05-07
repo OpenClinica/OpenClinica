@@ -1479,7 +1479,7 @@ public class SDVUtil {
         else if (eventCrf != null) {
             SdvDTO sdvDTO = new SdvDTO();
             sdvDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
-            sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
+            sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getName());
             sdvDTO.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
             Date startDate = eventCrf.getStudyEvent().getDateStart();
             if (startDate != null) {
