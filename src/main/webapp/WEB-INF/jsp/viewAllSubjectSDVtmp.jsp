@@ -252,6 +252,10 @@
         overflow-y: auto;
     }
 
+    #sdv td:first-child {
+        vertical-align: middle;
+    }
+
     #sdv td:last-child {
         white-space: nowrap;
     }
@@ -296,10 +300,6 @@
     #sdv-close-popup > .icon-cancel::before {
         color: black;
         background-color: transparent;
-    }
-
-    .sdvCheck {
-        margin-top: 7px !important;
     }
 
     .icon.icon-icon-SDV-doubleCheck {
