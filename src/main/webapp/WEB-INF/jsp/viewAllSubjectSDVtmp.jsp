@@ -474,8 +474,6 @@
         function getItems() {
             var sinceLastVerified = $('#sdv-show-type input:checked').val();
             $.get(url + '?changedAfterSdvOnlyFilter=' + sinceLastVerified, function (data) {
-                if (!data.lastVerifiedDate)
-                    data.sdvStatus = 'NOT_VERIFIED';
 
                 $('#participantId').text(data.participantId);
                 if (data.repeatingEvent) {
@@ -503,10 +501,14 @@
                     if (item.lastVerifiedDate != null && item.lastModifiedDate > item.lastVerifiedDate) {
                         item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
                     }
-                    if (!item.lastVerifiedDate) {
-                        item.lastVerifiedDate = 'Never';
-                    } else {
+                    if (item.lastVerifiedDate) {
                         item.lastVerifiedDate = formatDateTime(item.lastVerifiedDate);
+                    }
+                    else if (data.sdvStatus === 'NOT_VERIFIED') {
+                        item.lastVerifiedDate = 'Never';
+                    }
+                    else {
+                        item.lastVerifiedDate = '';
                     }
                     item.lastModifiedDate = formatDateTime(item.lastModifiedDate);
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName;
