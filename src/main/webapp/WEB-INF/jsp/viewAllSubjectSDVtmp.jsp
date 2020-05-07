@@ -343,8 +343,8 @@
             <td id="eventName"></td>
         </tr>
         <tr>
-            <th>Site Name:</th>
-            <td id="siteName"></td>
+            <th>Site ID:</th>
+            <td id="siteId"></td>
             <th>Event Start Date:</th>
             <td id="eventStartDate"></td>
         </tr>
@@ -483,7 +483,7 @@
                 }
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
-                $('#siteName').text(data.siteName);
+                $('#siteId').text(data.siteId);
                 $('#eventStartDate').text(data.eventStartDate);
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
