@@ -252,8 +252,8 @@
         overflow-y: auto;
     }
 
-    #sdv td:first-child {
-        vertical-align: middle;
+    #sdv td {
+        vertical-align: middle !important;
     }
 
     #sdv td:last-child {

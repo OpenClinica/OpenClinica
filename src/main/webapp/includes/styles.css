@@ -952,6 +952,8 @@ form#searchByStudySubjectId {
 }
 
 .icon-icon-sdv-change-status.small-icon:before {
+    position: relative;
+    top: -2px;
     margin-right: 0.2em;
     transform: scale(0.7);
     transform-origin: bottom;
