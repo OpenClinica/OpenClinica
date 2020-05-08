@@ -65,6 +65,11 @@
                   </td></tr>
                 </c:if>
             </td>
+            <c:if test="${userRole.isInvestigator() && currRow.bean.studyEvent.signed != true && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && (currRow.bean.studyEvent.workflowStatus == 'COMPLETED' || currRow.bean.studyEvent.workflowStatus == 'STOPPED' || currRow.bean.studyEvent.workflowStatus == 'SKIPPED')}">
+                <td>
+                    <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="SignStudySubject?id=<c:out value="${studySub.id}"/>&seid=<c:out value="${currRow.bean.studyEvent.id}"/>"><span hspace="2" border="0" title="Sign" alt="Sign" class="icon icon-icon-sign" name="bt_Reassign1"></span></a>
+                </td>
+            </c:if>
         </table>
     </td>
     <td class="table_cell">
