@@ -216,6 +216,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
 
         return al;
     }
+
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
