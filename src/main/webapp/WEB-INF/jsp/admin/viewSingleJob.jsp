@@ -97,7 +97,7 @@
 	</tr>
 	<c:if test="${groupName=='XsltTriggersExportJobs'}">
 	<tr>
-		<td class="table_header_column"><fmt:message key="file_formats" bundle="${resword}"/>:</td>
+		<td class="table_header_column"><fmt:message key="file_format" bundle="${resword}"/>:</td>
 		<td class="table_cell">
             <c:out value="${triggerBean.exportFormat}"/>
 		</td>
