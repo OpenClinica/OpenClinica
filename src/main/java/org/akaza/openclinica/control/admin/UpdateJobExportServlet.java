@@ -58,7 +58,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
 
         Date jobDate = trigger.getNextFireTime();
         HashMap presetValues = new HashMap();
-        Calendar calendar = new GregorianCalendar();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(jobDate);
         presetValues.put(DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
         presetValues.put(DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
