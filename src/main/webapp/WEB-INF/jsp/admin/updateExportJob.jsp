@@ -142,7 +142,7 @@
 	</tr>
 
 	<tr>
-		<td class="text"><b><fmt:message key="file_formats" bundle="${resword}"/>:</b>
+		<td class="text"><b><fmt:message key="file_format" bundle="${resword}"/>:</b>
 		&nbsp;<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="tab"/></jsp:include>
 		</td>
 		<td class="text">

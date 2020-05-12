@@ -895,8 +895,8 @@ public class XsltTransformJob extends QuartzJobBean {
     private double setFormat(double number) {
         if(number <1) number=1.0;
         DecimalFormat df = new DecimalFormat("#.#");
-        logger.info("Number is" + Double.parseDouble(df.format(number)));
-        logger.info("Number is" + (float) Double.parseDouble(df.format(number)));
+        logger.info("Number is " + Double.parseDouble(df.format(number)));
+        logger.info("Number is " + (float) Double.parseDouble(df.format(number)));
         return  Double.valueOf(df.format(number));
     }
 

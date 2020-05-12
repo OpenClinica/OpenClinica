@@ -53,7 +53,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         request.setAttribute(DATASET_ID, fp2.getInt(DATASET_ID));
         Date jobDate = fp2.getDateTime(DATE_START_JOB);
         HashMap presetValues = new HashMap();
-        Calendar calendar = new GregorianCalendar();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(jobDate);
         presetValues.put(DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
         presetValues.put(DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
@@ -89,7 +89,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // collect form information
             XsltTriggerService xsltService = new XsltTriggerService();
-            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME));
+            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(TRIGGER_EXPORT_GROUP));
             TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
             HashMap errors = validateForm(fp, request, triggerKeys, "");
 
@@ -127,7 +127,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 int i = 0;
                 String[] temp = new String[exportFiles.length];
                 //JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
-                String datasetFilePath = SQLInitServlet.getField("filePath") + "datasets";
+                String datasetFilePath = SQLInitServlet.getField("filePath");
 
                 while (i < exportFiles.length) {
                     temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, sdfDir, datasetFilePath);
@@ -137,7 +137,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 epBean.setExportFileName(temp);
 
                 String generalFileDir = SQLInitServlet.getField("filePath");
-                generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
+                generalFileDir = generalFileDir + "datasets/scheduled" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
                 String exportFileName = epBean.getExportFileName()[cnt];
 
                 // need to set the dataset path here, tbh
@@ -145,6 +145,10 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 //JN all the properties need to have the variables...
                 String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
                 String endFilePath = epBean.getFileLocation();
+                String beg = endFilePath.substring(0, endFilePath.indexOf("/$datasetName"));
+                String end = endFilePath.substring(endFilePath.indexOf("/$datasetName"), endFilePath.length());
+                endFilePath = beg + "/scheduled" + end;
+
                 endFilePath = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
                 if (epBean.getPostProcExportName() != null) {
                     String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, sdfDir, datasetFilePath);
@@ -218,6 +222,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 jobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
                 jobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
                 jobDetailFactoryBean.setDurability(true); // need durability?
+                jobDetailFactoryBean.setDescription(jobDesc);
                 jobDetailFactoryBean.afterPropertiesSet();
 
                 // set to the scheduler

@@ -49,7 +49,6 @@ import java.util.*;
 
 /**
  * Fetch odm data from database and load odm related classes.
- *
  * @author ywang (May, 2008)
  */
 
@@ -75,9 +74,9 @@ public class OdmExtractDAO extends DatasetDAO {
         this.studyDao = studyDao;
     }
 
-    public OdmExtractDAO(DataSource ds,Set<Integer> edcSet, StudyDao studyDao) {
+    public OdmExtractDAO(DataSource ds, Set<Integer> edcSet, StudyDao studyDao) {
         super(ds);
-        this.edcSet=edcSet;
+        this.edcSet = edcSet;
         this.studyDao = studyDao;
     }
 
@@ -706,7 +705,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<Integer, Integer> cvIdPoses = new HashMap<Integer, Integer>();
 
         this.setStudyEventAndFormMetaTypesExpected();
-        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, true, showArchivedSql(showArchived),permissionTagsString));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, true, showArchivedSql(showArchived), permissionTagsString));
         Iterator it = rows.iterator();
         String sedprev = "";
         MetaDataVersionProtocolBean protocol = metadata.getProtocol();
@@ -767,17 +766,17 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    public void getMetadata(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion ,String permissionTags) {
+    public void getMetadata(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
         if (odmVersion.equalsIgnoreCase("occlinical_data"))
             odmVersion = "oc1.3";
 
         if ("oc1.3".equals(odmVersion)) {
-                // this.getOCMetadata(parentStudyId, study, metadata, odmVersion);
-                this.getMetadataOC1_3(parentStudy, study, metadata, odmVersion,permissionTags);
+            // this.getOCMetadata(parentStudyId, study, metadata, odmVersion);
+            this.getMetadataOC1_3(parentStudy, study, metadata, odmVersion, permissionTags);
         } else if ("oc1.2".equals(odmVersion)) {
-            this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion,permissionTags);
+            this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion, permissionTags);
         } else {
-            this.getODMMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion ,permissionTags);
+            this.getODMMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion, permissionTags);
         }
     }
 
@@ -786,7 +785,6 @@ public class OdmExtractDAO extends DatasetDAO {
      * global crfs, i.e crfs that do not belong to
      * any particular CRF. In order to comply with cdisc ODM, the studyOID, studyeventDefOID etc will be static values
      * which do not exist in the database.
-     *
      * @param metadata
      */
 
@@ -957,14 +955,14 @@ public class OdmExtractDAO extends DatasetDAO {
     /**
      * metadata for ODM extraction only
      */
-    public void getODMMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion ,String permissionTags) {
+    public void getODMMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
         String cvIds = "";
         HashMap<Integer, Integer> cvIdPoses = new HashMap<Integer, Integer>();
         this.setStudyEventAndFormMetaTypesExpected();
 
         logger.debug("Begin to execute GetStudyEventAndFormMetaSql");
-        logger.info("getStudyEventAndFormMetaSQl= " + this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false, showArchivedSql(showArchived),permissionTags));
-        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false, showArchivedSql(showArchived),permissionTags));
+        logger.info("getStudyEventAndFormMetaSQl= " + this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false, showArchivedSql(showArchived), permissionTags));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false, showArchivedSql(showArchived), permissionTags));
         Iterator it = rows.iterator();
         String sedprev = "";
         MetaDataVersionProtocolBean protocol = metadata.getProtocol();
@@ -1343,14 +1341,13 @@ public class OdmExtractDAO extends DatasetDAO {
 
     /**
      * Metadata for ODM_1.2 OpenClinica extension and partial ODM_1.3 OpenClinica extension
-     *
      * @param parentStudyId
      * @param studyId
      * @param metadata
      * @param odmVersion
      */
-    public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion ,String permissionTags) {
-        this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion,permissionTags);
+    public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
+        this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion, permissionTags);
 
         String cvIds = metadata.getCvIds();
         if (odmVersion.startsWith("oc")) {
@@ -1511,7 +1508,7 @@ public class OdmExtractDAO extends DatasetDAO {
         // return nullClSet;
     }
 
-    public void getStudyEventAndFormMetaOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, boolean isIncludedSite , String permissionTags) {
+    public void getStudyEventAndFormMetaOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, boolean isIncludedSite, String permissionTags) {
         ArrayList<StudyEventDefBean> seds = (ArrayList<StudyEventDefBean>) metadata.getStudyEventDefs();
         ArrayList<FormDefBean> forms = (ArrayList<FormDefBean>) metadata.getFormDefs();
 
@@ -1535,9 +1532,9 @@ public class OdmExtractDAO extends DatasetDAO {
 
         this.setStudyEventAndFormMetaOC1_3TypesExpected();
         logger.debug("Begin to execute GetStudyEventAndFormMetaOC1_3Sql");
-        logger.debug("getStudyEventAndFormMetaOC1_3SQl= {} ", this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived),permissionTags));
+        logger.debug("getStudyEventAndFormMetaOC1_3SQl= {} ", this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived), permissionTags));
 
-        ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived),permissionTags));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived), permissionTags));
         Iterator iter = rows.iterator();
         String sedOIDs = "";
         while (iter.hasNext()) {
@@ -1651,7 +1648,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     public void getMetadataOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
-        this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion , permissionTags);
+        this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion, permissionTags);
 
         // StudyBean study = metadata.getStudy();
         // if(study.getId()>0) {
@@ -1662,7 +1659,7 @@ public class OdmExtractDAO extends DatasetDAO {
         // StudyConfigService studyConfig = new StudyConfigService(this.ds);
         // study = studyConfig.setParametersForStudy(study);
 
-        this.getStudyEventAndFormMetaOC1_3(parentStudy, study, metadata, odmVersion, false,permissionTags);
+        this.getStudyEventAndFormMetaOC1_3(parentStudy, study, metadata, odmVersion, false, permissionTags);
 
         String cvIds = metadata.getCvIds();
         ArrayList<ItemGroupDefBean> igs = (ArrayList<ItemGroupDefBean>) metadata.getItemGroupDefs();
@@ -2178,7 +2175,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return nullValueCVs;
     }
 
-    public void getClinicalData(Study study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType , String permissionTagsString) {
+    public void getClinicalData(Study study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType, String permissionTagsString) {
         String dbName = CoreResources.getDBName();
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
@@ -2225,7 +2222,7 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setSubjectEventFormDataTypesExpected(odmVersion);
             ArrayList viewRows = select(getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
-            this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType,permissionTagsString);
+            this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType, permissionTagsString);
         } else {
             logger.info("getSubjectEventFormSql=" + getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected();
@@ -2345,13 +2342,12 @@ public class OdmExtractDAO extends DatasetDAO {
                     //             List <EventDefinitionCrfPermissionTag> edcPTagIds= eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getId(), edc.getParentId(),tagIds);
 
 
-                    formIsTagged= isFormTagged(edc);
-                    if(formIsTagged & permissionTagsString != null && permissionTagsString.length() > 0){
+                    formIsTagged = isFormTagged(edc);
+                    if (formIsTagged & permissionTagsString != null && permissionTagsString.length() > 0) {
                         formIsTagged = permissionAccessCheck(edc, permissionTagsString);
-                    }else if(formIsTagged && (permissionTagsString == null || permissionTagsString.length()==0)){
-                        ClinicalDataCollector.datasetFiltered="YES";
+                    } else if (formIsTagged && (permissionTagsString == null || permissionTagsString.length() == 0)) {
+                        ClinicalDataCollector.datasetFiltered = "YES";
                     }
-
 
 
                     if (oidPoses.containsKey(ecId) && !formIsTagged) {
@@ -2502,7 +2498,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected void setErasedScoreItemDataValues(OdmClinicalDataBean data, String itemIds, String itemDataIds, HashMap<Integer, String> idataOidPoses,
-            String odmVersion) {
+                                                String odmVersion) {
         this.setErasedScoreItemDataIdsTypesExpected();
         ArrayList<Integer> rows = this.select(this.getErasedScoreItemDataIdsSql(itemIds, itemDataIds));
         if (rows == null || rows.size() < 1) {
@@ -2615,43 +2611,43 @@ public class OdmExtractDAO extends DatasetDAO {
                     }
                 }
 
-               if(se!=null){
-                AuditLogBean auditLog = new AuditLogBean();
-                auditLog.setOid("AL_" + auditId);
-                auditLog.setUserId("USR_" + userId);
-                auditLog.setDatetimeStamp(auditDate);
-                auditLog.setType(type);
-                auditLog.setReasonForChange(auditReason);
-                auditLog.setDetails(details);
-                auditLog.setAuditLogEventTypeId(typeId);
-                if (typeId == 17 || typeId == 18 || typeId == 19 || typeId == 20 || typeId == 21 || typeId == 22 || typeId == 23 || typeId == 31) {
-                    if ("0".equals(newValue)) {
-                        auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
+                if (se != null) {
+                    AuditLogBean auditLog = new AuditLogBean();
+                    auditLog.setOid("AL_" + auditId);
+                    auditLog.setUserId("USR_" + userId);
+                    auditLog.setDatetimeStamp(auditDate);
+                    auditLog.setType(type);
+                    auditLog.setReasonForChange(auditReason);
+                    auditLog.setDetails(details);
+                    auditLog.setAuditLogEventTypeId(typeId);
+                    if (typeId == 17 || typeId == 18 || typeId == 19 || typeId == 20 || typeId == 21 || typeId == 22 || typeId == 23 || typeId == 31) {
+                        if ("0".equals(newValue)) {
+                            auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
+                        } else {
+                            auditLog.setNewValue(SubjectEventStatus.getFromMap(Integer.parseInt(newValue)).getName());
+                        }
+                        if ("0".equals(oldValue)) {
+                            auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
+                        } else {
+                            auditLog.setOldValue(SubjectEventStatus.getFromMap(Integer.parseInt(oldValue)).getName());
+                        }
                     } else {
-                        auditLog.setNewValue(SubjectEventStatus.getFromMap(Integer.parseInt(newValue)).getName());
+                        auditLog.setNewValue(newValue);
+                        auditLog.setOldValue(oldValue);
                     }
-                    if ("0".equals(oldValue)) {
-                        auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
-                    } else {
-                        auditLog.setOldValue(SubjectEventStatus.getFromMap(Integer.parseInt(oldValue)).getName());
+                    AuditLogsBean logs = se.getAuditLogs();
+                    if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
+                        logs.setEntityID(se.getStudyEventOID());
                     }
-                } else {
-                    auditLog.setNewValue(newValue);
-                    auditLog.setOldValue(oldValue);
+                    logs.getAuditLogs().add(auditLog);
+                    se.setAuditLogs(logs);
                 }
-                AuditLogsBean logs = se.getAuditLogs();
-                if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
-                    logs.setEntityID(se.getStudyEventOID());
-                }
-                logs.getAuditLogs().add(auditLog);
-                se.setAuditLogs(logs);
-              }
             }
         }
     }
 
     protected void setOCFormDataAuditLogs(Study study, OdmClinicalDataBean data, String studySubjectOids, String ecIds,
-            HashMap<Integer, String> formOidPoses) {
+                                          HashMap<Integer, String> formOidPoses) {
         this.setOCFormDataAuditsTypesExpected();
         String dbName = CoreResources.getDBName();
         logger.debug("Begin to execute GetOCFormDataAuditsSql");
@@ -2693,11 +2689,11 @@ public class OdmExtractDAO extends DatasetDAO {
                         auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
                     }
                 } // Fix for 0011675: SDV'ed subject is dipslayed as not SDV'ed in the 1.3 Full ODM Extract commenting
-                  // out the following lines as these are treated like booleans while they are strings
-                  // JN:The Oracle still continues to have 1 and 2 for this audit type 32 so enabling the following code
-                  // for oracle only, ideally the trigger should be coded same for both postgres and oracle and since
-                  // the trigger doesnt do same things, the existing data would still be a problem, so doing this patch
-                  // work
+                // out the following lines as these are treated like booleans while they are strings
+                // JN:The Oracle still continues to have 1 and 2 for this audit type 32 so enabling the following code
+                // for oracle only, ideally the trigger should be coded same for both postgres and oracle and since
+                // the trigger doesnt do same things, the existing data would still be a problem, so doing this patch
+                // work
 
                 else if ((typeId == 32) && ("oracle".equalsIgnoreCase(dbName))) {
                     if ("1".equals(newValue)) {
@@ -3042,7 +3038,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected void setDataWithOCAttributes(Study study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, Iterator iter,
-            HashMap<Integer, String> oidPoses, String odmType , String permissionTagsString) {
+                                           HashMap<Integer, String> oidPoses, String odmType, String permissionTagsString) {
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
         String seprev = "";
@@ -3086,11 +3082,11 @@ public class OdmExtractDAO extends DatasetDAO {
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcdao.findByPK(edcId);
             StudyEventDefinitionBean sed = seddao.findByOid(sedOID);
 
-            formIsTagged= isFormTagged(edc);
-            if(formIsTagged & permissionTagsString != null && permissionTagsString.length() > 0){
+            formIsTagged = isFormTagged(edc);
+            if (formIsTagged & permissionTagsString != null && permissionTagsString.length() > 0) {
                 formIsTagged = permissionAccessCheck(edc, permissionTagsString);
-            }else if(formIsTagged && (permissionTagsString == null || permissionTagsString.length()==0)){
-                ClinicalDataCollector.datasetFiltered="YES";
+            } else if (formIsTagged && (permissionTagsString == null || permissionTagsString.length() == 0)) {
+                ClinicalDataCollector.datasetFiltered = "YES";
             }
 
             if (formIsTagged && sed.getType().equals("common")) {
@@ -3173,9 +3169,7 @@ public class OdmExtractDAO extends DatasetDAO {
             subOidPoses.put(studySubjectLabel, oidPos);
 
 
-
-
-            if(!sedIsTagged) {
+            if (!sedIsTagged) {
                 ExportStudyEventDataBean se = new ExportStudyEventDataBean();
                 // key += sedOID + sampleOrdinal;
                 key += sedOID;
@@ -3417,16 +3411,16 @@ public class OdmExtractDAO extends DatasetDAO {
                 + " sed.oc_oid as definition_oid, sed.name as definition_name, sed.repeating as definition_repeating,"
                 + " sed.type as definition_type, cv.oc_oid as cv_oid,"
                 + " cv.name as cv_name, edc.required_crf as cv_required, edc.null_values, crf.name as crf_name,crf.oc_oid as crf_oid ,sed.status_id as sed_status_id,edc.status_id as edc_status_id"
-                + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived,  permissionTags);
+                + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived, permissionTags);
     }
 
-    protected String getStudyEventAndFormMetaOC1_3Sql(int parentStudyId, int studyId, boolean isIncludedSite, String[] showArchived,String permissionTags) {
+    protected String getStudyEventAndFormMetaOC1_3Sql(int parentStudyId, int studyId, boolean isIncludedSite, String[] showArchived, String permissionTags) {
         return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, cv.crf_version_id,"
                 + " sed.oc_oid as definition_oid, cv.oc_oid as cv_oid,"
                 + " sed.description, sed.category, cv.description as version_description, cv.revision_notes,"
                 + " crf.oc_oid as crf_oid, crf.description as crf_description, edc.null_values, edc.default_version_id, edc.electronic_signature,"
                 + " edc.double_entry, edc.hide_crf, edc.participant_form,edc.allow_anonymous_submission,edc.submission_url,case when edc_tag.active is null then false else edc_tag.active end, edc.source_data_verification_code,sed.status_id as sed_status_id,edc.status_id as edc_status_id"
-                + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived , permissionTags);
+                + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived, permissionTags);
     }
 
     protected String studyEventAndFormMetaTables() {
@@ -3436,8 +3430,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 + "  left Join  event_definition_crf_tag edc_tag on edc_tag.path::text = ((sed.oc_oid::text || '.'::text) || crf.oc_oid::text)";
     }
 
-    protected String studyEventAndFormMetaCondition(int parentStudyId, int studyId, boolean isIncludedSite, String[] showArchived , String permissionTags) {
-        permissionTags =(permissionTags.length() != 0 ? permissionTags : "null");
+    protected String studyEventAndFormMetaCondition(int parentStudyId, int studyId, boolean isIncludedSite, String[] showArchived, String permissionTags) {
+        permissionTags = (permissionTags.length() != 0 ? permissionTags : "null");
         return " where sed.study_id = " + parentStudyId + " " + showArchived[0] + " and "
                 + this.getEventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite) + " " + showArchived[1] + " and edc.crf_id = crf.crf_id "
                 + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3]
@@ -3485,7 +3479,6 @@ public class OdmExtractDAO extends DatasetDAO {
     /**
      * The form display is determined the way items are ordered in CRF and this information is obtained from OID and
      * nothing hence this approach
-     *
      * @param crfVersionIds
      * @return
      */
@@ -3528,7 +3521,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
-            String studySubjectIds) {
+                                              String studySubjectIds) {
         return "select ss.oc_oid as study_subject_oid, sed.ordinal as definition_order, sed.oc_oid as definition_oid,"
                 + " sed.repeating as definition_repeating, se.sample_ordinal as sample_ordinal, edc.ordinal as crf_order, "
                 + " cv.oc_oid as crf_version_oid, ec.event_crf_id from (select study_event_id, study_event_definition_id, study_subject_id,"
@@ -3573,7 +3566,6 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
 
-
     protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
                                                 String studySubjectIds) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
@@ -3603,15 +3595,14 @@ public class OdmExtractDAO extends DatasetDAO {
                 "        and se.study_event_definition_id = sed.study_event_definition_id\n" +
                 "        and edc.study_event_definition_id = sed.study_event_definition_id\n" +
                 "        and edc.crf_id = fl.crf_id\n" +
-                "        and sed.study_event_definition_id in "+sedIds+" \n" +
+                "        and sed.study_event_definition_id in " + sedIds + " \n" +
                 "        and ss.study_subject_id in \n" +
-                "        ("+studySubjectIds+")\n" +
-                "        and idata.item_id in "+itemIds+" and idata.status_id "+itStatusConstraint+"\n" +
-                "        and ec.status_id "+ecStatusConstraint+" and length (value) > 0\n" +
+                "        (" + studySubjectIds + ")\n" +
+                "        and idata.item_id in " + itemIds + " and idata.status_id " + itStatusConstraint + "\n" +
+                "        and ec.status_id " + ecStatusConstraint + " and length (value) > 0\n" +
                 "        order by ss.oc_oid, sed.ordinal, se.sample_ordinal, edc.ordinal";
 
     }
-
 
 
     protected String getEventGroupItemSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
@@ -3646,7 +3637,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getEventCrfIdsByItemDataSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
-            String studySubjectIds) {
+                                                   String studySubjectIds) {
         String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds + " and (idata.status_id " + itStatusConstraint
@@ -3704,12 +3695,12 @@ public class OdmExtractDAO extends DatasetDAO {
                 "      ec.study_event_id=se.study_event_id and \n" +
                 "      ec.study_subject_id = ss.study_subject_id and\n" +
                 "      \n" +
-                "       ss.study_subject_id in ("+studySubjectIds+") and \n" +
+                "       ss.study_subject_id in (" + studySubjectIds + ") and \n" +
                 "\n" +
-                "      item.item_id in "+itemIds+"  and length(idata.value) > 0 and\n" +
-                "      se.study_event_definition_id in  "+sedIds+" and\n" +
-                "      ec.status_id "+ecStatusConstraint+" and\n" +
-                "      idata.status_id "+itStatusConstraint+" \n" +
+                "      item.item_id in " + itemIds + "  and length(idata.value) > 0 and\n" +
+                "      se.study_event_definition_id in  " + sedIds + " and\n" +
+                "      ec.status_id " + ecStatusConstraint + " and\n" +
+                "      idata.status_id " + itStatusConstraint + " \n" +
                 "      ) table1\n" +
                 "       left join\n" +
                 "      measurement_unit mu on      table1.units = mu.name\n" +
@@ -3779,13 +3770,13 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCSubjectDataDNsSql(String studySubjectOids) {
         return "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
-                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name , dn.thread_uuid, dn.thread_number"
+                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name, dn.thread_uuid, dn.thread_number"
                 + " from discrepancy_note dn, dn_subject_map dnsm, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
                 + " where dn.entity_type = 'subject'" + " and dn.discrepancy_note_id = dnsm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids
                 + ") and ss.subject_id = dnsm.subject_id and dn.resolution_status_id = rs.resolution_status_id"
                 + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id) union"
                 + "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
-                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name"
+                + " dn.owner_id, dn.date_created, rs.name as status, dnt.name, dn.thread_uuid, dn.thread_number"
                 + " from discrepancy_note dn, dn_study_subject_map dnssm, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
                 + " where dn.entity_type = 'studySub'" + " and dn.discrepancy_note_id = dnssm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids
                 + ") and ss.study_subject_id = dnssm.study_subject_id and dn.resolution_status_id = rs.resolution_status_id"
@@ -3867,16 +3858,14 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String permissionTagsLookupNoPermissionTags(EventDefinitionCRFBean edc) {
-       String query ="select * from event_definition_crf_permission_tag pt where pt.event_definition_crf_id="+edc.getId()+" or pt.event_definition_crf_id="+edc.getParentId();
-       return query;
-    }
-
-    protected String permissionTagsLookupWithPermissionTags(EventDefinitionCRFBean edc, String permissionTags) {
-        String query ="select * from event_definition_crf_permission_tag pt where ( pt.event_definition_crf_id="+edc.getId()+" or pt.event_definition_crf_id="+edc.getParentId()+") and permission_tag_id in (" + permissionTags + ")";
+        String query = "select * from event_definition_crf_permission_tag pt where pt.event_definition_crf_id=" + edc.getId() + " or pt.event_definition_crf_id=" + edc.getParentId();
         return query;
     }
 
-
+    protected String permissionTagsLookupWithPermissionTags(EventDefinitionCRFBean edc, String permissionTags) {
+        String query = "select * from event_definition_crf_permission_tag pt where ( pt.event_definition_crf_id=" + edc.getId() + " or pt.event_definition_crf_id=" + edc.getParentId() + ") and permission_tag_id in (" + permissionTags + ")";
+        return query;
+    }
 
 
     private EventDefinitionCRFBean getEventDefCRF(StudyEventDefBean studyEventDefBean, ElementRefBean formRef, Study studyBean) {
@@ -3955,25 +3944,25 @@ public class OdmExtractDAO extends DatasetDAO {
     private boolean permissionAccessCheck(EventDefinitionCRFBean edc, String permissionTags) {
         logger.debug("Begin to permissionTagsLookup");
 
-            ArrayList viewRows = select(permissionTagsLookupWithPermissionTags(edc, permissionTags));
-            logger.info("permissionAccessCheck : "
-                    + permissionTagsLookupWithPermissionTags(edc, permissionTags));
-            if(viewRows.size()>0){
-                // save the edc.getId in list and return to Job.
-                edcSet.add(edc.getId());
-                return false;
-            }else{
-                ClinicalDataCollector.datasetFiltered="YES";
-                return true;
-            }
+        ArrayList viewRows = select(permissionTagsLookupWithPermissionTags(edc, permissionTags));
+        logger.info("permissionAccessCheck : "
+                + permissionTagsLookupWithPermissionTags(edc, permissionTags));
+        if (viewRows.size() > 0) {
+            // save the edc.getId in list and return to Job.
+            edcSet.add(edc.getId());
+            return false;
+        } else {
+            ClinicalDataCollector.datasetFiltered = "YES";
+            return true;
+        }
     }
 
 
     private boolean isFormTagged(EventDefinitionCRFBean edc) {
         logger.debug("Begin to permissionTagsLookup");
-            ArrayList viewRows = select(permissionTagsLookupNoPermissionTags(edc));
-            //logger.info("permissionTagsLookup : " + permissionTagsLookupNoPermissionTags(edc));
-            return (viewRows.size() > 0 ?  true:  false) ;
+        ArrayList viewRows = select(permissionTagsLookupNoPermissionTags(edc));
+        //logger.info("permissionTagsLookup : " + permissionTagsLookupNoPermissionTags(edc));
+        return (viewRows.size() > 0 ? true : false);
     }
 
 }
