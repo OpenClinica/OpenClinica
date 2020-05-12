@@ -144,7 +144,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td class="text"><b><fmt:message key="file_formats" bundle="${resword}"/>: <span style="color:Orange;">*</span></b></td>
+		<td class="text"><b><fmt:message key="file_format" bundle="${resword}"/>: <span style="color:Orange;">*</span></b></td>
 		<td class="text">
 			<table border="0" cellpadding="0" cellspacing="0">
                 <c:forEach var="extract" items="${extractProperties}" varStatus="loopCounter">
