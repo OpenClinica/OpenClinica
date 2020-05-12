@@ -7,6 +7,10 @@
     <xsl:template match="text()"/>
     <!-- Get the parent study oid, which is listed first. -->
     <xsl:variable name="study_oid" select="substring(concat('S',substring(//odm:Study[position()=1]/@OID, 3)),1,8)"/>
+    <xsl:variable name="dobExist"
+                  select="//odm:SubjectData/@OpenClinica:DateOfBirth" />
+    <xsl:variable name="dobYearExist"
+                  select="//odm:SubjectData/@OpenClinica:YearOfBirth" />
     <!-- Index of objects for lookup. -->
     <xsl:key name="event-name" match="odm:StudyEventDef" use="@OID"/>
     <xsl:key name="item-name" match="odm:ItemDef" use="@OID"/>
@@ -32,6 +36,20 @@
             <DATATYPE>string</DATATYPE>
             <LENGTH>50</LENGTH>
         </row>
+        <xsl:if test="$dobExist">
+            <row name="DateofBirth">
+                <TYPE>character</TYPE>
+                <DATATYPE>string</DATATYPE>
+                <LENGTH>50</LENGTH>
+            </row>
+        </xsl:if>
+        <xsl:if test="$dobYearExist">
+            <row name="YearofBirth">
+                <TYPE>character</TYPE>
+                <DATATYPE>string</DATATYPE>
+                <LENGTH>50</LENGTH>
+            </row>
+        </xsl:if>
         <row name="StudyEvent">
             <TYPE>character</TYPE>
             <DATATYPE>string</DATATYPE>

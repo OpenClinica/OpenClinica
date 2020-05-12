@@ -230,24 +230,24 @@ public class XsltTransformJob extends QuartzJobBean {
                 String xsltPath = dataMap.getString(XSLT_PATH)+ File.separator +epBean.getFileName()[fileCntr];
                 in = new java.io.FileInputStream(xsltPath);
 
-            Transformer transformer = transformerFactory.newTransformer(new StreamSource(in));
+                Transformer transformer = transformerFactory.newTransformer(new StreamSource(in));
 
 
-           endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
+                endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
 
 
 
 
-            endFileStream = new FileOutputStream(endFile);
-            transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
+                endFileStream = new FileOutputStream(endFile);
+                transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
 
-            // JN...CLOSE THE STREAM...HMMMM
-            in.close();
-            endFileStream.close();
+                // JN...CLOSE THE STREAM...HMMMM
+                in.close();
+                endFileStream.close();
 
-            fileCntr++;
+                fileCntr++;
 
-            JobTerminationMonitor.check();
+                JobTerminationMonitor.check();
             }
             if (oldFilesPath.isDirectory()) {
 

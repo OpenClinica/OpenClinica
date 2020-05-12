@@ -32,6 +32,8 @@
 		select="//odm:SubjectData/@OpenClinica:UniqueIdentifier" />
 	<xsl:variable name="dobExist"
 		select="//odm:SubjectData/@OpenClinica:DateOfBirth" />
+	<xsl:variable name="dobYearExist"
+				  select="//odm:SubjectData/@OpenClinica:YearOfBirth" />
 	<xsl:variable name="subjectStatusExist" select="//odm:SubjectData/@OpenClinica:Status" />
 	<xsl:variable name="subjectSecondaryIdExist" select="//odm:SubjectData/@OpenClinica:SecondaryID"/>
 	
@@ -2076,6 +2078,12 @@
 			<xsl:text> ADATE10</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+
+		<xsl:if test="$dobYearExist">
+			<xsl:text>YearofBirth</xsl:text>
+			<xsl:text> A</xsl:text><xsl:value-of select="$valueLength" />
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 	</xsl:template>
 <!--****************************************************************************************************** -->
 	<!-- Starting Columns and its labels -->
@@ -2123,6 +2131,12 @@
 		<xsl:if test="$dobExist">
 			<xsl:text>DateofBirth</xsl:text>
 			<xsl:text> "Date of Birth"</xsl:text><xsl:text> /</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+
+		<xsl:if test="$dobYearExist">
+			<xsl:text>YearofBirth</xsl:text>
+			<xsl:text> "Year of Birth"</xsl:text><xsl:text> /</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
