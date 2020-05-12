@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SdvDTO {
     private String participantId;
-    private String siteName;
+    private String siteId;
     private String eventName;
     private String eventStartDate;
     private int eventOrdinal;
@@ -25,12 +25,12 @@ public class SdvDTO {
         this.participantId = participantId;
     }
 
-    public String getSiteName() {
-        return siteName;
+    public String getSiteId() {
+        return siteId;
     }
 
-    public void setSiteName(String siteName) {
-        this.siteName = siteName;
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
     }
 
     public String getEventName() {
