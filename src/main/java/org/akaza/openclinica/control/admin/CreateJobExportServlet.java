@@ -89,7 +89,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // collect form information
             XsltTriggerService xsltService = new XsltTriggerService();
-            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME));
+            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(TRIGGER_EXPORT_GROUP));
             TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
             HashMap errors = validateForm(fp, request, triggerKeys, "");
 
@@ -218,6 +218,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 jobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
                 jobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
                 jobDetailFactoryBean.setDurability(true); // need durability?
+                jobDetailFactoryBean.setDescription(jobDesc);
                 jobDetailFactoryBean.afterPropertiesSet();
 
                 // set to the scheduler

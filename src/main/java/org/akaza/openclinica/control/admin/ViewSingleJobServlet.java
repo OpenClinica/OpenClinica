@@ -25,15 +25,6 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        // changes to this servlet, we now look at group name too, tbh 05/2009
-        String triggerName = fp.getString("tname");
-        String gName = fp.getString("gname");
-        String groupName = "";
-        if (gName.equals("") || gName.equals("0")) {
-            groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
-        } else { // if (gName.equals("1")) {
-            groupName = TRIGGER_IMPORT_GROUP;
-        }
         // << tbh 09/03/2009 #4143
         ApplicationContext context = null;
         scheduler = getScheduler();
@@ -43,19 +34,17 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
             logger.error("Error in receiving application context: ", e);
         }
         Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
-        Trigger trigger = jobScheduler.getTrigger(new TriggerKey(triggerName, groupName));
-
-        // trigger bean is a wrapper for the trigger, to serve as a link btw
-        // quartz classes and oc classes
-        // is it really necessary? DRY
-
-        if (trigger == null) {
-            groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
-            trigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), groupName));
+        // changes to this servlet, we now look at group name too, tbh 05/2009
+        String triggerName = fp.getString("tname");
+        String gName = fp.getString("gname");
+        String groupName = "";
+        if (gName.equals("") || gName.equals("0")) {
+            groupName = TRIGGER_EXPORT_GROUP;
+        } else { // if (gName.equals("1")) {
+            groupName = TRIGGER_IMPORT_GROUP;
         }
-        // << tbh 09/03/2009 #4143
-        // above is a hack, if we add more trigger groups this will have
-        // to be redone
+        Trigger trigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), groupName));
+
         logger.debug("found trigger name: " + triggerName);
         logger.debug("found group name: " + groupName);
         TriggerBean triggerBean = new TriggerBean();
