@@ -739,7 +739,6 @@ public class SDVUtil {
 
         // format column dates
         formatColumns(table, new String[]{"eventDate", "lastUpdatedDate"}, request);
-        table.getTableRenderer().setWidth("800");
         return tableFacade.render();
     }
 
@@ -817,7 +816,6 @@ public class SDVUtil {
         // format column dates
         formatColumns(table, new String[]{"eventDate", "lastUpdatedDate"}, request);
 
-        table.getTableRenderer().setWidth("800");
         return tableFacade.render();
     }
 
@@ -1342,7 +1340,6 @@ public class SDVUtil {
 
         setTitles(allTitles, table);
 
-        table.getTableRenderer().setWidth("800");
         return tableFacade.render();
 
     }
