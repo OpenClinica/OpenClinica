@@ -58,7 +58,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
 
         Date jobDate = trigger.getNextFireTime();
         HashMap presetValues = new HashMap();
-        Calendar calendar = new GregorianCalendar();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(jobDate);
         presetValues.put(DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
         presetValues.put(DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
@@ -72,8 +72,6 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        String action = fp.getString("action");
-        String triggerName = fp.getString("tname");
         scheduler = getScheduler();
         permissionService = getPermissionService();
         ApplicationContext context = null;
@@ -83,8 +81,10 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
             logger.error("Error in receiving application context: ", e);
         }
         Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        String action = fp.getString("action");
+        String triggerName = fp.getString("tname");
         ExtractUtils extractUtils = new ExtractUtils();
-        Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), XsltTriggerService.TRIGGER_GROUP_NAME));
+        Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), TRIGGER_EXPORT_GROUP));
         if (StringUtil.isBlank(action)) {
             setUpServlet(updatingTrigger);
             forwardPage(Page.UPDATE_JOB_EXPORT);
@@ -129,7 +129,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 int i = 0;
                 String[] temp = new String[exportFiles.length];
                 //JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
-                String datasetFilePath = SQLInitServlet.getField("filePath") + "datasets";
+                String datasetFilePath = SQLInitServlet.getField("filePath");
                 while (i < exportFiles.length) {
                     temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, sdfDir, datasetFilePath);
                     i++;
@@ -139,11 +139,14 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
 
                 XsltTriggerService xsltService = new XsltTriggerService();
                 String generalFileDir = SQLInitServlet.getField("filePath");
-                generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
+                generalFileDir = generalFileDir + "datasets/scheduled" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
                 exportFileName = epBean.getExportFileName()[cnt];
 
                 String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
                 String endFilePath = epBean.getFileLocation();
+                String beg = endFilePath.substring(0, endFilePath.indexOf("/$datasetName"));
+                String end = endFilePath.substring(endFilePath.indexOf("/$datasetName"), endFilePath.length());
+                endFilePath = beg + "/scheduled" + end;
                 endFilePath = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
                 if (epBean.getPostProcExportName() != null) {
                     String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, sdfDir, datasetFilePath);
@@ -216,6 +219,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 jobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
                 jobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
                 jobDetailFactoryBean.setDurability(true); // need durability?
+                jobDetailFactoryBean.setDescription(trigger.getDescription());
                 jobDetailFactoryBean.afterPropertiesSet();
 
                 try {
