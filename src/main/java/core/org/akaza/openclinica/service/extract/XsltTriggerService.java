@@ -19,7 +19,7 @@ public class XsltTriggerService {
     public XsltTriggerService() {
     }
 
-    private static final Logger logger= LoggerFactory.getLogger(XsltTriggerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(XsltTriggerService.class);
     public static final String DATASET_ID = "dsId";
     public static final String EMAIL = "contactEmail";
     public static final String USER_ID = "user_id";
@@ -31,12 +31,12 @@ public class XsltTriggerService {
     public static final String LOCALE = "locale";
     public static final String STUDY_ID = "studyId";
     public static final String TENANT_SCHEMA = "tenantSchema";
-    public static final String ZIPPED="zipped";
-    public static final String DELETE_OLD="deleteOld";
-    public static final String SUCCESS_MESSAGE="SUCCESS_MESSAGE";
-    public static final String FAILURE_MESSAGE="FAILURE_MESSAGE";
-    public static final String XSLT_PATH="XSLT_PATH";
-    public static final String EP_BEAN="epBean";
+    public static final String ZIPPED = "zipped";
+    public static final String DELETE_OLD = "deleteOld";
+    public static final String SUCCESS_MESSAGE = "SUCCESS_MESSAGE";
+    public static final String FAILURE_MESSAGE = "FAILURE_MESSAGE";
+    public static final String XSLT_PATH = "XSLT_PATH";
+    public static final String EP_BEAN = "epBean";
     public static String TRIGGER_GROUP_NAME = "XsltTriggersExportJobs";
     public static final String PERIOD = "periodToRun";
     public static final String EXPORT_FORMAT = "exportFormat";
@@ -46,19 +46,19 @@ public class XsltTriggerService {
 
 
     //POST PROCESSING VARIABLES
-    public static final String POST_PROC_DELETE_OLD="postProcDeleteOld";
-    public static final String POST_PROC_ZIP="postProcZip";
-    public static final String POST_PROC_LOCATION="postProcLocation";
-    public static final String POST_PROC_EXPORT_NAME="postProcExportName";
-    public static final String COUNT="count";
+    public static final String POST_PROC_DELETE_OLD = "postProcDeleteOld";
+    public static final String POST_PROC_ZIP = "postProcZip";
+    public static final String POST_PROC_LOCATION = "postProcLocation";
+    public static final String POST_PROC_EXPORT_NAME = "postProcExportName";
+    public static final String COUNT = "count";
 
 
     public SimpleTrigger generateXsltTrigger(Scheduler scheduler, String xslFile, String xmlFile, String endFilePath,
                                              String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale, int cnt, String xsltPath, String triggerGroupName,
                                              Study currentPublicStudy, Study currentStudy, ArchivedDatasetFileBean archivedDatasetFileBean) {
         //Date startDateTime = new Date(System.currentTimeMillis());
-        String jobName =  datasetId+ "_"+epBean.getExportFileName()[0];
-        if(triggerGroupName!=null)
+        String jobName = datasetId + "_" + epBean.getExportFileName()[0];
+        if (triggerGroupName != null)
             TRIGGER_GROUP_NAME = triggerGroupName;
 
         //WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
@@ -67,7 +67,7 @@ public class XsltTriggerService {
         try {
             context = (ApplicationContext) scheduler.getContext().get("applicationContext");
         } catch (SchedulerException e) {
-            logger.error("Cannot reach applicationContext: ",e);
+            logger.error("Cannot reach applicationContext: ", e);
         }
         SimpleTriggerFactoryBean triggerFactoryBean = context.getBean(SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath, currentPublicStudy, currentStudy, archivedDatasetFileBean);
         SimpleTrigger trigger = triggerFactoryBean.getObject();
@@ -115,8 +115,7 @@ public class XsltTriggerService {
         return interval.intValue();
     }
 
-    public String getTriggerGroupNameForExportJobs()
-    {
+    public String getTriggerGroupNameForExportJobs() {
         return "XsltTriggersExportJobs";
     }
 

@@ -72,8 +72,6 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        String action = fp.getString("action");
-        String triggerName = fp.getString("tname");
         scheduler = getScheduler();
         permissionService = getPermissionService();
         ApplicationContext context = null;
@@ -83,8 +81,10 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
             logger.error("Error in receiving application context: ", e);
         }
         Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        String action = fp.getString("action");
+        String triggerName = fp.getString("tname");
         ExtractUtils extractUtils = new ExtractUtils();
-        Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), XsltTriggerService.TRIGGER_GROUP_NAME));
+        Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), TRIGGER_EXPORT_GROUP));
         if (StringUtil.isBlank(action)) {
             setUpServlet(updatingTrigger);
             forwardPage(Page.UPDATE_JOB_EXPORT);
@@ -216,6 +216,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 jobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
                 jobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
                 jobDetailFactoryBean.setDurability(true); // need durability?
+                jobDetailFactoryBean.setDescription(trigger.getDescription());
                 jobDetailFactoryBean.afterPropertiesSet();
 
                 try {
