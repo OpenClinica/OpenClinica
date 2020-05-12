@@ -402,6 +402,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 }
                             }
 
+                            if(form.getSdvStatus() != null){
+                                xml.append("\" OpenClinica:SdvStatus=\"" +StringEscapeUtils.escapeXml(form.getSdvStatus().getDisplayValue()));
+                            }
+
                             if (form.getRemoved() != null) {
                                 boolean removed = form.getRemoved();
                                 if (!StringUtils.isEmpty(removed)) {
