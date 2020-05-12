@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.akaza.openclinica.control.submit.EnketoFormServlet;
+
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
@@ -59,7 +61,7 @@ public class PdfActionUrlObject extends ActionUrlObject {
                               EventCrf eventCrf, String loadWarning, boolean formLocked, String studySubjectOID, String format,
                               String margin, String landscape) {
         super(formLayout, crfOid, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor, role,
-                parentStudy, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked);
+                parentStudy, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked, EnketoAPI.INTERFACE_DEFAULT);
         this.studySubjectOID = studySubjectOID;
         this.format = format;
         this.margin = margin;
