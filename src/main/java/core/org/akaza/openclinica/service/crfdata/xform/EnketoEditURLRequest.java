@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.akaza.openclinica.control.submit.EnketoFormServlet;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +27,8 @@ public class EnketoEditURLRequest {
     private String pid = null;
     @JsonProperty("parent_window_origin")
     private String parentWindowOrigin = null;
+    @JsonProperty("interface")
+    private String iface = EnketoAPI.INTERFACE_DEFAULT;
 
     public String getLoad_warning() {
         return load_warning;
@@ -60,7 +64,7 @@ public class EnketoEditURLRequest {
     }
 
     public EnketoEditURLRequest(String server_url, String ecId, String form_id, String instance_id, String return_url, String instance, String complete_button,
-            InstanceAttachment instanceAttachments, String goTo, String load_warning, String jini, String pid, String parentWindowOrigin) {
+            InstanceAttachment instanceAttachments, String goTo, String load_warning, String jini, String pid, String parentWindowOrigin, String iface) {
         this.server_url = server_url;
         this.form_id = form_id;
         this.instance_id = instance_id;
@@ -74,6 +78,7 @@ public class EnketoEditURLRequest {
         this.jini = jini;
         this.pid = pid;
         this.parentWindowOrigin = parentWindowOrigin;
+        this.iface = iface;
     }
 
     public String getServer_url() {
@@ -161,5 +166,13 @@ public class EnketoEditURLRequest {
 
     public void setParentWindowOrigin(String parentWindowOrigin) {
         this.parentWindowOrigin = parentWindowOrigin;
+    }
+
+    public String getIface() {
+        return iface;
+    }
+
+    public void setIface(String iface) {
+        this.iface = iface;
     }
 }

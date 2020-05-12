@@ -13,6 +13,7 @@ import core.org.akaza.openclinica.domain.xform.XformParser;
 import core.org.akaza.openclinica.domain.xform.dto.*;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.service.crfdata.FormUrlObject;
+import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import core.org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.view.Page;
@@ -143,7 +144,7 @@ public class EnketoFormServlet extends SecureController {
         if (Integer.valueOf(eventCrfId) > 0 || (Integer.valueOf(eventCrfId) == 0 && formContainsContactData && !preview)) {
             logger.info("eventCrfId:" + eventCrfId + " user:" + ub.getName());
             formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), formLayout,
-                    flavor, null, role, mode, loadWarning, isFormLocked,formContainsContactData,binds,ub);
+                    flavor, null, role, mode, loadWarning, isFormLocked, EnketoAPI.INTERFACE_QUERIES, formContainsContactData, binds, ub);
         } else if (Integer.valueOf(eventCrfId) == 0) {
             logger.info("eventCrfId is zero user:" + ub.getName());
             String hash = formLayout.getXform();

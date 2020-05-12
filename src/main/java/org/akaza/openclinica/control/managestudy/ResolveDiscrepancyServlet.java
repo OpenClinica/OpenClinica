@@ -198,13 +198,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         // this is for item data
         else if ("itemdata".equalsIgnoreCase(entityType)) {
-            prepareItemRequest(request, ds, currentStudy, note, viewNotesUrl(module), flavor, loadWarning, isLocked, id, EnketoAPI.EDIT_MODE);
+            prepareItemRequest(request, ds, currentStudy, note, viewNotesUrl(module), flavor, loadWarning, isLocked, id, EnketoAPI.EDIT_MODE, EnketoAPI.INTERFACE_QUERIES);
         }
         return true;
     }
 
     private void prepareItemRequest(HttpServletRequest request, DataSource ds, Study currentStudy, DiscrepancyNoteBean note,
-            String originatingPage, String flavor, String loadWarning, boolean isLocked, int id, String enketoMode) throws Exception, IOException {
+            String originatingPage, String flavor, String loadWarning, boolean isLocked, int id, String enketoMode, String iface) throws Exception, IOException {
         String jini ="false";
         String jiniEnabled =CoreResources.getField("jini.enabled");
         if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
@@ -377,10 +377,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
         if (ecb.getId() > 0 ||  (ecb.getId() == 0 && formContainsContactData)) {
             if (isLocked) {
                 formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb, role,
-                        enketoMode, loadWarning, true,formContainsContactData,binds,ub);
+                        enketoMode, loadWarning, true, iface, formContainsContactData, binds, ub);
             } else
                 formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), null, flavor, idb,
-                        role, enketoMode, loadWarning, false,formContainsContactData,binds,ub);
+                        role, enketoMode, loadWarning, false, iface, formContainsContactData, binds, ub);
         } else {
             String hash = formLayout.getXform();
             formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOc_oid(), flavor, role, enketoMode, hash, loadWarning, isLocked);
@@ -409,7 +409,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             String referer = request.getHeader("referer");
             String redirectTo = UriComponentsBuilder.fromUriString(referer).replaceQueryParam("popupIndex", popupIndex).toUriString();
             flavor = QUERY_FLAVOR;
-            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, redirectTo, flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE);
+            prepareItemRequest(request, sm.getDataSource(), currentStudy, null, redirectTo, flavor, "SDV Load Item", false, itemDataId, EnketoAPI.VIEW_MODE, EnketoAPI.INTERFACE_SDV);
             forwardPage(Page.ENKETO_FORM_SERVLET);
             return;
         }

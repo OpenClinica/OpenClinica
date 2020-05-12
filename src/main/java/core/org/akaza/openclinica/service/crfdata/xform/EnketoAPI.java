@@ -58,6 +58,9 @@ public class EnketoAPI {
     public static final String EDIT_MODE = "edit";
     public static final String PARTICIPATE_MODE = "participate";
     public static final String PREVIEW_MODE = "preview";
+    public static final String INTERFACE_DEFAULT = "default";
+    public static final String INTERFACE_QUERIES = "queries";
+    public static final String INTERFACE_SDV = "sdv";
 
     /*
      * SURVEY : Initial Data Entry
@@ -405,6 +408,7 @@ public class EnketoAPI {
         String studyOid = actionUrlObject.studyOid;
         String loadWarning = actionUrlObject.loadWarning;
         EventCrf eventCrf = actionUrlObject.eventCrf;
+        String iface = actionUrlObject.iface;
         EnketoURLResponse urlResponse = null;
         boolean lockOn = false;
         boolean shouldLock = false;
@@ -652,7 +656,7 @@ public class EnketoAPI {
                 subjectLabel = null;
 
             EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, actionUrlObject.ecid, crfOid, instanceId, redirect, instance, String.valueOf(markComplete),
-                    attachment, goTo, loadWarning, isJiniEnabled(), subjectLabel, getParentWindowOrigin());
+                    attachment, goTo, loadWarning, isJiniEnabled(), subjectLabel, getParentWindowOrigin(), iface);
             HttpEntity<EnketoEditURLRequest> request = new HttpEntity<EnketoEditURLRequest>(body, headers);
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoURLResponse> response = rest.postForEntity(eURL.toString(), request, EnketoURLResponse.class);

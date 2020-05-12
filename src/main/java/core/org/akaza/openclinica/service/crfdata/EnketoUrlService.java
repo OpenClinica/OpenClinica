@@ -171,7 +171,7 @@ public class EnketoUrlService {
     }
 
     public FormUrlObject getActionUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
-                                      ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked , boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub) throws Exception {
+                                      ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked, String iface, boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub) throws Exception {
         Study study = enketoCredentials.getParentStudy(studyOid);
         Study site = enketoCredentials.getSiteStudy(studyOid);
         studyOid = study.getOc_oid();
@@ -241,7 +241,7 @@ public class EnketoUrlService {
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
         ActionUrlObject actionUrlObject = new ActionUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
-                mediaList, goTo, flavor, role, study, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked);
+                mediaList, goTo, flavor, role, study, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked, iface);
 
         // EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
         // URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);

@@ -30,10 +30,11 @@ public class ActionUrlObject {
     EventCrf eventCrf;
     String loadWarning;
     boolean formLocked;
+    String iface;
 
     public ActionUrlObject(FormLayout formLayout, String crfOid, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
                            List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, Study site, StudyEvent studyEvent, String mode,
-                           EventDefinitionCrf edc, EventCrf eventCrf, String loadWarning, boolean formLocked) {
+                           EventDefinitionCrf edc, EventCrf eventCrf, String loadWarning, boolean formLocked, String iface) {
         super();
         this.formLayout = formLayout;
         this.crfOid = crfOid;
@@ -54,6 +55,7 @@ public class ActionUrlObject {
         this.site = site;
         this.loadWarning = loadWarning;
         this.formLocked = formLocked;
+        this.iface = iface;
     }
 
     @Override
@@ -78,6 +80,7 @@ public class ActionUrlObject {
         buffer.append("eventCrf:" + eventCrf);
         buffer.append("loadWarning:" + loadWarning);
         buffer.append("formLocked:" + formLocked);
+        buffer.append("iface:" + iface);
         return buffer.toString();
     }
 }
