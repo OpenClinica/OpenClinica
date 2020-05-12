@@ -345,7 +345,7 @@ public class DataImportService {
                 }
                 // Alter the SDV status if item data has been changed or added
                 if (eventCrfBean != null && resetSDV  && eventCrfBean.getSdvStatus() == SdvStatus.VERIFIED)
-                    eventCrfDao.setSDVStatus(SdvStatus.CHANGED_AFTER_VERIFIED, userBean.getId(), eventCrfBean.getId());
+                    eventCrfDao.setSDVStatus(SdvStatus.CHANGED_SINCE_VERIFIED, userBean.getId(), eventCrfBean.getId());
             }
         }
         if (!discNotesGenerated) {
