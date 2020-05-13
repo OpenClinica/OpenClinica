@@ -738,7 +738,6 @@ public class SDVUtil {
 
         // format column dates
         formatColumns(table, new String[]{"eventDate", "lastUpdatedDate"}, request);
-        table.getTableRenderer().setWidth("800");
         return tableFacade.render();
     }
 
@@ -816,7 +815,6 @@ public class SDVUtil {
         // format column dates
         formatColumns(table, new String[]{"eventDate", "lastUpdatedDate"}, request);
 
-        table.getTableRenderer().setWidth("800");
         return tableFacade.render();
     }
 
@@ -1336,7 +1334,6 @@ public class SDVUtil {
 
         setTitles(allTitles, table);
 
-        table.getTableRenderer().setWidth("800");
         return tableFacade.render();
 
     }
@@ -1467,7 +1464,7 @@ public class SDVUtil {
         else if (eventCrf != null) {
             SdvDTO sdvDTO = new SdvDTO();
             sdvDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
-            sdvDTO.setSiteName(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
+            sdvDTO.setSiteId(eventCrf.getStudySubject().getStudy().getUniqueIdentifier());
             sdvDTO.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
             Date startDate = eventCrf.getStudyEvent().getDateStart();
             if (startDate != null) {

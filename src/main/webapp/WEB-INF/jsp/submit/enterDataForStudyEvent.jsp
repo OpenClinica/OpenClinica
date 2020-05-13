@@ -188,7 +188,14 @@
                                   <fmt:message key="subject_event_status" bundle="${resword}"/>
                                 </td>
                                 <td class="table_cell">
-                                  <c:out value="${studyEvent.workflowStatus.displayValue}"/>
+                                        <c:choose>
+                                            <c:when test="${studyEvent.removed == true}">
+                                                <fmt:message key="removed" bundle="${resword}"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:out value="${studyEvent.workflowStatus.displayValue}"/>
+                                            </c:otherwise>
+                                        </c:choose>
                                 </td>
                               </tr>
                               <tr>
@@ -428,19 +435,29 @@
                               <td class="table_cell"><c:out value="${dec.eventCRF.formLayout.name}" />&nbsp;</td>
                               <td class="table_cell" bgcolor="#F5F5F5" align="center">
                                 <c:choose>
-                                  <c:when test="${ dec.eventCRF.workflowStatus == 'NOT_STARTED'}">
-                                    <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
-                                  </c:when>
-                                  <c:when test="${dec.eventCRF.workflowStatus == 'INITIAL_DATA_ENTRY'}">
-                                    <span class="icon icon-pencil-squared orange" alt="<fmt:message key="data_entry_started" bundle="${resword}"/>" title="<fmt:message key="data_entry_started" bundle="${resword}"/>"></span>
-                                  </c:when>
-                                  <c:when test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
-                                    <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>"></span>
+                                  <c:when test="${dec.eventCRF.removed == true || studyEvent.removed == true}">
+                                    <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>"></span>
                                   </c:when>
                                   <c:otherwise>
-                                    <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>"></span>
+
+                                     <c:choose>
+                                         <c:when test="${ dec.eventCRF.workflowStatus == 'NOT_STARTED'}">
+                                               <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
+                                         </c:when>
+                                         <c:when test="${dec.eventCRF.workflowStatus == 'INITIAL_DATA_ENTRY'}">
+                                               <span class="icon icon-pencil-squared orange" alt="<fmt:message key="data_entry_started" bundle="${resword}"/>" title="<fmt:message key="data_entry_started" bundle="${resword}"/>"></span>
+                                         </c:when>
+                                         <c:when test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                                               <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>"></span>
+                                         </c:when>
+                                         <c:otherwise>
+                                            <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>"></span>
+                                         </c:otherwise>
+                                     </c:choose>
+
                                   </c:otherwise>
                                 </c:choose>
+
                               </td>
                               <td class="table_cell">
                                 <c:out value="${dec.eventCRF.updater.name}" />

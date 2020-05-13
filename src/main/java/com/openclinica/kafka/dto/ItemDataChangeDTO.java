@@ -8,7 +8,9 @@ public class ItemDataChangeDTO {
     private String participantOid;
     private String formOid;
     private String eventOid;
+    private int eventRepeatKey;
     private String itemGroupOid;
+    private int itemGroupRepeatKey;
     private String itemDataType;
     private String itemOid;
     private String itemName;
@@ -66,13 +68,19 @@ public class ItemDataChangeDTO {
         this.eventOid = eventOid;
     }
 
+    public int getEventRepeatKey() { return eventRepeatKey; }
+
+    public void setEventRepeatKey(int eventRepeatKey) { this.eventRepeatKey = eventRepeatKey; }
+
     public String getItemGroupOid() {
         return itemGroupOid;
     }
 
-    public void setItemGroupOid(String itemGroupOid) {
-        this.itemGroupOid = itemGroupOid;
-    }
+    public void setItemGroupOid(String itemGroupOid) { this.itemGroupOid = itemGroupOid; }
+
+    public int getItemGroupRepeatKey() { return itemGroupRepeatKey; }
+
+    public void setItemGroupRepeatKey(int itemGroupRepeatKey) { this.itemGroupRepeatKey = itemGroupRepeatKey;}
 
     public String getItemDataType() {
         return itemDataType;

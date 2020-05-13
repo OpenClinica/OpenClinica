@@ -32,6 +32,7 @@ import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.control.SpringServletAccess;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
@@ -193,6 +194,24 @@ public class SignStudySubjectServlet extends SecureController {
         return updated;
     }
 
+    public static boolean signStudyEvent(int id, DataSource ds, UserAccountBean ub) {
+        boolean updated = true;
+        StudyEventDAO sedao = new StudyEventDAO(ds);
+        StudyEventBean studyEvent = (StudyEventBean) sedao.findByPK(id);
+        try {
+            studyEvent.setUpdater(ub);
+            Date date = new Date();
+            studyEvent.setUpdatedDate(date);
+            studyEvent.setSigned(Boolean.TRUE);
+            studyEvent.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
+                    + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
+            sedao.update(studyEvent);
+        } catch ( Exception ex ) {
+            updated = false;
+        }
+        return updated;
+    }
+
     @Override
     public void processRequest() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(context);
@@ -205,6 +224,7 @@ public class SignStudySubjectServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         String action = fp.getString("action");
         int studySubId = fp.getInt("id", true);// studySubjectId
+        int studyEventId = fp.getInt("seid", true);// studyEventId
 
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
@@ -236,21 +256,33 @@ public class SignStudySubjectServlet extends SecureController {
             boolean isAuthenticated = keycloakUserService.authenticateKeycloakUser(username, password);
 
             if (isAuthenticated && ub.getName().equalsIgnoreCase(username)) {
-                if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {
-                    // Making the StudySubject signed as all the events have
-                    // become signed.
-                    studySub.setStatus(Status.SIGNED);
-                    studySub.setUpdater(ub);
-                    subdao.update(studySub);
-                    addPageMessage(respage.getString("subject_event_signed"));
-                    // forwardPage(Page.SUBMIT_DATA_SERVLET);
-                    forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
-                    // >> changed tbh, 06/2009
-                    return;
+                if (studyEventId == 0) {
+                    if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {
+                        // Making the StudySubject signed as all the events have
+                        // become signed.
+                        studySub.setStatus(Status.SIGNED);
+                        studySub.setUpdater(ub);
+                        subdao.update(studySub);
+                        addPageMessage(respage.getString("subject_event_signed"));
+                        // forwardPage(Page.SUBMIT_DATA_SERVLET);
+                        forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+                        // >> changed tbh, 06/2009
+                        return;
+                    } else {
+                        addPageMessage(respage.getString("errors_in_submission_see_below"));
+                        forwardPage(Page.LIST_STUDY_SUBJECTS);
+                        return;
+                    }
                 } else {
-                    addPageMessage(respage.getString("errors_in_submission_see_below"));
-                    forwardPage(Page.LIST_STUDY_SUBJECTS);
-                    return;
+                    if (signStudyEvent(studyEventId, sm.getDataSource(), ub)) {
+                        addPageMessage(respage.getString("study_event_signed"));
+                        response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" + new Integer(studySubId).toString());
+                        return;
+                    } else {
+                        addPageMessage(respage.getString("errors_in_submission_see_below"));
+                        forwardPage(Page.LIST_STUDY_SUBJECTS);
+                        return;
+                    }
                 }
             } else {
 
@@ -282,6 +314,7 @@ public class SignStudySubjectServlet extends SecureController {
                 request.setAttribute("displayStudyEvents", displayEvents);
                 request.setAttribute(ORIGINATING_PAGE, originationUrl);
                 request.setAttribute("id", new Integer(studySubId).toString());
+                request.setAttribute("seid", new Integer(studyEventId).toString());
                 addPageMessage(restext.getString("password_match"));
                 forwardPage(Page.SIGN_STUDY_SUBJECT);
                 return;
@@ -418,6 +451,7 @@ public class SignStudySubjectServlet extends SecureController {
         }
         // logger.warning("^^^ finished iteration");
         request.setAttribute("eventLogs", eventLogs);
+        request.setAttribute("seid", new Integer(studyEventId).toString());
 
         forwardPage(Page.SIGN_STUDY_SUBJECT);
 

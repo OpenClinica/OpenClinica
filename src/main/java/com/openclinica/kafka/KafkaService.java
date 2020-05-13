@@ -73,6 +73,29 @@ public class KafkaService {
     kafkaTemplate.send(producerRecord);
   }
 
+  public void sendItemDataChangeMessage(ItemData itemData) throws Exception {
+
+    ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemData);
+
+    Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
+    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
+    kafkaTemplate.send(producerRecord);
+  }
+
+  public void sendStudyPublishMessage(Study study) throws Exception {
+    StudyPublishDTO studyPublishDTO = new StudyPublishDTO();
+
+    String customerUuid = coreUtilService.getCustomerUuid();
+
+    studyPublishDTO.setCustomerUuid(customerUuid);
+    studyPublishDTO.setStudyUuid(study.getStudyUuid());
+    studyPublishDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
+
+    Headers headers = buildHeaders("com.openclinica.kafka.dto.StudyPublishDTO");
+    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.STUDY_PUBLISH_TOPIC, null, null, null, studyPublishDTO, headers);
+    kafkaTemplate.send(producerRecord);
+  }
+
   private Headers buildHeaders(String dtoType){
     Headers headers = new RecordHeaders();
     headers.add(new Header() {
@@ -89,37 +112,10 @@ public class KafkaService {
     return headers;
   }
 
-  public void sendStudyPublishMessage(Study study) throws Exception {
-    StudyPublishDTO studyPublishDTO = new StudyPublishDTO();
-
-    String customerUuid = coreUtilService.getCustomerUuid();
-
-    studyPublishDTO.setCustomerUuid(customerUuid);
-    studyPublishDTO.setStudyUuid(study.getStudyUuid());
-    studyPublishDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
-
-    Headers headers = new RecordHeaders();
-    headers.add(new Header() {
-      @Override
-      public String key() {
-        return "__TypeId__";
-      }
-
-      @Override
-      public byte[] value() {
-        return "com.openclinica.kafka.dto.StudyPublishDTO".getBytes();
-      }
-    });
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.STUDY_PUBLISH_TOPIC, null, null, null, studyPublishDTO, headers);
-    kafkaTemplate.send(producerRecord);
-  }
-
-  // Removed temporarily until ODM updates are in.
-  public void sendItemDataChangeMessage(ItemData itemData) throws Exception {
-
-/*    Study study = itemData.getEventCrf().getStudySubject().getStudy();
+  private ItemDataChangeDTO constructItemDataChangeDTO(ItemData itemData){
     ItemDataChangeDTO itemDataChangeDTO = new ItemDataChangeDTO();
 
+    Study study = itemData.getEventCrf().getStudySubject().getStudy();
     String studyOid;
     String siteOid;
     if (study.getStudy() == null) {
@@ -139,27 +135,17 @@ public class KafkaService {
     itemDataChangeDTO.setParticipantOid(itemData.getEventCrf().getStudySubject().getOcOid());
     itemDataChangeDTO.setFormOid(itemData.getEventCrf().getFormLayout().getCrf().getOcOid());
     itemDataChangeDTO.setEventOid(itemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid());
+    itemDataChangeDTO.setEventRepeatKey(itemData.getEventCrf().getStudyEvent().getSampleOrdinal());
 
     itemDataChangeDTO.setItemGroupOid(itemData.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
+    itemDataChangeDTO.setItemGroupRepeatKey(itemData.getOrdinal());
+
     itemDataChangeDTO.setItemDataType(itemData.getItem().getItemDataType().getName());
     itemDataChangeDTO.setItemName(itemData.getItem().getName());
     itemDataChangeDTO.setItemOid(itemData.getItem().getOcOid());
     itemDataChangeDTO.setItemData(itemData.getValue());
 
-    Headers headers = new RecordHeaders();
-    headers.add(new Header() {
-      @Override
-      public String key() {
-        return "__TypeId__";
-      }
-
-      @Override
-      public byte[] value() {
-        return "com.openclinica.kafka.dto.ItemDataChangeDTO".getBytes();
-      }
-    });
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);*/
+    return itemDataChangeDTO;
   }
 
   private EventAttributeChangeDTO constructEventChangeDTO(StudyEventBean studyEventBean){

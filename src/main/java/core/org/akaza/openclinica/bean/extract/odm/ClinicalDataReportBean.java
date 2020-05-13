@@ -285,7 +285,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         // ***************** OpenClinica:Link REMOVE EVENT **************
                         if (!studyEvent.isCurrentlyRemoved()
                                 && !studyEvent.isCurrentlyArchived()) {
-                            if (!role.equals(Role.MONITOR) && studySubject.getStatus().equals(Status.AVAILABLE)
+                            if (!role.equals(Role.MONITOR) && (studySubject.getStatus().equals(Status.AVAILABLE) ||studySubject.getStatus().equals(Status.SIGNED))
                                     && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                 String removeUrl = "/RemoveStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
                                         + studySubject.getStudySubjectId();
