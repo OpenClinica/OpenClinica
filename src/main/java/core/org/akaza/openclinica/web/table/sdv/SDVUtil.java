@@ -1540,6 +1540,11 @@ public class SDVUtil {
                         else {
                             sdvItemDTO.setValue(itemData.getValue());
                         }
+                        if(responseType == 8){  //Actions not allowed for items with calculation datatype
+                            sdvItemDTO.setActionsAllowed(false);
+                        }
+                        else
+                            sdvItemDTO.setActionsAllowed(true);
                         break;
                     }
                     sdvItemDTO.setItemDataId(itemData.getItemDataId());

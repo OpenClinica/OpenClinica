@@ -19,6 +19,15 @@ public class SdvItemDTO {
     private String lastModifiedUserLastName;
     private String sdvStatus;
     private int openQueriesCount;
+    private boolean isActionsAllowed;
+
+    public boolean isActionsAllowed() {
+        return isActionsAllowed;
+    }
+
+    public void setActionsAllowed(boolean actionsAllowed) {
+        isActionsAllowed = actionsAllowed;
+    }
 
     public int getItemDataId() {
         return itemDataId;
