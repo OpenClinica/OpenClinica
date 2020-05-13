@@ -163,7 +163,6 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 List<String> permissionTagsList = permissionService.getPermissionTagsList((Study) request.getSession().getAttribute("study"), request);
                 ODMFilterDTO odmFilter = new ODMFilterDTO();
 
-
                 try {
                     jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
                     jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
@@ -173,12 +172,15 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                     logger.error("Error in setting the permissions: ", e);
                 }
 
+                String uniqueKey = UUID.randomUUID().toString();
+                Date dateCreated = new Date();
+
                 ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
                 archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
                 archivedDatasetFileBean.setFormat(epBean.getFormatDescription());
                 archivedDatasetFileBean.setOwnerId(userBean.getId());
                 archivedDatasetFileBean.setDatasetId(dsBean.getId());
-                archivedDatasetFileBean.setDateCreated(new Date());
+                archivedDatasetFileBean.setDateCreated(dateCreated);
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
@@ -213,7 +215,9 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
-                trigger.getJobDataMap().put("job_type", "exportJob");
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, uniqueKey);
+                trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, dateCreated);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());

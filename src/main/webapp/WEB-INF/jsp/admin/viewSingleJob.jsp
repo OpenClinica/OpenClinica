@@ -46,6 +46,10 @@
                     <td class="table_cell_top"><c:out value="${triggerBean.fullName}" />&nbsp;</td>
                 </tr>
                 <tr>
+                    <td class="table_header_column"><fmt:message key="created" bundle="${resword}"/>:</td>
+                    <td class="table_cell"><fmt:formatDate value="${triggerBean.createdDate}" pattern="${dtetmeFormat}"/>&nbsp;</td>
+                </tr>
+                <tr>
                     <td class="table_header_column"><fmt:message key="last_time_fired" bundle="${resword}"/>:</td>
                     <td class="table_cell"><fmt:formatDate value="${triggerBean.previousDate}" pattern="${dtetmeFormat}"/>&nbsp;</td>
                 </tr>

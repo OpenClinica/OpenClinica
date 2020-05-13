@@ -8,6 +8,7 @@ import java.util.Date;
 
 public class TriggerBean extends EntityBean {
 
+    private Date createdDate;
     private Date previousDate;
     private Date nextDate;
     private String fullName;
@@ -24,6 +25,14 @@ public class TriggerBean extends EntityBean {
 	private String periodToRun;
 	private String datasetName;
 	private String studyName;
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 
     public String getPeriodToRun() {
 		return periodToRun;

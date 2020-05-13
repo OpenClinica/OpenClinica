@@ -85,6 +85,18 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         String triggerName = fp.getString("tname");
         ExtractUtils extractUtils = new ExtractUtils();
         Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), TRIGGER_EXPORT_GROUP));
+
+        //Make sure the Uuid never changes from first creation time, only create one if UUID hasn't been created
+        String uniqueKey = updatingTrigger.getJobDataMap().getString(XsltTriggerService.JOB_UUID);
+        if (uniqueKey == null) {
+            uniqueKey = UUID.randomUUID().toString();
+        }
+        Date createdDate = (Date) updatingTrigger.getJobDataMap().get(XsltTriggerService.CREATED_DATE);
+        // for export jobs that were already created before we added this feature, we will give a created date starting now
+        if (createdDate == null) {
+            createdDate = new Date();
+        }
+
         if (StringUtil.isBlank(action)) {
             setUpServlet(updatingTrigger);
             forwardPage(Page.UPDATE_JOB_EXPORT);
@@ -212,6 +224,9 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, uniqueKey);
+                trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, createdDate);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
