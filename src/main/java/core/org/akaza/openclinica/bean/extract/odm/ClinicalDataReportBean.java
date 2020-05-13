@@ -730,6 +730,13 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             String vt = audit.getValueType();
             String details = (audit.getDetails() != null) ? audit.getDetails() : "";
 
+            if (vt.equals("Archived") || vt.equals("Removed") || vt.equals("Locked") || vt.equals("Signed")) {
+                if (o.equals("true")) o = "Yes";
+                if (n.equals("true")) n = "Yes";
+                if (o.equals("false")) o = "No";
+                if (n.equals("false")) n = "No";
+            }
+
             if (getAuditLogEventTypes().contains(audit.getAuditLogEventTypeId()) && o.length() > 0) {
                 o = StringEscapeUtils.escapeXml("Masked");
             }

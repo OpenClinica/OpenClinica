@@ -632,7 +632,11 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                                     // table study_event
                                     if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
                                         hm.put(column, new Boolean(false));
-                                    }else  if (column.equalsIgnoreCase("removed") || column.equalsIgnoreCase("archived") || column.equalsIgnoreCase("locked") || column.equalsIgnoreCase("signed")) {
+                                    }else  if (column.equalsIgnoreCase("removed") || column.equalsIgnoreCase("archived")
+                                            || column.equalsIgnoreCase("locked") || column.equalsIgnoreCase("signed")
+                                            ||column.equalsIgnoreCase("event_removed") || column.equalsIgnoreCase("event_archived")
+                                            || column.equalsIgnoreCase("event_locked") || column.equalsIgnoreCase("event_signed")
+                                            || column.equalsIgnoreCase("form_removed") || column.equalsIgnoreCase("form_archived")) {
                                             hm.put(column, null);
                                     } else {
                                         hm.put(column, new Boolean(true));
