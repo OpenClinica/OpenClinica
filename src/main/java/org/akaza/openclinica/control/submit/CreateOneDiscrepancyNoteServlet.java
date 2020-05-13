@@ -403,7 +403,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                 studySubject.setUpdater(ub);
                 studySubject.setUpdatedDate(new Date());
                 studySubjectDAO.update(studySubject);
-                ec.setSdvStatus(SdvStatus.CHANGED_AFTER_VERIFIED);
+                ec.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
                 ecdao.update(ec);
             }
 

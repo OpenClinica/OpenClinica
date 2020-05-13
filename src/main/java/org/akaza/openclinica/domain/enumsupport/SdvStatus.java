@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
  * The SdvStatus enumeration.
  */
 public enum SdvStatus {
-    NOT_VERIFIED, VERIFIED, CHANGED_AFTER_VERIFIED;
+    NOT_VERIFIED, VERIFIED, CHANGED_SINCE_VERIFIED;
 
     public String getDisplayValue() {
         ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();

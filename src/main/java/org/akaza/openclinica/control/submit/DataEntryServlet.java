@@ -1505,7 +1505,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     ssb.setUpdater(ub);
                     ssb.setUpdatedDate(new Date());
                     studySubjectDao.update(ssb);
-                    ecb.setSdvStatus(SdvStatus.CHANGED_AFTER_VERIFIED);
+                    ecb.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
                     ecb.setSdvUpdateId(ub.getId());
                 }
 

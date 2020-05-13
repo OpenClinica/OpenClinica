@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="sbalasubramanian" id="4.0-2020-05-12-OC-12747">
+        <comment>Updating the sdv_status from CHANGED_AFTER_VERIFIED to CHANGED_SINCE_VERIFIED on event_crf table</comment>
+        <sql>
+            UPDATE event_crf
+            SET sdv_status='CHANGED_SINCE_VERIFIED' WHERE sdv_status ='CHANGED_AFTER_VERIFIED';
+        </sql>
+    </changeSet>
+</databaseChangeLog>
