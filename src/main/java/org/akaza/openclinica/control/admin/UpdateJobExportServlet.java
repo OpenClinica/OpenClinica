@@ -212,6 +212,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
+                trigger.getJobDataMap().put("job_type", "exportJob");
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
