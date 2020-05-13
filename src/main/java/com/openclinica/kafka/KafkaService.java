@@ -85,9 +85,7 @@ public class KafkaService {
   public void sendStudyPublishMessage(Study study) throws Exception {
     StudyPublishDTO studyPublishDTO = new StudyPublishDTO();
 
-    String customerUuid = coreUtilService.getCustomerUuid();
-
-    studyPublishDTO.setCustomerUuid(customerUuid);
+    studyPublishDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     studyPublishDTO.setStudyUuid(study.getStudyUuid());
     studyPublishDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
 
@@ -118,17 +116,25 @@ public class KafkaService {
     Study study = itemData.getEventCrf().getStudySubject().getStudy();
     String studyOid;
     String siteOid;
+    String studyUuid;
+    String studyEnvUuid;
     if (study.getStudy() == null) {
       // Study-level
       studyOid = study.getOc_oid();
       siteOid = null;
+      studyUuid = study.getStudyUuid();
+      studyEnvUuid = study.getStudyEnvUuid();
     } else {
       // Site-level
       siteOid = study.getOc_oid();
       studyOid = study.getStudy().getOc_oid();
+      studyUuid = study.getStudy().getStudyUuid();
+      studyEnvUuid = study.getStudy().getStudyEnvUuid();
     }
 
-    itemDataChangeDTO.setCustomerUuid(CoreResources.getKeyCloakConfig().getRealm());
+    itemDataChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+    itemDataChangeDTO.setStudyUuid(studyUuid);
+    itemDataChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
     itemDataChangeDTO.setStudyOid(studyOid);
     itemDataChangeDTO.setSiteOid(siteOid);
     itemDataChangeDTO.setParticipantId(itemData.getEventCrf().getStudySubject().getLabel());
@@ -170,9 +176,7 @@ public class KafkaService {
       studyEnvUuid = study.getStudy().getStudyEnvUuid();
     }
 
-    String customerUuid = coreUtilService.getCustomerUuid();
-
-    formChangeDTO.setCustomerUuid(customerUuid);
+    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     formChangeDTO.setStudyUuid(studyUuid);
     formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
     formChangeDTO.setStudyOid(studyOid);
@@ -210,9 +214,7 @@ public class KafkaService {
       studyEnvUuid = study.getStudy().getStudyEnvUuid();
     }
 
-    String customerUuid = coreUtilService.getCustomerUuid();
-
-    formChangeDTO.setCustomerUuid(customerUuid);
+    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     formChangeDTO.setStudyUuid(studyUuid);
     formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
     formChangeDTO.setStudyOid(studyOid);
@@ -250,9 +252,7 @@ public class KafkaService {
       studyUuid = study.getStudy().getStudyUuid();
       studyEnvUuid = study.getStudy().getStudyEnvUuid();
     }
-    String customerUuid = coreUtilService.getCustomerUuid();
-
-    formChangeDTO.setCustomerUuid(customerUuid);
+    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     formChangeDTO.setStudyUuid(studyUuid);
     formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
     formChangeDTO.setStudyOid(studyOid);
@@ -286,9 +286,8 @@ public class KafkaService {
       studyUuid = study.getStudy().getStudyUuid();
       studyEnvUuid = study.getStudy().getStudyEnvUuid();
     }
-    String customerUuid = coreUtilService.getCustomerUuid();
 
-    formChangeDTO.setCustomerUuid(customerUuid);
+    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     formChangeDTO.setStudyUuid(studyUuid);
     formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
     formChangeDTO.setStudyOid(studyOid);
@@ -323,9 +322,7 @@ public class KafkaService {
       studyEnvUuid = currentStudy.getStudy().getStudyEnvUuid();
     }
 
-    String customerUuid = coreUtilService.getCustomerUuid();
-
-    formChangeDTO.setCustomerUuid(customerUuid);
+    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     formChangeDTO.setStudyUuid(studyUuid);
     formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
     formChangeDTO.setStudyOid(studyOid);
