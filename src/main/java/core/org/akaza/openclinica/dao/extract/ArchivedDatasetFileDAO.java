@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 
 /**
  * @author thickerson
- *
+ * <p>
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
@@ -67,6 +67,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         this.setTypeExpected(9, TypeNames.INT);// owner id
         this.setTypeExpected(10, TypeNames.STRING);// format
         this.setTypeExpected(11, TypeNames.STRING);// status
+        this.setTypeExpected(12, TypeNames.STRING);// job UUID
 
     }
 
@@ -84,6 +85,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(8), new java.sql.Timestamp(fb.getDateCreated().getTime()));
         variables.put(Integer.valueOf(9), fb.getFormat());
         variables.put(Integer.valueOf(10), fb.getStatus());
+        variables.put(Integer.valueOf(11), fb.getJobUuid());
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -106,7 +108,8 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(8), new java.sql.Timestamp(fb.getDateCreated().getTime()));
         variables.put(Integer.valueOf(9), fb.getFormat());
         variables.put(Integer.valueOf(10), fb.getStatus());
-        variables.put(Integer.valueOf(11), Integer.valueOf(fb.getId()));
+        variables.put(Integer.valueOf(11), fb.getJobUuid());
+        variables.put(Integer.valueOf(12), Integer.valueOf(fb.getId()));
 
         this.execute(digester.getQuery("update"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -129,18 +132,18 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setOwnerId(((Integer) hm.get("owner_id")).intValue());
         fb.setFormat((String) hm.get("format"));
         fb.setStatus((String) hm.get("status"));
+        fb.setJobUuid((String) hm.get("job_uuid"));
         UserAccountDAO uaDAO = new UserAccountDAO(this.ds);
         UserAccountBean owner = (UserAccountBean) uaDAO.findByPK(fb.getOwnerId());
         fb.setOwner(owner);
         return fb;
     }
 
-    public void deleteArchiveDataset(ArchivedDatasetFileBean adfBean){
+    public void deleteArchiveDataset(ArchivedDatasetFileBean adfBean) {
         HashMap variables = new HashMap();
         variables.put(Integer.valueOf(1), adfBean.getId());
         this.execute(digester.getQuery("deleteArchiveDataset"), variables);
     }
-
 
 
     public Collection findAll() {
@@ -214,6 +217,21 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
             al.add(fb);
         }
 
+        return al;
+    }
+
+    public ArrayList findByJobUuid(String jobUuid) {
+        this.setTypesExpected();
+        ArrayList al = new ArrayList();
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), String.valueOf(jobUuid));
+        String sql = digester.getQuery("findByJobUuid");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            ArchivedDatasetFileBean fb = (ArchivedDatasetFileBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(fb);
+        }
         return al;
     }
 

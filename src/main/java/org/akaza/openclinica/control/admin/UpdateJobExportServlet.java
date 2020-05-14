@@ -85,6 +85,11 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         String triggerName = fp.getString("tname");
         ExtractUtils extractUtils = new ExtractUtils();
         Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), TRIGGER_EXPORT_GROUP));
+        //Make sure the Uuid never changes from first creation time, only create one if UUID hasn't been created
+        String uniqueKey = updatingTrigger.getJobDataMap().getString(XsltTriggerService.JOB_UUID);
+        if (uniqueKey == null) {
+            uniqueKey = UUID.randomUUID().toString();
+        }
         if (StringUtil.isBlank(action)) {
             setUpServlet(updatingTrigger);
             forwardPage(Page.UPDATE_JOB_EXPORT);
@@ -179,6 +184,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setDateCreated(new Date());
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
+                archivedDatasetFileBean.setJobUuid(uniqueKey);
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 
@@ -212,7 +218,8 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
-                trigger.getJobDataMap().put("job_type", "exportJob");
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, uniqueKey);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
@@ -225,7 +232,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
 
                 try {
                     jobScheduler.deleteJob(new JobKey(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME));
-                    Date dataStart = jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), trigger);
+                    jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), trigger);
                     addPageMessage("Your job has been successfully modified.");
                     forwardPage(Page.VIEW_JOB_SERVLET);
                 } catch (SchedulerException se) {

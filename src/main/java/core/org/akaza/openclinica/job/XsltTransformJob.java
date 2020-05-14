@@ -157,8 +157,8 @@ public class XsltTransformJob extends QuartzJobBean {
 
 
             int dsId = dataMap.getInt(DATASET_ID);
-             int archivedDatasetFileBeanId = dataMap.getInt(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID);
-             ArchivedDatasetFileBean archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.findByPK(archivedDatasetFileBeanId);
+            int archivedDatasetFileBeanId = dataMap.getInt(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID);
+            ArchivedDatasetFileBean archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.findByPK(archivedDatasetFileBeanId);
             archivedDatasetFileBean.setStatus(JobStatus.IN_PROGRESS.name());
             archivedDatasetFileBean.setFileReference("");
             archivedDatasetFileBean.setDateCreated(new Date());
@@ -916,18 +916,14 @@ public class XsltTransformJob extends QuartzJobBean {
         }
     }
 
-
     private void deleteArchivedDataset(ArchivedDatasetFileBean adf) {
-
-
         archivedDatasetFilePermissionTagDao.delete(adf.getId());
         archivedDatasetFileDao.deleteArchiveDataset(adf);
-}
-    private ArchivedDatasetFileBean createArchivedDataset(ArchivedDatasetFileBean adf , Set<Integer> edcSet) {
+    }
 
+    private ArchivedDatasetFileBean createArchivedDataset(ArchivedDatasetFileBean adf , Set<Integer> edcSet) {
         ArchivedDatasetFileBean   fbFinal = (ArchivedDatasetFileBean) archivedDatasetFileDao.create(adf);
         persistPermissionTags( edcSet,fbFinal.getId());
-
         return fbFinal;
     }
 

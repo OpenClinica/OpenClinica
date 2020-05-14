@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping(value = "/auth/api")
@@ -40,14 +42,55 @@ public class ScheduledExtractController {
     @Autowired
     private StudyDao studyDao;
 
+    @Autowired
+    private ArchivedDatasetFileDAO archivedDatasetFileDAO;
 
 
+    @ApiOperation(value = "To get latest scheduled extract dataset ids and creation time for the job name at study level", notes = "only work for authorized users with the right access permission")
+    @RequestMapping(value = "/studies/{studyOID}/extractJobs/{jobName}/results", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<Object> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("studyOID") String studyOid,
+                                                                           @PathVariable("jobName") String jobName,
+                                                                           HttpServletRequest request) throws SchedulerException {
 
-    @ApiOperation(value = "To get scheduled extract jobs for specific job name at study level", notes = "only work for authorized users with the right access permission ")
-    @RequestMapping(value = "/studies/{studyOID}/extractJobs/{jobName}/result", method = RequestMethod.GET)
+        Study study = studyDao.findByOcOID(studyOid.trim());
+        if (study == null) {
+            return new ResponseEntity<>("Invalid studyOid.", HttpStatus.NOT_FOUND);
+        }
+
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
+            return new ResponseEntity<>("User must be type admin.", HttpStatus.UNAUTHORIZED);
+        }
+
+        utilService.setSchemaFromStudyOid(studyOid);
+        JobDetail jobDetail = scheduler.getJobDetail(JobKey.jobKey(jobName, "XsltTriggersExportJobs"));
+        if (jobDetail == null) {
+            return new ResponseEntity<>("Invalid job name.", HttpStatus.NOT_FOUND);
+        }
+        JobDataMap jobDataMap = jobDetail.getJobDataMap();
+        String jobUuid = jobDataMap.getString("job_uuid");
+        if (jobUuid == null) {
+            return new ResponseEntity<>("Could not find extract jobs.", HttpStatus.NO_CONTENT);
+        }
+
+        logger.debug("Found job uuid: " + jobUuid);
+
+        ArrayList<ArchivedDatasetFileBean> extracts = archivedDatasetFileDAO.findByJobUuid(jobUuid);
+        String output = "";
+        for (ArchivedDatasetFileBean adfb : extracts) {
+            output += " Dataset Id: " + adfb.getId() + "  Date Created: " + adfb.getDateCreated() + "\n";
+        }
+
+        return new ResponseEntity<>("Extract files for job name " + jobName + ": \n" + output, HttpStatus.OK);
+    }
+
+
+    @ApiOperation(value = "To get link to download extract with datasetId at study level", notes = "only work for authorized users with the right access permission")
+    @RequestMapping(value = "/studies/{studyOID}/extractJobs/{datasetId}/result", method = RequestMethod.GET)
     public @ResponseBody
     ResponseEntity<Object> getScheduledExtractJob(@PathVariable("studyOID") String studyOid,
-                                                  @PathVariable("jobName") String jobName,
+                                                  @PathVariable("datasetId") int datasetId,
                                                   HttpServletRequest request) throws SchedulerException {
 
         Study study = studyDao.findByOcOID(studyOid.trim());
@@ -61,24 +104,9 @@ public class ScheduledExtractController {
         }
 
         utilService.setSchemaFromStudyOid(studyOid);
-        JobDetail jobDetail = scheduler.getJobDetail(JobKey.jobKey(jobName, XsltTriggerService.TRIGGER_GROUP_NAME));
-        if (jobDetail == null) {
-            return new ResponseEntity<>("Invalid job name.", HttpStatus.NOT_FOUND);
-        }
 
-        JobDataMap jobDataMap = jobDetail.getJobDataMap();
-        int fileId = jobDataMap.getInt("archived_dataset_file_bean_id");
-        if (fileId == 0) {
-            return new ResponseEntity<>("Could not find extract job.", HttpStatus.NO_CONTENT);
-        }
+        String link = CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + datasetId;
 
-        logger.debug("Found archived_dataset_file_id: " + fileId);
-
-        String link = "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileId
-                + "\">" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileId
-                + " </a>";
-
-        return new ResponseEntity<>("Download file: " + link, HttpStatus.OK);
-
+        return new ResponseEntity<>("Download file link: " + link, HttpStatus.OK);
     }
 }
