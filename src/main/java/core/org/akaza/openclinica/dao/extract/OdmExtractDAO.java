@@ -42,6 +42,7 @@ import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
 import core.org.akaza.openclinica.service.extract.GenerateClinicalDataService;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -3253,6 +3254,9 @@ public class OdmExtractDAO extends DatasetDAO {
                             form.setArchived(form_archived);
 
                         }
+                        if(row.get("sdv_status") != null){
+                            form.setSdvStatus(SdvStatus.valueOf((String) row.get("sdv_status")));
+                        }
                         if (dataset.isShowCRFinterviewerName()) {
                             form.setInterviewerName((String) row.get("interviewer_name"));
                         }
@@ -3540,7 +3544,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 "        sample_ordinal, se.location as se_location, se.date_start, se.date_end, se.start_time_flag, se.end_time_flag, se.workflow_status \n" +
                 "        as event_workflow_status,se.removed as event_removed ,se.archived as event_archived,se.locked as event_locked,se.signed as event_signed, edc.ordinal as crf_order, edc.event_definition_crf_id as edc_id, fl.oc_oid as\n" +
                 "        form_layout_oid, fl.name as form_layout_name, fl.status_id as fl_status_id, ec.workflow_status as event_crf_workflow_status,ec.removed as form_removed,ec.archived as form_archived, ec.\n" +
-                "        event_crf_id, ec.date_interviewed, ec.interviewer_name, ec.validator_id, sed.name as definition_name\n" +
+                "        event_crf_id, ec.date_interviewed, ec.interviewer_name, ec.validator_id, ec.sdv_status , sed.name as definition_name\n" +
                 "        from\n" +
                 "        study_event se,\n" +
                 "        study_event_definition sed,\n" +

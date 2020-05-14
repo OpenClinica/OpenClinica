@@ -46,7 +46,7 @@
 <xsl:template name="copyOC1.2Attrib" priority="9" match="@*:StudySubjectID | @*:UniqueIdentifier | @*:Status
 | @*:DateOfBirth | @*:Sex | @*:StudyEventLocation | @*:StartDate 
 | @*:SubjectAgeAtEvent | @*:Version | @*:InterviewerName 
-| @*:InterviewDate | @*:Status | @*:ReasonForNull" >
+| @*:InterviewDate | @*:Status | @*:ReasonForNull | @*:SdvStatus " >
 	<xsl:attribute name="OpenClinica:{local-name()}" namespace="http://www.openclinica.org/ns/odm_ext_v130/v1.2">
 		<xsl:value-of select="."/>
 	</xsl:attribute>	
