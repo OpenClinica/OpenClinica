@@ -13,6 +13,7 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.PermissionService;
 import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
@@ -65,6 +66,12 @@ public class ValidateServiceImpl implements ValidateService {
 
     @Autowired
     StudySubjectDao studySubjectDao;
+
+    @Autowired
+    EventCrfDao eventCrfDao;
+
+    @Autowired
+    PermissionService permissionService;
 
     @Autowired
     private TokenService tokenService;
@@ -500,8 +507,8 @@ public class ValidateServiceImpl implements ValidateService {
         return crfDao.findByOcOID(formOid) != null;
     }
 
-    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int oridinal) {
-
+    public void validateForSdvItemForm(String studyOid, String studyEventOid, String studySubjectLabel, String formOid, UserAccountBean userAccount, int ordinal, HttpServletRequest request)
+    {
         if (!isStudyOidValid(studyOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
 
@@ -529,10 +536,14 @@ public class ValidateServiceImpl implements ValidateService {
         if (!isEventPresent(studyEventOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_EVENTOID_NOT_EXIST_IN_THIS_STUDY);
         int studySubjectId = studySubjectDao.findByLabelAndStudyOrParentStudy(studySubjectLabel, study).getStudySubjectId();
-        if (!isEventOidAndParticipantIdAreLinked(studyEventOid, studySubjectId, oridinal))
+        if (!isEventOidAndParticipantIdAreLinked(studyEventOid, studySubjectId, ordinal))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPANT_DOES_NOT_HAVE_THIS_EVENT_IN_THIS_STUDY);
         if (!isCrfPresent(formOid))
             throw new OpenClinicaSystemException(ErrorConstants.ERR_FORMOID_NOT_EXIST_IN_THIS_STUDY);
+
+        EventCrf eventCrf = eventCrfDao.findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOid, studySubjectLabel, formOid, ordinal);
+        if (!permissionService.hasFormAccess(eventCrf, eventCrf.getFormLayout().getFormLayoutId(), eventCrf.getStudyEvent().getStudyEventId(), request))
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_HAS_NO_ACCESS_TO_FORM);
     }
 }
 
