@@ -1,7 +1,11 @@
 package org.akaza.openclinica.controller;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.PermissionService;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -23,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @Api(value = "SDV", tags = { "SDV" }, description = "REST API for SDV Controller")
-@RequestMapping(value ="/auth/api/sdv")
+@RequestMapping(value = "/auth/api/sdv")
 public class SdvApiController {
 
     @Autowired
@@ -39,19 +43,26 @@ public class SdvApiController {
     @Autowired
     UtilService utilService;
 
-        @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/occurrences/{Ordinal}/forms/{FormOid}/participants/{ParticipantId}/sdvItems", method = RequestMethod.GET)
-    public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
-                                                        @PathVariable("studyOid") String studyOID,
-                                                        @PathVariable("FormOid") String formOID,
-                                                        @PathVariable("StudyEventOid") String studyEventOID,
-                                                        @PathVariable(value = "Ordinal") String ordinal,
-                                                        @PathVariable("ParticipantId") String studySubjectLabel,
-                                                        @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
-        studyBuildService.setRequestSchemaByStudyOrParentStudy(studyOID);
-            UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-        boolean changedAfterSdvOnlyFilterFlag=true;
-        int ordinalValue ;
+    @Autowired
+    PermissionService permissionService;
 
+    @Autowired
+    StudyEventDao studyEventDao;
+
+    @Autowired
+    EventCrfDao eventCrfDao;
+
+    @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/occurrences/{Ordinal}/forms/{FormOid}/participants/{ParticipantId}/sdvItems", method = RequestMethod.GET)
+    public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
+            @PathVariable("studyOid") String studyOID, @PathVariable("FormOid") String formOID,
+            @PathVariable("StudyEventOid") String studyEventOID, @PathVariable(value = "Ordinal") String ordinal,
+            @PathVariable("ParticipantId") String studySubjectLabel,
+            @RequestParam(value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false) String changedAfterSdvOnlyFilter) {
+        studyBuildService.setRequestSchemaByStudyOrParentStudy(studyOID);
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        boolean changedAfterSdvOnlyFilterFlag = true;
+        int ordinalValue;
+        
         if(changedAfterSdvOnlyFilter.equals("n"))
             changedAfterSdvOnlyFilterFlag = false;
         SdvDTO responseDTO = null;
@@ -62,7 +73,18 @@ public class SdvApiController {
                 ordinalValue = Integer.parseInt(ordinal);
             else
                 throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_IS_INCORRECT);
-            validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean,ordinalValue);
+
+            EventCrf eventCrf = eventCrfDao.findByStudyEventOIdStudySubjectOIdCrfOId(studyEventOID, studySubjectLabel, formOID, ordinalValue);
+            boolean hasAccess = permissionService.hasFormAccess(
+                eventCrf, 
+                eventCrf.getFormLayout().getFormLayoutId(), 
+                eventCrf.getStudyEvent().getStudyEventId(), 
+                request
+            );
+            if (!hasAccess)
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_HAS_NO_ACCESS_TO_FORM);
+                
+            validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean, ordinalValue);
             responseDTO = sdvUtil.getFormDetailsForSDV(studyOID, formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
         }
         catch(OpenClinicaSystemException e) {
