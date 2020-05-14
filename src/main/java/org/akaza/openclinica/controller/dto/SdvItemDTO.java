@@ -19,6 +19,15 @@ public class SdvItemDTO {
     private String lastModifiedUserLastName;
     private String sdvStatus;
     private int openQueriesCount;
+    private boolean isCalculateItem;
+
+    public boolean isCalculateItem() {
+        return isCalculateItem;
+    }
+
+    public void setCalculateItem(boolean calculateItem) {
+        isCalculateItem = calculateItem;
+    }
 
     public int getItemDataId() {
         return itemDataId;
