@@ -2,7 +2,6 @@ package org.akaza.openclinica.controller;
 
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import core.org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.service.PermissionService;
@@ -45,9 +44,6 @@ public class SdvApiController {
 
     @Autowired
     PermissionService permissionService;
-
-    @Autowired
-    StudyEventDao studyEventDao;
 
     @Autowired
     EventCrfDao eventCrfDao;
