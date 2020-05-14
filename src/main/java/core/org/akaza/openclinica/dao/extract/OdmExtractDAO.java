@@ -319,17 +319,27 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setTypeExpected(18, TypeNames.BOOL);// start_time_flag
             this.setTypeExpected(19, TypeNames.BOOL);// end_time_flag
             this.setTypeExpected(20, TypeNames.STRING);// event_workflow_status
-            this.setTypeExpected(21, TypeNames.INT);// crf_order;
-            this.setTypeExpected(22, TypeNames.INT);// edc_id;
-            this.setTypeExpected(23, TypeNames.STRING);// crf_version_oid
-            this.setTypeExpected(24, TypeNames.STRING);// crf_version
-            this.setTypeExpected(25, TypeNames.INT); // cv_status_id
-            this.setTypeExpected(26, TypeNames.STRING);//  event_crf_workflow_status
-            this.setTypeExpected(27, TypeNames.INT);// event_crf_id
-            this.setTypeExpected(28, TypeNames.DATE);// date_interviewed
-            this.setTypeExpected(29, TypeNames.STRING);// interviewer_name
-            this.setTypeExpected(30, TypeNames.INT);// validator_id
-            this.setTypeExpected(31, TypeNames.STRING);// definition_name;
+
+            this.setTypeExpected(21, TypeNames.BOOL);// event_removed
+            this.setTypeExpected(22, TypeNames.BOOL);// event_archived
+            this.setTypeExpected(23, TypeNames.BOOL);// event_locked
+            this.setTypeExpected(24, TypeNames.BOOL);// event_signed
+
+            this.setTypeExpected(25, TypeNames.INT);// crf_order;
+            this.setTypeExpected(26, TypeNames.INT);// edc_id;
+            this.setTypeExpected(27, TypeNames.STRING);// crf_version_oid
+            this.setTypeExpected(28, TypeNames.STRING);// crf_version
+            this.setTypeExpected(29, TypeNames.INT); // cv_status_id
+            this.setTypeExpected(30, TypeNames.STRING);//  event_crf_workflow_status
+
+            this.setTypeExpected(31, TypeNames.BOOL);// form_removed
+            this.setTypeExpected(32, TypeNames.BOOL);// form_archived
+
+            this.setTypeExpected(33, TypeNames.INT);// event_crf_id
+            this.setTypeExpected(34, TypeNames.DATE);// date_interviewed
+            this.setTypeExpected(35, TypeNames.STRING);// interviewer_name
+            this.setTypeExpected(36, TypeNames.INT);// validator_id
+            this.setTypeExpected(37, TypeNames.STRING);// definition_name;
         }
     }
 
@@ -2631,6 +2641,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setDetails(details);
                 auditLog.setAuditLogEventTypeId(typeId);
+                auditLog.setValueType(entity_name);
 
                    if(entity_name.equals("Status")) {
                        auditLog.setOldValue(setStudyEventStatus(oldValue));
@@ -2684,6 +2695,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setAuditLogEventTypeId(typeId);
+                auditLog.setValueType(entity_name);
+
             if(entity_name.equals("Status")) {
                 auditLog.setOldValue(setEventCrfStatus(oldValue));
                 auditLog.setNewValue(setEventCrfStatus(newValue));
@@ -3193,6 +3206,16 @@ public class OdmExtractDAO extends DatasetDAO {
                     if (dataset.isShowEventStatus()) {
                         StudyEventWorkflowStatusEnum workflowEnum = StudyEventWorkflowStatusEnum.valueOf((String) row.get("event_workflow_status")) ;
                         se.setWorkflowStatus(workflowEnum);
+                        Boolean event_removed= (Boolean) row.get("event_removed");
+                        Boolean event_archived= (Boolean) row.get("event_archived");
+                        Boolean event_locked= (Boolean) row.get("event_locked");
+                        Boolean event_signed= (Boolean) row.get("event_signed");
+                        se.setRemoved(event_removed);
+                        se.setArchived(event_archived);
+                        se.setLocked(event_locked);
+                        se.setSigned(event_signed);
+
+
                     }
                     // ----- finish adding study event attributes
                     se.setStudyEventRepeatKey(studyEventRepeating ? sampleOrdinal + "" : "1");
@@ -3223,6 +3246,12 @@ public class OdmExtractDAO extends DatasetDAO {
                         if (dataset.isShowCRFstatus()) {
                             EventCrfWorkflowStatusEnum workflowEnum = EventCrfWorkflowStatusEnum.valueOf((String) row.get("event_crf_workflow_status")) ;
                             form.setWorkflowStatus(workflowEnum);
+                            Boolean form_removed= (Boolean) row.get("form_removed");
+                            Boolean form_archived= (Boolean) row.get("form_archived");
+
+                            form.setRemoved(form_removed);
+                            form.setArchived(form_archived);
+
                         }
                         if (dataset.isShowCRFinterviewerName()) {
                             form.setInterviewerName((String) row.get("interviewer_name"));
@@ -3509,8 +3538,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 "        study_subject_oid, ss.label, s.unique_identifier, ss.secondary_label, s.gender, s.date_of_birth, ss.status_id, null as sgc_id, null as sgc_name, null as sg_name,  sed.ordinal\n" +
                 "        as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating, se.sample_ordinal as\n" +
                 "        sample_ordinal, se.location as se_location, se.date_start, se.date_end, se.start_time_flag, se.end_time_flag, se.workflow_status \n" +
-                "        as event_workflow_status, edc.ordinal as crf_order, edc.event_definition_crf_id as edc_id, fl.oc_oid as\n" +
-                "        form_layout_oid, fl.name as form_layout_name, fl.status_id as fl_status_id, ec.workflow_status as event_crf_workflow_status, ec.\n" +
+                "        as event_workflow_status,se.removed as event_removed ,se.archived as event_archived,se.locked as event_locked,se.signed as event_signed, edc.ordinal as crf_order, edc.event_definition_crf_id as edc_id, fl.oc_oid as\n" +
+                "        form_layout_oid, fl.name as form_layout_name, fl.status_id as fl_status_id, ec.workflow_status as event_crf_workflow_status,ec.removed as form_removed,ec.archived as form_archived, ec.\n" +
                 "        event_crf_id, ec.date_interviewed, ec.interviewer_name, ec.validator_id, sed.name as definition_name\n" +
                 "        from\n" +
                 "        study_event se,\n" +

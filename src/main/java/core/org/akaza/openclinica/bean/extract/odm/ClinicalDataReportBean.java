@@ -310,9 +310,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
                                 || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))
                                 && studySubject.getStatus().equals(Status.AVAILABLE)
-                                && studyBean.getStatus().equals(Status.AVAILABLE)) {
-                            String signUrl = "/UpdateStudyEvent?action=submit&event_id=" + studyEvent.getStudyEventId() + "&ss_id="
-                                    + studySubject.getStudySubjectId() + "&statusId=8";
+                                && studyBean.getStatus().equals(Status.AVAILABLE)
+                                && studyEvent.getSigned() == null && studyEvent.getArchived() == null && studyEvent.getRemoved() == null) {
+                            String signUrl = "/SignStudySubject?id=" + studySubject.getStudySubjectId() + "&seid=" + studyEvent.getStudyEventId();
 
                             xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"sign\" href=\""
                                     + StringEscapeUtils.escapeXml(signUrl) + "\"");
@@ -729,6 +729,13 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             String n = audit.getNewValue();
             String vt = audit.getValueType();
             String details = (audit.getDetails() != null) ? audit.getDetails() : "";
+
+            if (vt.equals("Archived") || vt.equals("Removed") || vt.equals("Locked") || vt.equals("Signed")) {
+                if (o.equals("true")) o = "Yes";
+                if (n.equals("true")) n = "Yes";
+                if (o.equals("false")) o = "No";
+                if (n.equals("false")) n = "No";
+            }
 
             if (getAuditLogEventTypes().contains(audit.getAuditLogEventTypeId()) && o.length() > 0) {
                 o = StringEscapeUtils.escapeXml("Masked");

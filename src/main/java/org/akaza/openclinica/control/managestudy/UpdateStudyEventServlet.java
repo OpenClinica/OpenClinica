@@ -77,8 +77,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
     public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
 
-    public static final String EVENT_WORKFLOW_STATUS = "workflowStatus";
-    public static final String SUBJECT_EVENT_STATUS_ID = "statusId";
+    public static final String EVENT_WORKFLOW_STATUS = "statusId";
 
     public static final String INPUT_STARTDATE_PREFIX = "start";
 
