@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @Api(value = "SDV", tags = { "SDV" }, description = "REST API for SDV Controller")
-@RequestMapping(value ="/auth/api/sdv")
+@RequestMapping(value = "/auth/api/sdv")
 public class SdvApiController {
 
     @Autowired
@@ -39,19 +39,17 @@ public class SdvApiController {
     @Autowired
     UtilService utilService;
 
-        @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/occurrences/{Ordinal}/forms/{FormOid}/participants/{ParticipantId}/sdvItems", method = RequestMethod.GET)
+    @RequestMapping(value = "studies/{studyOid}/events/{StudyEventOid}/occurrences/{Ordinal}/forms/{FormOid}/participants/{ParticipantId}/sdvItems", method = RequestMethod.GET)
     public ResponseEntity<Object> viewFormDetailsForSDV(HttpServletRequest request,
-                                                        @PathVariable("studyOid") String studyOID,
-                                                        @PathVariable("FormOid") String formOID,
-                                                        @PathVariable("StudyEventOid") String studyEventOID,
-                                                        @PathVariable(value = "Ordinal") String ordinal,
-                                                        @PathVariable("ParticipantId") String studySubjectLabel,
-                                                        @RequestParam( value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false ) String changedAfterSdvOnlyFilter){
+            @PathVariable("studyOid") String studyOID, @PathVariable("FormOid") String formOID,
+            @PathVariable("StudyEventOid") String studyEventOID, @PathVariable(value = "Ordinal") String ordinal,
+            @PathVariable("ParticipantId") String studySubjectLabel,
+            @RequestParam(value = "changedAfterSdvOnlyFilter", defaultValue = "y", required = false) String changedAfterSdvOnlyFilter) {
         studyBuildService.setRequestSchemaByStudyOrParentStudy(studyOID);
-            UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-        boolean changedAfterSdvOnlyFilterFlag=true;
-        int ordinalValue ;
-
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        boolean changedAfterSdvOnlyFilterFlag = true;
+        int ordinalValue;
+        
         if(changedAfterSdvOnlyFilter.equals("n"))
             changedAfterSdvOnlyFilterFlag = false;
         SdvDTO responseDTO = null;
@@ -62,7 +60,8 @@ public class SdvApiController {
                 ordinalValue = Integer.parseInt(ordinal);
             else
                 throw new OpenClinicaSystemException( ErrorConstants.ERR_EVENT_ORDINAL_IS_INCORRECT);
-            validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean,ordinalValue);
+                
+            validateService.validateForSdvItemForm(studyOID, studyEventOID, studySubjectLabel, formOID, userAccountBean, ordinalValue, request);
             responseDTO = sdvUtil.getFormDetailsForSDV(studyOID, formOID, studyEventOID, studySubjectLabel, ordinalValue, changedAfterSdvOnlyFilterFlag);
         }
         catch(OpenClinicaSystemException e) {

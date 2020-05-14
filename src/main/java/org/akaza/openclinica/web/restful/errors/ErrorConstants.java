@@ -193,4 +193,6 @@ public class ErrorConstants {
     public static final String ERR_EVENT_CRF_NOT_COMPLETED = "errorCode.eventCrfIsNotInCompleted";
     public static final String ERR_EVENT_ORDINAL_IS_INCORRECT = "errorCode.eventOrdinalIsIncorrect";
 
+    public static final String ERR_HAS_NO_ACCESS_TO_FORM = "errorCode.hasNoAccessToForm";
+
 }
