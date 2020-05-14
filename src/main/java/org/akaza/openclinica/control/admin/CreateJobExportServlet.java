@@ -51,9 +51,10 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         request.setAttribute(DATASET_ID, fp2.getInt(DATASET_ID));
         HashMap presetValues = new HashMap();
         Calendar calendar = Calendar.getInstance();
+        Date jobDate = calendar.getTime();
         presetValues.put(DATE_START_JOB + "Hour", calendar.get(Calendar.HOUR_OF_DAY));
         presetValues.put(DATE_START_JOB + "Minute", calendar.get(Calendar.MINUTE));
-        presetValues.put(DATE_START_JOB + "Date", local_df.format(calendar.get(Calendar.DATE)));
+        presetValues.put(DATE_START_JOB + "Date", local_df.format(jobDate));
         fp2.setPresetValues(presetValues);
         setPresetValues(fp2.getPresetValues());
         request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB + "Date"));
