@@ -512,10 +512,9 @@
                     item.lastModifiedDate = formatDateTime(item.lastModifiedDate);
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName;
 
-                    console.log(item.calculateItem);
                     item.actions = '';
                     if (item.calculateItem)
-                        item.actions +=
+                        item.actions =
                             '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy' +
                             '?itemDataId=' + item.itemDataId +
                             '&popupIndex=' + popupIndex +
