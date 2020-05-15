@@ -59,10 +59,10 @@
     
   <tr valign="top"><td class="table_header_column"><fmt:message key="date_started" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="date_ended" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${event.dateEnded}" pattern="${dteFormat}"/></td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${event.status.name}"/>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${event.workflowStatus.getDisplayValue()}"/>
   </td></tr>
 
- </table> 
+ </table>
 </div>
 </div></div></div></div></div></div></div></div>
 
@@ -73,24 +73,20 @@
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="0" width="100%"> 
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
 		<td class="table_header_column_top"><fmt:message key="CRF_name" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="version" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="date_interviewed" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="owner" bundle="${resword}"/></td>
-		<td class="table_header_column_top"><fmt:message key="completion_status" bundle="${resword}"/></td>	
-		
-	 </tr> 
+	 </tr>
 	<tr>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.crf.name}" /></td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.formLayout.name}" /></td>
 		<td class="table_cell"><fmt:formatDate value="${displayEventCRF.eventCRF.dateInterviewed}" pattern="${dteFormat}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.interviewerName}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.owner.name}" /></td>
-		<td class="table_cell"><c:out value="${displayEventCRF.stage.name}" /></td>	
-		
 	 </tr>
  
  </table> 
