@@ -215,8 +215,11 @@
                                             <c:when test="${studyEventAudit.oldValue eq 'SIGNED' or studyEventAudit.oldValue eq '8'}">signed</c:when>
                                         </c:choose>
                       </c:when>
-                      <c:when test="${studyEventAudit.entityName=='Removed' or studyEventAudit.entityName=='Archived' or studyEventAudit.entityName=='Locked'}">
-                                  ${studyEventAudit.oldValue}
+                      <c:when test="${studyEventAudit.entityName=='Removed' or studyEventAudit.entityName=='Archived' or studyEventAudit.entityName=='Locked' or studyEventAudit.entityName=='Signed'}">
+                          <c:choose>
+                             <c:when test="${ studyEventAudit.oldValue eq 'true' }">Yes</c:when>
+                             <c:when test="${ studyEventAudit.oldValue eq 'false'}">No</c:when>
+                          </c:choose>
                       </c:when>
                      </c:choose>
                        &nbsp;</td>
@@ -237,8 +240,11 @@
                                             <c:when test="${studyEventAudit.newValue eq 'SIGNED' or studyEventAudit.newValue eq '8'}">signed</c:when>
                                         </c:choose>
                       </c:when>
-                      <c:when test="${studyEventAudit.entityName=='Removed' or studyEventAudit.entityName=='Archived' or studyEventAudit.entityName=='Locked'}">
-                                  ${studyEventAudit.newValue}
+                      <c:when test="${studyEventAudit.entityName=='Removed' or studyEventAudit.entityName=='Archived' or studyEventAudit.entityName=='Locked' or studyEventAudit.entityName=='Signed'}">
+                                <c:choose>
+                                   <c:when test="${ studyEventAudit.newValue eq 'true' }">Yes</c:when>
+                                   <c:when test="${ studyEventAudit.newValue eq 'false'}">No</c:when>
+                                </c:choose>
                       </c:when>
                      </c:choose>
                      &nbsp;</td>
@@ -326,10 +332,12 @@
                                         <c:if test="${eventCRFAudit.oldValue eq '6'}">locked</c:if>
                                         <c:if test="${eventCRFAudit.oldValue eq 'NOT_STARTED' or eventCRFAudit.oldValue eq '11'}">not started</c:if>
                                     </c:when>
-                                    <c:when test='${eventCRFAudit.auditEventTypeId == 61 or eventCRFAudit.entityName eq "Removed" or eventCRFAudit.auditEventTypeId == 62 or eventCRFAudit.entityName eq "Archived" }'>
-                                         ${eventCRFAudit.oldValue}
+                                    <c:when test="${eventCRFAudit.entityName=='Removed' or eventCRFAudit.entityName=='Archived'}">
+                                        <c:choose>
+                                            <c:when test="${eventCRFAudit.oldValue !=null && eventCRFAudit.oldValue eq 'true' }">Yes</c:when>
+                                            <c:when test="${eventCRFAudit.oldValue !=null && eventCRFAudit.oldValue eq 'false'}">No</c:when>
+                                        </c:choose>
                                     </c:when>
-
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                         <c:choose>
                                         <c:when test="${eventCRFAudit.oldValue eq '1'}">TRUE</c:when>
@@ -359,8 +367,11 @@
                                         <c:if test="${eventCRFAudit.newValue eq '6'}">locked</c:if>
                                         <c:if test="${eventCRFAudit.newValue eq 'NOT_STARTED' or eventCRFAudit.newValue eq '11'}">not started</c:if>
                                     </c:when>
-                                    <c:when test='${eventCRFAudit.auditEventTypeId == 61 or eventCRFAudit.entityName eq "Removed" or eventCRFAudit.auditEventTypeId == 62 or eventCRFAudit.entityName eq "Archived" }'>
-                                        ${eventCRFAudit.newValue}
+                                    <c:when test="${eventCRFAudit.entityName=='Removed' or eventCRFAudit.entityName=='Archived'}">
+                                        <c:choose>
+                                           <c:when test="${ eventCRFAudit.newValue eq 'true' }">Yes</c:when>
+                                           <c:when test="${ eventCRFAudit.newValue eq 'false'}">No</c:when>
+                                        </c:choose>
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                         <c:choose>

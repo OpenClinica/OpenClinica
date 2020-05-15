@@ -18,7 +18,7 @@ public class SdvStatusFilter extends DroplistFilterEditor {
     @Override
     protected List<Option> getOptions()  {
         List<Option> options = new ArrayList<Option>();
-        String optionA = SdvStatus.NOT_VERIFIED.getDisplayValue() + " + " + SdvStatus.CHANGED_AFTER_VERIFIED.getDisplayValue();
+        String optionA = SdvStatus.NOT_VERIFIED.getDisplayValue() + " + " + SdvStatus.CHANGED_SINCE_VERIFIED.getDisplayValue();
         options.add(new Option(optionA, optionA));
         for (SdvStatus sdv : SdvStatus.values()) {
                 options.add(new Option(sdv.getDisplayValue(), sdv.getDisplayValue()));

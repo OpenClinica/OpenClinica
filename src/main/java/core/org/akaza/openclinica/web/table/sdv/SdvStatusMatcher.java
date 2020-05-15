@@ -12,7 +12,7 @@ public class SdvStatusMatcher implements FilterMatcher {
         String item = String.valueOf(itemValue);
         String filter = String.valueOf(filterValue);
 
-        return (filter.equalsIgnoreCase(SdvStatus.NOT_VERIFIED.getDisplayValue() +" + " + SdvStatus.CHANGED_AFTER_VERIFIED.getDisplayValue() ) || filter.equalsIgnoreCase(SdvStatus.NOT_VERIFIED.getDisplayValue()) ||
-                filter.equalsIgnoreCase(SdvStatus.CHANGED_AFTER_VERIFIED.getDisplayValue()) || (filter.equalsIgnoreCase(SdvStatus.VERIFIED.getDisplayValue()) && (item.contains("icon-icon-SDV-doubleCheck"))));
+        return (filter.equalsIgnoreCase(SdvStatus.NOT_VERIFIED.getDisplayValue() +" + " + SdvStatus.CHANGED_SINCE_VERIFIED.getDisplayValue() ) || filter.equalsIgnoreCase(SdvStatus.NOT_VERIFIED.getDisplayValue()) ||
+                filter.equalsIgnoreCase(SdvStatus.CHANGED_SINCE_VERIFIED.getDisplayValue()) || (filter.equalsIgnoreCase(SdvStatus.VERIFIED.getDisplayValue()) && (item.contains("icon-icon-SDV-doubleCheck"))));
     }
 }

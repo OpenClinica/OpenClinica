@@ -340,7 +340,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         if(eventCrf.getSdvStatus() == null)
             eventCrf.setSdvStatus(SdvStatus.NOT_VERIFIED);
         else if(eventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() == SdvStatus.VERIFIED)
-            eventCrf.setSdvStatus(SdvStatus.CHANGED_AFTER_VERIFIED);
+            eventCrf.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
         eventCrf.setSdvUpdateId(container.getUser().getUserId());
         eventCrfDao.saveOrUpdate(eventCrf);
     }

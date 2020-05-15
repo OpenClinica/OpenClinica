@@ -141,7 +141,11 @@ public class KafkaService {
     itemDataChangeDTO.setParticipantOid(itemData.getEventCrf().getStudySubject().getOcOid());
     itemDataChangeDTO.setFormOid(itemData.getEventCrf().getFormLayout().getCrf().getOcOid());
     itemDataChangeDTO.setEventOid(itemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid());
-    itemDataChangeDTO.setEventRepeatKey(itemData.getEventCrf().getStudyEvent().getSampleOrdinal());
+    if (itemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getRepeating()){
+      itemDataChangeDTO.setEventRepeatKey(itemData.getEventCrf().getStudyEvent().getSampleOrdinal());
+    } else{
+      itemDataChangeDTO.setEventRepeatKey(0);
+    }
 
     itemDataChangeDTO.setItemGroupOid(itemData.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
     itemDataChangeDTO.setItemGroupRepeatKey(itemData.getOrdinal());
@@ -155,7 +159,7 @@ public class KafkaService {
   }
 
   private EventAttributeChangeDTO constructEventChangeDTO(StudyEventBean studyEventBean){
-    EventAttributeChangeDTO formChangeDTO = new EventAttributeChangeDTO();
+    EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
     StudySubject studySubject = studySubjectDao.findById(studyEventBean.getStudySubjectId());
     Study study = studySubject.getStudy();
     String studyOid;
@@ -176,24 +180,32 @@ public class KafkaService {
       studyEnvUuid = study.getStudy().getStudyEnvUuid();
     }
 
-    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    formChangeDTO.setStudyUuid(studyUuid);
-    formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
-    formChangeDTO.setStudyOid(studyOid);
-    formChangeDTO.setSiteOid(siteOid);
+    eventAttributeChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+    eventAttributeChangeDTO.setStudyUuid(studyUuid);
+    eventAttributeChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
+    eventAttributeChangeDTO.setStudyOid(studyOid);
+    eventAttributeChangeDTO.setSiteOid(siteOid);
 
-    formChangeDTO.setParticipantId(studySubject.getLabel());
-    formChangeDTO.setParticipantOid(studySubject.getOcOid());
+    eventAttributeChangeDTO.setParticipantId(studySubject.getLabel());
+    eventAttributeChangeDTO.setParticipantOid(studySubject.getOcOid());
     if (studyEventBean.getStudyEventDefinitionId() != 0){
       StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByStudyEventDefinitionId(studyEventBean.getStudyEventDefinitionId());
-      formChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
+      eventAttributeChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
+      if (studyEventDefinition.getRepeating()){
+        eventAttributeChangeDTO.setEventRepeatKey(studyEventBean.getSampleOrdinal());
+      } else{
+        eventAttributeChangeDTO.setEventRepeatKey(0);
+      }
     }
 
-    return formChangeDTO;
+    eventAttributeChangeDTO.setStartDate(studyEventBean.getDateStarted().toString());
+    eventAttributeChangeDTO.setEventWorkflowStatus(studyEventBean.getWorkflowStatus().getDisplayValue());
+
+    return eventAttributeChangeDTO;
   }
 
   private EventAttributeChangeDTO constructEventChangeDTO(StudyEvent studyEvent){
-    EventAttributeChangeDTO formChangeDTO = new EventAttributeChangeDTO();
+    EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
     StudySubject studySubject = studySubjectDao.findById(studyEvent.getStudySubject().getStudySubjectId());
     Study study = studySubject.getStudy();
     String studyOid;
@@ -214,19 +226,27 @@ public class KafkaService {
       studyEnvUuid = study.getStudy().getStudyEnvUuid();
     }
 
-    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    formChangeDTO.setStudyUuid(studyUuid);
-    formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
-    formChangeDTO.setStudyOid(studyOid);
-    formChangeDTO.setSiteOid(siteOid);
+    eventAttributeChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+    eventAttributeChangeDTO.setStudyUuid(studyUuid);
+    eventAttributeChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
+    eventAttributeChangeDTO.setStudyOid(studyOid);
+    eventAttributeChangeDTO.setSiteOid(siteOid);
 
-    formChangeDTO.setParticipantId(studySubject.getLabel());
-    formChangeDTO.setParticipantOid(studySubject.getOcOid());
+    eventAttributeChangeDTO.setParticipantId(studySubject.getLabel());
+    eventAttributeChangeDTO.setParticipantOid(studySubject.getOcOid());
     if (studyEvent.getStudyEventDefinition().getOc_oid() != null){
-      formChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
+      eventAttributeChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
+    }
+    if (studyEvent.getStudyEventDefinition().getRepeating()){
+      eventAttributeChangeDTO.setEventRepeatKey(studyEvent.getSampleOrdinal());
+    } else{
+      eventAttributeChangeDTO.setEventRepeatKey(0);
     }
 
-    return formChangeDTO;
+    eventAttributeChangeDTO.setStartDate(studyEvent.getDateStart().toString());
+    eventAttributeChangeDTO.setEventWorkflowStatus(studyEvent.getWorkflowStatus().name());
+
+    return eventAttributeChangeDTO;
   }
 
   public FormChangeDTO constructEventCrfAttributeChangeDTO(EventCRFBean eventCrfBean){
@@ -262,6 +282,12 @@ public class KafkaService {
     formChangeDTO.setFormOid(eventCrfBean.getCrf().getOid());
     formChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
 
+    if (eventCrfBean.getStudyEvent().getStudyEventDefinition().isRepeating()){
+      formChangeDTO.setEventRepeatKey(eventCrfBean.getStudyEvent().getSampleOrdinal());
+    } else{
+      formChangeDTO.setEventRepeatKey(0);
+    }
+
     return formChangeDTO;
   }
 
@@ -296,6 +322,11 @@ public class KafkaService {
     formChangeDTO.setParticipantOid(eventCrf.getStudySubject().getOcOid());
     formChangeDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
     formChangeDTO.setEventOid(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid());
+    if (eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating()){
+      formChangeDTO.setEventRepeatKey(eventCrf.getStudyEvent().getSampleOrdinal());
+    } else{
+      formChangeDTO.setEventRepeatKey(0);
+    }
 
     return formChangeDTO;
   }
@@ -331,6 +362,11 @@ public class KafkaService {
     formChangeDTO.setParticipantOid(studyEvent.getStudySubject().getOcOid());
     formChangeDTO.setFormOid(formLayout.getCrf().getOcOid());
     formChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
+    if (studyEvent.getStudyEventDefinition().getRepeating()){
+      formChangeDTO.setEventRepeatKey(studyEvent.getSampleOrdinal());
+    } else{
+      formChangeDTO.setEventRepeatKey(0);
+    }
 
     return formChangeDTO;
   }

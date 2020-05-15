@@ -8,6 +8,14 @@
 
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
 import core.org.akaza.openclinica.bean.admin.AuditBean;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
@@ -22,6 +30,13 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import liquibase.util.StringUtils;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import core.org.akaza.openclinica.dao.admin.AuditDAO;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
@@ -425,6 +440,17 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                 newValue = "locked";
                             else if (newValue.equals("8") )
                                 newValue = "signed";
+                        }else if(entityName.equals("Archived")||entityName.equals("Removed") ||entityName.equals("Locked")||entityName.equals("Signed") ){
+                            if (oldValue.equals("true"))
+                                oldValue = "Yes";
+                            else if (oldValue.equals("false"))
+                                oldValue = "No";
+                            if (newValue.equals("true"))
+                                newValue = "Yes";
+                            else if (newValue.equals("false"))
+                                newValue = "No";
+                        }else{
+                            newValue=newValue.toLowerCase();
                         }
                                 excelRow = new String[]{studyEvent.getAuditEventTypeName(), dateTimeFormat(studyEvent.getAuditDate()), studyEvent.getUserName(),
                                     entityName + "(" + studyEvent.getOrdinal() + ")", oldValue, newValue, studyEvent.getDetails()};
@@ -491,6 +517,12 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                         oldValue = "FALSE";
                                     else if (oldValue.equals("1"))
                                         oldValue = "TRUE";
+                                }else if(entityName.equals("Archived")||entityName.equals("Removed")  ){
+                                    if (oldValue.equals("true"))
+                                        oldValue = "Yes";
+                                    else if (oldValue.equals("false"))
+                                        oldValue = "No";
+
                                 }else{
                                     oldValue=oldValue.toLowerCase();
                                 }
@@ -509,9 +541,17 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                         newValue = "FALSE";
                                     else if (newValue.equals("1"))
                                         newValue = "TRUE";
+                                } else if (entityName.equals("Archived") || entityName.equals("Removed")) {
+                                    if (newValue.equals("true"))
+                                        newValue = "Yes";
+                                    else if (newValue.equals("false"))
+                                        newValue = "No";
+                                } else {
+                                    newValue = newValue.toLowerCase();
                                 }
 
-                                String ordinal = "";
+
+                            String ordinal = "";
                                 if (eventCrfAudit.getOrdinal() != 0) {
                                     ordinal = "(" + eventCrfAudit.getOrdinal() + ")";
                                 } else if (eventCrfAudit.getOrdinal() == 0 && eventCrfAudit.getItemDataRepeatKey() != 0) {

@@ -423,7 +423,7 @@
         var trans = {
             'VERIFIED': 'Verified',
             'NOT_VERIFIED': 'Ready to verify',
-            'CHANGED_AFTER_VERIFIED': 'Changed since verified',
+            'CHANGED_SINCE_VERIFIED': 'Changed since verified',
             '100percent_required': '100% Required',
             'partial_required': 'Partial Required',
             'not_required': 'Not Required',
@@ -530,7 +530,7 @@
         $('#sdvVerify').css('visibility', data.sdvStatus === 'VERIFIED' ? 'hidden' : 'visible');
 
         $('#sdv-show-type').off('change');
-        if (data.sdvStatus === 'CHANGED_AFTER_VERIFIED') {
+        if (data.sdvStatus === 'CHANGED_SINCE_VERIFIED') {
             $('#sdv-show-type input[value=y]').click();
         } else {
             $('#sdv-show-type input[value=n]').click();

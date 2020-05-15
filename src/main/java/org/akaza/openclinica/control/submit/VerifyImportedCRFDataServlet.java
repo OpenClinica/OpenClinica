@@ -280,7 +280,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                     }
                     // Alter the SDV status if item data has been changed or added
                     if (eventCrfBean != null && resetSDV && eventCrfBean.getSdvStatus() == SdvStatus.VERIFIED)
-                        eventCRFDAO.setSDVStatus(SdvStatus.CHANGED_AFTER_VERIFIED, ub.getId(), eventCrfBean.getId());
+                        eventCRFDAO.setSDVStatus(SdvStatus.CHANGED_SINCE_VERIFIED, ub.getId(), eventCrfBean.getId());
 
                     // end of item datas, tbh
                     // crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);

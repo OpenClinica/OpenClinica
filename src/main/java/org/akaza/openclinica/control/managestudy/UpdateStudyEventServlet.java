@@ -70,8 +70,12 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String STUDY_SUBJECT_ID = "ss_id";
     public static final String EVENT_BEAN = "studyEvent";
     public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
+
+    //public static final String EVENT_WORKFLOW_STATUS = "statusId";
+
     public static final String EVENT_WORKFLOW_STATUS = "workflowStatus";
     public static final String SUBJECT_EVENT_STATUS_ID = "statusId";
+
     public static final String INPUT_STARTDATE_PREFIX = "start";
     public static final String INPUT_ENDDATE_PREFIX = "end";
     public static final String INPUT_LOCATION = "location";
@@ -512,7 +516,6 @@ public class UpdateStudyEventServlet extends SecureController {
                         + fp.getString(INPUT_ENDDATE_PREFIX + "Minute") + "%26endHalf=" + fp.getString(INPUT_ENDDATE_PREFIX + "Half") + "%26statusId="
                         + studyEvent.getWorkflowStatus();
 
-                // Failed to sign?
                 request.setAttribute(ORIGINATING_PAGE, originationUrl);
                 forwardPage(Page.UPDATE_STUDY_EVENT_SIGNED);
             }
