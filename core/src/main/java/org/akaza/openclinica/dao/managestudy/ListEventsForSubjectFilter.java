@@ -189,4 +189,17 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
         }
     }
 
+    public HashMap<String, String> getFilters(){
+        HashMap<String,String> temp = null;
+        if(filters.size() == 0){
+            return temp;
+        }else{
+            temp = new HashMap<>();
+            for(Filter filter: filters){
+                temp.put(filter.getProperty().substring(4), StringEscapeUtils.escapeSql(filter.getValue().toString()));
+            }
+            return temp;
+        }
+    }
+
 }
