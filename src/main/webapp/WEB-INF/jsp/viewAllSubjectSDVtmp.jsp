@@ -513,7 +513,7 @@
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName;
 
                     item.actions = '';
-                    if (item.calculateItem)
+                    if (!item.calculateItem)
                         item.actions =
                             '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy' +
                             '?itemDataId=' + item.itemDataId +
