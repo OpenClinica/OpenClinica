@@ -309,7 +309,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     }
 
     /**
-     * Creates the subjects whose crfs match the user's filter
+     * Creates the subjects list whose crfs match the user's filter
      * choice from the Subject Matrix.
      * @param studySubjectBeans
      * @param eventsForSubjectFilter
