@@ -868,6 +868,7 @@ public class XsltTransformJob extends QuartzJobBean {
         archivedDatasetFileBean.setExportFormatBean(efb);
         archivedDatasetFileBean.setExportFormatId(efb.getId());
         archivedDatasetFileBean.setDateCreated(new Date());
+        archivedDatasetFileBean.setDatasetFileUuid(UUID.randomUUID().toString());
         archivedDatasetFileBean.setStatus(JobStatus.COMPLETED.name());
 
         archivedDatasetFileBean = updateArchivedDatasetFileToComplete(archivedDatasetFileBean , edcSet);

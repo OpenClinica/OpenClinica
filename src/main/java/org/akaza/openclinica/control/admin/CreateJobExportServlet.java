@@ -58,13 +58,10 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         fp2.setPresetValues(presetValues);
         setPresetValues(fp2.getPresetValues());
         request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB + "Date"));
-        // EMAIL, TAB, CDISC, SPSS, PERIOD, DATE_START_JOB
-        // TODO pick out the datasets and the date
     }
 
     @Override
     protected void processRequest() throws Exception {
-        // TODO multi stage servlet which will create export jobs
         // will accept, create, and return the ViewJob servlet
         FormProcessor fp = new FormProcessor(request);
         scheduler = getScheduler();
@@ -180,6 +177,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
                 archivedDatasetFileBean.setJobUuid(uniqueKey);
+                archivedDatasetFileBean.setDatasetFileUuid(UUID.randomUUID().toString());
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 

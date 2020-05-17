@@ -65,8 +65,6 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         presetValues.put(DATE_START_JOB + "Date", local_df.format(jobDate));
         fp2.setPresetValues(presetValues);
         setPresetValues(fp2.getPresetValues());
-
-        // TODO pick out the datasets and the date
     }
 
     @Override
@@ -90,6 +88,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         if (uniqueKey == null) {
             uniqueKey = UUID.randomUUID().toString();
         }
+
         if (StringUtil.isBlank(action)) {
             setUpServlet(updatingTrigger);
             forwardPage(Page.UPDATE_JOB_EXPORT);
@@ -185,6 +184,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
                 archivedDatasetFileBean.setJobUuid(uniqueKey);
+                archivedDatasetFileBean.setDatasetFileUuid(UUID.randomUUID().toString());
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 

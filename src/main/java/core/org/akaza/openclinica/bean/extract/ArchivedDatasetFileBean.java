@@ -39,6 +39,8 @@ public class ArchivedDatasetFileBean extends EntityBean {
     private String status;
     private String jobUuid;
 
+    private String datasetFileUuid;
+
 
     public int getId() {
         return id;
@@ -219,5 +221,13 @@ public class ArchivedDatasetFileBean extends EntityBean {
      */
     public void setJobUuid(String Uuid) {
         this.jobUuid = Uuid;
+    }
+
+    public String getDatasetFileUuid() {
+        return datasetFileUuid;
+    }
+
+    public void setDatasetFileUuid(String datasetFileUuid) {
+        this.datasetFileUuid = datasetFileUuid;
     }
 }

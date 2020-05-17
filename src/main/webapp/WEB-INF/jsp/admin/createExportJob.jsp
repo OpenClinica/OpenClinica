@@ -169,7 +169,6 @@
                 <tr><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="formatId"/></jsp:include></td></tr>
 			</table>
 		</td>
-		
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="contact_email" bundle="${resword}"/>: <span style="color:Orange;">*</span></b></td>
@@ -182,12 +181,6 @@
 	</tr>
 	<tr>
 	</tr>
-
-<%--
-	<tr>
-		<td class="text"><fmt:message key="status" bundle="${resword}"/></td>
-		<td class="text"><b><c:out value="${newDataset.status.name}" /></b>
-	</tr>--%>
 	<tr>
 		<td align="left">
 		  <input type="submit" name="btnSubmit" value="<fmt:message key="confirm_and_save" bundle="${resword}"/>" class="button_xlong"/>

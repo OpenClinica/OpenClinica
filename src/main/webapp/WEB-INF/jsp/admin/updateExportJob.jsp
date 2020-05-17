@@ -169,19 +169,12 @@
 			</table>
 		</td>
 	</tr>
-
-
-
 	<tr>
 		<td class="text"><b><fmt:message key="contact_email" bundle="${resword}"/>:</b><br>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="contactEmail"/></jsp:include></td>
 		<td class="text"><input type="text" name="contactEmail" size="60" value="<c:out value="${contactEmail}"/>"/>
 		</td>
 	</tr>
-	<tr>
-
-	</tr>
-
 	<tr>
 		<td align="left">
 		  <input type="submit" name="btnSubmit" value="<fmt:message key="confirm_and_save" bundle="${resword}"/>" class="button_xlong"/>

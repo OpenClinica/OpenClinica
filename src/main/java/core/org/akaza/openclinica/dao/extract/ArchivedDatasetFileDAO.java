@@ -68,6 +68,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         this.setTypeExpected(10, TypeNames.STRING);// format
         this.setTypeExpected(11, TypeNames.STRING);// status
         this.setTypeExpected(12, TypeNames.STRING);// job UUID
+        this.setTypeExpected(13, TypeNames.STRING);// dataset file UUID
 
     }
 
@@ -86,6 +87,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(9), fb.getFormat());
         variables.put(Integer.valueOf(10), fb.getStatus());
         variables.put(Integer.valueOf(11), fb.getJobUuid());
+        variables.put(Integer.valueOf(12), fb.getDatasetFileUuid());
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -133,6 +135,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setFormat((String) hm.get("format"));
         fb.setStatus((String) hm.get("status"));
         fb.setJobUuid((String) hm.get("job_uuid"));
+        fb.setDatasetFileUuid((String) hm.get("dataset_file_uuid"));
         UserAccountDAO uaDAO = new UserAccountDAO(this.ds);
         UserAccountBean owner = (UserAccountBean) uaDAO.findByPK(fb.getOwnerId());
         fb.setOwner(owner);
@@ -233,6 +236,21 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
             al.add(fb);
         }
         return al;
+    }
+
+    public EntityBean findByDatasetFileUuid(String datasetFileUuid) {
+        this.setTypesExpected();
+        ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), String.valueOf(datasetFileUuid));
+
+        String sql = digester.getQuery("findByDatasetFileUuid");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            fb = (ArchivedDatasetFileBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return fb;
     }
 
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
