@@ -43,7 +43,8 @@ public class XsltTriggerService {
     public static final String EXPORT_FORMAT_ID = "exportFormatId";
     public static final String JOB_NAME = "jobName";
     public static final String ARCHIVED_DATASET_FILE_BEAN_ID = "archived_dataset_file_bean_id";
-
+    public static final String JOB_TYPE = "job_type";
+    public static final String JOB_UUID = "job_uuid";
 
     //POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD = "postProcDeleteOld";
