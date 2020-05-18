@@ -523,15 +523,11 @@ public class ValidateServiceImpl implements ValidateService {
             String siteOid = site.getOc_oid();
             if (!isSiteOidValid(siteOid))
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
-            if (!isSiteAvailable(siteOid))
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_AVAILABLE);
             if (!isUserHas_CRC_INV_DM_DEP_DS_SM_RoleInSite(userAccount.getRoles(), siteOid))
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         } else { // at study-level
             if (!isStudyOidValidStudyLevelOid(studyOid))
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
-            if (!isStudyAvailable(studyOid))
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_AVAILABLE);
             if (!isUserHas_DM_MON_RoleInStudy(userAccount.getRoles(), studyOid))
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         }

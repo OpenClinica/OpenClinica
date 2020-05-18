@@ -147,6 +147,8 @@ public class ViewStudySubjectServlet extends SecureController {
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
             request.setAttribute("studySub", studySub);
+            Study studyRelatedTostudySub = (Study) getStudyDao().findById(studySub.getStudyId());
+            request.setAttribute("studyRelatedTostudySub",studyRelatedTostudySub);
             request.setAttribute("originatingPage", URLEncoder.encode("ViewStudySubject?id=" + studySub.getId(), "UTF-8"));
 
             int studyId = studySub.getStudyId();

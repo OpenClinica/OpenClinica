@@ -1529,10 +1529,10 @@ public class SDVUtil {
                             sdvItemDTO.setValue(itemData.getValue());
                         }
                         if(responseType == 8){  //Actions not allowed for items with calculation datatype
-                            sdvItemDTO.setCalculateItem(false);
+                            sdvItemDTO.setCalculateItem(true);
                         }
                         else
-                            sdvItemDTO.setCalculateItem(true);
+                            sdvItemDTO.setCalculateItem(false);
                         break;
                     }
                     sdvItemDTO.setItemDataId(itemData.getItemDataId());
