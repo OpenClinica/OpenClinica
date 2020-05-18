@@ -10,7 +10,7 @@ public class EventAttributeChangeDTO {
     private String participantOid;
     private String eventOid;
     private int eventRepeatKey;
-    private String startDate;
+    private String eventStartDate;
     private String eventWorkflowStatus;
 
     public String getCustomerUuid() { return customerUuid; }
@@ -60,8 +60,8 @@ public class EventAttributeChangeDTO {
     public int getEventRepeatKey() { return eventRepeatKey; }
     public void setEventRepeatKey(int eventRepeatKey) { this.eventRepeatKey = eventRepeatKey; }
 
-    public String getStartDate() { return startDate; }
-    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public String getEventStartDate() { return eventStartDate; }
+    public void setEventStartDate(String eventStartDate) { this.eventStartDate = eventStartDate; }
 
     public String getEventWorkflowStatus() { return eventWorkflowStatus; }
     public void setEventWorkflowStatus(String eventWorkflowStatus) { this.eventWorkflowStatus = eventWorkflowStatus; }

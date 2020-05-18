@@ -8,9 +8,9 @@ public class ItemDataChangeDTO {
     private String siteOid;
     private String participantId;
     private String participantOid;
-    private String formOid;
     private String eventOid;
     private int eventRepeatKey;
+    private String formOid;
     private String itemGroupOid;
     private int itemGroupRepeatKey;
     private String itemDataType;

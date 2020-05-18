@@ -2,12 +2,9 @@ package com.openclinica.kafka;
 
 import com.openclinica.kafka.dto.*;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
-import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
-import core.org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.CoreUtilServiceImpl;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
@@ -114,23 +111,11 @@ public class KafkaService {
     ItemDataChangeDTO itemDataChangeDTO = new ItemDataChangeDTO();
 
     Study study = itemData.getEventCrf().getStudySubject().getStudy();
-    String studyOid;
-    String siteOid;
-    String studyUuid;
-    String studyEnvUuid;
-    if (study.getStudy() == null) {
-      // Study-level
-      studyOid = study.getOc_oid();
-      siteOid = null;
-      studyUuid = study.getStudyUuid();
-      studyEnvUuid = study.getStudyEnvUuid();
-    } else {
-      // Site-level
-      siteOid = study.getOc_oid();
-      studyOid = study.getStudy().getOc_oid();
-      studyUuid = study.getStudy().getStudyUuid();
-      studyEnvUuid = study.getStudy().getStudyEnvUuid();
-    }
+
+    String studyOid = getStudyOid(study);
+    String siteOid = getSiteOid(study);
+    String studyUuid = getStudyUuid(study);
+    String studyEnvUuid = getStudyEnvUuid(study);
 
     itemDataChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     itemDataChangeDTO.setStudyUuid(studyUuid);
@@ -162,23 +147,11 @@ public class KafkaService {
     EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
     StudySubject studySubject = studySubjectDao.findById(studyEventBean.getStudySubjectId());
     Study study = studySubject.getStudy();
-    String studyOid;
-    String siteOid;
-    String studyUuid;
-    String studyEnvUuid;
-    if (study.getStudy() == null) {
-      // Study-level
-      studyOid = study.getOc_oid();
-      siteOid = null;
-      studyUuid = study.getStudyUuid();
-      studyEnvUuid = study.getStudyEnvUuid();
-    } else {
-      // Site-level
-      siteOid = study.getOc_oid();
-      studyOid = study.getStudy().getOc_oid();
-      studyUuid = study.getStudy().getStudyUuid();
-      studyEnvUuid = study.getStudy().getStudyEnvUuid();
-    }
+
+    String studyOid = getStudyOid(study);
+    String siteOid = getSiteOid(study);
+    String studyUuid = getStudyUuid(study);
+    String studyEnvUuid = getStudyEnvUuid(study);
 
     eventAttributeChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     eventAttributeChangeDTO.setStudyUuid(studyUuid);
@@ -198,7 +171,7 @@ public class KafkaService {
       }
     }
 
-    eventAttributeChangeDTO.setStartDate(studyEventBean.getDateStarted().toString());
+    eventAttributeChangeDTO.setEventStartDate(studyEventBean.getDateStarted().toString());
     eventAttributeChangeDTO.setEventWorkflowStatus(studyEventBean.getWorkflowStatus().getDisplayValue());
 
     return eventAttributeChangeDTO;
@@ -208,23 +181,11 @@ public class KafkaService {
     EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
     StudySubject studySubject = studySubjectDao.findById(studyEvent.getStudySubject().getStudySubjectId());
     Study study = studySubject.getStudy();
-    String studyOid;
-    String siteOid;
-    String studyUuid;
-    String studyEnvUuid;
-    if (study.getStudy() == null) {
-      // Study-level
-      studyOid = study.getOc_oid();
-      siteOid = null;
-      studyUuid = study.getStudyUuid();
-      studyEnvUuid = study.getStudyEnvUuid();
-    } else {
-      // Site-level
-      siteOid = study.getOc_oid();
-      studyOid = study.getStudy().getOc_oid();
-      studyUuid = study.getStudy().getStudyUuid();
-      studyEnvUuid = study.getStudy().getStudyEnvUuid();
-    }
+
+    String studyOid = getStudyOid(study);
+    String siteOid = getSiteOid(study);
+    String studyUuid = getStudyUuid(study);
+    String studyEnvUuid = getStudyEnvUuid(study);
 
     eventAttributeChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     eventAttributeChangeDTO.setStudyUuid(studyUuid);
@@ -243,7 +204,7 @@ public class KafkaService {
       eventAttributeChangeDTO.setEventRepeatKey(0);
     }
 
-    eventAttributeChangeDTO.setStartDate(studyEvent.getDateStart().toString());
+    eventAttributeChangeDTO.setEventStartDate(studyEvent.getDateStart().toString());
     eventAttributeChangeDTO.setEventWorkflowStatus(studyEvent.getWorkflowStatus().name());
 
     return eventAttributeChangeDTO;
@@ -255,23 +216,11 @@ public class KafkaService {
     StudyEventDefinition studyEventDefinition = studyEventDao.findById(eventCrfBean.getStudyEventId()).getStudyEventDefinition();
     StudySubject studySubject = studySubjectDao.findById(eventCrfBean.getStudySubjectId());
     Study study = studySubject.getStudy();
-    String studyOid;
-    String siteOid;
-    String studyUuid;
-    String studyEnvUuid;
-    if (study.getStudy() == null) {
-      // Study-level
-      studyOid = study.getOc_oid();
-      siteOid = null;
-      studyUuid = study.getStudyUuid();
-      studyEnvUuid = study.getStudyEnvUuid();
-    } else {
-      // Site-level
-      siteOid = study.getOc_oid();
-      studyOid = study.getStudy().getOc_oid();
-      studyUuid = study.getStudy().getStudyUuid();
-      studyEnvUuid = study.getStudy().getStudyEnvUuid();
-    }
+    String studyOid = getStudyOid(study);
+    String siteOid = getSiteOid(study);
+    String studyUuid = getStudyUuid(study);
+    String studyEnvUuid = getStudyEnvUuid(study);
+
     formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     formChangeDTO.setStudyUuid(studyUuid);
     formChangeDTO.setStudyEnvironmentUuid(studyEnvUuid);
@@ -295,23 +244,11 @@ public class KafkaService {
     FormChangeDTO formChangeDTO = new FormChangeDTO();
 
     Study study = eventCrf.getStudySubject().getStudy();
-    String studyOid;
-    String siteOid;
-    String studyUuid;
-    String studyEnvUuid;
-    if (study.getStudy() == null) {
-      // Study-level
-      studyOid = study.getOc_oid();
-      siteOid = null;
-      studyUuid = study.getStudyUuid();
-      studyEnvUuid = study.getStudyEnvUuid();
-    } else {
-      // Site-level
-      siteOid = study.getOc_oid();
-      studyOid = study.getStudy().getOc_oid();
-      studyUuid = study.getStudy().getStudyUuid();
-      studyEnvUuid = study.getStudy().getStudyEnvUuid();
-    }
+
+    String studyOid = getStudyOid(study);
+    String siteOid = getSiteOid(study);
+    String studyUuid = getStudyUuid(study);
+    String studyEnvUuid = getStudyEnvUuid(study);
 
     formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     formChangeDTO.setStudyUuid(studyUuid);
@@ -335,23 +272,10 @@ public class KafkaService {
   public FormChangeDTO constructNewFormDTO(Study currentStudy, StudyEvent studyEvent, FormLayout formLayout){
     FormChangeDTO formChangeDTO = new FormChangeDTO();
 
-    String studyOid;
-    String siteOid;
-    String studyUuid;
-    String studyEnvUuid;
-    if (currentStudy.getStudy() == null) {
-      // Study-level
-      studyOid = currentStudy.getOc_oid();
-      siteOid = null;
-      studyUuid = currentStudy.getStudyUuid();
-      studyEnvUuid = currentStudy.getStudyEnvUuid();
-    } else {
-      // Site-level
-      siteOid = currentStudy.getOc_oid();
-      studyOid = currentStudy.getStudy().getOc_oid();
-      studyUuid = currentStudy.getStudy().getStudyUuid();
-      studyEnvUuid = currentStudy.getStudy().getStudyEnvUuid();
-    }
+    String studyOid = getStudyOid(currentStudy);
+    String siteOid = getSiteOid(currentStudy);
+    String studyUuid = getStudyUuid(currentStudy);
+    String studyEnvUuid = getStudyEnvUuid(currentStudy);
 
     formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
     formChangeDTO.setStudyUuid(studyUuid);
@@ -369,6 +293,38 @@ public class KafkaService {
     }
 
     return formChangeDTO;
+  }
+
+  private String getStudyEnvUuid(Study study) {
+    if (study.getStudy() == null){
+      return study.getStudyEnvUuid();
+    } else {
+      return study.getStudy().getStudyEnvUuid();
+    }
+  }
+
+  private String getStudyUuid(Study study) {
+    if (study.getStudy() == null){
+      return study.getStudyUuid();
+    } else {
+      return study.getStudy().getStudyUuid();
+    }
+  }
+
+  private String getSiteOid(Study study) {
+    if (study.getStudy() == null){
+      return null;
+    } else {
+      return study.getOc_oid();
+    }
+  }
+
+  private String getStudyOid(Study study){
+    if (study.getStudy() == null){
+      return study.getOc_oid();
+    } else {
+      return study.getStudy().getOc_oid();
+    }
   }
 
 }
