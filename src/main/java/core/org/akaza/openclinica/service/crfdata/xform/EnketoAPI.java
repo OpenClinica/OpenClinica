@@ -426,7 +426,8 @@ public class EnketoAPI {
             // https://jira.openclinica.com/browse/OC-8270 Open Form when event is locked
             // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
 
-            if (((parentStudy.getStatus().equals(Status.LOCKED))
+            if ( (eventCrf != null && eventCrf.getStudySubject().getStudy().getStatus().equals(Status.LOCKED))
+                 || ((parentStudy.getStatus().equals(Status.LOCKED))
                  || (site != null && site.getStatus().equals(Status.LOCKED)))
                  || studyEvent.isCurrentlyLocked()
                  || studyEvent.isCurrentlyRemoved()
