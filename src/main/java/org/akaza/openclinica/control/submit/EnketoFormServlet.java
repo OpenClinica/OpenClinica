@@ -143,7 +143,7 @@ public class EnketoFormServlet extends SecureController {
 
         if (Integer.valueOf(eventCrfId) > 0 || (Integer.valueOf(eventCrfId) == 0 && formContainsContactData && !preview)) {
             logger.info("eventCrfId:" + eventCrfId + " user:" + ub.getName());
-            formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOc_oid(), formLayout,
+            formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, eventCrf.getStudySubject().getStudy().getOc_oid(), formLayout,
                     flavor, null, role, mode, loadWarning, isFormLocked, EnketoAPI.INTERFACE_QUERIES, formContainsContactData, binds, ub);
         } else if (Integer.valueOf(eventCrfId) == 0) {
             logger.info("eventCrfId is zero user:" + ub.getName());
