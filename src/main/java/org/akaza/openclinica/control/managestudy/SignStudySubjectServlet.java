@@ -141,33 +141,42 @@ public class SignStudySubjectServlet extends SecureController {
         ArrayList studyEvents = sedao.findAllByStudySubject(studySub);
         for (int l = 0; l < studyEvents.size(); l++) {
             StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(l);
-            ArrayList eventCrfs = ecdao.findAllByStudyEvent(studyEvent);
-            for (int i = 0; i < eventCrfs.size(); i++) {
-                EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
-                // ArrayList discList =
-                // discDao.findAllItemNotesByEventCRF(ecrf.getId());
-                // for (int j = 0; j < discList.size(); j++) {
-                // DiscrepancyNoteBean discBean = (DiscrepancyNoteBean)
-                // discList.get(j);
-                // if
-                // (discBean.getResStatus().equals(core.org.akaza.openclinica.bean.core
-                // .ResolutionStatus.OPEN)
-                // ||
-                // discBean.getResStatus().equals(core.org.akaza.openclinica.bean.core
-                // .ResolutionStatus.UPDATED))
-                // {
-                // sign = false;
-                // break;
-                // }
-                // }
-                EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), ecrf.getCRFVersionId());
+            sign = permitStudyEventSign(studySub, studyEvent, ds, sdao);
+        }
+        return sign;
+    }
 
-                    if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)){
-                    sign = false;
-                    break;
-                }
+    public static boolean permitStudyEventSign(StudySubjectBean studySub, StudyEventBean studyEvent, DataSource ds, StudyDao sdao) {
+        boolean sign = true;
+        EventCRFDAO ecdao = new EventCRFDAO(ds);
+        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
+        Study studyBean = (Study) sdao.findByPK(studySub.getStudyId());
+        ArrayList eventCrfs = ecdao.findAllByStudyEvent(studyEvent);
+        for (int i = 0; i < eventCrfs.size(); i++) {
+            EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
+            // ArrayList discList =
+            // discDao.findAllItemNotesByEventCRF(ecrf.getId());
+            // for (int j = 0; j < discList.size(); j++) {
+            // DiscrepancyNoteBean discBean = (DiscrepancyNoteBean)
+            // discList.get(j);
+            // if
+            // (discBean.getResStatus().equals(core.org.akaza.openclinica.bean.core
+            // .ResolutionStatus.OPEN)
+            // ||
+            // discBean.getResStatus().equals(core.org.akaza.openclinica.bean.core
+            // .ResolutionStatus.UPDATED))
+            // {
+            // sign = false;
+            // break;
+            // }
+            // }
+            EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), ecrf.getCRFVersionId());
 
+            if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)){
+                sign = false;
+                break;
             }
+
         }
         return sign;
     }
@@ -237,12 +246,23 @@ public class SignStudySubjectServlet extends SecureController {
         StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
         request.setAttribute("studySub", studySub);
 
-        if (!permitSign(studySub, sm.getDataSource(),this.getStudyDao())) {
-            addPageMessage(respage.getString("subject_event_cannot_signed"));
-            // forwardPage(Page.SUBMIT_DATA_SERVLET);
-            forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
-            // >> changed tbh, 06/2009
-            return;
+        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+        StudyEventBean subevent = (StudyEventBean) sedao.findByPK(studyEventId);
+
+        if (studyEventId > 0) {
+            if (!permitStudyEventSign(studySub, subevent, sm.getDataSource(), this.getStudyDao())) {
+                addPageMessage(respage.getString("study_event_cannot_signed"));
+                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" + new Integer(studySubId).toString());
+                return;
+            }
+        } else {
+            if (!permitSign(studySub, sm.getDataSource(), this.getStudyDao())) {
+                addPageMessage(respage.getString("subject_event_cannot_signed"));
+                // forwardPage(Page.SUBMIT_DATA_SERVLET);
+                forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+                // >> changed tbh, 06/2009
+                return;
+            }
         }
 
         if (action.equalsIgnoreCase("confirm")) {
@@ -289,7 +309,6 @@ public class SignStudySubjectServlet extends SecureController {
                 int studyId = studySub.getStudyId();
                 Study study = (Study) getStudyDao().findByPK(studyId);
 
-                StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
                 StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
                 EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
@@ -357,7 +376,6 @@ public class SignStudySubjectServlet extends SecureController {
         request.setAttribute("children", children);
 
         // find study events
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
