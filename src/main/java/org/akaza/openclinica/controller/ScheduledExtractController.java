@@ -82,7 +82,7 @@ public class ScheduledExtractController {
         ArrayList<ArchivedDatasetFileBean> extracts = archivedDatasetFileDAO.findByJobUuid(jobUuid);
         String output = "";
         for (ArchivedDatasetFileBean adfb : extracts) {
-            output += " Dataset Id: " + adfb.getDatasetFileUuid() + "  Date Created: " + adfb.getDateCreated() + "\n";
+            output += " Dataset Id: " + adfb.getJobExecutionUuid() + "  Date Created: " + adfb.getDateCreated() + "\n";
         }
 
         return new ResponseEntity<>("Extract files for job name " + jobName + ": \n" + output, HttpStatus.OK);
@@ -90,9 +90,9 @@ public class ScheduledExtractController {
 
 
     @ApiOperation(value = "To get latest scheduled extract dataset ids and creation time for the job name at study level", notes = "only work for authorized users with the right access permission")
-    @RequestMapping(value = "/studies/extractJobs/{fileUuid}/jobExecutions", method = RequestMethod.GET, produces = "application/zip")
+    @RequestMapping(value = "/extractJobs/jobExecutions/{jobExecutionUuid}/dataset", method = RequestMethod.GET, produces = "application/zip")
     public @ResponseBody
-    ResponseEntity<byte[]> getScheduledExtract(@PathVariable("fileUuid") String fileUuid,
+    ResponseEntity<byte[]> getScheduledExtract(@PathVariable("jobExecutionUuid") String jobExecutionUuid,
                                                           HttpServletRequest request,
                                                           HttpServletResponse response) throws IOException{
 
@@ -101,7 +101,7 @@ public class ScheduledExtractController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        ArchivedDatasetFileBean extract = (ArchivedDatasetFileBean) archivedDatasetFileDAO.findByDatasetFileUuid(fileUuid);
+        ArchivedDatasetFileBean extract = (ArchivedDatasetFileBean) archivedDatasetFileDAO.findByJobExecutionUuid(jobExecutionUuid);
         if (extract == null) {
             logger.debug("Archived Dataset File not found.");
         }

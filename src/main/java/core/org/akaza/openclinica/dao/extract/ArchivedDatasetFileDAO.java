@@ -87,7 +87,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(9), fb.getFormat());
         variables.put(Integer.valueOf(10), fb.getStatus());
         variables.put(Integer.valueOf(11), fb.getJobUuid());
-        variables.put(Integer.valueOf(12), fb.getDatasetFileUuid());
+        variables.put(Integer.valueOf(12), fb.getJobExecutionUuid());
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -135,7 +135,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setFormat((String) hm.get("format"));
         fb.setStatus((String) hm.get("status"));
         fb.setJobUuid((String) hm.get("job_uuid"));
-        fb.setDatasetFileUuid((String) hm.get("dataset_file_uuid"));
+        fb.setJobExecutionUuid((String) hm.get("dataset_file_uuid"));
         UserAccountDAO uaDAO = new UserAccountDAO(this.ds);
         UserAccountBean owner = (UserAccountBean) uaDAO.findByPK(fb.getOwnerId());
         fb.setOwner(owner);
@@ -238,13 +238,13 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         return al;
     }
 
-    public EntityBean findByDatasetFileUuid(String datasetFileUuid) {
+    public EntityBean findByJobExecutionUuid(String jobExecutionUuid) {
         this.setTypesExpected();
         ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), String.valueOf(datasetFileUuid));
+        variables.put(Integer.valueOf(1), String.valueOf(jobExecutionUuid));
 
-        String sql = digester.getQuery("findByDatasetFileUuid");
+        String sql = digester.getQuery("findByJobExecutionUuid");
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
         if (it.hasNext()) {
