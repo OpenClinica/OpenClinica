@@ -107,6 +107,9 @@ public class SDVUtil {
     private final static String FORM_LOCKED_ICON_CLASS_NAME = "icon icon-lock";
     private final static String FORM_COMPLETED_ICON_CLASS_NAME = "icon icon-checkbox-checked green";
     private String pathPrefix;
+    private final static String LOCKED_STATUS = "Locked";
+    private final static String SIGNED_STATUS = "Signed";
+    private final static String INVALID_STATUS = "Invalid";
 
     String getIconForCrfStatusPrefix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
@@ -125,7 +128,7 @@ public class SDVUtil {
 
     public final static Map<core.org.akaza.openclinica.domain.datamap.SubjectEventStatus, String> SUBJECT_EVENT_STATUS_ICONS = new HashMap<core.org.akaza.openclinica.domain.datamap.SubjectEventStatus, String>();
     public final static Map<Integer, String> CRF_STATUS_ICONS = new HashMap<Integer, String>();
-    public final static Map<StudyEventWorkflowStatusEnum, String> STUDY_EVENT_WORKFLOW_ICONS = new HashMap();
+    public final static Map<String, String> STUDY_EVENT_WORKFLOW_ICONS = new HashMap();
     static {
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.INVALID, "icon icon-doc");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SCHEDULED, "icon icon-clock2");
@@ -135,14 +138,18 @@ public class SDVUtil {
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.STOPPED, "icon icon-stop-circle red");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SKIPPED, "icon icon-redo");
         SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.LOCKED, "icon icon-lock");
-        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SIGNED, "icon con-icon-sign green");
+        SUBJECT_EVENT_STATUS_ICONS.put(core.org.akaza.openclinica.domain.datamap.SubjectEventStatus.SIGNED, "icon icon-icon-sign green");
 
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED, "icon icon-clock");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SCHEDULED, "icon icon-clock2");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED,  "icon icon-pencil-squared orange");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.COMPLETED, "icon icon-checkbox-checked green");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.STOPPED, "icon icon-stop-circle red");
-        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SKIPPED, "icon icon-redo");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.toString() , "icon icon-clock");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SCHEDULED.toString() , "icon icon-clock2");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString() ,  "icon icon-pencil-squared orange");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.COMPLETED.toString() , "icon icon-checkbox-checked green");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.STOPPED.toString() , "icon icon-stop-circle red");
+        STUDY_EVENT_WORKFLOW_ICONS.put(StudyEventWorkflowStatusEnum.SKIPPED.toString() , "icon icon-redo");
+        STUDY_EVENT_WORKFLOW_ICONS.put(LOCKED_STATUS , "icon icon-lock");
+        STUDY_EVENT_WORKFLOW_ICONS.put(SIGNED_STATUS , "icon icon-icon-sign green");
+        STUDY_EVENT_WORKFLOW_ICONS.put(INVALID_STATUS , "icon icon-doc");
+
 
 
 
@@ -914,6 +921,7 @@ public class SDVUtil {
 
         for (EventCRFBean eventCRFBean : eventCRFBeans) {
             EventCrf eventCrf = eventCrfDao.findByPK(eventCRFBean.getId());
+            StudyEvent studyEvent =eventCrf.getStudyEvent();
             tempSDVBean = new SubjectSDVContainer();
 
             studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(eventCRFBean.getStudySubjectId());
@@ -959,7 +967,22 @@ public class SDVUtil {
                 }
                 crfStatusBuilder.append("<center><a title='" + statusTitle + "' alt='" + statusTitle + "' class='" + statusIconClassName + "' accessCheck' border='0'/></center>");
                 tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
-            tempSDVBean.setSubjectEventStatus("<center><a title='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' alt='"+eventCrf.getStudyEvent().getWorkflowStatus()+"' class='"+STUDY_EVENT_WORKFLOW_ICONS.get(eventCrf.getStudyEvent().getWorkflowStatus())+"' accessCheck' border='0'/></center>");
+                String studyEventStatusName ;
+                String studyEventStatusDisplayName;
+            if(studyEvent.getLocked() != null && studyEvent.getLocked()){
+                studyEventStatusName = LOCKED_STATUS;
+                studyEventStatusDisplayName = LOCKED_STATUS;
+            }else if(studyEvent.getSigned() != null && studyEvent.getSigned()){
+                studyEventStatusName = SIGNED_STATUS;
+                studyEventStatusDisplayName = SIGNED_STATUS;
+            }else if( (studyEvent.getArchived()!= null && studyEvent.getArchived()) || (studyEvent.getRemoved() != null && studyEvent.getRemoved())){
+                studyEventStatusName = INVALID_STATUS;
+                studyEventStatusDisplayName = INVALID_STATUS;
+            }else{
+                studyEventStatusName = studyEvent.getWorkflowStatus().toString();
+                studyEventStatusDisplayName = studyEvent.getWorkflowStatus().getDisplayValue();
+            }
+            tempSDVBean.setSubjectEventStatus("<center><a title='"+studyEventStatusDisplayName+"' alt='"+studyEventStatusDisplayName+"' class='"+STUDY_EVENT_WORKFLOW_ICONS.get(studyEventStatusName)+"' accessCheck' border='0'/></center>");
 
             // TODO: I18N Date must be formatted properly
             Locale locale = LocaleResolver.getLocale(request);
