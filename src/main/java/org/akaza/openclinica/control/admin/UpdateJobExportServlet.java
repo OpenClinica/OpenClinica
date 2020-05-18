@@ -65,8 +65,6 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         presetValues.put(DATE_START_JOB + "Date", local_df.format(jobDate));
         fp2.setPresetValues(presetValues);
         setPresetValues(fp2.getPresetValues());
-
-        // TODO pick out the datasets and the date
     }
 
     @Override
@@ -91,6 +89,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         if (uniqueKey == null) {
             uniqueKey = UUID.randomUUID().toString();
         }
+
         Date createdDate = (Date) updatingTrigger.getJobDataMap().get(XsltTriggerService.CREATED_DATE);
         // for export jobs that were already created before we added this feature, we will give a created date starting now
         if (createdDate == null) {
@@ -191,6 +190,8 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setDateCreated(new Date());
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
+                archivedDatasetFileBean.setJobUuid(uniqueKey);
+                archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 
@@ -239,7 +240,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
 
                 try {
                     jobScheduler.deleteJob(new JobKey(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME));
-                    Date dataStart = jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), trigger);
+                    jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), trigger);
                     addPageMessage("Your job has been successfully modified.");
                     forwardPage(Page.VIEW_JOB_SERVLET);
                 } catch (SchedulerException se) {

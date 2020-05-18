@@ -13,17 +13,11 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import java.util.Date;
 
 /**
- * <P>
  * Hold metadata for files found in the system. This includes:
- * <P>
  * Size
- * <P>
  * Date last run
- * <P>
  * average run time?
- * <P>
  * other comments
- *
  * @author thickerson
  *
  * TODO sync up fields with the table, eventually
@@ -43,6 +37,9 @@ public class ArchivedDatasetFileBean extends EntityBean {
     private int ownerId;
     private String format;
     private String status;
+    private String jobUuid;
+
+    private String jobExecutionUuid;
 
 
     public int getId() {
@@ -52,7 +49,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     public void setId(int id) {
         this.id = id;
     }
-    
+
 
     /**
      * @return Returns the datasetId.
@@ -62,8 +59,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param datasetId
-     *            The datasetId to set.
+     * @param datasetId The datasetId to set.
      */
     public void setDatasetId(int datasetId) {
         this.datasetId = datasetId;
@@ -77,8 +73,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param dateCreated
-     *            The dateCreated to set.
+     * @param dateCreated The dateCreated to set.
      */
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
@@ -92,8 +87,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param exportFormatId
-     *            The exportFormatId to set.
+     * @param exportFormatId The exportFormatId to set.
      */
     public void setExportFormatId(int exportFormatId) {
         this.exportFormatId = exportFormatId;
@@ -107,8 +101,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param fileSize
-     *            The fileSize to set.
+     * @param fileSize The fileSize to set.
      */
     public void setFileSize(int fileSize) {
         this.fileSize = fileSize;
@@ -122,8 +115,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param ownerId
-     *            The ownerId to set.
+     * @param ownerId The ownerId to set.
      */
     public void setOwnerId(int ownerId) {
         this.ownerId = ownerId;
@@ -137,8 +129,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param runTime
-     *            The runTime to set.
+     * @param runTime The runTime to set.
      */
     public void setRunTime(double runTime) {
         this.runTime = runTime;
@@ -152,8 +143,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param webPath
-     *            The webPath to set.
+     * @param webPath The webPath to set.
      */
     public void setWebPath(String webPath) {
         this.webPath = webPath;
@@ -167,8 +157,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param exportFormatBean
-     *            The exportFormatBean to set.
+     * @param exportFormatBean The exportFormatBean to set.
      */
     public void setExportFormatBean(ExportFormatBean exportFormatBean) {
         this.exportFormatBean = exportFormatBean;
@@ -182,8 +171,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param fileReference
-     *            The fileReference to set.
+     * @param fileReference The fileReference to set.
      */
     public void setFileReference(String fileReference) {
         this.fileReference = fileReference;
@@ -197,8 +185,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     }
 
     /**
-     * @param owner
-     *            The owner to set.
+     * @param owner The owner to set.
      */
     public void setOwner(UserAccountBean owner) {
         this.owner = owner;
@@ -218,5 +205,29 @@ public class ArchivedDatasetFileBean extends EntityBean {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * Returns unique job Uuid
+     * @return jobUuid
+     */
+    public String getJobUuid() {
+        return jobUuid;
+    }
+
+    /**
+     * Sets unique job Uuid
+     * @param Uuid unique UUID
+     */
+    public void setJobUuid(String Uuid) {
+        this.jobUuid = Uuid;
+    }
+
+    public String getJobExecutionUuid() {
+        return jobExecutionUuid;
+    }
+
+    public void setJobExecutionUuid(String jobExecutionUuid) {
+        this.jobExecutionUuid = jobExecutionUuid;
     }
 }

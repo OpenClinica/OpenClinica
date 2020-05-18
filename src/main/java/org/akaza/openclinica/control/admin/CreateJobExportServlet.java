@@ -17,10 +17,7 @@ import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
@@ -28,6 +25,7 @@ import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Calendar;
 
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 
@@ -60,13 +58,10 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         fp2.setPresetValues(presetValues);
         setPresetValues(fp2.getPresetValues());
         request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB + "Date"));
-        // EMAIL, TAB, CDISC, SPSS, PERIOD, DATE_START_JOB
-        // TODO pick out the datasets and the date
     }
 
     @Override
     protected void processRequest() throws Exception {
-        // TODO multi stage servlet which will create export jobs
         // will accept, create, and return the ViewJob servlet
         FormProcessor fp = new FormProcessor(request);
         scheduler = getScheduler();
@@ -183,6 +178,8 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setDateCreated(dateCreated);
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
+                archivedDatasetFileBean.setJobUuid(uniqueKey);
+                archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 
