@@ -2799,7 +2799,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         } else {
             for (int i = 0; i < subjarray.length - 1; i++) {
                 returnme += subjarray[i];
-                returnme += "''";
+                returnme += "'";
             }
             returnme += subjarray[subjarray.length - 1];
         }
