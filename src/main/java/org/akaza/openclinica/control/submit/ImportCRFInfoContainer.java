@@ -80,7 +80,7 @@ public class ImportCRFInfoContainer {
         Map<String, Map<String, Map<String, String>>> subjectMap = new HashMap<String, Map<String, Map<String, String>>>();
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getStudyId());
+            StudySubjectBean studySubjectBean = getStudySubjectBean(subjectDataBean, studyBean, studySubjectDAO);
 
             Map<String, Map<String, String>> eventMap = new HashMap<String, Map<String, String>>();
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
@@ -230,6 +230,15 @@ public class ImportCRFInfoContainer {
 
     public void setImportCRFMap(Map<String, Map<String, Map<String, String>>> importCRFMap) {
         this.importCRFMap = importCRFMap;
+    }
+
+    private StudySubjectBean getStudySubjectBean(SubjectDataBean subjectDataBean, Study studyBean, StudySubjectDAO studySubjectDAO) {
+        if (subjectDataBean.getSubjectOID() != null) {
+            return getStudySubjectBean(subjectDataBean, studyBean, studySubjectDAO);
+        } else if (subjectDataBean.getStudySubjectID() != null) {
+            return studySubjectDAO.findByLabelAndStudy(subjectDataBean.getStudySubjectID(), studyBean);
+        }
+        return null;
     }
 
 }
