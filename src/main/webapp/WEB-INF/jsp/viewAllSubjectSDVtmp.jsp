@@ -260,6 +260,10 @@
         white-space: nowrap;
     }
 
+    #sdv tbody td:empty:nth-child(6)::after {
+        content: "N/A";
+    }
+
     #sdv-details {
         padding: 10px;
         background-color: lightgray;
@@ -364,8 +368,7 @@
     </table>
     <fieldset id="sdv-show-type">
         <label>
-            <input type="radio" name="sinceLastVerified" value="n" autofocus="autofocus" checked="checked"> Show all
-            items
+            <input type="radio" name="sinceLastVerified" value="n" autofocus="autofocus" checked="checked"> Show all items
         </label>
         <label>
             <input type="radio" name="sinceLastVerified" value="y"> Show only changed since last Verified
@@ -484,7 +487,7 @@
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
                 $('#siteId').text(data.siteId);
-                $('#eventStartDate').text(data.eventStartDate);
+                $('#eventStartDate').text(data.eventStartDate || 'N/A');
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
@@ -513,11 +516,13 @@
                     item.lastModifiedDate = formatDateTime(item.lastModifiedDate);
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName;
 
-                    item.actions =
-                        '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy' +
-                        '?itemDataId=' + item.itemDataId +
-                        '&popupIndex=' + popupIndex +
-                        '"></a>';
+                    item.actions = '';
+                    if (!item.calculateItem)
+                        item.actions =
+                            '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy' +
+                            '?itemDataId=' + item.itemDataId +
+                            '&popupIndex=' + popupIndex +
+                            '"></a>';
 
                     return item;
                 }));
