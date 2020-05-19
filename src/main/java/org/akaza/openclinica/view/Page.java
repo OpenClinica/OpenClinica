@@ -125,33 +125,9 @@ public enum Page {
    SYSTEM_STATUSe("/WEB-INF/jsp/admin/systemStatus.jsp", "System Status"),
 
     /**
-     * Page for creating a study.
-     */
-     CREATE_STUDY1 ("/WEB-INF/jsp/managestudy/createStudy1.jsp", "Create a new Study first section"),
-    CREATE_STUDY2 ("/WEB-INF/jsp/managestudy/createStudy2.jsp", "Create a new Study second section"),
-    CREATE_STUDY3 ("/WEB-INF/jsp/managestudy/createStudy3.jsp", "Create a new Study third section"),
-    CREATE_STUDY4 ("/WEB-INF/jsp/managestudy/createStudy4.jsp", "Create a new Study forth section"),
-    CREATE_STUDY5 ("/WEB-INF/jsp/managestudy/createStudy5.jsp", "Create a new Study fifth section"),
-    CREATE_STUDY6 ("/WEB-INF/jsp/managestudy/createStudy6.jsp", "Create a new Study sixth section"),
-    CREATE_STUDY7 ("/WEB-INF/jsp/managestudy/createStudy7.jsp", "Create a new Study seventh section"),
-     CREATE_STUDY8 ("/WEB-INF/jsp/managestudy/createStudy8.jsp", "Create a new Study last section"),
-
-    /**
      * Page for confirming a new study.
      */
     STUDY_CREATE_CONFIRM ("/WEB-INF/jsp/managestudy/studyCreateConfirm.jsp", "Confirm a new Study"),
-
-    /**
-     * Page for update a study.
-     */
-    UPDATE_STUDY1("/WEB-INF/jsp/managestudy/updateStudy1.jsp", "Update a Study first section"),
-    UPDATE_STUDY2("/WEB-INF/jsp/managestudy/updateStudy2.jsp", "Update a Study second section"),
-    UPDATE_STUDY3("/WEB-INF/jsp/managestudy/updateStudy3.jsp", "Update a Study third section"),
-    UPDATE_STUDY4 ("/WEB-INF/jsp/managestudy/updateStudy4.jsp", "Update a Study forth section"),
-    UPDATE_STUDY5("/WEB-INF/jsp/managestudy/updateStudy5.jsp", "Update a Study fifth section"),
-    UPDATE_STUDY6 ("/WEB-INF/jsp/managestudy/updateStudy6.jsp", "Update a Study sixth section"),
-    UPDATE_STUDY7("/WEB-INF/jsp/managestudy/updateStudy7.jsp", "Update a Study seventh section"),
-    UPDATE_STUDY8 ("/WEB-INF/jsp/managestudy/updateStudy8.jsp", "Update a Study last section"),
 
     LIST_STUDY_SUBJECTS ("/WEB-INF/jsp/managestudy/findSubjects.jsp", "List Study Subjects"),
     LIST_STUDY_SUBJECTS_SERVLET("/ListStudySubjects", "List Study Subjects"),
@@ -170,16 +146,6 @@ public enum Page {
     STUDY_UPDATE_CONFIRM ("/WEB-INF/jsp/managestudy/studyUpdateConfirm.jsp", "Confirm a Study"),
 
     /**
-     * Page for creating a new sub study.
-     */
-    CREATE_SUB_STUDY ("/WEB-INF/jsp/managestudy/createSubStudy.jsp", "Create a sub Study"),
-
-    /**
-     * Page for confirming a new sub study.
-     */
-    CONFIRM_CREATE_SUB_STUDY("/WEB-INF/jsp/managestudy/createSubStudyConfirm.jsp", "Confirm a new site"),
-
-    /**
      * Page for confirming a new sub study.
      */
     CONFIRM_UPDATE_SUB_STUDY ("/WEB-INF/jsp/managestudy/updateSubStudyConfirm.jsp", "Confirm a site"),
@@ -195,21 +161,6 @@ public enum Page {
     VIEW_SITE("/WEB-INF/jsp/managestudy/viewSite.jsp", "View a sub Study"),
     VIEW_SITE_SERVLET ("/ViewSite", "View a sub Study"),
 
-    REMOVE_STUDY ("/WEB-INF/jsp/admin/removeStudy.jsp", "Remove a Study"),
-
-    /**
-     * Page for restoring a study.
-     */
-    RESTORE_STUDY ("/WEB-INF/jsp/admin/restoreStudy.jsp", "Restore a Study"),
-    /**
-     * Page for removing a sub study.
-     */
-    REMOVE_SITE ("/WEB-INF/jsp/managestudy/removeSite.jsp", "View a sub Study"),
-
-    /**
-     * Page for restoring a sub study.
-     */
-    RESTORE_SITE ("/WEB-INF/jsp/managestudy/restoreSite.jsp", "Restore a sub Study"),
     /**
      * Page for editing a study user role.
      */
@@ -238,53 +189,12 @@ public enum Page {
     SIGN_STUDY_SUBJECT ("/WEB-INF/jsp/managestudy/signStudySubject.jsp", "Sign Study Subject"),
 
     /**
-     * Page for view all study group classes.
-     */
-    SUBJECT_GROUP_CLASS_LIST ("/WEB-INF/jsp/managestudy/subjectGroupClassList.jsp", "View All Group Class"),
-    SUBJECT_GROUP_CLASS_LIST_SERVLET ("/ListSubjectGroupClass", "View Subject Group Class Servlet"),
-    CREATE_SUBJECT_GROUP_CLASS ("/WEB-INF/jsp/managestudy/createSubjectGroupClass.jsp", "Create Subject Group Class"),
-    CREATE_SUBJECT_GROUP_CLASS_CONFIRM ("/WEB-INF/jsp/managestudy/createSubjectGroupClassConfirm.jsp",
-            "Create Subject Group Class Confirm"),
-    UPDATE_SUBJECT_GROUP_CLASS ("/WEB-INF/jsp/managestudy/updateSubjectGroupClass.jsp", "Update Subject Group Class"),
-    UPDATE_SUBJECT_GROUP_CLASS_CONFIRM ("/WEB-INF/jsp/managestudy/updateSubjectGroupClassConfirm.jsp",
-            "Update Subject Group Class Confirm"),
-    VIEW_SUBJECT_GROUP_CLASS ("/WEB-INF/jsp/managestudy/viewSubjectGroupClass.jsp", "View Subject Group Class"),
-    REMOVE_SUBJECT_GROUP_CLASS ("/WEB-INF/jsp/managestudy/removeSubjectGroupClass.jsp", "Remove Subject Group Class"),
-    RESTORE_SUBJECT_GROUP_CLASS ("/WEB-INF/jsp/managestudy/restoreSubjectGroupClass.jsp", "Restore Subject Group Class"),
-
-    /**
-     * Page for defining a study event.
-     */
-    DEFINE_STUDY_EVENT1 ("/WEB-INF/jsp/managestudy/defineStudyEvent1.jsp", "Define Study Event"),
-    DEFINE_STUDY_EVENT2 ("/WEB-INF/jsp/managestudy/defineStudyEvent2.jsp", "Define Study Event"),
-    DEFINE_STUDY_EVENT3 ("/WEB-INF/jsp/managestudy/defineStudyEvent3.jsp", "Define Study Event"),
-    DEFINE_STUDY_EVENT4 ("/WEB-INF/jsp/managestudy/defineStudyEvent4.jsp", "Define Study Event"),
-    DEFINE_STUDY_EVENT_CONFIRM("/WEB-INF/jsp/managestudy/defineStudyEventConfirm.jsp", "Define Study Event Confirm"),
-
-    /**
-     * Page for updating a study event definition.
-     */
-   UPDATE_EVENT_DEFINITION1 ("/WEB-INF/jsp/managestudy/updateEventDefinition1.jsp", "Update Event Definition"),
-    UPDATE_EVENT_DEFINITION2 ("/WEB-INF/jsp/managestudy/updateEventDefinition2.jsp", "Update Event Definition"),
-    UPDATE_EVENT_DEFINITION_CONFIRM ("/WEB-INF/jsp/managestudy/updateEventDefinitionConfirm.jsp",
-            "Update Event Definition Confirm"),
-
-    /**
      * Page for viewing definition
      */
     VIEW_EVENT_DEFINITION ("/WEB-INF/jsp/managestudy/viewEventDefinition.jsp", "View Event Definition"),
     VIEW_EVENT_DEFINITION_READONLY ("/WEB-INF/jsp/managestudy/viewEventDefinitionReadOnly.jsp", "View Event Definition"),
     VIEW_EVENT_DEFINITION_NOSIDEBAR ("/WEB-INF/jsp/managestudy/viewEventDefinitionNoSidebar.jsp", "View Event Definition"),
     VIEW_EVENT_DEFINITION_SERVLET ("/ViewEventDefinition", "View Event Definition Servlet"),
-
-    /**
-     * Page for removing definition
-     */
-    REMOVE_DEFINITION("/WEB-INF/jsp/managestudy/removeDefinition.jsp", "Remove Event Definition"),
-    /**
-     * Page for removing definition
-     */
-    RESTORE_DEFINITION("/WEB-INF/jsp/managestudy/restoreDefinition.jsp", "Restore Event Definition"),
 
     /**
      * Page for locking definition
@@ -346,17 +256,6 @@ public enum Page {
     CREATE_CRF_CONFIRM ("/WEB-INF/jsp/admin/createCRFConfirm.jsp", "Create a new CRF Confirm"),
 
     /**
-     * Page for creating crf version.
-     */
-    CREATE_CRF_VERSION ("/WEB-INF/jsp/admin/createCRFVersion.jsp", "Create a new CRF Version"),
-    UPLOAD_CRF_VERSION ("/WEB-INF/jsp/admin/uploadCRFVersionFile.jsp", "Upload a new CRF Version"),
-
-    REMOVE_CRF_VERSION ("/WEB-INF/jsp/admin/removeCRFVersion.jsp", "Remove CRF Version"),
-    RESTORE_CRF_VERSION ("/WEB-INF/jsp/admin/restoreCRFVersion.jsp", "Restore CRF Version"),
-
-    CREATE_XFORM_CRF_VERSION_SERVLET ("/WEB-INF/jsp/admin/createXformCRFVersion.jsp", "Create a new Xform CRF Version"),
-
-    /**
      * Page for creating crf data imports
      */
     IMPORT_CRF_DATA ("/WEB-INF/jsp/submit/import.jsp", "Import CRF Data"),
@@ -385,17 +284,7 @@ public enum Page {
      * Page for creating crf version.
      */
     CREATE_CRF_VERSION_SERVLET ("/CreateCRFVersion", "Create a new CRF Version Servlet"),
-    /**
-     * Page for confirming crf version.
-     */
-    CREATE_CRF_VERSION_CONFIRM ("/WEB-INF/jsp/admin/createCRFVersionConfirm.jsp", "Create a new CRF Version Confirm"),
-    CREATE_CRF_VERSION_CONFIRMSQL ("/WEB-INF/jsp/admin/createCRFVersionConfirmSQL.jsp",
-            "Create a new CRF Version Confirm SQL"),
-    CREATE_CRF_VERSION_DONE ("/WEB-INF/jsp/admin/createCRFVersionDone.jsp", "Create a new CRF Version Done"),
-    REMOVE_CRF_VERSION_CONFIRM ("/WEB-INF/jsp/admin/removeCRFVersionConfirm.jsp", "Remove CRF Version Confirm"),
-    CREATE_CRF_VERSION_NODELETE("/WEB-INF/jsp/admin/createCRFVersionNoDelete.jsp", "Create a new CRF cannot delete version"),
-    CREATE_CRF_VERSION_ERROR ("/WEB-INF/jsp/admin/createCRFVersionError.jsp", "Create a new CRF error"),
-    REMOVE_CRF_VERSION_DEF ("/WEB-INF/jsp/admin/removeCRFVersionDef.jsp", "Remove CRF Version From Definition"),
+
 
     AUDIT_LOG_USER ("/WEB-INF/jsp/admin/auditLogUser.jsp", "Audit JsonLog display by User"),
     AUDIT_LOG_STUDY ("/WEB-INF/jsp/admin/auditLogStudy.jsp", "Audit JsonLog display by Study"),
@@ -641,10 +530,6 @@ public enum Page {
     FILE_UPLOAD ("/WEB-INF/jsp/submit/uploadFile.jsp", "Form For File Uploading"),
     //UPLOAD_FILE_SERVLET ("/UploadFile", "Upload File"),
     DOWNLOAD_ATTACHED_FILE ("/WEB-INF/jsp/submit/downloadAttachedFile.jsp", "Download Attached File"),
-
-    CONFIRM_LOCKING_CRF_VERSION ("/WEB-INF/jsp/managestudy/confirmLockingCRFVersion.jsp", "confirm locking crf version"),
-    CONFIRM_UNLOCKING_CRF_VERSION ("/WEB-INF/jsp/managestudy/confirmUnlockingCRFVersion.jsp",
-            "confirm unlocking crf version"),
 
     // MANAGE_STUDY_MODULE = new
     // Page("pages/studymodule", "Manage study");

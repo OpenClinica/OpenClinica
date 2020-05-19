@@ -127,30 +127,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         };
     }
 
-    @Bean
-    public SmartInitializingSingleton commandLineRunner(ApplicationContext ctx) {
-        return () -> {
-
-            System.out.println("Let's inspect the beans provided by Spring Boot:");
-            System.out.println("//////////////////////////////////////////////////////////////////////");
-
-            System.out.println(ctx.getApplicationName());
-            System.out.println(ctx.getDisplayName());
-            System.out.println(ctx.getId());
-
-            String[] beanNames = ctx.getBeanDefinitionNames();
-            Arrays.sort(beanNames);
-            for (String beanName : beanNames) {
-                try {
-                    System.out.println(beanName + " : " + ctx.getBean(beanName).getClass().toString());
-                } catch (Exception e) {
-                    System.out.println(beanName + " : " + "no class");
-                }
-            }
-            System.out.println("//////////////////////////////////////////////////////////////////////");
-        };
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);

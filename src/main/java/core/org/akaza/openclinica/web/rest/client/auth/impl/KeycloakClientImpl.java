@@ -82,7 +82,7 @@ public class KeycloakClientImpl {
         userResource.update(userRepresentation);
     }
 
-    public String createParticipateUser(String accessTgetSystemTokenoken, String email, String username, String accessCode,String studyEnvironment,String realm) {
+    public String createParticipateUser(String accessToken, String email, String username, String accessCode,String studyEnvironment,String realm) {
         logger.debug("Calling Keycloak to create participate user with username: {}", username);
 
         String customerUuid = coreUtilService.getCustomerUuid();
