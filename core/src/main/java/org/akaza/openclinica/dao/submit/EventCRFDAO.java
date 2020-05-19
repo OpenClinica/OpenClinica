@@ -361,6 +361,16 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
     }
 
     
+    public ArrayList<EventCRFBean> findAllByStudyEventDefinition(int sed_Id,int studyId) {
+        HashMap variables = new HashMap();
+       
+        variables.put(new Integer(1), new Integer(sed_Id));
+        variables.put(new Integer(2), new Integer(sed_Id));
+        variables.put(new Integer(3), new Integer(studyId));
+
+        return executeFindAllQuery("findAllByStudyEventDefinition", variables);
+    }
+    
     public ArrayList findAllByCRF(int crfId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(crfId));
