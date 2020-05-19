@@ -188,7 +188,7 @@ public class BeanPropertyService{
     
     private Integer getNewEventOrdinal(String eventOID,Integer studySubjectId,StudyEventDefinition eventDef)
     {
-    	if (eventDef.getRepeating())
+    	if (eventDef.isRepeating())
     	{
     		List<StudyEvent> events = getStudyEventDAO().fetchListByStudyEventDefOIDTransactional(eventOID, studySubjectId);
     		return events.size()+1;

@@ -43,6 +43,7 @@ public class AuditEventCrfAspect {
 
     public boolean eventCrfIsTheSame(EventCrf eventCrf){
         EventCrf existingEventCrf = eventCrfDao.findById(eventCrf.getEventCrfId());
+
         if (existingEventCrf != null){
             if (existingEventCrf.getWorkflowStatus().equals(eventCrf.getWorkflowStatus())) {
                 log.info("AoP: Workflow status does match!");

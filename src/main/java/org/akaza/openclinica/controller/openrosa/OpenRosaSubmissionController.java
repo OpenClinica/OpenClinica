@@ -258,6 +258,7 @@ public class OpenRosaSubmissionController {
 
             if (!formCacheService.expireAndRemoveForm(ecid)){
                 FormChangeDTO formChangeDTO = kafkaService.constructEditFormDTO(eventCrf);
+                formChangeDTO.setFormWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue());
                 kafkaService.sendFormChangeMessage(formChangeDTO);
             }
             //TODO Re-enable randomize.

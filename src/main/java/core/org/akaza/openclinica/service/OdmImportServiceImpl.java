@@ -451,7 +451,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	private StudyEventDefinition updateEventDef(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
 			StudyEventDefinition studyEventDefinition, Study study, Errors errors) {
 		if (study.getEnvType().equals(StudyEnvEnum.PROD) && odmStudyEventDef.getRepeating().value().equalsIgnoreCase("No")
-				&& studyEventDefinition.getRepeating()) {
+				&& studyEventDefinition.isRepeating()) {
 			errors.rejectValue("name", "event_error", " Cannot change Event \"" + studyEventDefinition.getName()
 					+ "\" to non-repeating since it was previously published to Production as repeating - FAILED");
 			logger.info(studyEventDefinition.getName() + " cannot change to non-repeating; event has been published to Production - FAILED");

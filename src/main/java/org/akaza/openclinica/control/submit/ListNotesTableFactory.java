@@ -914,7 +914,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                         item = itemDao.findByOcOID(itemOid);
                     if (!StringUtils.isEmpty(sedOid)) {
                         studyEventDefinition = studyEventDefinitionHibDao.findByOcOID(sedOid);
-                        if (studyEventDefinition != null && !studyEventDefinition.getRepeating()) {
+                        if (studyEventDefinition != null && !studyEventDefinition.isRepeating()) {
                             studyEvents = studyEventDao.fetchListByStudyEventDefOID(sedOid, discrepancyNoteBean.getStudySub().getId());
 
                             if (studyEvents != null) {

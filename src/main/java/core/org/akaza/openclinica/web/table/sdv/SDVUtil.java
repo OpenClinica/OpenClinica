@@ -982,7 +982,7 @@ public class SDVUtil {
             //
             // }
             // eventCRFBean.getEventName()
-            if (eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating())
+            if (eventCrf.getStudyEvent().getStudyEventDefinition().isRepeating())
                 tempSDVBean.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName() + " (" + eventCrf.getStudyEvent().getSampleOrdinal() + ")");
             else
                 tempSDVBean.setEventName(eventCrf.getStudyEvent().getStudyEventDefinition().getName());
@@ -1478,7 +1478,7 @@ public class SDVUtil {
                 sdvDTO.setEventStartDate(dateFormat.format(startDate));    
             }
             sdvDTO.setEventOrdinal(eventCrf.getStudyEvent().getSampleOrdinal());
-            sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().getRepeating());
+            sdvDTO.setRepeatingEvent(eventCrf.getStudyEvent().getStudyEventDefinition().isRepeating());
             Study study = studyDao.findByOcOID(studyOID);
             EventDefinitionCrf eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), study.getStudy() != null ? study.getStudy().getStudyId() : study.getStudyId());
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());

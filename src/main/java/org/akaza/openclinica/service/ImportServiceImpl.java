@@ -861,7 +861,7 @@ public class ImportServiceImpl implements ImportService {
         int eventOrdinal = maxSeOrdinal + 1;
         if (studyEventDefinition.getType().equals(COMMON)) {   // Common Event
 
-            if (studyEventDefinition.getRepeating()) {   // Repeating Common Event
+            if (studyEventDefinition.isRepeating()) {   // Repeating Common Event
                 if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
                     eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                     if (eventObject instanceof ErrorObj) return eventObject;
@@ -947,7 +947,7 @@ public class ImportServiceImpl implements ImportService {
             }
         } else {   // Visit Event
 
-            if (studyEventDefinition.getRepeating()) {   // Repeating Visit Event
+            if (studyEventDefinition.isRepeating()) {   // Repeating Visit Event
                 if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
                     //validate repeat key for integer
                     eventObject = validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());

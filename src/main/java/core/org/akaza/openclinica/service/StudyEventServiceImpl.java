@@ -10,10 +10,7 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
-import com.openclinica.kafka.KafkaService;
-import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.RestReponseDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -23,7 +20,6 @@ import core.org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import core.org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import core.org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.controller.dto.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -675,7 +671,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_START_DATE);
             }
 
-            if (studyEventDefinition.getRepeating()) {   // Repeating Visit Event
+            if (studyEventDefinition.isRepeating()) {   // Repeating Visit Event
                 studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
 
                 eventObject = importService.validateStartAndEndDateAndOrder(studyEventDataBean);
@@ -717,7 +713,7 @@ public class StudyEventServiceImpl implements StudyEventService {
         int maxSeOrdinal = studyEventDao.findMaxOrdinalByStudySubjectStudyEventDefinition(studySubject.getStudySubjectId(), studyEventDefinition.getStudyEventDefinitionId());
         int eventOrdinal = maxSeOrdinal + 1;
 
-        if (studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.getRepeating()) {   // Repeating Visit Event
+        if (studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.isRepeating()) {   // Repeating Visit Event
             if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
                 eventObject = importService.validateEventRepeatKeyIntNumber(studyEventDataBean.getStudyEventRepeatKey());
                 if (eventObject instanceof ErrorObj) return eventObject;
@@ -739,7 +735,7 @@ public class StudyEventServiceImpl implements StudyEventService {
                 return new ErrorObj(FAILED, ErrorConstants.ERR_MISSING_STUDY_EVENT_REPEAT_KEY);
             }
 
-        } else if (studyEventDefinition.getType().equals(UNSCHEDULED) && !studyEventDefinition.getRepeating()) {   // Non Repeat Event
+        } else if (studyEventDefinition.getType().equals(UNSCHEDULED) && !studyEventDefinition.isRepeating()) {   // Non Repeat Event
             studyEventDataBean.setStudyEventRepeatKey(String.valueOf('1'));
             eventObject = processEventUpdateForUnscheduled(studyEventDataBean, userAccount, studySubject);
             if (eventObject instanceof ErrorObj) return eventObject;
