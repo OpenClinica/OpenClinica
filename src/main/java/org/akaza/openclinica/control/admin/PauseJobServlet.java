@@ -43,6 +43,7 @@ public class PauseJobServlet extends ScheduleJobServlet {
                 // set return message here
                 logger.debug("deleted job: " + triggerName);
                 addPageMessage("The following job " + triggerName + " and its corresponding Trigger have been deleted from the system.");
+
             } else {
 
                 if (jobScheduler.getTriggerState(TriggerKey.triggerKey(triggerName, finalGroupName)) == Trigger.TriggerState.PAUSED) {

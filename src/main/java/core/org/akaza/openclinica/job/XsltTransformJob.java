@@ -155,12 +155,11 @@ public class XsltTransformJob extends QuartzJobBean {
             logger.debug("found output path: " + outputPath);
             String generalFileDir = dataMap.getString(XML_FILE_PATH);
 
-
             int dsId = dataMap.getInt(DATASET_ID);
             int archivedDatasetFileBeanId = dataMap.getInt(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID);
             ArchivedDatasetFileBean archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.findByPK(archivedDatasetFileBeanId);
-            archivedDatasetFileBean.setStatus(JobStatus.IN_PROGRESS.name());
             archivedDatasetFileBean.setFileReference("");
+            archivedDatasetFileBean.setStatus(JobStatus.IN_PROGRESS.name());
             archivedDatasetFileBean.setDateCreated(new Date());
             archivedDatasetFileBean=(ArchivedDatasetFileBean) archivedDatasetFileDao.update(archivedDatasetFileBean);
 
@@ -466,7 +465,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
                 if (deleteOld) {
                     deleteIntermFiles(intermediateFiles, endFile, dontDelFiles);
-
                     deleteIntermFiles(markForDelete, endFile, dontDelFiles);
 
                 }

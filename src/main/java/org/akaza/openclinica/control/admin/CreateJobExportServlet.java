@@ -207,6 +207,8 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                         .forJob(jobName, xsltService.getTriggerGroupNameForExportJobs())
                         .withDescription(jobDesc)
                         .build();
+
+                trigger.getJobDataMap().put(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID, archivedDatasetFileBean.getId());
                 trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
                 trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());

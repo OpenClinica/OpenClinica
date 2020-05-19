@@ -94,7 +94,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         if(userRoleStudy != null)
             setRoleDescription(role, userRoleStudy);
 
-        if (odmFilter.isCrossForm()) {
+        if (odmFilter != null && odmFilter.isCrossForm()) {
             xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");
         }
 

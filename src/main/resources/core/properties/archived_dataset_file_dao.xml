@@ -35,7 +35,7 @@
         <name>update</name>
         <sql>UPDATE ARCHIVED_DATASET_FILE SET NAME=?, DATASET_ID=?,
             EXPORT_FORMAT_ID=?, FILE_REFERENCE=?, FILE_SIZE=?, RUN_TIME=?,
-            OWNER_ID=?, DATE_CREATED=?, FORMAT=?, STATUS=?, JOB_UUID=? WHERE
+            OWNER_ID=?, DATE_CREATED=?, FORMAT=?, STATUS=?, JOB_UUID=?, DATASET_FILE_UUID=? WHERE
             ARCHIVED_DATASET_FILE_ID=?
         </sql>
     </query>

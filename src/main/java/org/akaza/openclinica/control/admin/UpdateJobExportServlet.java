@@ -220,6 +220,8 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                                 .withRepeatCount(64000)
                                 .withMisfireHandlingInstructionNextWithExistingCount())
                         .build();
+
+                trigger.getJobDataMap().put(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID, archivedDatasetFileBean.getId());
                 trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
                 trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
