@@ -43,9 +43,6 @@
     $(function () {
         $('#sidebar_Info_closed').css('display', 'none');
         $('#sidebar_Info_open').removeAttr('style');
-
-        $('#sidebar_Links_closed').css('display', 'none');
-        $('#sidebar_Links_open').removeAttr('style');
     });
 </script>
 

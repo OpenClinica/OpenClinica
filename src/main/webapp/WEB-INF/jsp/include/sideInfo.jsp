@@ -87,7 +87,7 @@
 
             </td>
         </tr>
-        <tr id="sidebar_Links_open" <c:if test="${!closeQuickLinks}">style="display: none"</c:if>>
+        <tr id="sidebar_Links_open">
             <td class="sidebar_tab">
 
                 <a href="javascript:leftnavExpand('sidebar_Links_open'); leftnavExpand('sidebar_Links_closed');">
@@ -109,7 +109,7 @@
         </tr>
         </tr>
         <%-- OC-8695 --%>
-        <tr id="sidebar_Links_closed" <c:if test="${closeQuickLinks}">style="display: none"</c:if>>
+        <tr id="sidebar_Links_closed" style="display: none">
             <td class="sidebar_tab">
 
                 <a href="javascript:leftnavExpand('sidebar_Links_open'); leftnavExpand('sidebar_Links_closed');"><span
