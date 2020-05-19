@@ -950,11 +950,11 @@ public class SDVUtil {
 //                ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
                 String statusTitle = "";
                 String statusIconClassName = "";
-                if(eventCRFBean.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.LOCKED)){
-                    statusTitle = DataEntryStage.LOCKED.getName();
+                if(eventCrf.getStudyEvent().isCurrentlyLocked()){
+                    statusTitle = EventCrfWorkflowStatusEnum.LOCKED.getDisplayValue();
                     statusIconClassName = FORM_LOCKED_ICON_CLASS_NAME;
                 } else {
-                    statusTitle = resWords.getString("completed");
+                    statusTitle = EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue();
                     statusIconClassName = FORM_COMPLETED_ICON_CLASS_NAME;
                 }
                 crfStatusBuilder.append("<center><a title='" + statusTitle + "' alt='" + statusTitle + "' class='" + statusIconClassName + "' accessCheck' border='0'/></center>");
@@ -1496,9 +1496,9 @@ public class SDVUtil {
             sdvDTO.setSdvRequirement(SourceDataVerification.getByCode(eventDefinitionCrf.getSourceDataVerificationCode()).getDescription());
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
             if(eventCrf.getStudyEvent().isCurrentlyLocked()) {
-                sdvDTO.setFormStatus("locked");
+                sdvDTO.setFormStatus(EventCrfWorkflowStatusEnum.LOCKED.getDisplayValue());
             } else {
-                sdvDTO.setFormStatus("completed"); //EventCrf Status is checked to be UNAVAVAILABLE (i.e. COMPLETED) at parent If Itself
+                sdvDTO.setFormStatus(EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue());
             }
             sdvDTO.setLastVerifiedDate(eventCrf.getLastSdvVerifiedDate());
             sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
