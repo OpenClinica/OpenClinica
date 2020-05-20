@@ -1253,5 +1253,32 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
     public void setObserver(Observer observer) {
 		this.observer = observer;
 	}
+	
+	public boolean isThisRepeatingEventScheduledMoreThanOneTime(int studyId,int sed_Id) {
+       
+        setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), studyId);
+        variables.put(Integer.valueOf(2), studyId);
+        variables.put(Integer.valueOf(3), studyId);
+        variables.put(Integer.valueOf(4), sed_Id);
+        String sql = digester.getQuery("getCountofScheduledMoreThanOneRepeatingEvents");
+
+        ArrayList rows = this.select(sql, variables);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            if(count.intValue() >= 1) {
+            	return true;
+            }else {
+            	return false;
+            }
+           
+        } else {
+            return false;
+        }
+    }
 
 }

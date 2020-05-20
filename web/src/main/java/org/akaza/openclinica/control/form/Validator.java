@@ -458,6 +458,7 @@ public class Validator {
     
     public static final int NO_LEADING_OR_TRAILING_SPACES = 46;
     public static final int DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS = 47;
+    public static final int CAN_NOT_CHANGE_NONE_REPEATING_NOW = 48;
 
     /**
      * The last field for which an addValidation method was invoked. This is
@@ -853,6 +854,9 @@ public class Validator {
             case DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS:
                 errorMessage = resexception.getString("id_can_not_contain_html_lessthan_or_greaterthan_elements");
                 break;
+            case CAN_NOT_CHANGE_NONE_REPEATING_NOW:
+                errorMessage = resexception.getString("current_repeating_event_already_have_data");
+                break;    
             }
         }
         // logger.info("<<<error added: "+errorMessage+" to "+fieldName);
@@ -1148,11 +1152,15 @@ public class Validator {
             if (isSubmissionUrlUnique(fieldName)) {
                 addError(fieldName, v);
             }
+            break;
         case DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS:
             if (doesContainHtmlElements(fieldName)) {
                 addError(fieldName, v);
             }
-break;
+            break;
+        case CAN_NOT_CHANGE_NONE_REPEATING_NOW:
+        	addError(fieldName, v);
+            break;    
      }
         return errors;
     }
@@ -1214,6 +1222,10 @@ break;
         }
         try {
             float f = Float.parseFloat(fieldValue);
+           
+            if(fieldValue.toLowerCase().endsWith("d") || fieldValue.toLowerCase().endsWith("f") || fieldValue.toLowerCase().endsWith("l") || fieldValue.toLowerCase().indexOf("e") > 0) {
+        		return false;
+        	}
         } catch (Exception e) {
             return false;
         }

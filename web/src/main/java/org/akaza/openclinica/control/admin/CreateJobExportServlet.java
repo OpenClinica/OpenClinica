@@ -50,6 +50,7 @@ public class CreateJobExportServlet extends SecureController {
     public static final String STUDY_NAME = "study_name";
 
     private static String SCHEDULER = "schedulerFactoryBean";
+   
     // faking out DRY - should we create a super class, Job Servlet, which
     // captures the scheduler?
     private StdScheduler scheduler;
@@ -137,7 +138,7 @@ public class CreateJobExportServlet extends SecureController {
             forwardPage(Page.CREATE_JOB_EXPORT);
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // collect form information
-            HashMap errors = validateForm(fp, request, scheduler.getTriggerNames("DEFAULT"), "");
+            HashMap errors = validateForm(fp, request, scheduler.getTriggerNames(XsltTriggerService.TRIGGER_GROUP_NAME), "");
 
             if (!errors.isEmpty()) {
                 // set errors to request

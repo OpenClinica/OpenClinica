@@ -124,6 +124,7 @@
                             <input type="radio" checked name="repeating" value="0"><fmt:message key="no" bundle="${resword}"/>
                         </c:otherwise>
                     </c:choose>
+                    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="repeating"/></jsp:include>
                 </td></tr>
 
                 <tr valign="top"><td class="formlabel"><fmt:message key="type" bundle="${resword}"/>:</td><td>
