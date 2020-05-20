@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 
 public class ViewSingleJobServlet extends ScheduleJobServlet {
@@ -48,11 +49,12 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
         logger.debug("found trigger name: " + triggerName);
         logger.debug("found group name: " + groupName);
         TriggerBean triggerBean = new TriggerBean();
-        JobDataMap dataMap = new JobDataMap();
+        JobDataMap dataMap;
         AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource(), getStudyDao());
 
         try {
             triggerBean.setFullName(trigger.getKey().getName());
+            triggerBean.setCreatedDate((Date) trigger.getJobDataMap().get(XsltTriggerService.CREATED_DATE));
             triggerBean.setPreviousDate(trigger.getPreviousFireTime());
             triggerBean.setNextDate(trigger.getNextFireTime());
             // >> set active here, tbh 10/08/2009
@@ -77,6 +79,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 if (gName.equals("") || gName.equals("0")) {
                     String exportFormat = dataMap.getString(XsltTriggerService.EXPORT_FORMAT);
                     String periodToRun = dataMap.getString(ExampleSpringJob.PERIOD);
+                    String createdDate = dataMap.getString("");
                     // int userId = new Integer(userAcctId).intValue();
                     int dsId = dataMap.getInt(ExampleSpringJob.DATASET_ID);
                     triggerBean.setExportFormat(exportFormat);
@@ -84,6 +87,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                     DatasetDAO datasetDAO = new DatasetDAO(sm.getDataSource());
                     DatasetBean dataset = (DatasetBean) datasetDAO.findByPK(dsId);
                     triggerBean.setDataset(dataset);
+
                 }
                 int userId = dataMap.getInt(ExampleSpringJob.USER_ID);
                 // need to set information, extract bean, user account bean

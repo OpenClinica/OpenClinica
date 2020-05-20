@@ -155,25 +155,25 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
                 String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
                 String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
-                List<String> permissionTagsList = permissionService.getPermissionTagsList((Study) request.getSession().getAttribute("study"), request);
                 ODMFilterDTO odmFilter = new ODMFilterDTO();
-                String uniqueKey = UUID.randomUUID().toString();
 
                 try {
                     jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
                     jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
-                    jobScheduler.getContext().put("permissionTagsList", permissionTagsList);
                     jobScheduler.getContext().put("odmFilter", odmFilter);
                 } catch (SchedulerException e) {
                     logger.error("Error in setting the permissions: ", e);
                 }
+
+                String uniqueKey = UUID.randomUUID().toString();
+                Date dateCreated = new Date();
 
                 ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
                 archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
                 archivedDatasetFileBean.setFormat(epBean.getFormatDescription());
                 archivedDatasetFileBean.setOwnerId(userBean.getId());
                 archivedDatasetFileBean.setDatasetId(dsBean.getId());
-                archivedDatasetFileBean.setDateCreated(new Date());
+                archivedDatasetFileBean.setDateCreated(dateCreated);
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
                 archivedDatasetFileBean.setJobUuid(uniqueKey);
@@ -205,6 +205,8 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                         .forJob(jobName, xsltService.getTriggerGroupNameForExportJobs())
                         .withDescription(jobDesc)
                         .build();
+
+                trigger.getJobDataMap().put(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID, archivedDatasetFileBean.getId());
                 trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
                 trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
@@ -212,6 +214,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, uniqueKey);
+                trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, dateCreated);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());

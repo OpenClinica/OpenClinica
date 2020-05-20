@@ -83,10 +83,17 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         String triggerName = fp.getString("tname");
         ExtractUtils extractUtils = new ExtractUtils();
         Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), TRIGGER_EXPORT_GROUP));
+
         //Make sure the Uuid never changes from first creation time, only create one if UUID hasn't been created
         String uniqueKey = updatingTrigger.getJobDataMap().getString(XsltTriggerService.JOB_UUID);
         if (uniqueKey == null) {
             uniqueKey = UUID.randomUUID().toString();
+        }
+
+        Date createdDate = (Date) updatingTrigger.getJobDataMap().get(XsltTriggerService.CREATED_DATE);
+        // for export jobs that were already created before we added this feature, we will give a created date starting now
+        if (createdDate == null) {
+            createdDate = new Date();
         }
 
         if (StringUtil.isBlank(action)) {
@@ -163,13 +170,11 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
                 String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
                 String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
-                List<String> permissionTagsList = permissionService.getPermissionTagsList((Study) request.getSession().getAttribute("study"), request);
                 ODMFilterDTO odmFilter = new ODMFilterDTO();
 
                 try {
                     jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
                     jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
-                    jobScheduler.getContext().put("permissionTagsList", permissionTagsList);
                     jobScheduler.getContext().put("odmFilter", odmFilter);
                 } catch (SchedulerException e) {
                     logger.error("Error in setting the permissions: ", e);
@@ -213,6 +218,8 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                                 .withRepeatCount(64000)
                                 .withMisfireHandlingInstructionNextWithExistingCount())
                         .build();
+
+                trigger.getJobDataMap().put(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID, archivedDatasetFileBean.getId());
                 trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
                 trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
@@ -220,6 +227,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, uniqueKey);
+                trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, createdDate);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());

@@ -37,13 +37,13 @@ public class PauseJobServlet extends ScheduleJobServlet {
             logger.error("Error in receiving application context: ", e);
         }
         Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
-        Trigger trigger = jobScheduler.getTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
         try {
             if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {
                 jobScheduler.deleteJob(JobKey.jobKey(triggerName, finalGroupName));
                 // set return message here
                 logger.debug("deleted job: " + triggerName);
                 addPageMessage("The following job " + triggerName + " and its corresponding Trigger have been deleted from the system.");
+
             } else {
 
                 if (jobScheduler.getTriggerState(TriggerKey.triggerKey(triggerName, finalGroupName)) == Trigger.TriggerState.PAUSED) {

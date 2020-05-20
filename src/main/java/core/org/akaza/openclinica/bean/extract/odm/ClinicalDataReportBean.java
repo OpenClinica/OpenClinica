@@ -81,6 +81,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     + StringEscapeUtils.escapeXml(this.clinicalData.getMetaDataVersionOID()) + "\">");
             xml.append(nls);
         }
+
         Role role = null; // OpenClinica:
         StudyUserRoleBean userRole = null;
         Study publicStudyBean = studyDao.getPublicStudy(userBean.getActiveStudyId());

@@ -111,7 +111,8 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(9), fb.getFormat());
         variables.put(Integer.valueOf(10), fb.getStatus());
         variables.put(Integer.valueOf(11), fb.getJobUuid());
-        variables.put(Integer.valueOf(12), Integer.valueOf(fb.getId()));
+        variables.put(Integer.valueOf(12), fb.getJobExecutionUuid());
+        variables.put(Integer.valueOf(13), Integer.valueOf(fb.getId()));
 
         this.execute(digester.getQuery("update"), variables, nullVars);
         if (isQuerySuccessful()) {

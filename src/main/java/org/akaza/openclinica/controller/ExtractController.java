@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -205,6 +206,8 @@ public class ExtractController {
         archivedDatasetFileBean.setDateCreated(new Date());
         archivedDatasetFileBean.setExportFormatId(1);
         archivedDatasetFileBean.setFileReference("");
+        archivedDatasetFileBean.setJobUuid(UUID.randomUUID().toString());
+        archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
 
         ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(dataSource);
         archivedDatasetFileBean=(ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);

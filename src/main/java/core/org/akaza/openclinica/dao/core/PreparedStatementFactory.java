@@ -62,6 +62,7 @@ public class PreparedStatementFactory {
                     Integer nullType = (Integer) nullVars.get(order);
                     ps.setNull(order.intValue(), nullType.intValue());
                 } else {
+                    logger.error("Some variables were missing from the ran statement: " + ps);
                     throw new NullPointerException("No type found for this null object at order:" + order + ", make sure you set the type in your DAO.");
                 }
             } else {
