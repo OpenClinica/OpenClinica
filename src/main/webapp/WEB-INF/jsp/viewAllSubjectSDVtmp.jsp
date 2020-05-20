@@ -502,7 +502,7 @@
 
                     item.lastVerifiedDate = data.lastVerifiedDate;
                     if (item.lastVerifiedDate != null && item.lastModifiedDate > item.lastVerifiedDate) {
-                        item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
+                        item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16" title="Value changed since last verified">';
                     }
                     if (item.lastVerifiedDate) {
                         item.lastVerifiedDate = formatDateTime(item.lastVerifiedDate);
