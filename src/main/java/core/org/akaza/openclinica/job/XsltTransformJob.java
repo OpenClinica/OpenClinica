@@ -61,6 +61,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.util.StringUtils;
+
+
 /**
  * Xalan Transform Job, an XSLT transform job using the Xalan classes
  *
@@ -121,7 +123,7 @@ public class XsltTransformJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) {
         logger.info("Job " + context.getJobDetail().getDescription() + " started.");
         JobDataMap dataMap = context.getMergedJobDataMap();
-        initDependencies(context.getScheduler(),dataMap);
+        initDependencies(context.getScheduler(), dataMap);
         // need to generate a Locale for emailing users with i18n
         // TODO make dynamic?
         Locale locale = new Locale("en-US");
@@ -181,8 +183,8 @@ public class XsltTransformJob extends QuartzJobBean {
             long sysTimeBegin = System.currentTimeMillis();
             userBean = (UserAccountBean) userAccountDao.findByPK(userAccountId);
 
-            Study currentStudy = (Study) studyDao.findByPK(studyId);
-            Study parentStudy = (Study) studyDao.findByPK(currentStudy.checkAndGetParentStudyId());
+            Study currentStudy = studyDao.findByPK(studyId);
+            Study parentStudy = studyDao.findByPK(currentStudy.checkAndGetParentStudyId());
             String successMsg = epBean.getSuccessMessage();
             String failureMsg = epBean.getFailureMessage();
             final long start = System.currentTimeMillis();
@@ -195,11 +197,9 @@ public class XsltTransformJob extends QuartzJobBean {
             logger.debug("--> job starting: ");
             String permissionTagsString = (String) context.getScheduler().getContext().get("permissionTagsString");
             String[] permissionTagsStringArray = (String[]) context.getScheduler().getContext().get("permissionTagsStringArray");
-            List <String> permissionTagsList = (List <String>) context.getScheduler().getContext().get("permissionTagsList");
-
             ODMFilterDTO odmFilter = (ODMFilterDTO) context.getScheduler().getContext().get("odmFilter");
-            Set<Integer> edcSet = new HashSet<>();
 
+            Set<Integer> edcSet = new HashSet<>();
             ArchivedDatasetFileBean fbFinal=null;
             ClinicalDataCollector.datasetFiltered="NO";
 

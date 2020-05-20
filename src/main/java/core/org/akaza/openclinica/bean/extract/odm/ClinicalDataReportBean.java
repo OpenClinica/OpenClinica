@@ -81,6 +81,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     + StringEscapeUtils.escapeXml(this.clinicalData.getMetaDataVersionOID()) + "\">");
             xml.append(nls);
         }
+
         Role role = null; // OpenClinica:
         StudyUserRoleBean userRole = null;
         Study publicStudyBean = studyDao.getPublicStudy(userBean.getActiveStudyId());
@@ -94,7 +95,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         if(userRoleStudy != null)
             setRoleDescription(role, userRoleStudy);
 
-        if (odmFilter != null && odmFilter.isCrossForm()) {
+        if (odmFilter.isCrossForm()) {
             xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");
         }
 
