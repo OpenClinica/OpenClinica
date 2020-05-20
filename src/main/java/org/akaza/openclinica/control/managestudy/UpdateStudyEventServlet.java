@@ -97,6 +97,7 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String STUDY_EVENT = "study_event";
     public static final String PREV_STUDY_EVENT_SIGNED_STATUS = "prev_study_event_workflow_status";
+    public static final String NEW_STATUS = "newStatus";
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -310,6 +311,7 @@ public class UpdateStudyEventServlet extends SecureController {
             studyEvent.setWorkflowStatus(ses);
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+            String newStatus = fp.getString(NEW_STATUS);
             if (ses.equals(StudyEventWorkflowStatusEnum.SKIPPED) ) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
@@ -320,8 +322,22 @@ public class UpdateStudyEventServlet extends SecureController {
                     ecdao.update(ecb);
                 }
             } else {
+                if (newStatus != null) {
+                    if (newStatus.equalsIgnoreCase(Status.LOCKED.getName())) {
+                        studyEvent.setLocked(true);
+                    } else {
+                        studyEvent.setLocked(false);
+                    }
+                }
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
+                    if (newStatus != null) {
+                        if (newStatus.equalsIgnoreCase(Status.LOCKED.getName())) {
+                            ecb.setStatus(Status.UNAVAILABLE);
+                        } else {
+                            ecb.setStatus(Status.AVAILABLE);
+                        }
+                    }
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
                     ecdao.update(ecb);
