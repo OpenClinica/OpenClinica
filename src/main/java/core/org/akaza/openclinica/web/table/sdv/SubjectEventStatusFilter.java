@@ -13,9 +13,10 @@ public class SubjectEventStatusFilter extends DroplistFilterEditor {
     @Override
     protected List<Option> getOptions() {
         List<Option> options = new ArrayList<Option>();
+        options.add(new Option("locked", "Locked"));
         for (StudyEventWorkflowStatusEnum workflowStatus : StudyEventWorkflowStatusEnum.values()) {
                 String subjectEventStatusDesc = workflowStatus.getDisplayValue();
-                options.add(new Option(workflowStatus.toString(), workflowStatus.getDisplayValue()));
+                options.add(new Option(workflowStatus.getDisplayValue(), workflowStatus.getDisplayValue()));
         }
         return options;
     }
