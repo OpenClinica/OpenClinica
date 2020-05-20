@@ -382,6 +382,19 @@
             order by study_event_id
             </sql>
     </query>
+     <query>
+        <name>findAllByStudyEventDefinition</name>
+        <sql>select ec.* from event_crf  ec, crf c ,crf_version cv,study_event se
+            where ec.crf_version_id=cv.crf_version_id
+            and c.crf_id=cv.crf_id
+			and se.study_event_id=ec.study_event_id
+			and se.study_event_definition_id=?
+            and c.crf_id in 
+            (select crf_id from event_definition_crf 
+            where study_event_definition_id =? and study_id =?)
+            order by study_event_id
+         </sql>
+    </query>
     <query>
         <name>findAllByCRFVersion</name>
         <sql>select ec.* from event_crf  ec, crf_version cv

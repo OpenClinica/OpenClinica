@@ -323,4 +323,19 @@
 			LIMIT 1
         </sql>
     </query>
+     <query>
+	        <name>getCountofScheduledMoreThanOneRepeatingEvents</name>
+	        <sql>
+	           select count(*) count from 	(		
+				select se.study_event_definition_id, edc.study_id, se.study_subject_id,count(*) cnt
+				from study_event se, event_definition_crf edc, study st 
+				where se.study_event_definition_id=edc.study_event_definition_id
+				AND edc.study_id = st.study_id
+				AND (st.study_id = ? or st.parent_study_id=?)
+				and edc.study_id =?
+				and  edc.study_event_definition_id =? 
+				group by se.study_event_definition_id, edc.study_id,se.study_subject_id
+				) scheduled where cnt >1
+	        </sql>
+	  </query>
 </queries>
