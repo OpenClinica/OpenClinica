@@ -261,10 +261,6 @@
         white-space: nowrap;
     }
 
-    #sdv tbody td:empty:nth-child(6)::after {
-        content: "N/A";
-    }
-
     #sdv-details {
         padding: 10px;
         background-color: lightgray;
@@ -488,7 +484,7 @@
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
                 $('#siteId').text(data.siteId);
-                $('#eventStartDate').text(data.eventStartDate || 'N/A');
+                $('#eventStartDate').text(data.eventStartDate);
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
