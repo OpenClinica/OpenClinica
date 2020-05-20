@@ -242,6 +242,10 @@
         font-weight: normal;
     }
 
+    #sdv-items td {
+        word-wrap: anywhere;
+    }
+
     #sdv-items .icon::before {
         padding: 0;
         min-width: 1.45em;
