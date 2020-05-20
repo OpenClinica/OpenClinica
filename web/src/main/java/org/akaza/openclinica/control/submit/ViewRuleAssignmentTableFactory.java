@@ -1,5 +1,7 @@
 package org.akaza.openclinica.control.submit;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -972,9 +974,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     }
 
     public String encodeTarget(String target){
-        target= StringUtils.replace(target,"[", "%5B");
-        target= StringUtils.replace(target,"]", "%5D");
-        return target;
+        try{
+            return URLEncoder.encode(target, StandardCharsets.UTF_8.toString());
+        }catch(UnsupportedEncodingException ex){
+            return target;
+        }
     }
 
     private String convertMessage(String message) {
