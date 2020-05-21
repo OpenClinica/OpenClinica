@@ -118,6 +118,9 @@
     .actions .icon.icon-lock:before {
         content: "\e811";
     }
+    .actions .icon.icon-lock-open:before {
+        content: "\e812";
+    }
 }
 </style>
 
@@ -137,6 +140,10 @@
             s = s.join(', ');
         s = s.trim();
         return s.length < length ? s : s.substring(0, length) + '...';
+    });
+
+    Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+        return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
@@ -194,7 +201,11 @@
                         <td class="actions">
                             {{#each submission.links as |link|}}
                                 <a href="${pageContext.request.contextPath}{{link.[@href]}}">
-                                    <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
+                                    {{#ifEquals link.[@rel] "lock-open"}}
+                                        <span class="icon icon-{{link.[@rel]}}" alt="Unlock" title="Unlock"></span>
+                                    {{else}}
+                                        <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
+                                    {{/ifEquals}}
                                 </a>
                             {{/each}}
                         </td>
@@ -238,7 +249,7 @@ $(function() {
             var item = items[i];
             try {
                 if (condition(item))
-                    return item;                
+                    return item;
             }
             catch (e) {
                 logError('Unable to process' + item, e);
@@ -346,7 +357,7 @@ $(function() {
         var numVisitBased = 0;
         foreach(metadata.StudyEventDef, function(studyEvent) {
             studyEvents[studyEvent['@OID']] = studyEvent;
-            
+
             var eventType = studyEvent['@OpenClinica:EventType'];
             if (eventType === 'Common') {
                 if (studyEvent['@OpenClinica:Status'] !== 'DELETED')
@@ -410,7 +421,7 @@ $(function() {
         }, errors);
 
         if (numVisitBased && $('#subjectEvents').hasClass('hide')) {
-            showSection(1, '#subjectEvents');            
+            showSection(1, '#subjectEvents');
         }
 
         var hideClass = 'oc-status-removed';
