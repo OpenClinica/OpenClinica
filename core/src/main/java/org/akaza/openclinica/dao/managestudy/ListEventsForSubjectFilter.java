@@ -78,10 +78,10 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                     " and ec.validator_id= 0 and date_validate_completed is not null )" +
                     " and se.study_event_definition_id = "+studyEventDefinitionId;
                 }
-                else if (value.equals("2")){ //DAtaEntryStage.Initial_data_entry
+                else if (value.equals("2")){ //DAtaEntryStage.Initial_data_entry with subject_event_status is DES and status is AVAILABLE
                     criteria += " and  se.study_EVENT_ID  in(select study_event_id from  event_crf ec,crf_version cv where " +
                     		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( date_validate_completed is  null  or DATE_COMPLETED is NULL ) )"+
-                    		 "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 3";
+                    		 "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 3 and se.status_id = 1";
  
         
                 }

@@ -200,20 +200,23 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
         Limit limit = tableFacade.getLimit();
-        
+
         ListEventsForSubjectFilter eventsForSubjectFilter = getListEventsForSubjectFilter(limit);
 
+        //Used on Initial sort without filters
         if (!limit.isComplete()) {
             int totalRows = getStudySubjectDAO().getCountWithFilter(eventsForSubjectFilter, getStudyBean());
             tableFacade.setTotalRows(totalRows);
         }
 
+        //Preprocess the studysubjectbean list to find subjects with crf status
         ListEventsForSubjectSort eventsForSubjectSort = getListEventsForSubjectSort(limit);
 
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
         Collection<StudySubjectBean> items =
-            getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), eventsForSubjectFilter, eventsForSubjectSort, rowStart, rowEnd);
+                getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), eventsForSubjectFilter, eventsForSubjectSort, rowStart, rowEnd);
+
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
         for (StudySubjectBean studySubjectBean : items) {
@@ -238,17 +241,11 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             }
             subjectGroupMapBean = null;
 
-            // Get EventCrfs for study Subject
-            List<EventCRFBean> eventCrfs = getEventCRFDAO().findAllByStudySubject(studySubjectBean.getId());
-            HashMap<String, EventCRFBean> crfAsKeyEventCrfAsValue = new HashMap<String, EventCRFBean>();
-            for (EventCRFBean eventCRFBean : eventCrfs) {
-                CRFBean crf = getCrfDAO().findByVersionId(eventCRFBean.getCRFVersionId());
-                crfAsKeyEventCrfAsValue.put(crf.getId() + "_" + eventCRFBean.getStudyEventId(), eventCRFBean);
-            }
+            HashMap<String, EventCRFBean> crfAsKeyEventCrfAsValue = getEventsCrfsForStudySubject(studySubjectBean);
 
             // Get the event Status
             List<StudyEventBean> eventsForStudySubjectAndEventDefinitions =
-                getStudyEventDAO().findAllByDefinitionAndSubject(selectedStudyEventDefinition, studySubjectBean);
+                    getStudyEventDAO().findAllByDefinitionAndSubject(selectedStudyEventDefinition, studySubjectBean);
             List<DisplayBean> events = new ArrayList<DisplayBean>();
             // study event size < 1
             if (eventsForStudySubjectAndEventDefinitions.size() < 1) {
@@ -304,6 +301,22 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         // Do not forget to set the items back on the tableFacade.
         tableFacade.setItems(theItems);
 
+    }
+
+    /**
+     * This builds a hashmap object whose key is "crfId_eventId". This is to target a specific form
+     * in an event if the form is used elsewhere.
+     * @param studySubjectBean
+     * @return
+     */
+    private HashMap<String, EventCRFBean> getEventsCrfsForStudySubject(StudySubjectBean studySubjectBean){
+        List<EventCRFBean> eventCrfs = getEventCRFDAO().findAllByStudySubject(studySubjectBean.getId());
+        HashMap<String, EventCRFBean> crfAsKeyEventCrfAsValue = new HashMap<>();
+        for (EventCRFBean eventCRFBean : eventCrfs) {
+            CRFBean crf = getCrfDAO().findByVersionId(eventCRFBean.getCRFVersionId());
+            crfAsKeyEventCrfAsValue.put(crf.getId() + "_" + eventCRFBean.getStudyEventId(), eventCRFBean);
+        }
+        return crfAsKeyEventCrfAsValue;
     }
 
     private EventDefinitionCRFBean getEventDefinitionCRFBean(Integer studyEventDefinitionId, CRFBean crfBean, StudySubjectBean studySubject) {
