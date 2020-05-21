@@ -60,6 +60,7 @@
                 </td>
             </c:if>
             <td>
+
                         <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
                             <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
                             onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
@@ -222,7 +223,6 @@
                                     <tr>
                                                 <td>
                                                     <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && currRow.bean.studyEvent.workflowStatus != 'SKIPPED' && currRow.bean.studyEvent.workflowStatus != 'STOPPED'}">
-
                                                         <c:choose>
                                                             <c:when test="${dedc.eventCRF.id != 0}">
                                                                 <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"

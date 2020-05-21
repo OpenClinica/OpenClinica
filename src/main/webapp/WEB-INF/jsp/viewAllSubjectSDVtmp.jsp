@@ -43,9 +43,6 @@
     $(function () {
         $('#sidebar_Info_closed').css('display', 'none');
         $('#sidebar_Info_open').removeAttr('style');
-
-        $('#sidebar_Links_closed').css('display', 'none');
-        $('#sidebar_Links_open').removeAttr('style');
     });
 </script>
 
@@ -242,6 +239,10 @@
         font-weight: normal;
     }
 
+    #sdv-items td {
+        word-wrap: anywhere;
+    }
+
     #sdv-items .icon::before {
         padding: 0;
         min-width: 1.45em;
@@ -258,10 +259,6 @@
 
     #sdv td:last-child {
         white-space: nowrap;
-    }
-
-    #sdv tbody td:empty:nth-child(6)::after {
-        content: "N/A";
     }
 
     #sdv-details {
@@ -487,7 +484,7 @@
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
                 $('#siteId').text(data.siteId);
-                $('#eventStartDate').text(data.eventStartDate || 'N/A');
+                $('#eventStartDate').text(data.eventStartDate);
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
