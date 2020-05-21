@@ -1,5 +1,8 @@
 package org.akaza.openclinica.control.submit;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -39,6 +42,7 @@ import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -948,7 +952,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     private String testEditByDesignerBuilder(String target, String ruleOid, String runTime, String message) {
         HtmlBuilder actionLink = new HtmlBuilder();
-        // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
+        // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/
+        target = encodeTarget(target);
         setDesignerLink(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName());
         actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment&runTime="+ runTime +"&msg="+ convertMessage(message));
         actionLink.append("target=\"_parent\"");
@@ -966,6 +971,14 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     public void setDesignerLink(String designerLink)
     {
         this.designerLink = designerLink;
+    }
+
+    public String encodeTarget(String target){
+        try{
+            return URLEncoder.encode(target, StandardCharsets.UTF_8.toString());
+        }catch(UnsupportedEncodingException ex){
+            return target;
+        }
     }
 
     private String convertMessage(String message) {
