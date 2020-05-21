@@ -943,7 +943,7 @@ public class SDVUtil {
                 tempSDVBean.setOpenQueries("<center>" + openQueriesCount + "</center>");
             tempSDVBean.setCrfName(getCRFName(eventCRFBean.getCRFVersionId()));
             tempSDVBean.setCrfVersion(getFormLayoutName(eventCRFBean.getFormLayoutId()));
-                String eventCrfWorkflowStatus = eventCRFBean.getWorkflowStatus().toString();
+                String eventCrfWorkflowStatus = eventCRFBean.getWorkflowStatus().getDisplayValue();
                 StringBuilder crfStatusBuilder = new StringBuilder(new HtmlBuilder().toString());
                 String input = "<input type=\"hidden\" statusId=\"" + eventCrfWorkflowStatus + "\" />";
                 // "<input type=\"hidden\" statusId=\"1\" />"
