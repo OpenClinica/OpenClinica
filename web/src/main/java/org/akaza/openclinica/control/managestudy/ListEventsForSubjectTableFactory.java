@@ -217,11 +217,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         Collection<StudySubjectBean> items =
                 getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), eventsForSubjectFilter, eventsForSubjectSort, rowStart, rowEnd);
 
-        if(eventsForSubjectFilter.getFilters() != null){
-            items = getSubjectListByCrfStatusFilter(items, eventsForSubjectFilter);
-            tableFacade.setTotalRows(items.size()); //reset the total rows for the table based on filters
-        }
-
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
         for (StudySubjectBean studySubjectBean : items) {
@@ -306,56 +301,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         // Do not forget to set the items back on the tableFacade.
         tableFacade.setItems(theItems);
 
-    }
-
-    /**
-     * Creates the subjects list whose crfs match the user's filter
-     * choice from the Subject Matrix.
-     * @param studySubjectBeans
-     * @param eventsForSubjectFilter
-     * @return
-     */
-    private Collection<StudySubjectBean> getSubjectListByCrfStatusFilter(Collection<StudySubjectBean> studySubjectBeans, ListEventsForSubjectFilter eventsForSubjectFilter) {
-        Collection<StudySubjectBean> filteredStudySubjects = new ArrayList<>();
-        HashMap<String,String> filters = eventsForSubjectFilter.getFilters();
-
-        for(StudySubjectBean subject: studySubjectBeans){
-            List<StudyEventBean> events =
-                    getStudyEventDAO().findAllByDefinitionAndSubject(selectedStudyEventDefinition, subject);
-            HashMap<String, EventCRFBean> crfAsKeyEventCrfAsValue = getEventsCrfsForStudySubject(subject);
-            List<CRFBean> crfs = getCrfs(selectedStudyEventDefinition);
-
-            //Look through the events of the subjects
-            for(StudyEventBean event: events){
-                //Look through the crfs associated with the event
-                for(CRFBean crf: crfs){
-                    /*
-                     * Get the displayed crf status (DataEntryStage) filter value
-                     * and check to see if the event crf bean's displayed crf status matches
-                     * the user's selected displayed crf status. Add the subject if there
-                     * is a match.
-                     */
-                    String dataEntryStageFilter = filters.get(Integer.toString(crf.getId()));
-
-                    //Get the specific event crf bean associated with event and crf
-                    EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + event.getId());
-                    if (eventCRFBean != null) {
-
-                        if(dataEntryStageFilter != null){
-                            DataEntryStage filterStage = DataEntryStage.get(Integer.parseInt(dataEntryStageFilter));
-                            if(eventCRFBean.getStage() == filterStage ){
-                                filteredStudySubjects.add(subject);
-                                break;
-                            }
-                        }
-                    }else if(dataEntryStageFilter!=null && dataEntryStageFilter.equals("1")){//DataEntryStage.UNCOMPLETED
-                        filteredStudySubjects.add(subject);
-                    }
-                }
-            }
-        }
-
-        return filteredStudySubjects;
     }
 
     /**
