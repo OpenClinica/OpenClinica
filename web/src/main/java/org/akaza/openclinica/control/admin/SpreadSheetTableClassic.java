@@ -1806,7 +1806,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
      *            the subject line
      * @return A string with all the quotes escaped.
      */
-    public String stripQuotes(String subj) {
+    /*public String stripQuotes(String subj) {
         if (subj == null) {
             return null;
         }
@@ -1822,7 +1822,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
             returnme += subjarray[subjarray.length - 1];
         }
         return returnme;
-    }
+    }*/
 
     public String getValue(HSSFCell cell) {
         String val = null;

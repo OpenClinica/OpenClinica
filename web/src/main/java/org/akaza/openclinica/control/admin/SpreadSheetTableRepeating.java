@@ -2794,7 +2794,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
      *            the subject line
      * @return A string with all the quotes escaped.
      */
-    public String stripQuotes(String subj) {
+    /*public String stripQuotes(String subj) {
         if (subj == null) {
             return null;
         }
@@ -2810,7 +2810,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
             returnme += subjarray[subjarray.length - 1];
         }
         return returnme;
-    }
+    }*/
 
     public String getValue(HSSFCell cell) {
         String val = null;
