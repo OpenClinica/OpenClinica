@@ -304,6 +304,11 @@
         background-color: transparent;
     }
 
+    .sdvCheck {
+        position: relative;
+        left: 3px;
+    }
+
     .icon.icon-icon-SDV-doubleCheck {
         margin-top: 1px;
     }
