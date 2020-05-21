@@ -969,19 +969,20 @@ public class SDVUtil {
                 tempSDVBean.setCrfStatus(crfStatusBuilder.toString());
                 String studyEventStatusName ;
                 String studyEventStatusDisplayName;
-            if(studyEvent.getLocked() != null && studyEvent.getLocked()){
-                studyEventStatusName = LOCKED_STATUS;
+            if(studyEvent.isCurrentlyLocked())
                 studyEventStatusDisplayName = LOCKED_STATUS;
-            }else if(studyEvent.getSigned() != null && studyEvent.getSigned()){
-                studyEventStatusName = SIGNED_STATUS;
+            else if(studyEvent.isCurrentlySigned())
                 studyEventStatusDisplayName = SIGNED_STATUS;
-            }else if( (studyEvent.getArchived()!= null && studyEvent.getArchived()) || (studyEvent.getRemoved() != null && studyEvent.getRemoved())){
-                studyEventStatusName = INVALID_STATUS;
+            else if( studyEvent.isCurrentlyArchived() || studyEvent.isCurrentlyRemoved())
                 studyEventStatusDisplayName = INVALID_STATUS;
-            }else{
-                studyEventStatusName = studyEvent.getWorkflowStatus().toString();
+            else
                 studyEventStatusDisplayName = studyEvent.getWorkflowStatus().getDisplayValue();
-            }
+
+            if(StudyEventWorkflowStatusEnum.getByI18nDescription(studyEventStatusDisplayName) == null)
+                studyEventStatusName = studyEventStatusDisplayName;
+            else
+                studyEventStatusName = StudyEventWorkflowStatusEnum.getByI18nDescription(studyEventStatusDisplayName).toString();
+
             tempSDVBean.setSubjectEventStatus("<center><a title='"+studyEventStatusDisplayName+"' alt='"+studyEventStatusDisplayName+"' class='"+STUDY_EVENT_WORKFLOW_ICONS.get(studyEventStatusName)+"' accessCheck' border='0'/></center>");
 
             // TODO: I18N Date must be formatted properly
