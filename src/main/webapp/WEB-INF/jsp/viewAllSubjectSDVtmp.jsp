@@ -441,6 +441,10 @@
         return moment(date).utc().format('DD-MMM-YYYY hh:mm');
     }
 
+    function isMidnight(date) {
+        return moment(date).utc().format('HHmmssSSS') === '000000000';
+    }
+
     function calcPopupPos() {
         var winWidth = $(window).width();
         if (winWidth < 900) {
@@ -515,7 +519,12 @@
                     else {
                         item.lastVerifiedDate = '';
                     }
+
+                    var legacyItem = isMidnight(item.lastModifiedDate);
                     item.lastModifiedDate = formatDateTime(item.lastModifiedDate);
+                    if (legacyItem) { // don't display the time component
+                        item.lastModifiedDate = item.lastModifiedDate.split(' ')[0];
+                    }
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName;
 
                     item.actions = '';
