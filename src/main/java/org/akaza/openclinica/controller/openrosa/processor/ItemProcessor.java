@@ -21,7 +21,6 @@ import core.org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import core.org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
 import core.org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import core.org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
-import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.CrfVersion;
 import core.org.akaza.openclinica.domain.datamap.Item;
 import core.org.akaza.openclinica.domain.datamap.ItemData;
@@ -188,7 +187,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                         groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                     }
                     newItemData.setInstanceId(container.getInstanceId());
-                    itemDataDao.saveOrUpdate(newItemData);
+                    itemDataDao.auditedSaveOrUpdate(newItemData);
 
                 } else if (existingItemData.getValue().equals(newItemData.getValue())) {
                     // Existing item. Value unchanged. Do nothing.
@@ -197,10 +196,8 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     existingItemData.setValue(newItemData.getValue());
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
-                    itemDataDao.saveOrUpdate(existingItemData);
+                    itemDataDao.auditedSaveOrUpdate(existingItemData);
                 }
-
-                kafkaService.sendItemDataChangeMessage(existingItemData);
             }
         }
     }
@@ -256,7 +253,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     itemData.setUserAccount(container.getUser());
                     itemData.setUpdateId(container.getUser().getUserId());
                     itemData.setInstanceId(container.getInstanceId());
-                    itemData = itemDataDao.saveOrUpdate(itemData);
+                    itemData = itemDataDao.auditedSaveOrUpdate(itemData);
 
                     // Close discrepancy notes
                     closeItemDiscrepancyNotes(container, itemData);

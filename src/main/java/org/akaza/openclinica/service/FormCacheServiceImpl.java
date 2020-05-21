@@ -34,7 +34,7 @@ public class FormCacheServiceImpl {
                 asyncExpirationListener(formListener).
                 maxSize(256).
                 expirationPolicy(ExpirationPolicy.ACCESSED).
-                expiration(40, TimeUnit.SECONDS).
+                expiration(3600, TimeUnit.SECONDS).
                 build();
     }
 

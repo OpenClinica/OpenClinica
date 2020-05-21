@@ -17,7 +17,6 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -203,9 +202,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUserAccount(container.getUser());
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setInstanceId(container.getInstanceId());
-                    existingItemData = itemDataDao.saveOrUpdate(existingItemData);
 
-                    kafkaService.sendItemDataChangeMessage(existingItemData);
+                    itemDataDao.auditedSaveOrUpdate(existingItemData);
                     updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                     resetSdvStatus(container);
 
@@ -214,9 +212,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 } else if (itemOrdinal < maxRowCount) {
                     ItemData newItemData = createItemData(ig.getItem(), "", itemOrdinal, container);
                     newItemData.setDeleted(true);
-                    newItemData = itemDataDao.saveOrUpdate(newItemData);
+                    itemDataDao.auditedSaveOrUpdate(newItemData);
 
-                    kafkaService.sendItemDataChangeMessage(newItemData);
                     updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                 }
             }
@@ -273,9 +270,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
                 ItemData randomizeDataCheck = null;
                 if (existingItemData == null) {
-                    itemDataDao.saveOrUpdate(newItemData);
-
-                    kafkaService.sendItemDataChangeMessage(newItemData);
+                    itemDataDao.auditedSaveOrUpdate(newItemData);
                     updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
 
                     resetSdvStatus(container);
@@ -286,9 +281,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setValue(newItemData.getValue());
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
-                    itemDataDao.saveOrUpdate(existingItemData);
-
-                    kafkaService.sendItemDataChangeMessage(existingItemData);
+                    itemDataDao.auditedSaveOrUpdate(existingItemData);
 
                     updateEventAndSubjectStatusIfSigned(container.getEventCrf().getStudyEvent(),container.getSubject(),container.getUser());
                     resetSdvStatus(container);

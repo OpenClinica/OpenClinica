@@ -11,10 +11,14 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+//@ConditionalOnProperty(name = "sun.java.launcher", havingValue = "skdlsalkdjsa")
+@ConditionalOnProperty(name = "kafka.auditing", havingValue = "true")
 public class AuditStudyEventAspect {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     private KafkaService kafkaService;

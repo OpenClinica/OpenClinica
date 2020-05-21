@@ -505,24 +505,9 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.NoAccessServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>DefineStudyEvent</display-name>
-        <servlet-name>DefineStudyEventServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.DefineStudyEventServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>ListEventDefinition</display-name>
         <servlet-name>ListEventDefinitionServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ListEventDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>RemoveCRFFromDefinition</display-name>
-        <servlet-name>RemoveCRFFromDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveCRFFromDefinitionServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>RestoreCRFFromDefinition</display-name>
-        <servlet-name>RestoreCRFFromDefinitionServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreCRFFromDefinitionServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ViewEventDefinition</display-name>
@@ -533,12 +518,6 @@
         <display-name>ViewEventDefinitionReadOnly</display-name>
         <servlet-name>ViewEventDefinitionReadOnlyServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewEventDefinitionReadOnlyServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>CreateCRF</display-name>
-
-        <servlet-name>CreateCRFServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.CreateCRFServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ExtractDatasetsMain</display-name>
@@ -1311,10 +1290,6 @@
         <url-pattern>/NoAccess</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>DefineStudyEventServlet</servlet-name>
-        <url-pattern>/DefineStudyEvent</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ListEventDefinitionServlet</servlet-name>
         <url-pattern>/ListEventDefinition</url-pattern>
     </servlet-mapping>
@@ -1343,24 +1318,12 @@
         <url-pattern>/CreateNewStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RemoveCRFFromDefinitionServlet</servlet-name>
-        <url-pattern>/RemoveCRFFromDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RestoreCRFFromDefinitionServlet</servlet-name>
-        <url-pattern>/RestoreCRFFromDefinition</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ViewEventDefinitionServlet</servlet-name>
         <url-pattern>/ViewEventDefinition</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewEventDefinitionReadOnlyServlet</servlet-name>
         <url-pattern>/ViewEventDefinitionReadOnly</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateCRFServlet</servlet-name>
-        <url-pattern>/CreateCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ExtractDatasetsMainServlet</servlet-name>

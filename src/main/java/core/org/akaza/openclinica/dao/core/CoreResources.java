@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -50,13 +51,6 @@ public class CoreResources implements InitializingBean {
     private static Properties EXTRACTINFO;
     private static KeyCloakConfiguration KEYCLOAKCONFIG;
 
-    public static final Integer PDF_ID = 10;
-    public static final Integer TAB_ID = 8;
-    public static final Integer CDISC_ODM_1_2_ID = 5;
-    public static final Integer CDISC_ODM_1_2_EXTENSION_ID = 4;
-    public static final Integer CDISC_ODM_1_3_ID = 3;
-    public static final Integer CDISC_ODM_1_3_EXTENSION_ID = 2;
-    public static final Integer SPSS_ID = 9;
     private static final String DATA_INFO_FILE_NAME = "datainfo.properties";
     private static final String EXTRACT_INFO_FILE_NAME = "extract.properties";
     private static final String EXTERNAL_PROPERTY_DIRECTORY = System.getProperty("user.home") + "/runtime-config/";
@@ -71,6 +65,11 @@ public class CoreResources implements InitializingBean {
     // default no arg constructor
     public CoreResources() {
 
+    }
+
+    // Used for pushing the datainfo properties into the Spring environment context.
+    public static Properties getDatainfoProperties(){
+        return DATAINFO;
     }
 
     /**
@@ -979,6 +978,14 @@ public class CoreResources implements InitializingBean {
         return value;
     }
 
+    // Kafka
+    // Aspects
+    //
+    public static String isKafkaEnabled() {
+        String value = getField("kafkaBrokers");
+        return value;
+    }
+
     // TODO internationalize
     public static String getExtractField(String key) {
         String value = EXTRACTINFO.getProperty(key);
@@ -1097,6 +1104,7 @@ public class CoreResources implements InitializingBean {
 
     // Overwrites external properties (if present) on Internal properties
     public static Properties loadProperties(String fileProps) {
+        logger.info("//////////////////////////////////////////////////////////////// Loading datainfo.properties ////////////////////////////////////////////////////////////////");
         Properties internalProp = null;
         InputStream inpStream;
         Properties externalProp = null;

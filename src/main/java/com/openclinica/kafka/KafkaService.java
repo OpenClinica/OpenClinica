@@ -3,6 +3,7 @@ package com.openclinica.kafka;
 import com.openclinica.kafka.dto.*;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
@@ -12,6 +13,7 @@ import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +26,15 @@ public class KafkaService {
   @Autowired
   StudyEventDao studyEventDao;
   @Autowired
+  EventCrfDao eventCrfDao;
+  @Autowired
+  ItemDao itemDao;
+  @Autowired
   private StudyEventDefinitionDao studyEventDefinitionDao;
   @Autowired
   private CoreUtilServiceImpl coreUtilService;
+  @Autowired
+  private Environment environment;
 
   public void sendFormChangeMessage(FormChangeDTO formChangeDTO) throws Exception {
     Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
@@ -74,6 +82,15 @@ public class KafkaService {
   public void sendItemDataChangeMessage(ItemData itemData) throws Exception {
 
     ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemData);
+
+    Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
+    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
+    kafkaTemplate.send(producerRecord);
+  }
+
+  public void sendItemDataChangeMessage(ItemDataBean itemDataBean) throws Exception {
+
+    ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemDataBean);
 
     Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
     ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
@@ -133,6 +150,37 @@ public class KafkaService {
     itemDataChangeDTO.setItemName(itemData.getItem().getName());
     itemDataChangeDTO.setItemOid(itemData.getItem().getOcOid());
     itemDataChangeDTO.setItemData(itemData.getValue());
+
+    return itemDataChangeDTO;
+  }
+
+  private ItemDataChangeDTO constructItemDataChangeDTO(ItemDataBean itemDataBean){
+    ItemDataChangeDTO itemDataChangeDTO = new ItemDataChangeDTO();
+
+    EventCrf eventCrf = eventCrfDao.findById(itemDataBean.getEventCRFId());
+    Item item = itemDao.findById(itemDataBean.getItemId());
+    Study study = eventCrf.getStudySubject().getStudy();
+
+    itemDataChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+    itemDataChangeDTO.setStudyUuid(getStudyUuid(study));
+    itemDataChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
+    itemDataChangeDTO.setStudyOid(getStudyOid(study));
+    itemDataChangeDTO.setSiteOid(getSiteOid(study));
+    itemDataChangeDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
+    itemDataChangeDTO.setParticipantOid(eventCrf.getStudySubject().getOcOid());
+
+    itemDataChangeDTO.setEventOid(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid());
+    itemDataChangeDTO.setEventRepeatKey(getEventRepeatKey(eventCrf.getStudyEvent()));
+
+    itemDataChangeDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
+
+    itemDataChangeDTO.setItemGroupOid(item.getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
+    itemDataChangeDTO.setItemGroupRepeatKey(itemDataBean.getOrdinal());
+
+    itemDataChangeDTO.setItemDataType(item.getItemDataType().getName());
+    itemDataChangeDTO.setItemName(item.getName());
+    itemDataChangeDTO.setItemOid(item.getOcOid());
+    itemDataChangeDTO.setItemData(itemDataBean.getValue());
 
     return itemDataChangeDTO;
   }

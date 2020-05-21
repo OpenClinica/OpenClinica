@@ -21,6 +21,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,6 +42,7 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 @SuppressWarnings("unused")
 @KeycloakConfiguration
@@ -59,6 +63,8 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     private CoreUtilServiceImpl coreUtilService;
     @Autowired
     private CustomerServiceClientImpl customerServiceClient;
+    @Autowired
+    ConfigurableEnvironment configurableEnvironment;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -126,6 +132,14 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
             logger.info("Customer UUID: " + customerUuid);
         };
     }
+/*
+    @Bean
+    public SmartInitializingSingleton loadDatainfoPropertiesIntoSpringEnvironment() {
+        return () -> {
+            Properties datainfoProperties = CoreResources.getDatainfoProperties();
+            configurableEnvironment.getPropertySources().addFirst(new PropertiesPropertySource("datainfoProperties", datainfoProperties));
+        };
+    }*/
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
