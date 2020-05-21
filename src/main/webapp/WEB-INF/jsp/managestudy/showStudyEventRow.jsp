@@ -74,7 +74,6 @@
                             onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
                             name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
                         </c:if>
-
                 <c:if test="${userRole.manageStudy && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' &&  currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
                   <td>
                       <a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
