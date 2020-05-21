@@ -376,7 +376,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                 
                                 ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                                 sqlParameters.add(new SqlParameter(oid));
-                                sqlParameters.add(new SqlParameter(stripQuotes(unit)));
+                                sqlParameters.add(new SqlParameter(unit));
                                                              
                                 QueryObject qo = new QueryObject();
                                 qo.setSql(muSql);
@@ -846,9 +846,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         //backupItemQueries.put(itemName, vlSql);
                         sqlParameters = new ArrayList<>();
                         
-                        sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(unit)));                                              
+                        sqlParameters.add(new SqlParameter(itemName));
+                        sqlParameters.add(new SqlParameter(descLabel));
+                        sqlParameters.add(new SqlParameter(unit));
                         sqlParameters.add(new SqlParameter(itemOid));
                                                            
                         qo = new QueryObject();
@@ -871,7 +871,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         // notice that still "\\," in options - jxu-08-31-06
                         String updatedResOptions = resOptions.replaceAll("\\\\,", "\\,");
                         String updatedResValues = resValues.replaceAll("\\\\,", "\\,");
-                        rsb.setOptions(stripQuotes(updatedResOptions), stripQuotes(updatedResValues));
+                        rsb.setOptions(updatedResOptions, updatedResValues);
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
@@ -926,9 +926,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     //openQueries.put(itemName, upSql);
                                     sqlParameters = new ArrayList<>();
                                     
-                                    sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
-                                    sqlParameters.add(new SqlParameter(stripQuotes(unit)));                                  
-                                    sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                    sqlParameters.add(new SqlParameter(descLabel));
+                                    sqlParameters.add(new SqlParameter(unit));
+                                    sqlParameters.add(new SqlParameter(itemName));
                                     sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
                                                                        
                                     qo = new QueryObject();
@@ -956,8 +956,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     //openQueries.put(itemName, upSql);
                                     sqlParameters = new ArrayList<>();
                                     
-                                    sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
-                                    sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                    sqlParameters.add(new SqlParameter(descLabel));
+                                    sqlParameters.add(new SqlParameter(itemName));
                                     sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
                                     
                                     qo = new QueryObject();
@@ -984,10 +984,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                  "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
                                 		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"
                                 		 +  versionIdString + ")";
-                    	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                          sqlParameters.add(new SqlParameter(stripQuotes(resOptions.replaceAll("\\\\,", "\\,"))));
-                          sqlParameters.add(new SqlParameter(stripQuotes(resValues.replace("\\\\", "\\"))));
-                          sqlParameters.add(new SqlParameter(stripQuotes(stripQuotes(responseType.toLowerCase()))));
+                    	  sqlParameters.add(new SqlParameter(responseLabel));
+                          sqlParameters.add(new SqlParameter(resOptions.replaceAll("\\\\,", "\\,")));
+                          sqlParameters.add(new SqlParameter(resValues.replace("\\\\", "\\")));
+                          sqlParameters.add(new SqlParameter(responseType.toLowerCase()));
                          //in versionIdString there is one parameter:crfId
                           sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         } else {
@@ -1000,10 +1000,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                      "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
                                     		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"
                                     		 +  versionIdString + ")";
-                        	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResOptions)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResValues)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(stripQuotes(responseType.toLowerCase()))));
+                        	  sqlParameters.add(new SqlParameter(responseLabel));
+                              sqlParameters.add(new SqlParameter(updatedResOptions));
+                              sqlParameters.add(new SqlParameter(updatedResValues));
+                              sqlParameters.add(new SqlParameter(responseType.toLowerCase()));
                              //in versionIdString there is one parameter:crfId
                               sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         }
@@ -1027,10 +1027,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         if (!StringUtil.isBlank(parentItem)) {
                             if (dbName.equals("oracle")) {
                                 parentItemString =
-                                    "(SELECT MAX(ITEM_ID) FROM ITEM WHERE NAME='" + stripQuotes(parentItem) + "' AND owner_id = " + ownerId + " )";
+                                    "(SELECT MAX(ITEM_ID) FROM ITEM WHERE NAME='" + parentItem + "' AND owner_id = " + ownerId + " )";
                             } else {
                                 parentItemString =
-                                    "(SELECT ITEM_ID FROM ITEM WHERE NAME='" + stripQuotes(parentItem) + "' AND owner_id = " + ownerId
+                                    "(SELECT ITEM_ID FROM ITEM WHERE NAME='" + parentItem + "' AND owner_id = " + ownerId
                                         + " ORDER BY OC_OID DESC LIMIT 1)";
                             }
                         }
@@ -1115,7 +1115,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                           + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
                                           +  versionIdString                                                                  
                                           + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
-                                          + stripQuotes(responseLabel)
+                                          + responseLabel
                                           + "'"
                                           + " AND VERSION_ID="
                                           + versionIdString
@@ -1135,11 +1135,11 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                           + "',"
                                           + columnNum
                                           + ",'"
-                                          + stripQuotes(page)
+                                          + page
                                           + "','"
-                                          + stripQuotes(questionNum)
+                                          + questionNum
                                           + "','"
-                                          + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + (isRequired ? 1 : 0) + ")";
+                                          + regexp1 + "','" + regexpError + "', " + (isRequired ? 1 : 0) + ")";
                          
                         } else {
                            /* sql2 =
@@ -1187,7 +1187,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                          + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
                                          + versionIdString                                         
                                          + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
-                                         + stripQuotes(responseLabel)
+                                         + responseLabel
                                          + "'"
                                          + " AND VERSION_ID="
                                          + versionIdString
@@ -1207,21 +1207,21 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                          + "',"
                                          + columnNum
                                          + ",'"
-                                         + stripQuotes(page)
+                                         + page
                                          + "','"
-                                         + stripQuotes(questionNum)
+                                         + questionNum
                                          + "','"
-                                         + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + isRequired + ")";
+                                         + regexp1 + "','" + regexpError + "', " + isRequired + ")";
                                                                                 
                         }
                      
                        //in versionIdString there is one parameter:crfId
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
-                        sqlParameters.add(new SqlParameter(stripQuotes(subHeader)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(header)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(leftItemText)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));                        
+                        sqlParameters.add(new SqlParameter(subHeader));
+                        sqlParameters.add(new SqlParameter(header));
+                        sqlParameters.add(new SqlParameter(leftItemText));
+                        sqlParameters.add(new SqlParameter(rightItemText));
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         
                         qo = new QueryObject();
@@ -1436,9 +1436,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         
                         sqlParameters.add(new SqlParameter(secLabel));
-                        sqlParameters.add(new SqlParameter(stripQuotes(title)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(instructions)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(subtitle)));
+                        sqlParameters.add(new SqlParameter(title));
+                        sqlParameters.add(new SqlParameter(instructions));
+                        sqlParameters.add(new SqlParameter(subtitle));
                         sqlParameters.add(new SqlParameter(pageNumber));
                         sqlParameters.add(new SqlParameter(k+"",JDBCType.INTEGER));
                         sqlParameters.add(new SqlParameter(parentId +"",JDBCType.INTEGER));
@@ -1594,8 +1594,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                             
                             ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                             sqlParameters.add(new SqlParameter(crfId +"",JDBCType.INTEGER));
-                            sqlParameters.add(new SqlParameter(stripQuotes(crfName)));
-                            sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));                          
+                            sqlParameters.add(new SqlParameter(crfName));
+                            sqlParameters.add(new SqlParameter(versionDesc));
                             sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
                             sqlParameters.add(new SqlParameter(crfOid));                          
                             sqlParameters.add(new SqlParameter(studyId+"",JDBCType.INTEGER));                          
@@ -1659,10 +1659,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         	        "VALUES (?, ?, (SELECT CRF_ID FROM CRF WHERE NAME=?), 1, sysdate, ?, ?, ?)";
                         	 
                              sqlParameters.add(new SqlParameter(version +""));                    
-                             sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                             sqlParameters.add(new SqlParameter(versionDesc));
                              sqlParameters.add(new SqlParameter(crfName));
                              sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
-                             sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));                          
+                             sqlParameters.add(new SqlParameter(revisionNotes));
                              sqlParameters.add(new SqlParameter(oid+""));
                         } else {
                            /* sql =
@@ -1674,10 +1674,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         	        "VALUES (?, ?, ?, 1, sysdate, ?, ?, ?)";
                         	 
                              sqlParameters.add(new SqlParameter(version +""));                    
-                             sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                             sqlParameters.add(new SqlParameter(versionDesc));
                              sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                              sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
-                             sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));                          
+                             sqlParameters.add(new SqlParameter(revisionNotes));
                              sqlParameters.add(new SqlParameter(oid+"")); 
                         }
                     } else {
@@ -1691,10 +1691,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         	        " VALUES (?, ?, (SELECT CRF_ID FROM CRF WHERE NAME=?), 1, NOW(), ?, ?, ?)";
                         	 
                              sqlParameters.add(new SqlParameter(version +""));                    
-                             sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                             sqlParameters.add(new SqlParameter(versionDesc));
                              sqlParameters.add(new SqlParameter(crfName));
                              sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
-                             sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));                          
+                             sqlParameters.add(new SqlParameter(revisionNotes));
                              sqlParameters.add(new SqlParameter(oid+""));            
                         } else {
                            /* sql =
@@ -1706,10 +1706,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         	        " VALUES (?, ?, ?, 1, NOW(), ?, ?, ?)";
                         	 
                              sqlParameters.add(new SqlParameter(version +""));                    
-                             sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                             sqlParameters.add(new SqlParameter(versionDesc));
                              sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                              sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
-                             sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));                          
+                             sqlParameters.add(new SqlParameter(revisionNotes));
                              sqlParameters.add(new SqlParameter(oid+""));            
                         }
                     }
@@ -1802,8 +1802,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
      * stripQuotes, utility function meant to replace single quotes in strings
      * with double quotes for SQL compatability. Don't -> Don''t, for example.
      *
-     * @param subj
-     *            the subject line
+     * Removed due to utilization of PreparedStatement class's methods
+     * for setting strings in parameterized queries. - Zique 21-May-2020
      * @return A string with all the quotes escaped.
      */
     /*public String stripQuotes(String subj) {
@@ -1931,7 +1931,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
 
    
     private String getMUInsertSql(String oid, String measurementUnitName, int ownerId, String dbName) {
-        return "insert into measurement_unit (oc_oid, name) values ('" + oid + "', '" + stripQuotes(measurementUnitName) + "')";
+        return "insert into measurement_unit (oc_oid, name) values ('" + oid + "', '" + measurementUnitName + "')";
     }
     
     private String getMUInsertSqlParameters() {
