@@ -2786,32 +2786,6 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         return ncrf;
     }
 
-    /**
-     * stripQuotes, utility function meant to replace single quotes in strings
-     * with double quotes for SQL compatability. Don't -> Don''t, for example.
-     *
-     * Removed due to utilization of PreparedStatement class's methods
-     * for setting strings in parameterized queries. - Zique 21-May-2020
-     *
-     */
-    /*public String stripQuotes(String subj) {
-        if (subj == null) {
-            return null;
-        }
-        String returnme = "";
-        String[] subjarray = subj.split("'");
-        if (subjarray.length == 1) {
-            returnme = subjarray[0];
-        } else {
-            for (int i = 0; i < subjarray.length - 1; i++) {
-                returnme += subjarray[i];
-                returnme += "'";
-            }
-            returnme += subjarray[subjarray.length - 1];
-        }
-        return returnme;
-    }*/
-
     public String getValue(HSSFCell cell) {
         String val = null;
         int cellType = 0;
