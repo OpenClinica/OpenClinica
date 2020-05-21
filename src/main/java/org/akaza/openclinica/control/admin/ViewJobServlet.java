@@ -56,7 +56,6 @@ public class ViewJobServlet extends ScheduleJobServlet {
                 // could be nulls in the dates, etc
             }
             TriggerBean triggerBean = new TriggerBean();
-            triggerBean.setFullName(trigger.getKey().getName());
             triggerBean.setPreviousDate(trigger.getPreviousFireTime());
             triggerBean.setNextDate(trigger.getNextFireTime());
             if (trigger.getDescription() != null) {
@@ -67,6 +66,7 @@ public class ViewJobServlet extends ScheduleJobServlet {
             DatasetDAO datasetDAO = new DatasetDAO(sm.getDataSource());
             if (trigger.getJobDataMap().size() > 0) {
                 dataMap = trigger.getJobDataMap();
+                triggerBean.setFullName(dataMap.getString(XsltTriggerService.JOB_NAME));
                 int dsId = dataMap.getInt(ExampleSpringJob.DATASET_ID);
                 String periodToRun = dataMap.getString(ExampleSpringJob.PERIOD);
                 triggerBean.setPeriodToRun(periodToRun);
@@ -75,6 +75,7 @@ public class ViewJobServlet extends ScheduleJobServlet {
                 triggerBean.setDatasetName(dataset.getName());
                 Study study = getStudyDao().findByPK(dataset.getStudyId());
                 triggerBean.setStudyName(study.getName());
+                triggerBean.setJobUuid(trigger.getKey().getName());
             }
             logger.debug("Trigger Priority: " + trigger.getKey().getName() + " " + trigger.getPriority());
             if (jobScheduler.getTriggerState(triggerKey) == Trigger.TriggerState.PAUSED) {

@@ -136,7 +136,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setFormat((String) hm.get("format"));
         fb.setStatus((String) hm.get("status"));
         fb.setJobUuid((String) hm.get("job_uuid"));
-        fb.setJobExecutionUuid((String) hm.get("dataset_file_uuid"));
+        fb.setJobExecutionUuid((String) hm.get("job_execution_uuid"));
         UserAccountDAO uaDAO = new UserAccountDAO(this.ds);
         UserAccountBean owner = (UserAccountBean) uaDAO.findByPK(fb.getOwnerId());
         fb.setOwner(owner);

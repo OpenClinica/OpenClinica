@@ -65,6 +65,10 @@
                     <td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td>
                     <td class="table_cell"><c:out value="${triggerBean.description}" />&nbsp;</td>
                 </tr>
+                <tr>
+                    <td class="table_header_column"><fmt:message key="job_uuid" bundle="${resword}"/>:</td>
+                    <td class="table_cell"><c:out value="${triggerBean.jobUuid}" />&nbsp;</td>
+                </tr>
                 <c:if test="${groupName=='XsltTriggersExportJobs'}">
                     <tr>
                         <td class="table_header_column"><fmt:message key="dataset" bundle="${resword}"/>:</td>
@@ -100,7 +104,7 @@
         <c:choose>
             <c:when test="${groupName=='XsltTriggersExportJobs'}">
                 <td>
-                    <form action='UpdateJobExport?tname=<c:out value="${triggerBean.fullName}" />' method="POST">
+                    <form action='UpdateJobExport?tname=<c:out value="${triggerBean.fullName}"/>&jobUuid=<c:out value="${triggerBean.jobUuid}"/>' method="POST">
                         <input type="submit" name="submit" value="<fmt:message key="edit_this_job" bundle="${resword}"/>" class="button_long">
                     </form>
                 </td>

@@ -20,7 +20,7 @@ public class PauseJobServlet extends ScheduleJobServlet {
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         String triggerName = fp.getString("tname");
-        // String gName = fp.getString("gname");
+        String jobUuid = fp.getString("jobUuid");
         String gName = request.getParameter("gname");
         String finalGroupName = "";
         if ("".equals(gName) || "0".equals(gName)) {
@@ -46,14 +46,14 @@ public class PauseJobServlet extends ScheduleJobServlet {
 
             } else {
 
-                if (jobScheduler.getTriggerState(TriggerKey.triggerKey(triggerName, finalGroupName)) == Trigger.TriggerState.PAUSED) {
-                    jobScheduler.resumeTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
+                if (jobScheduler.getTriggerState(TriggerKey.triggerKey(jobUuid, finalGroupName)) == Trigger.TriggerState.PAUSED) {
+                    jobScheduler.resumeTrigger(TriggerKey.triggerKey(jobUuid, finalGroupName));
                     // trigger.setPriority(Trigger.DEFAULT_PRIORITY);
                     logger.debug("-- resuming trigger! " + triggerName + " " + finalGroupName);
                     addPageMessage("This trigger " + triggerName + " has been resumed and will continue to run until paused or deleted.");
                     // set message here
                 } else {
-                    jobScheduler.pauseTrigger(TriggerKey.triggerKey(triggerName, finalGroupName));
+                    jobScheduler.pauseTrigger(TriggerKey.triggerKey(jobUuid, finalGroupName));
                     // trigger.setPriority(Trigger.STATE_PAUSED);
                     logger.debug("-- pausing trigger! " + triggerName + " " + finalGroupName);
                     addPageMessage("This trigger " + triggerName + " has been paused, and will not run again until it is restored.");

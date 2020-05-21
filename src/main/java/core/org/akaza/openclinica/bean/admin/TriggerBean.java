@@ -22,9 +22,10 @@ public class TriggerBean extends EntityBean {
     private String spss;
     private String exportFormat;
     private String contactEmail;
-	private String periodToRun;
-	private String datasetName;
-	private String studyName;
+    private String periodToRun;
+    private String datasetName;
+    private String studyName;
+    private String jobUuid;
 
     public Date getCreatedDate() {
         return createdDate;
@@ -35,30 +36,30 @@ public class TriggerBean extends EntityBean {
     }
 
     public String getPeriodToRun() {
-		return periodToRun;
-	}
+        return periodToRun;
+    }
 
-	public void setPeriodToRun(String periodToRun) {
-		this.periodToRun = periodToRun;
-	}
+    public void setPeriodToRun(String periodToRun) {
+        this.periodToRun = periodToRun;
+    }
 
-	public String getDatasetName() {
-		return datasetName;
-	}
+    public String getDatasetName() {
+        return datasetName;
+    }
 
-	public void setDatasetName(String datasetName) {
-		this.datasetName = datasetName;
-	}
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
 
-	public String getStudyName() {
-		return studyName;
-	}
+    public String getStudyName() {
+        return studyName;
+    }
 
-	public void setStudyName(String studyName) {
-		this.studyName = studyName;
-	}
+    public void setStudyName(String studyName) {
+        this.studyName = studyName;
+    }
 
-	public Date getPreviousDate() {
+    public Date getPreviousDate() {
         return previousDate;
     }
 
@@ -152,5 +153,13 @@ public class TriggerBean extends EntityBean {
 
     public void setExportFormat(String exportFormat) {
         this.exportFormat = exportFormat;
+    }
+
+    public String getJobUuid() {
+        return jobUuid;
+    }
+
+    public void setJobUuid(String jobUuid) {
+        this.jobUuid = jobUuid;
     }
 }

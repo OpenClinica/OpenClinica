@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="schan" id="2020-05-13-OC-12682-03">
+        <comment>Change column name from dataset_file_uuid to job_execution_uuid</comment>
+        <renameColumn tableName="archived_dataset_file" oldColumnName="dataset_file_uuid" newColumnName="job_execution_uuid" columnDataType="VARCHAR(255)" />
+    </changeSet>
+
+</databaseChangeLog>

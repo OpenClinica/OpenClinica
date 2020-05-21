@@ -50,10 +50,10 @@ public class ScheduledExtractController {
 
 
     @ApiOperation(value = "To get latest scheduled extract dataset ids and creation time for the job name at study level", notes = "only work for authorized users with the right access permission")
-    @RequestMapping(value = "/studies/{studyOID}/extractJobs/{jobName}/jobExecutions", method = RequestMethod.GET)
+    @RequestMapping(value = "/studies/{studyOID}/extractJobs/{jobUuid}/jobExecutions", method = RequestMethod.GET)
     public @ResponseBody
     ResponseEntity<Object> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("studyOID") String studyOid,
-                                                                           @PathVariable("jobName") String jobName,
+                                                                           @PathVariable("jobUuid") String jobUuid,
                                                                            HttpServletRequest request) throws SchedulerException {
 
         Study study = studyDao.findByOcOID(studyOid.trim());
@@ -67,25 +67,19 @@ public class ScheduledExtractController {
         }
 
         utilService.setSchemaFromStudyOid(studyOid);
-        JobDetail jobDetail = scheduler.getJobDetail(JobKey.jobKey(jobName, "XsltTriggersExportJobs"));
-        if (jobDetail == null) {
-            return new ResponseEntity<>("Invalid job name.", HttpStatus.NOT_FOUND);
-        }
-        JobDataMap jobDataMap = jobDetail.getJobDataMap();
-        String jobUuid = jobDataMap.getString("job_uuid");
-        if (jobUuid == null) {
-            return new ResponseEntity<>("Could not find extract jobs.", HttpStatus.NO_CONTENT);
-        }
-
-        logger.debug("Found job uuid: " + jobUuid);
 
         ArrayList<ArchivedDatasetFileBean> extracts = archivedDatasetFileDAO.findByJobUuid(jobUuid);
+
+        if (extracts.size()==0) {
+            return new ResponseEntity<>("No content found for job Uuid: " + jobUuid + ".", HttpStatus.NOT_FOUND);
+        }
+
         String output = "";
         for (ArchivedDatasetFileBean adfb : extracts) {
             output += " Dataset Id: " + adfb.getJobExecutionUuid() + "  Date Created: " + adfb.getDateCreated() + "\n";
         }
 
-        return new ResponseEntity<>("Extract files for job name " + jobName + ": \n" + output, HttpStatus.OK);
+        return new ResponseEntity<>("Extract files for job name " + jobUuid + ": \n" + output, HttpStatus.OK);
     }
 
 
