@@ -351,7 +351,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 
                                 ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                                 sqlParameters.add(new SqlParameter(oid));
-                                sqlParameters.add(new SqlParameter(stripQuotes(unit)));
+                                sqlParameters.add(new SqlParameter(unit));
                                                              
                                 QueryObject qo = new QueryObject();
                                 qo.setSql(muSql);
@@ -1153,9 +1153,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                         QueryObject qo = new QueryObject();
                         
-                        sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(unit)));                                                
+                        sqlParameters.add(new SqlParameter(itemName));
+                        sqlParameters.add(new SqlParameter(descLabel));
+                        sqlParameters.add(new SqlParameter(unit));
                         sqlParameters.add(new SqlParameter(itemOid));
                                                            
                         qo = new QueryObject();
@@ -1178,7 +1178,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // notice that still "\\," in options - jxu-08-31-06
                         String updatedResOptions = resOptions.replaceAll("\\\\,", "\\,");
                         String updatedResValues = resValues.replaceAll("\\\\,", "\\,");
-                        rsb.setOptions(stripQuotes(updatedResOptions), stripQuotes(updatedResValues));
+                        rsb.setOptions(updatedResOptions, updatedResValues);
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
@@ -1225,9 +1225,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     //openQueries.put(itemName, upSql);
                                     sqlParameters = new ArrayList<>();
                                     
-                                    sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
-                                    sqlParameters.add(new SqlParameter(stripQuotes(unit)));                                    
-                                    sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                    sqlParameters.add(new SqlParameter(descLabel));
+                                    sqlParameters.add(new SqlParameter(unit));
+                                    sqlParameters.add(new SqlParameter(itemName));
                                     sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
                                                                        
                                     qo = new QueryObject();
@@ -1277,8 +1277,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         
                                         sqlParameters = new ArrayList<>();
                                         
-                                        sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));                                        
-                                        sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                        sqlParameters.add(new SqlParameter(descLabel));
+                                        sqlParameters.add(new SqlParameter(itemName));
                                         sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
                                                                            
                                         qo = new QueryObject();
@@ -1316,8 +1316,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                              		
                              		 sqlParameters = new ArrayList<>();
                                      
-                                     sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));                                
-                                     sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                     sqlParameters.add(new SqlParameter(descLabel));
+                                     sqlParameters.add(new SqlParameter(itemName));
                                      sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
                                                                         
                                      qo = new QueryObject();
@@ -1343,10 +1343,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         	sql =
                                     "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
                                    		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"+ versionIdString + ")";
-                       	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                             sqlParameters.add(new SqlParameter(stripQuotes(resOptions.replaceAll("\\\\,", "\\,"))));
-                             sqlParameters.add(new SqlParameter(stripQuotes(resValues.replace("\\\\", "\\"))));
-                             sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
+                       	  sqlParameters.add(new SqlParameter(responseLabel));
+                             sqlParameters.add(new SqlParameter(resOptions.replaceAll("\\\\,", "\\,")));
+                             sqlParameters.add(new SqlParameter(resValues.replace("\\\\", "\\")));
+                             sqlParameters.add(new SqlParameter(responseType.toLowerCase()));
                             
                         } else {
                             /*sql =
@@ -1357,10 +1357,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         	 sql =
                                      "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
                                     		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"+ versionIdString + ")";
-                        	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResOptions)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResValues)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
+                        	  sqlParameters.add(new SqlParameter(responseLabel));
+                              sqlParameters.add(new SqlParameter(updatedResOptions));
+                              sqlParameters.add(new SqlParameter(updatedResValues));
+                              sqlParameters.add(new SqlParameter(responseType.toLowerCase()));
                              
                         }
                         // YW << a response Label can not be used for more than
@@ -1398,10 +1398,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         if (!StringUtil.isBlank(parentItem)) {
                             if (dbName.equals("oracle")) {
                                 parentItemString =
-                                    "(SELECT MAX(ITEM_ID) FROM ITEM WHERE NAME='" + stripQuotes(parentItem) + "' AND owner_id = " + ownerId + " )";
+                                    "(SELECT MAX(ITEM_ID) FROM ITEM WHERE NAME='" + parentItem + "' AND owner_id = " + ownerId + " )";
                             } else {
                                 parentItemString =
-                                    "(SELECT ITEM_ID FROM ITEM WHERE NAME='" + stripQuotes(parentItem) + "' AND owner_id = " + ownerId
+                                    "(SELECT ITEM_ID FROM ITEM WHERE NAME='" + parentItem + "' AND owner_id = " + ownerId
                                         + " ORDER BY OC_OID DESC LIMIT 1)";
                             }
                         }
@@ -1498,7 +1498,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
                                         + versionIdString                                          
                                         + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
-                                        + stripQuotes(responseLabel)
+                                        + responseLabel
                                         + "'"
                                         + " AND VERSION_ID="
                                         + versionIdString
@@ -1517,19 +1517,19 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + "',"
                                         + columnNum
                                         + ",'"
-                                        + stripQuotes(page)
+                                        + page
                                         + "','"
-                                        + stripQuotes(questionNum)
+                                        + questionNum
                                         + "','"
-                                        + stripQuotes(regexp1)
+                                        + regexp1
                                         + "','"
-                                        + stripQuotes(regexpError)
+                                        + regexpError
                                         + "', "
                                         + (isRequired ? 1 : 0)
                                         + ", '"
-                                        + stripQuotes(default_value)
+                                        + default_value
                                         + "','"
-                                        + stripQuotes(responseLayout)
+                                        + responseLayout
                                         + "','"
                                         + widthDecimal
                                         + "', "
@@ -1592,7 +1592,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
                                         + versionIdString                                        
                                         + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
-                                        + stripQuotes(responseLabel)
+                                        + responseLabel
                                         + "'"
                                         + " AND VERSION_ID="
                                         + versionIdString
@@ -1612,28 +1612,28 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + "',"
                                         + columnNum
                                         + ",'"
-                                        + stripQuotes(page)
+                                        + page
                                         + "','"
-                                        + stripQuotes(questionNum)
+                                        + questionNum
                                         + "','"
-                                        + stripQuotes(regexp1)
+                                        + regexp1
                                         + "','"
-                                        + stripQuotes(regexpError)
+                                        + regexpError
                                         + "', "
                                         + isRequired
                                         + ", '"
-                                        + stripQuotes(default_value)
+                                        + default_value
                                         + "','"
-                                        + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem
+                                        + responseLayout + "','" + widthDecimal + "'," + isShowItem
                                         + ")";
 
                         }
                         //queries.add(sql2);
                        
-                        sqlParameters.add(new SqlParameter(stripQuotes(subHeader)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(header)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(leftItemText)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));                       
+                        sqlParameters.add(new SqlParameter(subHeader));
+                        sqlParameters.add(new SqlParameter(header));
+                        sqlParameters.add(new SqlParameter(leftItemText));
+                        sqlParameters.add(new SqlParameter(rightItemText));
                         
                         qo = new QueryObject();
                         qo.setSql(sql2);
@@ -1721,8 +1721,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 //queries.add(sql2_1);
                             	 sqlParameters = new ArrayList<>();
                                  sqlParameters.add(new SqlParameter(controlItemName));
-                                 sqlParameters.add(new SqlParameter(stripQuotes(optionValue)));
-                                 sqlParameters.add(new SqlParameter(stripQuotes(message)));                                
+                                 sqlParameters.add(new SqlParameter(optionValue));
+                                 sqlParameters.add(new SqlParameter(message));
                                  
                                  qo = new QueryObject();
                                  qo.setSql(sql2_1);
@@ -1773,13 +1773,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,HEADER," + "subheader, layout, repeat_number, repeat_max,"
                                             + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, show_group, repeating_group) VALUES ("
                                             + "(SELECT MAX(ITEM_GROUP_ID) FROM ITEM_GROUP WHERE NAME='"
-                                            + stripQuotes(itemGroup.getName())
+                                            + itemGroup.getName()
                                             + "' AND crf_id = "
                                             + crfId
                                             + " ),'"
-                                            + stripQuotes(igMeta.getHeader())
+                                            + igMeta.getHeader()
                                             + "', '"
-                                            + stripQuotes(igMeta.getSubheader())
+                                            + igMeta.getSubheader()
                                             + "', '"
                                             +
                                             // above removed?
@@ -1799,7 +1799,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + ",?"                                            
                                             + ","
                                             + "(SELECT MAX(ITEM.ITEM_ID) FROM ITEM,ITEM_FORM_METADATA,CRF_VERSION WHERE ITEM.NAME='"
-                                            + stripQuotes(itemName)
+                                            + itemName
                                             + "' "
                                             + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
                                             + "AND CRF_VERSION.CRF_ID= " + crfId + " ),"
@@ -2414,7 +2414,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         	 sql =
                                      "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
                                          + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED, BORDERS) " + "VALUES ("  + versionIdString+",1,?,'"
-                                         + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
+                                         + title + "', '" + instructions + "', '" + subtitle + "','" + pageNumber + "'," + k
                                          + "," + parentId + "," + ub.getId() + ",sysdate," + intBorder + ")";
                         } else {
                             /*sql =
@@ -2425,7 +2425,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         	sql =
                                     "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
                                         + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED,BORDERS) " + "VALUES (" +versionIdString+ ",1,?,'"
-                                        + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
+                                        + title + "', '" + instructions + "', '" + subtitle + "','" + pageNumber + "'," + k
                                         + "," + parentId + "," + ub.getId() + ",NOW()," + intBorder + ")";
                         }
 
@@ -2583,7 +2583,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + "'," + studyId + ")";*/
                             	 createCRFSql =
                                          "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES (" + crfId
-                                             + ", 1, ? ,'" + stripQuotes(versionDesc) + "'," + ub.getId() + ",sysdate" + ",'" + crfOid
+                                             + ", 1, ? ,'" + versionDesc + "'," + ub.getId() + ",sysdate" + ",'" + crfOid
                                              + "'," + studyId + ")";
                             } else {
                                /* createCRFSql =
@@ -2592,12 +2592,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + "'," + studyId + ")";*/
                             	 createCRFSql =
                                          "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES (" + crfId
-                                             + ", 1, ? ,'" + stripQuotes(versionDesc) + "'," + ub.getId() + ",NOW()" + ",'" + crfOid
+                                             + ", 1, ? ,'" + versionDesc + "'," + ub.getId() + ",NOW()" + ",'" + crfOid
                                              + "'," + studyId + ")";
                             }
                             //queries.add(createCRFSql);
                             ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
-                            sqlParameters.add(new SqlParameter(stripQuotes(crfName)));                           
+                            sqlParameters.add(new SqlParameter(crfName));
                             
                             QueryObject qo = new QueryObject();
                             qo.setSql(createCRFSql);
@@ -2662,8 +2662,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + crfName + "'),1,sysdate," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";*/
                         	sql =
                                     "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) "
-                                        + "VALUES (?,'" + stripQuotes(versionDesc) + "'," + "(SELECT CRF_ID FROM CRF C WHERE C.NAME='"
-                                        + crfName + "'),1,sysdate," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
+                                        + "VALUES (?,'" + versionDesc + "'," + "(SELECT CRF_ID FROM CRF C WHERE C.NAME='"
+                                        + crfName + "'),1,sysdate," + ub.getId() + ",'" + revisionNotes + "','" + oid + "')";
 
                         } else {
                            /* sql =
@@ -2672,8 +2672,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + stripQuotes(revisionNotes) + "','" + oid + "')";*/
                         	 sql =
                                      "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " 
-                        	 + "VALUES (?,'" + stripQuotes(versionDesc) + "'," + crfId + ",1,sysdate," + ub.getId() + ",'"
-                                         + stripQuotes(revisionNotes) + "','" + oid + "')";
+                        	 + "VALUES (?,'" + versionDesc + "'," + crfId + ",1,sysdate," + ub.getId() + ",'"
+                                         + revisionNotes + "','" + oid + "')";
 
                         }
                     } else {
@@ -2684,8 +2684,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + crfName + "'),1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";*/
                         	sql =
                                     "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) "
-                                        + "VALUES (?,'" + stripQuotes(versionDesc) + "'," + "(SELECT CRF_ID FROM CRF WHERE NAME='"
-                                        + crfName + "'),1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
+                                        + "VALUES (?,'" + versionDesc + "'," + "(SELECT CRF_ID FROM CRF WHERE NAME='"
+                                        + crfName + "'),1,NOW()," + ub.getId() + ",'" + revisionNotes + "','" + oid + "')";
                         } else {
                            /* sql =
                                 "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + "VALUES ('"
@@ -2693,14 +2693,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + "','" + oid + "')";*/
                         	 sql =
                                      "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " 
-                        	     + "VALUES (?,'" + stripQuotes(versionDesc) + "'," + crfId + ",1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes)
+                        	     + "VALUES (?,'" + versionDesc + "'," + crfId + ",1,NOW()," + ub.getId() + ",'" + revisionNotes
                                          + "','" + oid + "')";
                         }
                     }
 
                     //queries.add(sql);
                     ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
-                    sqlParameters.add(new SqlParameter(stripQuotes(version)));
+                    sqlParameters.add(new SqlParameter(version));
                     
                     QueryObject qo = new QueryObject();
                     qo.setSql(sql);
@@ -2784,32 +2784,6 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         // logger.debug("html table:" + buf.toString());
         ncrf.setHtmlTable(buf.toString());
         return ncrf;
-    }
-
-    /**
-     * stripQuotes, utility function meant to replace single quotes in strings
-     * with double quotes for SQL compatability. Don't -> Don''t, for example.
-     *
-     * @param subj
-     *            the subject line
-     * @return A string with all the quotes escaped.
-     */
-    public String stripQuotes(String subj) {
-        if (subj == null) {
-            return null;
-        }
-        String returnme = "";
-        String[] subjarray = subj.split("'");
-        if (subjarray.length == 1) {
-            returnme = subjarray[0];
-        } else {
-            for (int i = 0; i < subjarray.length - 1; i++) {
-                returnme += subjarray[i];
-                returnme += "'";
-            }
-            returnme += subjarray[subjarray.length - 1];
-        }
-        return returnme;
     }
 
     public String getValue(HSSFCell cell) {
@@ -2928,7 +2902,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         // '" + stripQuotes(measurementUnitName) + "', "
         // + ownerId + ", sysdate)";
         // } else {
-        muSql = "insert into measurement_unit (oc_oid, name) values ('" + oid + "', '" + stripQuotes(measurementUnitName) + "')";
+        muSql = "insert into measurement_unit (oc_oid, name) values ('" + oid + "', '" + measurementUnitName + "')";
         // }
         return muSql;
     }
