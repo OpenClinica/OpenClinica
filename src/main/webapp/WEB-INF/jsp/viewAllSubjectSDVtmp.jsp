@@ -508,7 +508,7 @@
 
                     item.lastVerifiedDate = data.lastVerifiedDate;
                     if (item.lastVerifiedDate != null && item.lastModifiedDate > item.lastVerifiedDate) {
-                        item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
+                        item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16" title="<fmt:message key="value_changed_since_last_verified" bundle="${resword}"/>">';
                     }
                     if (item.lastVerifiedDate) {
                         item.lastVerifiedDate = formatDateTime(item.lastVerifiedDate);
@@ -530,7 +530,7 @@
                     item.actions = '';
                     if (!item.calculateItem)
                         item.actions =
-                            '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy' +
+                            '<a title="<fmt:message key="view_form" bundle="${resword}"/>" class="icon icon-view-within" href="../ResolveDiscrepancy' +
                             '?itemDataId=' + item.itemDataId +
                             '&popupIndex=' + popupIndex +
                             '"></a>';
