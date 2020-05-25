@@ -4,8 +4,10 @@ import com.openclinica.kafka.dto.*;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.service.CoreUtilServiceImpl;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -15,7 +17,18 @@ import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
 
 @Service
 public class KafkaService {
@@ -33,80 +46,100 @@ public class KafkaService {
   private StudyEventDefinitionDao studyEventDefinitionDao;
   @Autowired
   private CoreUtilServiceImpl coreUtilService;
-  @Autowired
-  private Environment environment;
 
+  @Async
   public void sendFormChangeMessage(FormChangeDTO formChangeDTO) throws Exception {
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
+    if (CoreResources.isKafkaAuditingEnabled()){
+      Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
 
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_CHANGE_TOPIC, null, null, null, formChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
+      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_CHANGE_TOPIC, null, null, null, formChangeDTO, headers);
+      kafkaTemplate.send(producerRecord);
+    }
   }
 
+  @Async
   public void sendFormAttributeChangeMessage(EventCrf eventCrf) throws Exception {
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
+    if (CoreResources.isKafkaAuditingEnabled()) {
+      Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
 
-    FormChangeDTO formAttributeChangeDTO = constructEditFormDTO(eventCrf);
+      FormChangeDTO formAttributeChangeDTO = constructEditFormDTO(eventCrf);
 
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
+      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
+      kafkaTemplate.send(producerRecord);
+    }
   }
 
+  @Async
   public void sendFormAttributeChangeMessage(EventCRFBean eventCrfBean) throws Exception {
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
+    if (CoreResources.isKafkaAuditingEnabled()) {
+      Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
 
-    FormChangeDTO formAttributeChangeDTO = constructEventCrfAttributeChangeDTO(eventCrfBean);
+      FormChangeDTO formAttributeChangeDTO = constructEventCrfAttributeChangeDTO(eventCrfBean);
 
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
+      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
+      kafkaTemplate.send(producerRecord);
+    }
   }
 
+  @Async
   public void sendEventAttributeChangeMessage(StudyEventBean studyEventBean) throws Exception {
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
+    if (CoreResources.isKafkaAuditingEnabled()) {
+      Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
 
-    EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEventBean);
+      EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEventBean);
 
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
+      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
+      kafkaTemplate.send(producerRecord);
+    }
   }
 
+  @Async
   public void sendEventAttributeChangeMessage(StudyEvent studyEvent) throws Exception {
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
+    if (CoreResources.isKafkaAuditingEnabled()) {
+      Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
 
-    EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEvent);
+      EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEvent);
 
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
+      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
+      kafkaTemplate.send(producerRecord);
+    }
   }
 
+  @Async
   public void sendItemDataChangeMessage(ItemData itemData) throws Exception {
+    if (CoreResources.isKafkaAuditingEnabled()) {
+      ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemData);
 
-    ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemData);
-
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
+      Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
+      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
+      kafkaTemplate.send(producerRecord);
+    }
   }
 
+  @Async
   public void sendItemDataChangeMessage(ItemDataBean itemDataBean) throws Exception {
+    if (CoreResources.isKafkaAuditingEnabled()) {
+      ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemDataBean);
 
-    ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemDataBean);
-
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
-    kafkaTemplate.send(producerRecord);
+      Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
+      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
+      kafkaTemplate.send(producerRecord);
+    }
   }
 
+  @Async
   public void sendStudyPublishMessage(Study study) throws Exception {
-    StudyPublishDTO studyPublishDTO = new StudyPublishDTO();
+    if (CoreResources.isKafkaAuditingEnabled()) {
+      StudyPublishDTO studyPublishDTO = new StudyPublishDTO();
 
-    studyPublishDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    studyPublishDTO.setStudyUuid(study.getStudyUuid());
-    studyPublishDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
+      studyPublishDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+      studyPublishDTO.setStudyUuid(study.getStudyUuid());
+      studyPublishDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
 
-    Headers headers = buildHeaders("com.openclinica.kafka.dto.StudyPublishDTO");
-    ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.STUDY_PUBLISH_TOPIC, null, null, null, studyPublishDTO, headers);
-    kafkaTemplate.send(producerRecord);
+      Headers headers = buildHeaders("com.openclinica.kafka.dto.StudyPublishDTO");
+      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.STUDY_PUBLISH_TOPIC, null, null, null, studyPublishDTO, headers);
+      kafkaTemplate.send(producerRecord);
+    }
   }
 
   private Headers buildHeaders(String dtoType){

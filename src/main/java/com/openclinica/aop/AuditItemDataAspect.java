@@ -1,23 +1,19 @@
 package com.openclinica.aop;
 
-import com.openclinica.kafka.KafkaEnabled;
 import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-//@ConditionalOnProperty(name = "sun.java.launcher", havingValue = "SUN_STANDARD")
-//@ConditionalOnProperty(name = "kafka.auditing", havingValue = "true")
-@Conditional(KafkaEnabled.class)
 public class AuditItemDataAspect {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     private KafkaService kafkaService;
@@ -26,9 +22,10 @@ public class AuditItemDataAspect {
         this.kafkaService = kafkaService;
     }
 
-    @AfterReturning("execution(* core.org.akaza.openclinica.dao.hibernate.ItemDataDao.auditedSaveOrUpdate(..))")
-    public void onItemDataDaoAuditedSaveOrUpdate(JoinPoint joinPoint) {
-        log.info("AoP: onItemDataDaoAuditedSaveOrUpdate triggered");
+    // Point these to ItemProcessor and FSItemProcessor
+    @AfterReturning("execution(* org.akaza.openclinica.service.DataSaveServiceImpl.saveOrUpdate(..))")
+    public void onDataSaveServiceSaveOrUpdate(JoinPoint joinPoint) {
+        log.info("AoP: onDataSaveServiceSaveOrUpdate triggered");
         try {
             kafkaService.sendItemDataChangeMessage((ItemData) joinPoint.getArgs()[0]);
         } catch (Exception e) {

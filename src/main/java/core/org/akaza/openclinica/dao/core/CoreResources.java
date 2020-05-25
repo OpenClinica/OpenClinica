@@ -55,6 +55,9 @@ public class CoreResources implements InitializingBean {
     private static final String EXTRACT_INFO_FILE_NAME = "extract.properties";
     private static final String EXTERNAL_PROPERTY_DIRECTORY = System.getProperty("user.home") + "/runtime-config/";
 
+    public static final String KAFKA_BROKERS = "kafka.brokers";
+    public static final String KAFKA_AUDITING = "kafka.auditing";
+
     private static String webapp;
     protected final static Logger logger = LoggerFactory.getLogger("core.org.akaza.openclinica.dao.core.CoreResources");
     // private MessageSource messageSource;
@@ -65,11 +68,6 @@ public class CoreResources implements InitializingBean {
     // default no arg constructor
     public CoreResources() {
 
-    }
-
-    // Used for pushing the datainfo properties into the Spring environment context.
-    public static Properties getDatainfoProperties(){
-        return DATAINFO;
     }
 
     /**
@@ -974,8 +972,13 @@ public class CoreResources implements InitializingBean {
     }
 
     public static String getKafkaBrokers() {
-        String value = getField("kafkaBrokers");
+        String value = getField(KAFKA_BROKERS);
         return value;
+    }
+
+    public static boolean isKafkaAuditingEnabled() {
+        String value = getField(KAFKA_AUDITING);
+        return Boolean.parseBoolean(value);
     }
 
     // Kafka
@@ -1104,7 +1107,6 @@ public class CoreResources implements InitializingBean {
 
     // Overwrites external properties (if present) on Internal properties
     public static Properties loadProperties(String fileProps) {
-        logger.info("//////////////////////////////////////////////////////////////// Loading datainfo.properties ////////////////////////////////////////////////////////////////");
         Properties internalProp = null;
         InputStream inpStream;
         Properties externalProp = null;

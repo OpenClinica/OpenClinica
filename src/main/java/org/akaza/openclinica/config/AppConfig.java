@@ -132,14 +132,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
             logger.info("Customer UUID: " + customerUuid);
         };
     }
-/*
-    @Bean
-    public SmartInitializingSingleton loadDatainfoPropertiesIntoSpringEnvironment() {
-        return () -> {
-            Properties datainfoProperties = CoreResources.getDatainfoProperties();
-            configurableEnvironment.getPropertySources().addFirst(new PropertiesPropertySource("datainfoProperties", datainfoProperties));
-        };
-    }*/
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

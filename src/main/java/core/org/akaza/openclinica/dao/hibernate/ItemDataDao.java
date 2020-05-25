@@ -39,12 +39,6 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         return super.saveOrUpdate(itemData);
     }
 
-    // Audited via Spring AOP for Kafka Messages
-    @Transactional
-    public ItemData auditedSaveOrUpdate(ItemData itemData){
-        return super.saveOrUpdate(itemData);
-    }
-
     public List<ItemData> findByItemsEventCrf(List<Item> items, Integer eventCrfId, Integer numItems) {
         Query q = getCurrentSession().createQuery(findByItemEventCrfOrdinalQuery);
         q.setParameter("items", items);

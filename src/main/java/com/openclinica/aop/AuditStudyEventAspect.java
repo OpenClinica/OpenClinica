@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-//@ConditionalOnProperty(name = "sun.java.launcher", havingValue = "skdlsalkdjsa")
-@ConditionalOnProperty(name = "kafka.auditing", havingValue = "true")
 public class AuditStudyEventAspect {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     private KafkaService kafkaService;

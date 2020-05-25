@@ -266,6 +266,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 			List<ErrorObj> errList = getErrorList(errors.getAllErrors());
 			throw new CustomRuntimeException("There are errors with publishing", errList);
 		}
+		//TODO Do we want to throw an exception if Kafka can't send a message?
 		try {
 			kafkaService.sendStudyPublishMessage(study);
 		} catch (Exception e) {

@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import core.org.akaza.openclinica.domain.datamap.ItemGroup;
 import core.org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import core.org.akaza.openclinica.domain.datamap.ItemMetadata;
+import org.akaza.openclinica.service.DataSaveServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
     private CrfVersionDao crfVersionDao;
 
     @Autowired
-    private KafkaService kafkaService;
+    DataSaveServiceImpl dataSaveService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -187,7 +188,8 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                         groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                     }
                     newItemData.setInstanceId(container.getInstanceId());
-                    itemDataDao.auditedSaveOrUpdate(newItemData);
+                    dataSaveService.saveOrUpdate(newItemData);
+                    itemDataDao.saveOrUpdate(newItemData);
 
                 } else if (existingItemData.getValue().equals(newItemData.getValue())) {
                     // Existing item. Value unchanged. Do nothing.
@@ -196,7 +198,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     existingItemData.setValue(newItemData.getValue());
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
-                    itemDataDao.auditedSaveOrUpdate(existingItemData);
+                    dataSaveService.saveOrUpdate(existingItemData);
                 }
             }
         }
@@ -253,7 +255,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     itemData.setUserAccount(container.getUser());
                     itemData.setUpdateId(container.getUser().getUserId());
                     itemData.setInstanceId(container.getInstanceId());
-                    itemData = itemDataDao.auditedSaveOrUpdate(itemData);
+                    itemData = itemDataDao.saveOrUpdate(itemData);
 
                     // Close discrepancy notes
                     closeItemDiscrepancyNotes(container, itemData);
