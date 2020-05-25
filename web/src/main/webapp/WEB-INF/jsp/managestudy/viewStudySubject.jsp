@@ -88,24 +88,6 @@
 <jsp:useBean scope="request" id="groups" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="from" class="java.lang.String"/>
 
-<script language="JavaScript">
-    function leftnavExpand(strLeftNavRowElementName){
-      var objLeftNavRowElement;
-
-      objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-      if (objLeftNavRowElement != null) {
-        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-          objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-          objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-          if(objLeftNavRowElement.display == "none"){
-              objExCl.src = "images/bt_Expand.gif";
-          }else{
-              objExCl.src = "images/bt_Collapse.gif";
-          }
-        }
-      }
-</script>
-
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr><td><h1><div class="title_manage"><fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/></div></h1></td></tr>
 </table>
