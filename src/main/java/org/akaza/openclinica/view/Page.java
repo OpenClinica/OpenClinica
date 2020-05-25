@@ -95,39 +95,9 @@ public enum Page {
     /**
      * Page for creating a user account.
      */
-    CREATE_ACCOUNT("/WEB-INF/jsp/admin/createuseraccount.jsp", "Create an account"),
-
-    /**
-     * Page for creating a user account.
-     */
     TEST_OBJECT("/WEB-INF/jsp/admin/createtestObject.jsp", "Create an account"),
 
-    /**
-     * Page for editing a user account, and confirmation page.
-     */
-    EDIT_ACCOUNT("/WEB-INF/jsp/admin/edituseraccount.jsp", "Edit an account"),
-     EDIT_ACCOUNT_CONFIRM ("/WEB-INF/jsp/admin/edituseraccountconfirm.jsp", "Edit an account"),
-
-    /**
-     * Page for viewing all user accounts (for admin)
-     */
-    LIST_USER_ACCOUNTS ("/WEB-INF/jsp/admin/listuseraccounts.jsp", "List user accounts"),
-    LIST_USER_ACCOUNTS_SERVLET ("/ListUserAccounts", "List user accounts"),
-
-    /**
-     * Page for viewing a single user account (for admin)
-     */
-     VIEW_USER_ACCOUNT("/WEB-INF/jsp/admin/viewuseraccount.jsp", "View user account"),
- VIEW_USER_ACCOUNT_SERVLET ("/ViewUserAccount", "View user account servlet"),
-
-    CONFIGURATION ("/WEB-INF/jsp/admin/configuration.jsp", "Configuration"),
-   CONFIGURATION_PASSWORD_REQUIREMENTS("/WEB-INF/jsp/admin/configurationPasswordRequirements.jsp", "Configuration"),
    SYSTEM_STATUSe("/WEB-INF/jsp/admin/systemStatus.jsp", "System Status"),
-
-    /**
-     * Page for confirming a new study.
-     */
-    STUDY_CREATE_CONFIRM ("/WEB-INF/jsp/managestudy/studyCreateConfirm.jsp", "Confirm a new Study"),
 
     LIST_STUDY_SUBJECTS ("/WEB-INF/jsp/managestudy/findSubjects.jsp", "List Study Subjects"),
     LIST_STUDY_SUBJECTS_SERVLET("/ListStudySubjects", "List Study Subjects"),
@@ -146,11 +116,6 @@ public enum Page {
     STUDY_UPDATE_CONFIRM ("/WEB-INF/jsp/managestudy/studyUpdateConfirm.jsp", "Confirm a Study"),
 
     /**
-     * Page for confirming a new sub study.
-     */
-    CONFIRM_UPDATE_SUB_STUDY ("/WEB-INF/jsp/managestudy/updateSubStudyConfirm.jsp", "Confirm a site"),
-
-    /**
      * Page for updating a new sub study.
      */
     UPDATE_SUB_STUDY("/WEB-INF/jsp/managestudy/updateSubStudy.jsp", "Update a sub Study"),
@@ -162,26 +127,12 @@ public enum Page {
     VIEW_SITE_SERVLET ("/ViewSite", "View a sub Study"),
 
     /**
-     * Page for editing a study user role.
-     */
-    EDIT_STUDY_USER_ROLE ("/WEB-INF/jsp/admin/editstudyuserrole.jsp", "Edit Study User Role"),
-
-    /**
-     * Page for view all users of a study and its sites.
-     */
-    STUDY_USER_LIST ("/WEB-INF/jsp/managestudy/studyUserList.jsp", "View Study Users"),
-    /**
-     * Page for view all studies.
-     */
-    STUDY_LIST ("/WEB-INF/jsp/managestudy/studyList.jsp", "View All Studies"),
-
-    /**
      * Page for view all sites.
      */
-     SITE_LIST ("/WEB-INF/jsp/managestudy/siteList.jsp", "View All Sites"),
-     SITE_LIST_SERVLET ("/ListSite", "View All Sites Servlet"),
+    SITE_LIST ("/WEB-INF/jsp/managestudy/siteList.jsp", "View All Sites"),
+    SITE_LIST_SERVLET ("/ListSite", "View All Sites Servlet"),
 
-    /*
+ /*
      * Page for sign study subject
      */
 
@@ -416,14 +367,7 @@ public enum Page {
     MARK_EVENT_CRF_COMPLETE ("/WEB-INF/jsp/" + "submit/markEventCRFComplete.jsp", "Mark Event CRF Complete"),
 
     ADMIN_EDIT ("/WEB-INF/jsp/" + "submit/administrativeEditing.jsp", "Administrative Editing"),
-    ADMIN_EDIT_SERVLET ("/AdministrativeEditing", "Administrative Editing Servlet"),
-
-    LIST_USER_IN_STUDY ("/WEB-INF/jsp/" + "managestudy/listUserInStudy.jsp", "list users in a study"),
-    VIEW_USER_IN_STUDY ("/WEB-INF/jsp/" + "managestudy/viewUserInStudy.jsp", "view a user in a study"),
-    SET_USER_ROLE_IN_STUDY ("/WEB-INF/jsp/" + "managestudy/setUserRoleInStudy.jsp", "set a user role in a study"),
-    REMOVE_USER_ROLE_IN_STUDY ("/WEB-INF/jsp/" + "managestudy/removeStudyUserRole.jsp", "remove a user role in a study"),
-    RESTORE_USER_ROLE_IN_STUDY ("/WEB-INF/jsp/" + "managestudy/restoreStudyUserRole.jsp", "restore a user role in a study"),
-    LIST_USER_IN_STUDY_SERVLET ("/ListStudyUser", "list users in a study"),
+    ADMIN_EDIT_SERVLET ("/AdministrativeEditing", "Administrative EditViewStudyUsering Servlet"),
 
     LIST_SUBJECT ("/WEB-INF/jsp/" + "managestudy/listSubject.jsp", "list subjects in a study"),
     LIST_SUBJECT_SERVLET ("/ListSubject", "list subjects in a study"),
@@ -462,8 +406,6 @@ public enum Page {
 
     REMOVE_SUBJECT ("/WEB-INF/jsp/" + "admin/removeSubject.jsp", "remove a subject"),
     RESTORE_SUBJECT ("/WEB-INF/jsp/" + "admin/restoreSubject.jsp", "restore a subject"),
-
-    SET_USER_ROLE ("/WEB-INF/jsp/" + "admin/setUserRole.jsp", "set a study user role for a user"),
 
     DICOM_UPLOADER ("/WEB-INF/jsp/" + "managestudy/dicomUploader.jsp", "Upload dicom files"),
     /**

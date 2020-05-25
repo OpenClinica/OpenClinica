@@ -258,18 +258,6 @@
         <servlet-name>CheckCRFLocked</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.CheckCRFLocked</servlet-class>
     </servlet>
-
-    <servlet>
-        <description>ConfigureServlet</description>
-        <servlet-name>ConfigureServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.ConfigureServlet</servlet-class>
-    </servlet>
-
-    <servlet>
-        <description>ConfigurePasswordRequirementsServlet</description>
-        <servlet-name>ConfigurePasswordRequirementsServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.ConfigurePasswordRequirementsServlet</servlet-class>
-    </servlet>
     <servlet>
         <description>FormServlet</description>
         <display-name>FormServlet</display-name>
@@ -435,11 +423,6 @@
         <servlet-class>org.akaza.openclinica.control.admin.AuditLogStudyServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>ViewUserAccount</display-name>
-        <servlet-name>ViewUserAccountServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.ViewUserAccountServlet</servlet-class>
-    </servlet>
-    <servlet>
         <display-name>AddNewSubject</display-name>
         <servlet-name>AddNewSubjectServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.AddNewSubjectServlet</servlet-class>
@@ -450,49 +433,14 @@
         <servlet-class>org.akaza.openclinica.control.submit.CreateNewStudyEventServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>CreateUserAccount</display-name>
-        <servlet-name>CreateUserAccountServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.CreateUserAccountServlet</servlet-class>
+        <display-name>InitUpdateSubStudy</display-name>
+        <servlet-name>InitUpdateSubStudyServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.InitUpdateSubStudyServlet</servlet-class>
     </servlet>
     <servlet>
-        <display-name>EditUserAccount</display-name>
-        <servlet-name>EditUserAccountServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.EditUserAccountServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>ListUserAccounts</display-name>
-        <servlet-name>ListUserAccountsServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.ListUserAccountsServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>EditStudyUserRole</display-name>
-        <servlet-name>EditStudyUserRoleServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.EditStudyUserRoleServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>DeleteStudyUserRole</display-name>
-        <servlet-name>DeleteStudyUserRoleServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.DeleteStudyUserRoleServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>DeleteUser</display-name>
-        <servlet-name>DeleteUserServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.DeleteUserServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>UnLockUser</display-name>
-        <servlet-name>UnLockUserServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.UnLockUserServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>ListStudy</display-name>
-        <servlet-name>ListStudyServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListStudyServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>AssignUserToStudy</display-name>
-        <servlet-name>AssignUserToStudyServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.AssignUserToStudyServlet</servlet-class>
+        <display-name>UpdateSubStudy</display-name>
+        <servlet-name>UpdateSubStudyServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.UpdateSubStudyServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ListCRF</display-name>
@@ -585,16 +533,6 @@
         <servlet-name>ViewSiteServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewSiteServlet</servlet-class>
     </servlet>
-    <servlet>
-        <display-name>ListStudyUser</display-name>
-        <servlet-name>ListStudyUserServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ListStudyUserServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>ViewStudyUser</display-name>
-        <servlet-name>ViewStudyUserServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudyUserServlet</servlet-class>
-    </servlet>
 
     <!-- Export Excel -->
     <servlet>
@@ -602,105 +540,73 @@
         <servlet-name>ExportExcelStudySubjectAuditLogServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ExportExcelStudySubjectAuditLogServlet</servlet-class>
     </servlet>
-
-
-    <servlet>
-        <display-name>SetStudyUserRole</display-name>
-        <servlet-name>SetStudyUserRoleServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.SetStudyUserRoleServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>RemoveStudyUserRole</display-name>
-        <servlet-name>RemoveStudyUserRoleServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RemoveStudyUserRoleServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>RestoreStudyUserRole</display-name>
-
-        <servlet-name>RestoreStudyUserRoleServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudyUserRoleServlet</servlet-class>
-    </servlet>
     <servlet>
         <display-name>ListStudySubject</display-name>
-
         <servlet-name>ListStudySubjectsServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ListStudySubjectsServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ListStudySubject</display-name>
-
         <servlet-name>ListStudySubjectsManageServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ListStudySubjectsManageServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ListStudySubjectsSubmit</display-name>
-
         <servlet-name>ListStudySubjectsSubmitServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ListStudySubjectsSubmitServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ViewStudySubject</display-name>
-
         <servlet-name>ViewStudySubjectServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>UpdateStudySubject</display-name>
-
         <servlet-name>UpdateStudySubjectServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.UpdateStudySubjectServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RemoveStudySubject</display-name>
-
         <servlet-name>RemoveStudySubjectServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RemoveStudySubjectServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RestoreStudySubject</display-name>
-
         <servlet-name>RestoreStudySubjectServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudySubjectServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RemoveStudyEvent</display-name>
-
         <servlet-name>RemoveStudyEventServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RemoveStudyEventServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RestoreStudyEvent</display-name>
-
         <servlet-name>RestoreStudyEventServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudyEventServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>DeleteStudyEvent</display-name>
-
         <servlet-name>DeleteStudyEventServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.DeleteStudyEventServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RemoveEventCRF</display-name>
-
         <servlet-name>RemoveEventCRFServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RemoveEventCRFServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RestoreEventCRF</display-name>
-
         <servlet-name>RestoreEventCRFServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreEventCRFServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ApplyFilter</display-name>
-
         <servlet-name>ApplyFilterServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.extract.ApplyFilterServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ViewCRFVersion</display-name>
-
         <servlet-name>ViewCRFVersionServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewCRFVersionServlet</servlet-class>
     </servlet>
@@ -711,31 +617,26 @@
     </servlet>
     <servlet>
         <display-name>ReassignStudySubject</display-name>
-
         <servlet-name>ReassignStudySubjectServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ReassignStudySubjectServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>EditFilter</display-name>
-
         <servlet-name>EditFilterServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.extract.EditFilterServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RemoveFilter</display-name>
-
         <servlet-name>RemoveFilterServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.extract.RemoveFilterServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RemoveDataset</display-name>
-
         <servlet-name>RemoveDatasetServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.extract.RemoveDatasetServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>RestoreDataset</display-name>
-
         <servlet-name>RestoreDatasetServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.extract.RestoreDatasetServlet</servlet-class>
     </servlet>
@@ -778,11 +679,6 @@
         <display-name>ViewSubjectVersion</display-name>
         <servlet-name>ViewSubjectServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.ViewSubjectServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <display-name>SetUserRole</display-name>
-        <servlet-name>SetUserRoleServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.admin.SetUserRoleServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>ViewStudySubjectAuditLog</display-name>
@@ -1242,44 +1138,12 @@
         <url-pattern>/Contact</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListUserAccountsServlet</servlet-name>
-        <url-pattern>/ListUserAccounts</url-pattern>
+        <servlet-name>UpdateSubStudyServlet</servlet-name>
+        <url-pattern>/UpdateSubStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>DeleteStudyUserRoleServlet</servlet-name>
-        <url-pattern>/DeleteStudyUserRole</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DeleteUserServlet</servlet-name>
-        <url-pattern>/DeleteUser</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>UnLockUserServlet</servlet-name>
-        <url-pattern>/UnLockUser</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>EditStudyUserRoleServlet</servlet-name>
-        <url-pattern>/EditStudyUserRole</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ViewUserAccountServlet</servlet-name>
-        <url-pattern>/ViewUserAccount</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateUserAccountServlet</servlet-name>
-        <url-pattern>/CreateUserAccount</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>EditUserAccountServlet</servlet-name>
-        <url-pattern>/EditUserAccount</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ListStudyServlet</servlet-name>
-        <url-pattern>/ListStudy</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AssignUserToStudyServlet</servlet-name>
-        <url-pattern>/AssignUserToStudy</url-pattern>
+        <servlet-name>InitUpdateSubStudyServlet</servlet-name>
+        <url-pattern>/InitUpdateSubStudy</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ListCRFServlet</servlet-name>
@@ -1364,26 +1228,6 @@
     <servlet-mapping>
         <servlet-name>ViewSiteServlet</servlet-name>
         <url-pattern>/ViewSite</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ListStudyUserServlet</servlet-name>
-        <url-pattern>/ListStudyUser</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ViewStudyUserServlet</servlet-name>
-        <url-pattern>/ViewStudyUser</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SetStudyUserRoleServlet</servlet-name>
-        <url-pattern>/SetStudyUserRole</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RemoveStudyUserRoleServlet</servlet-name>
-        <url-pattern>/RemoveStudyUserRole</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RestoreStudyUserRoleServlet</servlet-name>
-        <url-pattern>/RestoreStudyUserRole</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ListStudySubjectsManageServlet</servlet-name>
@@ -1474,10 +1318,6 @@
         <url-pattern>/ViewSubject</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SetUserRoleServlet</servlet-name>
-        <url-pattern>/SetUserRole</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ViewStudySubjectAuditLogServlet</servlet-name>
         <url-pattern>/ViewStudySubjectAuditLog</url-pattern>
     </servlet-mapping>]
@@ -1562,14 +1402,6 @@
     <servlet-mapping>
         <servlet-name>SystemStatusServlet</servlet-name>
         <url-pattern>/SystemStatus</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ConfigurePasswordRequirementsServlet</servlet-name>
-        <url-pattern>/ConfigurePasswordRequirements</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ConfigureServlet</servlet-name>
-        <url-pattern>/Configure</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AuditDatabaseServlet</servlet-name>
