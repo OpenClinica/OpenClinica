@@ -292,7 +292,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         } else {
                             // ***************** OpenClinica:Link RESTORE EVENT **************
                             // userRole.manageStudy &&
-                            if (!role.equals(Role.MONITOR) && studySubject.getStatus().equals(Status.AVAILABLE)
+                            if (!role.equals(Role.MONITOR) && (studySubject.getStatus().equals(Status.AVAILABLE) ||studySubject.getStatus().equals(Status.SIGNED))
                                     && studyBean.getStatus().equals(Status.AVAILABLE)
                                     && studyEvent.getStudyEventDefinition().getStatus().equals(Status.AVAILABLE)
                                     && !studyEvent.isCurrentlyLocked()) {
