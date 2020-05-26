@@ -94,11 +94,22 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                 }
             } else if (property.equals("crfStatus")) {
                     criteria = criteria + " and ";
+                if(value.toString().equalsIgnoreCase("locked")){
                     criteria =
-                        criteria + " ( " + columnMapping.get(property) + " = '"+ EventCrfWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "'  ) ";
-
+                            criteria + " (  se.locked = true ) ";
+                }
+                else {
+                    criteria =
+                            criteria + " ( " + columnMapping.get(property) + " = '" + EventCrfWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' and ( se.locked is null  or  se.locked = false ) )";
+                }
             } else if (property.equals("subjectEventStatus")){
-                criteria = criteria + " and " + columnMapping.get(property)+" = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' ";
+                criteria = criteria + " and ";
+                if(value.toString().trim().equalsIgnoreCase("locked")){
+                    criteria =
+                            criteria + " (  se.locked = true ) ";
+                }
+                else
+                    criteria = criteria + " ( " + columnMapping.get(property)+" = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' and ( se.locked is null  or  se.locked = false ) ) ";
 
             }else if(property.equals("openQueries")){
                 String openQueriesQuery ="(select count(*) from discrepancy_note dn " +

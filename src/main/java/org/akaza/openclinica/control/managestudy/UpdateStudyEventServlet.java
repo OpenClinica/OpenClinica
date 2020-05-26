@@ -71,10 +71,7 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String EVENT_BEAN = "studyEvent";
     public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
 
-    //public static final String EVENT_WORKFLOW_STATUS = "statusId";
-
-    public static final String EVENT_WORKFLOW_STATUS = "workflowStatus";
-    public static final String SUBJECT_EVENT_STATUS_ID = "statusId";
+    public static final String EVENT_WORKFLOW_STATUS = "statusId";
 
     public static final String INPUT_STARTDATE_PREFIX = "start";
     public static final String INPUT_ENDDATE_PREFIX = "end";
@@ -89,6 +86,7 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String STUDY_EVENT = "study_event";
     public static final String PREV_STUDY_EVENT_SIGNED_STATUS = "prev_study_event_workflow_status";
+    public static final String NEW_STATUS = "newStatus";
 
     private StudyEventDAO studyEventDAO;
     private EventCRFDAO eventCRFDAO;
@@ -163,40 +161,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
         studyEvent.setEventCRFs(eventCRFDAO.findAllByStudyEvent(studyEvent));
 
-        // only owner, admins, and study director/coordinator can update
-        // if (ub.getId() != studyEvent.getOwnerId()) {
-        // if (!ub.isSysAdmin() &&
-        // !currentRole.getRole().equals(Role.STUDYDIRECTOR)
-        // && !currentRole.getRole().equals(Role.COORDINATOR)) {
-        // addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-        // + respage.getString("change_study_contact_sysadmin"));
-        // request.setAttribute("id", new Integer(studySubjectId).toString());
-        // forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-        // return;
-        // }
-        // }
-        // above removed tbh 11162007
-
         List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
-
-
-        // remove more eventWorkflowStatuses here, tbh, 092007
-        // ### updates to status setting, below added tbh 102007
-        // following pieces of logic to be added:
-        /*
-         * REMOVED can happen at any step, COMPLETED can happen if the Subject
-         * Event is already complete, COMPLETED can also happen if all required
-         * CRFs in the Subject Event are completed, LOCKED can occur when all
-         * Event CRFs are completed, or not started, or removed, LOCKED/REMOVED
-         * are only options, however, when the user is study director or study
-         * coordinator SKIPPED/STOPPED? Additional rules spelled out on Nov 16
-         * 2007: STOPPED should only be in the list of choices after IDE has
-         * been started, i.e. not when SCHEDULED SKIPPED should only be in the
-         * list before IDE has been started, i.e. when SCHEDULED reminder about
-         * LOCKED happening only when CRFs are completed (not as in the
-         * above...) if a status is LOCKED already, it should allow a user to
-         * set the event back to COMPLETED
-         */
 
         Study studyBean = (Study) getStudyDao().findByPK(ssub.getStudyId());
         checkRoleByUserAndStudy(ub, studyBean);
@@ -304,6 +269,7 @@ public class UpdateStudyEventServlet extends SecureController {
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
             studyEvent.setWorkflowStatus(ses);
             ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
+            String newStatus = fp.getString(NEW_STATUS);
             if (ses.equals(StudyEventWorkflowStatusEnum.SKIPPED) ) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
@@ -314,8 +280,22 @@ public class UpdateStudyEventServlet extends SecureController {
                     eventCRFDAO.update(ecb);
                 }
             } else {
+                if (newStatus != null) {
+                    if (newStatus.equalsIgnoreCase(Status.LOCKED.getName())) {
+                        studyEvent.setLocked(true);
+                    } else {
+                        studyEvent.setLocked(false);
+                    }
+                }
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
+                    if (newStatus != null) {
+                        if (newStatus.equalsIgnoreCase(Status.LOCKED.getName())) {
+                            ecb.setStatus(Status.UNAVAILABLE);
+                        } else {
+                            ecb.setStatus(Status.AVAILABLE);
+                        }
+                    }
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
                     eventCRFDAO.update(ecb);

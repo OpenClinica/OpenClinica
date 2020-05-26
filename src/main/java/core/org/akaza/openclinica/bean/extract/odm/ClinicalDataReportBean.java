@@ -284,7 +284,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                         // ***************** OpenClinica:Link REMOVE EVENT **************
                         if (!studyEvent.isCurrentlyRemoved()
-                                && !studyEvent.isCurrentlyArchived()) {
+                                && !studyEvent.isCurrentlyArchived()
+                                && !studyEvent.isCurrentlyLocked()) {
                             if (!role.equals(Role.MONITOR) && (studySubject.getStatus().equals(Status.AVAILABLE) ||studySubject.getStatus().equals(Status.SIGNED))
                                     && studyBean.getStatus().equals(Status.AVAILABLE)) {
                                 String removeUrl = "/RemoveStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
@@ -300,7 +301,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             // userRole.manageStudy &&
                             if (!role.equals(Role.MONITOR) && studySubject.getStatus().equals(Status.AVAILABLE)
                                     && studyBean.getStatus().equals(Status.AVAILABLE)
-                                    && studyEvent.getStudyEventDefinition().getStatus().equals(Status.AVAILABLE)) {
+                                    && studyEvent.getStudyEventDefinition().getStatus().equals(Status.AVAILABLE)
+                                    && !studyEvent.isCurrentlyLocked()) {
                                 String restoreUrl = "/RestoreStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
                                         + studySubject.getStudySubjectId();
                                 xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"restore\" href=\""
@@ -331,16 +333,40 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                         if (!studyEvent.isCurrentlyRemoved()
                                 && !studyEvent.isCurrentlyArchived()
+                                && !studyEvent.isCurrentlyLocked()
                                 && studySubject.getStatus().equals(Status.AVAILABLE)
                                 && studyBean.getStatus().equals(Status.AVAILABLE)) {
                             if ((!studyEvent.getStudyEventDefinition().getType().equals(COMMON) && !role.equals(Role.MONITOR))
                                     || (studyEvent.getStudyEventDefinition().getType().equals(COMMON)
                                     && (role.equals(Role.STUDY_STUDYDIRECTOR) || role.equals(Role.COORDINATOR)))) {
-                                String lockUrl = "/UpdateStudyEvent?event_id=" + studyEvent.getStudyEventId() + "&ss_id="
-                                        + studySubject.getStudySubjectId();
+                                String lockUrl = "/UpdateStudyEvent?action=submit&newStatus=Locked&statusId=" +
+                                        studyEvent.getWorkflowStatus() + "&event_id=" + studyEvent.getStudyEventId() +
+                                        "&ss_id=" + studySubject.getStudySubjectId();
 
                                 xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"lock\" href=\""
                                         + StringEscapeUtils.escapeXml(lockUrl) + "\"");
+                                xml.append("/>");
+                                xml.append(nls);
+
+                            }
+                        }
+
+                        // ***************** OpenClinica:Link UNLOCK EVENT **************
+
+                        if (!studyEvent.isCurrentlyRemoved()
+                                && !studyEvent.isCurrentlyArchived()
+                                && studyEvent.isCurrentlyLocked()
+                                && studySubject.getStatus().equals(Status.AVAILABLE)
+                                && studyBean.getStatus().equals(Status.AVAILABLE)) {
+                            if ((!studyEvent.getStudyEventDefinition().getType().equals(COMMON) && !role.equals(Role.MONITOR))
+                                    || (studyEvent.getStudyEventDefinition().getType().equals(COMMON)
+                                    && (role.equals(Role.STUDY_STUDYDIRECTOR) || role.equals(Role.COORDINATOR)))) {
+                                String unlockUrl = "/UpdateStudyEvent?action=submit&newStatus=UnLocked&statusId=" +
+                                        studyEvent.getWorkflowStatus() + "&event_id=" + studyEvent.getStudyEventId() +
+                                        "&ss_id=" + studySubject.getStudySubjectId();
+
+                                xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"lock-open\" href=\""
+                                        + StringEscapeUtils.escapeXml(unlockUrl) + "\"");
                                 xml.append("/>");
                                 xml.append(nls);
 
@@ -453,7 +479,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             // ***************** OpenClinica:Link ENKETO EDIT MODE **************
 
                             if (!(form.getEventDefinitionCrf().getStatusId() == Status.DELETED.getCode())
-                                    && !(form.getEventDefinitionCrf().getStatusId() == Status.AUTO_DELETED.getCode())) {
+                                    && !(form.getEventDefinitionCrf().getStatusId() == Status.AUTO_DELETED.getCode())
+                                    && !studyEvent.isCurrentlyLocked()) {
 
                                 if (!formLayout.getStatus().equals(Status.DELETED)
                                         && !role.equals(Role.MONITOR)

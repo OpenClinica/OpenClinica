@@ -127,48 +127,30 @@ public class SignStudySubjectServlet extends SecureController {
             de.setMaximumSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(sed, studySubject));
 
             displayEvents.add(de);
-            // event.setEventCRFs(createAllEventCRFs(eventCRFs,
-            // eventDefinitionCRFs));
-
         }
 
         return displayEvents;
     }
 
-    public boolean permitSign(StudySubjectBean studySub, DataSource ds,StudyDao sdao) {
+    public boolean permitSign(StudySubjectBean studySub) {
         boolean sign = true;
-        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-        Study studyBean = (Study) sdao.findByPK(studySub.getStudyId());
-        // DiscrepancyNoteDAO discDao = new DiscrepancyNoteDAO(ds);
         ArrayList studyEvents = studyEventDAO.findAllByStudySubject(studySub);
         for (int l = 0; l < studyEvents.size(); l++) {
             StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(l);
-            ArrayList eventCrfs = eventCRFDAO.findAllByStudyEvent(studyEvent);
-            for (int i = 0; i < eventCrfs.size(); i++) {
-                EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
-                // ArrayList discList =
-                // discDao.findAllItemNotesByEventCRF(ecrf.getId());
-                // for (int j = 0; j < discList.size(); j++) {
-                // DiscrepancyNoteBean discBean = (DiscrepancyNoteBean)
-                // discList.get(j);
-                // if
-                // (discBean.getResStatus().equals(core.org.akaza.openclinica.bean.core
-                // .ResolutionStatus.OPEN)
-                // ||
-                // discBean.getResStatus().equals(core.org.akaza.openclinica.bean.core
-                // .ResolutionStatus.UPDATED))
-                // {
-                // sign = false;
-                // break;
-                // }
-                // }
-                EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), ecrf.getCRFVersionId());
+            sign = permitStudyEventSign(studyEvent);
+        }
+        return sign;
+    }
 
-                    if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)){
-                    sign = false;
-                    break;
-                }
+    public boolean permitStudyEventSign(StudyEventBean studyEvent) {
+        boolean sign = true;
+        ArrayList eventCrfs = eventCRFDAO.findAllByStudyEvent(studyEvent);
+        for (int i = 0; i < eventCrfs.size(); i++) {
+            EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
 
+            if(ecrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY)){
+                sign = false;
+                break;
             }
         }
         return sign;
@@ -237,12 +219,23 @@ public class SignStudySubjectServlet extends SecureController {
         StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
         request.setAttribute("studySub", studySub);
 
-        if (!permitSign(studySub, sm.getDataSource(),this.getStudyDao())) {
-            addPageMessage(respage.getString("subject_event_cannot_signed"));
-            // forwardPage(Page.SUBMIT_DATA_SERVLET);
-            forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
-            // >> changed tbh, 06/2009
-            return;
+        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+        StudyEventBean subevent = (StudyEventBean) sedao.findByPK(studyEventId);
+
+        if (studyEventId > 0) {
+            if (!permitStudyEventSign(subevent)) {
+                addPageMessage(respage.getString("study_event_cannot_signed"));
+                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" + new Integer(studySubId).toString());
+                return;
+            }
+        } else {
+            if (!permitSign(studySub)) {
+                addPageMessage(respage.getString("subject_event_cannot_signed"));
+                // forwardPage(Page.SUBMIT_DATA_SERVLET);
+                forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+                // >> changed tbh, 06/2009
+                return;
+            }
         }
 
         if (action.equalsIgnoreCase("confirm")) {

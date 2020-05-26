@@ -14,10 +14,8 @@ public class CrfStatusFilter extends DroplistFilterEditor {
     @Override
     protected List<Option> getOptions() {
         List<Option> options = new ArrayList<Option>();
-        for (EventCrfWorkflowStatusEnum workflowStatus : EventCrfWorkflowStatusEnum.values()) {
-            String eventCrfStatusDesc = workflowStatus.getDisplayValue();
-            options.add(new Option(eventCrfStatusDesc, eventCrfStatusDesc));
-        }
+        options.add(new Option(EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue(), EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue()));
+        options.add(new Option(EventCrfWorkflowStatusEnum.LOCKED.getDisplayValue(),EventCrfWorkflowStatusEnum.LOCKED.getDisplayValue()));
         return options;
     }
 }

@@ -43,9 +43,6 @@
     $(function () {
         $('#sidebar_Info_closed').css('display', 'none');
         $('#sidebar_Info_open').removeAttr('style');
-
-        $('#sidebar_Links_closed').css('display', 'none');
-        $('#sidebar_Links_open').removeAttr('style');
     });
 </script>
 
@@ -242,6 +239,10 @@
         font-weight: normal;
     }
 
+    #sdv-items td {
+        word-wrap: anywhere;
+    }
+
     #sdv-items .icon::before {
         padding: 0;
         min-width: 1.45em;
@@ -258,10 +259,6 @@
 
     #sdv td:last-child {
         white-space: nowrap;
-    }
-
-    #sdv tbody td:empty:nth-child(6)::after {
-        content: "N/A";
     }
 
     #sdv-details {
@@ -305,6 +302,11 @@
     #sdv-close-popup > .icon-cancel::before {
         color: black;
         background-color: transparent;
+    }
+
+    .sdvCheck {
+        position: relative;
+        left: 3px;
     }
 
     .icon.icon-icon-SDV-doubleCheck {
@@ -439,6 +441,10 @@
         return moment(date).utc().format('DD-MMM-YYYY hh:mm');
     }
 
+    function isMidnight(date) {
+        return moment(date).utc().format('HHmmssSSS') === '000000000';
+    }
+
     function calcPopupPos() {
         var winWidth = $(window).width();
         if (winWidth < 900) {
@@ -487,7 +493,7 @@
                 $('#formName').text(data.formName);
                 $('#sdvRequirement').text(translate(data.sdvRequirement));
                 $('#siteId').text(data.siteId);
-                $('#eventStartDate').text(data.eventStartDate || 'N/A');
+                $('#eventStartDate').text(data.eventStartDate);
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
@@ -502,7 +508,7 @@
 
                     item.lastVerifiedDate = data.lastVerifiedDate;
                     if (item.lastVerifiedDate != null && item.lastModifiedDate > item.lastVerifiedDate) {
-                        item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16">';
+                        item.value += '&nbsp; <img src="../images/changed_since_verified.png" width="16" title="<fmt:message key="value_changed_since_last_verified" bundle="${resword}"/>">';
                     }
                     if (item.lastVerifiedDate) {
                         item.lastVerifiedDate = formatDateTime(item.lastVerifiedDate);
@@ -513,13 +519,18 @@
                     else {
                         item.lastVerifiedDate = '';
                     }
+
+                    var legacyItem = isMidnight(item.lastModifiedDate);
                     item.lastModifiedDate = formatDateTime(item.lastModifiedDate);
+                    if (legacyItem) { // don't display the time component
+                        item.lastModifiedDate = item.lastModifiedDate.split(' ')[0];
+                    }
                     item.lastModifiedBy = item.lastModifiedUserFirstName + ' ' + item.lastModifiedUserLastName;
 
                     item.actions = '';
                     if (!item.calculateItem)
                         item.actions =
-                            '<a title="View Form" class="icon icon-view-within" href="../ResolveDiscrepancy' +
+                            '<a title="<fmt:message key="view_form" bundle="${resword}"/>" class="icon icon-view-within" href="../ResolveDiscrepancy' +
                             '?itemDataId=' + item.itemDataId +
                             '&popupIndex=' + popupIndex +
                             '"></a>';

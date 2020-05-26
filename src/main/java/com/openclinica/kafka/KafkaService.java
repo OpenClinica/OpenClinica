@@ -81,7 +81,6 @@ public class KafkaService {
     }
   }
 
-  @Async
   public void sendEventAttributeChangeMessage(StudyEventBean studyEventBean) throws Exception {
     if (CoreResources.isKafkaAuditingEnabled()) {
       Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
@@ -93,7 +92,6 @@ public class KafkaService {
     }
   }
 
-  @Async
   public void sendEventAttributeChangeMessage(StudyEvent studyEvent) throws Exception {
     if (CoreResources.isKafkaAuditingEnabled()) {
       Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
