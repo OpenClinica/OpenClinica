@@ -50,23 +50,16 @@ public class ScheduledExtractController {
 
 
     @ApiOperation(value = "To get latest scheduled extract dataset ids and creation time for the job name at study level", notes = "only work for authorized users with the right access permission")
-    @RequestMapping(value = "/studies/{studyOID}/extractJobs/{jobUuid}/jobExecutions", method = RequestMethod.GET)
+    @RequestMapping(value = "/studies/extractJobs/{jobUuid}/jobExecutions", method = RequestMethod.GET)
     public @ResponseBody
     ResponseEntity<Object> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("studyOID") String studyOid,
                                                                            @PathVariable("jobUuid") String jobUuid,
                                                                            HttpServletRequest request) throws SchedulerException {
 
-        Study study = studyDao.findByOcOID(studyOid.trim());
-        if (study == null) {
-            return new ResponseEntity<>("Invalid studyOid.", HttpStatus.NOT_FOUND);
-        }
-
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
             return new ResponseEntity<>("User must be type admin.", HttpStatus.UNAUTHORIZED);
         }
-
-        utilService.setSchemaFromStudyOid(studyOid);
 
         ArrayList<ArchivedDatasetFileBean> extracts = archivedDatasetFileDAO.findByJobUuid(jobUuid);
 

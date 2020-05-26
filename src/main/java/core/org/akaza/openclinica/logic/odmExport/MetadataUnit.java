@@ -239,7 +239,7 @@ public class MetadataUnit extends OdmUnit {
 
 
             // populate protocol
-            oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTagsString);
+            oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(), permissionTagsString);
         } else {
             if (dataset != null) {
                 metadata.setOid(dataset.getODMMetaDataVersionOid());
@@ -274,7 +274,7 @@ public class MetadataUnit extends OdmUnit {
             // studyId,
             // metadata, this.getODMBean().getODMVersion());
             // studyBase.setNullClSet(nullCodeSet);
-            oedao.getMetadata(study.isSite() ? study.getStudy() : study , study, metadata, this.odmBean.getODMVersion(),permissionTagsString);
+            oedao.getMetadata(study.isSite() ? study.getStudy() : study , study, metadata, this.odmBean.getODMVersion());
             metadata.setRuleSetRules(getRuleSetRuleDao().findByRuleSetStudyIdAndStatusAvail(parentStudyId));
         }
     }
