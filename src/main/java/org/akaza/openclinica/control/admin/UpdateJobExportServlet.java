@@ -34,14 +34,8 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
 
     private void setUpServlet(Trigger trigger) {
         FormProcessor fp2 = new FormProcessor(request);
-
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
         Collection dsList = dsdao.findAllOrderByStudyIdAndName();
-
-        // TODO will have to dress this up to allow for sites then datasets
-        request.setAttribute("datasets", dsList);
-        request.setAttribute(JOB_NAME, trigger.getKey().getName());
-        request.setAttribute(JOB_DESC, trigger.getDescription());
 
         JobDataMap dataMap = trigger.getJobDataMap();
         String contactEmail = dataMap.getString(ExampleSpringJob.EMAIL);
@@ -49,12 +43,16 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         String period = dataMap.getString(XsltTriggerService.PERIOD);
         int exportFormatId = dataMap.getInt(XsltTriggerService.EXPORT_FORMAT_ID);
 
+        // TODO will have to dress this up to allow for sites then datasets
+        request.setAttribute("datasets", dsList);
+        request.setAttribute(JOB_NAME, trigger.getJobKey().getName());
+        request.setAttribute(JOB_DESC, trigger.getDescription());
         request.setAttribute(FORMAT_ID, exportFormatId);
         request.setAttribute(ExampleSpringJob.EMAIL, contactEmail);
-        // how to find out the period of time???
         request.setAttribute(PERIOD, period);
         request.setAttribute(DATASET_ID, dsId);
         request.setAttribute("extractProperties", CoreResources.getExtractProperties());
+        request.setAttribute("jobUuid", trigger.getKey().getName());
 
         Date jobDate = trigger.getNextFireTime();
         HashMap presetValues = new HashMap();
@@ -81,20 +79,10 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
         String action = fp.getString("action");
         String triggerName = fp.getString("tname");
+        String jobUuid = fp.getString("jobUuid");
         ExtractUtils extractUtils = new ExtractUtils();
-        Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), TRIGGER_EXPORT_GROUP));
-
-        //Make sure the Uuid never changes from first creation time, only create one if UUID hasn't been created
-        String uniqueKey = updatingTrigger.getJobDataMap().getString(XsltTriggerService.JOB_UUID);
-        if (uniqueKey == null) {
-            uniqueKey = UUID.randomUUID().toString();
-        }
-
+        Trigger updatingTrigger = jobScheduler.getTrigger(new TriggerKey(jobUuid, TRIGGER_EXPORT_GROUP));
         Date createdDate = (Date) updatingTrigger.getJobDataMap().get(XsltTriggerService.CREATED_DATE);
-        // for export jobs that were already created before we added this feature, we will give a created date starting now
-        if (createdDate == null) {
-            createdDate = new Date();
-        }
 
         if (StringUtil.isBlank(action)) {
             setUpServlet(updatingTrigger);
@@ -102,12 +90,12 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // change and update trigger here
             // validate first
-            // then update or send back
-            String name = XsltTriggerService.TRIGGER_GROUP_NAME;
-            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(name));
-            TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
-            HashMap errors = validateForm(fp, request, triggerKeys, updatingTrigger.getKey().getName());
+            Set<JobKey> jobKeySet = jobScheduler.getJobKeys(GroupMatcher.jobGroupEquals(XsltTriggerService.TRIGGER_GROUP_NAME));
+            JobKey[] jobKeys = jobKeySet.stream().toArray(JobKey[]::new);
+            HashMap errors = validateForm(fp, request, jobKeys, updatingTrigger.getJobKey().getName());
+            // if original name never changed
             if (!errors.isEmpty()) {
+                request.setAttribute("formMessages", errors);
                 // send back
                 addPageMessage("Your modifications caused an error, please see the messages for more information.");
                 setUpServlet(updatingTrigger);
@@ -188,7 +176,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setDateCreated(new Date());
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
-                archivedDatasetFileBean.setJobUuid(uniqueKey);
+                archivedDatasetFileBean.setJobUuid(jobUuid);
                 archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
@@ -209,7 +197,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
 
                 //Updating the original trigger with user given inputs
                 trigger = trigger.getTriggerBuilder()
-                        .withIdentity(jobName, xsltService.getTriggerGroupNameForExportJobs())
+                        .withIdentity(jobUuid, xsltService.getTriggerGroupNameForExportJobs())
                         .withDescription(jobDesc)
                         .startAt(startDateTime)
                         .forJob(jobName, xsltService.getTriggerGroupNameForExportJobs())
@@ -226,20 +214,23 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
-                trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, uniqueKey);
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, jobUuid);
                 trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, createdDate);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
-                jobDetailFactoryBean.setName(trigger.getKey().getName());
+                jobDetailFactoryBean.setName(trigger.getJobKey().getName());
                 jobDetailFactoryBean.setJobClass(core.org.akaza.openclinica.job.XsltStatefulJob.class);
                 jobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
                 jobDetailFactoryBean.setDurability(true); // need durability?
                 jobDetailFactoryBean.setDescription(trigger.getDescription());
                 jobDetailFactoryBean.afterPropertiesSet();
 
+                // then update or send back
                 try {
-                    jobScheduler.deleteJob(new JobKey(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME));
+                    //Delete from oc_qrtz_triggers
+                    jobScheduler.deleteJob(JobKey.jobKey(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME));
+                    //TODO: Delete from oc_qrtz_job_details as well
                     jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), trigger);
                     addPageMessage("Your job has been successfully modified.");
                     forwardPage(Page.VIEW_JOB_SERVLET);

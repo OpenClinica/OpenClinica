@@ -33,7 +33,6 @@
 <jsp:useBean scope='session' id='userBean' class='core.org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='jobName' class='java.lang.String'/>
 <jsp:useBean scope='request' id='jobDesc' class='java.lang.String'/>
-
 <jsp:useBean scope='request' id='periodToRun' class='java.lang.String'/>
 <jsp:useBean scope='request' id='tab' class='java.lang.String'/>
 <jsp:useBean scope='request' id='cdisc' class='java.lang.String'/>

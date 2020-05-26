@@ -13,6 +13,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.view.Page;
 import org.apache.commons.lang.StringUtils;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
@@ -136,7 +137,7 @@ public abstract class ScheduleJobServlet extends SecureController {
         beanFactory.registerSingleton(schema, sFBean);
     }
 
-    public HashMap validateForm(FormProcessor fp, HttpServletRequest request, TriggerKey[] triggerKeys, String properName) {
+    public HashMap validateForm(FormProcessor fp, HttpServletRequest request, JobKey[] jobKeys, String properName) {
         Validator v = new Validator(request);
         v.addValidation(JOB_NAME, Validator.NO_BLANKS);
         v.addValidation(JOB_NAME, Validator.NO_LEADING_OR_TRAILING_SPACES);
@@ -152,8 +153,8 @@ public abstract class ScheduleJobServlet extends SecureController {
         if (formatId == 0) {
             v.addError(errors, FORMAT_ID, "Please pick a file format.");
         }
-        for (TriggerKey triggerKey : triggerKeys) {
-            if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && !triggerKey.getName().equals(properName)) {
+        for (JobKey jobKey : jobKeys) {
+            if (jobKey.getName().equals(fp.getString(JOB_NAME)) && !jobKey.getName().equals(properName)) {
                 v.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
             }
         }

@@ -28,14 +28,14 @@
     <query>
         <name>findByJobExecutionUuid</name>
         <sql>SELECT * FROM ARCHIVED_DATASET_FILE
-            WHERE DATASET_FILE_UUID=?
+            WHERE JOB_EXECUTION_UUID=?
         </sql>
     </query>
     <query>
         <name>update</name>
         <sql>UPDATE ARCHIVED_DATASET_FILE SET NAME=?, DATASET_ID=?,
             EXPORT_FORMAT_ID=?, FILE_REFERENCE=?, FILE_SIZE=?, RUN_TIME=?,
-            OWNER_ID=?, DATE_CREATED=?, FORMAT=?, STATUS=?, JOB_UUID=?, DATASET_FILE_UUID=? WHERE
+            OWNER_ID=?, DATE_CREATED=?, FORMAT=?, STATUS=?, JOB_UUID=?, JOB_EXECUTION_UUID=? WHERE
             ARCHIVED_DATASET_FILE_ID=?
         </sql>
     </query>
@@ -48,7 +48,7 @@
         <name>create</name>
         <sql>INSERT INTO ARCHIVED_DATASET_FILE (NAME, DATASET_ID,
             EXPORT_FORMAT_ID, FILE_REFERENCE, FILE_SIZE, RUN_TIME,
-            OWNER_ID, DATE_CREATED, FORMAT, STATUS, JOB_UUID, DATASET_FILE_UUID)
+            OWNER_ID, DATE_CREATED, FORMAT, STATUS, JOB_UUID, JOB_EXECUTION_UUID)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
         </sql>
     </query>

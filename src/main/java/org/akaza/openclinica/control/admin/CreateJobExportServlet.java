@@ -83,9 +83,9 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // collect form information
             XsltTriggerService xsltService = new XsltTriggerService();
-            Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(TRIGGER_EXPORT_GROUP));
-            TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
-            HashMap errors = validateForm(fp, request, triggerKeys, "");
+            Set<JobKey> jobKeySet = jobScheduler.getJobKeys(GroupMatcher.jobGroupEquals(TRIGGER_EXPORT_GROUP));
+            JobKey[] jobKeys = jobKeySet.stream().toArray(JobKey[]::new);
+            HashMap errors = validateForm(fp, request, jobKeys, "");
 
             if (!errors.isEmpty()) {
                 // set errors to request
@@ -165,7 +165,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                     logger.error("Error in setting the permissions: ", e);
                 }
 
-                String uniqueKey = UUID.randomUUID().toString();
+                String jobUuid = UUID.randomUUID().toString();
                 Date dateCreated = new Date();
 
                 ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
@@ -176,7 +176,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setDateCreated(dateCreated);
                 archivedDatasetFileBean.setExportFormatId(1);
                 archivedDatasetFileBean.setFileReference("");
-                archivedDatasetFileBean.setJobUuid(uniqueKey);
+                archivedDatasetFileBean.setJobUuid(jobUuid);
                 archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
@@ -197,7 +197,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
 
                 //Updating the original trigger with user given inputs
                 trigger = trigger.getTriggerBuilder()
-                        .withIdentity(jobName, xsltService.getTriggerGroupNameForExportJobs())
+                        .withIdentity(jobUuid, xsltService.getTriggerGroupNameForExportJobs())
                         .withSchedule(simpleSchedule().withRepeatCount(64000)
                                 .withIntervalInSeconds(XsltTriggerService.getIntervalTimeInSeconds(period))
                                 .withMisfireHandlingInstructionNextWithExistingCount())
@@ -213,7 +213,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
-                trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, uniqueKey);
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, jobUuid);
                 trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, dateCreated);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();

@@ -26,7 +26,6 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        // << tbh 09/03/2009 #4143
         ApplicationContext context = null;
         scheduler = getScheduler();
         try {
@@ -36,6 +35,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
         }
         Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
         // changes to this servlet, we now look at group name too, tbh 05/2009
+        String jobUuid = fp.getString("jobUuid");
         String triggerName = fp.getString("tname");
         String gName = fp.getString("gname");
         String groupName = "";
@@ -44,20 +44,20 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
         } else { // if (gName.equals("1")) {
             groupName = TRIGGER_IMPORT_GROUP;
         }
-        Trigger trigger = jobScheduler.getTrigger(new TriggerKey(triggerName.trim(), groupName));
 
+        Trigger trigger = jobScheduler.getTrigger(new TriggerKey(jobUuid, groupName));
+
+        logger.debug("found job Uuid: " + jobUuid);
         logger.debug("found trigger name: " + triggerName);
         logger.debug("found group name: " + groupName);
         TriggerBean triggerBean = new TriggerBean();
-        JobDataMap dataMap;
         AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource(), getStudyDao());
 
         try {
-            triggerBean.setFullName(trigger.getKey().getName());
-            triggerBean.setCreatedDate((Date) trigger.getJobDataMap().get(XsltTriggerService.CREATED_DATE));
             triggerBean.setPreviousDate(trigger.getPreviousFireTime());
             triggerBean.setNextDate(trigger.getNextFireTime());
-            // >> set active here, tbh 10/08/2009
+            triggerBean.setJobUuid(jobUuid);
+
             if (jobScheduler.getTriggerState(new TriggerKey(triggerName, groupName)) == Trigger.TriggerState.PAUSED) {
                 triggerBean.setActive(false);
                 logger.debug("setting active to false for trigger: " + trigger.getKey().getName());
@@ -70,13 +70,15 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 triggerBean.setDescription(trigger.getDescription());
             }
             if (trigger.getJobDataMap().size() > 0) {
-                dataMap = trigger.getJobDataMap();
+                JobDataMap dataMap = trigger.getJobDataMap();
                 String contactEmail = dataMap.getString(XsltTriggerService.EMAIL);
                 logger.debug("found email: " + contactEmail);
                 // String datasetId =
                 // dataMap.getString(ExampleSpringJob.DATASET_ID);
                 // int dsId = new Integer(datasetId).intValue();
                 if (gName.equals("") || gName.equals("0")) {
+                    triggerBean.setFullName(trigger.getJobDataMap().getString(XsltTriggerService.JOB_NAME));
+                    triggerBean.setCreatedDate((Date) trigger.getJobDataMap().get(XsltTriggerService.CREATED_DATE));
                     String exportFormat = dataMap.getString(XsltTriggerService.EXPORT_FORMAT);
                     String periodToRun = dataMap.getString(ExampleSpringJob.PERIOD);
                     String createdDate = dataMap.getString("");
@@ -93,9 +95,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 // need to set information, extract bean, user account bean
 
                 UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-
                 triggerBean.setContactEmail(contactEmail);
-
                 UserAccountBean userAccount = (UserAccountBean) userAccountDAO.findByPK(userId);
 
                 triggerBean.setUserAccount(userAccount);
@@ -108,8 +108,6 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
 
                 EntityBeanTable table = fp.getEntityBeanTable();
                 String[] columns = {resword.getString("date_and_time"), resword.getString("action_message"), resword.getString("entity_operation"),
-                        // resword.getString("study_site"),
-                        // resword.getString("study_subject_ID"),
                         resword.getString("changes_and_additions")};
 
                 table.setColumns(new ArrayList(Arrays.asList(columns)));
@@ -118,7 +116,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 table.hideColumnLink(3);
                 table.hideColumnLink(4);
 
-                table.setQuery("ViewSingleJob?tname=" + triggerName + "&gname=" + gName, new HashMap());
+                table.setQuery("ViewSingleJob?tname=" + triggerName + "&gname=" + gName + "&jobUuid=" + jobUuid, new HashMap());
                 table.setRows(allRows);
                 table.computeDisplay();
 
@@ -133,7 +131,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
         // in other words the job data map
 
         request.setAttribute("triggerBean", triggerBean);
-
+        request.setAttribute("jobUuid", jobUuid);
         request.setAttribute("groupName", groupName);
 
         forwardPage(Page.VIEW_SINGLE_JOB);
