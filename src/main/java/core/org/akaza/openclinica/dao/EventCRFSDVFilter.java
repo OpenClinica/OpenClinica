@@ -33,6 +33,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
         columnMapping.put("sdvRequirementDefinition", "");
         columnMapping.put("crfStatus", "ec.workflow_status");
         columnMapping.put("subjectEventStatus","se.workflow_status");
+        columnMapping.put("lockStatus", "se.locked");
     }
 
     public void addFilter(String property, Object value) {
@@ -92,7 +93,16 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                     }
                     criteria += " ) )) ";
                 }
-            } else if (property.equals("crfStatus")) {
+            } else if(property.equals("lockStatus")){
+                criteria = criteria + " and ";
+                if(value.toString().equalsIgnoreCase("locked")){
+                    criteria += " (  " + columnMapping.get(property) + " = true ) ";
+                }
+                else{
+                    criteria += " ( " + columnMapping.get(property) + " is null  or " + columnMapping.get(property) + " = false ) ";
+                }
+
+            }else if (property.equals("crfStatus")) {
                     criteria = criteria + " and ";
                 if(value.toString().equalsIgnoreCase("locked")){
                     criteria =
@@ -103,13 +113,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                             criteria + " ( " + columnMapping.get(property) + " = '" + EventCrfWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' and ( se.locked is null  or  se.locked = false ) )";
                 }
             } else if (property.equals("subjectEventStatus")){
-                criteria = criteria + " and ";
-                if(value.toString().trim().equalsIgnoreCase("locked")){
-                    criteria =
-                            criteria + " (  se.locked = true ) ";
-                }
-                else
-                    criteria = criteria + " ( " + columnMapping.get(property)+" = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' and ( se.locked is null  or  se.locked = false ) ) ";
+                    criteria += " and ( " + columnMapping.get(property)+" = '" + StudyEventWorkflowStatusEnum.getByI18nDescription(value.toString().trim()) + "' ) ";
 
             }else if(property.equals("openQueries")){
                 String openQueriesQuery ="(select count(*) from discrepancy_note dn " +

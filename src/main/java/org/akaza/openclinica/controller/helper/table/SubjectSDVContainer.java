@@ -32,7 +32,7 @@ public class SubjectSDVContainer {
     private String crfVersion;
     //100% Required, Partial Required, 100% and Partial, Not Required
     private String sdvRequirementDefinition;
-    private String crfStatus;
+    private String lockStatus;
     private String subjectEventStatus;
     private Date lastUpdatedDate;
     private String lastUpdatedBy;
@@ -56,7 +56,7 @@ public class SubjectSDVContainer {
         studySubjectStatus = "";
         crfName = "";
         sdvRequirementDefinition = "";
-        crfStatus = "";
+        lockStatus = "";
         subjectEventStatus = "";
         lastUpdatedDate = null;
         lastUpdatedBy = "";
@@ -181,12 +181,12 @@ public class SubjectSDVContainer {
         this.studySubjectStatus = studySubjectStatus;
     }
 
-    public String getCrfStatus() {
-        return crfStatus;
+    public String getLockStatus() {
+        return lockStatus;
     }
 
-    public void setCrfStatus(String crfStatus) {
-        this.crfStatus = crfStatus;
+    public void setLockStatus(String lockStatus) {
+        this.lockStatus = lockStatus;
     }
 
     public Date getLastUpdatedDate() {
