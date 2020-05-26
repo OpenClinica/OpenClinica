@@ -6,6 +6,7 @@ import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
+import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
@@ -103,6 +104,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private final String  PARTICIPATE_STATUS="participate.status";
     private ResponseSet responseSet;
     final HashMap<String, String> imageIconPaths = new HashMap<String, String>(8);
+    final HashMap<String, Integer> statusPriorities = new HashMap<String, Integer>(8);
 
     @Override
     // To avoid showing title in other pages, the request element is used to determine where the request came from.
@@ -151,6 +153,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
+        imageIconPaths.put(EventCrfStatusEnum.REMOVED.toString(), "icon icon-cancel");
+
+        statusPriorities.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.toString(), 0);
+        statusPriorities.put(StudyEventWorkflowStatusEnum.SCHEDULED.toString(), 1);
+        statusPriorities.put(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED.toString(), 2);
+        statusPriorities.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), 3);
+        statusPriorities.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), 4);
+        statusPriorities.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), 5);
+        statusPriorities.put(EventCrfStatusEnum.REMOVED.toString(), 5);
     }
 
     @Override
@@ -989,7 +1000,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         StudyEventDefinitionBean studyEventDefinition;
         StudySubjectBean studySubjectBean;
-        StudyEventWorkflowStatusEnum workflowStatus;
+        String workflowStatus;
         List<StudyEventBean> studyEvents;
         SubjectBean subject;
 
@@ -1001,13 +1012,25 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         public Object getValue(Object item, String property, int rowcount) {
             studyEvents = (List<StudyEventBean>) ((HashMap<Object, Object>) item).get(property + "_studyEvents");
             studyEventDefinition = (StudyEventDefinitionBean) ((HashMap<Object, Object>) item).get(property + "_object");
-            workflowStatus = (StudyEventWorkflowStatusEnum) ((HashMap<Object, Object>) item).get(property);
+            workflowStatus = ((StudyEventWorkflowStatusEnum) ((HashMap<Object, Object>) item).get(property)).toString();
             subject = (SubjectBean) ((HashMap<Object, Object>) item).get("subject");
             studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
 
             StringBuilder url = new StringBuilder();
             url.append(eventDivBuilder(subject, rowcount, studyEvents, studyEventDefinition, studySubjectBean));
-            url.append("<span class='" + imageIconPaths.get(workflowStatus.toString()) + "' style='padding-top: 2px; padding-bottom: 3px;'>");
+            for (int i = 0; i < studyEvents.size(); i++) {
+                StudyEventBean seb = studyEvents.get(i);
+                String currentStatus = workflowStatus;
+                if (seb.isRemoved()) {
+                    currentStatus = EventCrfStatusEnum.REMOVED.toString();
+                } else {
+                    currentStatus = seb.getWorkflowStatus().toString();
+                }
+                if (i == 0 || (statusPriorities.get(workflowStatus) > statusPriorities.get(currentStatus))) {
+                    workflowStatus = currentStatus;
+                }
+            }
+            url.append("<span class='" + imageIconPaths.get(workflowStatus) + "' style='padding-top: 2px; padding-bottom: 3px;'>");
             url.append("<span style='color: #668cff; padding-left: 0px; font-size: 13px;'>" + getCount() + "</span></a></td></tr></table>");
 
             return url.toString();
