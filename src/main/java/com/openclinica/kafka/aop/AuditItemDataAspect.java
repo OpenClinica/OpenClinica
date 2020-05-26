@@ -1,4 +1,4 @@
-package com.openclinica.aop;
+package com.openclinica.kafka.aop;
 
 import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -10,6 +10,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Aspect

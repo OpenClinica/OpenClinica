@@ -6,9 +6,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import core.org.akaza.openclinica.bean.service.SasProcessingFunction;
 import core.org.akaza.openclinica.bean.service.SqlProcessingFunction;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -16,8 +14,6 @@ import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -56,7 +52,7 @@ public class CoreResources implements InitializingBean {
     private static final String EXTERNAL_PROPERTY_DIRECTORY = System.getProperty("user.home") + "/runtime-config/";
 
     public static final String KAFKA_BROKERS = "kafka.brokers";
-    public static final String KAFKA_AUDITING = "kafka.auditing";
+    public static final String KAFKA_ENABLED = "kafka.enabled";
 
     private static String webapp;
     protected final static Logger logger = LoggerFactory.getLogger("core.org.akaza.openclinica.dao.core.CoreResources");
@@ -976,17 +972,9 @@ public class CoreResources implements InitializingBean {
         return value;
     }
 
-    public static boolean isKafkaAuditingEnabled() {
-        String value = getField(KAFKA_AUDITING);
+    public static boolean isKafkaEnabled() {
+        String value = getField(KAFKA_ENABLED);
         return Boolean.parseBoolean(value);
-    }
-
-    // Kafka
-    // Aspects
-    //
-    public static String isKafkaEnabled() {
-        String value = getField("kafkaBrokers");
-        return value;
     }
 
     // TODO internationalize

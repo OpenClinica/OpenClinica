@@ -72,9 +72,7 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
-    <bean id="auditStudyEventAspect" class="com.openclinica.aop.AuditStudyEventAspect">
-        <!-- configure properties of aspect here as normal -->
-    </bean>
+
 
     <bean id="studyEventBeanListener" class="core.org.akaza.openclinica.service.rule.StudyEventBeanListener">
         <constructor-arg ref="studyEventJDBCDao"/>

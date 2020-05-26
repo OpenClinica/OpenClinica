@@ -1,4 +1,4 @@
-package com.openclinica.aop;
+package com.openclinica.kafka.aop;
 
 import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;

@@ -1,13 +1,14 @@
 package com.openclinica.kafka;
 
-import com.openclinica.kafka.dto.*;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
+import com.openclinica.kafka.dto.FormChangeDTO;
+import com.openclinica.kafka.dto.ItemDataChangeDTO;
+import com.openclinica.kafka.dto.StudyPublishDTO;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
-import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.service.CoreUtilServiceImpl;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -15,374 +16,347 @@ import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
 
 @Service
 public class KafkaService {
-  @Autowired
-  private KafkaTemplate kafkaTemplate;
-  @Autowired
-  private StudySubjectDao studySubjectDao;
-  @Autowired
-  StudyEventDao studyEventDao;
-  @Autowired
-  EventCrfDao eventCrfDao;
-  @Autowired
-  ItemDao itemDao;
-  @Autowired
-  private StudyEventDefinitionDao studyEventDefinitionDao;
-  @Autowired
-  private CoreUtilServiceImpl coreUtilService;
+    @Autowired
+    StudyEventDao studyEventDao;
+    @Autowired
+    EventCrfDao eventCrfDao;
+    @Autowired
+    ItemDao itemDao;
+    @Autowired
+    private KafkaTemplate kafkaTemplate;
+    @Autowired
+    private StudySubjectDao studySubjectDao;
+    @Autowired
+    private StudyEventDefinitionDao studyEventDefinitionDao;
+    @Autowired
+    private CoreUtilServiceImpl coreUtilService;
 
-  @Async
-  public void sendFormChangeMessage(FormChangeDTO formChangeDTO) throws Exception {
-    if (CoreResources.isKafkaAuditingEnabled()){
-      Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
+    @Async
+    public void sendFormChangeMessage(FormChangeDTO formChangeDTO) throws Exception {
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
 
-      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_CHANGE_TOPIC, null, null, null, formChangeDTO, headers);
-      kafkaTemplate.send(producerRecord);
-    }
-  }
-
-  @Async
-  public void sendFormAttributeChangeMessage(EventCrf eventCrf) throws Exception {
-    if (CoreResources.isKafkaAuditingEnabled()) {
-      Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
-
-      FormChangeDTO formAttributeChangeDTO = constructEditFormDTO(eventCrf);
-
-      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
-      kafkaTemplate.send(producerRecord);
-    }
-  }
-
-  @Async
-  public void sendFormAttributeChangeMessage(EventCRFBean eventCrfBean) throws Exception {
-    if (CoreResources.isKafkaAuditingEnabled()) {
-      Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
-
-      FormChangeDTO formAttributeChangeDTO = constructEventCrfAttributeChangeDTO(eventCrfBean);
-
-      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
-      kafkaTemplate.send(producerRecord);
-    }
-  }
-
-  public void sendEventAttributeChangeMessage(StudyEventBean studyEventBean) throws Exception {
-    if (CoreResources.isKafkaAuditingEnabled()) {
-      Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
-
-      EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEventBean);
-
-      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
-      kafkaTemplate.send(producerRecord);
-    }
-  }
-
-  public void sendEventAttributeChangeMessage(StudyEvent studyEvent) throws Exception {
-    if (CoreResources.isKafkaAuditingEnabled()) {
-      Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
-
-      EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEvent);
-
-      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
-      kafkaTemplate.send(producerRecord);
-    }
-  }
-
-  @Async
-  public void sendItemDataChangeMessage(ItemData itemData) throws Exception {
-    if (CoreResources.isKafkaAuditingEnabled()) {
-      ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemData);
-
-      Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
-      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
-      kafkaTemplate.send(producerRecord);
-    }
-  }
-
-  @Async
-  public void sendItemDataChangeMessage(ItemDataBean itemDataBean) throws Exception {
-    if (CoreResources.isKafkaAuditingEnabled()) {
-      ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemDataBean);
-
-      Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
-      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
-      kafkaTemplate.send(producerRecord);
-    }
-  }
-
-  @Async
-  public void sendStudyPublishMessage(Study study) throws Exception {
-    if (CoreResources.isKafkaAuditingEnabled()) {
-      StudyPublishDTO studyPublishDTO = new StudyPublishDTO();
-
-      studyPublishDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-      studyPublishDTO.setStudyUuid(study.getStudyUuid());
-      studyPublishDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
-
-      Headers headers = buildHeaders("com.openclinica.kafka.dto.StudyPublishDTO");
-      ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.STUDY_PUBLISH_TOPIC, null, null, null, studyPublishDTO, headers);
-      kafkaTemplate.send(producerRecord);
-    }
-  }
-
-  private Headers buildHeaders(String dtoType){
-    Headers headers = new RecordHeaders();
-    headers.add(new Header() {
-      @Override
-      public String key() {
-        return "__TypeId__";
-      }
-
-      @Override
-      public byte[] value() {
-        return dtoType.getBytes();
-      }
-    });
-    return headers;
-  }
-
-  private ItemDataChangeDTO constructItemDataChangeDTO(ItemData itemData){
-    ItemDataChangeDTO itemDataChangeDTO = new ItemDataChangeDTO();
-
-    Study study = itemData.getEventCrf().getStudySubject().getStudy();
-
-    itemDataChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    itemDataChangeDTO.setStudyUuid(getStudyUuid(study));
-    itemDataChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
-    itemDataChangeDTO.setStudyOid(getStudyOid(study));
-    itemDataChangeDTO.setSiteOid(getSiteOid(study));
-    itemDataChangeDTO.setParticipantId(itemData.getEventCrf().getStudySubject().getLabel());
-    itemDataChangeDTO.setParticipantOid(itemData.getEventCrf().getStudySubject().getOcOid());
-
-    itemDataChangeDTO.setEventOid(itemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid());
-    itemDataChangeDTO.setEventRepeatKey(getEventRepeatKey(itemData.getEventCrf().getStudyEvent()));
-
-    itemDataChangeDTO.setFormOid(itemData.getEventCrf().getFormLayout().getCrf().getOcOid());
-
-    itemDataChangeDTO.setItemGroupOid(itemData.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
-    itemDataChangeDTO.setItemGroupRepeatKey(itemData.getOrdinal());
-
-    itemDataChangeDTO.setItemDataType(itemData.getItem().getItemDataType().getName());
-    itemDataChangeDTO.setItemName(itemData.getItem().getName());
-    itemDataChangeDTO.setItemOid(itemData.getItem().getOcOid());
-    itemDataChangeDTO.setItemData(itemData.getValue());
-
-    return itemDataChangeDTO;
-  }
-
-  private ItemDataChangeDTO constructItemDataChangeDTO(ItemDataBean itemDataBean){
-    ItemDataChangeDTO itemDataChangeDTO = new ItemDataChangeDTO();
-
-    EventCrf eventCrf = eventCrfDao.findById(itemDataBean.getEventCRFId());
-    Item item = itemDao.findById(itemDataBean.getItemId());
-    Study study = eventCrf.getStudySubject().getStudy();
-
-    itemDataChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    itemDataChangeDTO.setStudyUuid(getStudyUuid(study));
-    itemDataChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
-    itemDataChangeDTO.setStudyOid(getStudyOid(study));
-    itemDataChangeDTO.setSiteOid(getSiteOid(study));
-    itemDataChangeDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
-    itemDataChangeDTO.setParticipantOid(eventCrf.getStudySubject().getOcOid());
-
-    itemDataChangeDTO.setEventOid(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid());
-    itemDataChangeDTO.setEventRepeatKey(getEventRepeatKey(eventCrf.getStudyEvent()));
-
-    itemDataChangeDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
-
-    itemDataChangeDTO.setItemGroupOid(item.getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
-    itemDataChangeDTO.setItemGroupRepeatKey(itemDataBean.getOrdinal());
-
-    itemDataChangeDTO.setItemDataType(item.getItemDataType().getName());
-    itemDataChangeDTO.setItemName(item.getName());
-    itemDataChangeDTO.setItemOid(item.getOcOid());
-    itemDataChangeDTO.setItemData(itemDataBean.getValue());
-
-    return itemDataChangeDTO;
-  }
-
-  private EventAttributeChangeDTO constructEventChangeDTO(StudyEventBean studyEventBean){
-    EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
-    StudySubject studySubject = studySubjectDao.findById(studyEventBean.getStudySubjectId());
-    Study study = studySubject.getStudy();
-
-    eventAttributeChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    eventAttributeChangeDTO.setStudyUuid(getStudyUuid(study));
-    eventAttributeChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
-    eventAttributeChangeDTO.setStudyOid(getStudyOid(study));
-    eventAttributeChangeDTO.setSiteOid(getSiteOid(study));
-
-    eventAttributeChangeDTO.setParticipantId(studySubject.getLabel());
-    eventAttributeChangeDTO.setParticipantOid(studySubject.getOcOid());
-
-    if (studyEventBean.getStudyEventDefinitionId() != 0){
-      StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByStudyEventDefinitionId(studyEventBean.getStudyEventDefinitionId());
-      eventAttributeChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
-      eventAttributeChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEventBean));
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_CHANGE_TOPIC, null, null, null, formChangeDTO, headers);
+        kafkaTemplate.send(producerRecord);
     }
 
-    eventAttributeChangeDTO.setEventStartDate(studyEventBean.getDateStarted().toString());
-    eventAttributeChangeDTO.setEventWorkflowStatus(studyEventBean.getWorkflowStatus().getDisplayValue());
+    @Async
+    public void sendFormAttributeChangeMessage(EventCrf eventCrf) throws Exception {
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
 
+        FormChangeDTO formAttributeChangeDTO = constructEditFormDTO(eventCrf);
 
-    return eventAttributeChangeDTO;
-  }
-
-  private EventAttributeChangeDTO constructEventChangeDTO(StudyEvent studyEvent){
-    EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
-    StudySubject studySubject = studySubjectDao.findById(studyEvent.getStudySubject().getStudySubjectId());
-    Study study = studySubject.getStudy();
-
-    eventAttributeChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    eventAttributeChangeDTO.setStudyUuid(getStudyUuid(study));
-    eventAttributeChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
-    eventAttributeChangeDTO.setStudyOid(getStudyOid(study));
-    eventAttributeChangeDTO.setSiteOid(getSiteOid(study));
-
-    eventAttributeChangeDTO.setParticipantId(studySubject.getLabel());
-    eventAttributeChangeDTO.setParticipantOid(studySubject.getOcOid());
-
-    if (studyEvent.getStudyEventDefinition().getOc_oid() != null){
-      eventAttributeChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
+        kafkaTemplate.send(producerRecord);
     }
-    eventAttributeChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEvent));
-    eventAttributeChangeDTO.setEventStartDate(studyEvent.getDateStart().toString());
-    eventAttributeChangeDTO.setEventWorkflowStatus(studyEvent.getWorkflowStatus().name());
 
-    return eventAttributeChangeDTO;
-  }
+    @Async
+    public void sendFormAttributeChangeMessage(EventCRFBean eventCrfBean) throws Exception {
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.FormChangeDTO");
 
-  public FormChangeDTO constructEventCrfAttributeChangeDTO(EventCRFBean eventCrfBean){
-    FormChangeDTO formChangeDTO = new FormChangeDTO();
+        FormChangeDTO formAttributeChangeDTO = constructEventCrfAttributeChangeDTO(eventCrfBean);
 
-    StudyEventDefinition studyEventDefinition = studyEventDao.findById(eventCrfBean.getStudyEventId()).getStudyEventDefinition();
-    StudySubject studySubject = studySubjectDao.findById(eventCrfBean.getStudySubjectId());
-    Study study = studySubject.getStudy();
-
-    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    formChangeDTO.setStudyUuid(getStudyUuid(study));
-    formChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
-    formChangeDTO.setStudyOid(getStudyOid(study));
-    formChangeDTO.setSiteOid(getSiteOid(study));
-
-    formChangeDTO.setParticipantId(String.valueOf(studySubject.getLabel()));
-    formChangeDTO.setParticipantOid(studySubject.getOcOid());
-
-    formChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
-    formChangeDTO.setEventRepeatKey(getEventRepeatKey(eventCrfBean.getStudyEvent()));
-
-    formChangeDTO.setFormOid(eventCrfBean.getCrf().getOid());
-    formChangeDTO.setFormCreatedDate(eventCrfBean.getCreatedDate().toString());
-    formChangeDTO.setFormUpdatedDate(eventCrfBean.getUpdatedDate().toString());
-
-    return formChangeDTO;
-  }
-
-  public FormChangeDTO constructEditFormDTO(EventCrf eventCrf){
-    FormChangeDTO formChangeDTO = new FormChangeDTO();
-
-    Study study = eventCrf.getStudySubject().getStudy();
-
-    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    formChangeDTO.setStudyUuid(getStudyUuid(study));
-    formChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
-    formChangeDTO.setStudyOid(getStudyOid(study));
-    formChangeDTO.setSiteOid(getSiteOid(study));
-
-    formChangeDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
-    formChangeDTO.setParticipantOid(eventCrf.getStudySubject().getOcOid());
-
-    formChangeDTO.setEventOid(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid());
-    formChangeDTO.setEventRepeatKey(getEventRepeatKey(eventCrf.getStudyEvent()));
-
-    formChangeDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
-    formChangeDTO.setFormCreatedDate(eventCrf.getDateCreated().toString());
-    formChangeDTO.setFormUpdatedDate(eventCrf.getDateUpdated().toString());
-
-    return formChangeDTO;
-  }
-
-  //TODO This is crashing if I open/view from a non-participant source since the study subject is null.
-  public FormChangeDTO constructNewFormDTO(Study study, StudyEvent studyEvent, FormLayout formLayout){
-    FormChangeDTO formChangeDTO = new FormChangeDTO();
-
-    formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
-    formChangeDTO.setStudyUuid(getStudyUuid(study));
-    formChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
-    formChangeDTO.setStudyOid(getStudyOid(study));
-    formChangeDTO.setSiteOid(getSiteOid(study));
-
-    formChangeDTO.setParticipantId(studyEvent.getStudySubject().getLabel());
-    formChangeDTO.setParticipantOid(studyEvent.getStudySubject().getOcOid());
-    formChangeDTO.setFormOid(formLayout.getCrf().getOcOid());
-    formChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
-    formChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEvent));
-    formChangeDTO.setFormWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue());
-
-    return formChangeDTO;
-  }
-
-  private String getStudyEnvUuid(Study study) {
-    if (study.getStudy() == null){
-      return study.getStudyEnvUuid();
-    } else {
-      return study.getStudy().getStudyEnvUuid();
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.FORM_ATTRIBUTE_CHANGE_TOPIC, null, null, null, formAttributeChangeDTO, headers);
+        kafkaTemplate.send(producerRecord);
     }
-  }
 
-  private String getStudyUuid(Study study) {
-    if (study.getStudy() == null){
-      return study.getStudyUuid();
-    } else {
-      return study.getStudy().getStudyUuid();
-    }
-  }
+    public void sendEventAttributeChangeMessage(StudyEventBean studyEventBean) throws Exception {
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
 
-  private String getSiteOid(Study study) {
-    if (study.getStudy() == null){
-      return null;
-    } else {
-      return study.getOc_oid();
-    }
-  }
+        EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEventBean);
 
-  private String getStudyOid(Study study){
-    if (study.getStudy() == null){
-      return study.getOc_oid();
-    } else {
-      return study.getStudy().getOc_oid();
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
+        kafkaTemplate.send(producerRecord);
     }
-  }
 
-  private int getEventRepeatKey(StudyEvent studyEvent){
-    if (studyEvent.getStudyEventDefinition().isRepeating()) {
-      return studyEvent.getSampleOrdinal();
-    } else {
-      return 0;
-    }
-  }
+    public void sendEventAttributeChangeMessage(StudyEvent studyEvent) throws Exception {
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.EventAttributeChangeDTO");
 
-  private int getEventRepeatKey(StudyEventBean studyEventBean){
-    //TODO It looks like this might have the same hibernate issue that the EventCrfAspect is having? It's already deleted?
-    if (studyEventBean.getStudyEventDefinition().isRepeating()) {
-      return studyEventBean.getSampleOrdinal();
-    } else {
-      return 0;
+        EventAttributeChangeDTO eventAttributeChangeDTO = constructEventChangeDTO(studyEvent);
+
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.EVENT_ATTRIBUTE_CHANGE_TOPIC, null, null, null, eventAttributeChangeDTO, headers);
+        kafkaTemplate.send(producerRecord);
     }
-  }
+
+    @Async
+    public void sendItemDataChangeMessage(ItemData itemData) throws Exception {
+        ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemData);
+
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
+        kafkaTemplate.send(producerRecord);
+    }
+
+    @Async
+    public void sendItemDataChangeMessage(ItemDataBean itemDataBean) throws Exception {
+        ItemDataChangeDTO itemDataChangeDTO = constructItemDataChangeDTO(itemDataBean);
+
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.ItemDataChangeDTO");
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.ITEM_DATA_CHANGE_TOPIC, null, null, null, itemDataChangeDTO, headers);
+        kafkaTemplate.send(producerRecord);
+    }
+
+    @Async
+    public void sendStudyPublishMessage(Study study) throws Exception {
+        StudyPublishDTO studyPublishDTO = new StudyPublishDTO();
+
+        studyPublishDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        studyPublishDTO.setStudyUuid(study.getStudyUuid());
+        studyPublishDTO.setStudyEnvironmentUuid(study.getStudyEnvUuid());
+
+        Headers headers = buildHeaders("com.openclinica.kafka.dto.StudyPublishDTO");
+        ProducerRecord producerRecord = new ProducerRecord(KafkaConfig.STUDY_PUBLISH_TOPIC, null, null, null, studyPublishDTO, headers);
+        kafkaTemplate.send(producerRecord);
+    }
+
+    private Headers buildHeaders(String dtoType) {
+        Headers headers = new RecordHeaders();
+        headers.add(new Header() {
+            @Override
+            public String key() {
+                return "__TypeId__";
+            }
+
+            @Override
+            public byte[] value() {
+                return dtoType.getBytes();
+            }
+        });
+        return headers;
+    }
+
+    private ItemDataChangeDTO constructItemDataChangeDTO(ItemData itemData) {
+        ItemDataChangeDTO itemDataChangeDTO = new ItemDataChangeDTO();
+
+        Study study = itemData.getEventCrf().getStudySubject().getStudy();
+
+        itemDataChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        itemDataChangeDTO.setStudyUuid(getStudyUuid(study));
+        itemDataChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
+        itemDataChangeDTO.setStudyOid(getStudyOid(study));
+        itemDataChangeDTO.setSiteOid(getSiteOid(study));
+        itemDataChangeDTO.setParticipantId(itemData.getEventCrf().getStudySubject().getLabel());
+        itemDataChangeDTO.setParticipantOid(itemData.getEventCrf().getStudySubject().getOcOid());
+
+        itemDataChangeDTO.setEventOid(itemData.getEventCrf().getStudyEvent().getStudyEventDefinition().getOc_oid());
+        itemDataChangeDTO.setEventRepeatKey(getEventRepeatKey(itemData.getEventCrf().getStudyEvent()));
+
+        itemDataChangeDTO.setFormOid(itemData.getEventCrf().getFormLayout().getCrf().getOcOid());
+
+        itemDataChangeDTO.setItemGroupOid(itemData.getItem().getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
+        itemDataChangeDTO.setItemGroupRepeatKey(itemData.getOrdinal());
+
+        itemDataChangeDTO.setItemDataType(itemData.getItem().getItemDataType().getName());
+        itemDataChangeDTO.setItemName(itemData.getItem().getName());
+        itemDataChangeDTO.setItemOid(itemData.getItem().getOcOid());
+        itemDataChangeDTO.setItemData(itemData.getValue());
+
+        return itemDataChangeDTO;
+    }
+
+    private ItemDataChangeDTO constructItemDataChangeDTO(ItemDataBean itemDataBean) {
+        ItemDataChangeDTO itemDataChangeDTO = new ItemDataChangeDTO();
+
+        EventCrf eventCrf = eventCrfDao.findById(itemDataBean.getEventCRFId());
+        Item item = itemDao.findById(itemDataBean.getItemId());
+        Study study = eventCrf.getStudySubject().getStudy();
+
+        itemDataChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        itemDataChangeDTO.setStudyUuid(getStudyUuid(study));
+        itemDataChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
+        itemDataChangeDTO.setStudyOid(getStudyOid(study));
+        itemDataChangeDTO.setSiteOid(getSiteOid(study));
+        itemDataChangeDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
+        itemDataChangeDTO.setParticipantOid(eventCrf.getStudySubject().getOcOid());
+
+        itemDataChangeDTO.setEventOid(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid());
+        itemDataChangeDTO.setEventRepeatKey(getEventRepeatKey(eventCrf.getStudyEvent()));
+
+        itemDataChangeDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
+
+        itemDataChangeDTO.setItemGroupOid(item.getItemGroupMetadatas().get(0).getItemGroup().getOcOid());
+        itemDataChangeDTO.setItemGroupRepeatKey(itemDataBean.getOrdinal());
+
+        itemDataChangeDTO.setItemDataType(item.getItemDataType().getName());
+        itemDataChangeDTO.setItemName(item.getName());
+        itemDataChangeDTO.setItemOid(item.getOcOid());
+        itemDataChangeDTO.setItemData(itemDataBean.getValue());
+
+        return itemDataChangeDTO;
+    }
+
+    private EventAttributeChangeDTO constructEventChangeDTO(StudyEventBean studyEventBean) {
+        EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
+        StudySubject studySubject = studySubjectDao.findById(studyEventBean.getStudySubjectId());
+        Study study = studySubject.getStudy();
+
+        eventAttributeChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        eventAttributeChangeDTO.setStudyUuid(getStudyUuid(study));
+        eventAttributeChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
+        eventAttributeChangeDTO.setStudyOid(getStudyOid(study));
+        eventAttributeChangeDTO.setSiteOid(getSiteOid(study));
+
+        eventAttributeChangeDTO.setParticipantId(studySubject.getLabel());
+        eventAttributeChangeDTO.setParticipantOid(studySubject.getOcOid());
+
+        if (studyEventBean.getStudyEventDefinitionId() != 0) {
+            StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByStudyEventDefinitionId(studyEventBean.getStudyEventDefinitionId());
+            eventAttributeChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
+            eventAttributeChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEventBean));
+        }
+
+        eventAttributeChangeDTO.setEventStartDate(studyEventBean.getDateStarted().toString());
+        eventAttributeChangeDTO.setEventWorkflowStatus(studyEventBean.getWorkflowStatus().getDisplayValue());
+
+
+        return eventAttributeChangeDTO;
+    }
+
+    private EventAttributeChangeDTO constructEventChangeDTO(StudyEvent studyEvent) {
+        EventAttributeChangeDTO eventAttributeChangeDTO = new EventAttributeChangeDTO();
+        StudySubject studySubject = studySubjectDao.findById(studyEvent.getStudySubject().getStudySubjectId());
+        Study study = studySubject.getStudy();
+
+        eventAttributeChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        eventAttributeChangeDTO.setStudyUuid(getStudyUuid(study));
+        eventAttributeChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
+        eventAttributeChangeDTO.setStudyOid(getStudyOid(study));
+        eventAttributeChangeDTO.setSiteOid(getSiteOid(study));
+
+        eventAttributeChangeDTO.setParticipantId(studySubject.getLabel());
+        eventAttributeChangeDTO.setParticipantOid(studySubject.getOcOid());
+
+        if (studyEvent.getStudyEventDefinition().getOc_oid() != null) {
+            eventAttributeChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
+        }
+        eventAttributeChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEvent));
+        eventAttributeChangeDTO.setEventStartDate(studyEvent.getDateStart().toString());
+        eventAttributeChangeDTO.setEventWorkflowStatus(studyEvent.getWorkflowStatus().name());
+
+        return eventAttributeChangeDTO;
+    }
+
+    public FormChangeDTO constructEventCrfAttributeChangeDTO(EventCRFBean eventCrfBean) {
+        FormChangeDTO formChangeDTO = new FormChangeDTO();
+
+        StudyEventDefinition studyEventDefinition = studyEventDao.findById(eventCrfBean.getStudyEventId()).getStudyEventDefinition();
+        StudySubject studySubject = studySubjectDao.findById(eventCrfBean.getStudySubjectId());
+        Study study = studySubject.getStudy();
+
+        formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        formChangeDTO.setStudyUuid(getStudyUuid(study));
+        formChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
+        formChangeDTO.setStudyOid(getStudyOid(study));
+        formChangeDTO.setSiteOid(getSiteOid(study));
+
+        formChangeDTO.setParticipantId(String.valueOf(studySubject.getLabel()));
+        formChangeDTO.setParticipantOid(studySubject.getOcOid());
+
+        formChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
+        formChangeDTO.setEventRepeatKey(getEventRepeatKey(eventCrfBean.getStudyEvent()));
+
+        formChangeDTO.setFormOid(eventCrfBean.getCrf().getOid());
+        formChangeDTO.setFormCreatedDate(eventCrfBean.getCreatedDate().toString());
+        formChangeDTO.setFormUpdatedDate(eventCrfBean.getUpdatedDate().toString());
+
+        return formChangeDTO;
+    }
+
+    public FormChangeDTO constructEditFormDTO(EventCrf eventCrf) {
+        FormChangeDTO formChangeDTO = new FormChangeDTO();
+
+        Study study = eventCrf.getStudySubject().getStudy();
+
+        formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        formChangeDTO.setStudyUuid(getStudyUuid(study));
+        formChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
+        formChangeDTO.setStudyOid(getStudyOid(study));
+        formChangeDTO.setSiteOid(getSiteOid(study));
+
+        formChangeDTO.setParticipantId(eventCrf.getStudySubject().getLabel());
+        formChangeDTO.setParticipantOid(eventCrf.getStudySubject().getOcOid());
+
+        formChangeDTO.setEventOid(eventCrf.getStudyEvent().getStudyEventDefinition().getOc_oid());
+        formChangeDTO.setEventRepeatKey(getEventRepeatKey(eventCrf.getStudyEvent()));
+
+        formChangeDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
+        formChangeDTO.setFormCreatedDate(eventCrf.getDateCreated().toString());
+        formChangeDTO.setFormUpdatedDate(eventCrf.getDateUpdated().toString());
+
+        return formChangeDTO;
+    }
+
+    //TODO This is crashing if I open/view from a non-participant source since the study subject is null.
+    public FormChangeDTO constructNewFormDTO(Study study, StudyEvent studyEvent, FormLayout formLayout) {
+        FormChangeDTO formChangeDTO = new FormChangeDTO();
+
+        formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
+        formChangeDTO.setStudyUuid(getStudyUuid(study));
+        formChangeDTO.setStudyEnvironmentUuid(getStudyEnvUuid(study));
+        formChangeDTO.setStudyOid(getStudyOid(study));
+        formChangeDTO.setSiteOid(getSiteOid(study));
+
+        formChangeDTO.setParticipantId(studyEvent.getStudySubject().getLabel());
+        formChangeDTO.setParticipantOid(studyEvent.getStudySubject().getOcOid());
+        formChangeDTO.setFormOid(formLayout.getCrf().getOcOid());
+        formChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
+        formChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEvent));
+        formChangeDTO.setFormWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue());
+
+        return formChangeDTO;
+    }
+
+    private String getStudyEnvUuid(Study study) {
+        if (study.getStudy() == null) {
+            return study.getStudyEnvUuid();
+        } else {
+            return study.getStudy().getStudyEnvUuid();
+        }
+    }
+
+    private String getStudyUuid(Study study) {
+        if (study.getStudy() == null) {
+            return study.getStudyUuid();
+        } else {
+            return study.getStudy().getStudyUuid();
+        }
+    }
+
+    private String getSiteOid(Study study) {
+        if (study.getStudy() == null) {
+            return null;
+        } else {
+            return study.getOc_oid();
+        }
+    }
+
+    private String getStudyOid(Study study) {
+        if (study.getStudy() == null) {
+            return study.getOc_oid();
+        } else {
+            return study.getStudy().getOc_oid();
+        }
+    }
+
+    private int getEventRepeatKey(StudyEvent studyEvent) {
+        if (studyEvent.getStudyEventDefinition().isRepeating()) {
+            return studyEvent.getSampleOrdinal();
+        } else {
+            return 0;
+        }
+    }
+
+    private int getEventRepeatKey(StudyEventBean studyEventBean) {
+        //TODO It looks like this might have the same hibernate issue that the EventCrfAspect is having? It's already deleted?
+        if (studyEventBean.getStudyEventDefinition().isRepeating()) {
+            return studyEventBean.getSampleOrdinal();
+        } else {
+            return 0;
+        }
+    }
 }
