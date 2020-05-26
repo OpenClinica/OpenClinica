@@ -50,7 +50,7 @@ public class ScheduledExtractController {
 
 
     @ApiOperation(value = "To get latest scheduled extract dataset ids and creation time for the job name at study level", notes = "only work for authorized users with the right access permission")
-    @RequestMapping(value = "/studies/extractJobs/{jobUuid}/jobExecutions", method = RequestMethod.GET)
+    @RequestMapping(value = "/extractJobs/{jobUuid}/jobExecutions", method = RequestMethod.GET)
     public @ResponseBody
     ResponseEntity<Object> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("studyOID") String studyOid,
                                                                            @PathVariable("jobUuid") String jobUuid,
