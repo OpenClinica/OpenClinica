@@ -797,6 +797,8 @@ public class ImportServiceImpl implements ImportService {
 
 
     private ErrorObj validateRadioOrSingleSelect(ResponseSet responseSet, String value) {
+        if(responseSet.getOptionsText().equals("_") && responseSet.getOptionsValues().equals("_"))
+            return null;
         if (!responseSet.getOptionsValues().contains(value)) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_VALUE_CHOICE_NOT_FOUND);
         }
@@ -1393,7 +1395,6 @@ public class ImportServiceImpl implements ImportService {
             if (errorObj != null) return errorObj;
 
         }
-
         ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
 
         if (itemData != null) {
