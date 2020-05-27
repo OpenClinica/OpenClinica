@@ -60,29 +60,12 @@
                 </td>
             </c:if>
             <td>
-
-                        <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
-                            <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-                            onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                            onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
-                            name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-                        </c:if>
-
                         <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' &&  currRow.bean.studyEvent.removed == true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
                             <a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
                             onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
                             onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
                             name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
                         </c:if>
-                <c:if test="${userRole.manageStudy && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' &&  currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
-                  <td>
-                      <a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-                      onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                      onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
-                      name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
-                      title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
-                  </td>
-                </c:if>
             </td>
             <c:if test="${userRole.isInvestigator() && currRow.bean.studyEvent.signed != true && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && (currRow.bean.studyEvent.workflowStatus == 'COMPLETED' || currRow.bean.studyEvent.workflowStatus == 'STOPPED' || currRow.bean.studyEvent.workflowStatus == 'SKIPPED')}">
                 <td>
