@@ -28,7 +28,7 @@ public class EnketoEditURLRequest {
     @JsonProperty("parent_window_origin")
     private String parentWindowOrigin = null;
     @JsonProperty("interface")
-    private String iface = EnketoAPI.INTERFACE_DEFAULT;
+    private String iface = null;
 
     public String getLoad_warning() {
         return load_warning;

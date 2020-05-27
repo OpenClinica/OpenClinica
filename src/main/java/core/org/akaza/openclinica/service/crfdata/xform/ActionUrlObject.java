@@ -34,7 +34,7 @@ public class ActionUrlObject {
 
     public ActionUrlObject(FormLayout formLayout, String crfOid, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
                            List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, Study site, StudyEvent studyEvent, String mode,
-                           EventDefinitionCrf edc, EventCrf eventCrf, String loadWarning, boolean formLocked, String iface) {
+                           EventDefinitionCrf edc, EventCrf eventCrf, String loadWarning, boolean formLocked) {
         super();
         this.formLayout = formLayout;
         this.crfOid = crfOid;
@@ -55,6 +55,12 @@ public class ActionUrlObject {
         this.site = site;
         this.loadWarning = loadWarning;
         this.formLocked = formLocked;
+    }
+
+    public ActionUrlObject(FormLayout formLayout, String crfOid, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
+                           List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, Study site, StudyEvent studyEvent, String mode,
+                           EventDefinitionCrf edc, EventCrf eventCrf, String loadWarning, boolean formLocked, String iface) {
+        this(formLayout, crfOid, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor, role, parentStudy, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked);
         this.iface = iface;
     }
 

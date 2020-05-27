@@ -61,7 +61,7 @@ public class PdfActionUrlObject extends ActionUrlObject {
                               EventCrf eventCrf, String loadWarning, boolean formLocked, String studySubjectOID, String format,
                               String margin, String landscape) {
         super(formLayout, crfOid, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor, role,
-                parentStudy, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked, EnketoAPI.INTERFACE_DEFAULT);
+                parentStudy, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked);
         this.studySubjectOID = studySubjectOID;
         this.format = format;
         this.margin = margin;
