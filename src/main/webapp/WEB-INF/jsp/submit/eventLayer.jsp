@@ -174,8 +174,6 @@
                                                         <fmt:message key="edit" bundle="${resword}"/></a>
                                           </td>
                                       </tr>
-									  <tr valign="top"><td class="table_cell_left"><a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp;
-									  <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 							 	     </c:if>
 								    </c:when>
 								    
@@ -185,11 +183,6 @@
 								      <c:if test="${userRole.role.name=='director' || userBean.sysAdmin}">
 								    	<tr valign="top"><td class="table_cell">
 								      	<a href="EnterDataForStudyEvent?eventId=<c:out value="${currEvent.id}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="EnterDataForStudyEvent?eventId=<c:out value="${currEvent.id}"/>"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
-								          <c:if test="${study.status.available}">
-								            <tr valign="top"><td class="table_cell">
-								                <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>">
-								                <img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
-							 	           </c:if>
 							 	      </c:if>
 							 	    
 							 	    </c:when>
@@ -201,9 +194,6 @@
 								     <c:if test="${(userRole.role.name=='director' || userBean.sysAdmin) && (study.status.available)}">
 									  <tr valign="top"><td class="table_cell"><a href="UpdateStudyEvent?event_id=<c:out value="${currEvent.id}"/>&ss_id=<c:out value="${subjectId}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>
 									  &nbsp;&nbsp; <a href="UpdateStudyEvent?event_id=<c:out value="${currEvent.id}"/>&ss_id=<c:out value="${subjectId}"/>&module=<c:out value="${module}"/>"><fmt:message key="edit" bundle="${resword}"/></a></td></tr>
-									
-									  <tr valign="top"><td class="table_cell"><a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-									  <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 							 	     </c:if>
 							 	    </c:otherwise>
 							 	   </c:choose>
@@ -283,18 +273,12 @@
 								  &nbsp;&nbsp;
                                       <a href="UpdateStudyEvent?event_id=<c:out value="${reEvent.id}"/>&ss_id=<c:out value="${subjectId}"/>"><fmt:message key="edit" bundle="${resword}"/></a></td></tr>
 
-								  <tr valign="top"><td class="table_cell"><a href="RemoveStudyEvent?action=confirm&id=<c:out value="${reEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								  <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${reEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 						 	     </c:if>
 							    </c:when>
 							    <c:when test="${reEvent.subjectEventStatus.name =='locked' || reEvent.subjectEventStatus.name ==lockedi18n }">
 							      <c:if test="${userRole.role.name=='director' || userBean.sysAdmin}">
 							        <tr valign="top"><td class="table_cell">
 								    <a href="EnterDataForStudyEvent?eventId=<c:out value="${currEvent.id}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="EnterDataForStudyEvent?eventId=<c:out value="${currEvent.id}"/>"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
-								        <c:if test="${study.status.available}">
-							            <tr valign="top"><td class="table_cell"><a href="RemoveStudyEvent?action=confirm&id=<c:out value="${reEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>">
-							            <img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${reEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
-                                        </c:if>
                                    </c:if>
 						 	    </c:when>
 							    <c:otherwise>		
@@ -305,8 +289,6 @@
 								  <tr valign="top"><td class="table_cell"><a href="UpdateStudyEvent?event_id=<c:out value="${reEvent.id}"/>&ss_id=<c:out value="${subjectId}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>
 								  &nbsp;&nbsp; <a href="UpdateStudyEvent?event_id=<c:out value="${reEvent.id}"/>&ss_id=<c:out value="${subjectId}"/>&module=<c:out value="${module}"/>"><fmt:message key="edit" bundle="${resword}"/></a></td></tr>
 								
-								  <tr valign="top"><td class="table_cell"><a href="RemoveStudyEvent?action=confirm&id=<c:out value="${reEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								  <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${reEvent.id}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 						 	     </c:if>
 						 	    </c:otherwise>
 						 	   </c:choose>
@@ -468,8 +450,6 @@
 								  <tr valign="top"><td class="table_cell_left"><a href="UpdateStudyEvent?event_id=<c:out value="${eventId}"/>&ss_id=<c:out value="${subjectId}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>
 								  &nbsp;&nbsp; <a href="UpdateStudyEvent?event_id=<c:out value="${eventId}"/>&ss_id=<c:out value="${subjectId}"/>"><fmt:message key="edit" bundle="${resword}"/></a></td></tr>
 								  
-								  <tr valign="top"><td class="table_cell_left"><a href="RemoveStudyEvent?action=confirm&id=<c:out value="${eventId}"/>&studySubId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								  <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${eventId}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 						 	     </c:if>
 						 	    </c:when>
 							   
@@ -478,10 +458,6 @@
 							      
 							        <tr valign="top"><td class="table_cell">
 								    <a href="EnterDataForStudyEvent?eventId=<c:out value="${currEvent.id}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="EnterDataForStudyEvent?eventId=<c:out value="${currEvent.id}"/>"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
-								    <c:if test="${study.status.available}">  
-							          <tr valign="top"><td class="table_cell_left"><a href="RemoveStudyEvent?action=confirm&id=<c:out value="${eventId}"/>&studySubId=<c:out value="${subjectId}"/>">
-							          <img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${eventId}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
-						 	        </c:if>
 						 	      </c:if>
 						 	    </c:when>	   
 							    <c:otherwise>
@@ -492,8 +468,6 @@
 								  <tr valign="top"><td class="table_cell_left"><a href="UpdateStudyEvent?event_id=<c:out value="${eventId}"/>&ss_id=<c:out value="${subjectId}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>
 								  &nbsp;&nbsp; <a href="UpdateStudyEvent?event_id=<c:out value="${eventId}"/>&ss_id=<c:out value="${subjectId}"/>"><fmt:message key="edit" bundle="${resword}"/></a></td></tr>
 								  
-								  <tr valign="top"><td class="table_cell_left"><a href="RemoveStudyEvent?action=confirm&id=<c:out value="${eventId}"/>&studySubId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								  <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${eventId}"/>&studySubId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 						 	     </c:if>
 						 	    </c:otherwise>
 						 	   
