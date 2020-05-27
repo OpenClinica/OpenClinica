@@ -13,6 +13,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.AuditDAO;
@@ -41,8 +42,9 @@ import java.util.Locale;
 public class AuditLogStudyServlet extends SecureController {
 
     Locale locale;
+    private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
-    // <ResourceBundle resword,resexception,respage;
 
     public static String getLink(int userId) {
         return "AuditLogStudy";
@@ -67,22 +69,17 @@ public class AuditLogStudyServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        int studyId = currentStudy.getStudyId();
 
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         AuditDAO adao = new AuditDAO(sm.getDataSource());
 
         FormProcessor fp = new FormProcessor(request);
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-        CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 
-        HashMap eventCRFAuditsHashMap = new HashMap();
         HashMap eventsHashMap = new HashMap();
         HashMap studySubjectAuditsHashMap = new HashMap();
         HashMap subjectHashMap = new HashMap();
@@ -93,7 +90,6 @@ public class AuditLogStudyServlet extends SecureController {
 
         for (int ss = 0; ss < studySubjects.size(); ss++) {
             ArrayList studySubjectAudits = new ArrayList();
-            ArrayList eventCRFAudits = new ArrayList();
 
             StudySubjectBean studySubject = (StudySubjectBean) studySubjects.get(ss);
             // request.setAttribute("studySub"+ss, studySubject);
@@ -121,30 +117,16 @@ public class AuditLogStudyServlet extends SecureController {
             // studySubjectAudits);
 
             // Get the list of events
-            ArrayList events = sedao.findAllByStudySubject(studySubject);
+            ArrayList events = studyEventDAO.findAllByStudySubject(studySubject);
             for (int i = 0; i < events.size(); i++) {
                 // Link study event definitions
                 StudyEventBean studyEvent = (StudyEventBean) events.get(i);
                 studyEvent.setStudyEventDefinition((StudyEventDefinitionBean) seddao.findByPK(studyEvent.getStudyEventDefinitionId()));
 
                 // Link event CRFs
-                studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
+                studyEvent.setEventCRFs(eventCRFDAO.findAllByStudyEvent(studyEvent));
             }
 
-            // for (int i = 0; i < events.size(); i++) {
-            // StudyEventBean studyEvent = (StudyEventBean) events.get(i);
-            // ArrayList eventCRFs = studyEvent.getEventCRFs();
-            // for (int j = 0; j < eventCRFs.size(); j++) {
-            // //Link CRF and CRF Versions
-            // EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(j);
-            // eventCRF.setCrfVersion((CRFVersionBean)
-            // cvdao.findByPK(eventCRF.getCRFVersionId()));
-            // eventCRF.setCrf((CRFBean)
-            // cdao.findByVersionId(eventCRF.getCRFVersionId()));
-            // //Get the event crf audits
-            // eventCRFAudits.addAll(adao.findEventCRFAuditEvents(eventCRF.getId()));
-            // }
-            // }
             eventsHashMap.put(new Integer(studySubject.getId()), events);
             // request.setAttribute("events"+ss, events);
             // eventCRFAuditsHashMap.put(new Integer(studySubject.getId()),
@@ -157,40 +139,6 @@ public class AuditLogStudyServlet extends SecureController {
         request.setAttribute("studySubjectAudits", studySubjectAuditsHashMap);
         request.setAttribute("study", currentStudy);
         request.setAttribute("subjects", subjectHashMap);
-
-        // FormProcessor fp = new FormProcessor(request);
-        //
-        // AuditEventDAO aeDAO = new AuditEventDAO(sm.getDataSource());
-        // ArrayList al = aeDAO.findAllByStudyId(currentStudy.getId());
-        //
-        // EntityBeanTable table = fp.getEntityBeanTable();
-        // ArrayList allRows = AuditEventStudyRow.generateRowsFromBeans(al);
-
-        // String[] columns = { "Date and Time", "Action", "Entity/Operation",
-        // "Record ID", "Changes and Additions","Other Info" };
-        // table.setColumns(new ArrayList(Arrays.asList(columns)));
-        // table.hideColumnLink(4);
-        // table.hideColumnLink(1);
-        // table.hideColumnLink(5);
-        // table.setQuery("AuditLogUser?userLogId="+userId, new HashMap());
-        // String[] columns =
-        // {resword.getString("date_and_time"),resword.getString("action_message"),
-        // resword.getString("entity_operation"),
-        // resword.getString("updated_by"),resword.getString("subject_unique_ID"),resword.getString("changes_and_additions"),
-        // //"Other Info",
-        // resword.getString("actions")};
-        // table.setColumns(new ArrayList(Arrays.asList(columns)));
-        // table.setAscendingSort(false);
-        // table.hideColumnLink(1);
-        // table.hideColumnLink(5);
-        // table.hideColumnLink(6);
-        // //table.hideColumnLink(7);
-        // table.setQuery("AuditLogStudy", new HashMap());
-        // table.setRows(allRows);
-        // table.computeDisplay();
-        //
-        //
-        // request.setAttribute("table", table);
 
         logger.warn("*** found servlet, sending to page ***");
         String pattn = "";
@@ -232,9 +180,5 @@ public class AuditLogStudyServlet extends SecureController {
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
     }
-
-    // protected String getAdminServlet() {
-    // return SecureController.ADMIN_SERVLET_CODE;
-    // }
 
 }

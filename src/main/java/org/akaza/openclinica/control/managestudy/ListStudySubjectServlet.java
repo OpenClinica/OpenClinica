@@ -18,6 +18,8 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -35,6 +37,7 @@ import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.bean.DisplayStudySubjectRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +60,8 @@ public abstract class ListStudySubjectServlet extends SecureController {
     public static String PAGINATING_QUERY = "paginatingQuery";
     public static String FILTER_KEYWORD = "ebl_filterKeyword";
     public static String SEARCH_SUBMITTED = "submitted";
+    private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     // >>
 
@@ -65,6 +70,8 @@ public abstract class ListStudySubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         locale = LocaleResolver.getLocale(request);
         // < resword =
         // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
@@ -108,7 +115,6 @@ public abstract class ListStudySubjectServlet extends SecureController {
         request.setAttribute(PAGINATING_QUERY, paginatingQuery.toString());
 
         StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
@@ -183,7 +189,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
 
             ArrayList subEvents = new ArrayList();
             // find all events order by definition ordinal
-            ArrayList events = sedao.findAllByStudySubject(studySub);
+            ArrayList events = studyEventDAO.findAllByStudySubject(studySub);
 
             for (int j = 0; j < allDefs.size(); j++) {
                 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) allDefs.get(j);
@@ -369,7 +375,6 @@ public abstract class ListStudySubjectServlet extends SecureController {
         if (studyEvent == null)
             return false;
 
-        EventCRFDAO eventCRFDAO = new EventCRFDAO(sm.getDataSource());
         EventDefinitionCRFDAO eventDefinitionDAO = new EventDefinitionCRFDAO(sm.getDataSource());
         List<EventCRFBean> crfBeans = new ArrayList<EventCRFBean>();
 
@@ -388,33 +393,6 @@ public abstract class ListStudySubjectServlet extends SecureController {
 
         return false;
 
-    }
-
-    public static DisplayStudyEventBean getDisplayStudyEventsForStudySubject(StudySubjectBean studySub, StudyEventBean event, DataSource ds,
-            UserAccountBean ub, StudyUserRoleBean currentRole, Study study) {
-        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
-        EventCRFDAO ecdao = new EventCRFDAO(ds);
-        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
-
-        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
-        event.setStudyEventDefinition(sed);
-
-        // find all active crfs in the definition
-        ArrayList eventDefinitionCRFs = edcdao.findAllActiveByEventDefinitionId(sed.getId());
-
-        ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
-
-        // construct info needed on view study event page
-        DisplayStudyEventBean de = new DisplayStudyEventBean();
-        de.setStudyEvent(event);
-        de.setDisplayEventCRFs(ViewStudySubjectServlet.getDisplayEventCRFs(ds, eventCRFs, eventDefinitionCRFs, ub, currentRole, event.getWorkflowStatus(),
-                study));
-        ArrayList al = ViewStudySubjectServlet.getUncompletedCRFs(ds, eventDefinitionCRFs, eventCRFs, event.getWorkflowStatus(), event.getId());
-        // ViewStudySubjectServlet.populateUncompletedCRFsWithCRFAndVersions(ds,
-        // al);
-        de.setUncompletedCRFs(al);
-
-        return de;
     }
 
 }

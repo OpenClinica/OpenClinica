@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.ListDiscNotesSubjectTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -45,10 +46,14 @@ public class ListDiscNotesSubjectServlet extends SecureController {
     public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
     public static final String FILTER_SUMMARY = "filterSummary";
     Locale locale;
+    private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
 
     // < ResourceBundleresexception,respage;
     @Override
     protected void processRequest() throws Exception {
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         String module = request.getParameter("module");
         String moduleStr = "manage";
@@ -127,13 +132,10 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.words",locale);
 
         StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
         StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
         StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
-        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-        EventCRFDAO edao = new EventCRFDAO(sm.getDataSource());
         EventDefinitionCRFDAO eddao = new EventDefinitionCRFDAO(sm.getDataSource());
         SubjectDAO subdao = new SubjectDAO(sm.getDataSource());
         DiscrepancyNoteDAO dnDAO = new DiscrepancyNoteDAO(sm.getDataSource());
@@ -142,14 +144,14 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         factory.setStudyEventDefinitionDao(seddao);
         factory.setSubjectDAO(subdao);
         factory.setStudySubjectDAO(sdao);
-        factory.setStudyEventDAO(sedao);
+        factory.setStudyEventDAO(studyEventDAO);
         factory.setStudyBean(currentStudy);
         factory.setStudyDao(getStudyDao());
         factory.setStudyGroupClassDAO(sgcdao);
         factory.setSubjectGroupMapDAO(sgmdao);
         factory.setCurrentRole(currentRole);
         factory.setCurrentUser(ub);
-        factory.setEventCRFDAO(edao);
+        factory.setEventCRFDAO(eventCRFDAO);
         factory.setEventDefintionCRFDAO(eddao);
         factory.setStudyGroupDAO(sgdao);
         factory.setDiscrepancyNoteDAO(dnDAO);

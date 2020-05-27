@@ -156,7 +156,7 @@ public class EventProcessor implements Processor {
                     || (!existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)
                             && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
                             && !existingStudyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED))) {
-                if (studyEventDefinition.getRepeating()) {
+                if (studyEventDefinition.isRepeating()) {
                     ordinal++;
                     continue;
                 } else {
@@ -178,7 +178,7 @@ public class EventProcessor implements Processor {
                             container.setStudyEvent(existingStudyEvent);
                             container.setEventCrf(existingEventCrf);
                             break;
-                        } else if (studyEventDefinition.getRepeating()) {
+                        } else if (studyEventDefinition.isRepeating()) {
                             ordinal++;
                             continue;
                         } else {

@@ -73,7 +73,7 @@ public class ViewSiteServlet extends SecureController {
         logger.info("site id:" + idString);
         if (StringUtil.isBlank(idString)) {
             addPageMessage(respage.getString("please_choose_a_site_to_edit"));
-            forwardPage(Page.SITE_LIST_SERVLET);
+            forwardPage(Page.MENU_SERVLET);
         } else {
             int siteId = Integer.valueOf(idString.trim()).intValue();
             Study study = (Study) getStudyDao().findByPK(siteId);

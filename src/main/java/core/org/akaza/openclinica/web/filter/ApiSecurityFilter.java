@@ -256,8 +256,36 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         map.put("institution", "OC");
         return map;
     }
+    private HashMap<String, String>  createRulesEngineUserAccount() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("username", "rules.engine");
+        map.put("fName", "Rules");
+        map.put("lName", "Engine");
+        map.put("role_name", "Data Manager");
+        map.put("user_uuid", "rulesEngineSystemUserUuid");
+        map.put("user_type", core.org.akaza.openclinica.service.UserType.TECH_ADMIN.getName());
+        map.put("authorize_soap", "true");
+        map.put("email", "openclinica-developers@openclinica.com");
+        map.put("institution", "OC");
+        return map;
+    }
+
+    private HashMap<String, String> createOdmServiceUserAccount() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("username", "odm.service");
+        map.put("fName", "ODM");
+        map.put("lName", "Service");
+        map.put("role_name", "Data Manager");
+        map.put("user_uuid", "odmServiceSystemUserUuid");
+        map.put("user_type", core.org.akaza.openclinica.service.UserType.TECH_ADMIN.getName());
+        map.put("authorize_soap", "true");
+        map.put("email", "openclinica-developers@openclinica.com");
+        map.put("institution", "OC");
+        return map;
+    }
 
     private UserAccountBean createSystemUser(String clientId, UserAccountDAO userAccountDAO, HttpServletRequest request) {
+        logger.info("Creating system user");
         UserAccountBean userAccountBean = null;
         Map<String, String> userAccountToCreate = null;
         if (clientId.equals(ApplicationConstants.RANDOMIZE_CLIENT)){
@@ -270,6 +298,19 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
             if (userAccountBean.getName().isEmpty()) {
                 userAccountToCreate = createDicomUserAccount();
             }
+        } else if (clientId.equals(ApplicationConstants.RULES_ENGINE_CLIENT)) {
+            userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.RULES_ENGINE__USERNAME);
+            if (userAccountBean.getName().isEmpty()) {
+                userAccountToCreate = createRulesEngineUserAccount();
+            }
+        }
+          else if (clientId.equals(ApplicationConstants.ODM_SERVICE_CLIENT)) {
+                userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.ODM_SERVICE_USERNAME);
+                if (userAccountBean.getName().isEmpty()) {
+                    userAccountToCreate = createOdmServiceUserAccount();
+                }
+
+
         }
 
         if (userAccountToCreate != null) {

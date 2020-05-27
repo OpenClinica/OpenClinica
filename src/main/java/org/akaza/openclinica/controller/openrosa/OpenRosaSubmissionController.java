@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.openrosa;
 
+import com.openclinica.kafka.dto.FormChangeDTO;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.rule.FileProperties;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -12,17 +13,22 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.UtilService;
+import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.randomize.RandomizationService;
 import core.org.akaza.openclinica.web.pform.PFormCache;
+import com.openclinica.kafka.KafkaService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.service.FormCacheServiceImpl;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +109,15 @@ public class OpenRosaSubmissionController {
 
     @Autowired
     private StudyBuildService studyBuildService;
+    @Autowired
+    private KafkaService kafkaService;
+    @Autowired
+    FormCacheServiceImpl formCacheService;
+
+    @Autowired
+    private UtilService utilService;
+    @Autowired
+    TokenService tokenService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
@@ -175,7 +190,6 @@ public class OpenRosaSubmissionController {
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processRequest(study, subjectContext, requestBody, errors, locale, listOfUploadFilePaths,
                     SubmissionContainer.FieldRequestTypeEnum.FORM_FIELD,userAccount);
-
         } catch (Exception e) {
             logger.error("Exception while processing xform submission.");
             logger.error(e.getMessage());
@@ -241,7 +255,14 @@ public class OpenRosaSubmissionController {
             eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
             eventCrfDao.saveOrUpdate(eventCrf);
-            checkRandomization(subjectContext, studyOID, studySubjectOID);
+
+            if (!formCacheService.expireAndRemoveForm(ecid)){
+                FormChangeDTO formChangeDTO = kafkaService.constructEditFormDTO(eventCrf);
+                formChangeDTO.setFormWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue());
+                kafkaService.sendFormChangeMessage(formChangeDTO);
+            }
+            //TODO Re-enable randomize.
+          //checkRandomization(subjectContext, studyOID, studySubjectOID);
         }
 
         updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount);
@@ -325,6 +346,16 @@ public class OpenRosaSubmissionController {
             PFormCache cache = PFormCache.getInstance(context);
             subjectContext = cache.getSubjectContext(ecid);
             UserAccount userAccount = getUserAccount(subjectContext);
+
+            if (!formCacheService.resetExpiration(ecid)){
+                logger.info("Updating expiration failed, re-adding entry in expiration map for: " + ecid);
+                int studyEventId = Integer.parseInt(subjectContext.get("studyEventID"));
+                StudyEvent studyEvent = studyEventDao.findById(studyEventId);
+                String formLayoutOid = subjectContext.get("formLayoutOID");
+                FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
+                //TODO Public study is not "current study" so we're not getting the site if the user is at the site level. Do we actually need the site OID for this DTO? It is getting set as null for now.
+                formCacheService.addNewFormToFormCache(ecid, publicStudy, studyEvent, formLayout);
+            }
 
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processFieldSubmissionRequest(study, subjectContext, instanceId, requestBody, errors, locale, listOfUploadFilePaths,

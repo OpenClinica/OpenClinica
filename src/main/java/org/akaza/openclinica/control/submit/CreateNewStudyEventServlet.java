@@ -18,12 +18,17 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
+import com.openclinica.kafka.KafkaService;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -43,44 +48,28 @@ import core.org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 // TODO: support YYYY-MM-DD HH:MM time formats
 
+@Component
 public class CreateNewStudyEventServlet extends SecureController {
 
     Locale locale;
     // < ResourceBundlerestext,respage,resexception;
 
     public static final String INPUT_STUDY_EVENT_DEFINITION = "studyEventDefinition";
-
-    // public static final String INPUT_STUDY_EVENT_DEFINITION_SCHEDULED =
-    // "studyEventDefinitionScheduled";
-
     public static final String INPUT_STUDY_SUBJECT = "studySubject";
-
     public static final String INPUT_STUDY_SUBJECT_LABEL = "studySubjectLabel";
-
     public static final String INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT = "studySubjectId";
-
     public static final String INPUT_EVENT_DEF_ID_FROM_VIEWSUBJECT = "eventDefId";
-
     public static final String INPUT_STARTDATE_PREFIX = "start";
-
     public static final String INPUT_ENDDATE_PREFIX = "end";
-
-    // public static final String INPUT_STARTDATE_PREFIX_SCHEDULED =
-    // "startScheduled";
-
-    // public static final String INPUT_ENDDATE_PREFIX_SCHEDULED =
-    // "endScheduled";
-
     public static final String INPUT_REQUEST_STUDY_SUBJECT = "requestStudySubject";
 
     public static final String INPUT_LOCATION = "location";
     private final String COMMON = "common";
-
-    // public static final String INPUT_SCHEDULED_LOCATION =
-    // "locationScheduled";
 
     private FormProcessor fp;
 
@@ -92,8 +81,12 @@ public class CreateNewStudyEventServlet extends SecureController {
     public final static String[] DISPLAY_SCHEDULED = { "display0", "display1", "display2", "display3" };
     public final static int ADDITIONAL_SCHEDULED_NUM = 4;
 
+    private StudyEventDAO studyEventDAO;
+
     @Override
     protected void processRequest() throws Exception {
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
         panel.setStudyInfoShown(false);
         fp = new FormProcessor(request);
@@ -169,7 +162,6 @@ public class CreateNewStudyEventServlet extends SecureController {
         ArrayList eventDefinitionsScheduled = new ArrayList(eventDefinitions);
 
         if (!fp.isSubmitted()) {
-            // StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
             // sed.updateSampleOrdinals_v092();
 
             HashMap presetValues = new HashMap();
@@ -475,7 +467,6 @@ public class CreateNewStudyEventServlet extends SecureController {
                 forwardPage(Page.CREATE_NEW_STUDY_EVENT);
             } else {
                 logger.debug("error is empty");
-                StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
 
                 StudyEventBean studyEvent = new StudyEventBean();
                 studyEvent.setStudyEventDefinitionId(definition.getId());
@@ -510,8 +501,8 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setStatus(Status.AVAILABLE);
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
                 studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
-                studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(definition, studySubject) + 1);
-                studyEvent = (StudyEventBean) sed.create(studyEvent);
+                studyEvent.setSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(definition, studySubject) + 1);
+                studyEvent = (StudyEventBean) studyEventDAO.create(studyEvent);
                 // getRuleSetService().runRulesInBeanProperty(createRuleSet(studySubject,definition),currentStudy,ub,request,studySubject);
 
                 if (!studyEvent.isActive()) {
@@ -527,7 +518,6 @@ public class CreateNewStudyEventServlet extends SecureController {
                 for (String element : eventFields) {
                     AddNewSubjectServlet.saveFieldNotes(element, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
                 }
-                // logger.debug("here ok 3333333333333333");
                 if (hasScheduledEvent) {
                     for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
 
@@ -574,9 +564,9 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 // sed.findAllByStudyAndStudySubjectId(
                                 // currentStudy,
                                 // studySubject.getId());
-                                studyEventScheduled.setSampleOrdinal(sed.getMaxSampleOrdinal(definitionScheduleds.get(i), studySubject) + 1);
+                                studyEventScheduled.setSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(definitionScheduleds.get(i), studySubject) + 1);
                                 // System.out.println("create scheduled events");
-                                studyEventScheduled = (StudyEventBean) sed.create(studyEventScheduled);
+                                studyEventScheduled = (StudyEventBean) studyEventDAO.create(studyEventScheduled);
                                 if (!studyEventScheduled.isActive()) {
                                     throw new OpenClinicaException(restext.getString("scheduled_event_not_created_in_database"), "2");
                                 }
@@ -657,7 +647,7 @@ public class CreateNewStudyEventServlet extends SecureController {
      * @return <code>true</code> if the subject may receive an additional study
      *         event, <code>false</code> otherwise.
      */
-    public static boolean subjectMayReceiveStudyEvent(DataSource ds, StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject) {
+    public boolean subjectMayReceiveStudyEvent(DataSource ds, StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject) {
 
         if (studyEventDefinition.isRepeating()) {
             // System.out.println("this def is repeating" +
@@ -665,8 +655,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             return true;
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(ds);
-        ArrayList allEvents = sedao.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
+        ArrayList allEvents = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
 
         if (allEvents.size() > 0) {
             // System.out.println("this non-repeating def has event already" +

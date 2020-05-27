@@ -15,8 +15,6 @@ import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
  */
 public interface MetadataServiceInterface {
 
-    public abstract boolean isShown(Object metadataBean, EventCRFBean eventCrfBean);
-
     public abstract boolean hide(Object metadataBean, EventCRFBean eventCrfBean);
 
     public abstract boolean showItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean);

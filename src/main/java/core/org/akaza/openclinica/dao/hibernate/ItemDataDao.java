@@ -6,6 +6,7 @@ import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.Item;
 import core.org.akaza.openclinica.domain.datamap.ItemData;
 import org.hibernate.query.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
@@ -32,6 +33,11 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
     private static String getMaxGroupRepeatQuery = "select max(id.ordinal) from ItemData id " + "join id.eventCrf ec on ec.eventCrfId = :eventCrfId "
             + "join id.item i on i.itemId = :itemId ";
+
+    @Transactional
+    public ItemData saveOrUpdate(ItemData itemData){
+        return super.saveOrUpdate(itemData);
+    }
 
     public List<ItemData> findByItemsEventCrf(List<Item> items, Integer eventCrfId, Integer numItems) {
         Query q = getCurrentSession().createQuery(findByItemEventCrfOrdinalQuery);

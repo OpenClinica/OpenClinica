@@ -71,4 +71,5 @@ public class TokenServiceImpl implements TokenService {
         String userType = (String) userContextMap.get("userType");
         return userType;
     }
+
 }

@@ -4,8 +4,10 @@ import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.service.CustomParameterizedException;
 import core.org.akaza.openclinica.service.OCUserDTO;
 import core.org.akaza.openclinica.service.UserType;
+import core.org.akaza.openclinica.service.UtilService;
 import core.org.akaza.openclinica.web.rest.client.dto.CustomerDTO;
 import core.org.akaza.openclinica.web.rest.client.impl.CustomerServiceClientImpl;
+import org.akaza.openclinica.service.CoreUtilServiceImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.javers.common.collections.Lists;
@@ -16,7 +18,6 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.authorization.client.AuthzClient;
-import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
@@ -61,6 +62,9 @@ public class KeycloakClientImpl {
     @Autowired
     private Keycloak keycloak;
 
+    @Autowired
+    private CoreUtilServiceImpl coreUtilService;
+
     public void resetParticipateUserAccessCode(String accessToken, String email, String username, String accessCode,String studyEnvironment,String realm) {
         UserResource userResource = null;
         List<UserRepresentation> userRepresentations = keycloak
@@ -78,8 +82,10 @@ public class KeycloakClientImpl {
         userResource.update(userRepresentation);
     }
 
-    public String createParticipateUser(String accessToken, String email, String username, String accessCode,String studyEnvironment,String realm,String customerUuid) {
+    public String createParticipateUser(String accessToken, String email, String username, String accessCode,String studyEnvironment,String realm) {
         logger.debug("Calling Keycloak to create participate user with username: {}", username);
+
+        String customerUuid = coreUtilService.getCustomerUuid();
 
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setEnabled(true);
@@ -125,7 +131,8 @@ public class KeycloakClientImpl {
     }
 
 
-    public String getRealmName(String accessToken, String customerUuid) {
+    public String getRealmName(String accessToken) {
+        String customerUuid = coreUtilService.getCustomerUuid();
         CustomerDTO customerDTO = customerServiceClient.getCustomer(accessToken, customerUuid);
         String realmName = customerDTO.getMetadata().get(DB_CONNECTION_KEY);
         logger.debug("Realm for customer uuid: {} is {}", customerUuid, realmName);

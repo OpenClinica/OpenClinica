@@ -425,18 +425,7 @@ public class StudyInfoPanel implements Serializable {
                 this.setCreateDataset(false);
                 this.setIconInfoShown(true);
                 this.setManageSubject(false);
-            } else if (page.equals(Page.CREATE_SUBJECT_GROUP_CLASS) || page.equals(Page.CREATE_SUBJECT_GROUP_CLASS_CONFIRM)
-                || page.equals(Page.UPDATE_SUBJECT_GROUP_CLASS) || page.equals(Page.UPDATE_SUBJECT_GROUP_CLASS_CONFIRM)) {
-
-                this.reset();
-                this.setStudyInfoShown(true);
-                this.setOrderedData(true);
-                this.setExtractData(false);
-                this.setSubmitDataModule(false);
-                this.setCreateDataset(false);
-                this.setIconInfoShown(true);
-                this.setManageSubject(false);
-            } else if (page.equals(Page.VIEW_RULE_SETS2)) {
+            }  else if (page.equals(Page.VIEW_RULE_SETS2)) {
                 HashMap eventlist = (HashMap) request.getAttribute("eventlist");
                 ArrayList displayData = generateEventTree(eventlist, false);
 

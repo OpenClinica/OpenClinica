@@ -15,6 +15,7 @@ import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
@@ -36,6 +37,9 @@ import java.util.Date;
  * Preferences - Java - Code Style - Code Templates
  */
 public class RestoreCRFServlet extends SecureController {
+
+    private EventCRFDAO eventCRFDAO;
+
     /**
      *
      */
@@ -56,6 +60,7 @@ public class RestoreCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
@@ -78,8 +83,7 @@ public class RestoreCRFServlet extends SecureController {
 
             SectionDAO secdao = new SectionDAO(sm.getDataSource());
 
-            EventCRFDAO evdao = new EventCRFDAO(sm.getDataSource());
-            ArrayList eventCRFs = evdao.findAllByCRF(crfId);
+            ArrayList eventCRFs = eventCRFDAO.findAllByCRF(crfId);
             if ("confirm".equalsIgnoreCase(action)) {
                 request.setAttribute("crfToRestore", crf);
                 request.setAttribute("eventCRFs", eventCRFs);
@@ -129,7 +133,7 @@ public class RestoreCRFServlet extends SecureController {
                         eventCRF.setStatus(Status.AVAILABLE);
                         eventCRF.setUpdater(ub);
                         eventCRF.setUpdatedDate(new Date());
-                        evdao.update(eventCRF);
+                        eventCRFDAO.update(eventCRF);
 
                         ArrayList items = idao.findAllByEventCRFId(eventCRF.getId());
                         for (int j = 0; j < items.size(); j++) {

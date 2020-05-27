@@ -91,6 +91,12 @@ public class ChangeCRFVersionController {
     private PermissionService permissionService;
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    @Qualifier("studyEventJDBCDao")
+    private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
 
     @Autowired
     StudyEventService studyEventService;
@@ -161,15 +167,13 @@ public class ChangeCRFVersionController {
         StudyEventDefinitionBean sedb = sfed.findByEventDefinitionCRFId(eventDefinitionCRFId);
         request.setAttribute("eventName", sedb.getName());
 
-        EventCRFDAO ecdao = new EventCRFDAO(dataSource);
-        EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
+        EventCRFBean ecb = (EventCRFBean) eventCrfDAO.findByPK(eventCRFId);
         final EventCrf ec = eventCrfDao.findById(eventCRFId);
         if (permissionService.hasFormAccess(ec, formLayoutId, 0, request) != true) {
             redirect(request, response, "/NoAccess?originatingPage="+ originatingPage);
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(dataSource);
-        StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+        StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
         request.setAttribute("eventCreateDate", formatDate(seb.getCreatedDate()));
         if (sedb.isRepeating()) {
             request.setAttribute("eventOrdinal", seb.getSampleOrdinal());
@@ -548,12 +552,10 @@ public class ChangeCRFVersionController {
         HttpSession session = request.getSession();
         // update event_crf_id table
         try {
-            EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-            StudyEventDAO sed = new StudyEventDAO(dataSource);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             Study currentPublicStudy = (Study) session.getAttribute("publicStudy");
-            EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
-            StudyEventBean seb = (StudyEventBean) sed.findByPK(ecb.getStudyEventId());
+            EventCRFBean ecb = (EventCRFBean) eventCrfDAO.findByPK(eventCRFId);
+            StudyEventBean seb = (StudyEventBean) studyEventDAO.findByPK(ecb.getStudyEventId());
             if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
                     + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
                 String errorData = getErrorData(request, ecb, currentPublicStudy);
@@ -562,7 +564,7 @@ public class ChangeCRFVersionController {
             }
             Connection con = dataSource.getConnection();
             con.setAutoCommit(false);
-            eventCRFDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
+            eventCrfDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
 
             String status_before_update = null;
             Status subjectStatus = null;
@@ -587,7 +589,7 @@ public class ChangeCRFVersionController {
             if (status_before_update != null && status_before_update.length() == 1) {
                studyEventService.convertStudyEventBeanStatus(status_before_update,seb);
             }
-            sed.update(seb, con);
+            studyEventDAO.update(seb, con);
 
             con.commit();
             con.setAutoCommit(true);

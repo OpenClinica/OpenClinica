@@ -1066,7 +1066,6 @@ public ArrayList<ErrorObj> validateStudyMetadata(String formOIDValue,
       
         // check 2:study event
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
         ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
         ItemDAO itemDAO = new ItemDAO(ds);

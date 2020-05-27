@@ -43,7 +43,6 @@ public class RuleSetServiceTest extends HibernateOcDbTestCase {
     // into this.
     // public void testFilterRuleSetsByStudyEventOrdinal() {
     // List<RuleSetBean> ruleSets = getRuleSets();
-    // StudyEventDAO studyEventDao = new StudyEventDAO(getDataSource());
     // StudyEventBean studyEventBean = (StudyEventBean)
     // studyEventDao.findByPK(1);
     //
@@ -64,7 +63,6 @@ public class RuleSetServiceTest extends HibernateOcDbTestCase {
     // look into this.
     // public void testFilterRuleSetsByStudyEventOrdinalWithALL() {
     // List<RuleSetBean> ruleSets = getRuleSets();
-    // StudyEventDAO studyEventDao = new StudyEventDAO(getDataSource());
     // StudyEventBean studyEventBean = (StudyEventBean)
     // studyEventDao.findByPK(2);
     //

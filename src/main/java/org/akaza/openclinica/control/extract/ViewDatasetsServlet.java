@@ -68,9 +68,7 @@ public class ViewDatasetsServlet extends SecureController {
         // YW >>
         if (StringUtil.isBlank(action)) {
             // YW 08-2008 << 2529 fix
-            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             Study studyWithEventDefinitions = currentStudy;
             if (currentStudy.isSite()) {
                 studyWithEventDefinitions = currentStudy.getStudy();

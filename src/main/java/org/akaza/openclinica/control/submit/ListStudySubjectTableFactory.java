@@ -25,7 +25,6 @@ import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -353,7 +352,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         Item item = null;
 
                         if (!StringUtils.isEmpty(sedOid)) {
-                            studyEventDefinition = studyEventDefinitionHibDao.findByOcOID(sedOid);if (studyEventDefinition != null && !studyEventDefinition.getRepeating()) {
+                            studyEventDefinition = studyEventDefinitionHibDao.findByOcOID(sedOid);if (studyEventDefinition != null && !studyEventDefinition.isRepeating()) {
                                 studyEvents = studyEventDao.fetchListByStudyEventDefOID(sedOid, studySubjectBean.getId());
 
                                 if (studyEvents != null) {

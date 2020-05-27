@@ -57,19 +57,8 @@ public class ChangeStudyServlet extends SecureController {
      * Checks whether the user has the correct privilege
      */
     Locale locale;
-    private StudyEventDefinitionDAO studyEventDefinitionDAO;
-    private SubjectDAO subjectDAO;
     private StudySubjectDAO studySubjectDAO;
     private StudyEventDAO studyEventDAO;
-    private StudyGroupClassDAO studyGroupClassDAO;
-    private SubjectGroupMapDAO subjectGroupMapDAO;
-//    private StudyDAO studyDAO;
-    private EventCRFDAO eventCRFDAO;
-    private EventDefinitionCRFDAO eventDefintionCRFDAO;
-    private StudyGroupDAO studyGroupDAO;
-    private DiscrepancyNoteDAO discrepancyNoteDAO;
-    private StudyParameterValueDAO studyParameterValueDAO;
-    private StudyBuildService studyBuildService;
 
     // < ResourceBundlerestext;
 
@@ -77,9 +66,6 @@ public class ChangeStudyServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
 
         locale = LocaleResolver.getLocale(request);
-        // < restext =
-        // ResourceBundle.getBundle("core.org.akaza.openclinica.i18n.notes",locale);
-
     }
 
 
@@ -87,6 +73,7 @@ public class ChangeStudyServlet extends SecureController {
     public void processRequest() throws Exception {
 
         String action = request.getParameter("action");// action sent by user
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         request.setAttribute("requestSchema", "public");
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource(), getStudyDao());
         Map<Integer, Study> allStudies = getStudyDao().findAll().stream().collect(Collectors.toMap(s->s.getStudyId(),s-> s));
@@ -340,7 +327,6 @@ public class ChangeStudyServlet extends SecureController {
         }
 
         forwardPage(Page.MENU);
-
     }
 
     private StudyEnvironmentRoleDTO getBaseRoleName() {
@@ -375,13 +361,6 @@ public class ChangeStudyServlet extends SecureController {
         return role;
     }
 
-    private void setupSubjectSDVTable() {
-
-     //   request.setAttribute("studyId", currentStudy.getId());
-     //   String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
-     //   request.setAttribute("sdvMatrix", sdvMatrix);
-    }
-
     private void setupStudySubjectStatusStatisticsTable() {
 
         StudySubjectStatusStatisticsTableFactory factory = new StudySubjectStatusStatisticsTableFactory();
@@ -396,7 +375,7 @@ public class ChangeStudyServlet extends SecureController {
         EventStatusStatisticsTableFactory factory = new EventStatusStatisticsTableFactory();
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
-        factory.setStudyEventDao(getStudyEventDAO());
+        factory.setStudyEventDao(studyEventDAO);
         factory.setStudyDao(getStudyDao());
         String subjectEventStatusStatistics = factory.createTable(request, response).render();
         request.setAttribute("subjectEventStatusStatistics", subjectEventStatusStatistics);
@@ -410,7 +389,6 @@ public class ChangeStudyServlet extends SecureController {
         factory.setStudyDao(getStudyDao());
         String studySiteStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySiteStatistics", studySiteStatistics);
-
     }
 
     private void setupStudyStatisticsTable() {
@@ -421,92 +399,12 @@ public class ChangeStudyServlet extends SecureController {
         factory.setStudyDao(getStudyDao());
         String studyStatistics = factory.createTable(request, response).render();
         request.setAttribute("studyStatistics", studyStatistics);
-
-    }
-
-    private void setupListStudySubjectTable() {
-
-        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
-        factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
-        factory.setSubjectDAO(getSubjectDAO());
-        factory.setStudySubjectDAO(getStudySubjectDAO());
-        factory.setStudyEventDAO(getStudyEventDAO());
-        factory.setStudyDAO(getStudyDao());
-        factory.setStudyBean(currentStudy);
-        factory.setStudyGroupClassDAO(getStudyGroupClassDAO());
-        factory.setSubjectGroupMapDAO(getSubjectGroupMapDAO());
-        factory.setCurrentRole(currentRole);
-        factory.setCurrentUser(ub);
-        factory.setEventCRFDAO(getEventCRFDAO());
-        factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
-        factory.setStudyGroupDAO(getStudyGroupDAO());
-        factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
-        String findSubjectsHtml = factory.createTable(request, response).render();
-        request.setAttribute("findSubjectsHtml", findSubjectsHtml);
-    }
-
-    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-        studyEventDefinitionDAO = studyEventDefinitionDAO == null ? new StudyEventDefinitionDAO(sm.getDataSource()) : studyEventDefinitionDAO;
-        return studyEventDefinitionDAO;
-    }
-
-    public SubjectDAO getSubjectDAO() {
-        subjectDAO = this.subjectDAO == null ? new SubjectDAO(sm.getDataSource()) : subjectDAO;
-        return subjectDAO;
     }
 
     public StudySubjectDAO getStudySubjectDAO() {
         studySubjectDAO = this.studySubjectDAO == null ? new StudySubjectDAO(sm.getDataSource()) : studySubjectDAO;
         return studySubjectDAO;
     }
-
-    public StudyGroupClassDAO getStudyGroupClassDAO() {
-        studyGroupClassDAO = this.studyGroupClassDAO == null ? new StudyGroupClassDAO(sm.getDataSource()) : studyGroupClassDAO;
-        return studyGroupClassDAO;
-    }
-
-    public SubjectGroupMapDAO getSubjectGroupMapDAO() {
-        subjectGroupMapDAO = this.subjectGroupMapDAO == null ? new SubjectGroupMapDAO(sm.getDataSource()) : subjectGroupMapDAO;
-        return subjectGroupMapDAO;
-    }
-
-    public StudyEventDAO getStudyEventDAO() {
-        studyEventDAO = this.studyEventDAO == null ? new StudyEventDAO(sm.getDataSource()) : studyEventDAO;
-        return studyEventDAO;
-    }
-
-    public EventCRFDAO getEventCRFDAO() {
-        eventCRFDAO = this.eventCRFDAO == null ? new EventCRFDAO(sm.getDataSource()) : eventCRFDAO;
-        return eventCRFDAO;
-    }
-
-    public EventDefinitionCRFDAO getEventDefinitionCRFDAO() {
-        eventDefintionCRFDAO = this.eventDefintionCRFDAO == null ? new EventDefinitionCRFDAO(sm.getDataSource()) : eventDefintionCRFDAO;
-        return eventDefintionCRFDAO;
-    }
-
-    public StudyGroupDAO getStudyGroupDAO() {
-        studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
-        return studyGroupDAO;
-    }
-
-    public DiscrepancyNoteDAO getDiscrepancyNoteDAO() {
-        discrepancyNoteDAO = this.discrepancyNoteDAO == null ? new DiscrepancyNoteDAO(sm.getDataSource()) : discrepancyNoteDAO;
-        return discrepancyNoteDAO;
-    }
-
-    public SDVUtil getSDVUtil() {
-        return (SDVUtil) SpringServletAccess.getApplicationContext(context).getBean("sdvUtil");
-    }
-
-	public StudyParameterValueDAO getStudyParameterValueDAO() {
-	     studyParameterValueDAO = this.studyParameterValueDAO == null ? new StudyParameterValueDAO(sm.getDataSource()) : studyParameterValueDAO;
-		return studyParameterValueDAO;
-	}
-
-	public void setStudyParameterValueDAO(StudyParameterValueDAO studyParameterValueDAO) {
-		this.studyParameterValueDAO = studyParameterValueDAO;
-	}
 
     public StudyBuildService getStudyBuildService() {
         WebApplicationContext ctx =

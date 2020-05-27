@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import com.openclinica.kafka.KafkaService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 import core.org.akaza.openclinica.dao.hibernate.CrfVersionDao;
@@ -20,7 +21,6 @@ import core.org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import core.org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
 import core.org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import core.org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
-import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.CrfVersion;
 import core.org.akaza.openclinica.domain.datamap.Item;
 import core.org.akaza.openclinica.domain.datamap.ItemData;
@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import core.org.akaza.openclinica.domain.datamap.ItemGroup;
 import core.org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import core.org.akaza.openclinica.domain.datamap.ItemMetadata;
+import org.akaza.openclinica.service.DataSaveServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,9 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
 
     @Autowired
     private CrfVersionDao crfVersionDao;
+
+    @Autowired
+    DataSaveServiceImpl dataSaveService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -184,6 +188,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                         groupOrdinalMapping.get(itemGroup.getItemGroupId()).add(newItemData.getOrdinal());
                     }
                     newItemData.setInstanceId(container.getInstanceId());
+                    dataSaveService.saveOrUpdate(newItemData);
                     itemDataDao.saveOrUpdate(newItemData);
 
                 } else if (existingItemData.getValue().equals(newItemData.getValue())) {
@@ -193,7 +198,7 @@ public class ItemProcessor extends AbstractItemProcessor implements Processor {
                     existingItemData.setValue(newItemData.getValue());
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
-                    itemDataDao.saveOrUpdate(existingItemData);
+                    dataSaveService.saveOrUpdate(existingItemData);
                 }
             }
         }

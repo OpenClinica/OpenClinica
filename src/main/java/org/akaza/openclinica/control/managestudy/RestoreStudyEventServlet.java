@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.openclinica.kafka.KafkaService;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
@@ -26,6 +28,8 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.auth.TokenService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -48,6 +52,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *         Restores a removed study event and all its data
  */
 public class RestoreStudyEventServlet extends SecureController {
+
+    private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
     /**
      *
      */
@@ -72,10 +79,11 @@ public class RestoreStudyEventServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
         if (studyEventId == 0) {
@@ -97,7 +105,7 @@ public class RestoreStudyEventServlet extends SecureController {
             }
             // YW
 
-            StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
             request.setAttribute("studySub", studySub);
 
@@ -116,8 +124,7 @@ public class RestoreStudyEventServlet extends SecureController {
                 // find all crfs in the definition
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllByEventDefinitionId(study, sed.getId());
 
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                 // construct info needed on view study event page
                 DisplayStudyEventBean de = new DisplayStudyEventBean();
@@ -133,7 +140,7 @@ public class RestoreStudyEventServlet extends SecureController {
                 event.setRemoved(Boolean.FALSE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
-                sedao.update(event);
+                studyEventDAO.update(event);
 
                 if(studySub.getStatus().equals(Status.SIGNED)){
                     studySub.setStatus(Status.AVAILABLE);
@@ -149,7 +156,7 @@ public class RestoreStudyEventServlet extends SecureController {
                         + respage.getString("has_been_restored_to_the_study") + " " + study.getName() + ".";
 
                 addPageMessage(emailBody);
-                // sendEmail(emailBody);
+
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
@@ -176,7 +183,6 @@ public class RestoreStudyEventServlet extends SecureController {
             definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 
@@ -194,7 +200,7 @@ public class RestoreStudyEventServlet extends SecureController {
             // then get the definition so we can call
             // DisplayEventCRFBean.setFlags
             int studyEventId = ecb.getStudyEventId();
-            int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
 
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
 
@@ -205,21 +211,4 @@ public class RestoreStudyEventServlet extends SecureController {
 
         return answer;
     }
-
-    /**
-     * Send email to director and administrator
-     *
-     * @param request
-     * @param response
-     */
-    private void sendEmail(String emailBody) throws Exception {
-
-        logger.info("Sending email...");
-        // to study director
-        sendEmail(ub.getEmail().trim(), respage.getString("restore_event_to_study"), emailBody, false);
-        // to admin
-        sendEmail(EmailEngine.getAdminEmail(), respage.getString("restore_event_to_study"), emailBody, false, false);
-        logger.info("Sending email done..");
-    }
-
 }

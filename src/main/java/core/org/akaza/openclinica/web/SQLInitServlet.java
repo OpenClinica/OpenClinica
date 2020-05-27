@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServlet;
 
 import core.org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.admin.DownloadVersionSpreadSheetServlet;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import core.org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
@@ -38,6 +37,7 @@ import core.org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
  */
 public class SQLInitServlet extends HttpServlet {
 
+    public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.9.xls";
     private ServletContext context;
     private static Properties params = new Properties();
     private static Properties entParams = new Properties();
@@ -83,10 +83,10 @@ public class SQLInitServlet extends HttpServlet {
         if (!(new File(theDir)).isDirectory() || !(new File(dir1)).isDirectory()
                 || !(new File(dir2)).isDirectory()) {
             (new File(theDir + dir1 + dir2)).mkdirs();
-            copyTemplate(theDir + dir1 + dir2 + DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+            copyTemplate(theDir + dir1 + dir2 + CRF_VERSION_TEMPLATE);
         }
         theDir = theDir + dir1 + dir2;
-        File excelFile = new File(theDir + DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+        File excelFile = new File(theDir + CRF_VERSION_TEMPLATE);
         if(!excelFile.isFile()){
             copyTemplate(theDir);
         }
@@ -158,7 +158,7 @@ public class SQLInitServlet extends HttpServlet {
         InputStream is = null;
         CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
         try {
-            is = cr.getInputStream(DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+            is = cr.getInputStream(CRF_VERSION_TEMPLATE);
             File excelOutFile = new File(theDir);
             out = new FileOutputStream(excelOutFile);
             byte[] buf = new byte[1024];

@@ -165,64 +165,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
     }
 
     /**
-     * This will update item data value
-     * 
-     * @param eb
-     * @return
-     */
-    public EntityBean updateValue(EntityBean eb) {
-        ItemDataBean idb = (ItemDataBean) eb;
-
-        // YW 12-06-2007 << convert to oc_date_format_string pattern before
-        // inserting into database
-        ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
-        idb.setActive(false);
-
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), idb.getValue());
-        variables.put(new Integer(2), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(3), new Integer(idb.getId()));
-        this.execute(digester.getQuery("updateValue"), variables);
-
-        if (isQuerySuccessful()) {
-            idb.setActive(true);
-        }
-
-        return idb;
-    }
-
-    public EntityBean updateValueForRemoved(EntityBean eb) {
-        ItemDataBean idb = (ItemDataBean) eb;
-
-        // YW 12-06-2007 << convert to oc_date_format_string pattern before
-        // inserting into database
-        ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
-        idb.setActive(false);
-
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), idb.getValue());
-        variables.put(new Integer(2), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(3), new Integer(idb.getId()));
-        this.execute(digester.getQuery("updateValueForRemoved"), variables);
-
-        if (isQuerySuccessful()) {
-            idb.setActive(true);
-        }
-
-        return idb;
-    }
-
-    /**
      * this will update item data status
      */
 
@@ -239,49 +181,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return idb;
     }
 
-    /**
-     * This will update item data value
-     * 
-     * @param eb
-     * @return
-     */
-    public EntityBean updateValue(EntityBean eb, String current_df_string) {
-        ItemDataBean idb = (ItemDataBean) eb;
-
-        ItemDataType dataType = getDataType(idb.getItemId());
-        setItemDataBeanIfDateOrPdate(idb, current_df_string, dataType);
-
-        idb.setActive(false);
-
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), idb.getValue());
-        variables.put(new Integer(2), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(3), new Integer(idb.getId()));
-        this.execute(digester.getQuery("updateValue"), variables);
-
-        if (isQuerySuccessful()) {
-            idb.setActive(true);
-        }
-
-        return idb;
-    }
-
-    public EntityBean updateUser(EntityBean eb) {
-        ItemDataBean idb = (ItemDataBean) eb;
-
-        idb.setActive(false);
-
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(2), new Integer(idb.getId()));
-        this.execute(digester.getQuery("updateUser"), variables);
-
-        if (isQuerySuccessful()) {
-            idb.setActive(true);
-        }
-
-        return idb;
-    }
 
     public EntityBean create(EntityBean eb) {
         ItemDataBean idb = (ItemDataBean) eb;
@@ -304,36 +203,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(6), new Integer(idb.getOrdinal()));
         variables.put(new Integer(7), new Boolean(idb.isDeleted()));
         this.execute(digester.getQuery("create"), variables);
-
-        if (isQuerySuccessful()) {
-            idb.setId(id);
-        }
-
-        return idb;
-    }
-
-    public EntityBean upsert(EntityBean eb) {
-        ItemDataBean idb = (ItemDataBean) eb;
-        // YW 12-06-2007 << convert to oc_date_format_string pattern before
-        // inserting into database
-        ItemDataType dataType = getDataType(idb.getItemId());
-        if (dataType.equals(ItemDataType.DATE)) {
-            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string, locale));
-        } else if (dataType.equals(ItemDataType.PDATE)) {
-            idb.setValue(formatPDate(idb.getValue()));
-        }
-
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        int id = getNextPK();
-        variables.put(new Integer(1), new Integer(id));
-        variables.put(new Integer(2), new Integer(idb.getEventCRFId()));
-        variables.put(new Integer(3), new Integer(idb.getItemId()));
-        variables.put(new Integer(4), idb.getValue());
-        variables.put(new Integer(5), new Integer(idb.getOwnerId()));
-        variables.put(new Integer(6), new Integer(idb.getOrdinal()));
-        variables.put(new Integer(7), new Integer(idb.getUpdaterId()));
-        variables.put(new Integer(8), new Boolean(idb.isDeleted()));
-        this.execute(digester.getQuery("upsert"), variables);
 
         if (isQuerySuccessful()) {
             idb.setId(id);
@@ -487,15 +356,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
     }
 
-    public void deleteDnMap(int itemDataId) {
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), new Integer(itemDataId));
-
-        this.execute(digester.getQuery("deleteDn"), variables);
-        return;
-
-    }
-
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
@@ -508,25 +368,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return al;
     }
 
-    public ArrayList<ItemDataBean> findAllBySectionIdAndEventCRFId(int sectionId, int eventCRFId) {
-        setTypesExpected();
-        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(sectionId));
-        variables.put(new Integer(2), new Integer(eventCRFId));
-
-        return this.executeFindAllQuery("findAllBySectionIdAndEventCRFId", variables);
-    }
-
-    public ArrayList<ItemDataBean> findByCRFVersion(CRFVersionBean crfVersionBean) {
-        setTypesExpected();
-        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(crfVersionBean.getId()));
-
-        return this.executeFindAllQuery("findByCRFVersion", variables);
-    }
-    
-    
-        
     public ArrayList<ItemDataBean> findAllActiveBySectionIdAndEventCRFId(int sectionId, int eventCRFId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -544,24 +385,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllByEventCRFId", variables);
     }
 
-    public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemId(int eventCRFId, int itemId) {
-        setTypesExpected();
-        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(eventCRFId));
-        variables.put(new Integer(2), new Integer(itemId));
-
-        return this.executeFindAllQuery("findAllByEventCRFIdAndItemId", variables);
-    }
-
-    public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemIdNoStatus(int eventCRFId, int itemId) {
-        setTypesExpected();
-        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(eventCRFId));
-        variables.put(new Integer(2), new Integer(itemId));
-
-        return this.executeFindAllQuery("findAllByEventCRFIdAndItemIdNoStatus", variables);
-    }
-
     public ArrayList<ItemDataBean> findAllBlankRequiredByEventCRFId(int eventCRFId, int crfVersionId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -570,18 +393,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return this.executeFindAllQuery("findAllBlankRequiredByEventCRFId", variables);
     }
-
-    public ItemDataBean findByEventCRFIdAndItemName(EventCRFBean eventCrfBean, String itemName) {
-
-        setTypesExpected();
-        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(eventCrfBean.getId()));
-        variables.put(new Integer(2), itemName);
-
-        ArrayList<ItemDataBean> itemDataBeans = this.executeFindAllQuery("findAllByEventCRFIdAndItemName", variables);
-        return !itemDataBeans.isEmpty() && itemDataBeans.size() == 1 ? itemDataBeans.get(0) : null;
-    }
-
 
     public ItemDataBean findByItemIdAndEventCRFId(int itemId, int eventCRFId) {
         setTypesExpected();
@@ -619,24 +430,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         }
     }
 
-    public ItemDataBean findByItemIdAndEventCRFIdAndOrdinalRaw(int itemId, int eventCRFId, int ordinal) {
-        setTypesExpected();
-        ItemDataBean answer = new ItemDataBean();
-
-        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-        variables.put(new Integer(1), new Integer(itemId));
-        variables.put(new Integer(2), new Integer(eventCRFId));
-        variables.put(new Integer(3), new Integer(ordinal));
-
-        EntityBean eb = this.executeFindByPKQuery("findByItemIdAndEventCRFIdAndOrdinal", variables);
-
-        if (!eb.isActive()) {
-            return new ItemDataBean();// hmm, return null instead?
-        } else {
-            return (ItemDataBean) eb;
-        }
-    }
-
     public int findAllRequiredByEventCRFId(EventCRFBean ecb) {
         setTypesExpected();
         int answer = 0;
@@ -652,163 +445,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return answer;
     }
 
-    /**
-     * Gets the maximum ordinal for item data in a given item group in a given section and event crf
-     * 
-     * @param ecb
-     * @param sb
-     * @param igb
-     * @return
-     */
-    public int getMaxOrdinalForGroup(EventCRFBean ecb, SectionBean sb, ItemGroupBean igb) {
-
-        this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-
-        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-        variables.put(new Integer(1), new Integer(ecb.getId()));
-        variables.put(new Integer(2), new Integer(sb.getId()));
-        variables.put(new Integer(3), new Integer(igb.getId()));
-
-        ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroup"), variables);
-        Iterator it = alist.iterator();
-        if (it.hasNext()) {
-            try {
-                HashMap hm = (HashMap) it.next();
-                Integer max = (Integer) hm.get("max_ord");
-                return max.intValue();
-            } catch (Exception e) {
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Gets the maximum ordinal for item data in a given item group in a given section and event crf
-     * 
-     * @param item_group_oid
-     * 
-     * @return
-     */
-    public int getMaxOrdinalForGroupByGroupOID(String item_group_oid, int event_crf_id) {
-
-        this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-        this.setTypeExpected(2, TypeNames.STRING);
-
-        HashMap variables = new HashMap(1);
-        variables.put(new Integer(1), new Integer(event_crf_id));
-        variables.put(new Integer(2), item_group_oid);
-
-        ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByGroupOID"), variables);
-        Iterator it = alist.iterator();
-        if (it.hasNext()) {
-            try {
-                HashMap hm = (HashMap) it.next();
-                Integer max = (Integer) hm.get("max_ord");
-                return max.intValue();
-            } catch (Exception e) {
-            }
-        }
-
-        return 0;
-    }
-
-    public int getMaxOrdinalForGroupByItemAndEventCrf(Integer itemId, EventCRFBean ec) {
-
-        this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-
-        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-        variables.put(new Integer(1), itemId);
-        variables.put(new Integer(2), new Integer(ec.getId()));
-
-        ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByItemAndEventCrf"), variables);
-        Iterator it = alist.iterator();
-        if (it.hasNext()) {
-            try {
-                HashMap hm = (HashMap) it.next();
-                Integer max = (Integer) hm.get("max_ord");
-                return max.intValue();
-            } catch (Exception e) {
-            }
-        }
-
-        return 0;
-    }
-
-    public boolean isItemExists(int item_id, int ordinal_for_repeating_group_field, int event_crf_id) {
-
-        this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-        this.setTypeExpected(2, TypeNames.INT);
-        this.setTypeExpected(3, TypeNames.INT);
-
-        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-        variables.put(new Integer(1), new Integer(item_id));
-        variables.put(new Integer(2), new Integer(ordinal_for_repeating_group_field));
-        variables.put(new Integer(3), new Integer(event_crf_id));
-
-        ArrayList alist = this.select(digester.getQuery("isItemExists"), variables);
-        Iterator it = alist.iterator();
-        if (it.hasNext()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public int getGroupSize(int itemId, int eventcrfId) {
-        this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);
-
-        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-        variables.put(new Integer(1), new Integer(itemId));
-        variables.put(new Integer(2), new Integer(eventcrfId));
-
-        ArrayList alist = this.select(digester.getQuery("getGroupSize"), variables);
-        Iterator it = alist.iterator();
-        if (it.hasNext()) {
-            Integer count = (Integer) ((HashMap) it.next()).get("count");
-            return count;
-        } else {
-            return 0;
-        }
-    }
-
-    public List<String> findValuesByItemOID(String itoid) {
-        List<String> vals = new ArrayList<String>();
-        this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.STRING);
-        HashMap<Integer, String> variables = new HashMap<Integer, String>();
-        variables.put(1, itoid);
-        ArrayList alist = this.select(digester.getQuery("findValuesByItemOID"), variables);
-        Iterator it = alist.iterator();
-        while (it.hasNext()) {
-            vals.add((String) ((HashMap) it.next()).get("value"));
-        }
-        return vals;
-    }
-
-    public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemGroupId(int eventCRFId, int itemGroupId) {
-        setTypesExpected();
-        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
-        variables.put(new Integer(1), new Integer(eventCRFId));
-        variables.put(new Integer(2), new Integer(itemGroupId));
-
-        return this.executeFindAllQuery("findAllByEventCRFIdAndItemGroupId", variables);
-    }
-
-	public void undelete(int itemDataId, int updaterId) {
-        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
-        variables.put(new Integer(1), new Integer(updaterId));
-        variables.put(new Integer(2), new Integer(itemDataId));
-
-        this.execute(digester.getQuery("undelete"), variables);
-        return;
-
-	}
 	
 	public ArrayList findSkipMatchCriterias(String sqlStr,ArrayList<String> skipMatchCriteriaOids) {
         setTypesExpected();

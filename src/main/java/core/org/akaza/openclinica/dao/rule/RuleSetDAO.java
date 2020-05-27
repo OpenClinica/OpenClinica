@@ -78,14 +78,6 @@ public class RuleSetDAO extends AuditableEntityDAO {
         return this.crfVersionDao != null ? this.crfVersionDao : new CRFVersionDAO(ds);
     }
 
-    private EventCRFDAO getEventCrfDao() {
-        return this.eventCrfDao != null ? this.eventCrfDao : new EventCRFDAO(ds);
-    }
-
-    private RuleDAO getRuleDao() {
-        return this.ruleDao != null ? this.ruleDao : new RuleDAO(ds);
-    }
-
     private RuleSetAuditDAO getRuleSetAuditDao() {
         return this.ruleSetAuditDao != null ? this.ruleSetAuditDao : new RuleSetAuditDAO(ds);
     }

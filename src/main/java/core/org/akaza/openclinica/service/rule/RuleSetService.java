@@ -991,24 +991,18 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     private CRFDAO getCrfDao() {
-        //crfDao = this.crfDao != null ? crfDao : new CRFDAO(dataSource);
         return new CRFDAO(dataSource);
     }
 
     private StudyEventDAO getStudyEventDao() {
-      //  studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
         return new StudyEventDAO(dataSource);
     }
 
     private ItemDAO getItemDao() {
-       // itemDao = this.itemDao != null ? itemDao : new ItemDAO(dataSource);
         return new ItemDAO(dataSource);
     }
 
     private ItemFormMetadataDAO getItemFormMetadataDao() {
-
-       // itemFormMetadataDao = this.itemFormMetadataDao != null ? itemFormMetadataDao : new ItemFormMetadataDAO(dataSource);
-      //  return itemFormMetadataDao;
         return new ItemFormMetadataDAO(dataSource);
     }
 
@@ -1019,17 +1013,14 @@ public class RuleSetService implements RuleSetServiceInterface {
     //JN:No reason to use global variables, they could cause potential concurrency issues.
 
     public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-    //    studyEventDefinitionDao = this.studyEventDefinitionDao != null ? studyEventDefinitionDao : new StudyEventDefinitionDAO(dataSource);
-        return  new StudyEventDefinitionDAO(dataSource);
+        return new StudyEventDefinitionDAO(dataSource);
     }
 
     private ItemDataDAO getItemDataDao() {
-      //  itemDataDao = this.itemDataDao != null ? itemDataDao : new ItemDataDAO(dataSource);
-        return  new ItemDataDAO(dataSource);
+        return new ItemDataDAO(dataSource);
     }
 
     private CRFVersionDAO getCrfVersionDao() {
-       // crfVersionDao = this.crfVersionDao != null ? crfVersionDao : new CRFVersionDAO(dataSource);
         return new CRFVersionDAO(dataSource);
     }
 

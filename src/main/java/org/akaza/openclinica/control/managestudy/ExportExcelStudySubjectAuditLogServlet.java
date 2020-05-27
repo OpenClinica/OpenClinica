@@ -22,7 +22,10 @@ import core.org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.core.Utils;
-import core.org.akaza.openclinica.bean.managestudy.*;
+import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -46,23 +49,25 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
 import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
-import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-
 import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.format.Colour;
 import jxl.format.UnderlineStyle;
-import jxl.write.Label;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
+import jxl.write.*;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.view.Page;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author jsampson
@@ -72,26 +77,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 @SuppressWarnings("serial")
 public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 
+    private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
     /**
      * Checks whether the user has the right permission to proceed function
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        // if (SubmitDataServlet.mayViewData(ub, currentRole)) {
-        // return;
-        // }
-        // if (ub.isSysAdmin()) {
-        // return;
-        // }
-        // Role r = currentRole.getRole();
-        // if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
-        // return;
-        // }
-        // addPageMessage(respage.getString("no_have_correct_privilege_current_study") +
-        // respage.getString("change_study_contact_sysadmin"));
-        // throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"),
-        // "1");
         if (ub.isSysAdmin()) {
             return;
         }
@@ -107,15 +100,15 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao = (EventDefinitionCrfPermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("eventDefinitionCrfPermissionTagDao");
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         AuditDAO adao = new AuditDAO(sm.getDataSource());
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         StudySubjectBean studySubject = null;
@@ -185,14 +178,14 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             studySubjectAudits.addAll(adao.findStudySubjectGroupAssignmentAuditEvents(studySubject.getId()));
 
             // Get the list of events
-            events = sedao.findAllByStudySubject(studySubject);
+            events = studyEventDAO.findAllByStudySubject(studySubject);
             for (int i = 0; i < events.size(); i++) {
                 // Link study event definitions
                 StudyEventBean studyEvent = (StudyEventBean) events.get(i);
                 studyEvent.setStudyEventDefinition((StudyEventDefinitionBean) seddao.findByPK(studyEvent.getStudyEventDefinitionId()));
 
                 // Link event CRFs
-                studyEvent.setEventCRFs(ecdao.findAllByStudyEvent(studyEvent));
+                studyEvent.setEventCRFs(eventCRFDAO.findAllByStudyEvent(studyEvent));
 
                 // Find deleted Event CRFs
                 List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
@@ -475,7 +468,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 // Event CRFs Audit Events
                 for (int j = 0; j < allEventCRFs.size(); j++) {
                     AuditBean auditBean = (AuditBean) allEventCRFs.get(j);
-                    EventCRFBean eventCrf = (EventCRFBean) ecdao.findByPK(auditBean.getEventCRFId());
+                    EventCRFBean eventCrf = (EventCRFBean) eventCRFDAO.findByPK(auditBean.getEventCRFId());
                     FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(eventCrf.getFormLayoutId());
                     if (auditBean.getStudyEventId() == event.getId()) {
 

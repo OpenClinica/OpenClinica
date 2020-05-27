@@ -38,7 +38,6 @@ public class DownloadAttachedFileServlet extends SecureController {
         Locale locale = LocaleResolver.getLocale(request);
         FormProcessor fp = new FormProcessor(request);
 /*        int eventCRFId = fp.getInt("eventCRFId");
-        EventCRFDAO edao = new EventCRFDAO(sm.getDataSource());
 
         if (eventCRFId > 0) {
             if (!entityIncluded(eventCRFId, ub.getName(), edao, sm.getDataSource())) {

@@ -9,26 +9,20 @@ package org.akaza.openclinica.control.managestudy;
 
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import core.org.akaza.openclinica.bean.submit.EventCRFBean;
-import core.org.akaza.openclinica.bean.submit.ItemDataBean;
+import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.control.core.SecureController;
-import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.dao.submit.SubjectDAO;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.service.UserStatus;
-import org.akaza.openclinica.view.Page;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.view.Page;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +33,9 @@ import java.util.Date;
  * Restores a removed subject to a study
  */
 public class RestoreStudySubjectServlet extends SecureController {
+
+    private StudySubjectService studySubjectService;
+
     /**
      *
      */
@@ -62,6 +59,7 @@ public class RestoreStudySubjectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+        studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
         String studySubIdString = request.getParameter("id");// studySubjectId
         String subIdString = request.getParameter("subjectId");
         String studyIdString = request.getParameter("studyId");
@@ -83,9 +81,7 @@ public class RestoreStudySubjectServlet extends SecureController {
 
             Study study = (Study) getStudyDao().findByPK(studyId);
             // find study events
-            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-//            ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);
-            ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole, getStudyDao());
+            ArrayList<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole, getStudyDao());
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
                 if (studySub.getStatus().equals(Status.AVAILABLE)) {
@@ -113,8 +109,6 @@ public class RestoreStudySubjectServlet extends SecureController {
 
                 // restore all study events
                 // restore all event crfs
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
 
                 String emailBody =
                     respage.getString("the_subject") + " " + studySub.getName() + " " + respage.getString("has_been_restored_to_the_study") + " "
@@ -128,23 +122,6 @@ public class RestoreStudySubjectServlet extends SecureController {
                 forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
             }
         }
-    }
-
-    /**
-     * Send email to director and administrator
-     *
-     * @param request
-     * @param response
-     */
-    private void sendEmail(String emailBody) throws Exception {
-
-        logger.info("Sending email...");
-        // to study director
-        boolean messageSent = sendEmail(ub.getEmail().trim(), respage.getString("restore_subject_to_study"), emailBody, false);
-        if(messageSent){
-            sendEmail(EmailEngine.getAdminEmail(), respage.getString("restore_subject_to_study"), emailBody, false);
-        }
-        logger.info("Sending email done..");
     }
 
 }

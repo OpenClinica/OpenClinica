@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.openclinica.kafka.KafkaService;
+import com.openclinica.kafka.dto.EventAttributeChangeDTO;
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Role;
@@ -23,6 +25,8 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.service.auth.TokenService;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.EmailEngine;
@@ -44,6 +48,10 @@ public class RemoveStudyEventServlet extends SecureController {
     /**
      *
      */
+
+    private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
@@ -67,8 +75,9 @@ public class RemoveStudyEventServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt("id");// studyEventId
         int studySubId = fp.getInt("studySubId");// studySubjectId
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
 
         if (studyEventId == 0) {
@@ -77,7 +86,8 @@ public class RemoveStudyEventServlet extends SecureController {
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
 
-            StudyEventBean event = (StudyEventBean) sedao.findByPK(studyEventId);
+            StudyEventBean event = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
+            event.getStudyEventDefinition().getOid();
 
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             request.setAttribute("studySub", studySub);
@@ -97,8 +107,7 @@ public class RemoveStudyEventServlet extends SecureController {
                 // find all crfs in the definition
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllByEventDefinitionId(study, sed.getId());
 
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                 // construct info needed on view study event page
                 DisplayStudyEventBean de = new DisplayStudyEventBean();
@@ -116,7 +125,7 @@ public class RemoveStudyEventServlet extends SecureController {
                 event.setRemoved(Boolean.TRUE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());
-                sedao.update(event);
+                studyEventDAO.update(event);
 
                 if(studySub.getStatus().equals(Status.SIGNED)){
                     studySub.setStatus(Status.AVAILABLE);
@@ -125,10 +134,7 @@ public class RemoveStudyEventServlet extends SecureController {
                     subdao.update(studySub);
                 }
 
-                // remove all event crfs
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
-                ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                 ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
                 for (int k = 0; k < eventCRFs.size(); k++) {
@@ -179,6 +185,7 @@ public class RemoveStudyEventServlet extends SecureController {
 
                 addPageMessage(emailBody);
                 // sendEmail(emailBody);
+
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
@@ -205,7 +212,6 @@ public class RemoveStudyEventServlet extends SecureController {
             definitionsById.put(new Integer(edc.getStudyEventDefinitionId()), edc);
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
 
@@ -223,7 +229,7 @@ public class RemoveStudyEventServlet extends SecureController {
             // then get the definition so we can call
             // DisplayEventCRFBean.setFlags
             int studyEventId = ecb.getStudyEventId();
-            int studyEventDefinitionId = sedao.getDefinitionIdFromStudyEventId(studyEventId);
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
 
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) definitionsById.get(new Integer(studyEventDefinitionId));
 

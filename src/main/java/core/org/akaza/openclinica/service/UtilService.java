@@ -21,8 +21,6 @@ public interface UtilService {
 
 	void setSchemaFromStudyOid(String studyOid);
 
-	String getCustomerUuidFromRequest(HttpServletRequest request);
-
 	UserAccountBean getUserAccountFromRequest(HttpServletRequest request);
 
     boolean isParticipantIDSystemGenerated(Study tenantStudy);

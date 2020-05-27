@@ -1182,9 +1182,6 @@ public class ExtractBean {
         eventCRF.setDateInterviewed(dateInterviewed);
         // eventCRF.setStatus(status); //this is the one that we want, tbh
 
-        // EventCRFDAO ecrfdao = new EventCRFDAO(ds);
-        // ArrayList events = ecrfdao.findAllByStudyEvent(se);
-
         CRFVersionBean crfVersion = new CRFVersionBean();
         crfVersion.setName(crfVersionName);
         crfVersion.setStatus(Status.get(crfVersionStatusId.intValue()));

@@ -7,39 +7,33 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.dao.service.StudyConfigService;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
-import org.akaza.openclinica.config.StudyParamNames;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
-import org.akaza.openclinica.view.Page;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.config.StudyParamNames;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.view.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.net.MalformedURLException;
+import java.util.*;
 
 /**
  * @author jxu
@@ -68,7 +62,7 @@ public class UpdateSubStudyServlet extends SecureController {
         }
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.STUDY_LIST, resexception.getString("not_study_director"), "1");
+        throw new InsufficientPermissionException(Page.SITE_LIST, resexception.getString("not_study_director"), "1");
 
     }
 
@@ -82,7 +76,7 @@ public class UpdateSubStudyServlet extends SecureController {
         String action = request.getParameter("action");
 
         if (StringUtil.isBlank(action)) {
-            request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+            request.setAttribute("facRecruitStatusMap", new LinkedHashMap<String, String>());
             request.setAttribute("statuses", Status.toStudyUpdateMembersList());
             FormProcessor fp = new FormProcessor(request);
             logger.info("start date:" + study.getDatePlannedEnd());
@@ -111,9 +105,6 @@ public class UpdateSubStudyServlet extends SecureController {
 
     /**
      * Validates the first section of study and save it into study bean * *
-     *
-     * @param request
-     * @param response
      * @throws Exception
      */
     private void confirmStudy() throws Exception {
@@ -154,7 +145,7 @@ public class UpdateSubStudyServlet extends SecureController {
 
             setPresetValues(fp.getPresetValues());
             request.setAttribute("formMessages", errors);
-            request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+            request.setAttribute("facRecruitStatusMap", new LinkedHashMap<String, String>());
             request.setAttribute("statuses", Status.toStudyUpdateMembersList());
             forwardPage(Page.UPDATE_SUB_STUDY);
         }
@@ -163,8 +154,6 @@ public class UpdateSubStudyServlet extends SecureController {
 
     /**
      * Constructs study bean from reques * *
-     *
-     * @param request
      * @return
      */
     private Study createStudyBean() {
@@ -497,7 +486,7 @@ public class UpdateSubStudyServlet extends SecureController {
     }
 
     public ArrayList<EventDefinitionCRFBean> validateSubmissionUrl(ArrayList<EventDefinitionCRFBean> edcsInSession,
-            ArrayList<EventDefinitionCRFBean> eventDefCrfList, Validator v, StudyEventDefinitionBean sed) {
+                                                                   ArrayList<EventDefinitionCRFBean> eventDefCrfList, Validator v, StudyEventDefinitionBean sed) {
         for (int i = 0; i < edcsInSession.size(); i++) {
             String order = i + "-" + edcsInSession.get(i).getId();
             v.addValidation("submissionUrl" + order, Validator.NO_SPACES_ALLOWED);
