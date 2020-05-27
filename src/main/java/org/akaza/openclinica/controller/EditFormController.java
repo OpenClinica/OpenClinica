@@ -144,7 +144,7 @@ public class EditFormController {
         if(openRosaServices.isFormContainsContactData(binds))
             formContainsContactData=true;
 
-        editURL = urlService.getActionUrl(formContext, subjectContext, studyOID, formLayout, PARTICIPATE_FLAVOR, null, role, mode, null, false, null, formContainsContactData, binds, ub);
+        editURL = urlService.getActionUrl(formContext, subjectContext, studyOID, formLayout, PARTICIPATE_FLAVOR, null, role, mode, null, false, formContainsContactData, binds, ub);
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL.getFormUrl(), org.springframework.http.HttpStatus.ACCEPTED);
