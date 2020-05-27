@@ -16,6 +16,7 @@ import core.org.akaza.openclinica.service.PermissionService;
 import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.service.ValidateService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	@Autowired
 	PermissionService permissionService;
+	@Autowired
+	ValidateService validateService;
 
 	@Autowired
 	private DataSource dataSource;
@@ -884,10 +887,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			isActiveRoleAtSite = false;
 		}
 
-		ArrayList<StudyUserRole> surlist = getStudyUserRoleDao().findAllUserRolesByUserAccountStudySites(userAccount, publicStudy.getStudyId(), parentStudyId);
-		if (surlist == null || surlist.size() == 0) {
-			// Does not have permission to view study or site info / return null
-			return null;
+		if (!validateService.isUserSystemUser(getRequest())) {
+			ArrayList<StudyUserRole> surlist = getStudyUserRoleDao().findAllUserRolesByUserAccountStudySites(userAccount, publicStudy.getStudyId(), parentStudyId);
+			if (surlist == null || surlist.size() == 0) {
+				// Does not have permission to view study or site info / return null
+				return null;
+			}
 		}
 
 		// This piece of code identifies if the study subject is assigned to study level or site level. If the study

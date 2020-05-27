@@ -21,8 +21,6 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.pmanage.Authorization;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import core.org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
-import core.org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import core.org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -347,18 +345,6 @@ import java.util.*;
         // Load Randomization  information
         String moduleManager = CoreResources.getField("moduleManager");
         map.addAttribute("moduleManager", moduleManager);
-        if (moduleManager != null && !moduleManager.equals("")) {
-
-            String randomizationOCStatus = currentStudy.getRandomization();
-            RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-            SeRandomizationDTO randomization = null;
-            try {
-                randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOc_oid(), true);
-            } catch (Exception e1) {
-                // TODO Auto-generated catch block
-                logger.error("Error while accessing randomization registrar: ",e1);
-            }
-        }
 
         // @pgawade 13-April-2011- #8877: Added the rule designer URL
         if (null != coreResources) {

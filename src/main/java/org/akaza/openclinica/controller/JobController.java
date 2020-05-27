@@ -113,9 +113,6 @@ public class JobController {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         }
 
-        String accessToken = utilService.getAccessTokenFromRequest(request);
-        String customerUuid = utilService.getCustomerUuidFromRequest(request);
-
         List<JobDetailDTO> jobDetailDTOS = jobService.findAllNonDeletedJobsBySiteExceptPublishedStudies(tenantSite, userAccountBean);
         logger.debug("REST request to get all JobDetails by site");
 
@@ -145,9 +142,6 @@ public class JobController {
         } else if (!validateService.isUserHas_DM_DEP_DS_SM_RoleInStudy(userRoles, studyOid)) {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         }
-
-        String accessToken = utilService.getAccessTokenFromRequest(request);
-        String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
         List<JobDetailDTO> jobDetailDTOS = jobService.findAllNonDeletedJobsByStudyExceptPublishedStudies(tenantStudy, userAccountBean);
         logger.debug("REST request to get all JobDetails By study");

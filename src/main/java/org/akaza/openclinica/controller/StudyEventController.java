@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
+import core.org.akaza.openclinica.service.auth.TokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -99,6 +100,9 @@ public class StudyEventController {
 
 	@Autowired
 	private StudyBuildService studyBuildService;
+
+	@Autowired
+	private TokenService tokenService;
 
 	PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
 			new PassiveExpiringMap<>(24, TimeUnit.HOURS);

@@ -1,6 +1,7 @@
 package core.org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.core.Utils;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
@@ -10,6 +11,7 @@ import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.domain.xform.XformParser;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.auth.TokenService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import core.org.akaza.openclinica.service.crfdata.XformMetaDataService;
@@ -56,6 +58,10 @@ public class OdmImportServiceImpl implements OdmImportService {
 
 	@Autowired
 	private StudyBuildService studyBuildService;
+	@Autowired
+	private KafkaService kafkaService;
+	@Autowired
+	TokenService tokenService;
 	private UserAccountDao userDaoDomain;
 	private StudyUserRoleDao studyUserRoleDao;
 	private StudyEventDefinitionDao studyEventDefDao;
@@ -260,6 +266,13 @@ public class OdmImportServiceImpl implements OdmImportService {
 			List<ErrorObj> errList = getErrorList(errors.getAllErrors());
 			throw new CustomRuntimeException("There are errors with publishing", errList);
 		}
+		//TODO Do we want to throw an exception if Kafka can't send a message?
+		try {
+			kafkaService.sendStudyPublishMessage(study);
+		} catch (Exception e) {
+			logger.error("Could not update Kafka of study Publish: ", e);
+		}
+
 		Map<String, Object> map = new HashMap<>();
 		map.put("study", study);
 		PublishingDTO publishingDTO = new PublishingDTO();
@@ -439,7 +452,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	private StudyEventDefinition updateEventDef(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
 			StudyEventDefinition studyEventDefinition, Study study, Errors errors) {
 		if (study.getEnvType().equals(StudyEnvEnum.PROD) && odmStudyEventDef.getRepeating().value().equalsIgnoreCase("No")
-				&& studyEventDefinition.getRepeating()) {
+				&& studyEventDefinition.isRepeating()) {
 			errors.rejectValue("name", "event_error", " Cannot change Event \"" + studyEventDefinition.getName()
 					+ "\" to non-repeating since it was previously published to Production as repeating - FAILED");
 			logger.info(studyEventDefinition.getName() + " cannot change to non-repeating; event has been published to Production - FAILED");

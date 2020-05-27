@@ -112,6 +112,8 @@ public class AddNewSubjectServlet extends SecureController {
     @Autowired
     private Configuration freemarkerConfiguration;
 
+    private StudyEventDAO studyEventDAO;
+
     // YW >>
 
     @Override
@@ -128,6 +130,7 @@ public class AddNewSubjectServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
 
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
         checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
 
@@ -363,7 +366,6 @@ public class AddNewSubjectServlet extends SecureController {
                 addPageMessage(restext.getString("not_a_valid_location"));
             } else {
                 logger.info("will create event with new subject");
-                StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
                 StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
                 StudyEventBean se = new StudyEventBean();
                 se.setLocation(location);
@@ -379,8 +381,8 @@ public class AddNewSubjectServlet extends SecureController {
                 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEventDefinitionId);
 
 
-                se.setSampleOrdinal(sedao.getMaxSampleOrdinal(sed, s) + 1);
-                sedao.create(se);
+                se.setSampleOrdinal(studyEventDAO.getMaxSampleOrdinal(sed, s) + 1);
+                studyEventDAO.create(se);
                 //    getRuleSetService().runRulesInBeanProperty(createRuleSet(s,sed),currentStudy,ub,request,s);
 
 

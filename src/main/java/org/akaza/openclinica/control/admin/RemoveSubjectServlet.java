@@ -13,6 +13,7 @@ import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
@@ -34,6 +35,9 @@ import java.util.Date;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class RemoveSubjectServlet extends SecureController {
+
+    private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
     /**
      *
      */
@@ -53,6 +57,8 @@ public class RemoveSubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int subjectId = fp.getInt("id");
@@ -70,8 +76,7 @@ public class RemoveSubjectServlet extends SecureController {
             ArrayList studySubs = ssdao.findAllBySubjectId(subjectId);
 
             // find study events
-            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-            ArrayList events = sedao.findAllBySubjectId(subjectId);
+            ArrayList events = studyEventDAO.findAllBySubjectId(subjectId);
             if ("confirm".equalsIgnoreCase(action)) {
                 request.setAttribute("subjectToRemove", subject);
                 request.setAttribute("studySubs", studySubs);
@@ -96,17 +101,15 @@ public class RemoveSubjectServlet extends SecureController {
                     }
                 }
 
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-
                 for (int j = 0; j < events.size(); j++) {
                     StudyEventBean event = (StudyEventBean) events.get(j);
                     if (!event.getStatus().equals(Status.DELETED)) {
                         event.setStatus(Status.AUTO_DELETED);
                         event.setUpdater(ub);
                         event.setUpdatedDate(new Date());
-                        sedao.update(event);
+                        studyEventDAO.update(event);
 
-                        ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
+                        ArrayList eventCRFs = eventCRFDAO.findAllByStudyEvent(event);
 
                         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
                         for (int k = 0; k < eventCRFs.size(); k++) {
@@ -115,7 +118,7 @@ public class RemoveSubjectServlet extends SecureController {
                                 eventCRF.setStatus(Status.AUTO_DELETED);
                                 eventCRF.setUpdater(ub);
                                 eventCRF.setUpdatedDate(new Date());
-                                ecdao.update(eventCRF);
+                                eventCRFDAO.update(eventCRF);
                                 // remove all the item data
                                 ArrayList itemDatas = iddao.findAllByEventCRFId(eventCRF.getId());
                                 for (int a = 0; a < itemDatas.size(); a++) {
@@ -142,20 +145,6 @@ public class RemoveSubjectServlet extends SecureController {
             }
         }
 
-    }
-
-    /**
-     * Send email to administrator
-     *
-     * @param request
-     * @param response
-     */
-    private void sendEmail(String emailBody) throws Exception {
-
-        logger.info("Sending email...");
-        // to admin
-        sendEmail(ub.getEmail().trim(), "Remove Subject from System", emailBody, false);
-        logger.info("Sending email done..");
     }
 
     @Override

@@ -181,7 +181,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
                     studyEventDefinition.getStudyEventDefinitionId());
         }
 
-        if (!studyEventDefinition.getRepeating()) {
+        if (!studyEventDefinition.isRepeating()) {
             logger.debug("StudyEventDefinition with Oid {} is Non Repeating", studyEventDefinition.getOc_oid());
             for (StudyEvent stEvent : studyEvents) {
                 eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(stEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());

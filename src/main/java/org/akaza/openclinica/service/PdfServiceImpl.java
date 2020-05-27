@@ -261,7 +261,7 @@ public class PdfServiceImpl implements PdfService {
 	    if(studyEvent != null) {
 	    	eventName =  studyEvent.getStudyEventDefinition().getName();
 	    	
-	    	if(studyEvent.getStudyEventDefinition().getRepeating()) {
+	    	if(studyEvent.getStudyEventDefinition().isRepeating()) {
 	    		isRepeating = true;
 	    		sequence = studyEvent.getSampleOrdinal()+"";
 	    	}

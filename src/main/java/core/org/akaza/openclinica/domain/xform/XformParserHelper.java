@@ -21,7 +21,8 @@ public class XformParserHelper {
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
             if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
-                if (node.hasChildNodes() && node.getChildNodes().getLength() != 1) {
+                if (node.hasChildNodes()
+                        && (node.getFirstChild() instanceof Element || node.getFirstChild().getNextSibling() instanceof Element)){
                     list = instanceItemPaths(node, list, path + "/" + node.getNodeName(), errors);
                 } else {
                     list.add(path + "/" + node.getNodeName());
@@ -38,7 +39,8 @@ public class XformParserHelper {
         for (int b = 0; b < outerNodeLength; b++) {
             Node node = outerNode.getChildNodes().item(b);
             if (node instanceof Element && !node.getNodeName().equals("formhub") && !node.getNodeName().equals("meta")) {
-                if (node.hasChildNodes() && !(node.getChildNodes().getLength() == 1 && !(node.getFirstChild() instanceof Element))) {
+                if (node.hasChildNodes()
+                       && (node.getFirstChild() instanceof Element || node.getFirstChild().getNextSibling() instanceof Element)) {
                     set = instanceItemNodes(node, set);
                 } else {
                     set.add(node);

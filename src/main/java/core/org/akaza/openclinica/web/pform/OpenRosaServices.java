@@ -1109,7 +1109,7 @@ public class OpenRosaServices {
         String studyEventRepeat = subjectContext.get("studyEventOrdinal");
         StudyEventDefinition sed = studyEventDefinitionDao.findById(Integer.valueOf(studyEventDefinitionID));
         String phraseToLookForInOdm ="";
-        if(sed.getType().equals(UNSCHECDULED) && !sed.getRepeating()) {
+        if(sed.getType().equals(UNSCHECDULED) && !sed.isRepeating()) {
             phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\"";
         }else{
             phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";

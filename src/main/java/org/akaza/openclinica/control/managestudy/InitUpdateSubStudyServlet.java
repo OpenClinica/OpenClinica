@@ -7,24 +7,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import core.org.akaza.openclinica.bean.service.StudyParamsConfig;
 import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -32,10 +20,19 @@ import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
+import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import core.org.akaza.openclinica.service.managestudy.EventDefinitionCrfTagService;
-import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.view.Page;
+
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author jxu
@@ -107,7 +104,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
             request.setAttribute("parentStudy", parent);
             session.setAttribute("parentName", parentStudyName);
             session.setAttribute("newStudy", study);
-            request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
+            request.setAttribute("facRecruitStatusMap", new LinkedHashMap<String, String>());
             request.setAttribute("statuses", Status.toStudyUpdateMembersList());
 
             FormProcessor fp = new FormProcessor(request);

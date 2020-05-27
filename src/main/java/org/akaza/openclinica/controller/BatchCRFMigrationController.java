@@ -62,6 +62,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -99,6 +100,13 @@ public class BatchCRFMigrationController implements Runnable {
     @Autowired
     private StudyBuildService studyBuildService;
     private HelperObject helperObject;
+
+    @Autowired
+    @Qualifier("studyEventJDBCDao")
+    private StudyEventDAO studyEventDAO;
+    @Autowired
+    @Qualifier("eventCRFJDBCDao")
+    private EventCRFDAO eventCrfDAO;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -482,7 +490,7 @@ public class BatchCRFMigrationController implements Runnable {
                     + seddBean.getName() + ". " + resterms.getString("Both_CRF_versions_are_not_available_at_the_Site"));
         }
 
-        List<EventCRFBean> eventCrfListToMigrate = ecdao().findAllCRFMigrationReportList(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist,
+        List<EventCRFBean> eventCrfListToMigrate = eventCrfDAO.findAllCRFMigrationReportList(sourceCrfVersionBean, targetCrfVersionBean, studyEventDefnlist,
                 sitelist);
 
         helperObject.setReportLog(reportLog);
@@ -504,15 +512,6 @@ public class BatchCRFMigrationController implements Runnable {
             Study parentStudy = study.getStudy();
             return parentStudy;
         }
-    }
-
-    @SuppressWarnings("rawtypes")
-    private EventCRFDAO ecdao() {
-        return new EventCRFDAO(dataSource);
-    }
-
-    private StudyEventDAO sedao() {
-        return new StudyEventDAO(dataSource);
     }
 
     @SuppressWarnings("rawtypes")
@@ -725,7 +724,7 @@ public class BatchCRFMigrationController implements Runnable {
 
             StudySubjectBean ssBean = (StudySubjectBean) ssdao().findByPK(eventCrfToMigrate.getStudySubjectId());
             Study sBean = (Study) studyDao.findByPK(ssBean.getStudyId());
-            StudyEventBean seBean = (StudyEventBean) sedao().findByPK(eventCrfToMigrate.getStudyEventId());
+            StudyEventBean seBean = (StudyEventBean) studyEventDAO.findByPK(eventCrfToMigrate.getStudyEventId());
             StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao().findByPK(seBean.getStudyEventDefinitionId());
             reportLog.getLogs()
                     .add(cBean.getName() + "," + helperObject.getSourceCrfVersionBean().getName() + "," + helperObject.getTargetCrfVersionBean().getName() + ","

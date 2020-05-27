@@ -6,9 +6,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import core.org.akaza.openclinica.bean.service.SasProcessingFunction;
 import core.org.akaza.openclinica.bean.service.SqlProcessingFunction;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -16,7 +14,6 @@ import org.keycloak.authorization.client.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -50,16 +47,12 @@ public class CoreResources implements InitializingBean {
     private static Properties EXTRACTINFO;
     private static KeyCloakConfiguration KEYCLOAKCONFIG;
 
-    public static final Integer PDF_ID = 10;
-    public static final Integer TAB_ID = 8;
-    public static final Integer CDISC_ODM_1_2_ID = 5;
-    public static final Integer CDISC_ODM_1_2_EXTENSION_ID = 4;
-    public static final Integer CDISC_ODM_1_3_ID = 3;
-    public static final Integer CDISC_ODM_1_3_EXTENSION_ID = 2;
-    public static final Integer SPSS_ID = 9;
     private static final String DATA_INFO_FILE_NAME = "datainfo.properties";
     private static final String EXTRACT_INFO_FILE_NAME = "extract.properties";
     private static final String EXTERNAL_PROPERTY_DIRECTORY = System.getProperty("user.home") + "/runtime-config/";
+
+    public static final String KAFKA_BROKERS = "kafka.brokers";
+    public static final String KAFKA_ENABLED = "kafka.enabled";
 
     private static String webapp;
     protected final static Logger logger = LoggerFactory.getLogger("core.org.akaza.openclinica.dao.core.CoreResources");
@@ -972,6 +965,16 @@ public class CoreResources implements InitializingBean {
     public static String getSBSFieldFormservice() {
         String value = getField("SBSBaseUrl");
         return value.concat("/form-service/api");
+    }
+
+    public static String getKafkaBrokers() {
+        String value = getField(KAFKA_BROKERS);
+        return value;
+    }
+
+    public static boolean isKafkaEnabled() {
+        String value = getField(KAFKA_ENABLED);
+        return Boolean.parseBoolean(value);
     }
 
     // TODO internationalize

@@ -26,7 +26,7 @@ public interface UserService {
     public static final String BULK_JOBS = "bulk_jobs";
 
     OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,
-                                 UserAccountBean ownerUserAccountBean, String realm,String customerUuid, ResourceBundle restext);
+                                 UserAccountBean ownerUserAccountBean, String realm, ResourceBundle restext);
 
     OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken);
 

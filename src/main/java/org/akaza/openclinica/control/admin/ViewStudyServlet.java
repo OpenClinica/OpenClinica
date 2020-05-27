@@ -8,7 +8,6 @@
 package org.akaza.openclinica.control.admin;
 
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -18,14 +17,10 @@ import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.service.StudyConfigService;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import core.org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
-import core.org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -51,7 +46,6 @@ public class ViewStudyServlet extends SecureController {
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_admin"), "1");
-
     }
 
     @Override
@@ -70,25 +64,7 @@ public class ViewStudyServlet extends SecureController {
             }
 
             String viewFullRecords = fp.getString("viewFull");
-
-            StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-            String randomizationStatusInOC = spvdao.findByHandleAndStudy(study.getStudyId(), "randomization").getValue();
-            String participantStatusInOC = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal").getValue();
-            if(participantStatusInOC=="") participantStatusInOC="disabled";
-            if(randomizationStatusInOC=="") randomizationStatusInOC="disabled";
-
-            RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-            SeRandomizationDTO seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOc_oid(), false);
-
-            if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")){
-                study.setRandomization("enabled");
-            } else {
-                study.setRandomization("disabled");
-            };
-
-             ParticipantPortalRegistrar  participantPortalRegistrar = new ParticipantPortalRegistrar();
-             String pStatus = participantPortalRegistrar.getCachedRegistrationStatus(study.getOc_oid(), session);
-             study.setParticipantPortal("enabled");
+            study.setParticipantPortal("enabled");
 
             request.setAttribute("studyToView", study);
             if ("yes".equalsIgnoreCase(viewFullRecords)) {
@@ -136,13 +112,8 @@ public class ViewStudyServlet extends SecureController {
                 request.setAttribute("siteNum", sites.size() + "");
 
                 request.setAttribute("userRolesToView", userRoles);
-  //              request.setAttribute("customRoles", customRoles);
-
 
                 request.setAttribute("userNum", userRoles.size() + "");
-
-                // request.setAttribute("subjectsToView", displayStudySubs);
-                // request.setAttribute("subjectNum", subjects.size() + "");
 
                 request.setAttribute("definitionsToView", definitions);
                 request.setAttribute("defNum", definitions.size() + "");

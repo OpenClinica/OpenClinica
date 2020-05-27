@@ -3,11 +3,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:aop="http://www.springframework.org/schema/aop"
         xsi:schemaLocation="http://www.springframework.org/schema/beans
                             http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
                             http://www.springframework.org/schema/context 
-                            http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+                            http://www.springframework.org/schema/context/spring-context-4.3.xsd
+                            http://www.springframework.org/schema/aop
+                            http://www.springframework.org/schema/aop/spring-aop.xsd">
 
+    <aop:aspectj-autoproxy/>
 
     <!--  Service layer supports legacy DAOs via constructor injection of dataSource
           and Hibernate DAO injection via autowiring -->
@@ -18,7 +22,7 @@
         <property name="studyEventDomainDao" ref="studyEventDaoDomain"/>
         <property name="studyEventDefDomainDao" ref="studyEventDefDaoDomain"/>
         <property name="ruleActionRunLogDao" ref="ruleActionRunLogDao"/>
-        <property name="studyDao" ref="studyDaoDomain"></property>
+        <property name="studyDao" ref="studyDaoDomain"/>
     </bean>
     
     <bean id="rulesPostImportContainerService" class="core.org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">
@@ -59,13 +63,19 @@
     <bean id="datasetDao" class="core.org.akaza.openclinica.dao.extract.DatasetDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
-   
-    <bean id="studyeventdaojdbc" class="core.org.akaza.openclinica.dao.managestudy.StudyEventDAO">
+
+    <bean id="studyEventJDBCDao" class="core.org.akaza.openclinica.dao.managestudy.StudyEventDAO">
        <constructor-arg ref="dataSource"/>
     </bean>
 
+    <bean id="eventCRFJDBCDao" class="core.org.akaza.openclinica.dao.submit.EventCRFDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+
+
     <bean id="studyEventBeanListener" class="core.org.akaza.openclinica.service.rule.StudyEventBeanListener">
-        <constructor-arg ref="studyeventdaojdbc"></constructor-arg>
+        <constructor-arg ref="studyEventJDBCDao"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
 

@@ -7,23 +7,36 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.*;
+import core.org.akaza.openclinica.bean.core.DataEntryStage;
+import core.org.akaza.openclinica.bean.core.ResolutionStatus;
+import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import core.org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.CRFVersionBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
+import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.admin.CRFDAO;
+import core.org.akaza.openclinica.dao.core.CoreResources;
+import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import core.org.akaza.openclinica.dao.managestudy.*;
+import core.org.akaza.openclinica.dao.rule.RuleSetDAO;
+import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
+import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
+import core.org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import core.org.akaza.openclinica.domain.datamap.AuditLogEventType;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.rule.RuleSetBean;
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.service.AuditLogEventService;
+import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import core.org.akaza.openclinica.service.rule.RuleSetService;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -32,30 +45,9 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import core.org.akaza.openclinica.core.form.StringUtil;
-import core.org.akaza.openclinica.dao.admin.CRFDAO;
-import core.org.akaza.openclinica.dao.core.CoreResources;
-import core.org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import core.org.akaza.openclinica.dao.rule.RuleSetDAO;
-import core.org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
-import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
-import core.org.akaza.openclinica.domain.datamap.AuditLogEvent;
-import core.org.akaza.openclinica.domain.datamap.AuditLogEventType;
-import core.org.akaza.openclinica.domain.rule.RuleSetBean;
-import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import core.org.akaza.openclinica.service.AuditLogEventService;
-import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import core.org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.view.Page;
-import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
@@ -63,30 +55,27 @@ import org.keycloak.authorization.client.util.HttpResponseException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import javax.sql.DataSource;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 /**
  * @author jxu
  *
  *         Performs updating study event action
  */
 public class UpdateStudyEventServlet extends SecureController {
+
     public static final String EVENT_ID = "event_id";
-
     public static final String STUDY_SUBJECT_ID = "ss_id";
-
     public static final String EVENT_BEAN = "studyEvent";
-
     public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
 
     public static final String EVENT_WORKFLOW_STATUS = "statusId";
 
     public static final String INPUT_STARTDATE_PREFIX = "start";
-
-    // YW, 3-12-2008, for 2220 fix <<
     public static final String INPUT_ENDDATE_PREFIX = "end";
-    // YW >>
-
     public static final String INPUT_LOCATION = "location";
-
     public final static String HAS_LOCATION_NOTE = "hasLocationNote";
     public final static String LOCATION_NOTE = "locationNote";
     public final static String HAS_START_DATE_NOTE = "hasStartDateNote";
@@ -99,6 +88,9 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String PREV_STUDY_EVENT_SIGNED_STATUS = "prev_study_event_workflow_status";
     public static final String NEW_STATUS = "newStatus";
 
+    private StudyEventDAO studyEventDAO;
+    private EventCRFDAO eventCRFDAO;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
@@ -108,12 +100,14 @@ public class UpdateStudyEventServlet extends SecureController {
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_study_director"), "1");
-
     }
 
     @Override
     public void processRequest() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(context);
+
+        studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
 
         FormDiscrepancyNotes discNotes = null;
         FormProcessor fp = new FormProcessor(request);
@@ -162,47 +156,12 @@ public class UpdateStudyEventServlet extends SecureController {
         // YW
 
         request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-        EventCRFDAO ecrfdao = new EventCRFDAO(sm.getDataSource());
 
-        StudyEventBean studyEvent = (StudyEventBean) sedao.findByPK(studyEventId);
+        StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
 
-        studyEvent.setEventCRFs(ecrfdao.findAllByStudyEvent(studyEvent));
-
-        // only owner, admins, and study director/coordinator can update
-        // if (ub.getId() != studyEvent.getOwnerId()) {
-        // if (!ub.isSysAdmin() &&
-        // !currentRole.getRole().equals(Role.STUDYDIRECTOR)
-        // && !currentRole.getRole().equals(Role.COORDINATOR)) {
-        // addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-        // + respage.getString("change_study_contact_sysadmin"));
-        // request.setAttribute("id", new Integer(studySubjectId).toString());
-        // forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-        // return;
-        // }
-        // }
-        // above removed tbh 11162007
+        studyEvent.setEventCRFs(eventCRFDAO.findAllByStudyEvent(studyEvent));
 
         List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
-
-
-        // remove more eventWorkflowStatuses here, tbh, 092007
-        // ### updates to status setting, below added tbh 102007
-        // following pieces of logic to be added:
-        /*
-         * REMOVED can happen at any step, COMPLETED can happen if the Subject
-         * Event is already complete, COMPLETED can also happen if all required
-         * CRFs in the Subject Event are completed, LOCKED can occur when all
-         * Event CRFs are completed, or not started, or removed, LOCKED/REMOVED
-         * are only options, however, when the user is study director or study
-         * coordinator SKIPPED/STOPPED? Additional rules spelled out on Nov 16
-         * 2007: STOPPED should only be in the list of choices after IDE has
-         * been started, i.e. not when SCHEDULED SKIPPED should only be in the
-         * list before IDE has been started, i.e. when SCHEDULED reminder about
-         * LOCKED happening only when CRFs are completed (not as in the
-         * above...) if a status is LOCKED already, it should allow a user to
-         * set the event back to COMPLETED
-         */
 
         Study studyBean = (Study) getStudyDao().findByPK(ssub.getStudyId());
         checkRoleByUserAndStudy(ub, studyBean);
@@ -309,8 +268,7 @@ public class UpdateStudyEventServlet extends SecureController {
             StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(EVENT_WORKFLOW_STATUS));
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
             studyEvent.setWorkflowStatus(ses);
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+            ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
             String newStatus = fp.getString(NEW_STATUS);
             if (ses.equals(StudyEventWorkflowStatusEnum.SKIPPED) ) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
@@ -319,7 +277,7 @@ public class UpdateStudyEventServlet extends SecureController {
                     ecb.setStatus(Status.UNAVAILABLE);
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
-                    ecdao.update(ecb);
+                    eventCRFDAO.update(ecb);
                 }
             } else {
                 if (newStatus != null) {
@@ -340,7 +298,7 @@ public class UpdateStudyEventServlet extends SecureController {
                     }
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
-                    ecdao.update(ecb);
+                    eventCRFDAO.update(ecb);
                 }
             }
             // YW 3-12-2008, 2220 fix
@@ -418,7 +376,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 studyEvent.setUpdater(ub);
                 studyEvent.setUpdatedDate(new Date());
                 updateClosedQueriesForUpdatedStudySubjectFields(studyEvent);
-                StudyEventBean updatedStudyEvent = (StudyEventBean) sedao.update(studyEvent);
+                StudyEventBean updatedStudyEvent = (StudyEventBean) studyEventDAO.update(studyEvent);
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -464,7 +422,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 seb.setUpdater(ub);
                 seb.setUpdatedDate(date);
                 seb.setAttestation(detail);
-                sedao.update(seb);
+                studyEventDAO.update(seb);
 
                 // OC-10834 OC4 - Signature not recorded when signing an event if the event status is already Signed
                 // manually add audit-log-event when user re-signed without any changes
@@ -501,8 +459,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
                 // prepare to figure out what the display should look like
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+                ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
 
@@ -512,7 +469,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
                 populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
-                ArrayList<DisplayEventCRFBean> displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
+                ArrayList<DisplayEventCRFBean> displayEventCRFs = getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
                         eventDefinitionCRFs, ub, currentRole, studyEvent.getWorkflowStatus(), study);
 
                 DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
@@ -632,9 +589,83 @@ public class UpdateStudyEventServlet extends SecureController {
 
     }
 
+    public ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
+                                         StudyUserRoleBean currentRole, StudyEventWorkflowStatusEnum workflowStatus, Study study) {
+        ArrayList answer = new ArrayList();
+
+        // HashMap definitionsById = new HashMap();
+        int i;
+        /*
+         * for (i = 0; i < eventDefinitionCRFs.size(); i++) {
+         * EventDefinitionCRFBean edc = (EventDefinitionCRFBean)
+         * eventDefinitionCRFs.get(i); definitionsById.put(new
+         * Integer(edc.getStudyEventDefinitionId()), edc); }
+         */
+
+        CRFDAO cdao = new CRFDAO(ds);
+        CRFVersionDAO cvdao = new CRFVersionDAO(ds);
+        FormLayoutDAO fldao = new FormLayoutDAO(ds);
+        ItemDataDAO iddao = new ItemDataDAO(ds);
+        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
+
+        for (i = 0; i < eventCRFs.size(); i++) {
+            EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
+
+            // populate the event CRF with its crf bean
+            int crfVersionId = ecb.getCRFVersionId();
+            int formLayoutId = ecb.getFormLayoutId();
+            CRFBean cb = cdao.findByLayoutId(formLayoutId);
+            ecb.setCrf(cb);
+
+            CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
+            ecb.setCrfVersion(cvb);
+            FormLayoutBean flb = (FormLayoutBean) fldao.findByPK(formLayoutId);
+            ecb.setFormLayout(flb);
+
+            // then get the definition so we can call
+            // DisplayEventCRFBean.setFlags
+            int studyEventId = ecb.getStudyEventId();
+            int studyEventDefinitionId = studyEventDAO.getDefinitionIdFromStudyEventId(studyEventId);
+
+            // EventDefinitionCRFBean edc = (EventDefinitionCRFBean)
+            // definitionsById.get(new Integer(
+            // studyEventDefinitionId));
+            // fix problem of the above code(commented out), find the correct
+            // edc, note that on definitionId can be related to multiple
+            // eventdefinitioncrfBeans
+            EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
+            // below added 092007 tbh
+
+            // above added 092007-102007 tbh
+            // TODO need to refactor since this is similar to other code, tbh
+            if (edc != null) {
+                ArrayList<FormLayoutBean> versions = (ArrayList<FormLayoutBean>) fldao.findAllActiveByCRF(edc.getCrfId());
+                edc.setVersions(versions);
+
+                // System.out.println("edc is not null, need to set flags");
+                DisplayEventCRFBean dec = new DisplayEventCRFBean();
+                dec.setEventDefinitionCRF(edc);
+                // System.out.println("edc.isDoubleEntry()" +
+                // edc.isDoubleEntry() + ecb.getId());
+                dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
+
+                if (dec.isLocked()) {
+                    // System.out.println("*** found a locked DEC:
+                    // "+edc.getCrfName());
+                }
+                ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
+                if (!idata.isEmpty()) {
+                    // consider an event crf started only if item data get
+                    // created
+                    answer.add(dec);
+                }
+            }
+        }
+        return answer;
+    }
+
     private void updateClosedQueriesForUpdatedStudySubjectFields(StudyEventBean updatedStudyEvent) {
-        StudyEventDAO seDAO = new StudyEventDAO(sm.getDataSource());
-        StudyEventBean existingStudyEvent = (StudyEventBean) seDAO.findByPK(updatedStudyEvent.getId());
+        StudyEventBean existingStudyEvent = (StudyEventBean) studyEventDAO.findByPK(updatedStudyEvent.getId());
         DiscrepancyNoteDAO dnDAO = new DiscrepancyNoteDAO(sm.getDataSource());
         List<DiscrepancyNoteBean> existingNotes = dnDAO.findExistingNoteForStudyEvent(existingStudyEvent);
 

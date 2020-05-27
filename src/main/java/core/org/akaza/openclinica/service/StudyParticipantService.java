@@ -23,9 +23,9 @@ import java.util.ResourceBundle;
 
 public interface StudyParticipantService {
 
-    AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, Study tenantStudy, Study tenantSite,String realm, String customerUuid, ResourceBundle textsBundle, String accessToken, String register );
+    AddParticipantResponseDTO addParticipant(AddParticipantRequestDTO addParticipantRequestDTO, UserAccountBean userAccountBean, Study tenantStudy, Study tenantSite, String realm, ResourceBundle textsBundle, String accessToken, String register );
 
-    void startBulkAddParticipantJob(MultipartFile file, Study study, Study site,UserAccountBean userAccountBean,  JobDetail jobDetail, String schema,String realm,String customerUuid, ResourceBundle textsBundle,String accessToken, String register);
+    void startBulkAddParticipantJob(MultipartFile file, Study study, Study site,UserAccountBean userAccountBean, JobDetail jobDetail, String schema,String realm, ResourceBundle textsBundle,String accessToken, String register);
   
     void startCaseBookPDFJob(JobDetail jobDetail,
                              String schema,

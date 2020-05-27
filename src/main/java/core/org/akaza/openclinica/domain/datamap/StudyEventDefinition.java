@@ -145,7 +145,7 @@ public class StudyEventDefinition  extends DataMapDomainObject {
 	}
 
 	@Column(name = "repeating")
-	public Boolean getRepeating() {
+	public Boolean isRepeating() {
 		return this.repeating;
 	}
 
