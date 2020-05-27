@@ -21,8 +21,15 @@
     <query>
         <name>findByJobUuid</name>
         <sql>SELECT * FROM ARCHIVED_DATASET_FILE
-            WHERE JOB_UUID=? AND STATUS = 'COMPLETED'
+            WHERE JOB_UUID=?
             ORDER BY date_created desc
+        </sql>
+    </query>
+    <query>
+        <name>findByJobUuidWithFileReference</name>
+        <sql>SELECT * FROM ARCHIVED_DATASET_FILE
+            WHERE JOB_UUID=? AND FILE_REFERENCE IS NOT NULL
+            ORDER BY date_created
         </sql>
     </query>
     <query>
@@ -35,8 +42,8 @@
         <name>update</name>
         <sql>UPDATE ARCHIVED_DATASET_FILE SET NAME=?, DATASET_ID=?,
             EXPORT_FORMAT_ID=?, FILE_REFERENCE=?, FILE_SIZE=?, RUN_TIME=?,
-            OWNER_ID=?, DATE_CREATED=?, FORMAT=?, STATUS=?, JOB_UUID=?, JOB_EXECUTION_UUID=? WHERE
-            ARCHIVED_DATASET_FILE_ID=?
+            OWNER_ID=?, DATE_CREATED=?, FORMAT=?, STATUS=?, JOB_UUID=?, JOB_EXECUTION_UUID=?, JOB_TYPE=?
+            WHERE ARCHIVED_DATASET_FILE_ID=?
         </sql>
     </query>
     <query>
@@ -48,8 +55,8 @@
         <name>create</name>
         <sql>INSERT INTO ARCHIVED_DATASET_FILE (NAME, DATASET_ID,
             EXPORT_FORMAT_ID, FILE_REFERENCE, FILE_SIZE, RUN_TIME,
-            OWNER_ID, DATE_CREATED, FORMAT, STATUS, JOB_UUID, JOB_EXECUTION_UUID)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+            OWNER_ID, DATE_CREATED, FORMAT, STATUS, JOB_UUID, JOB_EXECUTION_UUID, JOB_TYPE)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
         </sql>
     </query>
     <query>

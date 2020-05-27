@@ -41,6 +41,7 @@ public abstract class ScheduleJobServlet extends SecureController {
     protected static final String JOB_NAME = "jobName";
     protected static final String JOB_DESC = "jobDesc";
     protected static final String USER_ID = "user_id";
+    protected static final String NUMBER_OF_FILES_TO_SAVE = "numberOfFilesToSave";
     protected static String TRIGGER_IMPORT_GROUP = "importTrigger";
     protected static String TRIGGER_EXPORT_GROUP = "XsltTriggersExportJobs";
     protected PermissionService permissionService;

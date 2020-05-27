@@ -15,7 +15,9 @@ import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import io.swagger.models.auth.In;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -68,8 +70,8 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         this.setTypeExpected(10, TypeNames.STRING);// format
         this.setTypeExpected(11, TypeNames.STRING);// status
         this.setTypeExpected(12, TypeNames.STRING);// job UUID
-        this.setTypeExpected(13, TypeNames.STRING);// dataset file UUID
-
+        this.setTypeExpected(13, TypeNames.STRING);// job execution UUID
+        this.setTypeExpected(14, TypeNames.STRING); // job type
     }
 
     public EntityBean create(EntityBean eb) {
@@ -88,6 +90,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(10), fb.getStatus());
         variables.put(Integer.valueOf(11), fb.getJobUuid());
         variables.put(Integer.valueOf(12), fb.getJobExecutionUuid());
+        variables.put(Integer.valueOf(13), fb.getJobType());
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -112,7 +115,8 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(10), fb.getStatus());
         variables.put(Integer.valueOf(11), fb.getJobUuid());
         variables.put(Integer.valueOf(12), fb.getJobExecutionUuid());
-        variables.put(Integer.valueOf(13), Integer.valueOf(fb.getId()));
+        variables.put(Integer.valueOf(13), fb.getJobType());
+        variables.put(Integer.valueOf(14), Integer.valueOf(fb.getId()));
 
         this.execute(digester.getQuery("update"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -137,6 +141,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setStatus((String) hm.get("status"));
         fb.setJobUuid((String) hm.get("job_uuid"));
         fb.setJobExecutionUuid((String) hm.get("job_execution_uuid"));
+        fb.setJobType((String) hm.get("job_type"));
         UserAccountDAO uaDAO = new UserAccountDAO(this.ds);
         UserAccountBean owner = (UserAccountBean) uaDAO.findByPK(fb.getOwnerId());
         fb.setOwner(owner);
@@ -238,6 +243,22 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         }
         return al;
     }
+
+    public ArrayList findByJobUuidWithFileReference(String jobUuid) {
+        this.setTypesExpected();
+        ArrayList al = new ArrayList();
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), String.valueOf(jobUuid));
+        String sql = digester.getQuery("findByJobUuidWithFileReference");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            ArchivedDatasetFileBean fb = (ArchivedDatasetFileBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(fb);
+        }
+        return al;
+    }
+
 
     public EntityBean findByJobExecutionUuid(String jobExecutionUuid) {
         this.setTypesExpected();

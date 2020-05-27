@@ -46,6 +46,7 @@ public class XsltTriggerService {
     public static final String JOB_TYPE = "job_type";
     public static final String JOB_UUID = "jobUuid";
     public static final String CREATED_DATE = "createdDate";
+    public static final String NUMBER_OF_FILES_TO_SAVE = "numberOfFilesToSave";
 
     //POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD = "postProcDeleteOld";

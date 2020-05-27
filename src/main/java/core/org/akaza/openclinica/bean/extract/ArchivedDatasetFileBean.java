@@ -38,6 +38,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     private String format;
     private String status;
     private String jobUuid;
+    private String jobType;
 
     private String jobExecutionUuid;
 
@@ -229,5 +230,13 @@ public class ArchivedDatasetFileBean extends EntityBean {
 
     public void setJobExecutionUuid(String jobExecutionUuid) {
         this.jobExecutionUuid = jobExecutionUuid;
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
     }
 }

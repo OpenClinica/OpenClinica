@@ -12,10 +12,10 @@ public class ExtractUtils {
      * Returns the datetime based on pattern :"yyyy-MM-dd-HHmmssSSS", typically for resolving file name
      * @param endFilePath
      * @param dsBean
-     * @param sdfDir
+     * @param filePath
      * @return
      */
-    public String resolveVars(String endFilePath, DatasetBean dsBean, SimpleDateFormat sdfDir, String filePath) {
+    public String resolveVars(String endFilePath, DatasetBean dsBean, String filePath) {
 
         if (endFilePath.contains("$exportFilePath")) {
             endFilePath = endFilePath.replace("$exportFilePath", filePath + "datasets");// was + File.separator, tbh
@@ -39,22 +39,22 @@ public class ExtractUtils {
 
         if (endFilePath.contains("$dateTime")) {
             String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-            sdfDir = new SimpleDateFormat(simpleDatePattern);
+            SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
             endFilePath = endFilePath.replace("$dateTime", sdfDir.format(new java.util.Date()));
         }
         if (endFilePath.contains("${dateTime}")) {
             String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-            sdfDir = new SimpleDateFormat(simpleDatePattern);
+            SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
             endFilePath = endFilePath.replace("${dateTime}", sdfDir.format(new java.util.Date()));
         }
         if (endFilePath.contains("$date")) {
             String dateFilePattern = "yyyy-MM-dd";
-            sdfDir = new SimpleDateFormat(dateFilePattern);
+            SimpleDateFormat sdfDir = new SimpleDateFormat(dateFilePattern);
             endFilePath = endFilePath.replace("$date", sdfDir.format(new java.util.Date()));
         }
         if (endFilePath.contains("${date}")) {
             String dateFilePattern = "yyyy-MM-dd";
-            sdfDir = new SimpleDateFormat(dateFilePattern);
+            SimpleDateFormat sdfDir = new SimpleDateFormat(dateFilePattern);
             endFilePath = endFilePath.replace("${date}", sdfDir.format(new java.util.Date()));
         }
         //TODO change to dateTime
@@ -94,7 +94,6 @@ public class ExtractUtils {
         if (endFilePath.contains("${datasetName}")) {
             endFilePath = endFilePath.replace("${datasetName}", dsBean.getName());
         }
-        //TODO change to dateTime
 
         if (endFilePath.contains("$dateTime")) {
             endFilePath = endFilePath.replace("$dateTime", sdfDir.format(new java.util.Date()));
@@ -113,14 +112,14 @@ public class ExtractUtils {
         return endFilePath;
     }
 
-    public ExtractPropertyBean setAllProps(ExtractPropertyBean epBean, DatasetBean dsBean, SimpleDateFormat sdfDir, String filePath) {
-        epBean.setFiledescription(resolveVars(epBean.getFiledescription(), dsBean, sdfDir, filePath));
-        epBean.setLinkText(resolveVars(epBean.getLinkText(), dsBean, sdfDir, filePath));
-        epBean.setHelpText(resolveVars(epBean.getHelpText(), dsBean, sdfDir, filePath));
-        epBean.setFileLocation(resolveVars(epBean.getFileLocation(), dsBean, sdfDir, filePath));
-        epBean.setFailureMessage(resolveVars(epBean.getFailureMessage(), dsBean, sdfDir, filePath));
-        epBean.setSuccessMessage(resolveVars(epBean.getSuccessMessage(), dsBean, sdfDir, filePath));
-        epBean.setZipName(resolveVars(epBean.getZipName(), dsBean, sdfDir, filePath));
+    public ExtractPropertyBean setAllProps(ExtractPropertyBean epBean, DatasetBean dsBean, String filePath) {
+        epBean.setFiledescription(resolveVars(epBean.getFiledescription(), dsBean, filePath));
+        epBean.setLinkText(resolveVars(epBean.getLinkText(), dsBean, filePath));
+        epBean.setHelpText(resolveVars(epBean.getHelpText(), dsBean, filePath));
+        epBean.setFileLocation(resolveVars(epBean.getFileLocation(), dsBean, filePath));
+        epBean.setFailureMessage(resolveVars(epBean.getFailureMessage(), dsBean, filePath));
+        epBean.setSuccessMessage(resolveVars(epBean.getSuccessMessage(), dsBean, filePath));
+        epBean.setZipName(resolveVars(epBean.getZipName(), dsBean, filePath));
         epBean.setDatasetName(dsBean.getName());//JN:Adding this line to reflect the dataset name in the scheduled jobs list.
         return epBean;
     }

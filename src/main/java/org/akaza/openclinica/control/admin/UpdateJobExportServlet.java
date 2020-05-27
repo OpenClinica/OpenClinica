@@ -36,14 +36,16 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         FormProcessor fp2 = new FormProcessor(request);
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
         Collection dsList = dsdao.findAllOrderByStudyIdAndName();
+        ArrayList<Integer> numbers = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 
         JobDataMap dataMap = trigger.getJobDataMap();
         String contactEmail = dataMap.getString(ExampleSpringJob.EMAIL);
         int dsId = dataMap.getInt(XsltTriggerService.DATASET_ID);
         String period = dataMap.getString(XsltTriggerService.PERIOD);
         int exportFormatId = dataMap.getInt(XsltTriggerService.EXPORT_FORMAT_ID);
+        int numberOfFilesToSave = dataMap.getInt(XsltTriggerService.NUMBER_OF_FILES_TO_SAVE);
 
-        // TODO will have to dress this up to allow for sites then datasets
+        // Pre-populate with original fields
         request.setAttribute("datasets", dsList);
         request.setAttribute(JOB_NAME, trigger.getJobKey().getName());
         request.setAttribute(JOB_DESC, trigger.getDescription());
@@ -53,6 +55,8 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
         request.setAttribute(DATASET_ID, dsId);
         request.setAttribute("extractProperties", CoreResources.getExtractProperties());
         request.setAttribute("jobUuid", trigger.getKey().getName());
+        request.setAttribute(NUMBER_OF_FILES_TO_SAVE, numberOfFilesToSave);
+        request.setAttribute("numbersToChooseFrom", numbers);
 
         Date jobDate = trigger.getNextFireTime();
         HashMap presetValues = new HashMap();
@@ -115,6 +119,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 String jobDesc = fp.getString(JOB_DESC);
                 Date startDateTime = fp.getDateTime(DATE_START_JOB);
                 Integer exportFormatId = fp.getInt(FORMAT_ID);
+                Integer numberOfFilesToSave = fp.getInt(NUMBER_OF_FILES_TO_SAVE);
 
                 ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
                 DatasetBean dsBean = (DatasetBean) datasetDao.findByPK(new Integer(datasetId).intValue());
@@ -130,7 +135,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 //JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
                 String datasetFilePath = SQLInitServlet.getField("filePath");
                 while (i < exportFiles.length) {
-                    temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, sdfDir, datasetFilePath);
+                    temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, datasetFilePath);
                     i++;
                 }
                 epBean.setDoNotDelFiles(temp);
@@ -148,14 +153,14 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 endFilePath = beg + "/scheduled" + end;
                 endFilePath = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
                 if (epBean.getPostProcExportName() != null) {
-                    String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, sdfDir, datasetFilePath);
+                    String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, datasetFilePath);
                     epBean.setPostProcExportName(preProcExportPathName);
                 }
                 if (epBean.getPostProcLocation() != null) {
                     String prePocLoc = extractUtils.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
                     epBean.setPostProcLocation(prePocLoc);
                 }
-                extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
+                extractUtils.setAllProps(epBean, dsBean, datasetFilePath);
                 String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
                 String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
                 ODMFilterDTO odmFilter = new ODMFilterDTO();
@@ -178,6 +183,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setFileReference("");
                 archivedDatasetFileBean.setJobUuid(jobUuid);
                 archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
+                archivedDatasetFileBean.setJobType("Scheduled");
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 
@@ -216,6 +222,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, jobUuid);
                 trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, createdDate);
+                trigger.getJobDataMap().put(XsltTriggerService.NUMBER_OF_FILES_TO_SAVE, numberOfFilesToSave);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
@@ -230,7 +237,8 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 try {
                     //Delete from oc_qrtz_triggers
                     jobScheduler.deleteJob(JobKey.jobKey(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME));
-                    //TODO: Delete from oc_qrtz_job_details as well
+                    //delete the previously created updated job if its IN_QUEUE and not ran yet
+                    deletePreviouslyUpdatedTriggerInQueue(archivedDatasetFileDAO, jobUuid, archivedDatasetFileBean.getId());
                     jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), trigger);
                     addPageMessage("Your job has been successfully modified.");
                     forwardPage(Page.VIEW_JOB_SERVLET);
@@ -241,6 +249,15 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                     addPageMessage("There was an unspecified error with your creation, please contact an administrator.");
                     forwardPage(Page.UPDATE_JOB_EXPORT);
                 }
+            }
+        }
+    }
+
+    private void deletePreviouslyUpdatedTriggerInQueue(ArchivedDatasetFileDAO archivedDatasetFileDAO, String jobUuid, int currentId) {
+        ArrayList<ArchivedDatasetFileBean> archivedDatasetFileBeans = archivedDatasetFileDAO.findByJobUuid(jobUuid);
+        for (ArchivedDatasetFileBean archivedDatasetFileBean : archivedDatasetFileBeans) {
+            if (archivedDatasetFileBean.getStatus().equals(JobStatus.IN_QUEUE.name()) && archivedDatasetFileBean.getId() != currentId) {
+                archivedDatasetFileDAO.deleteArchiveDataset(archivedDatasetFileBean);
             }
         }
     }

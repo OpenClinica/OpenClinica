@@ -2,9 +2,11 @@ package org.akaza.openclinica.controller;
 
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
+import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.service.UtilService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,8 +54,7 @@ public class ScheduledExtractController {
     @ApiOperation(value = "To get latest scheduled extract dataset ids and creation time for the job name at study level", notes = "only work for authorized users with the right access permission")
     @RequestMapping(value = "/extractJobs/{jobUuid}/jobExecutions", method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<Object> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("studyOID") String studyOid,
-                                                                           @PathVariable("jobUuid") String jobUuid,
+    ResponseEntity<Object> getScheduledExtractJobDatasetIdsAndCreationTime(@PathVariable("jobUuid") String jobUuid,
                                                                            HttpServletRequest request) throws SchedulerException {
 
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
@@ -61,15 +62,16 @@ public class ScheduledExtractController {
             return new ResponseEntity<>("User must be type admin.", HttpStatus.UNAUTHORIZED);
         }
 
-        ArrayList<ArchivedDatasetFileBean> extracts = archivedDatasetFileDAO.findByJobUuid(jobUuid);
+        ArrayList<ArchivedDatasetFileBean> archivedDatasetFileBeans = archivedDatasetFileDAO.findByJobUuid(jobUuid);
 
-        if (extracts.size()==0) {
+        if (archivedDatasetFileBeans.size()==0) {
             return new ResponseEntity<>("No content found for job Uuid: " + jobUuid + ".", HttpStatus.NOT_FOUND);
         }
 
         String output = "";
-        for (ArchivedDatasetFileBean adfb : extracts) {
-            output += " Dataset Id: " + adfb.getJobExecutionUuid() + "  Date Created: " + adfb.getDateCreated() + "\n";
+        for (ArchivedDatasetFileBean adfb : archivedDatasetFileBeans) {
+            if (adfb.getStatus().equals(JobStatus.COMPLETED) && !adfb.getFileReference().isEmpty())
+                output += " Dataset Id: " + adfb.getJobExecutionUuid() + "  Date Created: " + adfb.getDateCreated() + "\n";
         }
 
         return new ResponseEntity<>("Extract files for job name " + jobUuid + ": \n" + output, HttpStatus.OK);
@@ -79,7 +81,7 @@ public class ScheduledExtractController {
     @ApiOperation(value = "To get latest scheduled extract dataset ids and creation time for the job name at study level", notes = "only work for authorized users with the right access permission")
     @RequestMapping(value = "/extractJobs/jobExecutions/{jobExecutionUuid}/dataset", method = RequestMethod.GET, produces = "application/zip")
     public @ResponseBody
-    ResponseEntity<byte[]> getScheduledExtract(@PathVariable("jobExecutionUuid") String jobExecutionUuid,
+    ResponseEntity<Object> getScheduledExtract(@PathVariable("jobExecutionUuid") String jobExecutionUuid,
                                                           HttpServletRequest request,
                                                           HttpServletResponse response) throws IOException{
 
@@ -93,6 +95,10 @@ public class ScheduledExtractController {
             logger.debug("Archived Dataset File not found.");
         }
         String filePath = extract.getFileReference();
+        if (StringUtil.isBlank(filePath)) {
+            logger.debug("The file reference for job_execution_uuid " + jobExecutionUuid + "has been deleted.");
+            return new ResponseEntity<>("The file reference for this job execution uuid has been deleted.", HttpStatus.NO_CONTENT);
+        }
         logger.debug("Found location of file: " + filePath);
 
 

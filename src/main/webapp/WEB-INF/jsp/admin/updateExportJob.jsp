@@ -171,6 +171,24 @@
             </table>
         </td>
 	</tr>
+    <tr>
+        <td class="text"><b><fmt:message key="number_of_files_to_save" bundle="${resword}"/>: </b></td>
+        <td class="text">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td><select name="numberOfFilesToSave">
+                        <c:forEach var="number" items="${numbersToChooseFrom}">
+                            <option value="<c:out value="${number}"/>"
+                            <c:if test="${numberOfFilesToSave == number}">
+                                selected
+                            </c:if>
+                            ><c:out value="${number}" /></option>
+                        </c:forEach>
+                    </select></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 	<tr>
 		<td class="text"><b><fmt:message key="contact_email" bundle="${resword}"/>: <span style="color:Orange;">*</span></b></td>
         <td class="text">

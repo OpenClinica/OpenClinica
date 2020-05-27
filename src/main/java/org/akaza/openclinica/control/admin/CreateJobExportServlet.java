@@ -36,11 +36,10 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
 
     private void setUpServlet() {
 
-        // TODO find all the form items and re-populate them if necessary
         FormProcessor fp2 = new FormProcessor(request);
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
         Collection dsList = dsdao.findAllOrderByStudyIdAndName();
-        // TODO will have to dress this up to allow for sites then datasets
+        ArrayList<Integer> numbers = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         request.setAttribute("datasets", dsList);
         request.setAttribute(JOB_NAME, fp2.getString(JOB_NAME));
         request.setAttribute(JOB_DESC, fp2.getString(JOB_DESC));
@@ -49,6 +48,9 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
         request.setAttribute(FORMAT_ID, fp2.getInt(FORMAT_ID));
         request.setAttribute(PERIOD, fp2.getString(PERIOD));
         request.setAttribute(DATASET_ID, fp2.getInt(DATASET_ID));
+        request.setAttribute(NUMBER_OF_FILES_TO_SAVE, fp2.getInt(NUMBER_OF_FILES_TO_SAVE));
+        request.setAttribute("numbersToChooseFrom", numbers);
+
         HashMap presetValues = new HashMap();
         Calendar calendar = Calendar.getInstance();
         Date jobDate = calendar.getTime();
@@ -107,6 +109,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 String jobDesc = fp.getString(JOB_DESC);
                 Date startDateTime = fp.getDateTime(DATE_START_JOB);
                 Integer exportFormatId = fp.getInt(FORMAT_ID);
+                int numberOfFilesToSave = fp.getInt(NUMBER_OF_FILES_TO_SAVE);
 
                 ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
                 DatasetBean dsBean = (DatasetBean) datasetDao.findByPK(new Integer(datasetId).intValue());
@@ -124,7 +127,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 String datasetFilePath = SQLInitServlet.getField("filePath");
 
                 while (i < exportFiles.length) {
-                    temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, sdfDir, datasetFilePath);
+                    temp[i] = extractUtils.resolveVars(exportFiles[i], dsBean, datasetFilePath);
                     i++;
                 }
                 epBean.setDoNotDelFiles(temp);
@@ -136,7 +139,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
 
                 // need to set the dataset path here, tbh
                 // next, can already run jobs, translations, and then add a message to be notified later
-                //JN all the properties need to have the variables...
+                // JN all the properties need to have the variables...
                 String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
                 String endFilePath = epBean.getFileLocation();
                 String beg = endFilePath.substring(0, endFilePath.indexOf("/$datasetName"));
@@ -145,14 +148,15 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
 
                 endFilePath = extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
                 if (epBean.getPostProcExportName() != null) {
-                    String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, sdfDir, datasetFilePath);
+                    String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(), dsBean, datasetFilePath);
                     epBean.setPostProcExportName(preProcExportPathName);
                 }
                 if (epBean.getPostProcLocation() != null) {
+                    //This is where it sets the name of the file
                     String prePocLoc = extractUtils.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
                     epBean.setPostProcLocation(prePocLoc);
                 }
-                extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
+                extractUtils.setAllProps(epBean, dsBean, datasetFilePath);
                 String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
                 String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
                 ODMFilterDTO odmFilter = new ODMFilterDTO();
@@ -178,13 +182,14 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setFileReference("");
                 archivedDatasetFileBean.setJobUuid(jobUuid);
                 archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
+                archivedDatasetFileBean.setJobType("Scheduled");
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 
                 SimpleTrigger trigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                         generalFileDir, // xml_file_path
                         endFilePath + File.separator,
-                        exportFileName,
+                        exportFileName, //TODO: change export file name everytime
                         dsBean.getId(),
                         epBean,
                         userBean,
@@ -215,6 +220,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_TYPE, "exportJob");
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, jobUuid);
                 trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, dateCreated);
+                trigger.getJobDataMap().put(XsltTriggerService.NUMBER_OF_FILES_TO_SAVE, numberOfFilesToSave);
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());

@@ -1,14 +1,15 @@
 package org.akaza.openclinica.control.admin;
 
-import core.org.akaza.openclinica.bean.admin.AuditEventBean;
 import core.org.akaza.openclinica.bean.admin.TriggerBean;
+import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
-import core.org.akaza.openclinica.web.bean.AuditEventRow;
+import core.org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -16,16 +17,17 @@ import org.akaza.openclinica.view.Page;
 import org.quartz.*;
 import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
+import java.io.File;
+import java.util.*;
 
 public class ViewSingleJobServlet extends ScheduleJobServlet {
 
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        String action = fp.getString("action");
+        int adfId = fp.getInt("adfId");
+
         ApplicationContext context = null;
         scheduler = getScheduler();
         try {
@@ -34,7 +36,39 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
             logger.error("Error in receiving application context: ", e);
         }
         Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
-        // changes to this servlet, we now look at group name too, tbh 05/2009
+
+
+        if (StringUtil.isBlank(action)) {
+            loadList(jobScheduler, fp);
+            forwardPage(Page.VIEW_SINGLE_JOB);
+        } else if ("delete".equalsIgnoreCase(action) && adfId > 0) {
+            boolean success = false;
+
+            ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
+            ArchivedDatasetFileBean adfBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.findByPK(adfId);
+
+
+            if (adfBean != null || adfBean.getId() != 0) {
+                File file = new File(adfBean.getFileReference());
+                if (!file.canWrite()) {
+                    addPageMessage(respage.getString("write_protected"));
+                } else {
+                    success = file.delete();
+                    if (success) {
+                        archivedDatasetFileDAO.deleteArchiveDataset(adfBean);
+                        addPageMessage(respage.getString("file_removed"));
+                    } else {
+                        addPageMessage(respage.getString("error_removing_file"));
+                    }
+                }
+            }
+            loadList(jobScheduler, fp);
+            forwardPage(Page.VIEW_SINGLE_JOB);
+        }
+
+    }
+
+    public void loadList(Scheduler jobScheduler, FormProcessor fp) throws Exception {
         String jobUuid = fp.getString("jobUuid");
         String triggerName = fp.getString("tname");
         String gName = fp.getString("gname");
@@ -51,7 +85,6 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
         logger.debug("found trigger name: " + triggerName);
         logger.debug("found group name: " + groupName);
         TriggerBean triggerBean = new TriggerBean();
-        AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource(), getStudyDao());
 
         try {
             triggerBean.setPreviousDate(trigger.getPreviousFireTime());
@@ -73,16 +106,12 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 JobDataMap dataMap = trigger.getJobDataMap();
                 String contactEmail = dataMap.getString(XsltTriggerService.EMAIL);
                 logger.debug("found email: " + contactEmail);
-                // String datasetId =
-                // dataMap.getString(ExampleSpringJob.DATASET_ID);
-                // int dsId = new Integer(datasetId).intValue();
+
                 if (gName.equals("") || gName.equals("0")) {
                     triggerBean.setFullName(trigger.getJobDataMap().getString(XsltTriggerService.JOB_NAME));
                     triggerBean.setCreatedDate((Date) trigger.getJobDataMap().get(XsltTriggerService.CREATED_DATE));
                     String exportFormat = dataMap.getString(XsltTriggerService.EXPORT_FORMAT);
                     String periodToRun = dataMap.getString(ExampleSpringJob.PERIOD);
-                    String createdDate = dataMap.getString("");
-                    // int userId = new Integer(userAcctId).intValue();
                     int dsId = dataMap.getInt(ExampleSpringJob.DATASET_ID);
                     triggerBean.setExportFormat(exportFormat);
                     triggerBean.setPeriodToRun(periodToRun);
@@ -97,24 +126,25 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
                 triggerBean.setContactEmail(contactEmail);
                 UserAccountBean userAccount = (UserAccountBean) userAccountDAO.findByPK(userId);
-
                 triggerBean.setUserAccount(userAccount);
 
-                ArrayList<AuditEventBean> triggerLogs = auditEventDAO.findAllByAuditTable(trigger.getKey().getName());
-
-                // set the table for the audit event beans here
-
-                ArrayList allRows = AuditEventRow.generateRowsFromBeans(triggerLogs);
-
+                ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
+                ArrayList<ArchivedDatasetFileBean> archivedDatasetFileBeans = archivedDatasetFileDAO.findByJobUuid(jobUuid);
+                ArrayList allRows = ArchivedDatasetFileRow.generateRowsFromBeans(archivedDatasetFileBeans);
                 EntityBeanTable table = fp.getEntityBeanTable();
-                String[] columns = {resword.getString("date_and_time"), resword.getString("action_message"), resword.getString("entity_operation"),
-                        resword.getString("changes_and_additions")};
-
+                table.setSortingIfNotExplicitlySet(3, false); // sort by date
+                String[] columns =
+                        {resword.getString("dataset_format"), resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
+                                resword.getString("created_by"), resword.getString("status"), resword.getString("action")};
                 table.setColumns(new ArrayList(Arrays.asList(columns)));
-                table.setAscendingSort(false);
+                table.hideColumnLink(0);
                 table.hideColumnLink(1);
+                table.hideColumnLink(2);
                 table.hideColumnLink(3);
                 table.hideColumnLink(4);
+                table.hideColumnLink(5);
+                table.hideColumnLink(6);
+                table.hideColumnLink(7);
 
                 table.setQuery("ViewSingleJob?tname=" + triggerName + "&gname=" + gName + "&jobUuid=" + jobUuid, new HashMap());
                 table.setRows(allRows);
@@ -127,13 +157,9 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
             // TODO Auto-generated catch block
             logger.debug(" found NPE " + e);
         }
-        // need to show the extract for which this runs, which files, etc
-        // in other words the job data map
 
         request.setAttribute("triggerBean", triggerBean);
         request.setAttribute("jobUuid", jobUuid);
         request.setAttribute("groupName", groupName);
-
-        forwardPage(Page.VIEW_SINGLE_JOB);
     }
 }
