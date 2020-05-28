@@ -30,6 +30,7 @@ import core.org.akaza.openclinica.bean.service.ProcessingFunction;
 import core.org.akaza.openclinica.bean.service.ProcessingResultType;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.OpenClinicaMailSender;
+import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.core.util.XMLFileFilter;
 import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -207,6 +208,12 @@ public class XsltTransformJob extends QuartzJobBean {
             zipped = epBean.getZipFormat();
 
             deleteOld = epBean.getDeleteOld();
+
+            //always delete old file references for manually ran jobs.
+            if (archivedDatasetFileBean.getJobType().contains("Manual")) {
+                deleteOld=true;
+            }
+
             long sysTimeBegin = System.currentTimeMillis();
             userBean = (UserAccountBean) userAccountDao.findByPK(userAccountId);
 
@@ -488,7 +495,9 @@ public class XsltTransformJob extends QuartzJobBean {
                 }
 
                 //Deleting old file_references from archived_dataset_file
-                deleteOldFileReferences(dataMap, archivedDatasetFileBean);
+                if (archivedDatasetFileBean.getJobType().contains("Scheduled")) {
+                    deleteOldFileReferences(dataMap, archivedDatasetFileBean);
+                }
 
 
             }

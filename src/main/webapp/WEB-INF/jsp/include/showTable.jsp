@@ -50,10 +50,7 @@
 
 	<table border="0" cellpadding="0" cellspacing="0"> 
 
-<!-- Table Actions row (pagination, search, tools) -->
-
-		
-
+    <!-- Table Actions row (pagination, search, tools) -->
 	<!-- Pagination cell (for multi-page tables) -->
 	
 		<td width="33%" class="table_actions">
@@ -84,15 +81,15 @@
 		<td width="33%" align="center" class="table_actions">
 		
 
-				<jsp:include page="showSubmitted.jsp" />
-				<c:forEach var="postArg" items="${table.postArgs}">
-					<input type="hidden" name="<c:out value="${postArg.key}"/>" value="<c:out value="${postArg.value}"/>" />
-				</c:forEach>
-				<input type="hidden" name="ebl_page" value="<c:out value="${table.currPageNumber}" />" />
-				<input type="hidden" name="ebl_sortColumnInd" value="<c:out value="${table.sortingColumnInd}"/>" />
-				<input type="hidden" name="ebl_sortAscending" value="<c:out value="${ascending}"/>"/>
-				<input type="hidden" name="ebl_filtered" value="1" />
-				<input type="hidden" name="ebl_paginated" value="<c:out value="${paginated}"/>" />
+            <jsp:include page="showSubmitted.jsp" />
+            <c:forEach var="postArg" items="${table.postArgs}">
+                <input type="hidden" name="<c:out value="${postArg.key}"/>" value="<c:out value="${postArg.value}"/>" />
+            </c:forEach>
+            <input type="hidden" name="ebl_page" value="<c:out value="${table.currPageNumber}" />" />
+            <input type="hidden" name="ebl_sortColumnInd" value="<c:out value="${table.sortingColumnInd}"/>" />
+            <input type="hidden" name="ebl_sortAscending" value="<c:out value="${ascending}"/>"/>
+            <input type="hidden" name="ebl_filtered" value="1" />
+            <input type="hidden" name="ebl_paginated" value="<c:out value="${paginated}"/>" />
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top">
