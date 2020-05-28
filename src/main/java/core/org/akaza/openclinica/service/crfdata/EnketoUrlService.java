@@ -601,7 +601,7 @@ public class EnketoUrlService {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
-        eventCrf.setSdvStatus(SdvStatus.NOT_VERIFIED);
+        eventCrf.setSdvStatus(null);
         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
         logger.debug("*********CREATED EVENT CRF");
         return eventCrf;

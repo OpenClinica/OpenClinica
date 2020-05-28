@@ -174,8 +174,10 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(14), new Integer(ecb.getStudySubjectId()));
         variables.put(new Integer(15), new Integer(ecb.getUpdaterId()));
         variables.put(new Integer(16), new Boolean(ecb.isElectronicSignatureStatus()));
-
-        variables.put(new Integer(17), ecb.getSdvStatus().toString());
+        if(ecb.getSdvStatus() != null)
+            variables.put(new Integer(17), ecb.getSdvStatus().toString());
+        else
+            variables.put(new Integer(17), null);
         if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
             variables.put(new Integer(18), new Integer(ecb.getOldStatus().getId()));
         } else {
@@ -277,7 +279,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         if(sdvStatus !=null && !(sdvStatus.isEmpty())) {
         	eb.setSdvStatus((SdvStatus) SdvStatus.valueOf(sdvStatus));
         }else {
-        	eb.setSdvStatus((SdvStatus) SdvStatus.NOT_VERIFIED);
+        	eb.setSdvStatus(null);
         }
         
         eb.setSdvUpdateId((Integer) hm.get("sdv_update_id"));
@@ -1048,7 +1050,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
 
         return result;
     }
-
+    
     public void updateFormLayoutID(int event_crf_id, int form_layout_id, int user_id, Connection con) {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
@@ -1061,7 +1063,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(1, form_layout_id);
         variables.put(2, user_id);
         variables.put(3, user_id);
-        variables.put(4, SdvStatus.NOT_VERIFIED.toString());
+        variables.put(4, null);
         variables.put(5, event_crf_id);
         String sql = digester.getQuery("updateFormLayoutID");
         // this is the way to make the change transactional

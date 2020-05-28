@@ -336,7 +336,7 @@ public class BatchCRFMigrationController implements Runnable {
         StudyEvent studyEvent = helperObject.getStudyEventDao().findById(eventCRFBean.getStudyEventId());
         FormLayout formLayout = helperObject.getFormLayoutDao().findById(helperObject.getTargetCrfVersionBean().getId());
         StudySubject studySubject = helperObject.getStudySubjectDao().findById(eventCRFBean.getStudySubjectId());
-        if(eventCrf.getSdvStatus()== SdvStatus.VERIFIED)
+        if(eventCrf.getSdvStatus() != null && eventCrf.getSdvStatus()== SdvStatus.VERIFIED)
             eventCrf.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
         eventCrf.setDateUpdated(new Date());
         eventCrf.setSdvUpdateId(helperObject.getUserAccountBean().getId());
