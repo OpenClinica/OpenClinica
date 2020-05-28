@@ -262,7 +262,7 @@ public class OpenRosaSubmissionController {
                 kafkaService.sendFormChangeMessage(formChangeDTO);
             }
             //TODO Re-enable randomize.
-          //checkRandomization(subjectContext, studyOID, studySubjectOID);
+          checkRandomization(subjectContext, studyOID, studySubjectOID);
         }
 
         updateStudyEventStatus(study,studySubject,sed,studyEvent,userAccount);

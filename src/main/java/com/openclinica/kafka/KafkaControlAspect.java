@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class KafkaControlAspect {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    @Around("execution(* com.openclinica.kafka.KafkaService.*(..))")
+    @Around("execution(* com.openclinica.kafka.KafkaService.*Message(..))")
     public void isKafkaEnabled(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         if (CoreResources.isKafkaEnabled()){
             proceedingJoinPoint.proceed();}

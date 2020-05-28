@@ -72,8 +72,6 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
-
-
     <bean id="studyEventBeanListener" class="core.org.akaza.openclinica.service.rule.StudyEventBeanListener">
         <constructor-arg ref="studyEventJDBCDao"/>
         <property name="dataSource" ref="dataSource"/>
