@@ -9,6 +9,7 @@ package core.org.akaza.openclinica.bean.managestudy;
 
 import core.org.akaza.openclinica.bean.core.AuditableEntityBean;
 import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 
 import java.util.ArrayList;
 
@@ -110,5 +111,22 @@ public class DisplayStudyEventBean extends AuditableEntityBean {
 
     public void setMaximumSampleOrdinal(int maximumSampleOrdinal) {
         this.maximumSampleOrdinal = maximumSampleOrdinal;
+    }
+
+    public boolean isSignAble() {
+        boolean signAble = true;
+        // check if all uncompledCRF is Not Started
+        for (DisplayEventDefinitionCRFBean displayEventDefinitionCRFBean : uncompletedCRFs) {
+            if (displayEventDefinitionCRFBean.getEventCRF().getId() > 0) {
+                signAble = false;
+            }
+        }
+        // check if all displayCRF is Completed
+        for (DisplayEventCRFBean displayEventCRFBean : displayEventCRFs) {
+            if (!displayEventCRFBean.getEventCRF().getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) {
+                signAble = false;
+            }
+        }
+        return signAble;
     }
 }

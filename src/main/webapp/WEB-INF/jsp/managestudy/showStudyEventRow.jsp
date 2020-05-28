@@ -59,17 +59,17 @@
                     </c:choose>
                 </td>
             </c:if>
-            <td>
-                        <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' &&  currRow.bean.studyEvent.removed == true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
-                            <a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-                            onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-                            onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
-                            name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
-                        </c:if>
-            </td>
-            <c:if test="${userRole.isInvestigator() && currRow.bean.studyEvent.signed != true && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && (currRow.bean.studyEvent.workflowStatus == 'COMPLETED' || currRow.bean.studyEvent.workflowStatus == 'STOPPED' || currRow.bean.studyEvent.workflowStatus == 'SKIPPED')}">
+            <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' &&  currRow.bean.studyEvent.removed == true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
                 <td>
-                    <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="SignStudySubject?id=<c:out value="${studySub.id}"/>&seid=<c:out value="${currRow.bean.studyEvent.id}"/>"><span hspace="2" border="0" title="Sign" alt="Sign" class="icon icon-icon-sign" name="bt_Reassign1"></span></a>
+                    <a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
+                    onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
+                    onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
+                    name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
+                </td>
+            </c:if>
+            <c:if test="${userRole.isInvestigator() && currRow.bean.studyEvent.signed != true && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && (currRow.bean.studyEvent.workflowStatus == 'COMPLETED' || currRow.bean.studyEvent.workflowStatus == 'STOPPED' || currRow.bean.studyEvent.workflowStatus == 'SKIPPED') && currRow.bean.isSignAble()}">
+                <td>
+                    <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="SignStudySubject?id=<c:out value="${studySub.id}"/>&seid=<c:out value="${currRow.bean.studyEvent.id}"/>"><span hspace="2" border="0" title="Sign" alt="Sign" class="icon icon-icon-sign" name="bt_sign"></span></a>
                 </td>
             </c:if>
         </table>
