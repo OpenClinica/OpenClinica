@@ -118,6 +118,7 @@ public class DiscrepancyNoteUtil {
         boolean hasDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
 
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(dataSource);
+        eventCrfDAO = new EventCRFDAO(dataSource);
 
         StudyEventBean studyEventBean;
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
