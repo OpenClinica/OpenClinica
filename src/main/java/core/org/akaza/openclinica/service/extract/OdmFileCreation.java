@@ -134,6 +134,7 @@ public class OdmFileCreation {
 
         int fId = createFileK(ODMXMLFileName, generalFileDir, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false,
                 zipped, deleteOld, userBean);
+
         if (!"".equals(generalFileDirCopy)) {
             int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
                     false, zipped, deleteOld, userBean);
@@ -284,16 +285,8 @@ public class OdmFileCreation {
                 complete.mkdirs();
             }
 
-            // else if(deleteOld)// so directory exists check if the files are there
-            // {
-            // deleteDirectory(complete);
-            // }
-
-            // File newFile = new File(complete, name);
-            // newFile.setLastModified(System.currentTimeMillis());
-
             File oldFile = new File(complete, name);
-            File newFile = null;
+            File newFile;
             if (oldFile.exists()) {
                 newFile = oldFile;
                 if (oldFiles != null || !oldFiles.isEmpty()) {
@@ -303,13 +296,12 @@ public class OdmFileCreation {
                 newFile = new File(complete, name);
             }
 
-            // File
             newFile.setLastModified(System.currentTimeMillis());
 
             w = new BufferedWriter(new FileWriter(newFile, true));
             w.write(content);
             w.close();
-            LOG.info("finished writing the text file..." + dir + "#######file:" + name);
+            LOG.info("finished writing the text file: " + dir + "#######file:" + name);
             // set up the zip to go into the database
             if (saveToDB) {
                 ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
