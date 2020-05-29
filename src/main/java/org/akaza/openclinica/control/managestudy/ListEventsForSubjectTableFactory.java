@@ -9,6 +9,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.*;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
@@ -82,12 +83,14 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
+        imageIconPaths.put(EventCrfStatusEnum.REMOVED.toString(), "icon icon-file-excel red");
 
       //  crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
         crfColumnImageIconPaths.put(EventCrfWorkflowStatusEnum.NOT_STARTED.toString(), "icon icon-doc");
         crfColumnImageIconPaths.put(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.toString(), "icon icon-pencil-squared orange");
         crfColumnImageIconPaths.put(EventCrfWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         crfColumnImageIconPaths.put(EventCrfWorkflowStatusEnum.LOCKED.toString(), "icon icon-lock");
+        crfColumnImageIconPaths.put(EventCrfStatusEnum.REMOVED.toString(), "icon icon-file-excel red");
         this.showMoreLink = showMoreLink;
     }
 
@@ -679,11 +682,15 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 StudyEventWorkflowStatusEnum eventWorkflowStatus = (StudyEventWorkflowStatusEnum) display.getProps().get("event.status");
                 studyEvent = (StudyEventBean) display.getProps().get("event");
                 studyEvents = new ArrayList<StudyEventBean>();
+                String iconStatus = eventWorkflowStatus.toString();
                 if (studyEvent != null) {
                     studyEvents.add(studyEvent);
+                    if (studyEvent.isRemoved()) {
+                        iconStatus = EventCrfStatusEnum.REMOVED.toString();
+                    }
                 }
                 url.append(eventDivBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents, studyEventDefinition, studySubjectBean));
-                url.append("<span class='" + imageIconPaths.get(eventWorkflowStatus.toString()) + "' border='0' style='position: relative; left: 7px;'>");
+                url.append("<span class='" + imageIconPaths.get(iconStatus) + "' border='0' style='position: relative; left: 7px;'>");
                 url.append("</a></td></tr></table>");
             }
 
@@ -749,8 +756,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 EventCrfLayerBuilder eventCrfLayerBuilder = new EventCrfLayerBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents,
                         crfWorkflowStatus, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path, studyDao);
 
+                String iconStatus = crfWorkflowStatus.toString();
+                if (eventCrf != null && eventCrf.isRemoved()) {
+                    iconStatus = EventCrfStatusEnum.REMOVED.toString();
+                }
                 url.append(eventCrfLayerBuilder.buid());
-                url.append("<span class='" + crfColumnImageIconPaths.get(crfWorkflowStatus.toString()) + "' border='0'>");
+                url.append("<span class='" + crfColumnImageIconPaths.get(iconStatus) + "' border='0'>");
                 url.append("</a></td></tr></table>");
             }
 

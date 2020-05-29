@@ -152,7 +152,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
-        imageIconPaths.put(EventCrfStatusEnum.REMOVED.toString(), "icon icon-cancel");
+        imageIconPaths.put(EventCrfStatusEnum.REMOVED.toString(), "icon icon-file-excel red");
 
         statusPriorities.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.toString(), 0);
         statusPriorities.put(StudyEventWorkflowStatusEnum.SCHEDULED.toString(), 1);
