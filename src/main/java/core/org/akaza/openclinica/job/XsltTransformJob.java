@@ -173,7 +173,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 newArchivedDatasetFileBean.setFileReference("");
                 newArchivedDatasetFileBean.setJobUuid(archivedDatasetFileBean.getJobUuid());
                 newArchivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
-                archivedDatasetFileBean.setJobType(archivedDatasetFileBean.getJobType());
+                newArchivedDatasetFileBean.setJobType(archivedDatasetFileBean.getJobType());
                 archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.create(newArchivedDatasetFileBean);
 
                 //create a new file for this export instead of overwrite the previous one
