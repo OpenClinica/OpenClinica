@@ -1404,10 +1404,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
-                    deleteStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, delete);
-                    eventDiv.tdEnd().trEnd(0);
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell").close();
                     reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
                     eventDiv.tdEnd().trEnd(0);
                 }
@@ -1421,10 +1417,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         eventDiv.tr(0).valign("top").close();
                         eventDiv.td(0).styleClass("table_cell").close();
                         removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                        eventDiv.tdEnd().trEnd(0);
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell").close();
-                        deleteStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, delete);
                         eventDiv.tdEnd().trEnd(0);
                         eventDiv.tr(0).valign("top").close();
                         eventDiv.td(0).styleClass("table_cell").close();
@@ -1446,10 +1438,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell_left").close();
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                    eventDiv.tdEnd().trEnd(0);
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    deleteStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, delete);
                     eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
@@ -1561,10 +1549,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
                     eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    deleteStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, delete);
-                    eventDiv.tdEnd().trEnd(0);
-                    eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
                     reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
                     eventDiv.tdEnd().trEnd(0);
@@ -1582,10 +1566,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         eventDiv.tr(0).valign("top").close();
                         eventDiv.td(0).styleClass("table_cell_left").close();
                         removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                        eventDiv.tdEnd().trEnd(0);
-                        eventDiv.tr(0).valign("top").close();
-                        eventDiv.td(0).styleClass("table_cell_left").close();
-                        deleteStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, delete);
                         eventDiv.tdEnd().trEnd(0);
                         eventDiv.tr(0).valign("top").close();
                         eventDiv.td(0).styleClass("table_cell").close();
@@ -1607,10 +1587,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell_left").close();
                     removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
-                    eventDiv.tdEnd().trEnd(0);
-                    eventDiv.tr(0).valign("top").close();
-                    eventDiv.td(0).styleClass("table_cell_left").close();
-                    deleteStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, delete);
                     eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
@@ -1649,16 +1625,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         builder.a().href(href1);
         builder.close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-cancel\"/>");
-        builder.nbsp().nbsp().a().href(href1);
-        builder.close().append(remove).aEnd();
-
-    }
-
-    private void deleteStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, String studyEventId, String remove) {
-        String href1 = "DeleteStudyEvent?action=confirm&id=" + studyEventId + "&studySubId=" + studySubjectId;
-        builder.a().href(href1);
-        builder.close();
-        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-trash red\"/>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(remove).aEnd();
 
