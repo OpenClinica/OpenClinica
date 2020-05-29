@@ -171,6 +171,11 @@ public class EnketoUrlService {
     }
 
     public FormUrlObject getActionUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
+                                      ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked, boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub) throws Exception {
+        return getActionUrl(subjectContextKey, subjectContext, studyOid, formLayout, flavor, idb, role, mode, loadWarning, formLocked, null, formContainsContactData, binds, ub);
+    }
+
+    public FormUrlObject getActionUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
                                       ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked, String iface, boolean formContainsContactData,List<Bind> binds ,UserAccountBean ub) throws Exception {
         Study study = enketoCredentials.getParentStudy(studyOid);
         Study site = enketoCredentials.getSiteStudy(studyOid);

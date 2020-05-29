@@ -235,7 +235,9 @@ public class KafkaService {
             eventAttributeChangeDTO.setEventOid(studyEvent.getStudyEventDefinition().getOc_oid());
         }
         eventAttributeChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEvent));
-        eventAttributeChangeDTO.setEventStartDate(studyEvent.getDateStart().toString());
+        if (studyEvent.getDateStart() != null){
+            eventAttributeChangeDTO.setEventStartDate(studyEvent.getDateStart().toString());
+        }
         eventAttributeChangeDTO.setEventWorkflowStatus(studyEvent.getWorkflowStatus().name());
 
         return eventAttributeChangeDTO;
@@ -244,7 +246,8 @@ public class KafkaService {
     public FormChangeDTO constructEventCrfAttributeChangeDTO(EventCRFBean eventCrfBean) {
         FormChangeDTO formChangeDTO = new FormChangeDTO();
 
-        StudyEventDefinition studyEventDefinition = studyEventDao.findById(eventCrfBean.getStudyEventId()).getStudyEventDefinition();
+        StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrfBean.getStudyEventId());
+        StudyEventDefinition studyEventDefinition = studyEvent.getStudyEventDefinition();
         StudySubject studySubject = studySubjectDao.findById(eventCrfBean.getStudySubjectId());
         Study study = studySubject.getStudy();
 
@@ -258,11 +261,12 @@ public class KafkaService {
         formChangeDTO.setParticipantOid(studySubject.getOcOid());
 
         formChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
-        formChangeDTO.setEventRepeatKey(getEventRepeatKey(eventCrfBean.getStudyEvent()));
+        formChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEvent));
 
         formChangeDTO.setFormOid(eventCrfBean.getCrf().getOid());
         formChangeDTO.setFormCreatedDate(eventCrfBean.getCreatedDate().toString());
         formChangeDTO.setFormUpdatedDate(eventCrfBean.getUpdatedDate().toString());
+        formChangeDTO.setFormWorkflowStatus(eventCrfBean.getWorkflowStatus().getDisplayValue());
 
         return formChangeDTO;
     }

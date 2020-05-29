@@ -28,12 +28,14 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes,
  * such as getting all notes for a study, or filtering them by subject or
  * resolution status.
  */
+@Service
 public class DiscrepancyNoteUtil {
     // TODO: initialize these static members from the database.
     public static final Map<String, Integer> TYPES = new HashMap<String, Integer>();
