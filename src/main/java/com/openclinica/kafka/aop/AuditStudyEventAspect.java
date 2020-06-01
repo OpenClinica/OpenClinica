@@ -3,6 +3,7 @@ package com.openclinica.kafka.aop;
 import com.openclinica.kafka.KafkaService;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -30,6 +31,16 @@ public class AuditStudyEventAspect {
         log.info("AoP: onStudyEventDaoSaveOrUpdate triggered");
         try {
             kafkaService.sendEventAttributeChangeMessage((StudyEvent) joinPoint.getArgs()[0]);
+        } catch (Exception e) {
+            log.error("Could not send kafka message triggered by StudyEventDao.saveOrUpdate: ", e);
+        }
+    }
+
+    @AfterReturning("execution(* core.org.akaza.openclinica.dao.hibernate.StudyEventDao.saveOrUpdateTransactional(..))")
+    public void onStudyEventDaoSaveOrUpdateTransactional(JoinPoint joinPoint) {
+        log.info("AoP: onStudyEventDaoSaveOrUpdate triggered");
+        try {
+            kafkaService.sendEventAttributeChangeMessage((StudyEventContainer) joinPoint.getArgs()[0]);
         } catch (Exception e) {
             log.error("Could not send kafka message triggered by StudyEventDao.saveOrUpdate: ", e);
         }

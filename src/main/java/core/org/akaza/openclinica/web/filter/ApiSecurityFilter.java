@@ -305,12 +305,10 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
             }
         }
           else if (clientId.equals(ApplicationConstants.ODM_SERVICE_CLIENT)) {
-                userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.ODM_SERVICE_USERNAME);
-                if (userAccountBean.getName().isEmpty()) {
-                    userAccountToCreate = createOdmServiceUserAccount();
-                }
-
-
+              userAccountBean = (UserAccountBean) userAccountDAO.findByUserName(ApplicationConstants.ODM_SERVICE_USERNAME);
+              if (userAccountBean.getName().isEmpty()) {
+                  userAccountToCreate = createOdmServiceUserAccount();
+              }
         }
 
         if (userAccountToCreate != null) {

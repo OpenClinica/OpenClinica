@@ -28,7 +28,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -257,7 +256,7 @@ public class OpenRosaSubmissionController {
             eventCrfDao.saveOrUpdate(eventCrf);
 
             if (!formCacheService.expireAndRemoveForm(ecid)){
-                FormChangeDTO formChangeDTO = kafkaService.constructEditFormDTO(eventCrf);
+                FormChangeDTO formChangeDTO = kafkaService.constructFormChangeDTO(eventCrf);
                 formChangeDTO.setFormWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED.getDisplayValue());
                 kafkaService.sendFormChangeMessage(formChangeDTO);
             }

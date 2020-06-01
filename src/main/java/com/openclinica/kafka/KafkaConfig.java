@@ -50,7 +50,9 @@ public class KafkaConfig {
   public KafkaAdmin admin() {
     Map<String, Object> configs = new HashMap<>();
     configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_BROKER_ADDRESS);
-    return new KafkaAdmin(configs);
+    KafkaAdmin kafkaAdmin = new KafkaAdmin(configs);
+    kafkaAdmin.setAutoCreate(false);
+    return kafkaAdmin;
   }
 
   @Bean

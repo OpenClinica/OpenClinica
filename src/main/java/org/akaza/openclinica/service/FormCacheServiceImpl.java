@@ -41,12 +41,12 @@ public class FormCacheServiceImpl {
     // Need to make sure we are not missing an entry point like the discrepancy note page that may open Enketo through
     // a different path.
     public void addEditFormToFormCache(String ecId, EventCrf eventCrf){
-        FormChangeDTO formChangeDTO = kafkaService.constructEditFormDTO(eventCrf);
+        FormChangeDTO formChangeDTO = kafkaService.constructFormChangeDTO(eventCrf);
         expiringMap.put(ecId, new FormChangeListener(formChangeDTO, kafkaService));
     }
 
     public void addNewFormToFormCache(String ecId, Study currentStudy, StudyEvent studyEvent, FormLayout formLayout) {
-        FormChangeDTO formChangeDTO = kafkaService.constructNewFormDTO(currentStudy, studyEvent, formLayout);
+        FormChangeDTO formChangeDTO = kafkaService.constructNewFormChangeDTO(currentStudy, studyEvent, formLayout);
         expiringMap.put(ecId, new FormChangeListener(formChangeDTO, kafkaService));
     }
 
