@@ -45,7 +45,7 @@ public class EventCRFBean extends AuditableEntityBean {
     private String validateString = "";
     private int studySubjectId = 0;
     private boolean electronicSignatureStatus = false;
-    private SdvStatus sdvStatus = SdvStatus.NOT_VERIFIED;
+    private SdvStatus sdvStatus = null;
     private int sdvUpdateId = 0;
     // the following are not in the table
     private String studySubjectName = "";
