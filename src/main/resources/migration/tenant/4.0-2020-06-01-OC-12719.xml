@@ -72,8 +72,8 @@
             or(OLD.signed is not NULL and NEW.signed is Null)
             or (OLD.signed <![CDATA[<>]]> NEW.signed)) THEN
             SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
-            VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Signed'', OLD.signed, NEW.signed);
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value,details)
+            VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Signed'', OLD.signed, NEW.signed, NEW.attestation);
             END IF;
 
             IF(OLD.date_start <![CDATA[<>]]> NEW.date_start) THEN
