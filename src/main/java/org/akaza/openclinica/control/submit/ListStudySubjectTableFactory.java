@@ -1473,7 +1473,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
         if (!sed.isRepeating()) {
-            eventDiv.br().bold().append(eventStatus).br();
+            eventDiv.br().bold().append(eventStatus.getDisplayValue()).br();
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
             linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
