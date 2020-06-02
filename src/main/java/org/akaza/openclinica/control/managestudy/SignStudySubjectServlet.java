@@ -74,6 +74,7 @@ public class SignStudySubjectServlet extends SecureController {
     private EventCRFDAO eventCRFDAO;
     private StudyEventDAO studyEventDAO;
     private StudySubjectService studySubjectService;
+    DiscrepancyNoteUtil discNoteUtil;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -200,6 +201,7 @@ public class SignStudySubjectServlet extends SecureController {
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
+        discNoteUtil = (DiscrepancyNoteUtil) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("discrepancyNoteUtil");
 
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
@@ -297,7 +299,6 @@ public class SignStudySubjectServlet extends SecureController {
                     displayEvent.setDisplayEventCRFs(displayEventCRFs);
                 }
 
-                DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
                 discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
 
                 Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
@@ -364,7 +365,6 @@ public class SignStudySubjectServlet extends SecureController {
             displayEvent.setDisplayEventCRFs(displayEventCRFs);
         }
 
-        DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
         // Don't filter for now; disc note beans are returned with eventCRFId
         // set
         discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);

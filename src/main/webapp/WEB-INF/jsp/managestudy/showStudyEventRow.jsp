@@ -59,34 +59,25 @@
                     </c:choose>
                 </td>
             </c:if>
-            <td>
-
-                        <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
-                            <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-                            onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                            onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
-                            name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-                        </c:if>
-
-                        <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' &&  currRow.bean.studyEvent.removed == true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
-                            <a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-                            onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-                            onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
-                            name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
-                        </c:if>
-                <c:if test="${userRole.manageStudy && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' &&  currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
-                  <td>
-                      <a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
-                      onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                      onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
-                      name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
-                      title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
-                  </td>
-                </c:if>
-            </td>
-            <c:if test="${userRole.isInvestigator() && currRow.bean.studyEvent.signed != true && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && (currRow.bean.studyEvent.workflowStatus == 'COMPLETED' || currRow.bean.studyEvent.workflowStatus == 'STOPPED' || currRow.bean.studyEvent.workflowStatus == 'SKIPPED')}">
+            <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
                 <td>
-                    <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="SignStudySubject?id=<c:out value="${studySub.id}"/>&seid=<c:out value="${currRow.bean.studyEvent.id}"/>"><span hspace="2" border="0" title="Sign" alt="Sign" class="icon icon-icon-sign" name="bt_Reassign1"></span></a>
+                    <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
+                    onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+                    onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
+                    name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                </td>
+            </c:if>
+            <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' &&  currRow.bean.studyEvent.removed == true && currRow.bean.studyEvent.archived != true && currRow.bean.studyEvent.locked != true}">
+                <td>
+                    <a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
+                    onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
+                    onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
+                    name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
+                </td>
+            </c:if>
+            <c:if test="${userRole.isInvestigator() && currRow.bean.studyEvent.signed != true && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && (currRow.bean.studyEvent.workflowStatus == 'COMPLETED' || currRow.bean.studyEvent.workflowStatus == 'STOPPED' || currRow.bean.studyEvent.workflowStatus == 'SKIPPED') && currRow.bean.isSignAble()}">
+                <td>
+                    <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="SignStudySubject?id=<c:out value="${studySub.id}"/>&seid=<c:out value="${currRow.bean.studyEvent.id}"/>"><span hspace="2" border="0" title="Sign" alt="Sign" class="icon icon-icon-sign" name="bt_sign"></span></a>
                 </td>
             </c:if>
         </table>
@@ -302,24 +293,24 @@
                             <td class="table_cell" width="140">
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tr valign="top">
-                                        <td>
-                                             <c:if test="${ !userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && dec.eventCRF.removed != true && dec.eventCRF.archived != true  && dec.eventCRF.formLayout.status.name != 'Removed' }">
-                                                <c:if test="${dec.eventCRF.workflowStatus != 'COMPLETED'}">
-                                                  <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
-                                                  onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                                  onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                                                  <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
-                                                </c:if>
-
-                                                <c:if test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
-                                                  <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
-                                                  onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                                  onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                                                  <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6"></a>
-                                                </c:if>
-                                                <%-- locked status here --%>
+                                        <c:if test="${ !userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && dec.eventCRF.removed != true && dec.eventCRF.archived != true  && dec.eventCRF.formLayout.status.name != 'Removed' }">
+                                            <c:if test="${dec.eventCRF.workflowStatus != 'COMPLETED'}">
+                                                <td>
+                                                    <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+                                                        <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6">
+                                                    </a>
+                                                </td>
                                             </c:if>
-                                        </td>
+
+                                            <c:if test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                                                <td>
+                                                    <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+                                                        <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
+                                                    </a>
+                                                </td>
+                                            </c:if>
+                                            <%-- locked status here --%>
+                                        </c:if>
                                         <td>
                                             <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                                             onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"

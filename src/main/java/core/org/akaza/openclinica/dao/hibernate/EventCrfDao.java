@@ -84,7 +84,7 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
         eventCrf.setSdvStatus(sdvStatus);
         eventCrf.setUpdateId(userId);
         eventCrf.setSdvUpdateId(userId);
-        if(sdvStatus.equals(SdvStatus.VERIFIED))
+        if(sdvStatus != null && sdvStatus.equals(SdvStatus.VERIFIED))
             eventCrf.setLastSdvVerifiedDate(new Date());
         getCurrentSession().update(eventCrf);
     }

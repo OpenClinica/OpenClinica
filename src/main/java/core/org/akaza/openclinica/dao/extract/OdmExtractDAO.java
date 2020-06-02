@@ -3254,8 +3254,8 @@ public class OdmExtractDAO extends DatasetDAO {
                             form.setArchived(form_archived);
 
                         }
-                        if(row.get("sdv_status") != null){
-                            form.setSdvStatus(SdvStatus.valueOf((String) row.get("sdv_status")));
+                        if(row.get("sdv_status") != null && !row.get("sdv_status").equals("")){
+                                form.setSdvStatus(SdvStatus.valueOf((String) row.get("sdv_status")));
                         }
                         if (dataset.isShowCRFinterviewerName()) {
                             form.setInterviewerName((String) row.get("interviewer_name"));
