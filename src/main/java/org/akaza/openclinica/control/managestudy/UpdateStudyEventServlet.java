@@ -358,7 +358,8 @@ public class UpdateStudyEventServlet extends SecureController {
                     studyEvent.setStartTimeFlag(true);
                 }
                 // YW >>
-                studyEvent.setDateStarted(start);
+                if(start != null)
+                    studyEvent.setDateStarted(start);
                 // YW, 3-12-2008, 2220 fix which adding End datetime <<
                 if (!strEnd.equals("")) {
                     studyEvent.setDateEnded(end);

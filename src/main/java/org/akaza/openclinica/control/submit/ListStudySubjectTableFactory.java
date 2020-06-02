@@ -152,7 +152,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(StudyEventWorkflowStatusEnum.COMPLETED.toString(), "icon icon-checkbox-checked green");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.STOPPED.toString(), "icon icon-stop-circle red");
         imageIconPaths.put(StudyEventWorkflowStatusEnum.SKIPPED.toString(), "icon icon-redo");
-        imageIconPaths.put(EventCrfStatusEnum.REMOVED.toString(), "icon icon-cancel");
+        imageIconPaths.put(EventCrfStatusEnum.REMOVED.toString(), "icon icon-file-excel red");
 
         statusPriorities.put(StudyEventWorkflowStatusEnum.NOT_SCHEDULED.toString(), 0);
         statusPriorities.put(StudyEventWorkflowStatusEnum.SCHEDULED.toString(), 1);
@@ -1400,6 +1400,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
+                    removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+                    eventDiv.tdEnd().trEnd(0);
+                    eventDiv.tr(0).valign("top").close();
+                    eventDiv.td(0).styleClass("table_cell").close();
                     reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
                     eventDiv.tdEnd().trEnd(0);
                 }
@@ -1410,6 +1414,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
                     eventDiv.tdEnd().trEnd(0);
                     if (studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
+                        eventDiv.tr(0).valign("top").close();
+                        eventDiv.td(0).styleClass("table_cell").close();
+                        removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+                        eventDiv.tdEnd().trEnd(0);
                         eventDiv.tr(0).valign("top").close();
                         eventDiv.td(0).styleClass("table_cell").close();
                         reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
@@ -1427,6 +1435,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.tdEnd().trEnd(0);
                 if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
                         && currentRole.getRole() != Role.MONITOR) {
+                    eventDiv.tr(0).valign("top").close();
+                    eventDiv.td(0).styleClass("table_cell_left").close();
+                    removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+                    eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
                     reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
@@ -1473,7 +1485,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
         if (!sed.isRepeating()) {
-            eventDiv.br().bold().append(eventStatus).br();
+            eventDiv.br().bold().append(eventStatus.getDisplayValue()).br();
             eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
@@ -1534,6 +1546,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     updateStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, edit);
                     eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
+                    eventDiv.td(0).styleClass("table_cell_left").close();
+                    removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+                    eventDiv.tdEnd().trEnd(0);
+                    eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
                     reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
                     eventDiv.tdEnd().trEnd(0);
@@ -1548,6 +1564,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     enterDataForStudyEventLinkBuilder(eventDiv, studyEventId, view);
                     eventDiv.tdEnd().trEnd(0);
                     if (studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE) {
+                        eventDiv.tr(0).valign("top").close();
+                        eventDiv.td(0).styleClass("table_cell_left").close();
+                        removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+                        eventDiv.tdEnd().trEnd(0);
                         eventDiv.tr(0).valign("top").close();
                         eventDiv.td(0).styleClass("table_cell").close();
                         reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
@@ -1565,6 +1585,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.tdEnd().trEnd(0);
                 if ((currentRole.getRole() == Role.STUDYDIRECTOR || currentUser.isSysAdmin()) && studyBean.getStatus() == core.org.akaza.openclinica.domain.Status.AVAILABLE
                         && currentRole.getRole() != Role.MONITOR && !eventStatus.equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
+                    eventDiv.tr(0).valign("top").close();
+                    eventDiv.td(0).styleClass("table_cell_left").close();
+                    removeStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, remove);
+                    eventDiv.tdEnd().trEnd(0);
                     eventDiv.tr(0).valign("top").close();
                     eventDiv.td(0).styleClass("table_cell").close();
                     reassignStudyEventLinkBuilder(eventDiv, studySubject.getId(), studyEventId, reassign);
@@ -1594,6 +1618,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-pencil\"/>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(edit).aEnd();
+
+    }
+
+    private void removeStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, String studyEventId, String remove) {
+        String href1 = "RemoveStudyEvent?action=confirm&id=" + studyEventId + "&studySubId=" + studySubjectId;
+        builder.a().href(href1);
+        builder.close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-cancel\"/>");
+        builder.nbsp().nbsp().a().href(href1);
+        builder.close().append(remove).aEnd();
 
     }
 
