@@ -377,6 +377,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         FormProcessor fp = new FormProcessor(request);
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
+        eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
         int noteId = fp.getInt(INPUT_NOTE_ID);
         int itemDataId = fp.getInt("itemDataId");
         String flavor = fp.getString(FLAVOR);
