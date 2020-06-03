@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="sbalasubramanian" id="4.0-2020-06-01-OC-11408">
+
+        <sql splitStatements="false">
+            CREATE OR REPLACE FUNCTION global_subject_trigger() RETURNS "trigger"
+            AS 'DECLARE
+            pk INTEGER;
+            entity_name_value TEXT;
+            BEGIN
+            IF (TG_OP = ''UPDATE'') THEN
+
+            IF(OLD.unique_identifier <![CDATA[<>]]> NEW.unique_identifier) THEN
+            /*---------------*/
+            /*Subject value changed*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value ''Person ID'';
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''7'', now(), NEW.update_id, ''subject'', NEW.subject_id, entity_name_value, OLD.unique_identifier, NEW.unique_identifier);
+            /*---------------*/
+            END IF;
+
+            IF(OLD.date_of_birth <![CDATA[<>]]> NEW.date_of_birth) THEN
+            /*---------------*/
+            /*Subject value changed*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value ''Date of Birth'';
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''7'', now(), NEW.update_id, ''subject'', NEW.subject_id, entity_name_value, OLD.date_of_birth, NEW.date_of_birth);
+            /*---------------*/
+            END IF;
+
+            IF(OLD.gender <![CDATA[<>]]> NEW.gender) THEN
+            /*---------------*/
+            /*Subject value changed*/
+            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
+            SELECT INTO entity_name_value ''Gender'';
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
+            VALUES (pk, ''7'', now(), NEW.update_id, ''subject'', NEW.subject_id, entity_name_value, OLD.gender, NEW.gender);
+            /*---------------*/
+            END IF;
+            END IF;
+            RETURN NULL;  /*return values ignored for ''after'' triggers*/
+            END;
+            '
+            LANGUAGE plpgsql;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
