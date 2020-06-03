@@ -11,7 +11,6 @@ import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import core.org.akaza.openclinica.service.extract.ExtractUtils;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import core.org.akaza.openclinica.web.SQLInitServlet;
@@ -124,7 +123,6 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
                 DatasetBean dsBean = (DatasetBean) datasetDao.findByPK(new Integer(datasetId).intValue());
                 String[] files = epBean.getFileName();
-                String exportFileName;
                 int cnt = 0;
                 dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
                 String[] exportFiles = epBean.getExportFileName();
@@ -144,7 +142,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 XsltTriggerService xsltService = new XsltTriggerService();
                 String generalFileDir = SQLInitServlet.getField("filePath");
                 generalFileDir = generalFileDir + "datasets/scheduled" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
-                exportFileName = epBean.getExportFileName()[cnt];
+                String exportFileName = epBean.getExportFileName()[cnt];
 
                 String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
                 String endFilePath = epBean.getFileLocation();
@@ -161,17 +159,6 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                     epBean.setPostProcLocation(prePocLoc);
                 }
                 extractUtils.setAllProps(epBean, dsBean, datasetFilePath);
-                String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
-                String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
-                ODMFilterDTO odmFilter = new ODMFilterDTO();
-
-                try {
-                    jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
-                    jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
-                    jobScheduler.getContext().put("odmFilter", odmFilter);
-                } catch (SchedulerException e) {
-                    logger.error("Error in setting the permissions: ", e);
-                }
 
                 ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
                 archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());

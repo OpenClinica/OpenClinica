@@ -6,25 +6,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import core.org.akaza.openclinica.bean.service.ProcessingFunction;
+
 /**
  * Extract Property Bean, by Tom Hickerson 09/2010
- * Placeholder for items from the extract.properties file, filled in 
+ * Placeholder for items from the extract.properties file, filled in
  * by a method from CoreResources.java.
- * 
  * @author thickerson
- *
  */
 //JN: added serializable, as this bean needs be to passed over in -non-static manner over to job. 
-public class ExtractPropertyBean implements Serializable{
+public class ExtractPropertyBean implements Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -2807419666500498114L;
-    /**
-     * 
-     */
-    
+
     protected Logger logger = LoggerFactory.getLogger(getClass().getName());
     private String[] fileName;
     private String filedescription;
@@ -41,95 +34,81 @@ public class ExtractPropertyBean implements Serializable{
     private String successMessage;
     private String failureMessage;
     //Post Processing Parameters
-	private String postProcLocation;
-	private String postProcExportName;
-	private boolean postProcDeleteOld;
-	private boolean postProcZip;
-	private String[] doNotDelFiles;
-	
-	private String datasetId;
-	private String zipName;
-	
-	
-	private String odmType;
-	
-	private String datasetName;
-
+    private String postProcLocation;
+    private String postProcExportName;
+    private boolean postProcDeleteOld;
+    private boolean postProcZip;
+    private String[] doNotDelFiles;
+    private String datasetId;
+    private String zipName;
+    private String odmType;
+    private String datasetName;
     private String formatDescription;
-
 
     public String getOdmType() {
         return odmType;
     }
 
-
     public void setOdmType(String odmType) {
         this.odmType = odmType;
     }
 
-
     public String getZipName() {
-		return zipName;
-	}
+        return zipName;
+    }
 
+    public void setZipName(String zipName) {
+        this.zipName = zipName;
+    }
 
-	public void setZipName(String zipName) {
-		this.zipName = zipName;
-	}
-
-
-	//Associating epBean with datasetId, since core resources to get around with coreResources.findExtractPropertyBeanById, to overcome the problems of static method
+    //Associating epBean with datasetId, since core resources to get around with coreResources.findExtractPropertyBeanById, to overcome the problems of static method
     public String getDatasetId() {
-		return datasetId;
-	}
+        return datasetId;
+    }
 
+    public void setDatasetId(String datasetId) {
+        this.datasetId = datasetId;
+    }
 
-	public void setDatasetId(String datasetId) {
-		this.datasetId = datasetId;
-	}
+    public String[] getDoNotDelFiles() {
+        return doNotDelFiles;
+    }
 
+    public void setDoNotDelFiles(String[] doNotDelFiles) {
+        this.doNotDelFiles = doNotDelFiles;
+    }
 
-	public String[] getDoNotDelFiles() {
-		return doNotDelFiles;
-	}
-
-
-	public void setDoNotDelFiles(String[] doNotDelFiles) {
-		this.doNotDelFiles = doNotDelFiles;
-	}
-
-
-	public ExtractPropertyBean() {
+    public ExtractPropertyBean() {
         fileName = new String[10];
         filedescription = "";
         linkText = "";
         helpText = "";
         fileLocation = "";
-        exportFileName =new String[10];
+        exportFileName = new String[10];
         id = 0;
         zipFormat = true;
         deleteOld = true;
         postProcessing = null;
-        successMessage=null;
-        failureMessage=null;
+        successMessage = null;
+        failureMessage = null;
         datasetId = null;
         postProcLocation = null;
         postProcExportName = null;
-         postProcDeleteOld = true;
-         postProcZip = true;
-        doNotDelFiles=null;
-        
+        postProcDeleteOld = true;
+        postProcZip = true;
+        doNotDelFiles = null;
+
     }
-    
-    
+
+
     public String[] getFileName() {
         return fileName;
     }
-    
+
     public void setFileName(String[] fileName) {
         this.fileName = fileName;
     }
-    
+
     public String getFormat() {
         return format;
     }
@@ -139,34 +118,41 @@ public class ExtractPropertyBean implements Serializable{
     }
 
     public int getId() {
-		return id;
-	}
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getFiledescription() {
+    public String getFiledescription() {
         return filedescription;
     }
+
     public void setFiledescription(String filedescription) {
         this.filedescription = filedescription;
     }
+
     public String getLinkText() {
         return linkText;
     }
+
     public void setLinkText(String linkText) {
         this.linkText = linkText;
     }
+
     public String getHelpText() {
         return helpText;
     }
+
     public void setHelpText(String helpText) {
         this.helpText = helpText;
     }
+
     public String getFileLocation() {
         return fileLocation;
     }
+
     /*
      * we need to set the file location and generate a unique name for the output.
      * unique tags include: $date, $type, $datetime
@@ -178,104 +164,98 @@ public class ExtractPropertyBean implements Serializable{
     public void setFileLocation(String fileLocation) {
         this.fileLocation = fileLocation;
     }
+
     public String[] getExportFileName() {
         return exportFileName;
     }
+
     public void setExportFileName(String[] exportFileName) {
         this.exportFileName = exportFileName;
     }
+
     public String[] getRolesAllowed() {
         return rolesAllowed;
     }
+
     public void setRolesAllowed(String[] rolesAllowed) {
         this.rolesAllowed = rolesAllowed;
     }
+
     public ProcessingFunction getPostProcessing() {
         return postProcessing;
     }
+
     public void setPostProcessing(ProcessingFunction postProcessing) {
         this.postProcessing = postProcessing;
     }
-    public void setZipFormat(boolean zipFormat)
-    {
-    	this.zipFormat = zipFormat;
+
+    public void setZipFormat(boolean zipFormat) {
+        this.zipFormat = zipFormat;
     }
-    public boolean getZipFormat()
-    {
-    	return zipFormat;
+
+    public boolean getZipFormat() {
+        return zipFormat;
     }
-    public void setDeleteOld(boolean deleteOld)
-    {
-    	this.deleteOld = deleteOld;
+
+    public void setDeleteOld(boolean deleteOld) {
+        this.deleteOld = deleteOld;
     }
-    public boolean getDeleteOld()
-    {
-    	return deleteOld;
+
+    public boolean getDeleteOld() {
+        return deleteOld;
     }
+
     public String getSuccessMessage() {
-		return successMessage;
-	}
+        return successMessage;
+    }
 
+    public void setSuccessMessage(String successMessage) {
+        this.successMessage = successMessage;
+    }
 
-	public void setSuccessMessage(String successMessage) {
-		this.successMessage = successMessage;
-	}
+    public String getFailureMessage() {
+        return failureMessage;
+    }
 
+    public void setFailureMessage(String failureMessage) {
+        this.failureMessage = failureMessage;
+    }
 
-	public String getFailureMessage() {
-		return failureMessage;
-	}
+    public String getPostProcLocation() {
+        return postProcLocation;
+    }
 
+    public void setPostProcLocation(String postProcLocation) {
+        this.postProcLocation = postProcLocation;
+    }
 
-	public void setFailureMessage(String failureMessage) {
-		this.failureMessage = failureMessage;
-	}
+    public String getPostProcExportName() {
+        return postProcExportName;
+    }
 
+    public void setPostProcExportName(String postProcExportName) {
+        this.postProcExportName = postProcExportName;
+    }
 
-	public String getPostProcLocation() {
-		return postProcLocation;
-	}
+    public boolean getPostProcDeleteOld() {
+        return postProcDeleteOld;
+    }
 
+    public void setPostProcDeleteOld(boolean postProcDeleteOld) {
+        this.postProcDeleteOld = postProcDeleteOld;
+    }
 
-	public void setPostProcLocation(String postProcLocation) {
-		this.postProcLocation = postProcLocation;
-	}
+    public boolean getPostProcZip() {
+        return postProcZip;
+    }
 
-
-	public String getPostProcExportName() {
-		return postProcExportName;
-	}
-
-
-	public void setPostProcExportName(String postProcExportName) {
-		this.postProcExportName = postProcExportName;
-	}
-
-
-	public boolean getPostProcDeleteOld() {
-		return postProcDeleteOld;
-	}
-
-
-	public void setPostProcDeleteOld(boolean postProcDeleteOld) {
-		this.postProcDeleteOld = postProcDeleteOld;
-	}
-
-
-	public boolean getPostProcZip() {
-		return postProcZip;
-	}
-
-
-	public void setPostProcZip(boolean postProcZip) {
-		this.postProcZip = postProcZip;
-	}
-
+    public void setPostProcZip(boolean postProcZip) {
+        this.postProcZip = postProcZip;
+    }
 
     public void setDatasetName(String datasetName) {
         this.datasetName = datasetName;
     }
-
 
     public String getDatasetName() {
         return datasetName;

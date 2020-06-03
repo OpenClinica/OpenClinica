@@ -30,7 +30,6 @@ import core.org.akaza.openclinica.bean.service.ProcessingFunction;
 import core.org.akaza.openclinica.bean.service.ProcessingResultType;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.OpenClinicaMailSender;
-import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.core.util.XMLFileFilter;
 import core.org.akaza.openclinica.dao.admin.AuditEventDAO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
@@ -159,6 +158,7 @@ public class XsltTransformJob extends QuartzJobBean {
             int archivedDatasetFileBeanId = dataMap.getInt(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID);
             ArchivedDatasetFileBean archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.findByPK(archivedDatasetFileBeanId);
             ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
+            boolean isScheduled = archivedDatasetFileBean.getJobType().contains("Scheduled");
 
             //Create a new row in archived dataset file db if previous one is completed (for export triggers)
             if (archivedDatasetFileBean.getStatus().equals(JobStatus.COMPLETED.name())) {
@@ -178,16 +178,25 @@ public class XsltTransformJob extends QuartzJobBean {
 
                 //create a new file for this export instead of overwrite the previous one
                 int id = dataMap.getInt(EXTRACT_PROPERTY);
-                String newFileName = CoreResources.getExtractFields("extract." + id + ".exportname")[0];
-                String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-                SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
-                newFileName = newFileName.replace("$dateTime", sdfDir.format(new java.util.Date()));
-                newFileName = newFileName.replace("$datasetName", epBean.getDatasetName());
-                dataMap.put(POST_FILE_NAME, newFileName);
-
-                String[] exportFileNames = {newFileName};
-                epBean.setExportFileName(exportFileNames);
-                epBean.setDoNotDelFiles(exportFileNames);
+                String fileName;
+                if (id == 9 || id == 10) { //for SAS and SPSS
+                    fileName = CoreResources.getExtractFields("extract." + id + ".zipName")[0];
+                    String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
+                    SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
+                    String currentDate = sdfDir.format(new java.util.Date());
+                    fileName = fileName.replace("$dateTime", currentDate).replace("$datasetName", epBean.getDatasetName());
+                    epBean.setZipName(fileName);
+                } else {
+                    fileName = CoreResources.getExtractFields("extract." + id + ".exportname")[0];
+                    String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
+                    SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
+                    String currentDate = sdfDir.format(new java.util.Date());
+                    fileName = fileName.replace("$dateTime", currentDate).replace("$datasetName", epBean.getDatasetName());
+                    String[] exportFileName = {fileName};
+                    epBean.setExportFileName(exportFileName);
+                    epBean.setDoNotDelFiles(exportFileName);
+                }
+                dataMap.put(POST_FILE_NAME, fileName);
             }
 
             archivedDatasetFileBean.setFileReference("");
@@ -210,8 +219,8 @@ public class XsltTransformJob extends QuartzJobBean {
             deleteOld = epBean.getDeleteOld();
 
             //always delete old file references for manually ran jobs.
-            if (archivedDatasetFileBean.getJobType().contains("Manual")) {
-                deleteOld=true;
+            if (!isScheduled) {
+                deleteOld = true;
             }
 
             long sysTimeBegin = System.currentTimeMillis();
@@ -229,9 +238,21 @@ public class XsltTransformJob extends QuartzJobBean {
             // generate file directory for file service
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             logger.debug("--> job starting: ");
-            String permissionTagsString = (String) context.getScheduler().getContext().get("permissionTagsString");
-            String[] permissionTagsStringArray = (String[]) context.getScheduler().getContext().get("permissionTagsStringArray");
-            ODMFilterDTO odmFilter = (ODMFilterDTO) context.getScheduler().getContext().get("odmFilter");
+
+            String permissionTagsString;
+            String[] permissionTagsStringArray;
+            ODMFilterDTO odmFilter;
+
+            if (isScheduled) {
+                String userUuid = userBean.getUserUuid();
+                permissionTagsString = permissionService.getPermissionTagsString(currentStudy, userUuid);
+                permissionTagsStringArray = permissionService.getPermissionTagsStringArray(currentStudy, userUuid);
+                odmFilter = new ODMFilterDTO();
+            } else {
+                permissionTagsString = (String) context.getScheduler().getContext().get("permissionTagsString");
+                permissionTagsStringArray = (String[]) context.getScheduler().getContext().get("permissionTagsStringArray");
+                odmFilter = (ODMFilterDTO) context.getScheduler().getContext().get("odmFilter");
+            }
 
             Set<Integer> edcSet = new HashSet<>();
             ArchivedDatasetFileBean fbFinal = null;
@@ -424,10 +445,9 @@ public class XsltTransformJob extends QuartzJobBean {
                     archivedFilename = dataMap.getString(POST_FILE_NAME) + ".zip";
                 }
 
-                // delete old files now
                 List<File> intermediateFiles = generateFileService.getOldFiles();
                 String[] dontDelFiles = epBean.getDoNotDelFiles();
-                //JN: The following is the code for zipping up the files, in case of more than one xsl being provided.
+                // The following is the code for zipping up the files, in case of more than one xsl being provided (i.e. SPSS and SAS)
                 if (dontDelFiles.length > 1 && zipped) {
                     logger.debug("count =====" + cnt + "dontDelFiles length==---" + dontDelFiles.length);
 
@@ -495,10 +515,13 @@ public class XsltTransformJob extends QuartzJobBean {
                 }
 
                 //Deleting old file_references from archived_dataset_file
-                if (archivedDatasetFileBean.getJobType().contains("Scheduled")) {
+                if (isScheduled) {
+                    //for SAS and SPSS delete the unzipped files
+                    if (dataMap.getInt(EXTRACT_PROPERTY) == 9 || dataMap.getInt(EXTRACT_PROPERTY) == 10) {
+                        deleteNonZippedFilesInFolder(generalFileDir);
+                    }
                     deleteOldFileReferences(dataMap, archivedDatasetFileBean);
                 }
-
 
             }
             // email the message to the user
@@ -757,13 +780,13 @@ public class XsltTransformJob extends QuartzJobBean {
     private void deleteIntermFiles(List<File> intermediateFiles, String dontDeleteFile, String[] dontDelFiles) {
 
         Iterator<File> fileIt = intermediateFiles.iterator();
-        File temp = null;
-        File DontDelFile = new File(dontDeleteFile);
-        int i = 0;
-        boolean del = true;
+        File temp;
+        File dontDelFile = new File(dontDeleteFile);
+        int i;
+        boolean del;
         while (fileIt.hasNext()) {
             temp = fileIt.next();
-            if (!temp.getName().equals(DontDelFile.getName())) {
+            if (!temp.getName().equals(dontDelFile.getName())) {
                 i = 0;
                 del = true;
                 logger.debug("File Name?" + temp.getName());
@@ -967,6 +990,17 @@ public class XsltTransformJob extends QuartzJobBean {
             archivedDatasetFileDao.update(adfb);
         }
         logger.info("Deleted " + numToDelete + " old file references for jobUuid " + archivedDatasetFileBean.getJobUuid() + ".");
+    }
+
+
+    private void deleteNonZippedFilesInFolder(String generalFileDir) {
+        File oldFilesPath = new File(generalFileDir);
+        File[] fileList = oldFilesPath.listFiles();
+        for (int i = 0; i < fileList.length; i++) {
+            if (!fileList[i].getName().contains(".zip")) {
+                fileList[i].delete();
+            }
+        }
     }
 
 }
