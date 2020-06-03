@@ -95,7 +95,7 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
             Long percentage = totalEvents == 0 ? 0 : Math.round((totalEventsByEventStatus.doubleValue() / totalEvents.doubleValue()) * 100);
 
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
-            theItem.put("status", workflowStatus);
+            theItem.put("status", workflowStatus.getDisplayValue());
             theItem.put("studySubjects", totalEventsByEventStatus);
             theItem.put("percentage", String.valueOf(percentage) + "%");
             theItems.add(theItem);

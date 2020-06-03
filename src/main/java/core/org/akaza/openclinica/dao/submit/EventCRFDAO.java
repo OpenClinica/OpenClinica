@@ -176,8 +176,10 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(16), new Boolean(ecb.isElectronicSignatureStatus()));
         if(ecb.getSdvStatus() != null)
             variables.put(new Integer(17), ecb.getSdvStatus().toString());
-        else
+        else {
+            nullVars.put(new Integer(17), new Integer(Types.VARCHAR));
             variables.put(new Integer(17), null);
+        }
         if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
             variables.put(new Integer(18), new Integer(ecb.getOldStatus().getId()));
         } else {
