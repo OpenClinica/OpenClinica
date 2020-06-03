@@ -809,18 +809,21 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private AuditLogsBean fetchODMAuditBean(ArrayList<AuditLogEvent> auditLogEvents, AuditLogsBean auditLogsBean) {
 
 		for (AuditLogEvent auditLogEvent : auditLogEvents) {
+		// Previously studySubject creation is duplicated in audit log ('study_subject_created' and 'subject_created')
+		// Hence discarding the older 'subject_created' from audit logs
+		if(auditLogEvent.getAuditLogEventType().getAuditLogEventTypeId() != 5) {
 			AuditLogBean auditBean = new AuditLogBean();
 			auditBean.setOid("AL_" + auditLogEvent.getAuditId());
 			auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
 			auditBean.setDetails(auditLogEvent.getDetails());
 			if (auditLogEvent.getEntityName() != null && auditLogEvent.getEntityName().equals(STATUS)) {
-				OdmExtractDAO oedao = new OdmExtractDAO(dataSource,studyDao);
+				OdmExtractDAO oedao = new OdmExtractDAO(dataSource, studyDao);
 				if (auditLogEvent.getAuditTable().equals(STUDY_EVENT)) {
 					auditBean.setNewValue(oedao.setStudyEventStatus(auditLogEvent.getNewValue()));
 					auditBean.setOldValue(oedao.setStudyEventStatus(auditLogEvent.getOldValue()));
 
 				} else if (auditLogEvent.getAuditTable().equals(EVENT_CRF)) {
-					auditBean.setNewValue(oedao.setEventCrfStatus(auditLogEvent.getNewValue()) );
+					auditBean.setNewValue(oedao.setEventCrfStatus(auditLogEvent.getNewValue()));
 					auditBean.setOldValue(oedao.setEventCrfStatus(auditLogEvent.getOldValue()));
 				} else if (auditLogEvent.getAuditTable().equals(SUBJECT_GROUP_MAP)) {
 					auditBean.setNewValue(auditLogEvent.getNewValue());
@@ -857,7 +860,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				auditBean.setName("");
 			}
 			auditLogsBean.getAuditLogs().add(auditBean);
-
+		}
 		}
 		return auditLogsBean;
 	}
