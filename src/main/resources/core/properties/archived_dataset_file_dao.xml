@@ -28,7 +28,7 @@
     <query>
         <name>findByJobUuidWithFileReference</name>
         <sql>SELECT * FROM ARCHIVED_DATASET_FILE
-            WHERE JOB_UUID=? AND FILE_REFERENCE != ''
+            WHERE JOB_UUID=? AND FILE_REFERENCE IS NOT NULL
             ORDER BY date_created
         </sql>
     </query>

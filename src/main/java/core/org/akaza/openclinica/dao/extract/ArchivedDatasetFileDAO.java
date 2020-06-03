@@ -15,9 +15,7 @@ import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import io.swagger.models.auth.In;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -25,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.sql.DataSource;
+import java.sql.Types;
 
 /**
  * @author thickerson
@@ -81,7 +80,12 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), fb.getName());
         variables.put(Integer.valueOf(2), Integer.valueOf(fb.getDatasetId()));
         variables.put(Integer.valueOf(3), Integer.valueOf(fb.getExportFormatId()));
-        variables.put(Integer.valueOf(4), fb.getFileReference());
+        if (fb.getFileReference() != null){
+            variables.put(Integer.valueOf(4), fb.getFileReference());
+        } else {
+            nullVars.put(new Integer(4), new Integer(Types.VARCHAR));
+            variables.put(Integer.valueOf(4), null);
+        }
         variables.put(Integer.valueOf(5), Integer.valueOf(fb.getFileSize()));
         variables.put(Integer.valueOf(6), new Double(fb.getRunTime()));
         variables.put(Integer.valueOf(7), Integer.valueOf(fb.getOwnerId()));
@@ -106,7 +110,12 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), fb.getName());
         variables.put(Integer.valueOf(2), Integer.valueOf(fb.getDatasetId()));
         variables.put(Integer.valueOf(3), Integer.valueOf(fb.getExportFormatId()));
-        variables.put(Integer.valueOf(4), fb.getFileReference());
+        if (fb.getFileReference() != null){
+            variables.put(Integer.valueOf(4), fb.getFileReference());
+        } else {
+            nullVars.put(new Integer(4), new Integer(Types.VARCHAR));
+            variables.put(Integer.valueOf(4), null);
+        }
         variables.put(Integer.valueOf(5), Integer.valueOf(fb.getFileSize()));
         variables.put(Integer.valueOf(6), new Double(fb.getRunTime()));
         variables.put(Integer.valueOf(7), Integer.valueOf(fb.getOwnerId()));

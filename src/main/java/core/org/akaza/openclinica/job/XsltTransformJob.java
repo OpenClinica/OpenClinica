@@ -170,7 +170,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 newArchivedDatasetFileBean.setDatasetId(archivedDatasetFileBean.getDatasetId());
                 newArchivedDatasetFileBean.setDateCreated(new Date());
                 newArchivedDatasetFileBean.setExportFormatId(1);
-                newArchivedDatasetFileBean.setFileReference("");
+                newArchivedDatasetFileBean.setFileReference(null);
                 newArchivedDatasetFileBean.setJobUuid(archivedDatasetFileBean.getJobUuid());
                 newArchivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
                 newArchivedDatasetFileBean.setJobType(archivedDatasetFileBean.getJobType());
@@ -199,7 +199,6 @@ public class XsltTransformJob extends QuartzJobBean {
                 dataMap.put(POST_FILE_NAME, fileName);
             }
 
-            archivedDatasetFileBean.setFileReference("");
             archivedDatasetFileBean.setStatus(JobStatus.IN_PROGRESS.name());
             archivedDatasetFileBean.setDateCreated(new Date());
             archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.update(archivedDatasetFileBean);
@@ -239,20 +238,11 @@ public class XsltTransformJob extends QuartzJobBean {
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             logger.debug("--> job starting: ");
 
-            String permissionTagsString;
-            String[] permissionTagsStringArray;
-            ODMFilterDTO odmFilter;
+            String userUuid = userBean.getUserUuid();
+            String permissionTagsString = permissionService.getPermissionTagsString(currentStudy, userUuid);
+            String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray(currentStudy, userUuid);
+            ODMFilterDTO odmFilter = new ODMFilterDTO();
 
-            if (isScheduled) {
-                String userUuid = userBean.getUserUuid();
-                permissionTagsString = permissionService.getPermissionTagsString(currentStudy, userUuid);
-                permissionTagsStringArray = permissionService.getPermissionTagsStringArray(currentStudy, userUuid);
-                odmFilter = new ODMFilterDTO();
-            } else {
-                permissionTagsString = (String) context.getScheduler().getContext().get("permissionTagsString");
-                permissionTagsStringArray = (String[]) context.getScheduler().getContext().get("permissionTagsStringArray");
-                odmFilter = (ODMFilterDTO) context.getScheduler().getContext().get("odmFilter");
-            }
 
             Set<Integer> edcSet = new HashSet<>();
             ArchivedDatasetFileBean fbFinal = null;
@@ -986,7 +976,7 @@ public class XsltTransformJob extends QuartzJobBean {
             ArchivedDatasetFileBean adfb = archivedDatasetFileBeans.get(i);
             File fileToDelete = new File(adfb.getFileReference());
             fileToDelete.delete();
-            adfb.setFileReference("");
+            adfb.setFileReference(null);
             archivedDatasetFileDao.update(adfb);
         }
         logger.info("Deleted " + numToDelete + " old file references for jobUuid " + archivedDatasetFileBean.getJobUuid() + ".");

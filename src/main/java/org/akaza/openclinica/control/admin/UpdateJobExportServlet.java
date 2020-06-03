@@ -167,7 +167,7 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setDatasetId(dsBean.getId());
                 archivedDatasetFileBean.setDateCreated(new Date());
                 archivedDatasetFileBean.setExportFormatId(1);
-                archivedDatasetFileBean.setFileReference("");
+                archivedDatasetFileBean.setFileReference(null);
                 archivedDatasetFileBean.setJobUuid(jobUuid);
                 archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
                 archivedDatasetFileBean.setJobType("Scheduled");
