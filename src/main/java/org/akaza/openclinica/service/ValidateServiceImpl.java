@@ -1,12 +1,10 @@
 package org.akaza.openclinica.service;
 
-import liquibase.util.StringUtils;
 import core.org.akaza.openclinica.bean.core.ApplicationConstants;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.UserType;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
-import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.domain.Status;
@@ -22,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -295,14 +291,7 @@ public class ValidateServiceImpl implements ValidateService {
                         LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
                         String userType = (String) userContextMap.get("userType");
                         if (userType.equals(core.org.akaza.openclinica.service.UserType.SYSTEM.getName())) {
-                            String clientId = decodedToken.get("clientId").toString();
-                            if (org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RANDOMIZE_CLIENT)
-                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.DICOM_CLIENT)
-                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.RULES_ENGINE_CLIENT)
-                                    || org.apache.commons.lang.StringUtils.equalsIgnoreCase(clientId, ApplicationConstants.ODM_SERVICE_CLIENT)){
-                                skipRoleCheck = true;
-                            }
-
+                            skipRoleCheck = true;
                         }
                     }
                 }
@@ -341,8 +330,9 @@ public class ValidateServiceImpl implements ValidateService {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
         }
 
-        if (!userAccountBean.getEmail().equals("openclinica-developers@openclinica.com")) {
+        if (userAccountBean.getUserUuid().equals(ApplicationConstants.SYSTEM_USER_UUID)) {
             logger.debug("User is a system user. Role checks can be bypassed");
+        } else {
             if (!isUserHasAccessToStudy(userRoles, studyOid) && !isUserHasAccessToSite(userRoles, siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
             } else if (!isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
