@@ -46,7 +46,6 @@ import core.org.akaza.openclinica.web.job.XalanTriggerService;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 /**
@@ -565,7 +564,10 @@ public class ExportDatasetServlet extends SecureController {
         table.hideColumnLink(7);
         table.hideColumnLink(8);
 
-        table.setQuery("ExportDataset?datasetId=" + db.getId(), new HashMap());
+        HashMap args = new HashMap();
+        args.put("datasetId", Integer.toString(db.getId()));
+        table.setQuery("ExportDataset", args);
+
         // trying to continue...
         session.setAttribute("newDataset", db);
         table.setRows(filterRows);

@@ -72,6 +72,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
         String jobUuid = fp.getString("jobUuid");
         String triggerName = fp.getString("tname");
         String gName = fp.getString("gname");
+        String filterKeyword = fp.getString("ebl_filterKeyword");
         String groupName = "";
         if (gName.equals("") || gName.equals("0")) {
             groupName = TRIGGER_EXPORT_GROUP;
@@ -98,7 +99,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 triggerBean.setActive(true);
                 logger.debug("setting active to TRUE for trigger: " + trigger.getKey().getName());
             }
-            // <<
+
             if (trigger.getDescription() != null) {
                 triggerBean.setDescription(trigger.getDescription());
             }
@@ -146,8 +147,15 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 table.hideColumnLink(6);
                 table.hideColumnLink(7);
 
-                table.setQuery("ViewSingleJob?tname=" + triggerName + "&gname=" + gName + "&jobUuid=" + jobUuid, new HashMap());
+                HashMap args = new HashMap();
+                args.put("tname", new String(triggerName).toString());
+                args.put("gname", new String(gName).toString());
+                args.put("jobUuid", new String(jobUuid).toString());
+                table.setQuery("ViewSingleJob", args);
                 table.setRows(allRows);
+                if (filterKeyword != null && !"".equalsIgnoreCase(filterKeyword)) {
+                    table.setKeywordFilter(filterKeyword);
+                }
                 table.computeDisplay();
 
                 request.setAttribute("table", table);

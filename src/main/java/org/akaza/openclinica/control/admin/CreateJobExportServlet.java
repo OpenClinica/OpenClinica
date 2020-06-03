@@ -8,10 +8,8 @@ import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
-import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.enumsupport.JobStatus;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
-import core.org.akaza.openclinica.service.dto.ODMFilterDTO;
 import core.org.akaza.openclinica.service.extract.ExtractUtils;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import core.org.akaza.openclinica.web.SQLInitServlet;
@@ -156,19 +154,8 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                     String prePocLoc = extractUtils.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
                     epBean.setPostProcLocation(prePocLoc);
                 }
+
                 extractUtils.setAllProps(epBean, dsBean, datasetFilePath);
-                String permissionTagsString = permissionService.getPermissionTagsString((Study) request.getSession().getAttribute("study"), request);
-                String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray((Study) request.getSession().getAttribute("study"), request);
-                ODMFilterDTO odmFilter = new ODMFilterDTO();
-
-                try {
-                    jobScheduler.getContext().put("permissionTagsString", permissionTagsString);
-                    jobScheduler.getContext().put("permissionTagsStringArray", permissionTagsStringArray);
-                    jobScheduler.getContext().put("odmFilter", odmFilter);
-                } catch (SchedulerException e) {
-                    logger.error("Error in setting the permissions: ", e);
-                }
-
                 String jobUuid = UUID.randomUUID().toString();
                 Date dateCreated = new Date();
 
@@ -179,7 +166,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 archivedDatasetFileBean.setDatasetId(dsBean.getId());
                 archivedDatasetFileBean.setDateCreated(dateCreated);
                 archivedDatasetFileBean.setExportFormatId(1);
-                archivedDatasetFileBean.setFileReference("");
+                archivedDatasetFileBean.setFileReference(null);
                 archivedDatasetFileBean.setJobUuid(jobUuid);
                 archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
                 archivedDatasetFileBean.setJobType("Scheduled");
