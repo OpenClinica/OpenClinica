@@ -629,7 +629,7 @@ public class ImportServiceImpl implements ImportService {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
-        eventCrf.setSdvStatus(SdvStatus.NOT_VERIFIED);
+        eventCrf.setSdvStatus(null);
         logger.debug("Creating new Event Crf");
 
         return eventCrf;

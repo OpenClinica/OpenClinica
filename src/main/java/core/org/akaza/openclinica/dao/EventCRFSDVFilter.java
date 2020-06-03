@@ -68,6 +68,8 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                         criteria = criteria + " " + columnMapping.get(property) + " = '" + sdvStatusFilterArray.get(i) + "'";
                     else
                         criteria = criteria + " or " + columnMapping.get(property) + " = '" + sdvStatusFilterArray.get(i) + "'";
+                    if(sdvStatusFilterArray.get(i).equals(SdvStatus.NOT_VERIFIED.toString()))
+                        criteria = criteria + " or " + columnMapping.get(property) +" is null ";
                 }
                 criteria = criteria +" ) ";
             } else if (property.equals("sdvRequirementDefinition")) {

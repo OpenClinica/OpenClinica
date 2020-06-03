@@ -4,11 +4,17 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <html>
 <head>
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+    <style>
+      body > table {
+        min-width: 970px;
+      }
+    </style>
 </head>
 <jsp:useBean scope="request" id="subject" class="core.org.akaza.openclinica.bean.submit.SubjectBean"/>
 <jsp:useBean scope="request" id="study" class="core.org.akaza.openclinica.domain.datamap.Study"/>
@@ -340,9 +346,8 @@
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                         <c:choose>
-                                        <c:when test="${eventCRFAudit.oldValue eq '1'}">TRUE</c:when>
-                                        <c:when test="${eventCRFAudit.oldValue eq '0'}">FALSE</c:when>
-                                        <c:otherwise><c:out value="${eventCRFAudit.oldValue}"/></c:otherwise>
+                                        <c:when test="${eventCRFAudit.oldValue == null or eventCRFAudit.oldValue eq ''}">Null</c:when>
+                                        <c:otherwise><fmt:message key="${eventCRFAudit.oldValue}" bundle="${resterm}"></fmt:message></c:otherwise>
                                         </c:choose>
                                     </c:when>
                                     <c:otherwise>
@@ -375,9 +380,8 @@
                                     </c:when>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 32}' >
                                         <c:choose>
-                                        <c:when test="${eventCRFAudit.newValue eq '1'}">TRUE</c:when>
-                                        <c:when test="${eventCRFAudit.newValue eq '0'}">FALSE</c:when>
-                                        <c:otherwise><c:out value="${eventCRFAudit.newValue}"/></c:otherwise>
+                                        <c:when test="${eventCRFAudit.newValue == null or eventCRFAudit.newValue eq ''}">Null</c:when>
+                                        <c:otherwise><fmt:message key="${eventCRFAudit.newValue}" bundle="${resterm}"></fmt:message></c:otherwise>
                                         </c:choose>
                                     </c:when>
                                     <c:otherwise>

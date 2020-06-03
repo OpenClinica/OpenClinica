@@ -1058,6 +1058,7 @@ public class SDVUtil {
 
             StudyEvent event = eventCrf.getStudyEvent();
             StudyEventDefinition eventDef = event.getStudyEventDefinition();
+
             actionsBuilder
                 .append("<button style='padding:.4em 0.9em' class='accessCheck popupSdv' title='" + resWords.getString("view_sdv_item_data_hover") + "'")
                 .append(" data-participant-id='").append(studySubjectBean.getLabel()).append("'")
@@ -1478,7 +1479,10 @@ public class SDVUtil {
             sdvDTO.setFormName(eventCrf.getFormLayout().getCrf().getName());
             sdvDTO.setFormStatus(eventCrf.getWorkflowStatus().getDisplayValue());
             sdvDTO.setLastVerifiedDate(eventCrf.getLastSdvVerifiedDate());
-            sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
+            if(eventCrf.getSdvStatus() != null)
+                sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
+            else
+                sdvDTO.setSdvStatus(SdvStatus.NOT_VERIFIED.toString());
             List<SdvItemDTO> sdvItemDTOS = new ArrayList<>();
             for (ItemData itemData : getItemDataDao().findByEventCrfId(eventCrf.getEventCrfId())) {
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_SINCE_VERIFIED)) {
@@ -1566,6 +1570,8 @@ public class SDVUtil {
     }
 
     private SdvStatus getItemSdvStatus(EventCrf eventCrf, ItemData itemData) {
+        if(eventCrf.getSdvStatus() == null)
+            return SdvStatus.NOT_VERIFIED;
         if (eventCrf.getSdvStatus().equals(SdvStatus.CHANGED_SINCE_VERIFIED)) {
 
             Date lastUpdatedItemDate = eventCrf.getLastSdvVerifiedDate();
