@@ -52,6 +52,7 @@ import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.StudyBuildService;
 import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.rest.errors.ErrorConstants;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Attr;
@@ -62,6 +63,10 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
 	private final DataSource ds;
 	private StudyDao studyDao;
+	
+	private static final String PARTICIPANT_ID_HEADER_PROPERTY = "ParticipantIDHeader";
+	public static final String DELIMITER_PROPERTY = "Delimiter";
+	private static final String DEFAULT_PARTICIPANT_ID_HEADER = "ParticipantID";
 	private StudyBuildService studyBuildService;
 	public PipeDelimitedDataHelper(DataSource ds, StudyBuildService studyBuildService, StudyDao studyDao) {
 		super();
@@ -116,7 +121,7 @@ public String readFileToString(File file) throws IOException{
 	public String transformTextToODMxml(String rawMappingStr,String rawItemData,HashMap hm) throws OpenClinicaSystemException {
 		
 		String studyOID;
-		String subjectKey;
+		String participantId;
 		String studyEventOID;
 		String formOID;
 		String formVersion;
@@ -146,28 +151,34 @@ public String readFileToString(File file) throws IOException{
 	     * Hold all ItemGroupOIDs coming from mapping file
 	     */
 		Object[] mappingItemGroupOIDs;
-	     
+
 		String  mappingStr;
 
 		try {
-			
+
 
 			checkPipeNumber(rawItemData);
-			
-			columnNms = getDataColumnNames(rawItemData);	
-			
-			if(this.hasParticipantIDColumn(columnNms)) {
+
+			columnNms = getDataColumnNames(rawItemData);
+
+			String participantIdHeader = (String) mappedValues.get(PARTICIPANT_ID_HEADER_PROPERTY);
+			if (StringUtils.isBlank(participantIdHeader)) {
+				participantIdHeader = DEFAULT_PARTICIPANT_ID_HEADER;
+			}
+
+			if(this.hasParticipantIDColumn(participantIdHeader, columnNms)) {
 				;
 			}else {
 				return "errorCode.noParticipantIDinDataFile";
 			}
-			
-			mappedValues = getDataMappedValues(rawMappingStr,columnNms); 
+
+			mappedValues = getDataMappedValues(rawMappingStr,columnNms);
 			
 			studyOID =(String) mappedValues.get("StudyOID");
 			studyEventOID =(String) mappedValues.get("StudyEventOID");
 			formOID =(String) mappedValues.get("FormOID");
 			formVersion =(String) mappedValues.get("FormVersion");
+
 			// get default version
 			if(formVersion == null || formVersion.trim().length() == 0) {
 				formVersion = (String) hm.get("FormVersion");
@@ -258,7 +269,7 @@ public String readFileToString(File file) throws IOException{
 				// find subject OID, It may be at any position
 				if(i==0) {
 					for(int k=0;i<dataRow.length;k++){
-						if(dataRow[k].toString().trim().equals("ParticipantID") || dataRow[k].substring(1).trim().equals("ParticipantID")) {
+						if(dataRow[k].toString().trim().equals(participantIdHeader) || dataRow[k].substring(1).trim().equals(participantIdHeader)) {
 							indexofParticipantID = k;
 							
 							break;
@@ -268,12 +279,12 @@ public String readFileToString(File file) throws IOException{
 					// start process item data
 					// ignore blank line					
 					if(dataRows[i].toString().replaceAll("[\\n\\t\\r]", "").trim().length() > 0) {
-						subjectKey = dataRow[indexofParticipantID].toString().trim();
+						participantId = dataRow[indexofParticipantID].toString().trim();
 						//logger.info(i+ "************dataRow************************"+ dataRow);
 						
-						if(subjectKey != null && subjectKey.trim().length()>0){
-							Element subjectData = document.createElement("SubjectData");	
-							subjectData.setAttribute("SubjectKey", subjectKey);
+						if(participantId != null && participantId.trim().length() > 0){
+							Element subjectData = document.createElement("SubjectData");
+							subjectData.setAttribute("OpenClinica:StudySubjectID", participantId);
 							
 							Element studyEventData = document.createElement("StudyEventData");	
 							studyEventData.setAttribute("StudyEventOID", studyEventOID);
@@ -541,7 +552,11 @@ public String readFileToString(File file) throws IOException{
 			    //SkipMatchCriteria	
 			    }else  if(key.equals("SkipMatchCriteria") ||(!(key.startsWith("#")) && key.substring(1).equals("SkipMatchCriteria"))){			     	 
 			    	mappedValues.put("SkipMatchCriteria", val);	
-			    }else{
+			    } else if (key != null && (key.trim().startsWith(PARTICIPANT_ID_HEADER_PROPERTY) || key.trim().indexOf(PARTICIPANT_ID_HEADER_PROPERTY) == 1 )) {
+						mappedValues.put(PARTICIPANT_ID_HEADER_PROPERTY, val);
+					} else if (key != null && (key.trim().startsWith(DELIMITER_PROPERTY) || key.trim().indexOf(DELIMITER_PROPERTY) == 1 )) {
+						mappedValues.put(DELIMITER_PROPERTY, val);
+					} else{
 	                    // item OID: Height=IG_VITAL_GROUP1.HeightOID
 			    	//boolean isCorrectFormat = checkFormItemMappingFormat(rawMappingStrRowsStr);
 			    	boolean isCorrectFormat =true;
@@ -605,14 +620,14 @@ public String readFileToString(File file) throws IOException{
 		return matcher.matches();
 	}
 	
-	public boolean hasParticipantIDColumn(String[] columnNms) {
+	public boolean hasParticipantIDColumn(String participantIdHeader, String[] columnNms) {
 
 		boolean found = false;
 		String textStr;
 		
 		for(int i=0; i < columnNms.length; i++) {
 			//System.out.println("columnNms==========================" + columnNms[i]);
-			if(columnNms[i].trim().equals("ParticipantID")) {
+			if(columnNms[i].trim().equals(participantIdHeader)) {
 				found = true;
 				break;
 			}			
@@ -621,7 +636,7 @@ public String readFileToString(File file) throws IOException{
 			 *  in case data is in UTF-8 or  UTF-8-BOM etc encoding
 			 */
 			textStr = columnNms[i].substring(1);
-			if(textStr.trim().equals("ParticipantID")) {
+			if(textStr.trim().equals(participantIdHeader)) {
 				found = true;
 				break;
 			}				
@@ -653,7 +668,7 @@ public String readFileToString(File file) throws IOException{
      * @return
      * @throws IOException
      */
-    public String getStudyOidFromMappingFile(File mappingFile) throws IOException{
+    public String  getStudyOidFromMappingFile(File mappingFile) throws IOException{
         String studyOID = null;
         
         try(Scanner sc = new Scanner(mappingFile)){
@@ -790,7 +805,11 @@ public String readFileToString(File file) throws IOException{
 		             		}
 	            		 }
 	            		
-	             	 } else {
+	             	 } else if (keyWord != null && (keyWord.trim().startsWith(PARTICIPANT_ID_HEADER_PROPERTY) || keyWord.trim().indexOf("SkipMatchCriteria") == 1 )) {
+	           		 		// do nothing
+								 } else if (keyWord != null && (keyWord.trim().startsWith(DELIMITER_PROPERTY) || keyWord.trim().indexOf("SkipMatchCriteria") == 1 )) {
+									 // do nothing
+								 } else {
 	             		//check item configuration format
 	             		errorMsg = this.validateItemFormat(mappingRow);
 	             		if(errorMsg != null) {
@@ -1237,7 +1256,13 @@ public String getParticipantID(String rawMappingStr,String rawItemData) throws O
 		mappedValues = getDataMappedValues(rawMappingStr,columnNms);				
 		mappedColumnNameList =(ArrayList) mappedValues.get("mappedColumnNameList");
 		ArrayList itemGroupOIDList = (ArrayList) mappedValues.get("itemGroupOIDList");
-		
+
+
+		String participantIdHeader = (String) mappedValues.get(PARTICIPANT_ID_HEADER_PROPERTY);
+		if (StringUtils.isBlank(participantIdHeader)) {
+			participantIdHeader = DEFAULT_PARTICIPANT_ID_HEADER;
+		}
+
 		mappingItemGroupOIDs=(Object[]) itemGroupOIDList.toArray();						
 		String[] dataRows = rawItemData.split(new Character((char) 13).toString());
 		
@@ -1252,7 +1277,7 @@ public String getParticipantID(String rawMappingStr,String rawItemData) throws O
 			// find subject OID, It may be at any position
 			if(i==0) {
 				for(int k=0;i<dataRow.length;k++){
-					if(dataRow[k].toString().trim().equals("ParticipantID") || dataRow[k].substring(1).trim().equals("ParticipantID")) {
+					if(dataRow[k].toString().trim().equals(participantIdHeader) || dataRow[k].substring(1).trim().equals(participantIdHeader)) {
 						indexofParticipantID = k;
 						
 						break;

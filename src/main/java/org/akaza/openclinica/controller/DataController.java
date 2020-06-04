@@ -312,13 +312,9 @@ public class DataController {
             } catch (OpenClinicaSystemException e) {
                 errors.reject(e.getErrorCode(), e.getMessage());
                 
-                // log error into file             
-                String studySubjectOID = null;
-                try {
-                	studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();	
-                }catch(java.lang.NullPointerException e2) {
-                	;
-                }
+                // log error into file
+                SubjectDataBean subjectDataBean = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0);
+                String participantId = subjectDataBean == null ? null : subjectDataBean.getStudySubjectID();
                 
                 String originalFileName = request.getHeader("originalFileName");            	
             	String recordNum = null;
@@ -327,7 +323,7 @@ public class DataController {
             		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
             	}
             	String msg = e.getErrorCode() + ":" + e.getMessage();
-            	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
+            	msg = recordNum + "|" + participantId + "|FAILED|" + msg;
 	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
             }
 
@@ -368,8 +364,8 @@ public class DataController {
 
                     /**
                      * log error into log file 
-                     */                    
-                    String studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();
+                     */
+                  String participantId = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudySubjectID();
                     String originalFileName = request.getHeader("originalFileName");
                 	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
                 	String recordNum = null;
@@ -378,7 +374,7 @@ public class DataController {
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
                 	String msg = "errorCode.ValidationFailed:" + err_msg;
-                	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
+                	msg = recordNum + "|" + participantId + "|FAILED|" + msg;
     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
     	    		
                     return errorMsgs;
@@ -393,21 +389,21 @@ public class DataController {
                 
                 if (errorMessagesFromValidation.size() > 0) {
                 	String erroCode ="";
-                    String err_msg = convertToErrorString(errorMessagesFromValidation);
-                    if(err_msg!=null && err_msg.startsWith("errorCode.")) {
-                    	erroCode = err_msg.substring(0,err_msg.indexOf(":"));
-                    }else {
-                    	erroCode = "errorCode.ValidationFailed";
-                    }
-                    ErrorMessage errorOBject = createErrorMessage(erroCode, err_msg);
-                    errorMsgs.add(errorOBject);
+                  String err_msg = convertToErrorString(errorMessagesFromValidation);
+                  if(err_msg!=null && err_msg.startsWith("errorCode.")) {
+                    erroCode = err_msg.substring(0,err_msg.indexOf(":"));
+                  }else {
+                    erroCode = "errorCode.ValidationFailed";
+                  }
+                  ErrorMessage errorOBject = createErrorMessage(erroCode, err_msg);
+                  errorMsgs.add(errorOBject);
 
 
-                    /**
-                     * log error into log file 
-                     */ 
-                    String studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();
-                    String originalFileName = request.getHeader("originalFileName");
+                  /**
+                   * log error into log file
+                   */
+                  String participantId = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudySubjectID();
+                  String originalFileName = request.getHeader("originalFileName");
                 	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
                 	String recordNum = null;
                 	if(originalFileName !=null) {
@@ -425,7 +421,7 @@ public class DataController {
                 			msg = "errorCode.ValidationFailed:" + err_msg;
                 		}
                 		
-                    	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
+                    	msg = recordNum + "|" + participantId + "|FAILED|" + msg;
                 	}
                 	
     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);    	    		    	    		
@@ -470,7 +466,7 @@ public class DataController {
                 /**
                  *  Now it's time to log successful message into log file                      
                  */ 
-                String studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();
+                String participantId = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudySubjectID();
                 String originalFileName = request.getHeader("originalFileName");
             	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
             	String recordNum = null;
@@ -479,7 +475,7 @@ public class DataController {
             		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
             	}
             	String msg = "imported";
-            	msg = recordNum + "|" + studySubjectOID + "|SUCCESS|" + msg;
+            	msg = recordNum + "|" + participantId + "|SUCCESS|" + msg;
 	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
 	    	
                 ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource, studyDao);
