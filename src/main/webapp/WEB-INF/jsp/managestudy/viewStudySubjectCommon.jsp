@@ -195,7 +195,24 @@
                         {{#each submission.fields as |data|}}
                             <td data-search="{{data}}">{{truncate data 200}}</td>
                         {{/each}}
-                        <td>{{submission.studyStatus}}</td>
+                        <td>
+                            {{submission.studyStatus}}
+                            {{#if submission.isSigned}}
+                                <span class="icon" alt="Signed" title="Signed">
+                                    <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
+                                </span>
+                            {{/if}}
+                            {{#if submission.isLocked}}
+                                <span class="icon" alt="Locked" title="Locked">
+                                    <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
+                                </span>
+                            {{/if}}
+                            {{#if submission.isArchived}}
+                                <span class="icon" alt="Archived" title="Archived">
+                                    <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
+                                </span>
+                            {{/if}}
+                        </td>
                         <td>{{submission.updatedDate}}</td>
                         <td>{{submission.updatedBy}}</td>
                         <td class="actions">
@@ -600,7 +617,10 @@ $(function() {
                         updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
                         updatedBy: formData['@OpenClinica:UpdatedBy'],
                         fields: copyObject(form.submissionFields),
-                        links: collectLinks(studyEventData, formData)
+                        links: collectLinks(studyEventData, formData),
+                        isSigned: studyEventData['@OpenClinica:Signed'] === 'Yes',
+                        isLocked: studyEventData['@OpenClinica:Locked'] === 'Yes',
+                        isArchived: studyEventData['@OpenClinica:Archived'] === 'Yes'
                     };
                     foreach(formData.ItemGroupData, function(igd) {
                         foreach(igd.ItemData, function(itemData) {
