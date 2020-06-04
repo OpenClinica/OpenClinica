@@ -14,6 +14,9 @@ public class FormChangeDTO {
     private String formCreatedDate;
     private String formUpdatedDate;
     private String formWorkflowStatus;
+    private String formSdvStatus;
+    private String formRemoved;
+    private String formArchived;
 
     public String getCustomerUuid() { return customerUuid; }
     public void setCustomerUuid(String customerUuid) { this.customerUuid = customerUuid; }
@@ -77,4 +80,13 @@ public class FormChangeDTO {
 
     public String getFormWorkflowStatus() { return formWorkflowStatus; }
     public void setFormWorkflowStatus(String formWorkflowStatus) { this.formWorkflowStatus = formWorkflowStatus; }
+
+    public String getFormSdvStatus() { return formSdvStatus; }
+    public void setFormSdvStatus(String formSdvStatus) { this.formSdvStatus = formSdvStatus; }
+
+    public String getFormRemoved() { return formRemoved; }
+    public void setFormRemoved(String formRemoved) { this.formRemoved = formRemoved; }
+
+    public String getFormArchived() { return formArchived; }
+    public void setFormArchived(String formArchived) { this.formArchived = formArchived; }
 }

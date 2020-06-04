@@ -8,6 +8,7 @@
 package core.org.akaza.openclinica.bean.extract.odm;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
+import core.org.akaza.openclinica.bean.core.ApplicationConstants;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -88,8 +89,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             xml.append(nls);
         }
         Role role = null; // OpenClinica:
-        //TODO: check for system user
-        if (userBean.getEmail().equals("openclinica-developers@openclinica.com")) {
+        if (userBean.getUserUuid().equals(ApplicationConstants.SYSTEM_USER_UUID)) {
             role = Role.ADMIN;
         } else {
             StudyUserRoleBean userRole = null;

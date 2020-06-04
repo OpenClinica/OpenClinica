@@ -2,14 +2,10 @@ package core.org.akaza.openclinica.bean.core;
 
 public class ApplicationConstants {
 
-    public final static String RANDOMIZE_CLIENT = "randomize";
-    public final static String RANDOMIZE_USERNAME = "randomize";
-    public final static String DICOM_CLIENT = "dicom";
-    public final static String DICOM_USERNAME = "dicom";
-    public final static String RULES_ENGINE_CLIENT = "rules-engine";
-    public final static String RULES_ENGINE__USERNAME = "rules.engine";
-    public final static String ODM_SERVICE_CLIENT = "odm-service";
-    public final static String ODM_SERVICE_USERNAME = "odm.service";
+    //TODO Clean out these constants.
+    public final static String SYSTEM_USER = "system";
+    public final static String SYSTEM_USER_FNAME = "System";
+    public final static String SYSTEM_USER_UUID= "systemUserUuid";
 
     public static String getDateFormatInItemData() {
         return "yyyy-MM-dd";

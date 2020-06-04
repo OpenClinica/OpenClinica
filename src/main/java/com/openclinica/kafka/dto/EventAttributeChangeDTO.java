@@ -12,6 +12,10 @@ public class EventAttributeChangeDTO {
     private int eventRepeatKey;
     private String eventStartDate;
     private String eventWorkflowStatus;
+    private String eventRemoved;
+    private String eventArchived;
+    private String eventLocked;
+    private String eventSigned;
 
     public String getCustomerUuid() { return customerUuid; }
     public void setCustomerUuid(String customerUuid) { this.customerUuid = customerUuid; }
@@ -65,6 +69,18 @@ public class EventAttributeChangeDTO {
 
     public String getEventWorkflowStatus() { return eventWorkflowStatus; }
     public void setEventWorkflowStatus(String eventWorkflowStatus) { this.eventWorkflowStatus = eventWorkflowStatus; }
+
+    public String getEventRemoved() { return eventRemoved; }
+    public void setEventRemoved(String eventRemoved) { this.eventRemoved = eventRemoved; }
+
+    public String getEventArchived() { return eventArchived; }
+    public void setEventArchived(String eventArchived) { this.eventArchived = eventArchived; }
+
+    public String getEventLocked() { return eventLocked; }
+    public void setEventLocked(String eventLocked) { this.eventLocked = eventLocked; }
+
+    public String getEventSigned() { return eventSigned; }
+    public void setEventSigned(String eventSigned) { this.eventSigned = eventSigned; }
 
     @Override
     public String toString() {

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Aspect
 @Component
@@ -43,19 +44,37 @@ public class AuditEventCrfAspect {
         return afterEventCrf;
     }
 
+    @Transactional
     public boolean eventCrfIsTheSame(EventCrf eventCrf){
-        EventCrf existingEventCrf = eventCrfDao.findById(eventCrf.getEventCrfId());
+        EventCrf existingEventCrf = (EventCrf) eventCrfDao.getSessionFactory().openSession().find(EventCrf.class, eventCrf.getEventCrfId());
 
+        // workflowStatus, sdvStatus, removed, archived,
         if (existingEventCrf != null){
-            if (existingEventCrf.getWorkflowStatus().equals(eventCrf.getWorkflowStatus())) {
-                log.info("AoP: Workflow status does match!");
+            if (areEventCrfStatusesTheSame(eventCrf, existingEventCrf)) {
+                log.info("AoP: eventCRF is the same! Skipping kafka message.");
                 return true; }
             else {
-                log.info("AoP: Workflow status does NOT match!");
+                log.info("AoP: eventCRF is not the same!");
                 return false; }
+        }
+        // Captures a scenario where a new eventCRF was being saved multiple times before the transaction was completed.
+        if (existingEventCrf == null && eventCrf.getEventCrfId() != 0){
+            return true;
         }
         log.info("AoP: CRF must not exist, so it has changed.");
         return false;
+    }
+
+    public boolean areEventCrfStatusesTheSame(EventCrf eventCrf, EventCrf existingEventCrf){
+        if (!existingEventCrf.getWorkflowStatus().equals(eventCrf.getWorkflowStatus())){
+            return false;}
+        if (!existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus())){
+            return false;}
+        if (existingEventCrf.getArchived() != null && eventCrf.getArchived() != null && !existingEventCrf.getArchived().equals(eventCrf.getArchived())){
+            return false;}
+        if (existingEventCrf.getRemoved() != null && eventCrf.getRemoved() != null && !existingEventCrf.getRemoved().equals(eventCrf.getRemoved())){
+            return false;}
+        return true;
     }
 
     @AfterReturning("execution(* core.org.akaza.openclinica.dao.submit.EventCRFDAO.update(..))")
