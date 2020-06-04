@@ -90,16 +90,21 @@ public class ViewJobServlet extends ScheduleJobServlet {
         }
 
         ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
-
         EntityBeanTable table = fp.getEntityBeanTable();
+        table.setSortingIfNotExplicitlySet(0, false); // sort by name
         String[] columns =
                 {resword.getString("name"), resword.getString("previous_fire_time"), resword.getString("next_fire_time"), resword.getString("description"),
                         resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"), resword.getString("actions")};
         table.setColumns(new ArrayList(Arrays.asList(columns)));
+        table.hideColumnLink(0);
+        table.hideColumnLink(1);
+        table.hideColumnLink(2);
         table.hideColumnLink(3);
+        table.hideColumnLink(4);
+        table.hideColumnLink(5);
+        table.hideColumnLink(6);
         table.hideColumnLink(7);
         table.setQuery("ViewJob", new HashMap());
-        table.setSortingColumnInd(0);
         table.setRows(allRows);
         table.computeDisplay();
 
