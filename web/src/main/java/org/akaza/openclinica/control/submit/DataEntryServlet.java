@@ -2484,7 +2484,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
      *            The original array got from DB which contains multiple data rows
      * @param formGroups
      *            The new array got from front end which contains multiple data rows
-     * @param request TODO
+     * @param request
+     *            FormProcessor holds the form data in a key-value pair with the following structure
+     *              The first row of data points and new rows have a key that looks like GROUPOID_XinputITEMID
+     *                  example: IG_01REP_01REPEATING_0input3008
+     *              The existing rows of data points have a key that looks like GROUPOID_manualXinputITEMID
+     *                  example: IG_01REP_01REPEATING_manual1input3008
      * @return new constructed formGroups, compare to dbGroups, some rows are update, some new ones are added and some are removed
      */
     protected List<DisplayItemGroupBean> loadFormValueForItemGroup(DisplayItemGroupBean digb, List<DisplayItemGroupBean> dbGroups,
@@ -2514,9 +2519,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
         repeatMax = ( repeatMax < maxOrdinal)? maxOrdinal:repeatMax;
 
         ////////////////////////////////////////////////////////////////////////////////////////////
-        int manualRows = 1;
-        int newDataRowOrdinal = 0;
-        int existingGroupSize = dbGroups.size();
+        int manualRows = 1; //counter for rows preexisting data
+        int newDataRowOrdinal = 0;  //holds the ordinal of new data
+        int existingGroupSize = dbGroups.size(); //Size of existing repeating data retrieved from database
         ////////////////////////////////////////////////////////////////////////////////////////////
 
         //Need to go through all of the rows of data
@@ -2531,6 +2536,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // may use other better way to do, like clone
             List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
 
+            //Process preexisting data marked by the word "manual" from the UI
             if (fp.getStartsWith(igb.getOid() + "_manual" + i + "input")) {
                 formGroup.setOrdinal(i);
                 formGroup.setFormInputOrdinal(i);
@@ -2566,6 +2572,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     formGroup = processNewDataInRepeatingGroup(fp, igb, newDataRowOrdinal, dibs, digb, formGroup );
                 }
 
+                //this is used to handle removed data rows and set their ordinal correctly
+                //within the remaining data group displayed on the form
                 if(formGroup != null){
                     if (formGroup.isAuto() && formGroup.getFormInputOrdinal() > 0) {
                         LOGGER.trace("+++ formInputOrdinal() " + formGroup.getFormInputOrdinal());
@@ -2586,222 +2594,60 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 newDataRowOrdinal++;
             }
 
-        }// end of for (int i = 0; i < repeatMax; i++)
-        // >>TBH remove the above eventually, repeat some work here?
+        }
 
         request.setAttribute("manualRows", new Integer(manualRows));
-        /*LOGGER.trace("+++ starting to review groups 3: " + repeatMax);
-        two = System.currentTimeMillis() - timeCheck;
-        LOGGER.trace("time 3: " + two + "ms");*/
-        // >>TBH taking the nullvalues list out of the for loop, since it should
-        // be the same for all display beans
-        // nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(
-        // eventDefCRFId,
-        // getDataSource());
-        /*
-         * logger.trace("+++ count for null values list: " + nullValuesList.size()); logger.trace(nullValuesList.toString() + " found with " + eventDefCRFId);
-         */
 
-        // had the call to form bean utils here, tbh
-        // if the following for loop is missing, data isn't saved for new items
-//        for (int i = 0; i < repeatMax; i++) {
-//            DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
-//            formGroup.setItemGroupBean(digb.getItemGroupBean());
-//
-//            //            try {
-//            //                // set isShown here, tbh 04/2010
-//            //                boolean showGroup = getItemMetadataService().isGroupShown(digb.getGroupMetaBean().getId(), ecb);
-//            //                logger.debug("found show group for group meta bean " + digb.getGroupMetaBean().getId() + ": " + showGroup);
-//            //                if (showGroup) {
-//            //                    digb.getGroupMetaBean().setShowGroup(showGroup);
-//            //                    // we are only hiding, not showing (for now) tbh
-//            //                }
-//            //                // << tbh 04/2010
-//            //            } catch (OpenClinicaException oce) {
-//            //                // do nothing for right now, just store the bean
-//            //                logger.debug("throws an OCE for " + digb.getGroupMetaBean().getId());
-//            //            }
-//            formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean(), request));
-//            ItemGroupBean igb = digb.getItemGroupBean();
-//            // adding this code from below, since we want to pass a null values
-//            // list
-//            // in all cases of getDisplayBeansFromItems().
-//            // For adding null values to display items
-//            // FormBeanUtil formBeanUtil = new FormBeanUtil();
-//            // List<String> nullValuesList = new ArrayList<String>();
-//            // BWP>> Get a List<String> of any null values such as NA or NI
-//            // method returns null values as a List<String>
-//
-//            // >>BWP
-//            // want to do deep copy here, so always get a fresh copy for items,
-//            // may use other better way to do, like clone
-//
-//            // moved it back down here to fix another bug, tbh 12-3-2007
-//            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
-//            LOGGER.trace("+++count for dibs after deep copy: " + dibs.size());
-//            two = System.currentTimeMillis() - timeCheck;
-//            // logger.trace("time 3.dibs: " + two + "ms");
-//            // >>tbh
-//
-//            // let's get the values from the rep model, which includes the first
-//            // row and any new rows
-//            // created by rep model(add button)
-//            if (fp.getStartsWith(igb.getOid() + "_" + i + "input")) {
-//                formGroup.setInputId(igb.getOid() + "_" + i);
-//                if (i == 0) {
-//                    formGroup.setOrdinal(i);// ordinal that will be saved into
-//                    // DB
-//                } else {
-//                    formGroup.setFormInputOrdinal(i);// from 0 again, the
-//                    // ordinal from front
-//                    // end page, needs to be
-//                    // reprocessed
-//                }
-//                formGroup.setAuto(true);
-//                LOGGER.debug("1: set auto to TRUE for " + igb.getOid() + " " + i);
-//                dibs = processInputForGroupItem(fp, dibs, i, digb, true);
-//                LOGGER.trace("+++ group ordinal: " + i + " igb name " + igb.getName());
-//
-//                formGroup.setItems(dibs);
-//                formGroups.add(formGroup);
-//            } else if (!StringUtil.isBlank(fp.getString(igb.getOid() + "_" + i + ".newRow"))) {
-//                // || (fp.getStartsWith(igb.getOid() + "_" + i + "input"))) {
-//                // the ordinal is the number got from [ ] and submitted by
-//                // repetition javascript
-//                formGroup.setInputId(igb.getOid() + "_" + i);
-//                if (i == 0) {
-//                    formGroup.setOrdinal(i);// ordinal that will be saved into
-//                    // DB
-//                } else {
-//                    formGroup.setFormInputOrdinal(i);// from 0 again, the
-//                    // ordinal from front
-//                    // end page, needs to be
-//                    // reprocessed
-//                }
-//                // String fieldName = igb.getOid() + "_" + i + this.getInputName(dib);
-//                // if (!StringUtil.isBlank(fp.getString(fieldName))) {
-//                // if (i != repeatMax) {
-//                // formGroup.setAuto(false);
-//                // logger.debug("set auto to false for " + igb.getOid() + " " + i);
-//                // } else {
-//                formGroup.setAuto(true);
-//
-//                LOGGER.debug("2: set auto to TRUE for " + igb.getOid() + " " + i);
-//
-//                dibs = processInputForGroupItem(fp, dibs, i, digb, true);
-//                LOGGER.trace("+++ group ordinal: " + i + " igb name " + igb.getName());
-//
-//                formGroup.setItems(dibs);
-//                formGroups.add(formGroup);
-//            }/*else {
-//                secondLoopBreak++;
-//            }
-//            if (secondLoopBreak > 14) {
-//                LOGGER.debug("break second loop");
-//                break;
-//            }*/
-//
-//        } // end of for (int i = 0; i < repeatMax; i++)
-        /*LOGGER.debug("first loop: " + firstLoopBreak);
-        LOGGER.debug("second loop: " + secondLoopBreak);*/
-        /*LOGGER.trace("+++ starting to review groups 4: " + repeatMax);
-        two = System.currentTimeMillis() - timeCheck;
-        LOGGER.trace("time 4: " + two + "ms");*/
-        // checks how many rows are manually created, not added by repetition
-        // model
-
-        //int manualRows = getManualRows(formGroups);
-        // for (int j = 0; j < formGroups.size(); j++) {
-        // DisplayItemGroupBean formItemGroup = formGroups.get(j);
-        // // logger.trace("begin formGroup Ordinal:" +
-        // // formItemGroup.getOrdinal());
-        // if (formItemGroup.isAuto() == false) {
-        // manualRows = manualRows + 1;
-        // }
-        // }
         LOGGER.debug(" manual rows " + manualRows + " formGroup size " + formGroups.size());
 
-        //request.setAttribute("manualRows", new Integer(manualRows));
-        // reset ordinal for the auto-created rows except for the first row
-        /*for (int j = 0; j < formGroups.size(); j++) {
-            DisplayItemGroupBean formItemGroup = formGroups.get(j);
-            if (formItemGroup.isAuto() && formItemGroup.getFormInputOrdinal() > 0) {
-                LOGGER.trace("+++ formInputOrdinal() " + formItemGroup.getFormInputOrdinal());
-                // rows included in the model: first row, last existing row and
-                // new rows
-                // the rows in between are manually added
-
-                // set the correct ordinal that will be saved into DB
-                // the rows generated by model starts from 0, need to add the
-                // number of manual rows to
-                // get the correct ordinals, otherwise, we will have duplicate
-                // ordinals like two ordinal 0
-                formItemGroup.setOrdinal(formItemGroup.getFormInputOrdinal() + manualRows);
-            }
-        }*/
-        /*LOGGER.trace("+++ starting to review groups 5: " + repeatMax);
-        two = System.currentTimeMillis() - timeCheck;
-        LOGGER.trace("time 5: " + two + "ms");*/
         Collections.sort(formGroups);// sort all the rows by ordinal
 
-        LOGGER.trace("group row size:" + formGroups.size());
         // suppose we have 3 rows of data from db, the orginal order is 0,1,2,
         // repetition model will submit row number in [ ] like the following:
         // 0,1,2.. consecutive numbers, means no row removed in between
         // 0,1,3,4.. the 2rd row is removed, 3 and 4 are new rows
-        int previous = -1;
+        // Additionally, walk parallely through both the created formGroups and dbGroups
+        // lists and set the editFlag member variable to DisplayItemGroupBean
+        // to tell OC what is new data and what data needs to be updated
         for (int j = 0; j < formGroups.size(); j++) {
             DisplayItemGroupBean formItemGroup = formGroups.get(j);
+
             LOGGER.trace("formGroup Ordinal:" + formItemGroup.getOrdinal());
-            // logger.debug("=== formGroup Ordinal:" + formItemGroup.getOrdinal());
-            // the below if loop addresses a specific problem with the repeating model
-            // if we cut a row out of a long list, the repeater returns double ordinals of another row
-            // and a second row gets deleted by mistake.
-            // tbh 08/2009
-            if (formItemGroup.getOrdinal() == previous) {
-                LOGGER.debug("found a match btw previous and ordinal");
-                formItemGroup.setEditFlag("edit");
-                formItemGroup.setOrdinal(previous + 1);
-                // dbGroups.get(j).setEditFlag("edit");
-            }
-            // << tbh 08/2009
+
+            //Ready new data group to be added or existing data edited, respectively
             if (formItemGroup.getOrdinal() > dbGroups.size() - 1) {
                 formItemGroup.setEditFlag("add");
-            } else {
-                for (int i = 0; i < dbGroups.size(); i++) {
-                    DisplayItemGroupBean dbItemGroup = dbGroups.get(i);
-                    if (formItemGroup.getOrdinal() == i) {
-                        // the first row is different, it could be blank on page
-                        // just for
-                        // display, so need to insert this row, not update
-                        if ("initial".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
-                            formItemGroup.setEditFlag("add");
-                        } else {
-                            dbItemGroup.setEditFlag("edit");
-                            // need to set up item data id in order to update
-                            for (DisplayItemBean dib : dbItemGroup.getItems()) {
-                                ItemDataBean data = dib.getData();
-                                for (DisplayItemBean formDib : formItemGroup.getItems()) {
-                                    if (formDib.getItem().getId() == dib.getItem().getId()) {
-                                        formDib.getData().setId(data.getId());
-                                        // this will save the data from IDE
-                                        // complete, used only for DDE
-                                        formDib.setDbData(dib.getData());
-                                        // tbh removed below line so as not to
-                                        // log so much, 112007
-                                        LOGGER.debug("+++ +++ form dib get data set id " + data.getId());
-                                        break;
-                                    }
+            } else { //match existing data with data from form to update at the correct position
+                DisplayItemGroupBean dbItemGroup = dbGroups.get(j);
+                if (formItemGroup.getOrdinal() == j) {
+                    // the first row is different, it could be blank on page
+                    // just for
+                    // display, so need to insert this row, not update
+                    if ("initial".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
+                        formItemGroup.setEditFlag("add");
+                    } else {
+                        dbItemGroup.setEditFlag("edit");
+                        // need to set up item data id in order to update
+                        for (DisplayItemBean dib : dbItemGroup.getItems()) {
+                            ItemDataBean data = dib.getData();
+                            for (DisplayItemBean formDib : formItemGroup.getItems()) {
+                                if (formDib.getItem().getId() == dib.getItem().getId()) {
+                                    formDib.getData().setId(data.getId());
+                                    // this will save the data from IDE
+                                    // complete, used only for DDE
+                                    formDib.setDbData(dib.getData());
+                                    // tbh removed below line so as not to
+                                    // log so much, 112007
+                                    LOGGER.debug("+++ +++ form dib get data set id " + data.getId());
+                                    break;
                                 }
                             }
+                        }
 
-                            formItemGroup.setEditFlag("edit");
-                        }// else
-                        break;
+                        formItemGroup.setEditFlag("edit");
                     }
                 }
-            } // else
-            previous = formItemGroup.getOrdinal();
+            }
 
         }
 
@@ -5811,6 +5657,18 @@ String tempKey = idb.getItemId()+","+idb.getOrdinal();
         }
 	}
 
+    /**
+     * Extracts the new data from FormProcessor by setting the temporary ordinals, auto member variable, and
+     * the DisplayItemBeans in the FormGroup object.
+     * @param fp
+     * @param igb
+     * @param i
+     * @param dibs
+     * @param digb
+     * @param formGroup
+     * @return null
+     *          Return null if there is no data at the expected ordinal within the FormProcessor object
+     */
 	private DisplayItemGroupBean processNewDataInRepeatingGroup(FormProcessor fp, ItemGroupBean igb, int i,
                                                                 List<DisplayItemBean> dibs, DisplayItemGroupBean digb, DisplayItemGroupBean formGroup ){
 
