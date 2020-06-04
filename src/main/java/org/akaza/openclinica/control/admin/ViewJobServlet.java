@@ -41,7 +41,6 @@ public class ViewJobServlet extends ScheduleJobServlet {
         }
         Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
         XsltTriggerService xsltTriggerSrvc = new XsltTriggerService();
-
         Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
         TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
 

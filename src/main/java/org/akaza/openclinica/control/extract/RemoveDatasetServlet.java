@@ -11,28 +11,28 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.core.Status;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DatasetRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.admin.ScheduleJobServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author thickerson
- *
- *
  */
-public class RemoveDatasetServlet extends SecureController {
+public class RemoveDatasetServlet extends ScheduleJobServlet {
 
     Locale locale;
 
@@ -49,7 +49,7 @@ public class RemoveDatasetServlet extends SecureController {
         DatasetDAO dsDAO = new DatasetDAO(sm.getDataSource());
         DatasetBean dataset = (DatasetBean) dsDAO.findByPK(dsId);
 
-        Study study = (Study)getStudyDao().findByPK(dataset.getStudyId());
+        Study study = (Study) getStudyDao().findByPK(dataset.getStudyId());
         checkRoleByUserAndStudy(ub, study);
         if (study != null && currentStudy != null && study.getStudyId() != currentStudy.getStudyId() && study.checkAndGetParentStudyId() != currentStudy.getStudyId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
@@ -58,13 +58,20 @@ public class RemoveDatasetServlet extends SecureController {
             return;
         }
 
-        if(!ub.isSysAdmin() && dataset.getOwnerId() != ub.getId()){
+        if (!ub.isSysAdmin() && dataset.getOwnerId() != ub.getId()) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));
             forwardPage(Page.MENU_SERVLET);
             return;
         }
 
+        // One of the scheduled jobs is using this dataset. Do not delete.
+        if (getSchduledJobsDatasetIds().contains(dsId)) {
+            addPageMessage(respage.getString("cannot_remove_dataset")
+                    + " " + respage.getString("contact_admin_to_remove"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
 
         String action = request.getParameter("action");
         if (resword.getString("remove_this_dataset").equalsIgnoreCase(action)) {
@@ -94,7 +101,7 @@ public class RemoveDatasetServlet extends SecureController {
             return;// TODO limit to owner only?
         }
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            ) {
+                ) {
             return;
         }
 
@@ -119,8 +126,8 @@ public class RemoveDatasetServlet extends SecureController {
         ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
 
         String[] columns =
-            { resword.getString("dataset_name"), resword.getString("description"), resword.getString("created_by"), resword.getString("created_date"),
-                resword.getString("status"), resword.getString("actions") };
+                {resword.getString("dataset_name"), resword.getString("description"), resword.getString("created_by"), resword.getString("created_date"),
+                        resword.getString("status"), resword.getString("actions")};
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(5);
         table.addLink(resword.getString("show_only_my_datasets"), "ViewDatasets?action=owner&ownerId=" + ub.getId());
@@ -129,6 +136,27 @@ public class RemoveDatasetServlet extends SecureController {
         table.setRows(datasetRows);
         table.computeDisplay();
         return table;
+    }
+
+    private List<Integer> getSchduledJobsDatasetIds() throws Exception {
+        List<Integer> datasetIds = new LinkedList<>();
+        ApplicationContext context = null;
+        scheduler = getScheduler();
+        try {
+            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
+        } catch (SchedulerException e) {
+            logger.error("Error in receiving application context: ", e);
+        }
+        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        XsltTriggerService xsltTriggerSrvc = new XsltTriggerService();
+        Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
+        TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
+
+        for (TriggerKey triggerKey : triggerKeys) {
+            Trigger trigger = jobScheduler.getTrigger(triggerKey);
+            datasetIds.add(trigger.getJobDataMap().getInt(DATASET_ID));
+        }
+        return datasetIds;
     }
 
 }
