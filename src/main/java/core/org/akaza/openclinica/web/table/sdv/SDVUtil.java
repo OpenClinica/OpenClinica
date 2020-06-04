@@ -8,6 +8,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +28,10 @@ import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.domain.xform.XformParserHelper;
+import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.controller.dto.SdvDTO;
 import org.akaza.openclinica.controller.dto.SdvItemDTO;
@@ -101,6 +105,8 @@ public class SDVUtil {
     @Autowired
     @Qualifier("eventCRFJDBCDao")
     private EventCRFDAO eventCrfDAO;
+    @Autowired
+    private XformParserHelper xformParserHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(SDVUtil.class);
     private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
@@ -1483,7 +1489,7 @@ public class SDVUtil {
                 sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
             else
                 sdvDTO.setSdvStatus(SdvStatus.NOT_VERIFIED.toString());
-            List<SdvItemDTO> sdvItemDTOS = new ArrayList<>();
+            Map<ItemData, SdvItemDTO> itemDataSdvItemMap = new HashMap<>();
             for (ItemData itemData : getItemDataDao().findByEventCrfId(eventCrf.getEventCrfId())) {
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_SINCE_VERIFIED)) {
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
@@ -1536,8 +1542,10 @@ public class SDVUtil {
                     sdvItemDTO.setOpenQueriesCount(discrepancyNoteDao.findNewOrUpdatedParentQueriesByItemData(itemData.getItemDataId(), 3).size());
                     sdvItemDTO.setOrdinal(itemData.getOrdinal());
                     ItemGroupMetadata itemGroupMetadata = itemGroupMetadataDao.findByItemId(itemData.getItem().getItemId());
-                    if (itemGroupMetadata != null)
+                    if (itemGroupMetadata != null) {
                         sdvItemDTO.setRepeatingGroup(itemGroupMetadata.isRepeatingGroup());
+                        sdvItemDTO.setItemGroupName(itemGroupMetadata.getItemGroup().getName());
+                    }
                     if (itemData.getDateUpdated() != null)
                         sdvItemDTO.setLastModifiedDate(itemData.getDateUpdated());
                     else
@@ -1549,21 +1557,18 @@ public class SDVUtil {
                     sdvItemDTO.setLastModifiedUserFirstName(itemUpdatedUserAccount.getFirstName());
                     sdvItemDTO.setLastModifiedUserLastName(itemUpdatedUserAccount.getLastName());
                     sdvItemDTO.setSdvStatus(getItemSdvStatus(eventCrf, itemData).toString());
-                    sdvItemDTOS.add(sdvItemDTO);
+                    itemDataSdvItemMap.put(itemData, sdvItemDTO);
                 }
             }
-            Collections.sort(sdvItemDTOS, new Comparator<SdvItemDTO>() {
-                @Override
-                public int compare(SdvItemDTO o1, SdvItemDTO o2) {
-                    return o1.getSdvStatus().compareTo(o2.getSdvStatus());
+            List<SdvItemDTO> orderedSdvItemDTOS = new ArrayList<>();
+            List<ItemData> xformOrderedItemDatas = xformParserHelper.getItemDatasInXformOrder(new ArrayList<>(itemDataSdvItemMap.keySet()), eventCrf.getFormLayout(), studyOID);
+
+            for(ItemData itemData: xformOrderedItemDatas){
+                if(itemDataSdvItemMap.get(itemData)!= null){
+                    orderedSdvItemDTOS.add(itemDataSdvItemMap.get(itemData));
                 }
-            }.thenComparing(new Comparator<SdvItemDTO>() {
-                @Override
-                public int compare(SdvItemDTO o1, SdvItemDTO o2) {
-                    return (-1) * (o1.getLastModifiedDate().compareTo(o2.getLastModifiedDate()));
-                }
-            }));
-            sdvDTO.setSdvItems(sdvItemDTOS);
+            }
+            sdvDTO.setSdvItems(orderedSdvItemDTOS);
             return sdvDTO;
         } else
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDYSUBJECT_STUDYEVENT_STUDYFORM_NOT_RELATED);

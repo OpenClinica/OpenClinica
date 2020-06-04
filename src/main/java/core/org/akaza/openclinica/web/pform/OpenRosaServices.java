@@ -311,7 +311,7 @@ public class OpenRosaServices {
             studyFilePath = study.getFilePath();
             LOGGER.info("From Database original studyFilePath is" + studyFilePath);
             do {
-                xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
+                xformOutput = xformParserHelper.getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
             LOGGER.info(" Final studyFilePath is" + studyFilePath);
@@ -550,7 +550,7 @@ public class OpenRosaServices {
             studyFilePath = study.getFilePath();
             LOGGER.info("From Database original studyFilePath is" + studyFilePath);
             do {
-                xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
+                xformOutput = xformParserHelper.getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
             LOGGER.info(" Final studyFilePath is" + studyFilePath);
@@ -1157,25 +1157,6 @@ public class OpenRosaServices {
         formLayoutDao.saveOrUpdate(formLayout);
     }
 
-    public String getXformOutput(String studyOID, int studyFilePath, String crfOID, String formLayoutOID, String flavor) throws IOException {
-        String xformOutput = "";
-        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, studyFilePath, crfOID, formLayoutOID);
-        File dir = new File(directoryPath);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX))
-                        || (flavor.equals(PARTICIPATE_FLAVOR) && child.getName().endsWith(PARTICIPATE_SUFFIX))
-                        || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX))) {
-                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                    break;
-                }
-            }
-        }
-        return xformOutput;
-    }
-
-
     @GET
     @Path("/{studyOID}/downloadUsers")
     
@@ -1200,34 +1181,9 @@ public class OpenRosaServices {
         return builder.build();
     }
 
-    public Html getHtml(FormLayout formLayout, String flavor,String studyOid ) throws Exception {
-        String xformOutput = "";
-        Study study =studyDao.findByOcOID(studyOid);
-        Study parentStudy= study.getStudy()!=null?study.getStudy():study;
-        int studyFilePath = parentStudy.getFilePath();
-        CrfBean crf = formLayout.getCrf();
-
-        do {
-            xformOutput = getXformOutput(parentStudy.getOc_oid(), studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
-            studyFilePath--;
-        } while (xformOutput.equals("") && studyFilePath > 0);
-        Html html = xformParser.unMarshall(xformOutput);
-
-        return html;
-    }
-
-
     public List<Bind> getBinds(FormLayout formLayout, String flavor, String studyOid) throws Exception {
-
-        Html html = getHtml(formLayout, flavor, studyOid);
-        Body body = html.getBody();
-        Head head = html.getHead();
-        Model model = head.getModel();
-
-        List<Bind> binds = model.getBind();
-        return binds;
+        return xformParserHelper.getBinds(formLayout, flavor, studyOid);
     }
-
     public boolean isFormContainsContactData(List<Bind> binds) {
         boolean formContainsContactData = false;
         for (Bind bind : binds) {
@@ -1240,7 +1196,7 @@ public class OpenRosaServices {
     }
 
     private String getCrossFormReferenceEvents(String formLayoutOID, String studyOID, String flavor, StudyEventDefinition sed, String studyEventRepeat) throws Exception {
-        Html html = getHtml(getFormLayout(formLayoutOID), flavor, studyOID);
+        Html html = xformParserHelper.getHtml(getFormLayout(formLayoutOID), flavor, studyOID);
         String crossformReferenceEvents = html.getHead().getCrossform_references();
 
         if (crossformReferenceEvents == null || crossformReferenceEvents.equals("")) {

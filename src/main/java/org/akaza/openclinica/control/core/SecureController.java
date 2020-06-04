@@ -1564,5 +1564,4 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      return  (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
 
  }
-
 }
