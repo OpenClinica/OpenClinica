@@ -177,14 +177,14 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         if(ecb.getSdvStatus() != null)
             variables.put(new Integer(17), ecb.getSdvStatus().toString());
         else
-            variables.put(new Integer(17), null);
+            variables.put(new Integer(17), new String(""));
         if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
             variables.put(new Integer(18), new Integer(ecb.getOldStatus().getId()));
         } else {
             variables.put(new Integer(18), new Integer(0));
         }
         // @pgawade 22-May-2011 added the sdv updater id variable
-        variables.put(new Integer(19), ecb.getSdvUpdateId());
+        variables.put(new Integer(19), new Integer(ecb.getSdvUpdateId()));
         // variables.put(new Integer(19), new Integer(ecb.getId()));
         variables.put(new Integer(20), new Integer(ecb.getFormLayoutId()));
         variables.put(new Integer(21), ecb.getWorkflowStatus().toString());
