@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.rule.FileUploadHelper;
 import core.org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
+import core.org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -36,6 +37,9 @@ import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.CsvFileConverterServiceImpl;
+import org.akaza.openclinica.service.ExcelFileConverterServiceImpl;
+import org.akaza.openclinica.service.SasFileConverterServiceImpl;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
@@ -1037,9 +1041,21 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 
 	public RestfulServiceHelper getRestfulServiceHelper() {
 		if(restfulServiceHelper == null) {
-			restfulServiceHelper = new RestfulServiceHelper(this.getSM().getDataSource(), getStudyBuildService(), getStudyDao());
+			restfulServiceHelper = new RestfulServiceHelper(this.getSM().getDataSource(), getStudyBuildService(), getStudyDao(), getSasFileConverterService(), getExcelFileConverterService(), getCsvFileConverterService());
 		}
 		return restfulServiceHelper;
+	}
+
+	protected SasFileConverterServiceImpl getSasFileConverterService(){
+		return (SasFileConverterServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("sasFileConverterService");
+	}
+
+	protected ExcelFileConverterServiceImpl getExcelFileConverterService(){
+		return (ExcelFileConverterServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("excelFileConverterService");
+	}
+
+	protected CsvFileConverterServiceImpl getCsvFileConverterService(){
+		return (CsvFileConverterServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("csvFileConverterService");
 	}
 
 	public void setRestfulServiceHelper(RestfulServiceHelper restfulServiceHelper) {
