@@ -42,6 +42,7 @@ import core.org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import core.org.akaza.openclinica.core.form.StringUtil;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -138,6 +139,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
     private EventCRFDAO eventCRFDAO;
+    private XformParserHelper xformParserHelper;
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -285,7 +287,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         }
 
         do {
-            xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOc_oid(), studyFilePath, crf.getOid(), formLayout.getOid(),QUERY_FLAVOR);
+            xformOutput = xformParserHelper.getXformOutput(parentStudyBean.getOc_oid(), studyFilePath, crf.getOid(), formLayout.getOid(),QUERY_FLAVOR);
             studyFilePath--;
         } while (xformOutput.equals("") && studyFilePath > 0);
 
@@ -378,6 +380,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
+        xformParserHelper = (XformParserHelper) SpringServletAccess.getApplicationContext(context).getBean("xformParserHelper");
         int noteId = fp.getInt(INPUT_NOTE_ID);
         int itemDataId = fp.getInt("itemDataId");
         String flavor = fp.getString(FLAVOR);

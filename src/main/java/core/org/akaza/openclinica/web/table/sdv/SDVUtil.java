@@ -28,6 +28,7 @@ import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
+import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.web.pform.OpenRosaServices;
@@ -105,7 +106,7 @@ public class SDVUtil {
     @Qualifier("eventCRFJDBCDao")
     private EventCRFDAO eventCrfDAO;
     @Autowired
-    private OpenRosaServices openRosaServices;
+    private XformParserHelper xformParserHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(SDVUtil.class);
     private final static String VIEW_ICON_FORSUBJECT_PREFIX = "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
@@ -1488,7 +1489,7 @@ public class SDVUtil {
                 sdvDTO.setSdvStatus(eventCrf.getSdvStatus().toString());
             else
                 sdvDTO.setSdvStatus(SdvStatus.NOT_VERIFIED.toString());
-            List<SdvItemDTO> sdvItemDTOS = new ArrayList<>();
+            Map<ItemData, SdvItemDTO> itemDataSdvItemMap = new HashMap<>();
             for (ItemData itemData : getItemDataDao().findByEventCrfId(eventCrf.getEventCrfId())) {
                 if (!changedAfterSdvOnlyFilter || getItemSdvStatus(eventCrf, itemData).equals(SdvStatus.CHANGED_SINCE_VERIFIED)) {
                     SdvItemDTO sdvItemDTO = new SdvItemDTO();
@@ -1556,49 +1557,16 @@ public class SDVUtil {
                     sdvItemDTO.setLastModifiedUserFirstName(itemUpdatedUserAccount.getFirstName());
                     sdvItemDTO.setLastModifiedUserLastName(itemUpdatedUserAccount.getLastName());
                     sdvItemDTO.setSdvStatus(getItemSdvStatus(eventCrf, itemData).toString());
-                    sdvItemDTOS.add(sdvItemDTO);
+                    itemDataSdvItemMap.put(itemData, sdvItemDTO);
                 }
             }
             List<SdvItemDTO> orderedSdvItemDTOS = new ArrayList<>();
-            List<Bind> binds;
-            try {
-                binds = openRosaServices.getBinds(eventCrf.getFormLayout(), "", studyOID);
-                binds.forEach(bind ->  {if(bind.getItemGroup() == null) bind.setItemGroup(""); });
-                Map<String, List<Bind>> bindGroupMap = binds.stream().filter(bind -> bind.getItemGroup() != null).collect(Collectors.groupingBy(Bind::getItemGroup));
-                Map<String, SdvItemDTO> itemLabelAndGroupNameMap = sdvItemDTOS.stream().collect(Collectors.toMap(e -> itemLabelAndGroupNameMapKeyGenerator(e), e -> e));
-                Set<String> repeatingItemGroupsSet = itemLabelAndGroupNameMap.keySet().stream().filter(key -> key.split("/").length > 2)
-                                                        .map(key -> key.split("/")[1]).collect(Collectors.toCollection(HashSet::new));
-                for(int i = 0; i < binds.size(); i++){
-                    String key = bindItemKeyGenerator(binds.get(i));
-                    String itemGroupName = binds.get(i).getItemGroup();
-                    if(itemLabelAndGroupNameMap.get(key) != null){
-                        orderedSdvItemDTOS.add(itemLabelAndGroupNameMap.get(key));
-                        itemLabelAndGroupNameMap.remove(key);
-                    }
-                    else if(repeatingItemGroupsSet.contains(itemGroupName)){
-                        //repeatingGroup
-                        List<Bind> repeatingGroupBindList = bindGroupMap.get(itemGroupName);
-                        for(int j =1; j<= itemLabelAndGroupNameMap.size();j++){
-                            key = j+"/";
-                            boolean itemOrdinalFound = false;
-                            for(Bind bind : repeatingGroupBindList){
-                                String repeatingGroupKey = key + bindItemKeyGenerator(bind);
-                                if(itemLabelAndGroupNameMap.get(repeatingGroupKey) != null)
-                                {
-                                    itemOrdinalFound = true;
-                                    orderedSdvItemDTOS.add(itemLabelAndGroupNameMap.get(repeatingGroupKey));
-                                    itemLabelAndGroupNameMap.remove(repeatingGroupKey);
-                                }
-                            }
-                            if(!itemOrdinalFound)
-                                break;
-                        }
-                        repeatingItemGroupsSet.remove(itemGroupName);
-                    }
-                }
+            List<ItemData> xformOrderedItemDatas = xformParserHelper.getItemDatasInXformOrder(new ArrayList<>(itemDataSdvItemMap.keySet()), eventCrf.getFormLayout(), studyOID);
 
-            }catch (Exception e){
-                orderedSdvItemDTOS = sdvItemDTOS;
+            for(ItemData itemData: xformOrderedItemDatas){
+                if(itemDataSdvItemMap.get(itemData)!= null){
+                    orderedSdvItemDTOS.add(itemDataSdvItemMap.get(itemData));
+                }
             }
             sdvDTO.setSdvItems(orderedSdvItemDTOS);
             return sdvDTO;
@@ -1606,23 +1574,6 @@ public class SDVUtil {
             throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDYSUBJECT_STUDYEVENT_STUDYFORM_NOT_RELATED);
     }
 
-    private String bindItemKeyGenerator(Bind bind){
-        String nodeSet = bind.getNodeSet();
-        int sepPos = nodeSet.lastIndexOf("/");
-        String itemName = nodeSet.substring(sepPos+1,nodeSet.length());
-        String itemGroupName = bind.getItemGroup();
-        String key = itemGroupName +"/"+ itemName;
-        return  key;
-    }
-    private static String itemLabelAndGroupNameMapKeyGenerator(SdvItemDTO sdvItemDTO){
-        String key ="";
-        if(sdvItemDTO.isRepeatingGroup()) {
-            key = sdvItemDTO.getOrdinal()+"/";
-        }
-        String groupName = sdvItemDTO.getItemGroupName() == null ? "" : sdvItemDTO.getItemGroupName();
-        key += groupName +"/"+ sdvItemDTO.getName();
-        return key;
-    }
     private SdvStatus getItemSdvStatus(EventCrf eventCrf, ItemData itemData) {
         if(eventCrf.getSdvStatus() == null)
             return SdvStatus.NOT_VERIFIED;
