@@ -11,7 +11,6 @@ import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.extract.DatasetBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -27,7 +26,6 @@ import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.bean.DatasetRow;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -201,7 +199,7 @@ public class ViewDatasetsServlet extends SecureController {
      * Initialize data of a DatasetBean and set session attributes for
      * displaying selected data of this DatasetBean
      *
-     * @param db
+     * @param datasetId
      * @return
      *
      */
