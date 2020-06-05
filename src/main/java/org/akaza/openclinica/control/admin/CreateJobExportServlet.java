@@ -208,6 +208,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_UUID, jobUuid);
                 trigger.getJobDataMap().put(XsltTriggerService.CREATED_DATE, dateCreated);
                 trigger.getJobDataMap().put(XsltTriggerService.NUMBER_OF_FILES_TO_SAVE, numberOfFilesToSave);
+                trigger.getJobDataMap().put(XsltTriggerService.USER_ID, userBean.getId());
 
                 JobDetailFactoryBean jobDetailFactoryBean = new JobDetailFactoryBean();
                 jobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
