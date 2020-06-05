@@ -68,7 +68,7 @@ public class AuditEventCrfAspect {
     public boolean areEventCrfStatusesTheSame(EventCrf eventCrf, EventCrf existingEventCrf){
         if (!existingEventCrf.getWorkflowStatus().equals(eventCrf.getWorkflowStatus())){
             return false;}
-        if (!existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus())){
+        if (existingEventCrf.getSdvStatus() != null && eventCrf.getSdvStatus() != null && !existingEventCrf.getSdvStatus().equals(eventCrf.getSdvStatus())){
             return false;}
         if (existingEventCrf.getArchived() != null && eventCrf.getArchived() != null && !existingEventCrf.getArchived().equals(eventCrf.getArchived())){
             return false;}
