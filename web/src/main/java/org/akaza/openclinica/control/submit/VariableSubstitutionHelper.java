@@ -75,6 +75,8 @@ public class VariableSubstitutionHelper {
         }
         else tokensMap.put("studySubjectOID", "");
         tokensMap.put("studyName", encode(study.getName()));
+        // FR:2020-06-05 - Added Studyuid
+        tokensMap.put("studyUid", encode(study.getIdentifier()));
         tokensMap.put("eventName", encode(eventDef.getName()));
         if (event == null) tokensMap.put("eventOrdinal", "");
         else tokensMap.put("eventOrdinal", encode(Integer.toString(event.getSampleOrdinal())));
