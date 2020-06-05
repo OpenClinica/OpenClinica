@@ -577,11 +577,13 @@ public class UserServiceImpl implements UserService {
     private boolean sendSMSToParticipant(String accessToken, OCParticipantDTO participantDTO, Study tenantStudy, ParticipantAccessDTO accessDTO) {
         String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
 
-        StringBuffer buffer = new StringBuffer("Hi ").append(participantDTO.getFirstName())
+        StringBuffer buffer1 = new StringBuffer("Hi ").append(participantDTO.getFirstName())
                 .append(", Thanks for participating in ").append(studyName).append("! ")
-                .append("Please follow the link below to get started. ").append(System.lineSeparator())
-                .append("For future reference, your access code is ").append(accessDTO.getAccessCode())
-                .append(System.lineSeparator()).append(accessDTO.getAccessLink());
+                .append("Please follow the link below to get started. ");
+
+        StringBuffer buffer2 = new StringBuffer(accessDTO.getAccessLink()).append(System.lineSeparator())
+                .append("For future reference, your access code is ")
+                .append(accessDTO.getAccessCode());
 
 
         RestTemplate restTemplate = new RestTemplate();
@@ -591,14 +593,24 @@ public class UserServiceImpl implements UserService {
         objectMapper.registerModule(new JavaTimeModule());
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
-        OCMessageDTO messageDTO = new OCMessageDTO();
-        messageDTO.setReceiverPhone(StringUtils.remove(participantDTO.getPhoneNumber(), " "));
-        messageDTO.setMessage(buffer.toString());
-        HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
+        OCMessageDTO messageDTO1 = new OCMessageDTO();
+        messageDTO1.setReceiverPhone(StringUtils.remove(participantDTO.getPhoneNumber(), " "));
+        messageDTO1.setMessage(buffer1.toString());
+        HttpEntity<OCMessageDTO> request1 = new HttpEntity<>(messageDTO1, headers);
+
+        OCMessageDTO messageDTO2 = new OCMessageDTO();
+        messageDTO2.setReceiverPhone(StringUtils.remove(participantDTO.getPhoneNumber(), " "));
+        messageDTO2.setMessage(buffer2.toString());
+        HttpEntity<OCMessageDTO> request2 = new HttpEntity<>(messageDTO2, headers);
 
         ResponseEntity<String> result = null;
         try {
-            result = restTemplate.postForEntity(messageServiceUri, request, String.class);
+            result = restTemplate.postForEntity(messageServiceUri, request1, String.class);
+            if(result.getStatusCode() != HttpStatus.OK){
+                logger.error("sendMessage failed with :" + result.getStatusCode());
+                return false;
+            }
+            result = restTemplate.postForEntity(messageServiceUri, request2, String.class);
         } catch (RestClientException e) {
             logger.error("sendMessage failed with :" + e);
             return false;
@@ -607,6 +619,7 @@ public class UserServiceImpl implements UserService {
             logger.error("sendMessage failed with :" + result.getStatusCode());
             return false;
         }
+
         return true;
     }
 
