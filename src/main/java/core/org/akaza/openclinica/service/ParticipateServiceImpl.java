@@ -18,6 +18,7 @@ import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.ocobserver.StudyEventChangeDetails;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
@@ -93,6 +94,8 @@ public class ParticipateServiceImpl implements ParticipateService {
     @Qualifier("eventCRFJDBCDao")
     private EventCRFDAO eventCrfDAO;
 
+    @Autowired
+    private XformParserHelper xformParserHelper;
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
     public static final String PARTICIPATE_EDIT = "participate-edit";
@@ -203,7 +206,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                         if (validStatus) {
                             String formUrl = null;
                             FormLayout fl = formLayoutDao.findById(formLayout.getId());
-                            List<Bind> binds = openRosaServices.getBinds(fl,PARTICIPATE_FLAVOR,studyOID);
+                            List<Bind> binds = xformParserHelper.getBinds(fl,PARTICIPATE_FLAVOR,studyOID);
                             if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
                                 formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
                             }else {
@@ -292,7 +295,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         Study study = studyDao.findById(crfBean.getStudyId());
         List<Bind> binds=null;
         try {
-             binds = openRosaServices.getBinds(fl, PARTICIPATE_FLAVOR, study.getOc_oid());
+             binds = xformParserHelper.getBinds(fl, PARTICIPATE_FLAVOR, study.getOc_oid());
         }catch(Exception e){
             logger.debug(e.getMessage());
         }

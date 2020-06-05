@@ -3,6 +3,7 @@ package org.akaza.openclinica.domain.enumsupport;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -14,6 +15,11 @@ public enum StudyEventWorkflowStatusEnum {
 
     public String getDisplayValue() {
         ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
+        return resterm.getString(this.toString().toLowerCase());
+    }
+
+    public String getEnglishDisplayValue() {
+        ResourceBundle resterm = ResourceBundleProvider.getTermsBundle(Locale.ENGLISH);
         return resterm.getString(this.toString().toLowerCase());
     }
 

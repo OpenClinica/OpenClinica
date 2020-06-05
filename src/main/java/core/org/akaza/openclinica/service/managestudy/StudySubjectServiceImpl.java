@@ -339,17 +339,7 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                 // System.out.println("edc.isDoubleEntry()" +
                 // edc.isDoubleEntry() + ecb.getId());
                 dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
-
-                if (dec.isLocked()) {
-                    // System.out.println("*** found a locked DEC:
-                    // "+edc.getCrfName());
-                }
-                ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
-                if (!idata.isEmpty()) {
-                    // consider an event crf started only if item data get
-                    // created
-                    answer.add(dec);
-                }
+                answer.add(dec);
             }
         }
         return answer;
