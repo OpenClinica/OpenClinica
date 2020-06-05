@@ -1489,9 +1489,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
             }
             eventDiv.br().bold().append(eventStatus.getDisplayValue()).br();
-            if (studyEvents.size() > 0 && studyEvents.get(0).getDateStarted() != null) {
-                eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
-            }
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
             linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
