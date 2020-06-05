@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller.helper;
 
+import com.google.common.io.Files;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
@@ -14,6 +15,9 @@ import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
+import org.akaza.openclinica.service.CsvFileConverterServiceImpl;
+import org.akaza.openclinica.service.ExcelFileConverterServiceImpl;
+import org.akaza.openclinica.service.SasFileConverterServiceImpl;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.http.HttpEntity;
@@ -28,9 +32,12 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,14 +56,17 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
+@Configurable
 @Service("serviceHelper")
 public class RestfulServiceHelper {
 	
 	private final static Logger log = LoggerFactory.getLogger("RestfulServiceHelper");
 	
 	//CSV file header
-	private static final String ParticipantID_header = "ParticipantID";
-
+	private static final String SAS_FILE_EXTENSION = "sas7bdat";
+	private static final String XLSX_FILE_EXTENSION = "xlsx";
+	private static final String CSV_FILE_EXTENSION = "csv";
+	private static final String TXT_FILE_EXTENSION = "txt";
 
 	private DataSource dataSource;
 	private StudyDao studyDao;
@@ -64,11 +74,32 @@ public class RestfulServiceHelper {
 	private UserAccountDAO userAccountDAO;
 	private PipeDelimitedDataHelper importDataHelper;
 	private MessageLogger messageLogger;
+	private SasFileConverterServiceImpl sasFileConverterService;
+	private ExcelFileConverterServiceImpl excelFileConverterService;
+	private CsvFileConverterServiceImpl csvFileConverterService;
+
+	public RestfulServiceHelper() {
+
+	}
 
 	public RestfulServiceHelper(DataSource dataSource, StudyBuildService studyBuildService, StudyDao studyDao) {
 		this.dataSource = dataSource;
 		this.studyBuildService = studyBuildService;
 		this.studyDao = studyDao;
+	}
+
+	public RestfulServiceHelper(DataSource dataSource,
+															StudyBuildService studyBuildService,
+															StudyDao studyDao,
+															SasFileConverterServiceImpl sasFileConverterService,
+															ExcelFileConverterServiceImpl excelFileConverterService,
+															CsvFileConverterServiceImpl csvFileConverterService) {
+		this.dataSource = dataSource;
+		this.studyBuildService = studyBuildService;
+		this.studyDao = studyDao;
+		this.sasFileConverterService = sasFileConverterService;
+		this.excelFileConverterService = excelFileConverterService;
+		this.csvFileConverterService = csvFileConverterService;
 	}
 
 	/**
@@ -285,13 +316,12 @@ public class RestfulServiceHelper {
 	  		String logFileName = null;	 	 	 	
 	  		logFileName =   (String) request.getAttribute("logFileName");
 	 	 	    
-		  	int i = 1;	  		
+		  	int i = 1;
 	 		for (File file : files) {
 	 			// skip mapping file
 	 			if(file.getName().toLowerCase().endsWith(".properties")) {
-	 				;
 	 			}else {
-	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
+	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(mappingFile, file,studyOID);
 	 				
 	 				Iterator dataFilesIt = dataFileList.iterator();
 	 				File rowFile = null;
@@ -453,11 +483,11 @@ public class RestfulServiceHelper {
 	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
-	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
+	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(mappingFile, file, studyOID);
 	 				
 	 				 // prepare log file
 	 	 	 	 	String logFileName = null;
-	 	 	 	 	logFileName = buildLogFileName(file.getName()); 
+	 	 	 	 	logFileName = buildLogFileName(file.getName());
 	 	 	 	    this.getImportDataHelper().copyMappingFileToLogFile(mappingFile, logFileName,request);
 	 	 	 	    request.setAttribute("logFileName", logFileName);
 	 	 	 	    
@@ -583,7 +613,28 @@ public class RestfulServiceHelper {
 	 		return importCRFInfoSummary;
 	  }
 
-	    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file,String studyOID) {
+	    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File mappingFile, File dataFile, String studyOID) throws IOException, OpenClinicaException {
+	 		String importFileDir = this.getImportDataHelper().getImportFileDir(studyOID);
+	 		String fileType = Files.getFileExtension(dataFile.getAbsolutePath());
+	 		if (fileType.equals(SAS_FILE_EXTENSION)) {
+	 			// convert sas to pipe-delimited
+				dataFile = sasFileConverterService.convert(dataFile);
+			} else if (fileType.equals(XLSX_FILE_EXTENSION)) {
+	 			// convert xlsx to pipe-delimited
+				dataFile = excelFileConverterService.convert(dataFile);
+			} else if (fileType.equals(CSV_FILE_EXTENSION)) {
+				// convert csv to pipe-delimited
+				dataFile = csvFileConverterService.convert(dataFile);
+			} else if (fileType.equals(TXT_FILE_EXTENSION)) {
+				Properties mappingProperties = readMappingProperties(mappingFile);
+				String delimiter = mappingProperties.getProperty(PipeDelimitedDataHelper.DELIMITER_PROPERTY);
+				if (delimiter != null) {
+					if (delimiter.length() != 1) {
+						throw new OpenClinicaException("Invalid delimiter character", ErrorConstants.INVALID_DELIMITER);
+					}
+					dataFile = csvFileConverterService.convert(dataFile, delimiter.charAt(0));
+				}
+			}
 			ArrayList<File> fileList = new ArrayList<>();
 		    BufferedReader reader;
 		    
@@ -591,11 +642,10 @@ public class RestfulServiceHelper {
 	            int count =1;	    	
 		    		    	
 		    	File splitFile;
-		    	String importFileDir = this.getImportDataHelper().getImportFileDir(studyOID);
 		    	
-		    	reader = new BufferedReader(new FileReader(file));
+		    	reader = new BufferedReader(new FileReader(dataFile));
 		    	
-		    	String orginalFileName = file.getName();
+		    	String orginalFileName = dataFile.getName();
 		    	int pos = orginalFileName.indexOf(".");
 		    	if(pos > 0) {
 		    		orginalFileName = orginalFileName.substring(0,pos);
@@ -716,7 +766,7 @@ public class RestfulServiceHelper {
 		public String buildLogFileName(String originalFileName) {
 			String logFileName = null;
 			if(originalFileName !=null) {	            	
-				originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf(".txt"));
+				originalFileName = Files.getNameWithoutExtension(originalFileName);
 			}
 
 			Date now = new Date();	
@@ -725,5 +775,11 @@ public class RestfulServiceHelper {
 			logFileName =originalFileName+"_"+ timeStamp+"_log.txt";
 						
 			return logFileName;
+		}
+
+		private Properties readMappingProperties(File mappingFile) throws IOException {
+			Properties mappingProperties = new Properties();
+			mappingProperties.load(new FileReader(mappingFile));
+			return mappingProperties;
 		}
 }

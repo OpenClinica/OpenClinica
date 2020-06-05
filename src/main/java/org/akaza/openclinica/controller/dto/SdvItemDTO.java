@@ -15,6 +15,7 @@ public class SdvItemDTO {
     private Date lastModifiedDate;
     private boolean lastModifiedDateHasOnlyDate;
     private String lastModifiedUserName;
+    private String itemGroupName;
     private String lastModifiedUserFirstName;
     private String lastModifiedUserLastName;
     private String sdvStatus;
@@ -155,5 +156,13 @@ public class SdvItemDTO {
 
     public void setOpenQueriesCount(int openQueriesCount) {
         this.openQueriesCount = openQueriesCount;
+    }
+
+    public String getItemGroupName() {
+        return itemGroupName;
+    }
+
+    public void setItemGroupName(String itemGroupName) {
+        this.itemGroupName = itemGroupName;
     }
 }

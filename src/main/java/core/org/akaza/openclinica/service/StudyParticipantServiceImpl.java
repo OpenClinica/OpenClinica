@@ -4,6 +4,7 @@ package core.org.akaza.openclinica.service;
 import core.org.akaza.openclinica.bean.core.Role;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
+import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import core.org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
@@ -108,6 +109,10 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 
     @Autowired
     private StudyDao studyDao;
+
+    @Autowired
+    private XformParserHelper xformParserHelper;
+
     private StudySubjectDAO studySubjectDao;
     private SubjectDAO subjectDao;  
 
@@ -482,7 +487,7 @@ public class StudyParticipantServiceImpl implements StudyParticipantService {
 					        Role role = Role.RESEARCHASSISTANT;
 					        String mode = EnketoAPI.VIEW_MODE;
 					        
-							List<Bind> binds = openRosaServices.getBinds(formLayout,EnketoAPI.QUERY_FLAVOR,studyOID);
+							List<Bind> binds = xformParserHelper.getBinds(formLayout,EnketoAPI.QUERY_FLAVOR,studyOID);
 					        boolean formContainsContactData=false;
 					        if(openRosaServices.isFormContainsContactData(binds))
 					            formContainsContactData=true;

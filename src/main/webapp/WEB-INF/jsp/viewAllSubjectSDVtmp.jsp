@@ -497,9 +497,6 @@
                 $('#formStatus').text(data.formStatus);
                 $('#sdvStatus').text(translate(data.sdvStatus));
 
-                data.sdvItems.sort(function(a, b) {
-                    return a.itemId - b.itemId;
-                });
                 itemsTable.rows.add(data.sdvItems.map(function (item) {
                     item.descName = (item.briefDescription || item.label || '') + ' (' + item.name + ')';
                     if (item.repeatingGroup) {

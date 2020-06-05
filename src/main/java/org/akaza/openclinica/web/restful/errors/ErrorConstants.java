@@ -60,6 +60,8 @@ public class ErrorConstants {
     public static final String ERR_START_DATE = "errorCode.startDateError";
     public static final String ERR_PARSE_DATE = "errorCode.dateParsedError";
 
+    public static final String INVALID_DELIMITER = "errorCode.invalidDelimiter";
+
     public static final String ERR_END_DATE_BEFORE_START_DATE = "errorCode.endDateBeforeStartDate";
     public static final String ERR_STUDY_LOCKED = "errorCode.studyLocked";
 
