@@ -75,11 +75,33 @@ public class VariableSubstitutionHelper {
         }
         else tokensMap.put("studySubjectOID", "");
         tokensMap.put("studyName", encode(study.getName()));
+        // FR:2020-06-05 - Added Studyuid
+        tokensMap.put("studyUid", encode(study.getIdentifier()));
         tokensMap.put("eventName", encode(eventDef.getName()));
         if (event == null) tokensMap.put("eventOrdinal", "");
         else tokensMap.put("eventOrdinal", encode(Integer.toString(event.getSampleOrdinal())));
         tokensMap.put("crfName", encode(section.getCrf().getName()));
         tokensMap.put("crfVersion", encode(section.getCrfVersion().getName()));
+
+		// FR:2019-02-20
+		// event status as code and status name
+		if (event == null) {
+			tokensMap.put("subjectEventStatusCode", "");
+			tokensMap.put("subjectEventStatus", "");
+		} else {
+			tokensMap.put("subjectEventStatusCode", encode(Integer.toString(event.getSubjectEventStatus().getId())));
+			tokensMap.put("subjectEventStatus", encode(event.getSubjectEventStatus().getName()));
+		}
+
+		// FR:2019-02-20
+		// crf status as code and status name
+		if (section.getCrf().getStatus() == null) {
+			tokensMap.put("crfStatusCode", "");
+			tokensMap.put("crfStatus", "");
+		} else {
+			tokensMap.put("crfStatusCode", encode(Integer.toString(section.getCrf().getStatus().getId())));
+			tokensMap.put("crfStatus", encode(section.getCrf().getStatus().getName()));
+		}
 
         // Render a set of "item['ITEM_NAME']" tokens for existing item data
         for (ItemBean item : items) {
