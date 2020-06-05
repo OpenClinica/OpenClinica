@@ -329,7 +329,8 @@ public class KafkaService {
         formChangeDTO.setFormCreatedDate(eventCrf.getDateCreated().toString());
         formChangeDTO.setFormUpdatedDate(eventCrf.getDateUpdated().toString());
         formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().getEnglishDisplayValue());
-        formChangeDTO.setFormSdvStatus(eventCrf.getSdvStatus().getEnglishDisplayValue());
+        if (eventCrf.getSdvStatus() != null){
+        formChangeDTO.setFormSdvStatus(eventCrf.getSdvStatus().getEnglishDisplayValue());}
         if (eventCrf.getRemoved() != null){
         formChangeDTO.setFormRemoved(eventCrf.getRemoved().toString());}
         if (eventCrf.getArchived() != null){
