@@ -46,7 +46,6 @@
                     name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
             </td>
-
             <c:if test="${userRole.manageStudy && study.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true}">
                 <td>
                     <c:choose>
