@@ -128,6 +128,7 @@ public class DiscrepancyNoteUtil {
         for (DisplayStudyEventBean dStudyEventBean : displayStudyBeans) {
             studyEventBean = dStudyEventBean.getStudyEvent();
             // All EventCRFs for a study event
+            eventCrfDAO = new EventCRFDAO(dataSource);
             eventCRFBeans = eventCrfDAO.findAllByStudyEvent(studyEventBean);
 
             for (EventCRFBean eventCrfBean : eventCRFBeans) {
