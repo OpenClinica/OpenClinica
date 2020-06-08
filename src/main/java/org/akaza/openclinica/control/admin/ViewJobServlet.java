@@ -90,7 +90,7 @@ public class ViewJobServlet extends ScheduleJobServlet {
 
         ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
         EntityBeanTable table = fp.getEntityBeanTable();
-        table.setSortingIfNotExplicitlySet(0, false); // sort by name
+        table.setSortingIfNotExplicitlySet(0, true); // sort by name
         String[] columns =
                 {resword.getString("name"), resword.getString("previous_fire_time"), resword.getString("next_fire_time"), resword.getString("description"),
                         resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"), resword.getString("actions")};
