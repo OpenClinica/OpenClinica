@@ -1486,7 +1486,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         if (!sed.isRepeating()) {
             if (studyEvents.size() > 0 && studyEvents.get(0).getDateStarted() != null) {
-                eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
+                eventDiv.br().bold().append(formatDate(studyEvents.get(0).getDateStarted())).boldEnd();
             }
             eventDiv.br().bold().append(eventStatus.getDisplayValue()).br();
             eventDiv.tdEnd();
