@@ -570,14 +570,6 @@ public class XsltTransformJob extends QuartzJobBean {
             postErrorMessage(e.getMessage(), context);
             logger.error("Error executing extract", e);
             exceptions = true;
-        } catch (NullPointerException e) {
-            sendErrorEmail(e.getMessage() + " for " + jobName, context, alertEmail);
-            postErrorMessage(e.getMessage(), context);
-            logger.error("Error executing extract for " + jobName, e);
-            exceptions = true;
-            archivedDatasetFileBean.setStatus("FAILED");
-            archivedDatasetFileDao.update(archivedDatasetFileBean);
-
         } catch (Exception ee) {
             sendErrorEmail(ee.getMessage() + " for " + jobName, context, alertEmail);
             postErrorMessage(ee.getMessage(), context);

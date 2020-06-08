@@ -124,7 +124,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
     }
 
     public HashMap setRoleTypesExpected() {
-        this.unsetTypeExpected();
         HashMap roleTypes = new HashMap();
         // assuming select star from study_user_role
         roleTypes.put(1, TypeNames.STRING);
