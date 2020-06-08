@@ -119,7 +119,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
     /**
      * This is the method added to cache the queries
-     * 
+     *
      * @param cache
      */
     public void setCache(final EhCacheWrapper cache) {
@@ -198,6 +198,10 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     }
 
     public ArrayList<V> select(String query, HashMap variables) {
+        return select(query, variables, setTypes);
+    }
+
+    public ArrayList<V> select(String query, HashMap variables, HashMap setTypes) {
         clearSignals();
 
         ArrayList results = new ArrayList();
@@ -222,8 +226,11 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
             {
                 rs = ps.executeQuery();
-                results = this.processResultRows(rs);
-
+                if (setTypes != null) {
+                    results = this.processResultRows(rs, setTypes);
+                } else {
+                    results = this.processResultRows(rs);
+                }
             }
 
             // if (logger.isInfoEnabled()) {
@@ -337,8 +344,8 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
      *
      * @param query
      *            a static SQL statement which updates or inserts.
-     * 
-     * 
+     *
+     *
      */
 
     public void execute(String query) {
@@ -553,7 +560,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
      * Currently, latestPK is set only in executeWithPK() after inserting has been executed successfully. So, this
      * method should be called only immediately
      * after executeWithPK()
-     * 
+     *
      * @return ywang 11-26-2007
      */
     protected int getLatestPK() {
@@ -564,7 +571,11 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         logger.debug(message);
     }
 
-    public ArrayList processResultRows(ResultSet rs) {// throws SQLException
+    public ArrayList processResultRows(ResultSet rs) {
+        return processResultRows(rs, setTypes);
+    }
+
+    public ArrayList processResultRows(ResultSet rs, HashMap setTypes) {// throws SQLException
         ArrayList al = new ArrayList();
         HashMap hm;
 

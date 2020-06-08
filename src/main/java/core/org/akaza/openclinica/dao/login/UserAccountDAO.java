@@ -123,17 +123,18 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     }
 
-    public void setRoleTypesExpected() {
-        this.unsetTypeExpected();
+    public HashMap setRoleTypesExpected() {
+        HashMap roleTypes = new HashMap();
         // assuming select star from study_user_role
-        this.setTypeExpected(1, TypeNames.STRING);
-        this.setTypeExpected(2, TypeNames.INT);
-        this.setTypeExpected(3, TypeNames.INT);
-        this.setTypeExpected(4, TypeNames.INT);
-        this.setTypeExpected(5, TypeNames.DATE);
-        this.setTypeExpected(6, TypeNames.DATE);
-        this.setTypeExpected(7, TypeNames.INT);
-        this.setTypeExpected(8, TypeNames.STRING);
+        roleTypes.put(1, TypeNames.STRING);
+        roleTypes.put(2, TypeNames.INT);
+        roleTypes.put(3, TypeNames.INT);
+        roleTypes.put(4, TypeNames.INT);
+        roleTypes.put(5, TypeNames.DATE);
+        roleTypes.put(6, TypeNames.DATE);
+        roleTypes.put(7, TypeNames.INT);
+        roleTypes.put(8, TypeNames.STRING);
+        return roleTypes;
     }
 
     private void setPasswordTypesExpected() {
@@ -902,12 +903,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
     }
 
     public Collection findAllRolesByUserName(String userName) {
-        this.setRoleTypesExpected();
+        HashMap setTypes = this.setRoleTypesExpected();
         ArrayList answer = new ArrayList();
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), userName);
-        ArrayList alist = this.select(digester.getQuery("findAllRolesByUserName"), variables);
+        ArrayList alist = this.select(digester.getQuery("findAllRolesByUserName"), variables, setTypes);
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             StudyUserRoleBean surb = this.getRoleFromHashMap((HashMap) it.next());
@@ -917,14 +918,14 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return answer;
     }
     
-    public Collection findAllRolesByUserNameAndStudyOid(String userName,String studyOid) {
-        this.setRoleTypesExpected();
+    public Collection findAllRolesByUserNameAndStudyOid(String userName, String studyOid) {
+        HashMap setTypes = this.setRoleTypesExpected();
         ArrayList answer = new ArrayList();
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), userName);
         variables.put(new Integer(2), studyOid);
-        ArrayList alist = this.select(digester.getQuery("findAllRolesByUserNameAndStudyOid"), variables);
+        ArrayList alist = this.select(digester.getQuery("findAllRolesByUserNameAndStudyOid"), variables, setTypes);
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             StudyUserRoleBean surb = this.getRoleFromHashMap((HashMap) it.next());
@@ -961,7 +962,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
      * @param studyId
      */
     public ArrayList findAllUsersByStudyIdAndLimit(int studyId, boolean isLimited) {
-        this.setRoleTypesExpected();
+        HashMap setTypes = this.setRoleTypesExpected();
         ArrayList answer = new ArrayList();
 
         HashMap variables = new HashMap();
@@ -969,9 +970,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(2), new Integer(studyId));
         ArrayList alist = null;
         if (isLimited) {
-            alist = this.select(digester.getQuery("findAllByStudyIdAndLimit"), variables);
+            alist = this.select(digester.getQuery("findAllByStudyIdAndLimit"), variables, setTypes);
         } else {
-            alist = this.select(digester.getQuery("findAllByStudyId"), variables);
+            alist = this.select(digester.getQuery("findAllByStudyId"), variables, setTypes);
         }
         Iterator it = alist.iterator();
         while (it.hasNext()) {
@@ -1168,17 +1169,17 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     public int findRoleCountByUserNameAndStudyId(String userName, int studyId, int childStudyId) {
 
-        this.setRoleTypesExpected();
+        HashMap setTypes = this.setRoleTypesExpected();
         HashMap variables = new HashMap();
         variables.put(new Integer(1), userName);
         variables.put(new Integer(2), studyId);
 
         ArrayList alist = new ArrayList();
         if (childStudyId == 0) {
-            alist = this.select(digester.getQuery("findRoleCountByUserNameAndStudyId"), variables);
+            alist = this.select(digester.getQuery("findRoleCountByUserNameAndStudyId"), variables, setTypes);
         } else {
             variables.put(new Integer(3), childStudyId);
-            alist = this.select(digester.getQuery("findRoleByUserNameAndStudyIdOrSiteId"), variables);
+            alist = this.select(digester.getQuery("findRoleByUserNameAndStudyIdOrSiteId"), variables, setTypes);
         }
         return alist.size();
     }

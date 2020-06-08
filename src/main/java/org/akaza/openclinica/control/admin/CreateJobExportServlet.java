@@ -176,7 +176,7 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
                 SimpleTrigger trigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                         generalFileDir, // xml_file_path
                         endFilePath + File.separator,
-                        exportFileName, //TODO: change export file name everytime
+                        exportFileName,
                         dsBean.getId(),
                         epBean,
                         userBean,
