@@ -142,6 +142,16 @@ public class ItemDataDAO extends AuditableEntityDAO {
         this.setTypeExpected(11, TypeNames.INT);// old_status_id
         this.setTypeExpected(12, TypeNames.BOOL);// ocform_deleted
     }
+    
+    public void setExtraTypesExpected() {
+       
+        this.setTypeExpected(13, TypeNames.INT);        
+        this.setTypeExpected(14, TypeNames.STRING);
+        this.setTypeExpected(15, TypeNames.STRING);
+        this.setTypeExpected(16, TypeNames.INT);
+        this.setTypeExpected(17, TypeNames.INT);
+       
+    }
 
     public EntityBean update(EntityBean eb) {
         ItemDataBean idb = (ItemDataBean) eb;
@@ -459,7 +469,18 @@ public class ItemDataDAO extends AuditableEntityDAO {
         eb.setOldStatus(Status.get(hm.get("old_status_id") == null ? 1 : ((Integer) hm.get("old_status_id")).intValue()));
         return eb;
     }
-
+    /**
+     * select distinct item_data.*,
+     * event_crf.study_event_id,item.oc_oid as item_ocoid, item_group.oc_oid as ig_ocoid,item_data.status_id,study_event_definition.study_id
+     * @param hm
+     * @return
+     */
+    public Object getKeyFromHashMap(HashMap hm) {
+       String key = (Integer) hm.get("study_id") + (Integer) hm.get("study_event_id") + (String) hm.get("ig_ocoid") + (String) hm.get("item_ocoid");
+       
+       return key;
+    }
+    
     @SuppressWarnings("unchecked")
     public List<ItemDataBean> findByStudyEventAndOids(Integer studyEventId, String itemOid, String itemGroupOid) {
         setTypesExpected();
@@ -473,6 +494,43 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         ArrayList<ItemDataBean> dataItems = this.executeFindAllQuery("findByStudyEventAndOIDs", variables);
         return dataItems;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public HashMap findByStudyAndOids(Integer studyId, String itemOid, String itemGroupOid) {
+    	this.setTypesExpected();
+        setExtraTypesExpected();
+
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), studyId);
+        variables.put(new Integer(2), itemOid);
+        variables.put(new Integer(3), itemGroupOid);
+        variables.put(new Integer(4), Status.DELETED.getId());
+        variables.put(new Integer(5), Status.AUTO_DELETED.getId());
+
+        HashMap answer = new HashMap();
+
+        ArrayList rows;
+        String sql = digester.getQuery("findByStudyAndOIDs");
+
+        if (variables == null || variables.isEmpty()) {
+            rows = this.select(sql);
+        } else {
+            rows = this.select(sql, variables);
+        }
+        Iterator it = rows.iterator();
+
+        while (it.hasNext()) {
+        	HashMap hm = (HashMap) it.next();
+        	//construct key
+        	String key = (String) this.getKeyFromHashMap(hm);
+        	
+        	//construct dataItem
+        	ItemDataBean eb = (ItemDataBean) this.getEntityFromHashMap(hm);	
+        	answer.put(key, eb);       	           
+        }
+      
+        return answer;
     }
 
     public Collection<ItemDataBean> findAll() {
