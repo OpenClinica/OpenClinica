@@ -1484,24 +1484,22 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(subjectText).append(": ").append(studySubjectLabel).br();
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
+        eventDiv.tdEnd();
+        eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
+        linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
+        eventDiv.tdEnd();
+
+        eventDiv.tr(0).valign("top").close();
+        eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
+
         if (!sed.isRepeating()) {
             if (studyEvents.size() > 0 && studyEvents.get(0).getDateStarted() != null) {
-                eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
+                eventDiv.bold().append(formatDate(studyEvents.get(0).getDateStarted())).boldEnd();
             }
             eventDiv.br().bold().append(eventStatus.getDisplayValue()).br();
-            eventDiv.tdEnd();
-            eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
-            linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
-            eventDiv.tdEnd();
+            eventDiv.boldEnd().tdEnd().trEnd(0);
 
         } else {
-            eventDiv.tdEnd();
-            eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
-            linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
-            eventDiv.tdEnd();
-
-            eventDiv.tr(0).valign("top").close();
-            eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
             eventDiv.bold().append(occurrence_x_of).append(" 1 of 1").br();
             if (studyEvents.size() > 0) {
                 if (studyEvents.get(0).getDateStarted() != null)
