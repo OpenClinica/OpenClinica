@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -22,10 +22,10 @@ import core.org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
  * such as getting all notes for a study, or filtering them by subject or
  * resolution status.
  */
-@Service
+@Service("DiscrepancyNoteUtil")
 public class DiscrepancyNoteUtil {
     // TODO: initialize these static members from the database.
     public static final Map<String, Integer> TYPES = new HashMap<String, Integer>();
@@ -108,7 +108,7 @@ public class DiscrepancyNoteUtil {
     }
 
     public void injectParentDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans, Set<Integer> resolutionStatusIds,
-            DataSource dataSource, int discNoteType) {
+                                                            DataSource dataSource, int discNoteType, ServletContext context) {
 
         if (displayStudyBeans == null) {
             return;
@@ -127,6 +127,7 @@ public class DiscrepancyNoteUtil {
 
         for (DisplayStudyEventBean dStudyEventBean : displayStudyBeans) {
             studyEventBean = dStudyEventBean.getStudyEvent();
+            eventCrfDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
             // All EventCRFs for a study event
             eventCRFBeans = eventCrfDAO.findAllByStudyEvent(studyEventBean);
 
