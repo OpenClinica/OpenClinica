@@ -256,7 +256,7 @@ public class SignStudySubjectServlet extends SecureController {
                     displayEvent.setDisplayEventCRFs(displayEventCRFs);
                 }
 
-                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0, context);
 
                 Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
                 String originationUrl = "SignStudySubject?id=" + studySub.getId();
@@ -323,7 +323,7 @@ public class SignStudySubjectServlet extends SecureController {
 
         // Don't filter for now; disc note beans are returned with eventCRFId
         // set
-        discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+        discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0, context);
         // All the displaystudyevents for one subject
 
         // Set up a Map for the JSP view, mapping the eventCRFId to another Map:
