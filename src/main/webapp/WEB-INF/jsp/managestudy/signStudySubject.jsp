@@ -83,7 +83,6 @@
 <jsp:useBean scope='request' id='table' class='core.org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope="request" id="groups" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="from" class="java.lang.String"/>
-<jsp:useBean scope="request" id="seid" class="java.lang.String"/>
 
 <script language="JavaScript">
     <!--
@@ -147,7 +146,6 @@
 <br><br>
 <form action="SignStudySubject" method="post">
     <input type="hidden" name="id" value="<c:out value="${studySub.id}"/>">
-    <input type="hidden" name="seid" value="<c:out value="${seid}"/>">
     <input type="hidden" name="studyId" value="<c:out value="${studySub.studyId}"/>">
     <input type="hidden" name="action" value="confirm">
     <div style="width: 250px">

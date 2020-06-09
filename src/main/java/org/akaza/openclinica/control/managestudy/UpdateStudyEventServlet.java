@@ -266,11 +266,12 @@ public class UpdateStudyEventServlet extends SecureController {
             discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             StudyEventWorkflowStatusEnum ses = StudyEventWorkflowStatusEnum.valueOf( fp.getString(EVENT_WORKFLOW_STATUS));
+                studyEvent.setWorkflowStatus(ses);
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
-            studyEvent.setWorkflowStatus(ses);
+
             ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
             String newStatus = fp.getString(NEW_STATUS);
-            if (ses.equals(StudyEventWorkflowStatusEnum.SKIPPED) ) {
+            if (ses != null && ses.equals(StudyEventWorkflowStatusEnum.SKIPPED) ) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
@@ -407,7 +408,6 @@ public class UpdateStudyEventServlet extends SecureController {
             // tring encodedUserPass =
             // core.org.akaza.openclinica.core.SecurityManager.getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-            StudyEventBean seb = (StudyEventBean) session.getAttribute("eventSigned");
             boolean isAuthenticated = false;
             AuthzClient authzClient = AuthzClient.create(CoreResources.getKeyCloakConfig());
             try {
@@ -420,22 +420,23 @@ public class UpdateStudyEventServlet extends SecureController {
                 Date date = new Date();
                 String detail = "The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
                         + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3");
-                seb.setUpdater(ub);
-                seb.setUpdatedDate(date);
-                seb.setAttestation(detail);
-                studyEventDAO.update(seb);
+                studyEvent.setUpdater(ub);
+                studyEvent.setUpdatedDate(date);
+                studyEvent.setAttestation(detail);
+                studyEvent.setSigned(true);
+                studyEventDAO.update(studyEvent);
 
                 // OC-10834 OC4 - Signature not recorded when signing an event if the event status is already Signed
                 // manually add audit-log-event when user re-signed without any changes
                 Boolean signedStatus = (Boolean)session.getAttribute(PREV_STUDY_EVENT_SIGNED_STATUS);
-                if (seb.isSigned() && BooleanUtils.isTrue(signedStatus) ) {
+                if (studyEvent.isSigned() && BooleanUtils.isTrue(signedStatus) ) {
                     AuditLogEvent auditLogEvent = new AuditLogEvent();
                     auditLogEvent.setAuditTable(STUDY_EVENT);
-                    auditLogEvent.setEntityId(seb.getId());
+                    auditLogEvent.setEntityId(studyEvent.getId());
                     auditLogEvent.setEntityName("Signed");
                     auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-                    auditLogEvent.setNewValue(seb.getSigned().toString());
-                    auditLogEvent.setOldValue(seb.getSigned().toString());
+                    auditLogEvent.setNewValue(studyEvent.getSigned().toString());
+                    auditLogEvent.setOldValue(studyEvent.getSigned().toString());
                     auditLogEvent.setDetails(detail);
                     getAuditLogEventService().saveAuditLogEvent(auditLogEvent, ub);
                 }
@@ -448,13 +449,12 @@ public class UpdateStudyEventServlet extends SecureController {
                 AddNewSubjectServlet.saveFieldNotes(INPUT_STARTDATE_PREFIX, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
                 AddNewSubjectServlet.saveFieldNotes(INPUT_ENDDATE_PREFIX, fdn, dndao, studyEvent.getId(), "studyEvent", currentStudy);
 
-                session.removeAttribute("eventSigned");
                 request.setAttribute("id", new Integer(studySubjectId).toString());
                 addPageMessage(respage.getString("study_event_updated"));
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             } else {
                 request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
-                request.setAttribute("studyEvent", seb);
+                request.setAttribute("studyEvent", studyEvent);
                 // -------------------
                 ssdao = new StudySubjectDAO(sm.getDataSource());
                 StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
@@ -479,7 +479,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 displayEvBean.setDisplayEventCRFs(displayEventCRFs);
                 displayEvBean.setStudyEvent(studyEvent);
                 displayEvents.add(displayEvBean);
-                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0, context);
                 Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
                 request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
                 request.setAttribute("studySubject", ssb);
@@ -487,7 +487,6 @@ public class UpdateStudyEventServlet extends SecureController {
                 request.setAttribute("displayEventCRFs", displayEventCRFs);
 
                 // ------------------
-                request.setAttribute("studyEvent", session.getAttribute("eventSigned"));
                 addPageMessage(restext.getString("password_match"));
 
                 String originationUrl = "UpdateStudyEvent?action=" + action + "%26event_id=" + studyEventId + "%26ss_id=" + studySubjectId + "%26startDate="
