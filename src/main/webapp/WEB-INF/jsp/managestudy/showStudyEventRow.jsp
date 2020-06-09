@@ -29,6 +29,21 @@
                 <c:out value="${currRow.bean.studyEvent.workflowStatus.displayValue}"/>
             </c:otherwise>
         </c:choose>
+        <c:if test="${currRow.bean.studyEvent.signed == true}">
+            <span class="icon" alt="Signed" title="Signed">
+                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
+            </span>
+        </c:if>
+        <c:if test="${currRow.bean.studyEvent.locked == true}">
+            <span class="icon" alt="Locked" title="Locked">
+                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
+            </span>
+        </c:if>
+        <c:if test="${currRow.bean.studyEvent.archived == true}">
+            <span class="icon" alt="Archived" title="Archived">
+                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
+            </span>
+        </c:if>
     </td>
     <td class="table_cell">
         <table border="0" cellpadding="0" cellspacing="0">
