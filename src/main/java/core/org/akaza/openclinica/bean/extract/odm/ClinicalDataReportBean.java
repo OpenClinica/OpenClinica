@@ -811,11 +811,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 if (o.length() > 0) {
                     xml.append(nls);
-                    xml.append(currentIndent + "                      OldValue=\"" + StringEscapeUtils.escapeXml(o) + "\" ");
+                    xml.append(currentIndent + "                      OldValue=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(o) + "\" ");
                 }
                 if (n.length() > 0) {
                     xml.append(nls);
-                    xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml(n) + "\"");
+                    xml.append(currentIndent + "                      NewValue=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(n) + "\"");
                 }
                 if (vt.length() > 0) {
                     xml.append(nls);
