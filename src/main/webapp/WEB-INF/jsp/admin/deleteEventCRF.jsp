@@ -17,10 +17,10 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <h1><span class="title_manage">
-<fmt:message key="delete_CRF_from_event" bundle="${resword}"/>
+<fmt:message key="clear_CRF_from_event" bundle="${resword}"/>
 </span></h1>
 <p>
-<fmt:message key="confirm_deletion_of_this_CRF" bundle="${restext}">
+<fmt:message key="confirm_clearing_of_this_CRF" bundle="${restext}">
 	<fmt:param value="${event.studyEventDefinition.name}"/>
 	<fmt:param>
 	  <fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>
@@ -114,14 +114,14 @@
    <c:choose>
        <c:when test="${!empty items && count>0}">
          <form action='DeleteEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&ssId=<c:out value="${studySub.id}"/>' method="POST">
-          <input type="submit" name="submit" value="<fmt:message key="delete_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_CRF_has_data_want_delete" bundle="${restext}"/>");'>
+          <input type="submit" name="submit" value="<fmt:message key="clear_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_CRF_has_data_want_delete" bundle="${restext}"/>");'>
              &nbsp;
            <input type="button" onclick="confirmCancel(window.originatingPage);"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
          </form>
         </c:when>
         <c:otherwise>
           <form action='DeleteEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&ssId=<c:out value="${studySub.id}"/>' method="POST">
-          <input type="submit" name="submit" value="<fmt:message key="delete_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_delete_it" bundle="${restext}"/>");'>
+          <input type="submit" name="submit" value="<fmt:message key="clear_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_delete_it" bundle="${restext}"/>");'>
               &nbsp;
             <input type="button" onclick="confirmCancel(window.originatingPage);"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
          </form>

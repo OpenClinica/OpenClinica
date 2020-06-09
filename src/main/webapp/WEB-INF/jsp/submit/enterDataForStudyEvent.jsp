@@ -524,7 +524,7 @@
                                         <a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>"
                                         onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                                         onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
-                                        ><span name="bt_Delete<c:out value="${rowCount}"/>" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"  hspace="2"></span></a>
+                                        ><span name="bt_Delete<c:out value="${rowCount}"/>" class="icon icon-trash" border="0" alt="<fmt:message key="clear_form" bundle="${resword}"/>" title="<fmt:message key="clear_form" bundle="${resword}"/>"  hspace="2"></span></a>
                                       </td>
                                     </c:if>
                                     <!-- reassign crf version -->

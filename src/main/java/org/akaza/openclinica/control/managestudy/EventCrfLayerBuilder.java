@@ -237,9 +237,9 @@ public class EventCrfLayerBuilder {
             if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
-                deleteEventCrf(html, eventCrfBean, studySubject);
+                clearEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
+                clearEventCrf(html, eventCrfBean, studySubject, reswords.getString("clear_form"));
                 html.tdEnd().trEnd(0);
             }
             if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)) {
@@ -303,9 +303,9 @@ public class EventCrfLayerBuilder {
             if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
-                deleteEventCrf(html, eventCrfBean, studySubject);
+                clearEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
+                clearEventCrf(html, eventCrfBean, studySubject, reswords.getString("clear_form"));
                 html.tdEnd().trEnd(0);
             }
 
@@ -579,14 +579,14 @@ public class EventCrfLayerBuilder {
         builder.aEnd();
     }
 
-    private void deleteEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
+    private void clearEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
         String href = "DeleteEventCRF?action=confirm&ssId=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId();
         builder.a().append(" class=\"accessCheck\"  ").href(href).close();
-        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-trash red\"/>");
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-trash\"/>");
         builder.aEnd();
     }
 
-    private void deleteEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, String link) {
+    private void clearEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, String link) {
         String href = "DeleteEventCRF?action=confirm&ssId=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId();
         builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
