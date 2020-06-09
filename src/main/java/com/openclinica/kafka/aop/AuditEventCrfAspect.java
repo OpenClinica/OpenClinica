@@ -12,6 +12,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -22,11 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuditEventCrfAspect {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     private KafkaService kafkaService;
+    @Autowired @Qualifier("auditEventCrfDao")
     private EventCrfDao eventCrfDao;
 
-    public AuditEventCrfAspect(KafkaService kafkaService, EventCrfDao eventCrfDao){
+    public AuditEventCrfAspect(KafkaService kafkaService){
         this.kafkaService = kafkaService;
-        this.eventCrfDao = eventCrfDao;
     }
 
     @Around("execution(* core.org.akaza.openclinica.dao.hibernate.EventCrfDao.saveOrUpdate(..))")
@@ -46,7 +48,7 @@ public class AuditEventCrfAspect {
 
     @Transactional
     public boolean eventCrfIsTheSame(EventCrf eventCrf){
-        EventCrf existingEventCrf = (EventCrf) eventCrfDao.getSessionFactory().openSession().find(EventCrf.class, eventCrf.getEventCrfId());
+        EventCrf existingEventCrf = eventCrfDao.findById(eventCrf.getEventCrfId());
 
         // workflowStatus, sdvStatus, removed, archived,
         if (existingEventCrf != null){

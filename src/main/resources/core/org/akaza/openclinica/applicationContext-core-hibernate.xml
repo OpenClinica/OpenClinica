@@ -215,6 +215,7 @@
     <bean id="pageLayoutDao" class="core.org.akaza.openclinica.dao.hibernate.PageLayoutDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="formLayoutDao" class="core.org.akaza.openclinica.dao.hibernate.FormLayoutDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="eventCrfDao" class="core.org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="auditEventCrfDao" class="core.org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="eventDefinitionCrfDao" class="core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="archivedDatasetFilePermissionTagDao" class="core.org.akaza.openclinica.dao.hibernate.ArchivedDatasetFilePermissionTagDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="eventDefinitionCrfPermissionTagDao" class="core.org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao" parent="abstractDomainDao" autowire="byName" />
