@@ -1,19 +1,19 @@
 @font-face {
   font-family: 'icomoon';
-
-  src:  url('../fonts/icomoon.eot?ayqyno');
-  src:  url('../fonts/icomoon.eot?ayqyno#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?ayqyno') format('truetype'),
-    url('../fonts/icomoon.woff?ayqyno') format('woff'),
-    url('../fonts/icomoon.svg?ayqyno#icomoon') format('svg');
+  src:  url('../fonts/icomoon.eot?fr5pm6');
+  src:  url('../fonts/icomoon.eot?fr5pm6#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?fr5pm6') format('truetype'),
+    url('../fonts/icomoon.woff?fr5pm6') format('woff'),
+    url('../fonts/icomoon.svg?fr5pm6#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
+  font-display: block;
 }
 
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
-  speak: none;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -25,11 +25,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-icon-sdv-change-status:before {
-  content: "\e900";
-  color: #ED7800;
-  display: inline-block;
-}
 .icon-doc:before {
   content: "\e80f";
 }
@@ -75,8 +70,13 @@
 .icon-print:before {
   content: "\e81d";
 }
+.icon-icon-sdv-change-status:before {
+  content: "\e90e";
+  color: #ED7800;
+  display: inline-block;
+}
 .icon-doc-text-solid:before {
-  content: "\e901";
+  content: "\e90f";
 }
 .icon-icon-sdv-text:before {
   content: "\e919";
@@ -150,6 +150,9 @@
 .icon-doc-text-half:before {
   content: "\e933";
 }
+.icon-files-empty:before {
+  content: "\e934";
+}
 .icon-clock:before {
   content: "\e950";
 }
@@ -200,4 +203,34 @@
 }
 .icon-stop-circle:before {
   content: "\f28e";
+}
+.icon-archived-new .path1:before {
+  content: "\e900";
+  color: rgb(0, 0, 0);
+}
+.icon-archived-new .path2:before {
+  content: "\e901";
+  margin-left: -1.1025390625em;
+  color: rgb(0, 0, 0);
+}
+.icon-archived-new .path3:before {
+  content: "\e902";
+  margin-left: -1.1025390625em;
+  color: rgb(255, 255, 255);
+}
+.icon-archived-new .path4:before {
+  content: "\e903";
+  margin-left: -1.1025390625em;
+  color: rgb(0, 0, 0);
+}
+.icon-archived-new .path5:before {
+  content: "\e904";
+  margin-left: -1.1025390625em;
+  color: rgb(255, 255, 255);
+}
+.icon-lock-new:before {
+  content: "\e905";
+}
+.icon-stamp-new:before {
+  content: "\e906";
 }
