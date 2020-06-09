@@ -15,7 +15,6 @@ import org.akaza.openclinica.view.Page;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
