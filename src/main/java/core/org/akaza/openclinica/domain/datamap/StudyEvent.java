@@ -47,6 +47,8 @@ public class StudyEvent extends DataMapDomainObject  {
 	private Boolean archived;
 	private Boolean locked;
 	private Boolean signed;
+	private String attestation;
+
 
 	public StudyEvent() {
 	}
@@ -315,6 +317,17 @@ public class StudyEvent extends DataMapDomainObject  {
 
 	public void setSigned(Boolean signed) {
 		this.signed = signed;
+		if (signed == Boolean.FALSE)
+			this.setAttestation("");
+	}
+
+	@Column(name = "attestation")
+	public String getAttestation() {
+		return attestation;
+	}
+
+	public void setAttestation(String attestation) {
+		this.attestation = attestation;
 	}
 
 	@Transient
@@ -333,4 +346,5 @@ public class StudyEvent extends DataMapDomainObject  {
 	public boolean isCurrentlySigned() {
 		return BooleanUtils.isTrue(this.getSigned());
 	}
+
 }

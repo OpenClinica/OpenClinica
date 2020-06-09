@@ -137,6 +137,9 @@ public class RestoreStudyEventServlet extends SecureController {
             } else {
                 logger.info("submit to restore the event to study");
                 // restore event to study
+                if (event.isSigned()) {
+                    event.setSigned(Boolean.FALSE);
+                }
                 event.setRemoved(Boolean.FALSE);
                 event.setUpdater(ub);
                 event.setUpdatedDate(new Date());

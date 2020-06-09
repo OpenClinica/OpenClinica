@@ -428,6 +428,8 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
 
     public void setSigned(Boolean signed) {
         this.signed = signed;
+        if (signed == Boolean.FALSE)
+            this.setAttestation("");
     }
 
     public StudyEventWorkflowStatusEnum getWorkflowStatus() {
