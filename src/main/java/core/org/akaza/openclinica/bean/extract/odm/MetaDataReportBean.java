@@ -9,11 +9,13 @@ package core.org.akaza.openclinica.bean.extract.odm;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import core.org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import core.org.akaza.openclinica.bean.odmbeans.CodeListBean;
@@ -47,9 +49,11 @@ import core.org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import core.org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import core.org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
 import core.org.akaza.openclinica.logic.odmExport.MetadataUnit;
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.castor.xml.XMLConfiguration;
@@ -155,7 +159,8 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     public void addNodeRulesData(MetaDataVersionBean a) {
 
         RulesPostImportContainer rpic = new RulesPostImportContainer();
-        rpic.populate(a.getRuleSetRules(), true);
+        List<RuleSetRuleBean> ruleSetRules = (List<RuleSetRuleBean>) SerializationUtils.clone((Serializable) a.getRuleSetRules());
+        rpic.populate(ruleSetRules, true);
 
         if (rpic.getRuleSets() != null && rpic.getRuleSets().size() > 0) {
             StringBuffer xml = this.getXmlOutput();
@@ -250,7 +255,6 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
             }
         }
-
         //
         addProtocol(currentIndent + indent);
         boolean isStudy = !meta.getStudy().isSite();
@@ -279,9 +283,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             addItemGroupDef(isStudy, currentIndent + indent);
             addItemDef(isStudy, currentIndent + indent);
         }
-
         addNodeRulesData(meta);
-
         xml.append(currentIndent + "</MetaDataVersion>");
         xml.append(nls);
     }

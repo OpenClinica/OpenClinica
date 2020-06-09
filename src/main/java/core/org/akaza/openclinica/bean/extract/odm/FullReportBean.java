@@ -47,6 +47,7 @@ public class FullReportBean extends OdmXmlReportBean {
                 OdmStudyBean s = itm.next();
                 addNodeStudy(s, isDataset);
             }
+
             // 2) the information about administrative data
             String ODMVersion = this.getODMVersion();
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
@@ -110,6 +111,7 @@ public class FullReportBean extends OdmXmlReportBean {
     }
 
     public void addNodeStudy(OdmStudyBean odmstudy, boolean isDataset) {
+
         MetaDataReportBean meta = new MetaDataReportBean(odmstudy, getCoreResources());
         meta.setODMVersion(this.getODMVersion());
         meta.setXmlOutput(this.getXmlOutput());
