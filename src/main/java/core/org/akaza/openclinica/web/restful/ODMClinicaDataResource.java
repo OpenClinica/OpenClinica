@@ -275,7 +275,6 @@ public class ODMClinicaDataResource {
         }
         FullReportBean report=null;
 
-
         LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
 
         if (odmFilter.includeClinical()) {
