@@ -183,28 +183,41 @@
                                     </c:otherwise>
                                 </c:choose>
                             </td>
-                            <c:choose>
-                                <c:when test="${dedc.status.name=='locked'}">
-                                    <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
-                                      <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
-                                    </td>
-                                </c:when>
-                                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
-                                    <c:choose>
-                                        <c:when test="${dedc.eventCRF.id>0}">
-                                            <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </c:when>
-                                <c:otherwise>
-                                    <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
+                            <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
+                                <c:choose>
+                                    <c:when test="${dedc.status.name=='locked'}">
+                                        <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
+                                    </c:when>
+                                    <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+                                        <c:choose>
+                                            <c:when test="${dedc.eventCRF.id>0}">
+                                                <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:when>
+                                    <c:otherwise>
                                         <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
-                                    </td>
-                                </c:otherwise>
-                            </c:choose>
+                                    </c:otherwise>
+                                </c:choose>
+                                <c:if test="${currRow.bean.studyEvent.signed == true}">
+                                    <span class="icon" alt="Signed" title="Signed">
+                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
+                                    </span>
+                                </c:if>
+                                <c:if test="${currRow.bean.studyEvent.locked == true}">
+                                    <span class="icon" alt="Locked" title="Locked">
+                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
+                                    </span>
+                                </c:if>
+                                <c:if test="${dec.eventCRF.isArchived()}">
+                                    <span class="icon" alt="Archived" title="Archived">
+                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
+                                    </span>
+                                </c:if>
+                            </td>
                             <c:choose>
                                 <c:when test="${dedc.eventCRF.id == 0}">
                                     <td class="table_cell" width="80">&nbsp;&nbsp;</td>
@@ -226,28 +239,29 @@
                             <td class="table_cell" width="140">
                                 <table cellspacing="0" cellpadding="0" border="0">
                                     <tr>
-                                                <td>
-                                                    <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && currRow.bean.studyEvent.workflowStatus != 'SKIPPED' && currRow.bean.studyEvent.workflowStatus != 'STOPPED'}">
-                                                        <c:choose>
-                                                            <c:when test="${dedc.eventCRF.id != 0}">
-                                                                <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
-                                                                  onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                                                  onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                                                                 <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
-                                                                </a>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <a id="ide1-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" class="accessCheck"
-                                                                  href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
-                                                                  onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                                                  onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                                                                 <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
-                                                                </a>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </c:if>
-                                                </td>
-
+                                        <c:if test="${!userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && currRow.bean.studyEvent.workflowStatus != 'SKIPPED' && currRow.bean.studyEvent.workflowStatus != 'STOPPED'}">
+                                            <c:choose>
+                                                <c:when test="${dedc.eventCRF.id != 0}">
+                                                    <td>
+                                                        <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+                                                          onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+                                                          onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+                                                         <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
+                                                        </a>
+                                                    </td>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <td>
+                                                        <a id="ide1-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" class="accessCheck"
+                                                          href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+                                                          onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+                                                          onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+                                                         <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="right" hspace="6">
+                                                        </a>
+                                                    </td>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:if>
                                         <td>
                                           <a id="ide2-<c:out value="${currRow.bean.studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" class="accessCheck"
                                               href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
@@ -256,7 +270,6 @@
                                               <span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" align="left" hspace="6">
                                           </a>
                                         </td>
-
                                     </tr>
                                 </table>
                             </td>
@@ -292,6 +305,21 @@
 
                                 </c:otherwise>
                               </c:choose>
+                                <c:if test="${currRow.bean.studyEvent.signed == true}">
+                                    <span class="icon" alt="Signed" title="Signed">
+                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
+                                    </span>
+                                </c:if>
+                                <c:if test="${currRow.bean.studyEvent.locked == true}">
+                                    <span class="icon" alt="Locked" title="Locked">
+                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
+                                    </span>
+                                </c:if>
+                                <c:if test="${dec.eventCRF.isArchived()}">
+                                    <span class="icon" alt="Archived" title="Archived">
+                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
+                                    </span>
+                                </c:if>
                             </td>
                             <td class="table_cell" width="80">
                                 <c:choose>
