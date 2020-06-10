@@ -159,10 +159,12 @@ public class EnketoFormServlet extends SecureController {
             getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId(), request.getSession().getId());
         }
 
-        if (eventCrf != null) {
-            formCacheService.addEditFormToFormCache(contextHash, eventCrf);
-        } else {
-            formCacheService.addNewFormToFormCache(contextHash, currentStudy, studyEvent, formLayout);
+        if (!mode.equals(PREVIEW_MODE)) {
+            if (eventCrf != null) {
+                formCacheService.addEditFormToFormCache(contextHash, eventCrf);
+            } else {
+                formCacheService.addNewFormToFormCache(contextHash, currentStudy, studyEvent, formLayout);
+            }
         }
 
         request.setAttribute(FORM_URL, formUrlObject.getFormUrl());
