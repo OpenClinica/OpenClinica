@@ -320,8 +320,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))
                                 && studySubject.getStatus().equals(Status.AVAILABLE)
                                 && studyBean.getStatus().equals(Status.AVAILABLE)
-                                && studyEvent.getSigned() == null && studyEvent.getArchived() == null && studyEvent.getRemoved() == null) {
-                            String signUrl = "/SignStudySubject?id=" + studySubject.getStudySubjectId() + "&seid=" + studyEvent.getStudyEventId();
+                                && !studyEvent.isCurrentlySigned() && !studyEvent.isCurrentlyArchived() && !studyEvent.isCurrentlyRemoved() && !studyEvent.isCurrentlyLocked()) {
+                                String signUrl = "/UpdateStudyEvent?action=confirm&statusId=signed&ss_id=" + studySubject.getStudySubjectId() + "&event_id=" + studyEvent.getStudyEventId();
 
                             xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"sign\" href=\""
                                     + StringEscapeUtils.escapeXml(signUrl) + "\"");
@@ -811,11 +811,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 if (o.length() > 0) {
                     xml.append(nls);
-                    xml.append(currentIndent + "                      OldValue=\"" + StringEscapeUtils.escapeXml(o) + "\" ");
+                    xml.append(currentIndent + "                      OldValue=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(o) + "\" ");
                 }
                 if (n.length() > 0) {
                     xml.append(nls);
-                    xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml(n) + "\"");
+                    xml.append(currentIndent + "                      NewValue=\"" + org.apache.commons.lang3.StringEscapeUtils.escapeXml11(n) + "\"");
                 }
                 if (vt.length() > 0) {
                     xml.append(nls);

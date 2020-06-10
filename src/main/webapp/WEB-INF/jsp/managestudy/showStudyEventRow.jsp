@@ -29,6 +29,21 @@
                 <c:out value="${currRow.bean.studyEvent.workflowStatus.displayValue}"/>
             </c:otherwise>
         </c:choose>
+        <c:if test="${currRow.bean.studyEvent.signed == true}">
+            <span class="icon" alt="Signed" title="Signed">
+                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
+            </span>
+        </c:if>
+        <c:if test="${currRow.bean.studyEvent.locked == true}">
+            <span class="icon" alt="Locked" title="Locked">
+                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
+            </span>
+        </c:if>
+        <c:if test="${currRow.bean.studyEvent.archived == true}">
+            <span class="icon" alt="Archived" title="Archived">
+                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
+            </span>
+        </c:if>
     </td>
     <td class="table_cell">
         <table border="0" cellpadding="0" cellspacing="0">
@@ -46,7 +61,6 @@
                     name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
             </td>
-
             <c:if test="${userRole.manageStudy && study.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true}">
                 <td>
                     <c:choose>
@@ -77,7 +91,7 @@
             </c:if>
             <c:if test="${userRole.isInvestigator() && currRow.bean.studyEvent.signed != true && currRow.bean.studyEvent.removed != true && currRow.bean.studyEvent.archived != true && (currRow.bean.studyEvent.workflowStatus == 'COMPLETED' || currRow.bean.studyEvent.workflowStatus == 'STOPPED' || currRow.bean.studyEvent.workflowStatus == 'SKIPPED') && currRow.bean.isSignAble()}">
                 <td>
-                    <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="SignStudySubject?id=<c:out value="${studySub.id}"/>&seid=<c:out value="${currRow.bean.studyEvent.id}"/>"><span hspace="2" border="0" title="Sign" alt="Sign" class="icon icon-icon-sign" name="bt_sign"></span></a>
+                    <a onmouseup="javascript:setImage('bt_View1','icon icon-icon-sign');" onmousedown="javascript:setImage('bt_View1','icon icon-icon-sign');" href="UpdateStudyEvent?action=confirm&statusId=signed&ss_id=<c:out value="${studySub.id}"/>&event_id=<c:out value="${currRow.bean.studyEvent.id}"/>"><span hspace="2" border="0" title="Sign" alt="Sign" class="icon icon-icon-sign" name="bt_sign"></span></a>
                 </td>
             </c:if>
         </table>
