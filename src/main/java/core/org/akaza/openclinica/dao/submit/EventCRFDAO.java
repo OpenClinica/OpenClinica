@@ -546,7 +546,22 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return;
 
     }
+    public String getSDVStatus(int eventCrfId){
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.STRING);
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), eventCrfId);
+        String sql = digester.getQuery("getSDVStatus");
+        ArrayList rows = this.select(sql, variables);
+        Iterator it = rows.iterator();
 
+        if (it.hasNext()) {
+            return (String) ((HashMap) it.next()).get("sdv_status");
+
+        } else {
+            return null;
+        }
+    }
     public void setSDVStatus(SdvStatus sdvStatus, int userId, int eventCRFId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), sdvStatus.toString());
@@ -1053,26 +1068,33 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return result;
     }
     
-    public void updateFormLayoutID(int event_crf_id, int form_layout_id, int user_id, Connection con) {
+    public void  updateFormLayoutID(int event_crf_id, int form_layout_id, int user_id, Connection con) {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.INT);
         this.setTypeExpected(3, TypeNames.INT);
         this.setTypeExpected(4, TypeNames.STRING);
-        this.setTypeExpected(3, TypeNames.INT);
+        this.setTypeExpected(5, TypeNames.INT);
 
+        String currentSdvStatus = getSDVStatus(event_crf_id);
         HashMap variables = new HashMap();
+        HashMap nullVars = new HashMap();
         variables.put(1, form_layout_id);
         variables.put(2, user_id);
         variables.put(3, user_id);
-        variables.put(4, null);
+        if (currentSdvStatus.isEmpty() || currentSdvStatus == null){
+            variables.put(4, null);
+            nullVars.put(4,new Integer(Types.VARCHAR));
+        }
+        else
+            variables.put(4, SdvStatus.NOT_VERIFIED);
         variables.put(5, event_crf_id);
         String sql = digester.getQuery("updateFormLayoutID");
         // this is the way to make the change transactional
         if (con == null) {
-            this.execute(sql, variables);
+            this.execute(sql, variables, nullVars);
         } else {
-            this.execute(sql, variables, con);
+            this.execute(sql, variables, nullVars, con);
         }
     }
 

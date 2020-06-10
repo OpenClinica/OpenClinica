@@ -531,6 +531,12 @@
         </sql>
     </query>
     <query>
+        <name>getSDVStatus</name>
+        <sql>
+            select sdv_status from event_crf where event_crf_id=?
+        </sql>
+    </query>
+    <query>
         <name>setSDVStatus</name>
         <sql>
             update event_crf set sdv_status=?, sdv_update_id=? where event_crf_id=?
