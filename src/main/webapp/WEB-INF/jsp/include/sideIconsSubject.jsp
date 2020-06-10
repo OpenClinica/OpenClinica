@@ -75,6 +75,10 @@ View
                 <td><fmt:message key="edit" bundle="${reswords}"/></td>
             </tr>
             <tr>
+                <td>&nbsp;<span class="icon icon-trash"></span></td>
+                <td><fmt:message key="clear" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
                 <td>&nbsp;<span class="icon icon-cancel"></span></td>
                 <td><fmt:message key="remove" bundle="${reswords}"/></td>
             </tr>

@@ -381,8 +381,8 @@
                                                 <a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                                                 onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
                                                 onMouseUp="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"><span
-                                                name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
-                                                title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
+                                                name="bt_Delete1" class="icon icon-trash" border="0" alt="<fmt:message key="clear_form" bundle="${resword}"/>"
+                                                title="<fmt:message key="clear_form" bundle="${resword}"/>" align="left" hspace="6"></a>
                                             </td>
                                         </c:if>
                                         <c:set var="versionCount" value="0"/>
