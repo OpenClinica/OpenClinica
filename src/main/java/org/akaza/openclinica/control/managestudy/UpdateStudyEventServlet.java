@@ -271,37 +271,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
             ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
             String newStatus = fp.getString(NEW_STATUS);
-            if (ses != null && ses.equals(StudyEventWorkflowStatusEnum.SKIPPED) ) {
-                studyEvent.setStatus(Status.UNAVAILABLE);
-                for (int i = 0; i < eventCRFs.size(); i++) {
-                    EventCRFBean ecb = eventCRFs.get(i);
-                    ecb.setStatus(Status.UNAVAILABLE);
-                    ecb.setUpdater(ub);
-                    ecb.setUpdatedDate(new Date());
-                    eventCRFDAO.update(ecb);
-                }
-            } else {
-                if (newStatus != null) {
-                    if (newStatus.equalsIgnoreCase(Status.LOCKED.getName())) {
-                        studyEvent.setLocked(true);
-                    } else {
-                        studyEvent.setLocked(false);
-                    }
-                }
-                for (int i = 0; i < eventCRFs.size(); i++) {
-                    EventCRFBean ecb = eventCRFs.get(i);
-                    if (newStatus != null) {
-                        if (newStatus.equalsIgnoreCase(Status.LOCKED.getName())) {
-                            ecb.setStatus(Status.UNAVAILABLE);
-                        } else {
-                            ecb.setStatus(Status.AVAILABLE);
-                        }
-                    }
-                    ecb.setUpdater(ub);
-                    ecb.setUpdatedDate(new Date());
-                    eventCRFDAO.update(ecb);
-                }
-            }
+
             // YW 3-12-2008, 2220 fix
             String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
             String strEndScheduled = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
