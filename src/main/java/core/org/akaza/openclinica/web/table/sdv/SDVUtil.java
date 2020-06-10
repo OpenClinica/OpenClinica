@@ -1004,7 +1004,7 @@ public class SDVUtil {
                 sdvStatus.append(">");
                 sdvStatus.append("<span hspace='2' border='0'  title='" + resWords.getString(SdvStatus.VERIFIED.toString()) + "' alt='SDV Complete' class='icon icon-icon-SDV-doubleCheck'>").append("</a></center>");
             } else if (eventCRFBean.getSdvStatus() == SdvStatus.CHANGED_SINCE_VERIFIED) {
-                sdvStatus.append("<center><span title='" + resWords.getString(SdvStatus.CHANGED_SINCE_VERIFIED.toString()) + "' class='icon-icon-sdv-change-status small-icon' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
+                sdvStatus.append("<center><span title='" + resWords.getString(SdvStatus.CHANGED_SINCE_VERIFIED.toString()) + "' class='icon-no-border icon-icon-sdv-change-status small-icon orange' border='0'></span><input style='margin-right: 1.5em' type='checkbox' ")
                         .append("class='sdvCheck'").append(" name='").append(CHECKBOX_NAME)
                         .append(eventCRFBean.getId()).append("' /></center>");
             } else {

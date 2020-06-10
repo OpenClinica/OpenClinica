@@ -1,19 +1,19 @@
 @font-face {
   font-family: 'icomoon';
-
-  src:  url('../fonts/icomoon.eot?ayqyno');
-  src:  url('../fonts/icomoon.eot?ayqyno#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?ayqyno') format('truetype'),
-    url('../fonts/icomoon.woff?ayqyno') format('woff'),
-    url('../fonts/icomoon.svg?ayqyno#icomoon') format('svg');
+  src:  url('../fonts/icomoon.eot?jhy433');
+  src:  url('../fonts/icomoon.eot?jhy433#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?jhy433') format('truetype'),
+    url('../fonts/icomoon.woff?jhy433') format('woff'),
+    url('../fonts/icomoon.svg?jhy433#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
+  font-display: block;
 }
 
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
-  speak: none;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -25,10 +25,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-icon-sdv-change-status:before {
+.icon-lock-new:before {
   content: "\e900";
-  color: #ED7800;
-  display: inline-block;
+}
+.icon-stamp-new:before {
+  content: "\e901";
+}
+.icon-archived-new:before {
+  content: "\e902";
 }
 .icon-doc:before {
   content: "\e80f";
@@ -75,8 +79,11 @@
 .icon-print:before {
   content: "\e81d";
 }
+.icon-icon-sdv-change-status:before {
+  content: "\e903";
+}
 .icon-doc-text-solid:before {
-  content: "\e901";
+  content: "\e904";
 }
 .icon-icon-sdv-text:before {
   content: "\e919";
