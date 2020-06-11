@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
  * such as getting all notes for a study, or filtering them by subject or
  * resolution status.
  */
-@Service("DiscrepancyNoteUtil")
+@Service
 public class DiscrepancyNoteUtil {
     // TODO: initialize these static members from the database.
     public static final Map<String, Integer> TYPES = new HashMap<String, Integer>();
@@ -108,7 +108,7 @@ public class DiscrepancyNoteUtil {
     }
 
     public void injectParentDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans, Set<Integer> resolutionStatusIds,
-                                                            DataSource dataSource, int discNoteType, ServletContext context) {
+                                                            DataSource dataSource, int discNoteType) {
 
         if (displayStudyBeans == null) {
             return;
@@ -127,7 +127,6 @@ public class DiscrepancyNoteUtil {
 
         for (DisplayStudyEventBean dStudyEventBean : displayStudyBeans) {
             studyEventBean = dStudyEventBean.getStudyEvent();
-            eventCrfDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
             // All EventCRFs for a study event
             eventCRFBeans = eventCrfDAO.findAllByStudyEvent(studyEventBean);
 
