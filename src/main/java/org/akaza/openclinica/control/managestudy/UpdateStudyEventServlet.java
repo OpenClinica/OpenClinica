@@ -449,7 +449,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 displayEvBean.setDisplayEventCRFs(displayEventCRFs);
                 displayEvBean.setStudyEvent(studyEvent);
                 displayEvents.add(displayEvBean);
-                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0, context);
+                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
                 Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
                 request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
                 request.setAttribute("studySubject", ssb);
