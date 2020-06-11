@@ -432,7 +432,12 @@
                             </c:forEach>
                             <tr>
                               <td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" />&nbsp;</td>
-                              <td class="table_cell"><c:out value="${dec.eventCRF.formLayout.name}" />&nbsp;</td>
+                              <td class="table_cell">
+                                <c:out value="${dec.eventCRF.formLayout.name}" />&nbsp;
+                                <c:if test="${dec.eventCRF.formLayout.status.name == 'Removed'}">
+                                    <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
+                                </c:if>
+                              </td>
                               <td class="table_cell" bgcolor="#F5F5F5" align="center">
                                 <c:choose>
                                   <c:when test="${dec.eventCRF.removed == true || studyEvent.removed == true}">
@@ -524,7 +529,7 @@
                                         <a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>"
                                         onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                                         onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
-                                        ><span name="bt_Delete<c:out value="${rowCount}"/>" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"  hspace="2"></span></a>
+                                        ><span name="bt_Delete<c:out value="${rowCount}"/>" class="icon icon-trash" border="0" alt="<fmt:message key="clear_form" bundle="${resword}"/>" title="<fmt:message key="clear_form" bundle="${resword}"/>"  hspace="2"></span></a>
                                       </td>
                                     </c:if>
                                     <!-- reassign crf version -->

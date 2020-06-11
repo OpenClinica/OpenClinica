@@ -257,7 +257,7 @@
                                                <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>">
                                                    <img src="images/bt_Delete.gif" border="0" align="left"></a>&nbsp;&nbsp;
                                                <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>">
-                                               <fmt:message key="delete" bundle="${resword}"/></a></td></tr>
+                                               <fmt:message key="clear_form" bundle="${resword}"/></a></td></tr>
                                         </c:if>
                                     </c:if>
 							    </c:when>
@@ -342,7 +342,7 @@
 								   <c:if test="${userBean.sysAdmin && (study.status.available)}">
 								    <tr valign="top"><td class="table_cell_left"><a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>">
 								    <img src="images/bt_Delete.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								    <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>"><fmt:message key="delete" bundle="${resword}"/></a></td></tr>
+								    <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>"><fmt:message key="clear_form" bundle="${resword}"/></a></td></tr>
                                   </c:if>
 						 	    
 								</c:otherwise>

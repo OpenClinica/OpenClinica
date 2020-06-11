@@ -128,9 +128,10 @@ public class BatchCRFMigrationController implements Runnable {
         super();
     }
 
-    public BatchCRFMigrationController(HelperObject helperObject, StudyDao studyDao) {
+    public BatchCRFMigrationController(HelperObject helperObject, StudyDao studyDao, StudyEventDao studyEventDao) {
         this.helperObject = helperObject;
         this.studyDao = studyDao;
+        this.studyEventDao = studyEventDao;
     }
 
     @RequestMapping(value = "/forms/migrate/{filename}/downloadLogFile")
@@ -222,7 +223,7 @@ public class BatchCRFMigrationController implements Runnable {
 
         String str = "";
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
-            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject, studyDao);
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject, studyDao, studyEventDao);
             Thread thread = new Thread(bcmController);
             thread.start();
             str = resterms.getString("Batch_CRF_version_migration_is_running_You_will_receive_an_email_once_the_process_is_complete");
@@ -252,7 +253,7 @@ public class BatchCRFMigrationController implements Runnable {
 
         String pageMessages = null;
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
-            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject, studyDao);
+            BatchCRFMigrationController bcmController = new BatchCRFMigrationController(helperObject, studyDao, studyEventDao);
             Thread thread = new Thread(bcmController);
             thread.start();
 
@@ -337,7 +338,7 @@ public class BatchCRFMigrationController implements Runnable {
         FormLayout formLayout = helperObject.getFormLayoutDao().findById(helperObject.getTargetCrfVersionBean().getId());
         StudySubject studySubject = helperObject.getStudySubjectDao().findById(eventCRFBean.getStudySubjectId());
         if(eventCrf.getSdvStatus() != null && eventCrf.getSdvStatus()== SdvStatus.VERIFIED)
-            eventCrf.setSdvStatus(SdvStatus.CHANGED_SINCE_VERIFIED);
+            eventCrf.setSdvStatus(SdvStatus.NOT_VERIFIED);
         eventCrf.setDateUpdated(new Date());
         eventCrf.setSdvUpdateId(helperObject.getUserAccountBean().getId());
         eventCrf.setUpdateId(helperObject.getUserAccountBean().getId());
@@ -363,12 +364,9 @@ public class BatchCRFMigrationController implements Runnable {
 
         studyEvent.setUpdateId(helperObject.getUserAccountBean().getId());
         studyEvent.setDateUpdated(new Date());
-
-        status_before_update = auditDao().findLastStatus("study_event","Status" ,studyEvent.getStudyEventId(), studyEvent.getSigned().toString());
-        if (status_before_update != null && status_before_update.length() == 1) {
-          studyEventService.convertStudyEventStatus(status_before_update,studyEvent);
+        if(studyEvent.isCurrentlySigned()){
+            studyEvent.setSigned(false);
         }
-
         session.saveOrUpdate(studyEvent);
     }
 
@@ -724,8 +722,8 @@ public class BatchCRFMigrationController implements Runnable {
 
             StudySubjectBean ssBean = (StudySubjectBean) ssdao().findByPK(eventCrfToMigrate.getStudySubjectId());
             Study sBean = (Study) studyDao.findByPK(ssBean.getStudyId());
-            StudyEventBean seBean = (StudyEventBean) studyEventDAO.findByPK(eventCrfToMigrate.getStudyEventId());
-            StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao().findByPK(seBean.getStudyEventDefinitionId());
+            StudyEvent seBean = (StudyEvent) studyEventDao.findByStudyEventId(eventCrfToMigrate.getStudyEventId());
+            StudyEventDefinition sedBean =seBean.getStudyEventDefinition();
             reportLog.getLogs()
                     .add(cBean.getName() + "," + helperObject.getSourceCrfVersionBean().getName() + "," + helperObject.getTargetCrfVersionBean().getName() + ","
                             + ssBean.getLabel() + "," + sBean.getName() + "," + sedBean.getName() + "," + seBean.getSampleOrdinal());
