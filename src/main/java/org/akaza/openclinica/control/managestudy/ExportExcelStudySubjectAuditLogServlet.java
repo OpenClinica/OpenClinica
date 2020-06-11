@@ -500,7 +500,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         for (int k = 0; k < eventCRFAudits.size(); k++) {
                             row--;
                             AuditBean eventCrfAudit = (AuditBean) eventCRFAudits.get(k);
-                            if (eventCrfAudit.getStudyEventId() == event.getId() && eventCrfAudit.getEventCrfVersionId() == auditBean.getEventCrfVersionId()) {
+                            if (eventCrfAudit.getStudyEventId() == event.getId() && eventCrfAudit.getEventCRFId() == auditBean.getEventCRFId()) {
                                 String oldValue = eventCrfAudit.getOldValue();
                                 String newValue = eventCrfAudit.getNewValue();
                                 String entityName= eventCrfAudit.getEntityName();
