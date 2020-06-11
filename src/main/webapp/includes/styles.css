@@ -969,3 +969,8 @@ form#searchByStudySubjectId {
 .button_medium.table-icon {
     padding:.4em 0.9em
 }
+
+.icon.status:before {
+	color: black;
+	background: transparent;
+}

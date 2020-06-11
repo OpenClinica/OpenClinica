@@ -198,19 +198,13 @@
                         <td>
                             {{submission.studyStatus}}
                             {{#if submission.isSigned}}
-                                <span class="icon" alt="Signed" title="Signed">
-                                    <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
-                                </span>
+                                <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
                             {{/if}}
                             {{#if submission.isLocked}}
-                                <span class="icon" alt="Locked" title="Locked">
-                                    <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
-                                </span>
+                                <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
                             {{/if}}
                             {{#if submission.isArchived}}
-                                <span class="icon" alt="Archived" title="Archived">
-                                    <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
-                                </span>
+                                <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
                             {{/if}}
                         </td>
                         <td>{{submission.updatedDate}}</td>
