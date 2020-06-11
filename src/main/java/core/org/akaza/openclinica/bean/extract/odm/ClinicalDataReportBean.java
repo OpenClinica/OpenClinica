@@ -320,7 +320,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))
                                 && studySubject.getStatus().equals(Status.AVAILABLE)
                                 && studyBean.getStatus().equals(Status.AVAILABLE)
-                                && !studyEvent.isCurrentlySigned() && !studyEvent.isCurrentlyArchived() && !studyEvent.isCurrentlyRemoved() && !studyEvent.isCurrentlyLocked()) {
+                                && !studyEvent.isCurrentlySigned() && !studyEvent.isCurrentlyArchived() && !studyEvent.isCurrentlyRemoved()) {
                                 String signUrl = "/UpdateStudyEvent?action=confirm&statusId=signed&ss_id=" + studySubject.getStudySubjectId() + "&event_id=" + studyEvent.getStudyEventId();
 
                             xml.append(indent + indent + indent + indent + indent + "<OpenClinica:Link rel=\"sign\" href=\""
