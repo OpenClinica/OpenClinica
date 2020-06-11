@@ -267,7 +267,11 @@
                     <c:forEach var="dec" items="${currRow.bean.displayEventCRFs}">
                         <tr>
                             <td class="table_cell" width="180"><c:out value="${dec.eventCRF.crf.name}" /></td>
-                            <td class="table_cell" width="100"><c:out value="${dec.eventCRF.formLayout.name}" />
+                            <td class="table_cell" width="100">
+                                <c:out value="${dec.eventCRF.formLayout.name}" />
+                                <c:if test="${dec.eventCRF.formLayout.status.name == 'Removed'}">
+                                    <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
+                                </c:if>
                             </td>
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
                               <c:choose>
