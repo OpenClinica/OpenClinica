@@ -293,7 +293,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                     String value = "%" + filter.getFilters().get(filterKey).toString().toUpperCase() + "%";
 
                     filterQuery = filterQuery + " INTERSECT ";
-                    filterQuery = filterQuery + queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.select");
+                    filterQuery = filterQuery + queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.custom.select");
                     filterQuery = filterQuery + queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.custom.join");
                     filterQuery = filterQuery + queryStore.query(QUERYSTORE_FILE, "discrepancyNotes.main.where");
                     filterQuery = filterQuery + " and sed.oc_oid=\'" + sedOid + "\' and c.oc_oid = \'" + formOid + "\' and i.oc_oid= \'" + itemOid + "\' and UPPER(id.value) like \'" + value + "\'";
