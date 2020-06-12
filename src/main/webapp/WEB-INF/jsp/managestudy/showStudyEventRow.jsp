@@ -196,14 +196,8 @@
                                         <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
                                     </c:otherwise>
                                 </c:choose>
-                                <c:if test="${currRow.bean.studyEvent.signed == true}">
-                                    <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
-                                </c:if>
                                 <c:if test="${currRow.bean.studyEvent.locked == true}">
                                     <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
-                                </c:if>
-                                <c:if test="${dec.eventCRF.isArchived()}">
-                                    <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
                                 </c:if>
                             </td>
                             <c:choose>

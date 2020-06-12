@@ -90,6 +90,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
     private StudyEventDAO studyEventDAO;
     private EventCRFDAO eventCRFDAO;
+    private StudyEventDefinitionDAO studyEventDefinitionDAO;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -108,6 +109,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
         studyEventDAO = (StudyEventDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventJDBCDao");
         eventCRFDAO = (EventCRFDAO) SpringServletAccess.getApplicationContext(context).getBean("eventCRFJDBCDao");
+        studyEventDefinitionDAO = (StudyEventDefinitionDAO) SpringServletAccess.getApplicationContext(context).getBean("studyEventDefinitionJDBCDao");
 
         FormDiscrepancyNotes discNotes = null;
         FormProcessor fp = new FormProcessor(request);
@@ -158,6 +160,8 @@ public class UpdateStudyEventServlet extends SecureController {
         request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
 
         StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByPK(studyEventId);
+
+        studyEvent.setStudyEventDefinition((StudyEventDefinitionBean) studyEventDefinitionDAO.findByPK(studyEvent.getStudyEventDefinitionId()));
 
         studyEvent.setEventCRFs(eventCRFDAO.findAllByStudyEvent(studyEvent));
 
