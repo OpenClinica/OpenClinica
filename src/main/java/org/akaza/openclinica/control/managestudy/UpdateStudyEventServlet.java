@@ -270,7 +270,25 @@ public class UpdateStudyEventServlet extends SecureController {
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
 
             ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
+            // OC-12711 Lock/Unlock Visit Events from the Participant Details Page
             String newStatus = fp.getString(NEW_STATUS);
+            if (newStatus != null) {
+                boolean isLocked = false;
+                if (newStatus.equalsIgnoreCase(Status.LOCKED.getName())) {
+                    isLocked = true;
+                }
+                studyEvent.setLocked(isLocked);
+                for (int i = 0; i < eventCRFs.size(); i++) {
+                    EventCRFBean ecb = eventCRFs.get(i);
+                    if (isLocked)
+                        ecb.setStatus(Status.UNAVAILABLE);
+                    else
+                        ecb.setStatus(Status.AVAILABLE);
+                    ecb.setUpdater(ub);
+                    ecb.setUpdatedDate(new Date());
+                    eventCRFDAO.update(ecb);
+                }
+            }
 
             // YW 3-12-2008, 2220 fix
             String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);

@@ -30,19 +30,13 @@
             </c:otherwise>
         </c:choose>
         <c:if test="${currRow.bean.studyEvent.signed == true}">
-            <span class="icon" alt="Signed" title="Signed">
-                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
-            </span>
+            <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
         </c:if>
         <c:if test="${currRow.bean.studyEvent.locked == true}">
-            <span class="icon" alt="Locked" title="Locked">
-                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
-            </span>
+            <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
         </c:if>
         <c:if test="${currRow.bean.studyEvent.archived == true}">
-            <span class="icon" alt="Archived" title="Archived">
-                <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
-            </span>
+            <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
         </c:if>
     </td>
     <td class="table_cell">
@@ -203,19 +197,13 @@
                                     </c:otherwise>
                                 </c:choose>
                                 <c:if test="${currRow.bean.studyEvent.signed == true}">
-                                    <span class="icon" alt="Signed" title="Signed">
-                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
-                                    </span>
+                                    <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
                                 </c:if>
                                 <c:if test="${currRow.bean.studyEvent.locked == true}">
-                                    <span class="icon" alt="Locked" title="Locked">
-                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
-                                    </span>
+                                    <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
                                 </c:if>
                                 <c:if test="${dec.eventCRF.isArchived()}">
-                                    <span class="icon" alt="Archived" title="Archived">
-                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
-                                    </span>
+                                    <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
                                 </c:if>
                             </td>
                             <c:choose>
@@ -279,7 +267,11 @@
                     <c:forEach var="dec" items="${currRow.bean.displayEventCRFs}">
                         <tr>
                             <td class="table_cell" width="180"><c:out value="${dec.eventCRF.crf.name}" /></td>
-                            <td class="table_cell" width="100"><c:out value="${dec.eventCRF.formLayout.name}" />
+                            <td class="table_cell" width="100">
+                                <c:out value="${dec.eventCRF.formLayout.name}" />
+                                <c:if test="${dec.eventCRF.formLayout.status.name == 'Removed'}">
+                                    <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
+                                </c:if>
                             </td>
                             <td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
                               <c:choose>
@@ -306,19 +298,13 @@
                                 </c:otherwise>
                               </c:choose>
                                 <c:if test="${currRow.bean.studyEvent.signed == true}">
-                                    <span class="icon" alt="Signed" title="Signed">
-                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/stamp.png"/>
-                                    </span>
+                                    <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
                                 </c:if>
                                 <c:if test="${currRow.bean.studyEvent.locked == true}">
-                                    <span class="icon" alt="Locked" title="Locked">
-                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackLock.png"/>
-                                    </span>
+                                    <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
                                 </c:if>
                                 <c:if test="${dec.eventCRF.isArchived()}">
-                                    <span class="icon" alt="Archived" title="Archived">
-                                        <img hspace="5" width="9" height="13" border="0" alt="Locked" src="images/table/png/blackFileCabinet.png"/>
-                                    </span>
+                                    <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
                                 </c:if>
                             </td>
                             <td class="table_cell" width="80">
