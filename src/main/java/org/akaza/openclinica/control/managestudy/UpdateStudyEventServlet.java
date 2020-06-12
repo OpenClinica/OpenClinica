@@ -443,7 +443,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 ArrayList<DisplayEventCRFBean> displayEventCRFs = getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
                         eventDefinitionCRFs, ub, currentRole, studyEvent.getWorkflowStatus(), study);
 
-                DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
+                DiscrepancyNoteUtil discNoteUtil = (DiscrepancyNoteUtil) WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("discrepancyNoteUtil");
                 DisplayStudyEventBean displayEvBean = new DisplayStudyEventBean();
                 List<DisplayStudyEventBean> displayEvents = new ArrayList<DisplayStudyEventBean>();
                 displayEvBean.setDisplayEventCRFs(displayEventCRFs);
