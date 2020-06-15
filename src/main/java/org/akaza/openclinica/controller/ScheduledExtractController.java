@@ -42,9 +42,6 @@ public class ScheduledExtractController {
     private UtilService utilService;
 
     @Autowired
-    private Scheduler scheduler;
-
-    @Autowired
     private StudyDao studyDao;
 
     @Autowired
