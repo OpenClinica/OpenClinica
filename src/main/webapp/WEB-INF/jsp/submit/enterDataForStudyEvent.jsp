@@ -188,14 +188,24 @@
                                   <fmt:message key="subject_event_status" bundle="${resword}"/>
                                 </td>
                                 <td class="table_cell">
-                                        <c:choose>
-                                            <c:when test="${studyEvent.removed == true}">
-                                                <fmt:message key="removed" bundle="${resword}"/>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:out value="${studyEvent.workflowStatus.displayValue}"/>
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <c:choose>
+                                        <c:when test="${studyEvent.removed == true}">
+                                            <fmt:message key="removed" bundle="${resword}"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:out value="${studyEvent.workflowStatus.displayValue}"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <br/>
+                                    <c:if test="${studyEvent.signed == true}">
+                                        <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
+                                    </c:if>
+                                    <c:if test="${studyEvent.locked == true}">
+                                        <span class="icon icon-lock-new status" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"/>
+                                    </c:if>
+                                    <c:if test="${studyEvent.archived == true}">
+                                        <span class="icon icon-archived-new status" alt="<fmt:message key="archived" bundle="${resword}"/>" title="<fmt:message key="archived" bundle="${resword}"/>"/>
+                                    </c:if>
                                 </td>
                               </tr>
                               <tr>
