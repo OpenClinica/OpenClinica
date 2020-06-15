@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -70,7 +69,7 @@ public class ScheduledJobConfig {
         BeanDefinition beanDefinition = BeanDefinitionBuilder.rootBeanDefinition(OpenClinicaSchedulerFactoryBean.class)
                 .addPropertyValue("schedulerName", schema)
                 .addPropertyValue("jobFactory", jobFactory)
-                .addPropertyValue("dataSource", ((DataSource) applicationContext.getBean("dataSource")))
+                .addPropertyValue("dataSource", applicationContext.getBean("dataSource"))
                 .addPropertyValue("transactionManager", applicationContext.getBean("transactionManager"))
                 .addPropertyValue("applicationContext", applicationContext)
                 .addPropertyValue("applicationContextSchedulerContextKey", "applicationContext")
@@ -81,6 +80,7 @@ public class ScheduledJobConfig {
                 .getBeanDefinition();
         ((DefaultListableBeanFactory) ((XmlWebApplicationContext) applicationContext).getBeanFactory()).registerBeanDefinition(schema, beanDefinition);
     }
+
 
     public void setStudyDao(StudyDao studyDao) {
         this.studyDao = studyDao;
