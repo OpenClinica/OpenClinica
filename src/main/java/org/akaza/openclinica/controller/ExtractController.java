@@ -69,14 +69,10 @@ public class ExtractController {
     private DatasetDAO datasetDao;
 
     @Autowired
-    @Qualifier("schedulerFactoryBean")
-    private Scheduler scheduler;
-
-    @Autowired
-    private OpenClinicaSchedulerFactoryBean schedulerFactoryBean;
-
-    @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -173,14 +169,7 @@ public class ExtractController {
         // result code, user message, optional URL, archive message, log file message
         // asdf table: sort most recent at top
         logger.debug("found xslt file name " + xsltPath);
-        ApplicationContext context = null;
-        Scheduler jobScheduler = scheduler;
-        try {
-            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
-        } catch (SchedulerException e) {
-            logger.error("Error in receiving application context: ", e);
-        }
-        jobScheduler = getSchemaScheduler(request, context, jobScheduler);
+        Scheduler jobScheduler = getSchemaScheduler(request);
 
         ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
         archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
@@ -218,7 +207,7 @@ public class ExtractController {
         cnt++;
 
         //WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
-        JobDetailFactoryBean jobDetailFactoryBean = context.getBean(JobDetailFactoryBean.class, simpleTrigger, this.TRIGGER_GROUP_NAME);
+        JobDetailFactoryBean jobDetailFactoryBean = applicationContext.getBean(JobDetailFactoryBean.class, simpleTrigger, this.TRIGGER_GROUP_NAME);
 
 
         try {
@@ -240,20 +229,21 @@ public class ExtractController {
         return map;
     }
 
-    private Scheduler getSchemaScheduler(HttpServletRequest request, ApplicationContext context, Scheduler jobScheduler) {
+    private Scheduler getSchemaScheduler(HttpServletRequest request) {
+        Scheduler jobScheduler = null;
         if (request.getAttribute(CURRENT_TENANT_ID) != null) {
             String schema = (String) request.getAttribute(CURRENT_TENANT_ID);
             if (StringUtils.isNotEmpty(schema) &&
                     (schema.equalsIgnoreCase("public") != true)) {
                 try {
-                    jobScheduler = (Scheduler) context.getBean(schema);
+                    jobScheduler = (Scheduler) applicationContext.getBean(schema);
                     logger.debug("Existing schema scheduler found:" + schema);
                 } catch (NoSuchBeanDefinitionException e) {
-                    createSchedulerFactoryBean(context, schema);
+                    createSchedulerFactoryBean(schema);
                     try {
-                        jobScheduler = (Scheduler) context.getBean(schema);
+                        jobScheduler = (Scheduler) applicationContext.getBean(schema);
                     } catch (BeansException e1) {
-                        logger.error("Bean for scheduler is not able to accessed after creating scheduled factory bean: ", e1);
+                        logger.error("Bean for scheduler is not able to accessed after crexating scheduled factory bean: ", e1);
 
                     }
                 } catch (BeansException e) {
@@ -265,17 +255,17 @@ public class ExtractController {
         return jobScheduler;
     }
 
-    public void createSchedulerFactoryBean(ApplicationContext context, String schema) {
+    public void createSchedulerFactoryBean(String schema) {
         logger.debug("Creating a new schema scheduler:" + schema);
         OpenClinicaSchedulerFactoryBean sFBean = new OpenClinicaSchedulerFactoryBean();
         sFBean.setSchedulerName(schema);
         Properties properties = new Properties();
         AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
-        jobFactory.setApplicationContext(context);
+        jobFactory.setApplicationContext(applicationContext);
         sFBean.setJobFactory(jobFactory);
-        sFBean.setDataSource((DataSource) context.getBean("dataSource"));
-        sFBean.setTransactionManager((PlatformTransactionManager) context.getBean("transactionManager"));
-        sFBean.setApplicationContext(context);
+        sFBean.setDataSource((DataSource) applicationContext.getBean("dataSource"));
+        sFBean.setTransactionManager((PlatformTransactionManager) applicationContext.getBean("transactionManager"));
+        sFBean.setApplicationContext(applicationContext);
         sFBean.setApplicationContextSchedulerContextKey("applicationContext");
         sFBean.setGlobalJobListeners(new JobExecutionExceptionListener());
         sFBean.setGlobalTriggerListeners(new JobTriggerListener());
@@ -305,7 +295,7 @@ public class ExtractController {
             return;
         }
         sFBean.start();
-        ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
+        ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
         beanFactory.registerSingleton(schema, sFBean);
     }
 
