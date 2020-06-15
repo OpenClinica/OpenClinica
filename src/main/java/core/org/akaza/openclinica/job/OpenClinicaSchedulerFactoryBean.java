@@ -16,9 +16,4 @@ public class OpenClinicaSchedulerFactoryBean extends SchedulerFactoryBean {
         super.afterPropertiesSet();
     }
 
-    @Override
-    public boolean isSingleton() {
-        return false;
-    }
-
 }
