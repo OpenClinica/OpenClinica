@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Component
 public class ScheduledJobConfig {
@@ -35,6 +35,7 @@ public class ScheduledJobConfig {
     logger.info("In postProcessBeanFactory");
     studyDao.findAll().stream()
             .map(study -> study.getSchemaName())
+            .collect(Collectors.toSet())
             .forEach(schema -> {
               createSchedulerFactoryBean(schema);
             });
@@ -66,22 +67,18 @@ public class ScheduledJobConfig {
     jobFactory.setApplicationContext(applicationContext);
 
     BeanDefinition beanDefinition = BeanDefinitionBuilder.rootBeanDefinition(OpenClinicaSchedulerFactoryBean.class)
-    .addPropertyValue("schedulerName", schema)
-    .addPropertyValue("jobFactory", jobFactory)
-    .addPropertyValue("dataSource", ((DataSource) applicationContext.getBean("dataSource")))
-    .addPropertyValue("transactionManager", applicationContext.getBean("transactionManager"))
-    .addPropertyValue("applicationContext", applicationContext)
-    .addPropertyValue("applicationContextSchedulerContextKey", "applicationContext")
-    .addPropertyValue("globalJobListeners", new JobExecutionExceptionListener())
-    .addPropertyValue("globalTriggerListeners", new JobTriggerListener())
-    .addPropertyValue("quartzProperties", properties)
-            .setScope("prototype")
+            .addPropertyValue("schedulerName", schema)
+            .addPropertyValue("jobFactory", jobFactory)
+            .addPropertyValue("dataSource", (applicationContext.getBean("dataSource")))
+            .addPropertyValue("transactionManager", applicationContext.getBean("transactionManager"))
+            .addPropertyValue("applicationContext", applicationContext)
+            .addPropertyValue("applicationContextSchedulerContextKey", "applicationContext")
+            .addPropertyValue("globalJobListeners", new JobExecutionExceptionListener())
+            .addPropertyValue("globalTriggerListeners", new JobTriggerListener())
+            .addPropertyValue("quartzProperties", properties)
             .setInitMethodName("start")
             .getBeanDefinition();
     ((DefaultListableBeanFactory) ((XmlWebApplicationContext) applicationContext).getBeanFactory()).registerBeanDefinition(schema, beanDefinition);
-//    ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) applicationContext).getBeanFactory().configureBean();
-//    beanFactory.registerSingleton(schema, sFBean);
-//    applicationContext.getAutowireCapableBeanFactory().initializeBean(sFBean, schema);
   }
 
   public void setStudyDao(StudyDao studyDao) {
