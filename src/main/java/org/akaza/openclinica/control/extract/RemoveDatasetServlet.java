@@ -21,11 +21,9 @@ import org.akaza.openclinica.control.admin.ScheduleJobServlet;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.springframework.context.ApplicationContext;
 
 import java.util.*;
 
@@ -140,14 +138,9 @@ public class RemoveDatasetServlet extends ScheduleJobServlet {
 
     private List<Integer> getSchduledJobsDatasetIds() throws Exception {
         List<Integer> datasetIds = new LinkedList<>();
-        ApplicationContext context = null;
-        scheduler = getScheduler();
-        try {
-            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
-        } catch (SchedulerException e) {
-            logger.error("Error in receiving application context: ", e);
-        }
-        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        schedulerUtilService = getSchedulerUtilService();
+        applicationContext = getApplicationContext();
+        Scheduler jobScheduler = schedulerUtilService.getSchemaScheduler(applicationContext, request);
         XsltTriggerService xsltTriggerSrvc = new XsltTriggerService();
         Set<TriggerKey> triggerKeySet = jobScheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
         TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);

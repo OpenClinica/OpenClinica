@@ -19,7 +19,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 import java.io.File;
@@ -71,15 +70,10 @@ public class UpdateJobExportServlet extends ScheduleJobServlet {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        scheduler = getScheduler();
         permissionService = getPermissionService();
-        ApplicationContext context = null;
-        try {
-            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
-        } catch (SchedulerException e) {
-            logger.error("Error in receiving application context: ", e);
-        }
-        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        applicationContext = getApplicationContext();
+        schedulerUtilService = getSchedulerUtilService();
+        Scheduler jobScheduler = schedulerUtilService.getSchemaScheduler(applicationContext, request);
         String action = fp.getString("action");
         String triggerName = fp.getString("tname");
         String jobUuid = fp.getString("jobUuid");

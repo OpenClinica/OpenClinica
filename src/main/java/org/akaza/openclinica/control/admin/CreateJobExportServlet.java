@@ -64,14 +64,9 @@ public class CreateJobExportServlet extends ScheduleJobServlet {
     protected void processRequest() throws Exception {
         // will accept, create, and return the ViewJob servlet
         FormProcessor fp = new FormProcessor(request);
-        scheduler = getScheduler();
-        ApplicationContext context = null;
-        try {
-            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
-        } catch (SchedulerException e) {
-            logger.error("Error in receiving application context: ", e);
-        }
-        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        schedulerUtilService = getSchedulerUtilService();
+        applicationContext = getApplicationContext();
+        Scheduler jobScheduler = schedulerUtilService.getSchemaScheduler(applicationContext, request);
         permissionService = getPermissionService();
         String action = fp.getString("action");
         ExtractUtils extractUtils = new ExtractUtils();
