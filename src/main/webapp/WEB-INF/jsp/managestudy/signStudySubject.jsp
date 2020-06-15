@@ -438,7 +438,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 <c:choose>
     <c:when test="${empty displayStudyEvents}">
-    
+
     </c:when>
 
     <c:otherwise>
@@ -456,14 +456,14 @@
         <c:forEach var="dse" items="${displayStudyEvents}">
         <c:forEach var="dedc" items="${dse.uncompletedCRFs}">
 
-            <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}" />
+            <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySub.subjectId}&eventCRFId=${dedc.eventCRF.id}" />
                 <tr valign="top">
                             <c:set var="repeat" value="${dse.studyEvent.studyEventDefinition.name}(${dse.studyEvent.sampleOrdinal})" />
-            <c:set var="non_repeat" value="${dse.studyEvent.studyEventDefinition.name}" />            
-            
+            <c:set var="non_repeat" value="${dse.studyEvent.studyEventDefinition.name}" />
+
                 <td class="table_cell"><c:out value="${ dse.studyEvent.studyEventDefinition.repeating ? repeat :non_repeat }" />&nbsp;</td>
-                <td class="table_cell"><fmt:formatDate value="${dse.studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>              
-                
+                <td class="table_cell"><fmt:formatDate value="${dse.studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>
+
                     <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /></td>
                   <td class="table_cell">
 
@@ -544,7 +544,7 @@
                         </td>
                     </c:when>
 
-                    <c:when test="${studySubject.status.available }">
+                    <c:when test="${studySub.status.available }">
                         <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
                     </c:when>
 
@@ -568,7 +568,7 @@
                         &nbsp;
                     </c:when>
 
-                    <c:when test="${studySubject.status.available}">
+                    <c:when test="${studySub.status.available}">
                             <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${dse.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                             onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                             onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
@@ -595,13 +595,13 @@
         <%-- end of for each for dedc, uncompleted event crfs --%>
         <c:forEach var="dec" items="${dse.displayEventCRFs}" varStatus="status">
             <c:set var="discNoteMap" value="${discNoteByEventCRFid[dec.eventCRF.id]}"/>
-        
+
             <tr>
             <c:set var="repeat" value="${dse.studyEvent.studyEventDefinition.name}(${dse.studyEvent.sampleOrdinal})" />
-            <c:set var="non_repeat" value="${dse.studyEvent.studyEventDefinition.name}" />            
-            
+            <c:set var="non_repeat" value="${dse.studyEvent.studyEventDefinition.name}" />
+
                 <td class="table_cell"><c:out value="${ dse.studyEvent.studyEventDefinition.repeating ? repeat :non_repeat }" />&nbsp;</td>
-                <td class="table_cell"><fmt:formatDate value="${dse.studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>              
+                <td class="table_cell"><fmt:formatDate value="${dse.studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.crf.name}" />&nbsp;</td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.crfVersion.name}" />&nbsp;</td>
                 <td class="table_cell" bgcolor="#F5F5F5" align="center">
@@ -620,10 +620,10 @@
                   </c:choose>
                 </td>
                 <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
-                
-                
-                <td class="table_cell"> 
-                
+
+
+                <td class="table_cell">
+
                 <table>
                                 <tr><td>
                                         <span class="fa fa-bubble-red"  border="0"
@@ -643,7 +643,7 @@
                                         ${discNoteMap['Closed']}
                                         &nbsp;Closed
                                 </td></tr>
-                                
+
                                 <tr><td>
                                         <span class="fa fa-bubble-black" border="0"
                                           alt="<fmt:message key="Closed_Modified" bundle="${resterm}"/>" title="<fmt:message key="Closed_Modified" bundle="${resterm}"/>" align="left"/>
@@ -653,9 +653,9 @@
                     </table>
                     &nbsp;
                  </td>
-                
-                
-                
+
+
+
                 <td class="table_cell">
                     <c:set var="actionQuery" value="" />
 
@@ -706,7 +706,7 @@
                             <%-- added above 112007, tbh --%>
                         </c:when>
                         <c:otherwise>
-                            <c:if test="${studySubject.status.available}">
+                            <c:if test="${studySub.status.available}">
                             <a href="<c:out value="${actionQuery}"/>"
                                 onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                                 onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
@@ -718,7 +718,7 @@
                                 ><span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
 <!--
          <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
-   -->                         
+   -->
 
 
 
@@ -758,7 +758,7 @@
 
     </c:otherwise>
     </c:choose>
-    
+
 
 <div style="width: 250px">
 
@@ -904,7 +904,7 @@
 
                 </td>
             </tr>
-            
+
         </table>
 
         <!-- End Table Contents -->
