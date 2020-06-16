@@ -1,7 +1,3 @@
-
-/**
- *
- */
 package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;

@@ -11,14 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 import java.util.Properties;
 
 import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
@@ -55,21 +55,10 @@ public class SchedulerUtilServiceImpl implements SchedulerUtilService {
         return jobScheduler;
     }
 
-
     public void createSchedulerFactoryBean(ApplicationContext applicationContext, String schema) {
-        logger.debug("Creating a new schema scheduler:" + schema);
-        OpenClinicaSchedulerFactoryBean sFBean = new OpenClinicaSchedulerFactoryBean();
-        sFBean.setSchedulerName(schema);
+        logger.info("Creating a new schema scheduler:" + schema);
+
         Properties properties = new Properties();
-        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
-        jobFactory.setApplicationContext(applicationContext);
-        sFBean.setJobFactory(jobFactory);
-        sFBean.setDataSource((DataSource) applicationContext.getBean("dataSource"));
-        sFBean.setTransactionManager((PlatformTransactionManager) applicationContext.getBean("transactionManager"));
-        sFBean.setApplicationContext(applicationContext);
-        sFBean.setApplicationContextSchedulerContextKey("applicationContext");
-        sFBean.setGlobalJobListeners(new JobExecutionExceptionListener());
-        sFBean.setGlobalTriggerListeners(new JobTriggerListener());
 
         // use global Quartz properties
         properties.setProperty("org.quartz.jobStore.misfireThreshold",
@@ -88,15 +77,22 @@ public class SchedulerUtilServiceImpl implements SchedulerUtilService {
                 CoreResources.getField("org.quartz.threadPool.threadCount"));
         properties.setProperty("org.quartz.threadPool.threadPriority",
                 CoreResources.getField("org.quartz.threadPool.threadPriority"));
-        sFBean.setQuartzProperties(properties);
-        try {
-            sFBean.afterPropertiesSet();
-        } catch (Exception e) {
-            logger.error("Error creating the scheduler bean:" + schema, e.getMessage(), e);
-            return;
-        }
-        sFBean.start();
-        ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
-        beanFactory.registerSingleton(schema, sFBean);
+        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
+        jobFactory.setApplicationContext(applicationContext);
+
+        BeanDefinition beanDefinition = BeanDefinitionBuilder.rootBeanDefinition(OpenClinicaSchedulerFactoryBean.class)
+                .addPropertyValue("schedulerName", schema)
+                .addPropertyValue("jobFactory", jobFactory)
+                .addPropertyValue("dataSource", applicationContext.getBean("dataSource"))
+                .addPropertyValue("transactionManager", applicationContext.getBean("transactionManager"))
+                .addPropertyValue("applicationContext", applicationContext)
+                .addPropertyValue("applicationContextSchedulerContextKey", "applicationContext")
+                .addPropertyValue("globalJobListeners", new JobExecutionExceptionListener())
+                .addPropertyValue("globalTriggerListeners", new JobTriggerListener())
+                .addPropertyValue("quartzProperties", properties)
+                .setInitMethodName("start")
+                .getBeanDefinition();
+        ((DefaultListableBeanFactory) ((XmlWebApplicationContext) applicationContext).getBeanFactory()).registerBeanDefinition(schema, beanDefinition);
     }
+
 }
