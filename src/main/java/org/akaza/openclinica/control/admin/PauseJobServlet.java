@@ -4,7 +4,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.*;
-import org.springframework.context.ApplicationContext;
 
 /**
  * PauseJobServlet, a small servlet to pause/unpause a trigger in the scehduler.
@@ -29,14 +28,9 @@ public class PauseJobServlet extends ScheduleJobServlet {
             finalGroupName = TRIGGER_IMPORT_GROUP;
         }
         String deleteMe = fp.getString("del");
-        ApplicationContext context = null;
-        scheduler = getScheduler();
-        try {
-            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
-        } catch (SchedulerException e) {
-            logger.error("Error in receiving application context: ", e);
-        }
-        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
+        applicationContext = getApplicationContext();
+        schedulerUtilService = getSchedulerUtilService();
+        Scheduler jobScheduler = schedulerUtilService.getSchemaScheduler(applicationContext, request);
         try {
             if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {
                 jobScheduler.deleteJob(JobKey.jobKey(triggerName, finalGroupName));

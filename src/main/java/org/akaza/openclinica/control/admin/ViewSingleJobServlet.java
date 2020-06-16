@@ -15,7 +15,6 @@ import core.org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.quartz.*;
-import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.util.*;
@@ -27,16 +26,9 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
         FormProcessor fp = new FormProcessor(request);
         String action = fp.getString("action");
         int adfId = fp.getInt("adfId");
-
-        ApplicationContext context = null;
-        scheduler = getScheduler();
-        try {
-            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
-        } catch (SchedulerException e) {
-            logger.error("Error in receiving application context: ", e);
-        }
-        Scheduler jobScheduler = getSchemaScheduler(request, context, scheduler);
-
+        schedulerUtilService = getSchedulerUtilService();
+        applicationContext = getApplicationContext();
+        Scheduler jobScheduler = schedulerUtilService.getSchemaScheduler(applicationContext, request);
 
         if (StringUtil.isBlank(action)) {
             loadList(jobScheduler, fp);
