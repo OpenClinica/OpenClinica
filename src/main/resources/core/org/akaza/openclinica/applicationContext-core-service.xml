@@ -86,6 +86,11 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
+    <bean id="studyEventDefinitionJDBCDao" class="core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="studyDaoDomain"/>
+    </bean>
+
     <bean id="ruleSetListenerService" class="core.org.akaza.openclinica.service.rule.RuleSetListenerService">
         <property name="ruleSetService" ref="ruleSetService"/>
         <property name="ruleSetDao" ref="ruleSetDao"/>
@@ -165,6 +170,8 @@
     <bean id="ExpressionService" class="core.org.akaza.openclinica.service.rule.expression.ExpressionService">
        <constructor-arg ref="dataSource"/>
     </bean>
+
+    <bean id="discrepancyNoteUtil" class="core.org.akaza.openclinica.service.DiscrepancyNoteUtil"/>
 
     <context:component-scan base-package="org.akaza.openclinica.controller.openrosa"/>
 
