@@ -14,9 +14,9 @@
 			<StudyEventData StudyEventOID="SE_OID" OpenClinica:StartDate="2017-09-29" OpenClinica:EndDate="2017-09-29" OpenClinica:Status="data entry started" StudyEventRepeatKey="1">
 
 				<!-- Replace the F_OID with the OID of the Form that will be populated with the imported data.
-                     Replace the FormLayoutOID with the FormLayoutRef OID in the study metadata.
+                     Replace the Version_ID with the Form Version ID in the study metadata.
                      Specify the status the Form should have after the import is complete. Options are initial data entry or complete.-->
-				<FormData FormOID="F_OID" OpenClinica:FormLayoutOID="1.1" OpenClinica:Status="initial data entry" OpenClinica:ReasonForChangeForCompleteForms="Update via Import">
+				<FormData FormOID="F_OID" OpenClinica:FormLayoutOID="Version_ID" OpenClinica:Status="initial data entry" OpenClinica:ReasonForChangeForCompleteForms="Update via Import">
 
 					<!-- Replace the IG_OID with the Item Group OID. If the Group is a Grid, specify the row number for the insert in ItemGroupRepeatKey. TransactionType for an import should always be Insert.-->
 					<ItemGroupData ItemGroupOID="IG_OID" ItemGroupRepeatKey="1" TransactionType="Insert">
