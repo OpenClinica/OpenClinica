@@ -1779,7 +1779,7 @@
                     //render:"table"
                     width: 80,
                     height: 80,
-                    text: data.host + '?accessCode=' + data.accessCode
+                    text: data.host + '/?accessCode=' + data.accessCode
                 });
             },
             error: logDump

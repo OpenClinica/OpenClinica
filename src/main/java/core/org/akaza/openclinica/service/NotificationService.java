@@ -34,7 +34,7 @@ public class NotificationService  {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public static final String ACCESS_LINK_PART_URL = "?accessCode=";
+    public static final String ACCESS_LINK_PART_URL = "/?accessCode=";
     public static final String PARTICIPATE = "participate";
     private static final String ACCESS_CODE_ATTRIBUTE = "accessCode";
     String DB_CONNECTION_KEY = "dbConnection";
