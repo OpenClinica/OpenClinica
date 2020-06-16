@@ -72,6 +72,8 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
 
     public static final String EVENT_WORKFLOW_STATUS = "statusId";
+    public static final String LOCKED = "Locked";
+    public static final String UNLOCKED = "UnLocked";
 
     public static final String INPUT_STARTDATE_PREFIX = "start";
     public static final String INPUT_ENDDATE_PREFIX = "end";
@@ -274,25 +276,13 @@ public class UpdateStudyEventServlet extends SecureController {
             session.setAttribute(PREV_STUDY_EVENT_SIGNED_STATUS, studyEvent.getSigned());
 
             ArrayList<EventCRFBean> eventCRFs = eventCRFDAO.findAllByStudyEvent(studyEvent);
-            // OC-12711 Lock/Unlock Visit Events from the Participant Details Page
             String newStatus = fp.getString(NEW_STATUS);
-            if (newStatus != null) {
-                boolean isLocked = false;
-                if (newStatus.equalsIgnoreCase(Status.LOCKED.getName())) {
-                    isLocked = true;
+
+            if (newStatus != null && newStatus.equals(LOCKED)) {
+                studyEvent.setLocked(true);
+            }else if (newStatus != null && newStatus.equals(UNLOCKED)) {
+                studyEvent.setLocked(false);
                 }
-                studyEvent.setLocked(isLocked);
-                for (int i = 0; i < eventCRFs.size(); i++) {
-                    EventCRFBean ecb = eventCRFs.get(i);
-                    if (isLocked)
-                        ecb.setStatus(Status.UNAVAILABLE);
-                    else
-                        ecb.setStatus(Status.AVAILABLE);
-                    ecb.setUpdater(ub);
-                    ecb.setUpdatedDate(new Date());
-                    eventCRFDAO.update(ecb);
-                }
-            }
 
             // YW 3-12-2008, 2220 fix
             String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
