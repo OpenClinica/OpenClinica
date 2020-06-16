@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
     <changeSet author="sbalasubramanian" id="4.0-2020-05-27-OC-12716">
-        <comment>Updating the sdv_status from CHANGED_AFTER_VERIFIED to CHANGED_SINCE_VERIFIED on event_crf table</comment>
+        <comment>Updating the default sdv_status from NOT_VERIFIED to null </comment>
         <sql>
             UPDATE event_crf
             SET sdv_status= null WHERE sdv_status ='NOT_VERIFIED' and date_last_sdv_verified is null;
