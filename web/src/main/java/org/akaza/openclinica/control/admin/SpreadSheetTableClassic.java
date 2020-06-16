@@ -988,7 +988,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                           sqlParameters.add(new SqlParameter(stripQuotes(resOptions.replaceAll("\\\\,", "\\,"))));
                           sqlParameters.add(new SqlParameter(stripQuotes(resValues.replace("\\\\", "\\"))));
                           sqlParameters.add(new SqlParameter(stripQuotes(stripQuotes(responseType.toLowerCase()))));
-                         //in versionIdString there is one parameter:crfId
+                         //in versionIdString there one parameter:crfId
                           sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         } else {
                            /* sql =
@@ -1004,8 +1004,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                               sqlParameters.add(new SqlParameter(stripQuotes(updatedResOptions)));
                               sqlParameters.add(new SqlParameter(stripQuotes(updatedResValues)));
                               sqlParameters.add(new SqlParameter(stripQuotes(stripQuotes(responseType.toLowerCase()))));
-                             //in versionIdString there is one parameter:crfId
-                              sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                            //in versionIdString there one parameter:crfId
+                            sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         }
                         if (!resNames.contains(responseLabel)) {                        	                           
                                                       
@@ -1114,14 +1114,12 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                           + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
                                           + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
                                           +  versionIdString                                                                  
-                                          + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
-                                          + stripQuotes(responseLabel)
-                                          + "'"
+                                          + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL=?" //responseLabel
                                           + " AND VERSION_ID="
                                           + versionIdString
                                           + "),"
                                           + selectCorrectItemQueryPostgres
-                                          + ",?, ?, ?, ?, "
+                                          + ",?, ?, ?, ?, " //subHeader, header, leftItemText, rightItemText
                                           + parentItemString
                                           + ", (SELECT SECTION_ID FROM SECTION WHERE LABEL='"
                                           + secName
@@ -1134,12 +1132,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                           + parentItem
                                           + "',"
                                           + columnNum
-                                          + ",'"
-                                          + stripQuotes(page)
-                                          + "','"
-                                          + stripQuotes(questionNum)
-                                          + "','"
-                                          + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + (isRequired ? 1 : 0) + ")";
+                                          + ",?,?,?,?, " //page, questionNum, regexp1, regexpError
+                                          + (isRequired ? 1 : 0) + ")";
                          
                         } else {
                            /* sql2 =
@@ -1186,14 +1180,12 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                          + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
                                          + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
                                          + versionIdString                                         
-                                         + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
-                                         + stripQuotes(responseLabel)
-                                         + "'"
+                                         + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL=?" //responseLabel
                                          + " AND VERSION_ID="
                                          + versionIdString
                                          + "),"
                                          + selectCorrectItemQueryPostgres
-                                         + ",?, ?, ?, ?, "
+                                         + ",?, ?, ?, ?, " //subHeader, header, leftItemText, rightItemText
                                          + parentItemString
                                          + ", (SELECT SECTION_ID FROM SECTION WHERE LABEL='"
                                          + secName
@@ -1206,23 +1198,25 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                          + parentItem
                                          + "',"
                                          + columnNum
-                                         + ",'"
-                                         + stripQuotes(page)
-                                         + "','"
-                                         + stripQuotes(questionNum)
-                                         + "','"
-                                         + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + isRequired + ")";
+                                         + ",?,?,?,?, " //page, questionNum, regexp1, regexpError
+                                         + isRequired + ")";
                                                                                 
                         }
-                     
-                       //in versionIdString there is one parameter:crfId
+
+                        //in versionIdString there one parameter:crfId
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         sqlParameters.add(new SqlParameter(stripQuotes(subHeader)));
                         sqlParameters.add(new SqlParameter(stripQuotes(header)));
                         sqlParameters.add(new SqlParameter(stripQuotes(leftItemText)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));                        
+                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));
+                        //in versionIdString there one parameter:crfId
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(stripQuotes(page)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(questionNum)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(regexp1)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(regexpError)));
                         
                         qo = new QueryObject();
                         qo.setSql(sql2);
@@ -1243,8 +1237,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                        
                         }
                         sqlParameters = new ArrayList<>();
-                       
-                       //in versionIdString there is one parameter:crfId
+
+                        //in versionIdString there one parameter:crfId
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         
                         qo = new QueryObject();
@@ -1314,7 +1308,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         }
 
                         sqlParameters = new ArrayList<>();
-                       //in versionIdString there is one parameter:crfId
+                        //in versionIdString there one parameter:crfId
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                        
                         
@@ -1426,7 +1420,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         }
                         
                         ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
-                        //in versionIdString there is one parameter:crfId
+                        //in versionIdString there one parameter:crfId
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         
                         sqlParameters.add(new SqlParameter(secLabel));
