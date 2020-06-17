@@ -37,6 +37,7 @@ public class QuartzConfiguration {
 		jobDataMap.put(XSL_FILE_PATH, xslFile);
 		jobDataMap.put(XML_FILE_PATH, endFilePath);
 		jobDataMap.put(POST_FILE_PATH, endFilePath);
+		// needs a new name everytime there is new trigger.
 		jobDataMap.put(POST_FILE_NAME, endFile);
 
 		jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());

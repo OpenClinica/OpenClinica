@@ -958,6 +958,4 @@ public class UserServiceImpl implements UserService {
         jobDetail = jobService.saveOrUpdateJob(jobDetail);
         logger.debug("Job Id {} has failed", jobDetail.getJobDetailId());
     }
-
-
 }

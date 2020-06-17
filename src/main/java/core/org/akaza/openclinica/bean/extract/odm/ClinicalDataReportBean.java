@@ -88,6 +88,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     + StringEscapeUtils.escapeXml(this.clinicalData.getMetaDataVersionOID()) + "\">");
             xml.append(nls);
         }
+
         Role role = null; // OpenClinica:
         if (userBean.getUserUuid().equals(ApplicationConstants.SYSTEM_USER_UUID)) {
             role = Role.ADMIN;

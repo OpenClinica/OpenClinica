@@ -668,6 +668,7 @@ public class ImportServiceImpl implements ImportService {
         return studyEvent;
     }
 
+
     public StudyEvent updateStudyEventDatesAndStatus(StudyEvent studyEvent, UserAccount userAccount, String startDate, String endDate, String eventStatus) {
         studyEvent.setWorkflowStatus(getWorkflowStatus(eventStatus));
         setEventStartAndEndDate(studyEvent, startDate, endDate);
@@ -784,6 +785,8 @@ public class ImportServiceImpl implements ImportService {
 
 
     private ErrorObj validateRadioOrSingleSelect(ResponseSet responseSet, String value) {
+        if(responseSet.getOptionsText().equals("_") && responseSet.getOptionsValues().equals("_"))
+            return null;
         if (!responseSet.getOptionsValues().contains(value)) {
             return new ErrorObj(FAILED, ErrorConstants.ERR_VALUE_CHOICE_NOT_FOUND);
         }
@@ -1046,7 +1049,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
     /**
-     * @param studyEvent
+     * @param studyEventDataBean
      * @return
      */
 
@@ -1290,8 +1293,8 @@ public class ImportServiceImpl implements ImportService {
             }
         }
         if (studySubject != null && !(studySubject.getStatus().equals(Status.AVAILABLE)) && !(studySubject.getStatus().equals(Status.SIGNED))) {
-
             return new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+
         }
         subjectDataBean.setSubjectOID(studySubject.getOcOid());
         subjectDataBean.setStudySubjectID(studySubject.getLabel());
@@ -1332,7 +1335,6 @@ public class ImportServiceImpl implements ImportService {
             eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
 
             logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
-
 
             logger.debug("Study Event Id {} is updated", studyEvent.getStudyEventId());
         }
@@ -1401,7 +1403,6 @@ public class ImportServiceImpl implements ImportService {
             if (errorObj != null) return errorObj;
 
         }
-
         ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
 
         if (itemData != null) {
@@ -1563,6 +1564,7 @@ public class ImportServiceImpl implements ImportService {
         }
         return false;
     }
+
     public void updateEventAndSubjectStatusIfSigned(StudyEvent studyEvent, StudySubject studySubject, UserAccount userAccount) {
         if (studyEvent.isCurrentlySigned()) {
             studyEvent.setSigned(Boolean.FALSE);

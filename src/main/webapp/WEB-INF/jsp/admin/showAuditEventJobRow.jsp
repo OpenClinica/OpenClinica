@@ -42,13 +42,5 @@
       	</c:forEach>
       	</table> --%>
       </td>
-      <%--<td class="table_cell"><!-- other info goes here, from context --></td>      --%>
-      <td class="table_cell"><!-- actions go here. -->
-		  <c:import url="../include/showAuditEntityLink.jsp">
-			<c:param name="auditTable" value="${currRow.bean.auditTable}" />
-			<c:param name="entityId" value="${currRow.bean.entityId}" />
-			<c:param name="rolename" value="${userRole.role.name}"/>
-		</c:import>
-      </td>    
 </tr> 
   

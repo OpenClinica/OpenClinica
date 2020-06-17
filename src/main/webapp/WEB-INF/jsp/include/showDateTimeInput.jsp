@@ -34,9 +34,6 @@
     </c:if>
     <c:if test='${presetValue.key == hourFieldName}'>
         <c:set var="hour" value="${presetValue.value}" />
-        <%--<c:if test="${hour==0}">
-            <c:set var="hour" value="12" />
-        </c:if>--%>
     </c:if>
     <c:if test='${presetValue.key == minuteFieldName}'>
         <c:set var="minute" value="${presetValue.value}" />
@@ -70,10 +67,10 @@
     <c:forEach var="currHour" begin="0" end="23" step="1">
         <c:choose>
             <c:when test="${hour == currHour}">
-                <option value="<c:out value="${currHour}"/>" selected><c:out value="${currHour}"/></option>
+                <option value="<c:out value="${currHour}"/>" selected><fmt:formatNumber minIntegerDigits="2" value="${currHour}" /></option>
             </c:when>
             <c:otherwise>
-                <option value="<c:out value="${currHour}"/>"><c:out value="${currHour}"/></option>
+                <option value="<c:out value="${currHour}"/>"><fmt:formatNumber minIntegerDigits="2" value="${currHour}" /></option>
             </c:otherwise>
         </c:choose>
     </c:forEach>
@@ -81,10 +78,10 @@
     <c:forEach var="currHour" begin="1" end="12" step="1">
         <c:choose>
             <c:when test="${hour == currHour}">
-                <option value="<c:out value="${currHour}"/>" selected><c:out value="${currHour}"/></option>
+                <option value="<c:out value="${currHour}"/>" selected><fmt:formatNumber minIntegerDigits="2" value="${currHour}" /></option>
             </c:when>
             <c:otherwise>
-                <option value="<c:out value="${currHour}"/>"><c:out value="${currHour}"/></option>
+                <option value="<c:out value="${currHour}"/>"><fmt:formatNumber minIntegerDigits="2" value="${currHour}" /></option>
             </c:otherwise>
         </c:choose>
     </c:forEach>
@@ -102,10 +99,10 @@
     <c:forEach var="currMinute" begin="0" end="59" step="1">
         <c:choose>
             <c:when test="${minute == currMinute}">
-                <option value="<c:out value="${currMinute}"/>" selected><c:out value="${currMinute}"/></option>
+                <option value="<c:out value="${currMinute}"/>" selected><fmt:formatNumber minIntegerDigits="2" value="${currMinute}" /></option>
             </c:when>
             <c:otherwise>
-                <option value="<c:out value="${currMinute}"/>"><c:out value="${currMinute}"/></option>
+                <option value="<c:out value="${currMinute}"/>"><fmt:formatNumber minIntegerDigits="2" value="${currMinute}" /></option>
             </c:otherwise>
         </c:choose>
     </c:forEach>

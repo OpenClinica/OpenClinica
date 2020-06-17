@@ -18,15 +18,21 @@ public interface PermissionService {
 
     ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request);
 
-    List<String> getPermissionTagsList(Study study,HttpServletRequest request);
+    List<String> getPermissionTagsList(Study study, HttpServletRequest request);
 
-    String getPermissionTagsString(Study study,HttpServletRequest request);
+    String getPermissionTagsString(Study study, HttpServletRequest request);
 
-    String[] getPermissionTagsStringArray(Study study ,HttpServletRequest request);
+    String[] getPermissionTagsStringArray(Study study, HttpServletRequest request);
+
+    List<String> getPermissionTagsList(Study study, String userUuid);
+
+    String getPermissionTagsString(Study study, String userUuid);
+
+    String[] getPermissionTagsStringArray(Study study, String userUuid);
 
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);
-    
-    boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList);
+
+    boolean hasFormAccess(EventDefinitionCrf edc, List<String> permissionTagsList);
 
     boolean isUserHasPermission(String column, HttpServletRequest request, Study studyBean);
 

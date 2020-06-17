@@ -46,7 +46,6 @@ import core.org.akaza.openclinica.web.job.XalanTriggerService;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 /**
@@ -54,13 +53,10 @@ import org.springframework.scheduling.quartz.JobDetailFactoryBean;
  * files exist in the system or database,<BR/> Give the user the option of
  * showing a stored dataset, or refresh the current one.
  * </P>
- *
+ * <p>
  * TODO eventually allow for a thread to be split off, so that exporting can run
  * seperately from the servlet and be retrieved at a later time.
- *
  * @author thickerson
- *
- *
  */
 public class ExportDatasetServlet extends SecureController {
 
@@ -99,7 +95,7 @@ public class ExportDatasetServlet extends SecureController {
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
 
-        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(),request,
+        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(), request,
                 (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources"),
                 (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao"),
                 (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain"));
@@ -112,11 +108,11 @@ public class ExportDatasetServlet extends SecureController {
                 datasetId = dsb.getId();
                 logger.info("dataset id was zero, trying session: " + datasetId);
             } catch (NullPointerException e) {
-                logger.info("tripped over null pointer exception",e);
+                logger.info("tripped over null pointer exception", e);
             }
         }
         DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
-        Study study = (Study)getStudyDao().findByPK(db.getStudyId());
+        Study study = (Study) getStudyDao().findByPK(db.getStudyId());
         checkRoleByUserAndStudy(ub, study);
 
         //Checks if the study is current study or child of current study
@@ -163,20 +159,20 @@ public class ExportDatasetServlet extends SecureController {
                 return;
             }
 
-            if(adfBean!=null || adfBean.getId()!=0){
-            File file = new File(adfBean.getFileReference());
-            if (!file.canWrite()) {
-                addPageMessage(respage.getString("write_protected"));
-            } else {
-                success = file.delete();
-                if (success) {
-                    deleteArchivedDataset(asdfdao, adfBean);
-                    addPageMessage(respage.getString("file_removed"));
+            if (adfBean != null || adfBean.getId() != 0) {
+                File file = new File(adfBean.getFileReference());
+                if (!file.canWrite()) {
+                    addPageMessage(respage.getString("write_protected"));
                 } else {
-                    addPageMessage(respage.getString("error_removing_file"));
+                    success = file.delete();
+                    if (success) {
+                        deleteArchivedDataset(asdfdao, adfBean);
+                        addPageMessage(respage.getString("file_removed"));
+                    } else {
+                        addPageMessage(respage.getString("error_removing_file"));
+                    }
                 }
             }
-        }
             loadList(db, asdfdao, datasetId, fp, eb);
             forwardPage(Page.EXPORT_DATASETS);
         } else {
@@ -192,8 +188,7 @@ public class ExportDatasetServlet extends SecureController {
             String fileName = "";
 
             db.setName(db.getName().replaceAll(" ", "_"));
-            Page finalTarget = Page.GENERATE_DATASET;
-            finalTarget = Page.EXPORT_DATA_CUSTOM;
+            Page finalTarget = Page.EXPORT_DATA_CUSTOM;
 
             // now display report according to format specified
 
@@ -222,7 +217,7 @@ public class ExportDatasetServlet extends SecureController {
                 // HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "");
                 HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentStudy.getStudyId(), currentStudy.checkAndGetParentStudyId(), "99", true, true, true, null, ub);
 
-                for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+                for (Iterator it = answerMap.entrySet().iterator(); it.hasNext(); ) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                     Object key = entry.getKey();
                     Object value = entry.getValue();
@@ -261,7 +256,7 @@ public class ExportDatasetServlet extends SecureController {
                         Date dateStart = scheduler.scheduleJob(JobDetailFactoryBean.getObject(), simpleTrigger);
                         logger.info("== found job date: " + dateStart.toString());
                     } catch (SchedulerException se) {
-                        logger.error("job cannot be fetched: ",se);
+                        logger.error("job cannot be fetched: ", se);
                     }
                 }
             } else if ("txt".equalsIgnoreCase(action)) {
@@ -279,7 +274,7 @@ public class ExportDatasetServlet extends SecureController {
                 // push out to the browser. Shame that it is a long hack,
                 // though. need to pare it down later, tbh
                 // and of course DRY
-                for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+                for (Iterator it = answerMap.entrySet().iterator(); it.hasNext(); ) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                     Object key = entry.getKey();
                     Object value = entry.getValue();
@@ -339,7 +334,7 @@ public class ExportDatasetServlet extends SecureController {
                  * message that the two files are below, available for download
                  */
                 // hmm, DRY?
-                for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+                for (Iterator it = answerMap.entrySet().iterator(); it.hasNext(); ) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                     Object key = entry.getKey();
                     Object value = entry.getValue();
@@ -423,8 +418,8 @@ public class ExportDatasetServlet extends SecureController {
                 EntityBeanTable table = fp.getEntityBeanTable();
                 table.setSortingIfNotExplicitlySet(3, false);// sort by date
                 String[] columns =
-                        { resword.getString("dataset_format"),resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
-                                resword.getString("created_by"),resword.getString("status"), resword.getString("action") };
+                        {resword.getString("dataset_format"), resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
+                                resword.getString("created_by"), resword.getString("status"), resword.getString("action")};
                 table.setColumns(new ArrayList(Arrays.asList(columns)));
                 table.hideColumnLink(0);
                 table.hideColumnLink(1);
@@ -434,7 +429,6 @@ public class ExportDatasetServlet extends SecureController {
                 table.hideColumnLink(5);
                 table.hideColumnLink(6);
                 table.hideColumnLink(7);
-
 
                 // table.setQuery("ExportDataset?datasetId=" +db.getId(), new
                 // HashMap());
@@ -468,7 +462,7 @@ public class ExportDatasetServlet extends SecureController {
             return;
         }
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.MONITOR)) {
+                || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.MONITOR)) {
             return;
         }
 
@@ -500,29 +494,29 @@ public class ExportDatasetServlet extends SecureController {
 
             java.util.Enumeration entries = zipFile.entries();
 
-            while(entries.hasMoreElements()) {
-              ZipEntry entry = (ZipEntry)entries.nextElement();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
 
-              if(entry.isDirectory()) {
-                // Assume directories are stored parents first then children.
-                logger.debug("Extracting directory: " + entry.getName());
-                // This is not robust, just for demonstration purposes.
-                (new File(entry.getName())).mkdir();
-                // no dirs necessary?
-                continue;
-              }
+                if (entry.isDirectory()) {
+                    // Assume directories are stored parents first then children.
+                    logger.debug("Extracting directory: " + entry.getName());
+                    // This is not robust, just for demonstration purposes.
+                    (new File(entry.getName())).mkdir();
+                    // no dirs necessary?
+                    continue;
+                }
 
-              logger.debug("Extracting file: " + entry.getName());
-              // System.out.println("Writing to dir " + targetDir);
-              copyInputStream(zipFile.getInputStream(entry),
-                 new java.io.BufferedOutputStream(new java.io.FileOutputStream(entry.getName())));
+                logger.debug("Extracting file: " + entry.getName());
+                // System.out.println("Writing to dir " + targetDir);
+                copyInputStream(zipFile.getInputStream(entry),
+                        new java.io.BufferedOutputStream(new java.io.FileOutputStream(entry.getName())));
             }
 
             zipFile.close();
-          } catch (java.io.IOException ioe) {
-        	  logger.error("Unhandled exception:", ioe);
+        } catch (java.io.IOException ioe) {
+            logger.error("Unhandled exception:", ioe);
             return;
-          }
+        }
     }
 
     public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb) {
@@ -531,28 +525,22 @@ public class ExportDatasetServlet extends SecureController {
         logger.info("just set dataset to request");
         request.setAttribute("extractProperties", CoreResources.getExtractProperties());
         // find out if there are any files here:
-        File currentDir = new File(DATASET_DIR + db.getId() + File.separator);
 
-        //JN: Commenting out this, as its creating directories without any reason. TODO: Check why was this added.
-       // if (!currentDir.isDirectory()) {
-      //      currentDir.mkdirs();
-      //  }
-
-        ArrayList fileListRaw = new ArrayList();
-        fileListRaw = asdfdao.findByDatasetId(datasetId);
+        ArrayList fileListRaw = asdfdao.findByDatasetIdByDate(datasetId);
         fileList = new ArrayList();
         Iterator fileIterator = fileListRaw.iterator();
+        List<String> alreadyAddedJobUuid = new LinkedList<>();
         while (fileIterator.hasNext()) {
             ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) fileIterator.next();
-            // set the correct webPath in each bean here
-            // changed here, tbh, 4-18
-            // asdfBean.setWebPath(WEB_DIR+db.getId()+"/"+asdfBean.getName());
-            // asdfBean.setWebPath(DATASET_DIR+db.getId()+File.separator+
-            // asdfBean.getName());
             asdfBean.setWebPath(asdfBean.getFileReference());
 
+            // Only take the first one if it was a scheduled job
+            if (asdfBean.getJobType().contains("Scheduled") && !alreadyAddedJobUuid.contains(asdfBean.getJobUuid())) {
                 fileList.add(asdfBean);
-
+                alreadyAddedJobUuid.add(asdfBean.getJobUuid());
+            } else if (asdfBean.getJobType().contains("Manual")) {
+                fileList.add(asdfBean);
+            }
         }
 
         logger.warn("");
@@ -563,8 +551,8 @@ public class ExportDatasetServlet extends SecureController {
         EntityBeanTable table = fp.getEntityBeanTable();
         table.setSortingIfNotExplicitlySet(3, false);// sort by date
         String[] columns =
-                { resword.getString("dataset_format"),resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
-                        resword.getString("created_by"),resword.getString("status"), resword.getString("action") };
+                {resword.getString("dataset_format"), resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
+                        resword.getString("created_by"), resword.getString("status"), resword.getString("job_type"), resword.getString("action")};
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(0);
         table.hideColumnLink(1);
@@ -574,8 +562,12 @@ public class ExportDatasetServlet extends SecureController {
         table.hideColumnLink(5);
         table.hideColumnLink(6);
         table.hideColumnLink(7);
+        table.hideColumnLink(8);
 
-        table.setQuery("ExportDataset?datasetId=" + db.getId(), new HashMap());
+        HashMap args = new HashMap();
+        args.put("datasetId", Integer.toString(db.getId()));
+        table.setQuery("ExportDataset", args);
+
         // trying to continue...
         session.setAttribute("newDataset", db);
         table.setRows(filterRows);
@@ -609,16 +601,15 @@ public class ExportDatasetServlet extends SecureController {
     }
 
     private static final void copyInputStream(InputStream in, OutputStream out)
-    throws IOException
-    {
-      byte[] buffer = new byte[1024];
-      int len = 0;
+            throws IOException {
+        byte[] buffer = new byte[1024];
+        int len = 0;
 
-      while((len = in.read(buffer)) > 0)
-        out.write(buffer, 0, len);
+        while ((len = in.read(buffer)) > 0)
+            out.write(buffer, 0, len);
 
-      in.close();
-      out.close();
+        in.close();
+        out.close();
     }
 
     private void deleteArchivedDataset(ArchivedDatasetFileDAO asdfdao, ArchivedDatasetFileBean adfBean) {

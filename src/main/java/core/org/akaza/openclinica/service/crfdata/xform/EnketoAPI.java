@@ -46,7 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class EnketoAPI {
 
-    private String enketoURL = null; 
+    private String enketoURL = null;
     private String token = null;
     private String ocURL = null;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -108,7 +108,7 @@ public class EnketoAPI {
     private String userPasswdCombo;
 
     public EnketoAPI(EnketoCredentials credentials) {
-        this.enketoURL = credentials.getServerUrl();      
+        this.enketoURL = credentials.getServerUrl();
         this.token = credentials.getApiKey();
         this.ocURL = credentials.getOcInstanceUrl();
         this.userPasswdCombo = new String(Base64.encodeBase64((CoreResources.getField("ocform.adminapikey") + ":").getBytes()));
@@ -151,7 +151,7 @@ public class EnketoAPI {
         // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
         if ((parentStudy.getStatus().equals(Status.LOCKED)
                 || (site != null && site.getStatus().equals(Status.LOCKED)))
-                 || (studyEvent != null && studyEvent.isCurrentlyLocked())
+                || (studyEvent != null && studyEvent.isCurrentlyLocked())
                 || parentStudy.getStatus().equals(Status.FROZEN) || mode.equals(VIEW_MODE)) {
             eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
             lockOn = false;
@@ -159,30 +159,30 @@ public class EnketoAPI {
             // https://jira.openclinica.com/browse/OC-8266 Data Entry Person edits XForms.
             // https://jira.openclinica.com/browse/OC-7572 Investigator edits XForms.
             // https://jira.openclinica.com/browse/OC-7571 CRC edits XForms.
-        } else if ((mode.equals(EDIT_MODE)||mode.equals(PARTICIPATE_MODE)) && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
+        } else if ((mode.equals(EDIT_MODE) || mode.equals(PARTICIPATE_MODE)) && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
             if (isFormLocked) {
                 eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
                 lockOn = false;
             } else {
-                if(mode.equals(PARTICIPATE_MODE)) {
+                if (mode.equals(PARTICIPATE_MODE)) {
                     eURL = new URL(enketoURL + SURVEY_WRITABLE_PARTICIPATE);
-                }else{
+                } else {
                     eURL = new URL(enketoURL + SURVEY_WRITABLE_DN);
                 }
                 lockOn = true;
             }
-                shouldLock = true;
+            shouldLock = true;
 
             // https://jira.openclinica.com/browse/OC-8278 Data Manager edits XForms.
             // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
-        } else if ((mode.equals(EDIT_MODE)||mode.equals(PARTICIPATE_MODE)) && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
+        } else if ((mode.equals(EDIT_MODE) || mode.equals(PARTICIPATE_MODE)) && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
             if (isFormLocked) {
                 eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
                 lockOn = false;
             } else {
-                if(mode.equals(PARTICIPATE_MODE)) {
+                if (mode.equals(PARTICIPATE_MODE)) {
                     eURL = new URL(enketoURL + SURVEY_WRITABLE_PARTICIPATE);
-                }else{
+                } else {
                     eURL = new URL(enketoURL + SURVEY_WRITABLE_DN_CLOSE_BUTTON);
                 }
                 lockOn = true;
@@ -222,7 +222,7 @@ public class EnketoAPI {
             return "";
     }
 
-    public EnketoURLResponse registerAndDeleteCache(URL url, String ecId,String crfOID) {
+    public EnketoURLResponse registerAndDeleteCache(URL url, String ecId, String crfOID) {
         EnketoURLResponse urlResponse = null;
         try {
             deleteCache(url, ecId, crfOID);
@@ -300,8 +300,8 @@ public class EnketoAPI {
     }
 
     private String isJiniEnabled() {
-        String jini ="false";
-        String jiniEnabled =CoreResources.getField("jini.enabled");
+        String jini = "false";
+        String jiniEnabled = CoreResources.getField("jini.enabled");
         if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
             jini = "true";
         }
@@ -379,7 +379,7 @@ public class EnketoAPI {
         try {
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoAccountResponse> response = rest.exchange(
-            		enketoURL + "/accounts/api/v1/account" + "?server_url=" + ocURL + "&api_key=" + token, HttpMethod.GET,
+                    enketoURL + "/accounts/api/v1/account" + "?server_url=" + ocURL + "&api_key=" + token, HttpMethod.GET,
                     entity, EnketoAccountResponse.class);
             if (response.getBody().getCode() == 200)
                 accountExists = true;
@@ -426,18 +426,17 @@ public class EnketoAPI {
             // https://jira.openclinica.com/browse/OC-8270 Open Form when event is locked
             // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
 
-            if ( (eventCrf != null && eventCrf.getStudySubject().getStudy().getStatus().equals(Status.LOCKED))
-                 || ((parentStudy.getStatus().equals(Status.LOCKED))
-                 || (site != null && site.getStatus().equals(Status.LOCKED)))
-                 || studyEvent.isCurrentlyLocked()
-                 || studyEvent.isCurrentlyRemoved()
-                 || studyEvent.isCurrentlyArchived()
-                 || edc.getStatusId().equals(Status.DELETED.getCode())
-                 || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
-                 || eventCrf.isCurrentlyRemoved()
-                 || eventCrf.isCurrentlyArchived()
-                ) {
-
+            if ((eventCrf != null && eventCrf.getStudySubject().getStudy().getStatus().equals(Status.LOCKED))
+                    || ((parentStudy.getStatus().equals(Status.LOCKED))
+                    || (site != null && site.getStatus().equals(Status.LOCKED)))
+                    || studyEvent.isCurrentlyLocked()
+                    || studyEvent.isCurrentlyRemoved()
+                    || studyEvent.isCurrentlyArchived()
+                    || edc.getStatusId().equals(Status.DELETED.getCode())
+                    || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
+                    || eventCrf.isCurrentlyRemoved()
+                    || eventCrf.isCurrentlyArchived()
+                    ) {
 
 
                 eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
@@ -448,10 +447,10 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-8272 Investigator views XForms.
                 // https://jira.openclinica.com/browse/OC-8273 CRC views XForms.
             } else if (flavor.equals(QUERY_FLAVOR) && mode.equals(VIEW_MODE)
-                        && (role == Role.RESEARCHASSISTANT
-                            || role == Role.RESEARCHASSISTANT2
-                            || role == Role.INVESTIGATOR)) {
-                if(actionUrlObject.formLocked) {
+                    && (role == Role.RESEARCHASSISTANT
+                    || role == Role.RESEARCHASSISTANT2
+                    || role == Role.INVESTIGATOR)) {
+                if (actionUrlObject.formLocked) {
                     eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                     lockOn = false;
                 } else {
@@ -464,10 +463,10 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-7574 Study Director views XForms.
                 // https://jira.openclinica.com/browse/OC-7573 Data Manager views XForms.
             } else if (flavor.equals(QUERY_FLAVOR) && mode.equals(VIEW_MODE)
-                        && (role == Role.STUDYDIRECTOR
-                            || role == Role.COORDINATOR
-                            || role == Role.MONITOR)) {
-                if(actionUrlObject.formLocked) {
+                    && (role == Role.STUDYDIRECTOR
+                    || role == Role.COORDINATOR
+                    || role == Role.MONITOR)) {
+                if (actionUrlObject.formLocked) {
                     eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                     lockOn = false;
                 } else {
@@ -484,31 +483,31 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-7571 CRC edits XForms.
             } else if ((flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE)
                     || flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE))
-                        && ((!parentStudy.getStatus().equals(Status.FROZEN)
-                            || (site != null && !site.getStatus().equals(Status.FROZEN))))
-                        && (role == Role.RESEARCHASSISTANT
-                            || role == Role.RESEARCHASSISTANT2
-                            || role == Role.INVESTIGATOR)) {
+                    && ((!parentStudy.getStatus().equals(Status.FROZEN)
+                    || (site != null && !site.getStatus().equals(Status.FROZEN))))
+                    && (role == Role.RESEARCHASSISTANT
+                    || role == Role.RESEARCHASSISTANT2
+                    || role == Role.INVESTIGATOR)) {
                 if (markComplete) {
-                    if(actionUrlObject.formLocked) {
+                    if (actionUrlObject.formLocked) {
                         eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                         lockOn = false;
                     } else {
-                        if(mode.equals(PARTICIPATE_MODE)) {
+                        if (mode.equals(PARTICIPATE_MODE)) {
                             eURL = new URL(enketoURL + INSTANCE_WRITABLE_PARTICIPATE);
-                        }else{
+                        } else {
                             eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN);
                         }
                         lockOn = true;
                     }
                 } else {
-                    if(actionUrlObject.formLocked) {
+                    if (actionUrlObject.formLocked) {
                         eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                         lockOn = false;
                     } else {
-                        if(mode.equals(PARTICIPATE_MODE)) {
+                        if (mode.equals(PARTICIPATE_MODE)) {
                             eURL = new URL(enketoURL + INSTANCE_WRITABLE_PARTICIPATE);
-                        }else{
+                        } else {
                             eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_RFC);
                         }
                         lockOn = true;
@@ -519,31 +518,31 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
                 // https://jira.openclinica.com/browse/OC-8278 Data Manager edits XForms.
             } else if ((flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE)
-          || flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE))
-                        && ((!parentStudy.getStatus().equals(Status.FROZEN))
-                            || (site != null && !site.getStatus().equals(Status.FROZEN)))
-                        && (role == Role.STUDYDIRECTOR
-                                || role == Role.COORDINATOR)) {
+                    || flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE))
+                    && ((!parentStudy.getStatus().equals(Status.FROZEN))
+                    || (site != null && !site.getStatus().equals(Status.FROZEN)))
+                    && (role == Role.STUDYDIRECTOR
+                    || role == Role.COORDINATOR)) {
                 if (markComplete) {
-                    if(actionUrlObject.formLocked) {
+                    if (actionUrlObject.formLocked) {
                         eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                         lockOn = false;
                     } else {
-                        if(mode.equals(PARTICIPATE_MODE)) {
+                        if (mode.equals(PARTICIPATE_MODE)) {
                             eURL = new URL(enketoURL + INSTANCE_WRITABLE_PARTICIPATE);
-                        }else{
+                        } else {
                             eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_CLOSE_BUTTON);
                         }
                         lockOn = true;
                     }
                 } else {
-                    if(actionUrlObject.formLocked) {
+                    if (actionUrlObject.formLocked) {
                         eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                         lockOn = false;
                     } else {
-                        if(mode.equals(PARTICIPATE_MODE)) {
+                        if (mode.equals(PARTICIPATE_MODE)) {
                             eURL = new URL(enketoURL + INSTANCE_WRITABLE_PARTICIPATE);
-                        }else{
+                        } else {
                             eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_CLOSE_BUTTON_RFC);
                         }
                         lockOn = true;
@@ -552,20 +551,20 @@ public class EnketoAPI {
                 shouldLock = true;
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
             } else if ((flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE)
-                     || flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE)  )
-                        && ((parentStudy.getStatus().equals(Status.FROZEN))
-                                || (site != null && site.getStatus().equals(Status.FROZEN)))
-                        && (role == Role.RESEARCHASSISTANT
-                                || role == Role.RESEARCHASSISTANT2
-                                || role == Role.INVESTIGATOR)) {
+                    || flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE))
+                    && ((parentStudy.getStatus().equals(Status.FROZEN))
+                    || (site != null && site.getStatus().equals(Status.FROZEN)))
+                    && (role == Role.RESEARCHASSISTANT
+                    || role == Role.RESEARCHASSISTANT2
+                    || role == Role.INVESTIGATOR)) {
 
-                if(actionUrlObject.formLocked) {
+                if (actionUrlObject.formLocked) {
                     eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                     lockOn = false;
                 } else {
-                    if(mode.equals(PARTICIPATE_MODE)) {
+                    if (mode.equals(PARTICIPATE_MODE)) {
                         eURL = new URL(enketoURL + INSTANCE_WRITABLE_PARTICIPATE);
-                    }else{
+                    } else {
                         eURL = new URL(enketoURL + INSTANCE_READONLY_DN);
                     }
                     lockOn = true;
@@ -576,9 +575,9 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
             } else if (flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE)
                     && ((parentStudy.getStatus().equals(Status.FROZEN))
-                            || (site != null && site.getStatus().equals(Status.FROZEN)))
+                    || (site != null && site.getStatus().equals(Status.FROZEN)))
                     && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
-                if(actionUrlObject.formLocked) {
+                if (actionUrlObject.formLocked) {
                     eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                     lockOn = false;
                 } else {
@@ -590,9 +589,9 @@ public class EnketoAPI {
                 markComplete = false;
                 // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
             } else if (flavor.equals(QUERY_FLAVOR)
-                        && mode.equals(EDIT_MODE)
-                        && role == Role.MONITOR) {
-                if(actionUrlObject.formLocked) {
+                    && mode.equals(EDIT_MODE)
+                    && role == Role.MONITOR) {
+                if (actionUrlObject.formLocked) {
                     eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                     lockOn = false;
                 } else {
@@ -607,7 +606,7 @@ public class EnketoAPI {
                     && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2
                     || role == Role.INVESTIGATOR)) {
 
-                if(actionUrlObject.formLocked) {
+                if (actionUrlObject.formLocked) {
                     eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                     lockOn = false;
                 } else {
@@ -619,7 +618,7 @@ public class EnketoAPI {
                 // View Queries for Individual fields
             } else if (flavor.equals(SINGLE_ITEM_FLAVOR)
                     && (role == Role.MONITOR || role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
-                if(actionUrlObject.formLocked) {
+                if (actionUrlObject.formLocked) {
                     eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                     lockOn = false;
                 } else {
@@ -674,7 +673,6 @@ public class EnketoAPI {
     }
 
     /**
-     *
      * @param actionUrlObject
      * @return
      * @throws Exception
@@ -721,8 +719,8 @@ public class EnketoAPI {
             /**
              * prepare request header
              */
-            HttpHeaders   headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);           
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
@@ -731,8 +729,8 @@ public class EnketoAPI {
             finalUrl = builder.build().toUri();
             /**
              *  prepare body
-             */                      
-            EnketoPDFRequest  body = new EnketoPDFRequest();
+             */
+            EnketoPDFRequest body = new EnketoPDFRequest();
             body.setServer_url(ocURL);
             body.setEcid(ecid);
             body.setForm_id(crfOid);
@@ -740,60 +738,60 @@ public class EnketoAPI {
             body.setInstance_id(instanceId);
             body.setReturn_url(redirect);
             body.setInstanceAttachments(attachment);
-                         
+
             String subjectLabel = actionUrlObject.studyEvent.getStudySubject().getLabel();
             body.setPid(subjectLabel);
 
             String format = actionUrlObject.getFormat();
-            if(format == null || format.trim().length() == 0) {
+            if (format == null || format.trim().length() == 0) {
                 format = "A4";
             }
-            body.setFormat(format);            
+            body.setFormat(format);
 
-            String margin =actionUrlObject.getMargin();
-            if(margin == null || margin.trim().length()==0 ) {
-                margin =  "0.5in";
+            String margin = actionUrlObject.getMargin();
+            if (margin == null || margin.trim().length() == 0) {
+                margin = "0.5in";
             }
             body.setMargin(margin);
-            
+
             String landscape = actionUrlObject.getLandscape();
-            if(landscape != null && landscape.equalsIgnoreCase("true")) {
+            if (landscape != null && landscape.equalsIgnoreCase("true")) {
                 landscape = "true";
-            }else {
-            	landscape = "false";
-            }            
+            } else {
+                landscape = "false";
+            }
             body.setLandscape(landscape);
-            
-			HttpEntity<EnketoPDFRequest> request = new HttpEntity<EnketoPDFRequest>(body, headers);
-			            
-            RestTemplate rest = new RestTemplate();		            
+
+            HttpEntity<EnketoPDFRequest> request = new HttpEntity<EnketoPDFRequest>(body, headers);
+
+            RestTemplate rest = new RestTemplate();
             ResponseEntity<byte[]> response = rest.postForEntity(eURL.toString(), request, byte[].class);
 
             if (response != null) {
                 pdfResponse = new EnketoPDFResponse();
 
                 SimpleDateFormat sdf_pdfFile = new SimpleDateFormat("yyyy-MM-dd-hhmmssSSSZ");
-                String fileName = studySubjectOID+"_"+crfOid + "_" + sdf_pdfFile.format(new Date()) + ".pdf";
-                String filePath = getCaseBookFileTempPath() + File.separator +  fileName;
+                String fileName = studySubjectOID + "_" + crfOid + "_" + sdf_pdfFile.format(new Date()) + ".pdf";
+                String filePath = getCaseBookFileTempPath() + File.separator + fileName;
 
                 Path pdfFile = Files.write(Paths.get(filePath), response.getBody());
                 pdfResponse.setPdfFile(pdfFile.toFile());
-                pdfResponse.setStatusCode(response.getStatusCodeValue()+"");
+                pdfResponse.setStatusCode(response.getStatusCodeValue() + "");
             }
 
-        } catch(HttpClientErrorException ec) {
-            String bodyStr =ec.getResponseBodyAsString();
-            String msg = "ClientError:"+ec.getMessage();
+        } catch (HttpClientErrorException ec) {
+            String bodyStr = ec.getResponseBodyAsString();
+            String msg = "ClientError:" + ec.getMessage();
             String finalUrlStr = finalUrl.toString();
             //throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_CLIENT,msg+ ":" + bodyStr + ":" + finalUrlStr);
             throw ec;
 
-        } catch(HttpServerErrorException es) {
-            String bodyStr =es.getResponseBodyAsString();
+        } catch (HttpServerErrorException es) {
+            String bodyStr = es.getResponseBodyAsString();
             String msg = "ServerError:" + es.getMessage();
             String finalUrlStr = finalUrl.toString();
 
-            throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_SERVER,msg+ ":" + bodyStr + ":" + finalUrlStr);
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_ENKETO_SERVER, msg + ":" + bodyStr + ":" + finalUrlStr);
         } catch (Exception e) {
             throw e;
         }
@@ -802,7 +800,6 @@ public class EnketoAPI {
     }
 
     /**
-     *
      * @param pdfActionUrlObject
      * @return
      * @throws Exception
@@ -824,7 +821,7 @@ public class EnketoAPI {
             } else {
                 logger.error(e.getMessage());
                 logger.error(ExceptionUtils.getStackTrace(e));
-                
+
 
                 throw e;
             }
@@ -835,12 +832,11 @@ public class EnketoAPI {
     }
 
     /**
-     *
      * @return
      */
     public static String getCaseBookFileTempPath() {
-        String tempDir = System.getProperty( "java.io.tmpdir");
-        String dirPath = tempDir+ File.separator+ PDF_CASEBOOK_DIRECTORY;
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String dirPath = tempDir + File.separator + PDF_CASEBOOK_DIRECTORY;
 
         File directory = new File(dirPath);
         if (!directory.exists()) {
