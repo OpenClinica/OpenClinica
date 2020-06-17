@@ -259,6 +259,12 @@
         <servlet-class>org.akaza.openclinica.control.submit.CheckCRFLocked</servlet-class>
     </servlet>
     <servlet>
+        <description>DiscrepancyNoteOutputServlet</description>
+        <display-name>DiscrepancyNoteOutputServlet</display-name>
+        <servlet-name>DiscrepancyNoteOutputServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.extract.DiscrepancyNoteOutputServlet</servlet-class>
+    </servlet>
+    <servlet>
         <description>FormServlet</description>
         <display-name>FormServlet</display-name>
         <servlet-name>FormServlet</servlet-name>
@@ -1394,6 +1400,10 @@
     <servlet-mapping>
         <servlet-name>MatchPasswordServlet</servlet-name>
         <url-pattern>/MatchPassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DiscrepancyNoteOutputServlet</servlet-name>
+        <url-pattern>/DiscrepancyNoteOutputServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AuditUserActivityServlet</servlet-name>

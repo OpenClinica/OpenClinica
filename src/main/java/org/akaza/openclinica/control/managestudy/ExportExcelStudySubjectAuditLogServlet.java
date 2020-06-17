@@ -31,6 +31,7 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.domain.datamap.EventCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import liquibase.util.StringUtils;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -118,7 +119,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
         ArrayList <AuditBean>eventCRFAudits = new ArrayList();
         ArrayList studyEventAudits = new ArrayList();
         ArrayList allDeletedEventCRFs = new ArrayList();
-        ArrayList allEventCRFs = new ArrayList();
         ArrayList allEventCRFItems = new ArrayList();
         String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
@@ -190,8 +190,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 // Find deleted Event CRFs
                 List deletedEventCRFs = adao.findDeletedEventCRFsFromAuditEvent(studyEvent.getId());
                 allDeletedEventCRFs.addAll(deletedEventCRFs);
-                List eventCRFs = (List) adao.findAllEventCRFAuditEvents(studyEvent.getId());
-                allEventCRFs.addAll(eventCRFs);
                 List eventCRFItems = (List) adao.findAllEventCRFAuditEventsWithItemDataType(studyEvent.getId());
                 allEventCRFItems.addAll(eventCRFItems);
                 logger.info("deletedEventCRFs size[" + deletedEventCRFs.size() + "]");
@@ -466,11 +464,10 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 row++;
 
                 // Event CRFs Audit Events
-                for (int j = 0; j < allEventCRFs.size(); j++) {
-                    AuditBean auditBean = (AuditBean) allEventCRFs.get(j);
-                    EventCRFBean eventCrf = (EventCRFBean) eventCRFDAO.findByPK(auditBean.getEventCRFId());
+                for(int j = 0 ; j< event.getEventCRFs().size(); j++){
+                    EventCRFBean eventCrf = (EventCRFBean) event.getEventCRFs().get(j);
                     FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(eventCrf.getFormLayoutId());
-                    if (auditBean.getStudyEventId() == event.getId()) {
+                    if (eventCrf.getStudyEventId() == event.getId()) {
 
                         // Audit Events for Study Event
                         excelRow = new String[] { "name", "version", "date_interviewed", "interviewer_name", "owner" };
@@ -481,7 +478,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         }
                         row++;
 
-                        excelRow = new String[] { auditBean.getCrfName(), formLayout.getName(), dateFormat(eventCrf.getDateInterviewed()),
+                        excelRow = new String[] { eventCrf.getCrf().getName(), formLayout.getName(), dateFormat(eventCrf.getDateInterviewed()),
                                 eventCrf.getInterviewerName(), eventCrf.getOwner().getName() };
                         for (int i = 0; i < excelRow.length; i++) {
                             label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
@@ -500,7 +497,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         for (int k = 0; k < eventCRFAudits.size(); k++) {
                             row--;
                             AuditBean eventCrfAudit = (AuditBean) eventCRFAudits.get(k);
-                            if (eventCrfAudit.getStudyEventId() == event.getId() && eventCrfAudit.getEventCRFId() == auditBean.getEventCRFId()) {
+                            if (eventCrfAudit.getStudyEventId() == event.getId() && eventCrfAudit.getEventCRFId() == eventCrf.getId()) {
                                 String oldValue = eventCrfAudit.getOldValue();
                                 String newValue = eventCrfAudit.getNewValue();
                                 String entityName= eventCrfAudit.getEntityName();
@@ -513,10 +510,14 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                         oldValue = EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue();
 
                                 } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
-                                    if (oldValue.equals("0"))
-                                        oldValue = "FALSE";
-                                    else if (oldValue.equals("1"))
-                                        oldValue = "TRUE";
+                                    if(oldValue == null || oldValue.isEmpty())
+                                        oldValue = "Null";
+                                    else if(resterm.getString(oldValue) != null)
+                                        oldValue = resterm.getString(oldValue);
+                                    if(newValue == null || newValue.isEmpty())
+                                        newValue ="Null";
+                                    else if(resterm.getString(newValue) != null)
+                                        newValue = resterm.getString(newValue);
                                 }else if(entityName.equals("Archived")||entityName.equals("Removed")  ){
                                     if (oldValue.equals("true"))
                                         oldValue = "Yes";
@@ -536,11 +537,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                                     else if (newValue.equals(EventCrfWorkflowStatusEnum.NOT_STARTED))
                                         newValue = EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue();
 
-                                } else if (eventCrfAudit.getAuditEventTypeId() == 32) {
-                                    if (newValue.equals("0"))
-                                        newValue = "FALSE";
-                                    else if (newValue.equals("1"))
-                                        newValue = "TRUE";
                                 } else if (entityName.equals("Archived") || entityName.equals("Removed")) {
                                     if (newValue.equals("true"))
                                         newValue = "Yes";

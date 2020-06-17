@@ -605,9 +605,18 @@ $(function() {
                     if (!form)
                         return;
 
+                    function isInactive(data) {
+                        var ocstatus = data['@OpenClinica:Status'];
+                        return (
+                            data['@OpenClinica:Removed'] === 'Yes' || 
+                            data['@OpenClinica:Archived'] === 'Yes' ||
+                            ocstatus === 'removed' || ocstatus === 'auto-removed'
+                        );
+                    }
+
                     var submission = {
                         studyStatus: studyEventData['@OpenClinica:Removed'] === 'Yes' ? studyEventData['@OpenClinica:Status'] : studyEventData['@OpenClinica:WorkflowStatus'],
-                        hideStatus: studyEventData['@OpenClinica:Removed'] === 'Yes' || formData['@OpenClinica:Archived'] === 'Yes' ? 'oc-status-removed' : 'oc-status-active',
+                        hideStatus: isInactive(studyEventData) || isInactive(formData) ? 'oc-status-removed' : 'oc-status-active',
                         updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
                         updatedBy: formData['@OpenClinica:UpdatedBy'],
                         fields: copyObject(form.submissionFields),
