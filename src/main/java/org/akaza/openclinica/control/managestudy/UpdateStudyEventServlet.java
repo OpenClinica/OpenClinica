@@ -70,6 +70,7 @@ public class UpdateStudyEventServlet extends SecureController {
     public static final String STUDY_SUBJECT_ID = "ss_id";
     public static final String EVENT_BEAN = "studyEvent";
     public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
+    public static final String FIRST_SIGN = "first_sign";
 
     public static final String EVENT_WORKFLOW_STATUS = "statusId";
     public static final String LOCKED = "Locked";
@@ -468,8 +469,10 @@ public class UpdateStudyEventServlet extends SecureController {
                 request.setAttribute("uncompletedEventDefinitionCRFs", uncompletedEventDefinitionCRFs);
                 request.setAttribute("displayEventCRFs", displayEventCRFs);
 
+                String isFirstSign = fp.getString(FIRST_SIGN);
                 // ------------------
-                addPageMessage(restext.getString("password_match"));
+                if (!isFirstSign.equals("true"))
+                    addPageMessage(restext.getString("password_match"));
 
                 String originationUrl = "UpdateStudyEvent?action=" + action + "%26event_id=" + studyEventId + "%26ss_id=" + studySubjectId + "%26startDate="
                         + start_date + "%26startHour=" + fp.getString(INPUT_STARTDATE_PREFIX + "Hour") + "%26startMinute="
