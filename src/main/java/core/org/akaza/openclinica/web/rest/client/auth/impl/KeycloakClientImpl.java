@@ -46,7 +46,6 @@ public class KeycloakClientImpl {
     private static final String CUSTOMER_UUID_ATTRIBUTE = "customerUuid";
     private static final String ACCESS_CODE_ATTRIBUTE = "accessCode";
     private static final String STUDY_ENV_UUID_ATTRIBUTE = "studyEnvUuid";
-    private static final String OC_API_CLIENT_ID = "oc-api";
     private static final String USER_TYPE_ATTRIBUTE = "userType";
     String DB_CONNECTION_KEY = "dbConnection";
     public static final String IDENTITY_SERVER_CALL_FAILED = "errorCode.identityServerCallFailed";
@@ -60,6 +59,9 @@ public class KeycloakClientImpl {
 
     @Autowired
     private Keycloak keycloak;
+
+    @Autowired
+    private Keycloak keycloakRealmInstance;
 
     public void resetParticipateUserAccessCode(String accessToken, String email, String username, String accessCode,String studyEnvironment,String realm) {
         UserResource userResource = null;
@@ -187,46 +189,12 @@ public class KeycloakClientImpl {
 
     public String getSystemToken() {
         logger.debug("Create OC-API System Token");
-
-        try {
-            AuthzClient authzClient=AuthzClient.create(CoreResources.getKeyCloakConfig());
-            String realm = authzClient.getConfiguration().getRealm();
-            logger.debug("Getting access token for realm: {} and client: {}", realm, OC_API_CLIENT_ID);
-            ClientsResource clientsResource = keycloak
-                    .realm(realm)
-                    .clients();
-            ClientRepresentation ocApiClientRepresentation = clientsResource
-                    .findByClientId(OC_API_CLIENT_ID)
-                    .get(0);
-            String ocApiClientSecret = clientsResource
-                    .get(ocApiClientRepresentation.getId())
-                    .getSecret()
-                    .getValue();
-
-            String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
-
-            logger.debug("oc-api client secret for realm: {} is {}", realm, ocApiClientSecret);
-            // Get the keycloak instance specific to the given realm
-            Keycloak keycloakRealmInstance = KeycloakBuilder.builder()
-                    .serverUrl(keycloakBaseUrl)
-                    .realm(realm)
-                    .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                    .clientId(OC_API_CLIENT_ID)
-                    .clientSecret(ocApiClientSecret)
-                    .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(1).build())
-                    .build();
-
-            String accessToken = keycloakRealmInstance
-                    .tokenManager()
-                    .getAccessToken()
-                    .getToken();
-            logger.debug("Keycloak Access Token: {}", accessToken);
-            return accessToken;
-        } catch (Exception e) {
-            logger.error("Error reading keycloak properties from DataInfo.properties", e);
-            return null;
-        }
+        String accessToken = keycloakRealmInstance
+                .tokenManager()
+                .getAccessToken()
+                .getToken();
+        logger.debug("Keycloak Access Token: {}", accessToken);
+        return accessToken;
     }
-
 
 }
