@@ -535,14 +535,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // kept as "invalid" -- YW 06-21-2007
                 if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
                     currentRole = ub.getRoleByStudy(currentStudy.getId());
-                    if (currentStudy.getParentStudyId() > 0) {
-                        // Checking if currentStudy has been removed or not will
-                        // ge good enough -- YW 10-17-2007
-                        StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentStudy.getParentStudyId());
-                        // inherited role from parent study, pick the higher
-                        // role
-                        currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
-                    }
+                    
                     // logger.info("currentRole:" + currentRole.getRoleName());
                 } else {
                     currentRole = new StudyUserRoleBean();

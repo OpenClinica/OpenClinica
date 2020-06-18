@@ -733,8 +733,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
                     }
 
                     StudyUserRoleBean roleInChild = (StudyUserRoleBean) allStudyUserRoleBeans.get(childId);
-                    Role max = Role.max(roleInChild.getRole(), roleInStudy.getRole());
-                    roleInChild.setRole(max);
+                   // Role max = Role.max(roleInChild.getRole(), roleInStudy.getRole());
+                    roleInChild.setRole(roleInChild.getRole());
                     roleInChild.setParentStudyId(studyId.intValue());
                     subTreeRoles.add(roleInChild);
                 } else {
