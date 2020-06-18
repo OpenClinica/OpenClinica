@@ -351,7 +351,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 
                                 ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                                 sqlParameters.add(new SqlParameter(oid));
-                                sqlParameters.add(new SqlParameter(stripQuotes(unit)));
+                                sqlParameters.add(new SqlParameter(unit));
                                                              
                                 QueryObject qo = new QueryObject();
                                 qo.setSql(muSql);
@@ -1153,9 +1153,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                         QueryObject qo = new QueryObject();
                         
-                        sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(unit)));                                                
+                        sqlParameters.add(new SqlParameter(itemName));
+                        sqlParameters.add(new SqlParameter(descLabel));
+                        sqlParameters.add(new SqlParameter(unit));
                         sqlParameters.add(new SqlParameter(itemOid));
                                                            
                         qo = new QueryObject();
@@ -1178,7 +1178,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // notice that still "\\," in options - jxu-08-31-06
                         String updatedResOptions = resOptions.replaceAll("\\\\,", "\\,");
                         String updatedResValues = resValues.replaceAll("\\\\,", "\\,");
-                        rsb.setOptions(stripQuotes(updatedResOptions), stripQuotes(updatedResValues));
+                        rsb.setOptions(updatedResOptions, updatedResValues);
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
@@ -1225,9 +1225,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     //openQueries.put(itemName, upSql);
                                     sqlParameters = new ArrayList<>();
                                     
-                                    sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
-                                    sqlParameters.add(new SqlParameter(stripQuotes(unit)));                                    
-                                    sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                    sqlParameters.add(new SqlParameter(descLabel));
+                                    sqlParameters.add(new SqlParameter(unit));
+                                    sqlParameters.add(new SqlParameter(itemName));
                                     sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
                                                                        
                                     qo = new QueryObject();
@@ -1277,8 +1277,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         
                                         sqlParameters = new ArrayList<>();
                                         
-                                        sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));                                        
-                                        sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                        sqlParameters.add(new SqlParameter(descLabel));
+                                        sqlParameters.add(new SqlParameter(itemName));
                                         sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
                                                                            
                                         qo = new QueryObject();
@@ -1316,8 +1316,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                              		
                              		 sqlParameters = new ArrayList<>();
                                      
-                                     sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));                                
-                                     sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                     sqlParameters.add(new SqlParameter(descLabel));
+                                     sqlParameters.add(new SqlParameter(itemName));
                                      sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
                                                                         
                                      qo = new QueryObject();
@@ -1343,10 +1343,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         	sql =
                                     "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
                                    		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"+ versionIdString + ")";
-                       	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                             sqlParameters.add(new SqlParameter(stripQuotes(resOptions.replaceAll("\\\\,", "\\,"))));
-                             sqlParameters.add(new SqlParameter(stripQuotes(resValues.replace("\\\\", "\\"))));
-                             sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
+                       	  sqlParameters.add(new SqlParameter(responseLabel));
+                             sqlParameters.add(new SqlParameter(resOptions.replaceAll("\\\\,", "\\,")));
+                             sqlParameters.add(new SqlParameter(resValues.replace("\\\\", "\\")));
+                             sqlParameters.add(new SqlParameter(responseType.toLowerCase()));
                             
                         } else {
                             /*sql =
@@ -1357,10 +1357,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         	 sql =
                                      "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
                                     		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"+ versionIdString + ")";
-                        	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResOptions)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(updatedResValues)));
-                              sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
+                        	  sqlParameters.add(new SqlParameter(responseLabel));
+                              sqlParameters.add(new SqlParameter(updatedResOptions));
+                              sqlParameters.add(new SqlParameter(updatedResValues));
+                              sqlParameters.add(new SqlParameter(responseType.toLowerCase()));
                              
                         }
                         // YW << a response Label can not be used for more than
@@ -1603,20 +1603,20 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         }
                         //queries.add(sql2);
 
-                        sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
+                        sqlParameters.add(new SqlParameter(responseLabel));
 
-                        sqlParameters.add(new SqlParameter(stripQuotes(subHeader)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(header)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(leftItemText)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));
+                        sqlParameters.add(new SqlParameter(subHeader));
+                        sqlParameters.add(new SqlParameter(header));
+                        sqlParameters.add(new SqlParameter(leftItemText));
+                        sqlParameters.add(new SqlParameter(rightItemText));
 
-                        sqlParameters.add(new SqlParameter(stripQuotes(page)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(questionNum)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(regexp1)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(regexpError)));
+                        sqlParameters.add(new SqlParameter(page));
+                        sqlParameters.add(new SqlParameter(questionNum));
+                        sqlParameters.add(new SqlParameter(regexp1));
+                        sqlParameters.add(new SqlParameter(regexpError));
 
-                        sqlParameters.add(new SqlParameter(stripQuotes(default_value)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(responseLayout)));
+                        sqlParameters.add(new SqlParameter(default_value));
+                        sqlParameters.add(new SqlParameter(responseLayout));
                         
                         qo = new QueryObject();
                         qo.setSql(sql2);
@@ -1704,8 +1704,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 //queries.add(sql2_1);
                             	 sqlParameters = new ArrayList<>();
                                  sqlParameters.add(new SqlParameter(controlItemName));
-                                 sqlParameters.add(new SqlParameter(stripQuotes(optionValue)));
-                                 sqlParameters.add(new SqlParameter(stripQuotes(message)));                                
+                                 sqlParameters.add(new SqlParameter(optionValue));
+                                 sqlParameters.add(new SqlParameter(message));
                                  
                                  qo = new QueryObject();
                                  qo.setSql(sql2_1);
@@ -2407,9 +2407,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         //queries.add(sql);
                         ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                         sqlParameters.add(new SqlParameter(secLabel));
-                        sqlParameters.add(new SqlParameter(stripQuotes(title)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(instructions)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(subtitle)));
+                        sqlParameters.add(new SqlParameter(title));
+                        sqlParameters.add(new SqlParameter(instructions));
+                        sqlParameters.add(new SqlParameter(subtitle));
                         //sqlParameters.add(new SqlParameter(pageNumber));
                         
                         QueryObject qo = new QueryObject();
@@ -2576,8 +2576,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             }
                             //queries.add(createCRFSql);
                             ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
-                            sqlParameters.add(new SqlParameter(stripQuotes(crfName)));
-                            sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                            sqlParameters.add(new SqlParameter(crfName));
+                            sqlParameters.add(new SqlParameter(versionDesc));
 
                             QueryObject qo = new QueryObject();
                             qo.setSql(createCRFSql);
@@ -2678,9 +2678,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                     //queries.add(sql);
                     ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
-                    sqlParameters.add(new SqlParameter(stripQuotes(version)));
-                    sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
-                    sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));
+                    sqlParameters.add(new SqlParameter(version));
+                    sqlParameters.add(new SqlParameter(versionDesc));
+                    sqlParameters.add(new SqlParameter(revisionNotes));
                     
                     QueryObject qo = new QueryObject();
                     qo.setSql(sql);
@@ -2785,7 +2785,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         } else {
             for (int i = 0; i < subjarray.length - 1; i++) {
                 returnme += subjarray[i];
-                returnme += "'";
+                returnme += "''";
             }
             returnme += subjarray[subjarray.length - 1];
         }
