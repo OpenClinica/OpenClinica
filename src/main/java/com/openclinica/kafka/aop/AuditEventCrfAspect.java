@@ -10,6 +10,7 @@ import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuditEventCrfAspect {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     private KafkaService kafkaService;
-    @Autowired @Qualifier("auditEventCrfDao")
     private EventCrfDao eventCrfDao;
 
-    public AuditEventCrfAspect(KafkaService kafkaService){
+    public AuditEventCrfAspect(KafkaService kafkaService, EventCrfDao eventCrfDao){
         this.kafkaService = kafkaService;
+        this.eventCrfDao = eventCrfDao;
     }
 
     @Around("execution(* core.org.akaza.openclinica.dao.hibernate.EventCrfDao.saveOrUpdate(..))")
@@ -46,11 +47,14 @@ public class AuditEventCrfAspect {
         return afterEventCrf;
     }
 
-    @Transactional
+    // The reasoning for this check is that the eventCRF's updatedBy and lastUpdated fields are updated every time a single item data
+    // field within the form is changed. We don't want to trigger the processing of rules in rules-engine every time a single item
+    // data field is changed so we are filtering out those minimal changes here just to look for changes in the status of the eventCRF.
     public boolean eventCrfIsTheSame(EventCrf eventCrf){
-        EventCrf existingEventCrf = eventCrfDao.findById(eventCrf.getEventCrfId());
+        EventCrf existingEventCrf = getExistingEventCrf(eventCrf);
 
-        // workflowStatus, sdvStatus, removed, archived,
+        //EventCrf existingEventCrf = eventCrfDao.findById(eventCrf.getEventCrfId());
+
         if (existingEventCrf != null){
             if (areEventCrfStatusesTheSame(eventCrf, existingEventCrf)) {
                 log.info("AoP: eventCRF is the same! Skipping kafka message.");
@@ -65,6 +69,13 @@ public class AuditEventCrfAspect {
         }
         log.info("AoP: CRF must not exist, so it has changed.");
         return false;
+    }
+
+    private EventCrf getExistingEventCrf(EventCrf eventCrf) {
+        Session session = eventCrfDao.getSessionFactory().openSession();
+        EventCrf existingEventCrf = session.find(EventCrf.class, eventCrf.getEventCrfId());
+        session.close();
+        return existingEventCrf;
     }
 
     public boolean areEventCrfStatusesTheSame(EventCrf eventCrf, EventCrf existingEventCrf){
