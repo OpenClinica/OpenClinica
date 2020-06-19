@@ -719,4 +719,35 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             CoreResources.setRequestSchema(studyBean.getSchemaName());
     }
 
+    public String getStudyBoardUrl(String accessToken, Study study) {
+
+        String appendUrl = "/study-service/api/studies/" + study.getStudyEnvUuid();
+        String uri = sbsUrl + appendUrl;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+
+        logger.debug(uri);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+            return response.getBody();    
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
 }
