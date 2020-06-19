@@ -1460,6 +1460,14 @@
                                   <span>Dominican Republic</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
                               </td>
                           </tr>
+                          <tr class="country-option" data-country="FI">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1903px;"></div>
+                              </td>
+                              <td>
+                                  <span>Finland</span>&nbsp;&nbsp;<span class="the-country-code">+358</span>
+                              </td>
+                          </tr>
                           <tr class="country-option" data-country="FR">
                               <td class="flag-holder">
                                   <div class="the-flag" style="background-position: 0px -1012px;"></div>
@@ -1506,6 +1514,14 @@
                               </td>
                               <td>
                                   <span>Netherlands</span>&nbsp;&nbsp;<span class="the-country-code">+31</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="NO">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -121px;"></div>
+                              </td>
+                              <td>
+                                  <span>Norway</span>&nbsp;&nbsp;<span class="the-country-code">+47</span>
                               </td>
                           </tr>
                           <tr class="country-option" data-country="ES">
@@ -1779,7 +1795,7 @@
                     //render:"table"
                     width: 80,
                     height: 80,
-                    text: data.host + '?accessCode=' + data.accessCode
+                    text: data.host + '/?accessCode=' + data.accessCode
                 });
             },
             error: logDump
@@ -2052,6 +2068,13 @@
         },
         {
             backgroundPositionLeft: 0,
+            backgroundPositionTop: -1903,
+            name: 'Finland',
+            phoneCode: '+358',
+            countryCode: 'FI'
+        },
+        {
+            backgroundPositionLeft: 0,
             backgroundPositionTop: -1012,
             name: 'France',
             phoneCode: '+33',
@@ -2094,6 +2117,13 @@
         },
         {
             backgroundPositionLeft: 0,
+            backgroundPositionTop: -121,
+            name: 'Norway',
+            phoneCode: '+47',
+            countryCode: 'NO'
+        },
+        {
+            backgroundPositionLeft: 0,
             backgroundPositionTop: -1155,
             name: 'Spain',
             phoneCode: '+34',
@@ -2126,7 +2156,7 @@
             name: 'United Kingdom',
             phoneCode: '+44',
             countryCode: 'GB'
-        },
+        }
     ];
 
     var form = $('#contactInformationForm');

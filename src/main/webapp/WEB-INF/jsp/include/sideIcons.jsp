@@ -30,8 +30,8 @@
 				<td><fmt:message key="remove" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><span class="icon icon-trash red"></td>
-				<td><fmt:message key="delete" bundle="${reswords}"/></td>
+				<td><span class="icon icon-trash"></td>
+				<td><fmt:message key="clear" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
 				<td><span class="icon icon-lock"></td>

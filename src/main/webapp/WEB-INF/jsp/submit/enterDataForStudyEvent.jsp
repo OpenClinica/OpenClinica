@@ -472,7 +472,7 @@
 
                                   </c:otherwise>
                                 </c:choose>
-								                <c:if test="${studyEvent.signed == true}">
+								<c:if test="${studyEvent.signed == true}">
                                   <span class="icon icon-stamp-new status" alt="<fmt:message key="signed" bundle="${resword}"/>" title="<fmt:message key="signed" bundle="${resword}"/>"/>
                                 </c:if>
                                 <c:if test="${studyEvent.locked == true}">
