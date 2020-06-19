@@ -46,6 +46,8 @@ public class EnketoFormServlet extends SecureController {
     public static final String PREVIEW_MODE = "preview";
     public static final String JINI = "jini";
 
+    private FormCacheServiceImpl formCacheService;
+
     @Override
     protected void processRequest() throws Exception {
         FormLayoutDao formLayoutDao = (FormLayoutDao) SpringServletAccess.getApplicationContext(context).getBean("formLayoutDao");
@@ -56,7 +58,7 @@ public class EnketoFormServlet extends SecureController {
         EnketoCredentials enketoCredentials = (EnketoCredentials) SpringServletAccess.getApplicationContext(context).getBean("enketoCredentials");
         XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
         OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
-        FormCacheServiceImpl formCacheService = (FormCacheServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("formCacheServiceImpl");
+        formCacheService = (FormCacheServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("formCacheServiceImpl");
         TokenService tokenService = (TokenService)  SpringServletAccess.getApplicationContext(context).getBean("tokenService");
 
         String mode = request.getParameter(MODE);
@@ -159,6 +161,14 @@ public class EnketoFormServlet extends SecureController {
             getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId(), request.getSession().getId());
         }
 
+        addFormToFormCache(mode, eventCrf, contextHash, studyEvent, formLayout);
+
+        request.setAttribute(FORM_URL, formUrlObject.getFormUrl());
+        request.setAttribute(ORIGINATING_PAGE, originatingPage);
+        forwardPage(Page.ENKETO_FORM_SERVLET);
+    }
+
+    private void addFormToFormCache(String mode, EventCrf eventCrf, String contextHash, StudyEvent studyEvent, FormLayout formLayout) {
         if (!mode.equals(PREVIEW_MODE)) {
             if (eventCrf != null) {
                 formCacheService.addEditFormToFormCache(contextHash, eventCrf);
@@ -166,10 +176,6 @@ public class EnketoFormServlet extends SecureController {
                 formCacheService.addNewFormToFormCache(contextHash, currentStudy, studyEvent, formLayout);
             }
         }
-
-        request.setAttribute(FORM_URL, formUrlObject.getFormUrl());
-        request.setAttribute(ORIGINATING_PAGE, originatingPage);
-        forwardPage(Page.ENKETO_FORM_SERVLET);
     }
 
     @Override

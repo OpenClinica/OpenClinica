@@ -16,6 +16,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
+// Service class currently used by Kafka Service to track if a form is open. When a form stored in the cache is closed
+// it should trigger a formChange topic message which is used by rules-engine to know when it should re-process rules
+// on the new changes.
+
 @Service
 public class FormCacheServiceImpl {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -37,9 +41,7 @@ public class FormCacheServiceImpl {
                 build();
     }
 
-    //TODO Currently we are adding a form to the cache when it is opened through the participant's details page.
-    // Need to make sure we are not missing an entry point like the discrepancy note page that may open Enketo through
-    // a different path.
+    // TODO Currently we are adding a form to the cache when it is opened through the participant's details page.
     public void addEditFormToFormCache(String ecId, EventCrf eventCrf){
         FormChangeDTO formChangeDTO = kafkaService.constructFormChangeDTO(eventCrf);
         expiringMap.put(ecId, new FormChangeListener(formChangeDTO, kafkaService));

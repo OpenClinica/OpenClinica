@@ -13,6 +13,8 @@ public class FormChangeDTO {
     private String formOid;
     private String formCreatedDate;
     private String formUpdatedDate;
+    private String formCreatedBy;
+    private String formUpdatedBy;
     private String formWorkflowStatus;
     private String formSdvStatus;
     private String formRemoved;
@@ -77,6 +79,12 @@ public class FormChangeDTO {
 
     public String getFormUpdatedDate() {  return formUpdatedDate; }
     public void setFormUpdatedDate(String formUpdatedDate) { this.formUpdatedDate = formUpdatedDate; }
+
+    public String getFormCreatedBy() { return formCreatedBy; }
+    public void setFormCreatedBy(String formCreatedBy) { this.formCreatedBy = formCreatedBy; }
+
+    public String getFormUpdatedBy() { return formUpdatedBy; }
+    public void setFormUpdatedBy(String formUpdatedBy) { this.formUpdatedBy = formUpdatedBy; }
 
     public String getFormWorkflowStatus() { return formWorkflowStatus; }
     public void setFormWorkflowStatus(String formWorkflowStatus) { this.formWorkflowStatus = formWorkflowStatus; }

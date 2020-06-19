@@ -20,6 +20,7 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
+import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang3.BooleanUtils;
 import org.jmesa.view.html.HtmlBuilder;
 
@@ -193,7 +194,7 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             if (studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.DELETED && studySubject.getStatus() != core.org.akaza.openclinica.bean.core.Status.AUTO_DELETED
-                    && !currentRole.isMonitor()) {
+                    && !currentRole.isMonitor() && !getStudyEvent().isLocked()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 restoreEventCrf(html, eventCrfBean, studySubject);
@@ -215,7 +216,7 @@ public class EventCrfLayerBuilder {
 
             // if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() ||
             // currentUser.isSysAdmin())) {
-            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()) {
                 if (!hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
@@ -234,7 +235,8 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && !getStudyEvent().isLocked()
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 clearEventCrf(html, eventCrfBean, studySubject);
@@ -242,7 +244,7 @@ public class EventCrfLayerBuilder {
                 clearEventCrf(html, eventCrfBean, studySubject, reswords.getString("clear_form"));
                 html.tdEnd().trEnd(0);
             }
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable) && !getStudyEvent().isLocked()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -260,7 +262,9 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntryParameterized(html, eventCrfBean, eventDefinitionCrf, reswords.getString("view"), getStudyEvent());
                 html.tdEnd().trEnd(0);
 
-                if (getStudyEvent() != null && !currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE) {
+                if (getStudyEvent() != null && !currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE
+                        && !getStudyEvent().isLocked() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED
+                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
@@ -280,7 +284,7 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
             }
-            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()) {
                 if (!hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
@@ -291,7 +295,7 @@ public class EventCrfLayerBuilder {
                     html.tdEnd().trEnd(0);
                 }
             }
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && !getStudyEvent().isLocked()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
@@ -300,7 +304,8 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && !getStudyEvent().isLocked()
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 clearEventCrf(html, eventCrfBean, studySubject);
@@ -309,7 +314,7 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
 
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable) && !getStudyEvent().isLocked()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);

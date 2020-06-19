@@ -3,17 +3,13 @@
  */
 package core.org.akaza.openclinica.web.bean;
 
+import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Link;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A class for displaying a table of EntityBean objects on the screen.
@@ -162,11 +158,13 @@ public class EntityBeanTable {
 
     protected String noRowsMessage;
     protected String noColsMessage;
+    protected String filterPlaceHolder;
 
     public EntityBeanTable() {
         rows = new ArrayList();
         columns = new ArrayList();
         numColumns = 0;
+        filterPlaceHolder = "";
 
         currPageNumber = 1;
         totalPageNumbers = 0;
@@ -553,6 +551,28 @@ public class EntityBeanTable {
         // to reflect the number of rows that matched the search terms (if any)
         setRows(displayRows);
 
+        computeSort();
+        computePagination();
+    }
+    public void computeDisplayWithFilteringUsingContains(){
+        filterRowsUsingContains();
+        computeSort();
+        computePagination();
+    }
+
+    public void filterRowsUsingContains(){
+        String keyword = keywordFilter.trim().toLowerCase();
+        ArrayList displayRow = new ArrayList();
+        for(Object row : rows){
+            EntityBeanRow row1 = (EntityBeanRow) row;
+            if(row1.getSearchString().toLowerCase().contains(keyword))
+                displayRow.add(row1);
+        }
+        setRows(displayRow);
+    }
+
+    public void computeSort(){
+        ArrayList displayRows = rows;
         // *************
         // SORT THE ROWS
         // *************
@@ -564,7 +584,11 @@ public class EntityBeanTable {
             displayRows.set(i, row);
         }
         Collections.sort(displayRows);
+        setRows(displayRows);
+    }
 
+    public void computePagination(){
+        ArrayList displayRows = rows;
         // ****************
         // APPLY PAGINATION
         // ****************
@@ -600,7 +624,6 @@ public class EntityBeanTable {
             rows = displayRows;
         }
     }
-
     /**
      * @return Returns the links.
      */
@@ -658,5 +681,14 @@ public class EntityBeanTable {
             c.setShowLink(false);
             columns.set(i, c);
         }
+    }
+
+    public String getFilterPlaceHolder() {
+        return filterPlaceHolder;
+    }
+
+    public void setFilterPlaceHolder(String filterPlaceHolder) {
+        ResourceBundle resWords = ResourceBundleProvider.getWordsBundle();
+        this.filterPlaceHolder = resWords.getString(filterPlaceHolder) != null ? resWords.getString(filterPlaceHolder) : "";
     }
 }

@@ -5,16 +5,23 @@ import core.org.akaza.openclinica.dao.managestudy.CriteriaCommand;
 import core.org.akaza.openclinica.domain.SourceDataVerification;
 import core.org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class EventCRFSDVFilter implements CriteriaCommand {
-
+    private static final Logger logger = LoggerFactory.getLogger(EventCRFSDVFilter.class);
     List<Filter> filters = new ArrayList<Filter>();
     HashMap<String, String> columnMapping = new HashMap<String, String>();
     Integer studyId;
@@ -49,18 +56,22 @@ public class EventCRFSDVFilter implements CriteriaCommand {
     }
 
     private String buildCriteria(String criteria, String property, Object value) {
-        value = StringEscapeUtils.escapeSql(value.toString());
-        if (value != null) {
+        if(value != null && StringUtils.isNotBlank(value.toString())){
+            value = StringEscapeUtils.escapeSql(value.toString());
             if (property.equals("sdvStatus")) {
-                ArrayList<String> sdvStatusFilterArray = new ArrayList<>();
-                String sdvStatusString = value.toString().trim();
-                if(sdvStatusString.contains("+")){
-                    for(String sdvStatus: sdvStatusString.split("\\+")){
-                        sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatus.trim()).toString());
-                    }
+                String valueString = value.toString().trim();
+                try {
+                    valueString = URLDecoder.decode(valueString, StandardCharsets.UTF_8.toString());
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("Unsupported encoding");
                 }
-                else
-                    sdvStatusFilterArray.add(SdvStatus.getByI18nDescription(sdvStatusString).toString());
+
+                ArrayList<String> sdvStatusFilterArray = new ArrayList<>();
+                for(SdvStatus sdvStatus: SdvStatus.values()){
+                    if(valueString.contains(sdvStatus.getDisplayValue()))
+                        sdvStatusFilterArray.add(sdvStatus.toString());
+                }
+
                 criteria = criteria + " and (";
 
                 for(int i = 0 ; i < sdvStatusFilterArray.size(); i++){
