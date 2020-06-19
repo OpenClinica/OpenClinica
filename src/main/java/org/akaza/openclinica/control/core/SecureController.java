@@ -53,6 +53,8 @@ import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
+
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -563,6 +565,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 session.setAttribute("study", currentStudy);
             }
+            Study study = session.getAttribute("study");
+            String boardUrl = study.getBoardUrl();
+            if (boardUrl == null) {
+                keycloakClientImpl.getSystemToken();
+            }
+
+
             request.setAttribute("requestSchema", "public");
             currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
