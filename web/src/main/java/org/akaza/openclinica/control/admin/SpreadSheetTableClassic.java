@@ -871,7 +871,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         // notice that still "\\," in options - jxu-08-31-06
                         String updatedResOptions = resOptions.replaceAll("\\\\,", "\\,");
                         String updatedResValues = resValues.replaceAll("\\\\,", "\\,");
-                        rsb.setOptions(updatedResOptions, updatedResValues);
+
+                        //following rsb used in isResponseValid in CreateCRFVersionServlet for comparing response
+                        // options text and values between form versions. Please keep as is. - Z 19-Jun-2020
+                        rsb.setOptions(stripQuotes(updatedResOptions), stripQuotes(updatedResValues));
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
