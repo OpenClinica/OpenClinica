@@ -61,13 +61,13 @@ public class ScheduledExtractController {
 
         ArrayList<ArchivedDatasetFileBean> archivedDatasetFileBeans = archivedDatasetFileDAO.findByJobUuid(jobUuid);
 
-        if (archivedDatasetFileBeans.size()==0) {
+        if (archivedDatasetFileBeans.size() == 0) {
             return new ResponseEntity<>("No content found for job Uuid: " + jobUuid + ".", HttpStatus.NOT_FOUND);
         }
 
         String output = "";
         for (ArchivedDatasetFileBean adfb : archivedDatasetFileBeans) {
-            if (adfb.getStatus().equals(JobStatus.COMPLETED) && !adfb.getFileReference().isEmpty())
+            if (adfb.getStatus().equals(JobStatus.COMPLETED.name()) && !adfb.getFileReference().isEmpty())
                 output += " Dataset Id: " + adfb.getJobExecutionUuid() + "  Date Created: " + adfb.getDateCreated() + "\n";
         }
 
@@ -79,8 +79,8 @@ public class ScheduledExtractController {
     @RequestMapping(value = "/extractJobs/jobExecutions/{jobExecutionUuid}/dataset", method = RequestMethod.GET, produces = "application/zip")
     public @ResponseBody
     ResponseEntity<Object> getScheduledExtract(@PathVariable("jobExecutionUuid") String jobExecutionUuid,
-                                                          HttpServletRequest request,
-                                                          HttpServletResponse response) throws IOException{
+                                               HttpServletRequest request,
+                                               HttpServletResponse response) throws IOException {
 
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (!userAccountBean.isSysAdmin() && !userAccountBean.isTechAdmin()) {
@@ -105,7 +105,7 @@ public class ScheduledExtractController {
         response.setContentType(ContentType.APPLICATION_OCTET_STREAM.toString());
         response.setContentLength((int) file.length());
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"" + file.getName() + "\""));
-        response.setHeader(HttpHeaders.CONTENT_LENGTH, ""+file.length());
+        response.setHeader(HttpHeaders.CONTENT_LENGTH, "" + file.length());
 
         return new ResponseEntity<>(contents, HttpStatus.OK);
 
