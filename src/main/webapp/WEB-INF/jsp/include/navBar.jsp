@@ -295,7 +295,7 @@
             </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
             <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
             <c:if test="${sessionScope.baseUserRole == 'Data Manager'}">
-                <a href="${urlPrefix}DesignStudy"><fmt:message key="design" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${study.boardUrl}"><fmt:message key="design" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
             </c:if>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
                 <a href="${study.manager}/${study.studyUuid}/${study.studyEnvUuid}"><fmt:message key="share" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
