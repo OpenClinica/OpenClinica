@@ -121,7 +121,7 @@ public class ChangeCRFVersionController {
             @RequestParam("originatingPage") String originatingPage)
 
     {
-
+        setupResource(request);
         // to be removed for aquamarine
         if (!mayProceed(request)) {
             try {
@@ -708,6 +708,7 @@ public class ChangeCRFVersionController {
         ResourceBundleProvider.updateLocale(locale);
         resword = ResourceBundleProvider.getWordsBundle(locale);
         resformat = ResourceBundleProvider.getFormatBundle(locale);
+        respage = ResourceBundleProvider.getPageMessagesBundle(locale);
     }
 
     private String formatDate(Date date) {
