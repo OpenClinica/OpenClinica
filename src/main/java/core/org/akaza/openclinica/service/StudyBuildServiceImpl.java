@@ -738,16 +738,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
 
-        logger.debug(uri);
+        logger.info("getStudyBoardUrl: {}\naccessToken: {}", uri, accessToken);
 
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
-            return response.getBody();    
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
+        ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+        return response.getBody();    
     }
 
 }

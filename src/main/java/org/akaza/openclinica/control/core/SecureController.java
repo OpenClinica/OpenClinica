@@ -557,22 +557,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                             currentStudy.setStudy(getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
-                session.setAttribute("study", currentStudy);
+                setStudy(currentStudy, session);
             }
             else {
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                 currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
-                session.setAttribute("study", currentStudy);
-            }
-
-            Study study = (Study) session.getAttribute("study");
-            String boardUrl = study.getBoardUrl();
-            if (boardUrl == null) {
-                String accessToken = (String) session.getAttribute("accessToken");
-                if (accessToken != null) {
-                    boardUrl = getStudyBuildService().getStudyBoardUrl(accessToken, study);
-                    study.setBoardUrl(boardUrl);
-                }
+                setStudy(currentStudy, session);
             }
 
             request.setAttribute("requestSchema", "public");
@@ -1417,7 +1407,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             currentStudy = getStudyDao().findStudyWithSPVByStudyEnvUuid(studyEnvUuid);
 
             session.setAttribute("publicStudy", currentPublicStudy);
-            session.setAttribute("study", currentStudy);
+            setStudy(currentStudy, session);
             currentRole = role;
             session.setAttribute("userRole", role);
             logger.info("Found role for this study:" + role.getRoleName());
@@ -1562,7 +1552,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // Site level
                 currentStudy = (Study) getStudyDao().findByUniqueId(currentPublicStudy.getUniqueIdentifier());
             }
-            session.setAttribute("study", currentStudy);
+            setStudy(currentStudy, session);
             session.setAttribute("publicStudy", currentPublicStudy);
             ub.setActiveStudyId(currentPublicStudy.getStudyId());
             UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
@@ -1572,8 +1562,25 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
- protected PermissionService getPermissionService(){
-     return  (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+    protected PermissionService getPermissionService() {
+        return  (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+    }
 
- }
+    protected void setStudy(Study study, HttpSession session) {
+        String boardUrl = study.getBoardUrl();
+        if (boardUrl == null) {
+            String accessToken = (String) session.getAttribute("accessToken");
+            if (accessToken != null) {
+                try {
+                    boardUrl = getStudyBuildService().getStudyBoardUrl(accessToken, study);
+                    study.setBoardUrl(boardUrl);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }
+        session.setAttribute("study", study);
+    }
 }
