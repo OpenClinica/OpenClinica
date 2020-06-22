@@ -440,6 +440,14 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("findByEventSubjectVersion", variables);
     }
 
+    public ArrayList findByEventSubjectCRFid(StudyEventBean studyEvent, StudySubjectBean studySubject, CRFVersionBean crfVersion) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEvent.getId()));
+        variables.put(new Integer(2), new Integer(crfVersion.getId()));
+        variables.put(new Integer(3), new Integer(studySubject.getId()));
+
+        return executeFindAllQuery("findByEventSubjectCRFid", variables);
+    }
     // TODO: to get rid of warning refactor executeFindAllQuery method in
     // superclass
     public EventCRFBean findByEventCrfVersion(StudyEventBean studyEvent, CRFVersionBean crfVersion) {
@@ -449,6 +457,20 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         variables.put(new Integer(2), new Integer(crfVersion.getId()));
 
         ArrayList<EventCRFBean> eventCrfs = executeFindAllQuery("findByEventCrfVersion", variables);
+        if (!eventCrfs.isEmpty() && eventCrfs.size() == 1) {
+            eventCrfBean = eventCrfs.get(0);
+        }
+        return eventCrfBean;
+
+    }
+    
+    public EventCRFBean findByEventCrfID(StudyEventBean studyEvent, CRFVersionBean crfVersion) {
+        EventCRFBean eventCrfBean = null;
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(studyEvent.getId()));
+        variables.put(new Integer(2), new Integer(crfVersion.getId()));
+
+        ArrayList<EventCRFBean> eventCrfs = executeFindAllQuery("findByEventCrfID", variables);
         if (!eventCrfs.isEmpty() && eventCrfs.size() == 1) {
             eventCrfBean = eventCrfs.get(0);
         }

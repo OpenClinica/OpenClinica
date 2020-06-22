@@ -56,7 +56,10 @@ $.noConflict();
        jQuery('#selectedVersion').change(function() {
         var x = jQuery(this).val();
         // and update the hidden input's value
-        var ind = jQuery(this).attr("selectedIndex") ;
+        var ind = jQuery(this).attr("selectedIndex");
+		if(ind == undefined){
+		    ind = jQuery(this).prop("selectedIndex");	
+		}	
 		var selectedText = jQuery(this.options[ind]).text();
 		jQuery('#selectedVersionName').val(selectedText);
     });

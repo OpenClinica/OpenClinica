@@ -129,9 +129,19 @@ public class ImportCRFDataService {
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
 
                     ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
+                    
                     for (CRFVersionBean crfVersionBean : crfVersionBeans) {
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        /**
+                         *  OC-8255
+                         *  need to check :
+                         *  If another user already entered a different version of the same CRF for the same Study Event & Subject
+                         */
+                        if (eventCrfBeans.isEmpty()) {
+                        	eventCrfBeans = eventCrfDAO.findByEventSubjectCRFid(studyEventBean, studySubjectBean, crfVersionBean);
+                        }
+                        
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
                         // have us with a study event, but no corresponding
@@ -426,6 +436,14 @@ public class ImportCRFDataService {
                     // may be the point where we cut off item groups etc and
                     // instead work on sections
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+                    
+                    /**
+                     * OC-8255
+                     */
+                    if (eventCRFBean == null) {
+                    	eventCRFBean = eventCRFDAO.findByEventCrfID(studyEvent, crfVersion);
+                        
+                    }
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
                     EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),
                             crfVersion.getId());
