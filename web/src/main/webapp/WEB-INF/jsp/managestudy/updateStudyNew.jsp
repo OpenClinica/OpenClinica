@@ -20,7 +20,7 @@
 	</c:otherwise>
 </c:choose>
 
-  <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.9.1.min.js"></script>
+  <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-3.5.1.min.js"></script>
 
 
 <!-- move the alert message to the sidebar-->
