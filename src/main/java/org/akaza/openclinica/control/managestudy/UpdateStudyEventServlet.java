@@ -31,6 +31,7 @@ import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import core.org.akaza.openclinica.domain.datamap.AuditLogEventType;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudyEvent;
 import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.AuditLogEventService;
@@ -168,7 +169,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
         studyEvent.setEventCRFs(eventCRFDAO.findAllByStudyEvent(studyEvent));
 
-        List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>(Arrays.asList(StudyEventWorkflowStatusEnum.values()));
+        List<StudyEventWorkflowStatusEnum> eventWorkflowStatuses = new ArrayList<>();
 
         Study studyBean = (Study) getStudyDao().findByPK(ssub.getStudyId());
         checkRoleByUserAndStudy(ub, studyBean);
@@ -181,19 +182,33 @@ public class UpdateStudyEventServlet extends SecureController {
         // ///End of remove signed status from the list
 
         // BWP: 2735>>keep the DATA_ENTRY_STARTED status
+        if(studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)){
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.SCHEDULED);
+        }
+        else if(studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)){
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.SCHEDULED);
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.SKIPPED);
+        }
+        else if(studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)){
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.SKIPPED);
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.SCHEDULED);
+        }
+        else if(studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)){
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.COMPLETED);
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.STOPPED);
+        }
+        else if(studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)){
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.STOPPED);
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+        }
+        else if(studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)){
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.COMPLETED);
+            eventWorkflowStatuses.add(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED);
+        }
 
-        if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
-        }
-        if (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)) {
-            // can't lock a non-completed CRF, but removed above
-            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SCHEDULED);
-            // addl rule: skipped should only be present before data starts
-            // being entered
-        }
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SKIPPED);
-        }
 
 
         ArrayList getECRFs = studyEvent.getEventCRFs();
@@ -237,14 +252,6 @@ public class UpdateStudyEventServlet extends SecureController {
                 }
                 // }
             }
-        }
-
-
-        // also, if data entry is started, can't move back to scheduled or not
-        // scheduled
-        if (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)) {
-            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
-            eventWorkflowStatuses.remove(StudyEventWorkflowStatusEnum.SCHEDULED);
         }
 
         // ### tbh, above modified 102007
