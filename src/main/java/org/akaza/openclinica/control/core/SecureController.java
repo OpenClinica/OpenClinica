@@ -1572,7 +1572,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             String accessToken = (String) session.getAttribute("accessToken");
             if (accessToken != null) {
                 try {
-                    boardUrl = getStudyBuildService().getStudyBoardUrl(accessToken, study);
+                    boardUrl = getStudyBuildService().getCurrentBoardUrl(accessToken, study);
                     study.setBoardUrl(boardUrl);
                 }
                 catch (Exception e) {
