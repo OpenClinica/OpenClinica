@@ -145,11 +145,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
     
     public void setExtraTypesExpected() {
        
-        this.setTypeExpected(13, TypeNames.INT);        
-        this.setTypeExpected(14, TypeNames.STRING);
-        this.setTypeExpected(15, TypeNames.STRING);
-        this.setTypeExpected(16, TypeNames.INT);
-        this.setTypeExpected(17, TypeNames.INT);
+        this.setTypeExpected(1, TypeNames.INT);        
+        this.setTypeExpected(2, TypeNames.STRING);
+        this.setTypeExpected(3, TypeNames.STRING);
+        this.setTypeExpected(4, TypeNames.INT);
+     
        
     }
 
@@ -476,7 +476,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
      * @return
      */
     public Object getKeyFromHashMap(HashMap hm) {
-       String key = (Integer) hm.get("study_id") + (Integer) hm.get("study_event_id") + (String) hm.get("ig_ocoid") + (String) hm.get("item_ocoid");
+       String key = (Integer) hm.get("study_event_id") + (String) hm.get("ig_ocoid") + (String) hm.get("item_ocoid");
        
        return key;
     }
@@ -497,8 +497,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
     }
     
     @SuppressWarnings("unchecked")
-    public HashMap findByStudyAndOids(Integer studyId, String itemOid, String itemGroupOid) {
-    	this.setTypesExpected();
+    public HashMap findCountByStudyEventAndOIDs(Integer studyId, String itemOid, String itemGroupOid) {
+    
         setExtraTypesExpected();
 
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -511,7 +511,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         HashMap answer = new HashMap();
 
         ArrayList rows;
-        String sql = digester.getQuery("findByStudyAndOIDs");
+        String sql = digester.getQuery("findCountByStudyEventAndOIDs");
 
         if (variables == null || variables.isEmpty()) {
             rows = this.select(sql);
@@ -525,9 +525,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
         	//construct key
         	String key = (String) this.getKeyFromHashMap(hm);
         	
-        	//construct dataItem
-        	ItemDataBean eb = (ItemDataBean) this.getEntityFromHashMap(hm);	
-        	answer.put(key, eb);       	           
+        	Integer count = (Integer) hm.get("cnt");
+        	answer.put(key, count);       	           
         }
       
         return answer;
