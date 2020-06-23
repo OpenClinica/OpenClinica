@@ -11,6 +11,7 @@ import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.core.Status;
+import core.org.akaza.openclinica.bean.core.SubjectEventStatus;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
@@ -36,6 +37,7 @@ import core.org.akaza.openclinica.domain.rule.RuleSetBean;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.AuditLogEventService;
 import core.org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import core.org.akaza.openclinica.service.managestudy.StudySubjectService;
 import core.org.akaza.openclinica.service.rule.RuleSetService;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -439,6 +441,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             } else {
                 request.setAttribute(STUDY_SUBJECT_ID, new Integer(studySubjectId).toString());
+
                 request.setAttribute("studyEvent", studyEvent);
                 // -------------------
                 ssdao = new StudySubjectDAO(sm.getDataSource());
@@ -452,8 +455,16 @@ public class UpdateStudyEventServlet extends SecureController {
                 Study study = (Study) getStudyDao().findByPK(ssb.getStudyId());
                 ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
 
-                ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
-                populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
+                StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                        .getBean("studySubjectService");
+
+                DisplayStudyEventBean dse = null;
+                for (DisplayStudyEventBean dsevent : studySubjectService.getDisplayStudyEventsForStudySubject(ssb, ub, currentRole, study)) {
+                    if (dsevent.getStudyEvent().getId() == studyEventId) {
+                        dse = dsevent;
+                    }
+                }
+                ArrayList uncompletedEventDefinitionCRFs = dse.getUncompletedCRFs();
 
                 ArrayList<DisplayEventCRFBean> displayEventCRFs = getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
                         eventDefinitionCRFs, ub, currentRole, studyEvent.getWorkflowStatus(), study);
