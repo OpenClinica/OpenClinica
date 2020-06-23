@@ -409,20 +409,15 @@ public class UpdateStudyEventServlet extends SecureController {
                 studyEvent.setSigned(true);
                 studyEventDAO.update(studyEvent);
 
-                // OC-10834 OC4 - Signature not recorded when signing an event if the event status is already Signed
-                // manually add audit-log-event when user re-signed without any changes
-                Boolean signedStatus = (Boolean)session.getAttribute(PREV_STUDY_EVENT_SIGNED_STATUS);
-                if (studyEvent.isSigned() && BooleanUtils.isTrue(signedStatus) ) {
-                    AuditLogEvent auditLogEvent = new AuditLogEvent();
-                    auditLogEvent.setAuditTable(STUDY_EVENT);
-                    auditLogEvent.setEntityId(studyEvent.getId());
-                    auditLogEvent.setEntityName("Signed");
-                    auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-                    auditLogEvent.setNewValue(studyEvent.getSigned().toString());
-                    auditLogEvent.setOldValue(studyEvent.getSigned().toString());
-                    auditLogEvent.setDetails(detail);
-                    getAuditLogEventService().saveAuditLogEvent(auditLogEvent, ub);
-                }
+                AuditLogEvent auditLogEvent = new AuditLogEvent();
+                auditLogEvent.setAuditTable(STUDY_EVENT);
+                auditLogEvent.setEntityId(studyEvent.getId());
+                auditLogEvent.setEntityName("Signed");
+                auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
+                auditLogEvent.setNewValue(studyEvent.getSigned().toString());
+                auditLogEvent.setOldValue(studyEvent.getSigned().toString());
+                auditLogEvent.setDetails(detail);
+                getAuditLogEventService().saveAuditLogEvent(auditLogEvent, ub);
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
