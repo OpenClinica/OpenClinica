@@ -63,7 +63,7 @@
     if ( cancelButton != null) {
       if(confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>')) {
 
-        window.location.href="ListStudySubjects";
+        window.location.href='ViewStudySubject?id=<c:out value="${studySubject.id}"/>';
        return true;
       } else {
         return false;
