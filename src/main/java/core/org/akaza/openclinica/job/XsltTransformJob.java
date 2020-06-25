@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
@@ -61,11 +62,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.util.StringUtils;
+
+
 /**
  * Xalan Transform Job, an XSLT transform job using the Xalan classes
- *
  * @author thickerson
- *
  */
 public class XsltTransformJob extends QuartzJobBean {
 
@@ -84,9 +85,7 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String TENANT_SCHEMA = "tenantSchema";
     public static final String ZIPPED = "zipped";
     public static final String DELETE_OLD = "deleteOld";
-    public static final String SUCCESS_MESSAGE = "SUCCESS_MESSAGE";
-    public static final String FAILURE_MESSAGE = "FAILURE_MESSAGE";
-    public static final String XSLT_PATH="XSLT_PATH";
+    public static final String XSLT_PATH = "XSLT_PATH";
     public static final String EP_BEAN = "epBean";
 
     private OpenClinicaMailSender mailSender;
@@ -107,7 +106,6 @@ public class XsltTransformJob extends QuartzJobBean {
     @Autowired
     private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
 
-    //private final SaxonTransformerFactory transformerFactory = SaxonTransformerFactory.newInstance();
     private final TransformerFactory transformerFactory = new net.sf.saxon.TransformerFactoryImpl();
 
     // POST PROCESSING VARIABLES
@@ -121,13 +119,13 @@ public class XsltTransformJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) {
         logger.info("Job " + context.getJobDetail().getDescription() + " started.");
         JobDataMap dataMap = context.getMergedJobDataMap();
-        initDependencies(context.getScheduler(),dataMap);
+        initDependencies(context.getScheduler(), dataMap);
         // need to generate a Locale for emailing users with i18n
         // TODO make dynamic?
         Locale locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
-        List<File> markForDelete = new LinkedList<File>();
+        List<File> markForDelete = new LinkedList<>();
         Boolean zipped = true;
         Boolean deleteOld = true;
         Boolean exceptions = false;
@@ -140,50 +138,97 @@ public class XsltTransformJob extends QuartzJobBean {
             ResourceBundleProvider.updateLocale(locale);
             pageMessages = ResourceBundleProvider.getPageMessagesBundle();
         }
-        // get the file information from the job
-        String alertEmail = dataMap.getString(EMAIL);
         java.io.InputStream in = null;
         FileOutputStream endFileStream = null;
         UserAccountBean userBean = null;
+        // get the file information from the job
+        String alertEmail = dataMap.getString(EMAIL);
+        int userAccountId = dataMap.getInt(USER_ID);
+        logger.debug("found userAccountId: " + userAccountId);
+        int studyId = dataMap.getInt(STUDY_ID);
+        String outputPath = dataMap.getString(POST_FILE_PATH);
+        String generalFileDir = dataMap.getString(XML_FILE_PATH);
+        int dsId = dataMap.getInt(DATASET_ID);
+        int archivedDatasetFileBeanId = dataMap.getInt(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID);
+        logger.debug("found archivedDatasetFileBeanId: " + dsId);
+        ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
+        String jobName = dataMap.getString(XsltTriggerService.JOB_NAME);
+        ArchivedDatasetFileBean archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.findByPK(archivedDatasetFileBeanId);
+        if (archivedDatasetFileBean == null) {
+            logger.error("Could not find archivedDatasetFile for id: " + archivedDatasetFileBeanId);
+        } else {
+            logger.debug("Found archivedDatasetFile in the db.");
+        }
+
         try {
+            boolean isScheduled = archivedDatasetFileBean.getJobType().contentEquals("Scheduled");
+            //Create a new row in archived dataset file db if previous one is completed (for export triggers)
+            if (archivedDatasetFileBean.getStatus().equals(JobStatus.COMPLETED.name())) {
+                ArchivedDatasetFileBean newArchivedDatasetFileBean = new ArchivedDatasetFileBean();
+                newArchivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
+                newArchivedDatasetFileBean.setFormat(archivedDatasetFileBean.getFormat());
+                newArchivedDatasetFileBean.setOwner(archivedDatasetFileBean.getOwner());
+                newArchivedDatasetFileBean.setOwnerId(archivedDatasetFileBean.getOwnerId());
+                newArchivedDatasetFileBean.setDatasetId(archivedDatasetFileBean.getDatasetId());
+                newArchivedDatasetFileBean.setDateCreated(new Date());
+                newArchivedDatasetFileBean.setExportFormatId(1);
+                newArchivedDatasetFileBean.setFileReference(null);
+                newArchivedDatasetFileBean.setJobUuid(archivedDatasetFileBean.getJobUuid());
+                newArchivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
+                newArchivedDatasetFileBean.setJobType(archivedDatasetFileBean.getJobType());
+                archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.create(newArchivedDatasetFileBean);
 
-            // init all fields from the data map
-            int userAccountId = dataMap.getInt(USER_ID);
-            int studyId = dataMap.getInt(STUDY_ID);
-            String outputPath = dataMap.getString(POST_FILE_PATH);
-            // get all user info, generate xml
-            logger.debug("found output path: " + outputPath);
-            String generalFileDir = dataMap.getString(XML_FILE_PATH);
+                //create a new file for this export instead of overwrite the previous one
+                int id = dataMap.getInt(EXTRACT_PROPERTY);
+                String fileName;
+                if (id == 9 || id == 10) { //for SAS and SPSS
+                    fileName = CoreResources.getExtractFields("extract." + id + ".zipName")[0];
+                    String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
+                    SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
+                    String currentDate = sdfDir.format(new java.util.Date());
+                    fileName = fileName.replace("$dateTime", currentDate).replace("$datasetName", epBean.getDatasetName());
+                    epBean.setZipName(fileName);
+                } else {
+                    fileName = CoreResources.getExtractFields("extract." + id + ".exportname")[0];
+                    String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
+                    SimpleDateFormat sdfDir = new SimpleDateFormat(simpleDatePattern);
+                    String currentDate = sdfDir.format(new java.util.Date());
+                    fileName = fileName.replace("$dateTime", currentDate).replace("$datasetName", epBean.getDatasetName());
+                    String[] exportFileName = {fileName};
+                    epBean.setExportFileName(exportFileName);
+                    epBean.setDoNotDelFiles(exportFileName);
+                }
+                dataMap.put(POST_FILE_NAME, fileName);
+            }
 
-
-            int dsId = dataMap.getInt(DATASET_ID);
-             int archivedDatasetFileBeanId = dataMap.getInt(XsltTriggerService.ARCHIVED_DATASET_FILE_BEAN_ID);
-             ArchivedDatasetFileBean archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.findByPK(archivedDatasetFileBeanId);
             archivedDatasetFileBean.setStatus(JobStatus.IN_PROGRESS.name());
-            archivedDatasetFileBean.setFileReference("");
             archivedDatasetFileBean.setDateCreated(new Date());
-            archivedDatasetFileBean=(ArchivedDatasetFileBean) archivedDatasetFileDao.update(archivedDatasetFileBean);
+            archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDao.update(archivedDatasetFileBean);
 
             // JN: Change from earlier versions, cannot get static reference as
             // static references don't work. Reason being for example there could be
             // datasetId as a variable which is different for each dataset and
             // that needs to be loaded dynamically
-            ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
 
             File doNotDelDir = new File(generalFileDir);
-            if(doNotDelDir.isDirectory())
-            {
+            if (doNotDelDir.isDirectory()) {
                 doNotDeleteUntilExtract = doNotDelDir.list();
             }
 
             zipped = epBean.getZipFormat();
 
             deleteOld = epBean.getDeleteOld();
+
+            //always delete old file references for manually ran jobs.
+            if (!isScheduled) {
+                deleteOld = true;
+            }
+
             long sysTimeBegin = System.currentTimeMillis();
             userBean = (UserAccountBean) userAccountDao.findByPK(userAccountId);
 
-            Study currentStudy = (Study) studyDao.findByPK(studyId);
-            Study parentStudy = (Study) studyDao.findByPK(currentStudy.checkAndGetParentStudyId());
+            Study currentStudy = studyDao.findByPK(studyId);
+            Study parentStudy = studyDao.findByPK(currentStudy.checkAndGetParentStudyId());
             String successMsg = epBean.getSuccessMessage();
             String failureMsg = epBean.getFailureMessage();
             final long start = System.currentTimeMillis();
@@ -194,15 +239,16 @@ public class XsltTransformJob extends QuartzJobBean {
             // generate file directory for file service
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             logger.debug("--> job starting: ");
-            String permissionTagsString = (String) context.getScheduler().getContext().get("permissionTagsString");
-            String[] permissionTagsStringArray = (String[]) context.getScheduler().getContext().get("permissionTagsStringArray");
-            List <String> permissionTagsList = (List <String>) context.getScheduler().getContext().get("permissionTagsList");
 
-            ODMFilterDTO odmFilter = (ODMFilterDTO) context.getScheduler().getContext().get("odmFilter");
+            String userUuid = userBean.getUserUuid();
+            String permissionTagsString = permissionService.getPermissionTagsString(currentStudy, userUuid);
+            String[] permissionTagsStringArray = permissionService.getPermissionTagsStringArray(currentStudy, userUuid);
+            ODMFilterDTO odmFilter = new ODMFilterDTO();
+
+
             Set<Integer> edcSet = new HashSet<>();
-
-            ArchivedDatasetFileBean fbFinal=null;
-            ClinicalDataCollector.datasetFiltered="NO";
+            ArchivedDatasetFileBean fbFinal = null;
+            ClinicalDataCollector.datasetFiltered = "NO";
 
             HashMap<String, Integer> answerMap =
                     odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
@@ -218,7 +264,7 @@ public class XsltTransformJob extends QuartzJobBean {
             String ODMXMLFileName = "";
             int fId = 0;
             Iterator<Entry<String, Integer>> it = answerMap.entrySet().iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 JobTerminationMonitor.check();
 
                 Entry<String, Integer> entry = it.next();
@@ -244,17 +290,15 @@ public class XsltTransformJob extends QuartzJobBean {
             int fileCntr = 0;
 
             String xmlFilePath = new File(generalFileDir + ODMXMLFileName).toURI().toURL().toExternalForm();
-            String endFile =null;
+            String endFile = null;
             File oldFilesPath = new File(generalFileDir);
-            while(fileCntr<numXLS)
-            {
+            while (fileCntr < numXLS) {
                 JobTerminationMonitor.check();
 
-                String xsltPath = dataMap.getString(XSLT_PATH)+ File.separator +epBean.getFileName()[fileCntr];
+                String xsltPath = dataMap.getString(XSLT_PATH) + File.separator + epBean.getFileName()[fileCntr];
                 in = new java.io.FileInputStream(xsltPath);
 
                 Transformer transformer = transformerFactory.newTransformer(new StreamSource(in));
-
 
                 endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
 
@@ -270,31 +314,27 @@ public class XsltTransformJob extends QuartzJobBean {
                 JobTerminationMonitor.check();
             }
             if (oldFilesPath.isDirectory()) {
-
                 markForDelete = Arrays.asList(oldFilesPath.listFiles());
                 // logic to prevent deleting the file being created.
-
             }
-            final double done = setFormat(new Double(System.currentTimeMillis() - start)/1000);
+            final double done = setFormat(new Double(System.currentTimeMillis() - start) / 1000);
             logger.info("--> job completed in " + done + " ms");
             // run post processing
 
             ProcessingFunction function = epBean.getPostProcessing();
             String subject = "";
-            String jobName = dataMap.getString(XsltTriggerService.JOB_NAME);
             StringBuffer emailBuffer = new StringBuffer("");
             emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
                     + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
             emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
             emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
-            if(function!=null && function.getClass().equals(core.org.akaza.openclinica.bean.service.SqlProcessingFunction.class))
-            {
-                String dbUrl = ((core.org.akaza.openclinica.bean.service.SqlProcessingFunction)function).getDatabaseUrl();
+            if (function != null && function.getClass().equals(core.org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
+                String dbUrl = ((core.org.akaza.openclinica.bean.service.SqlProcessingFunction) function).getDatabaseUrl();
                 int lastIndex = dbUrl.lastIndexOf('/');
                 String schemaName = dbUrl.substring(lastIndex);
                 int HostIndex = dbUrl.substring(0, lastIndex).indexOf("//");
-                String Host = dbUrl.substring(HostIndex,lastIndex);
-                emailBuffer.append("<P>Database: " + ((core.org.akaza.openclinica.bean.service.SqlProcessingFunction)function).getDatabaseType() + "</P>");
+                String Host = dbUrl.substring(HostIndex, lastIndex);
+                emailBuffer.append("<P>Database: " + ((core.org.akaza.openclinica.bean.service.SqlProcessingFunction) function).getDatabaseType() + "</P>");
                 emailBuffer.append("<P>Schema: " + schemaName.replace("/", "") + "</P>");
                 emailBuffer.append("<P>Host: " + Host.replace("//", "") + "</P>");
 
@@ -314,20 +354,17 @@ public class XsltTransformJob extends QuartzJobBean {
                 File intermediateFiles[] = getInterFiles(dataMap.getString(POST_FILE_PATH));
                 ProcessingResultType message = function.run();
 
-
-
                 // Delete these files only in case when there is no failure
                 if (message.getCode().intValue() != 2) {
                     deleteOldFiles(intermediateFiles);
                 }
                 final long done2 = System.currentTimeMillis() - start;
                 logger.info("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
-                logger.info("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
                 if (!function.getClass().equals(core.org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
                     String archivedFile = dataMap.getString(POST_FILE_NAME) + "." + function.getFileType();
                     // JN: if the properties is set to zip the output file,
                     // download the zip file
-                    if (function.isZip()){
+                    if (function.isZip()) {
                         archivedFile = archivedFile + ".zip";
                     }
 
@@ -340,8 +377,8 @@ public class XsltTransformJob extends QuartzJobBean {
                     }
 
                     fbFinal =
-                            generateFileRecord(archivedFile, outputPath, datasetBean, done, new File(outputPath + File.separator + archivedFile).length(),
-                                    ExportFormatBean.PDFFILE, userAccountId,edcSet,epBean,archivedDatasetFileBean);
+                            generateFileRecord(archivedFile, outputPath, done, new File(outputPath + File.separator + archivedFile).length(),
+                                    ExportFormatBean.PDFFILE, edcSet, archivedDatasetFileBean);
 
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
@@ -350,14 +387,14 @@ public class XsltTransformJob extends QuartzJobBean {
                                         + " </a>");
                     }
                     emailBuffer.append("<p>" + successMsg + "</p>");
-                    logger.debug("System time begining.."+sysTimeBegin);
-                    logger.debug("System time end.."+System.currentTimeMillis());
-                    double sysTimeEnd = setFormat((System.currentTimeMillis() - sysTimeBegin)/1000);
-                    logger.debug("difference"+sysTimeEnd);
+                    logger.debug("System time begining.." + sysTimeBegin);
+                    logger.debug("System time end.." + System.currentTimeMillis());
+                    double sysTimeEnd = setFormat((System.currentTimeMillis() - sysTimeBegin) / 1000);
+                    logger.debug("difference" + sysTimeEnd);
 
                     if (fbFinal != null) {
                         fbFinal.setFileSize((int) bytesToKilo(new File(archivedFile).length()));
-                        fbFinal.setRunTime( sysTimeEnd);
+                        fbFinal.setRunTime(sysTimeEnd);
                     }
 
                 }
@@ -399,10 +436,9 @@ public class XsltTransformJob extends QuartzJobBean {
                     archivedFilename = dataMap.getString(POST_FILE_NAME) + ".zip";
                 }
 
-                // delete old files now
                 List<File> intermediateFiles = generateFileService.getOldFiles();
                 String[] dontDelFiles = epBean.getDoNotDelFiles();
-                //JN: The following is the code for zipping up the files, in case of more than one xsl being provided.
+                // The following is the code for zipping up the files, in case of more than one xsl being provided (i.e. SPSS and SAS)
                 if (dontDelFiles.length > 1 && zipped) {
                     logger.debug("count =====" + cnt + "dontDelFiles length==---" + dontDelFiles.length);
 
@@ -416,7 +452,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
                     archivedFilename = new File(zipName).getName();
                     zipAll(path, epBean.getDoNotDelFiles(), zipName);
-                    String[] tempArray = { archivedFilename };
+                    String[] tempArray = {archivedFilename};
                     dontDelFiles = tempArray;
                     endFile = archivedFilename;
 
@@ -440,9 +476,8 @@ public class XsltTransformJob extends QuartzJobBean {
                     deleteOldFiles(tempFile.listFiles(xmlFilter));
                 }
 
-                fbFinal =
-                        generateFileRecord(archivedFilename, outputPath, datasetBean, done, new File(outputPath + File.separator + archivedFilename).length(),
-                                ExportFormatBean.TXTFILE, userAccountId,edcSet,epBean,archivedDatasetFileBean);
+                fbFinal = generateFileRecord(archivedFilename, outputPath, done, new File(outputPath + File.separator + archivedFilename).length(),
+                        ExportFormatBean.TXTFILE, edcSet, archivedDatasetFileBean);
 
 
                 if (jobName != null) {
@@ -467,9 +502,16 @@ public class XsltTransformJob extends QuartzJobBean {
 
                 if (deleteOld) {
                     deleteIntermFiles(intermediateFiles, endFile, dontDelFiles);
-
                     deleteIntermFiles(markForDelete, endFile, dontDelFiles);
+                }
 
+                //Deleting old file_references from archived_dataset_file
+                if (isScheduled) {
+                    //for SAS and SPSS delete the unzipped files
+                    if (dataMap.getInt(EXTRACT_PROPERTY) == 9 || dataMap.getInt(EXTRACT_PROPERTY) == 10) {
+                        deleteNonZippedFilesInFolder(generalFileDir);
+                    }
+                    deleteOldFileReferences(dataMap, archivedDatasetFileBean);
                 }
 
             }
@@ -492,18 +534,17 @@ public class XsltTransformJob extends QuartzJobBean {
                 }
                 mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
 
+                logger.info("just sent email to " + alertEmail + ", from " + EmailEngine.getAdminEmail());
+                if (successMsg == null) {
+                    successMsg = " ";
+                }
+
             } catch (OpenClinicaSystemException ose) {
                 // Do Nothing, In the future we might want to have an email
                 // status added to system.
                 logger.info("exception sending mail: " + ose.getMessage());
                 logger.error("exception sending mail: " + ose.getMessage());
             }
-
-            logger.info("just sent email to " + alertEmail + ", from " + EmailEngine.getAdminEmail());
-            if(successMsg==null) {
-                successMsg =" ";
-            }
-
 
             postSuccessMessage(successMsg, context);
 
@@ -531,7 +572,7 @@ public class XsltTransformJob extends QuartzJobBean {
             logger.error("Error executing extract", e);
             exceptions = true;
         } catch (Exception ee) {
-            sendErrorEmail(ee.getMessage(), context, alertEmail);
+            sendErrorEmail(ee.getMessage() + " for " + jobName, context, alertEmail);
             postErrorMessage(ee.getMessage(), context);
             logger.error("Error executing extract", ee);
             exceptions = true;
@@ -539,8 +580,11 @@ public class XsltTransformJob extends QuartzJobBean {
             if (null != dataMap.get("job_type") && ((String) dataMap.get("job_type")).equalsIgnoreCase("exportJob")) {
                 TriggerBean triggerBean = new TriggerBean();
                 triggerBean.setUserAccount(userBean);
-                triggerBean.setFullName((String) dataMap.get(XsltTriggerService.JOB_NAME));
-                auditEventDAO.createRowForExtractDataJobFailure(triggerBean);
+                if (dataMap != null) {
+                    triggerBean.setFullName((String) dataMap.get(XsltTriggerService.JOB_NAME));
+                }
+                archivedDatasetFileBean.setStatus("FAILED");
+                archivedDatasetFileDao.update(archivedDatasetFileBean);
             }
 
         } finally {
@@ -559,8 +603,8 @@ public class XsltTransformJob extends QuartzJobBean {
                 }
 
             if (exceptions) {
-                logger.debug("EXCEPTIONS... EVEN TEHN DELETING OFF OLD FILES");
-                String generalFileDir = dataMap.getString(XML_FILE_PATH);
+                logger.debug("EXCEPTIONS... EVEN THEN DELETING OFF OLD FILES");
+                generalFileDir = dataMap.getString(XML_FILE_PATH);
                 File oldFilesPath = new File(generalFileDir);
 
                 if (oldFilesPath.isDirectory()) {
@@ -585,7 +629,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
     /**
      * Initializes the dependencies of this job with the components from the Spring application context.
-     *
      * @param scheduler
      * @param dataMap
      */
@@ -594,7 +637,8 @@ public class XsltTransformJob extends QuartzJobBean {
             ApplicationContext ctx = (ApplicationContext) scheduler.getContext().get("applicationContext");
             DataSource dataSource = ctx.getBean(DataSource.class);
             studyDao = (StudyDao) ctx.getBean("studyDaoDomain");
-            if (StringUtils.isEmpty(dataMap.getString(TENANT_SCHEMA))) CoreResources.tenantSchema.set(scheduler.getSchedulerName());
+            if (StringUtils.isEmpty(dataMap.getString(TENANT_SCHEMA)))
+                CoreResources.tenantSchema.set(scheduler.getSchedulerName());
             else CoreResources.tenantSchema.set(dataMap.getString(TENANT_SCHEMA));
             mailSender = ctx.getBean(OpenClinicaMailSender.class);
             auditEventDAO = ctx.getBean(AuditEventDAO.class);
@@ -651,8 +695,8 @@ public class XsltTransformJob extends QuartzJobBean {
                 fos.close();
             }
         }
-        for(String file:files){
-            File f  = new File(path+file);
+        for (String file : files) {
+            File f = new File(path + file);
             f.delete();
         }
     }
@@ -660,7 +704,6 @@ public class XsltTransformJob extends QuartzJobBean {
     /**
      * To go through all the existing archived datasets and delete off the
      * records whose file references do not exist any more.
-     *
      * @param datasetId
      */
     private void resetArchiveDataset(int datasetId) {
@@ -669,7 +712,7 @@ public class XsltTransformJob extends QuartzJobBean {
         for (ArchivedDatasetFileBean fbExisting : al) {
             logger.debug("The file to checking?" + fbExisting.getFileReference() + "Does the file exist?" + new File(fbExisting.getFileReference()).exists());
             logger.debug("check if it still exists in archive set before" + archivedDatasetFileDao.findByDatasetId(fbExisting.getDatasetId()).size());
-            if (!fbExisting.getFileReference().equals("") && !new File(fbExisting.getFileReference()).exists()) {
+            if (!fbExisting.getFileReference().equals("") && !new File(fbExisting.getFileReference()).exists() && !fbExisting.getJobType().contentEquals("Scheduled")) {
                 logger.debug(fbExisting.getFileReference() + "Doesnt exist,deleting it from archiveset data");
 
                 deleteArchivedDataset(fbExisting);
@@ -731,13 +774,13 @@ public class XsltTransformJob extends QuartzJobBean {
     private void deleteIntermFiles(List<File> intermediateFiles, String dontDeleteFile, String[] dontDelFiles) {
 
         Iterator<File> fileIt = intermediateFiles.iterator();
-        File temp = null;
-        File DontDelFile = new File(dontDeleteFile);
-        int i = 0;
-        boolean del = true;
+        File temp;
+        File dontDelFile = new File(dontDeleteFile);
+        int i;
+        boolean del;
         while (fileIt.hasNext()) {
             temp = fileIt.next();
-            if (!temp.getName().equals(DontDelFile.getName())) {
+            if (!temp.getName().equals(dontDelFile.getName())) {
                 i = 0;
                 del = true;
                 logger.debug("File Name?" + temp.getName());
@@ -775,7 +818,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
     /**
      * Stub to get the list of all old files.
-     *
      * @param outputPath
      * @param postProcLoc
      * @return
@@ -808,7 +850,7 @@ public class XsltTransformJob extends QuartzJobBean {
         return exisitingFiles;
     }
 
-    private void postSuccessMessage(String message,JobExecutionContext context){
+    private void postSuccessMessage(String message, JobExecutionContext context) {
         String SCHEDULER = "schedulerFactoryBean";
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
@@ -825,6 +867,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
         }
     }
+
     private void postErrorMessage(String message, JobExecutionContext context) {
         String SCHEDULER = "schedulerFactoryBean";
         try {
@@ -842,36 +885,27 @@ public class XsltTransformJob extends QuartzJobBean {
         }
     }
 
-    private ArchivedDatasetFileBean generateFileRecord(String name, String dir, DatasetBean datasetBean, double time, long fileLength, ExportFormatBean efb,
-                                                       int userBeanId,Set<Integer> edcSet,ExtractPropertyBean epBean,ArchivedDatasetFileBean archivedDatasetFileBean) {
+    private ArchivedDatasetFileBean generateFileRecord(String name, String dir, double time, long fileLength, ExportFormatBean efb,
+                                                       Set<Integer> edcSet, ArchivedDatasetFileBean archivedDatasetFileBean) {
 
-        // Deleting off the original file archive dataset file.
+        // Updating archive dataset file that is IN_PROGRESS.
 
-        if(ClinicalDataCollector.datasetFiltered.equals("YES")) {
-            archivedDatasetFileBean.setName("filtered-"+ name);
-        }else{
+        if (ClinicalDataCollector.datasetFiltered.equals("YES")) {
+            archivedDatasetFileBean.setName("filtered-" + name);
+        } else {
             archivedDatasetFileBean.setName(name);
         }
 
         archivedDatasetFileBean.setFileReference(dir + name);
-
-        // JN: the following is to convert to KB, not possible without changing
-        // database schema
         archivedDatasetFileBean.setFileSize((int) fileLength);
-
-        // set the above to compressed size?
-        // JN: the following commented out code is to convert from milli secs to
-        // secs
-        // seconds
-        archivedDatasetFileBean.setRunTime( time);// to convert to seconds
-        // need to set this in milliseconds, get it passed from above
-        // methods?
+        archivedDatasetFileBean.setRunTime(time);// to convert to seconds
         archivedDatasetFileBean.setExportFormatBean(efb);
         archivedDatasetFileBean.setExportFormatId(efb.getId());
         archivedDatasetFileBean.setDateCreated(new Date());
+        archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
         archivedDatasetFileBean.setStatus(JobStatus.COMPLETED.name());
 
-        archivedDatasetFileBean = updateArchivedDatasetFileToComplete(archivedDatasetFileBean , edcSet);
+        archivedDatasetFileBean = updateArchivedDatasetFileToComplete(archivedDatasetFileBean, edcSet);
         return archivedDatasetFileBean;
     }
 
@@ -894,50 +928,76 @@ public class XsltTransformJob extends QuartzJobBean {
 
     // Utility method to format upto 3 decimals.
     private double setFormat(double number) {
-        if(number <1) number=1.0;
+        if (number < 1) number = 1.0;
         DecimalFormat df = new DecimalFormat("#.#");
-        logger.info("Number is" + Double.parseDouble(df.format(number)));
-        logger.info("Number is" + (float) Double.parseDouble(df.format(number)));
-        return  Double.valueOf(df.format(number));
+        logger.info("Number is " + Double.parseDouble(df.format(number)));
+        logger.info("Number is " + (float) Double.parseDouble(df.format(number)));
+        return Double.valueOf(df.format(number));
     }
 
     public void persistPermissionTags(Set<Integer> edcSet, int archivedDatasetFileId) {
-     List <String> permissionTagsList = new ArrayList();
-        for(Integer edcId : edcSet){
-           List <String> tgs= eventDefinitionCrfPermissionTagDao.findTagsForEdcId(edcId);
-           if(tgs!=null) {
-               permissionTagsList.addAll(tgs);
-           }
+        List<String> permissionTagsList = new ArrayList();
+        for (Integer edcId : edcSet) {
+            List<String> tgs = eventDefinitionCrfPermissionTagDao.findTagsForEdcId(edcId);
+            if (tgs != null) {
+                permissionTagsList.addAll(tgs);
+            }
         }
         Set<String> s = new LinkedHashSet<>(permissionTagsList);
 
         for (String sbsTag : s) {
-            ArchivedDatasetFilePermissionTag adfTag= new ArchivedDatasetFilePermissionTag(archivedDatasetFileId,sbsTag);
+            ArchivedDatasetFilePermissionTag adfTag = new ArchivedDatasetFilePermissionTag(archivedDatasetFileId, sbsTag);
             archivedDatasetFilePermissionTagDao.saveOrUpdate(adfTag);
         }
     }
 
-
     private void deleteArchivedDataset(ArchivedDatasetFileBean adf) {
-
-
         archivedDatasetFilePermissionTagDao.delete(adf.getId());
         archivedDatasetFileDao.deleteArchiveDataset(adf);
-}
-    private ArchivedDatasetFileBean createArchivedDataset(ArchivedDatasetFileBean adf , Set<Integer> edcSet) {
+    }
 
-        ArchivedDatasetFileBean   fbFinal = (ArchivedDatasetFileBean) archivedDatasetFileDao.create(adf);
-        persistPermissionTags( edcSet,fbFinal.getId());
-
+    private ArchivedDatasetFileBean createArchivedDataset(ArchivedDatasetFileBean adf, Set<Integer> edcSet) {
+        ArchivedDatasetFileBean fbFinal = (ArchivedDatasetFileBean) archivedDatasetFileDao.create(adf);
+        persistPermissionTags(edcSet, fbFinal.getId());
         return fbFinal;
     }
 
 
-    private ArchivedDatasetFileBean updateArchivedDatasetFileToComplete(ArchivedDatasetFileBean adf , Set<Integer> edcSet) {
-        ArchivedDatasetFileBean   fbFinal = (ArchivedDatasetFileBean) archivedDatasetFileDao.update(adf);
-        persistPermissionTags( edcSet,fbFinal.getId());
+    private ArchivedDatasetFileBean updateArchivedDatasetFileToComplete(ArchivedDatasetFileBean adf, Set<Integer> edcSet) {
+        ArchivedDatasetFileBean fbFinal = (ArchivedDatasetFileBean) archivedDatasetFileDao.update(adf);
+        persistPermissionTags(edcSet, fbFinal.getId());
         return fbFinal;
     }
 
+    private void deleteOldFileReferences(JobDataMap dataMap, ArchivedDatasetFileBean archivedDatasetFileBean) {
+        //Deleting old file_references from archived_dataset_file
+        int filesToKeep = dataMap.getInt(XsltTriggerService.NUMBER_OF_FILES_TO_SAVE);
+        List<ArchivedDatasetFileBean> archivedDatasetFileBeans = archivedDatasetFileDao.findByJobUuidWithFileReference(archivedDatasetFileBean.getJobUuid());
+        int total = archivedDatasetFileBeans.size();
+        int numToDelete = total - filesToKeep;
+
+        //since it's already ordered by earliest date to later date, just delete the number needed.
+        for (int i = 0; i < numToDelete; i++) {
+            ArchivedDatasetFileBean adfb = archivedDatasetFileBeans.get(i);
+            File fileToDelete = new File(adfb.getFileReference());
+            fileToDelete.delete();
+            adfb.setFileReference(null);
+            archivedDatasetFileDao.update(adfb);
+        }
+
+        if (numToDelete > 0)
+            logger.info("Deleted " + numToDelete + " old file references for jobUuid " + archivedDatasetFileBean.getJobUuid() + ".");
+    }
+
+
+    private void deleteNonZippedFilesInFolder(String generalFileDir) {
+        File oldFilesPath = new File(generalFileDir);
+        File[] fileList = oldFilesPath.listFiles();
+        for (int i = 0; i < fileList.length; i++) {
+            if (!fileList[i].getName().contains(".zip")) {
+                fileList[i].delete();
+            }
+        }
+    }
 
 }

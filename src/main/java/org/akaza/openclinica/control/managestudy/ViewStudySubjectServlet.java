@@ -440,7 +440,6 @@ public class ViewStudySubjectServlet extends SecureController {
             // eventdefinitioncrfBeans
             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventDefinitionId, cb.getId());
             // below added 092007 tbh
-
             // above added 092007-102007 tbh
             // TODO need to refactor since this is similar to other code, tbh
             if (edc != null) {

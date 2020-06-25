@@ -205,6 +205,7 @@ public class EventCrfLayerBuilder {
 
 
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
+
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -254,7 +255,6 @@ public class EventCrfLayerBuilder {
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject, reswords.getString("reassign"));
                 html.tdEnd().trEnd(0);
             }
-
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();

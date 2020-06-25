@@ -1,26 +1,29 @@
 package org.akaza.openclinica.controller;
 
+import static core.org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import core.org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import core.org.akaza.openclinica.job.AutowiringSpringBeanJobFactory;
+import core.org.akaza.openclinica.job.JobExecutionExceptionListener;
+import core.org.akaza.openclinica.job.JobTriggerListener;
+import core.org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
 import core.org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
 import core.org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
 import core.org.akaza.openclinica.web.table.sdv.SDVUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jmesa.facade.TableFacade;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
@@ -32,10 +35,16 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,11 +66,11 @@ public class ScheduledJobController {
     public static final String EP_BEAN = "epBean";
 
     @Autowired
-    @Qualifier("sdvUtil")
-    private SDVUtil sdvUtil;
+    private ApplicationContext applicationContext;
 
     @Autowired
-    private Scheduler scheduler;
+    @Qualifier("sdvUtil")
+    private SDVUtil sdvUtil;
 
     @RequestMapping("/listCurrentScheduledJobs")
     public ModelMap listScheduledJobs(HttpServletRequest request, HttpServletResponse response) throws SchedulerException{
@@ -91,6 +100,7 @@ public class ScheduledJobController {
 
         request.setAttribute("pageMessages", pageMessages);
 
+        Scheduler scheduler = getSchemaScheduler(request, applicationContext);
         List<JobExecutionContext> listCurrentJobs = new ArrayList<JobExecutionContext>();
         listCurrentJobs = scheduler.getCurrentlyExecutingJobs();
         Iterator<JobExecutionContext> itCurrentJobs = listCurrentJobs.iterator();
@@ -193,7 +203,7 @@ public class ScheduledJobController {
             @RequestParam("theTriggerName")   String triggerName,@RequestParam("theTriggerGroupName")   String triggerGroupName,
             @RequestParam("redirection") String redirection, ModelMap model) throws SchedulerException
         {
-
+        Scheduler scheduler = getSchemaScheduler(request, applicationContext);
         scheduler.getJobDetail(JobKey.jobKey(theJobName, theJobGroupName));
         logger.debug("About to pause the job-->"+theJobName+"Job Group Name -->"+theJobGroupName);
 
@@ -266,6 +276,76 @@ public class ScheduledJobController {
 
     private SimpleDateFormat longFormat(Locale locale) {
         return new SimpleDateFormat(longFormatString(), locale);
+    }
+
+    private Scheduler getSchemaScheduler(HttpServletRequest request, ApplicationContext context) {
+        Scheduler jobScheduler = null;
+        if (request.getAttribute(CURRENT_TENANT_ID) != null) {
+            String schema = (String) request.getAttribute(CURRENT_TENANT_ID);
+            if (StringUtils.isNotEmpty(schema) &&
+                    (schema.equalsIgnoreCase("public") != true)) {
+                try {
+                    jobScheduler = (Scheduler) context.getBean(schema);
+                    logger.debug("Existing schema scheduler found:" + schema);
+                } catch (NoSuchBeanDefinitionException e) {
+                    createSchedulerFactoryBean(context, schema);
+                    try {
+                        jobScheduler = (Scheduler) context.getBean(schema);
+                    } catch (BeansException e1) {
+                        logger.error("Bean for scheduler is not able to accessed after creating scheduled factory bean: ", e1);
+
+                    }
+                } catch (BeansException e) {
+                    logger.error("Bean for scheduler is not able to accessed: ", e);
+
+                }
+            }
+        }
+        return jobScheduler;
+    }
+
+    public void createSchedulerFactoryBean(ApplicationContext context, String schema) {
+        logger.debug("Creating a new schema scheduler:" + schema);
+        OpenClinicaSchedulerFactoryBean sFBean = new OpenClinicaSchedulerFactoryBean();
+        sFBean.setSchedulerName(schema);
+        Properties properties = new Properties();
+        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
+        jobFactory.setApplicationContext(context);
+        sFBean.setJobFactory(jobFactory);
+        sFBean.setDataSource((DataSource) context.getBean("dataSource"));
+        sFBean.setTransactionManager((PlatformTransactionManager) context.getBean("transactionManager"));
+        sFBean.setApplicationContext(context);
+        sFBean.setApplicationContextSchedulerContextKey("applicationContext");
+        sFBean.setGlobalJobListeners(new JobExecutionExceptionListener());
+        sFBean.setGlobalTriggerListeners(new JobTriggerListener());
+
+        // use global Quartz properties
+        properties.setProperty("org.quartz.jobStore.misfireThreshold",
+                CoreResources.getField("org.quartz.jobStore.misfireThreshold"));
+        properties.setProperty("org.quartz.jobStore.class",
+                CoreResources.getField("org.quartz.jobStore.class"));
+        properties.setProperty("org.quartz.jobStore.driverDelegateClass",
+                CoreResources.getField("org.quartz.jobStore.driverDelegateClass"));
+        properties.setProperty("org.quartz.jobStore.useProperties",
+                CoreResources.getField("org.quartz.jobStore.useProperties"));
+        properties.setProperty("org.quartz.jobStore.tablePrefix", schema + "." +
+                CoreResources.getField("org.quartz.jobStore.tablePrefix"));
+        properties.setProperty("org.quartz.threadPool.class",
+                CoreResources.getField("org.quartz.threadPool.class"));
+        properties.setProperty("org.quartz.threadPool.threadCount",
+                CoreResources.getField("org.quartz.threadPool.threadCount"));
+        properties.setProperty("org.quartz.threadPool.threadPriority",
+                CoreResources.getField("org.quartz.threadPool.threadPriority"));
+        sFBean.setQuartzProperties(properties);
+        try {
+            sFBean.afterPropertiesSet();
+        } catch (Exception e) {
+            logger.error("Error creating the scheduler bean:" + schema, e.getMessage(), e);
+            return;
+        }
+        sFBean.start();
+        ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
+        beanFactory.registerSingleton(schema, sFBean);
     }
 
 }

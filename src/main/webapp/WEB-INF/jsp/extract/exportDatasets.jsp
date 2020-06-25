@@ -68,7 +68,6 @@
 <tr valign="top" width="100%"><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/></p></tr>
 <tr valign="top" width="100%">
     <td class="text" >
-	<ul><%-- <li><a href="ExportDataset?action=html&datasetId=<c:out value="${dataset.id}"/>"><fmt:message key="view_as_HTML" bundle="${resword}"/></a></li> --%>
 	<c:forEach var="extract" items="${extractProperties}">
 			<%-- use fn:startsWith(extract.filedescription, '&') here, for i18n --%>
 			<li>
@@ -90,7 +89,6 @@
 					</c:otherwise>
 				</c:choose>
 				</a>
-				<%--<c:out value="${extract.linkText}"/>--%>
 			</li>
     </c:forEach>	
 	</ul>
@@ -101,7 +99,8 @@
 <p><b><fmt:message key="archive_of_exported_dataset_files" bundle="${resword}"/>:</b></p>
 
 <c:import url="../include/showTable.jsp">
-<c:param name="rowURL" value="showArchivedDatasetFileRow.jsp" />
+    <c:param name="rowURL" value="showArchivedDatasetFileRow.jsp" />
+    <c:param name="exportDataset" value="true"/>
 </c:import>
 
 <jsp:include page="../include/footer.jsp"/>
