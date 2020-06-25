@@ -499,14 +499,26 @@
                                 </c:if>
                                 <table>
                                   <tr align="left">
-                                    <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && studyEvent.removed != true && studyEvent.archived != true && studyEvent.locked != true && dec.eventCRF.removed != true && dec.eventCRF.archived != true && dec.eventCRF.workflowStatus != 'COMPLETED' && dec.eventCRF.workflowStatus != 'SKIPPED'}">
-                                      <td>
-                                        <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
-                                        onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                                        onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
-                                        onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
-                                        <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6"></span></a>
-                                      </td>
+                                    <c:if test="${!userRole.monitor && subjectStudy.status.available && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && studyEvent.removed != true && studyEvent.archived != true && studyEvent.locked != true && dec.eventCRF.removed != true && dec.eventCRF.archived != true}">
+                                           <c:if test="${dec.eventCRF.workflowStatus != 'COMPLETED'}">
+
+                                        <td>
+                                          <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+                                          onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+                                          onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
+                                          onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                                          <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></span></a--></a>
+                                        </td>
+                                      </c:if>
+                                           <c:if test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                                        <td>
+                                          <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+                                          onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+                                          onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
+                                          onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                                          <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6"></span></a>
+                                        </td>
+                                      </c:if>
                                     </c:if>
                                     <td>
                                       <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
@@ -549,7 +561,7 @@
                                         </c:if>
                                       </c:forEach>
                                     </c:if>
-                                    <c:if test="${!userRole.monitor &&  (versionCount>1 || differentFormVersionAvailable) && subjectStudy.status.available && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && studyEvent.removed != true && studyEvent.archived != true && studyEvent.locked != true && studyEvent.workflowStatus !='SKIPPED' && studyEvent.workflowStatus !='STOPPED' && dec.eventCRF.removed != true && dec.eventCRF.archived != true}">
+                                    <c:if test="${!userRole.monitor &&  (versionCount>1 || differentFormVersionAvailable) && subjectStudy.status.available && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && studyEvent.removed != true && studyEvent.archived != true && studyEvent.locked != true && studyEvent.workflowStatus !='SKIPPED' && dec.eventCRF.removed != true && dec.eventCRF.archived != true}">
                                       <td>
                                         <a class="accessCheck" href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
                                         onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
