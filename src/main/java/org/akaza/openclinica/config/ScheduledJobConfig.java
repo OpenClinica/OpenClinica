@@ -44,7 +44,6 @@ public class ScheduledJobConfig {
         for (String schema : schemas) {
             CoreResources.setRequestSchema(schema);
             if (ocQrtzTriggersDAO.findAll().size() != 0) {
-                CoreResources.setRequestSchema("public");
                 logger.info("Found triggers in " + schema);
                 schedulerUtilService.createSchedulerFactoryBean(applicationContext, schema);
             }
