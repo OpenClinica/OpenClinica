@@ -5,7 +5,6 @@ import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.extract.OcQrtzTriggersDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
 import core.org.akaza.openclinica.service.SchedulerUtilService;
-import core.org.akaza.openclinica.service.UtilService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -15,9 +14,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,11 +37,11 @@ public class ScheduledJobConfig {
     public void createSchemaSpecificSchedulers() throws BeansException {
         logger.info("In postProcessBeanFactory");
 
-        Set<String> studyOcOids = studyDao.findAll().stream()
+        Set<String> schemas = studyDao.findAll().stream()
                 .map(study -> study.getSchemaName())
                 .collect(Collectors.toSet());
 
-        for (String schema: studyOcOids) {
+        for (String schema : schemas) {
             CoreResources.setRequestSchema(schema);
             if (ocQrtzTriggersDAO.findAll().size() != 0) {
                 CoreResources.setRequestSchema("public");

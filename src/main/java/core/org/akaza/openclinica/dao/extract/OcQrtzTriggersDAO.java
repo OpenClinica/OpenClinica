@@ -1,18 +1,17 @@
 package core.org.akaza.openclinica.dao.extract;
 
-import com.sun.mail.iap.ByteArray;
 import core.org.akaza.openclinica.bean.core.EntityBean;
 import core.org.akaza.openclinica.bean.extract.OcQrtzTriggersBean;
-import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import core.org.akaza.openclinica.dao.core.DAODigester;
 import core.org.akaza.openclinica.dao.core.SQLFactory;
 import core.org.akaza.openclinica.dao.core.TypeNames;
-import core.org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.hibernate.engine.jdbc.BinaryStream;
 
 import javax.sql.DataSource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class OcQrtzTriggersDAO extends AuditableEntityDAO {
 
@@ -138,60 +137,21 @@ public class OcQrtzTriggersDAO extends AuditableEntityDAO {
     }
 
     public EntityBean create(EntityBean eb) {
-        OcQrtzTriggersBean fb = (OcQrtzTriggersBean) eb;
-        HashMap variables = new HashMap();
-        HashMap nullVars = new HashMap();
-        variables.put(Integer.valueOf(1), fb.getTriggerName());
-        variables.put(Integer.valueOf(2), fb.getTriggerGroup());
-        variables.put(Integer.valueOf(3), fb.getJobName());
-        variables.put(Integer.valueOf(4), fb.getJobGroup());
-        variables.put(Integer.valueOf(5), fb.getDescription());
-        variables.put(Integer.valueOf(6), new Long(fb.getNextFireTime()));
-        variables.put(Integer.valueOf(7), new Long(fb.getPrevFireTime()));
-        variables.put(Integer.valueOf(8), Integer.valueOf(fb.getPriority()));
-        variables.put(Integer.valueOf(9), fb.getTriggerState());
-        variables.put(Integer.valueOf(10), fb.getTriggerType());
-        variables.put(Integer.valueOf(11), new Long(fb.getStartTime()));
-        variables.put(Integer.valueOf(12), new Long(fb.getEndTime()));
-        variables.put(Integer.valueOf(13), fb.getCalendarName());
-        variables.put(Integer.valueOf(14), new Short(fb.getMisfireInstr()));
-        variables.put(Integer.valueOf(15), new Byte(fb.getJobData()));
-        variables.put(Integer.valueOf(16), fb.getSchedName());
-
-        this.executeWithPK(digester.getQuery("create"), variables, nullVars);
-        if (isQuerySuccessful()) {
-            fb.setId(getLatestPK());
+        try {
+            // Do not use this to create an entity
+        } catch (Exception e) {
+            logger.error("Do not use this to create an entity, use the jobScheduler methods instead.", e.getMessage());
         }
-        return fb;
+        return null;
     }
 
     public EntityBean update(EntityBean eb) {
-        OcQrtzTriggersBean fb = (OcQrtzTriggersBean) eb;
-        HashMap variables = new HashMap();
-        HashMap nullVars = new HashMap();
-
-        // this should be the unique_id: fb.getTriggerName();
-        variables.put(Integer.valueOf(1), fb.getTriggerGroup());
-        variables.put(Integer.valueOf(2), fb.getJobName());
-        variables.put(Integer.valueOf(3), fb.getJobGroup());
-        variables.put(Integer.valueOf(4), fb.getDescription());
-        variables.put(Integer.valueOf(5), new Long(fb.getNextFireTime()));
-        variables.put(Integer.valueOf(6), new Long(fb.getPrevFireTime()));
-        variables.put(Integer.valueOf(7), Integer.valueOf(fb.getPriority()));
-        variables.put(Integer.valueOf(8), fb.getTriggerState());
-        variables.put(Integer.valueOf(9), fb.getTriggerType());
-        variables.put(Integer.valueOf(10), new Long(fb.getStartTime()));
-        variables.put(Integer.valueOf(11), new Long(fb.getEndTime()));
-        variables.put(Integer.valueOf(12), fb.getCalendarName());
-        variables.put(Integer.valueOf(13), new Short(fb.getMisfireInstr()));
-        variables.put(Integer.valueOf(14), new Byte(fb.getJobData()));
-        variables.put(Integer.valueOf(15), fb.getSchedName());
-
-        this.execute(digester.getQuery("update"), variables, nullVars);
-        if (isQuerySuccessful()) {
-            fb.setActive(true);
+        try {
+            // Do not use this to update an entity
+        } catch (Exception e) {
+            logger.error("Do not use this to update an entity, use the jobScheduler methods instead.", e.getMessage());
         }
-        return fb;
+        return null;
     }
 
 }
