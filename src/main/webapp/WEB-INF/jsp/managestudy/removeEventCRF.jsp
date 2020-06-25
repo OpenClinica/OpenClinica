@@ -80,6 +80,7 @@
 		<td class="table_header_column_top"><fmt:message key="date_interviewed" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
 		<td class="table_header_column_top"><fmt:message key="owner" bundle="${resword}"/></td>
+		<td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/></td>
 	 </tr>
 	<tr>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.crf.name}" /></td>
@@ -87,6 +88,7 @@
 		<td class="table_cell"><fmt:formatDate value="${displayEventCRF.eventCRF.dateInterviewed}" pattern="${dteFormat}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.interviewerName}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.owner.name}" /></td>
+		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.workflowStatus.getDisplayValue()}" /></td>
 	 </tr>
  
  </table> 
