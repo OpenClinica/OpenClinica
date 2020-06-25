@@ -230,10 +230,8 @@ public class KeycloakClientImpl {
             logger.debug("Keycloak Access Token: {}", accessToken);
             return accessToken;
         } catch (Exception e) {
-            logger.error("Error reading keycloak properties from DataInfo.properties or Auth.properties", e);
+            logger.error("Error retrieving system token from Keycloak.", e);
             return null;
         }
     }
-
-
 }

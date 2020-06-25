@@ -119,7 +119,6 @@ public class ViewStudySubjectServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studySubId = fp.getInt("id", true);// studySubjectId
         String from = fp.getString("from");
-
         int parentStudyId = currentStudy.isSite() ? currentStudy.getStudy().getStudyId() : currentStudy.getStudyId();
         if(currentStudy.isSite()){
             currentStudy.setSubjectIdGeneration(currentStudy.getStudy().getSubjectIdGeneration());
@@ -333,7 +332,8 @@ public class ViewStudySubjectServlet extends SecureController {
             args.put("id", new Integer(studySubId).toString());
             table.setQuery("ViewStudySubject", args);
             table.setRows(allEventRows);
-            table.computeDisplay();
+            table.setFilterPlaceHolder("enter_event_name");
+            table.computeDisplayWithFilteringUsingContains();
 
             request.setAttribute("table", table);
             SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());

@@ -9,6 +9,7 @@ import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.service.CoreUtilServiceImpl;
@@ -27,11 +28,17 @@ import java.time.LocalDate;
 @Service
 public class KafkaService {
     @Autowired
+    UserAccountDao userAccountDao;
+    @Autowired
     StudyEventDao studyEventDao;
     @Autowired
     EventCrfDao eventCrfDao;
     @Autowired
     ItemDao itemDao;
+    @Autowired
+    CrfDao crfDao;
+    @Autowired
+    CrfVersionDao crfVersionDao;
     @Autowired
     private KafkaTemplate kafkaTemplate;
     @Autowired
@@ -278,6 +285,9 @@ public class KafkaService {
     public FormChangeDTO constructEventCrfAttributeChangeDTO(EventCRFBean eventCrfBean) {
         FormChangeDTO formChangeDTO = new FormChangeDTO();
 
+        UserAccount creatorAccount = userAccountDao.findByUserId(eventCrfBean.getOwnerId());
+        UserAccount updaterAccount = userAccountDao.findByUserId(eventCrfBean.getUpdaterId());
+
         StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrfBean.getStudyEventId());
         StudyEventDefinition studyEventDefinition = studyEvent.getStudyEventDefinition();
         StudySubject studySubject = studySubjectDao.findById(eventCrfBean.getStudySubjectId());
@@ -295,9 +305,15 @@ public class KafkaService {
         formChangeDTO.setEventOid(studyEventDefinition.getOc_oid());
         formChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEvent));
 
-        formChangeDTO.setFormOid(eventCrfBean.getCrf().getOid());
+        String formOid = crfVersionDao.findByCrfVersionId(eventCrfBean.getCRFVersionId()).getCrf().getOcOid();
+        formChangeDTO.setFormOid(formOid);
+
         formChangeDTO.setFormCreatedDate(eventCrfBean.getCreatedDate().toString());
         formChangeDTO.setFormUpdatedDate(eventCrfBean.getUpdatedDate().toString());
+
+        formChangeDTO.setFormCreatedBy(creatorAccount.getUserName());
+        formChangeDTO.setFormUpdatedBy(updaterAccount.getUserName());
+
         formChangeDTO.setFormWorkflowStatus(eventCrfBean.getWorkflowStatus().getEnglishDisplayValue());
         if (eventCrfBean.getSdvStatus() != null){
             formChangeDTO.setFormSdvStatus(eventCrfBean.getSdvStatus().getEnglishDisplayValue());}
@@ -312,6 +328,7 @@ public class KafkaService {
     public FormChangeDTO constructEventCrfAttributeChangeDTO(EventCrf eventCrf) {
         FormChangeDTO formChangeDTO = new FormChangeDTO();
 
+        UserAccount updaterAccount = userAccountDao.findByUserId(eventCrf.getUpdateId());
         Study study = eventCrf.getStudySubject().getStudy();
 
         formChangeDTO.setCustomerUuid(coreUtilService.getCustomerUuid());
@@ -329,6 +346,10 @@ public class KafkaService {
         formChangeDTO.setFormOid(eventCrf.getFormLayout().getCrf().getOcOid());
         formChangeDTO.setFormCreatedDate(eventCrf.getDateCreated().toString());
         formChangeDTO.setFormUpdatedDate(eventCrf.getDateUpdated().toString());
+
+        formChangeDTO.setFormCreatedBy(eventCrf.getUserAccount().getUserName());
+        formChangeDTO.setFormUpdatedBy(updaterAccount.getUserName());
+
         formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().getEnglishDisplayValue());
         if (eventCrf.getSdvStatus() != null){
         formChangeDTO.setFormSdvStatus(eventCrf.getSdvStatus().getEnglishDisplayValue());}
@@ -365,7 +386,6 @@ public class KafkaService {
         return formChangeDTO;
     }
 
-    //TODO This is crashing if I open/view from a non-participant source since the study subject is null.
     public FormChangeDTO constructNewFormChangeDTO(Study study, StudyEvent studyEvent, FormLayout formLayout) {
         FormChangeDTO formChangeDTO = new FormChangeDTO();
 

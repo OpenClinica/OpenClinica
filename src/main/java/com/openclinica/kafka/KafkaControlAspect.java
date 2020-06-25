@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+
+// This class is used to enable or disable Kafka service. Currently we are determining the status from the datainfo.properties
+// file but this may change depending on how rules-engine integrates with runtime.
 @Aspect
 @Component
 public class KafkaControlAspect {
