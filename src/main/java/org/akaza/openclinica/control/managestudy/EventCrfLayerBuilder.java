@@ -218,8 +218,7 @@ public class EventCrfLayerBuilder {
             // if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() ||
             // currentUser.isSysAdmin())) {
             if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()) {
-                if (!hiddenCrf() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
-                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED ) {
+                if (!hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());

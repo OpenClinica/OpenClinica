@@ -316,12 +316,22 @@
                             <td class="table_cell" width="140">
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tr valign="top">
-                                        <c:if test="${ !userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && dec.eventCRF.removed != true && dec.eventCRF.archived != true && dec.eventCRF.workflowStatus != 'COMPLETED' && dec.eventCRF.workflowStatus != 'SKIPPED'}">
-                                          <td>
-                                              <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                                                  <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
-                                              </a>
-                                          </td>
+                                        <c:if test="${ !userRole.monitor && studyRelatedTostudySub.status.available && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true && currRow.bean.studyEvent.locked !=true && dec.eventCRF.removed != true && dec.eventCRF.archived != true }">
+                                            <c:if test="${dec.eventCRF.workflowStatus != 'COMPLETED'}">
+                                                <td>
+                                                    <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+                                                        <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6">
+                                                    </a>
+                                                </td>
+                                            </c:if>
+
+                                            <c:if test="${dec.eventCRF.workflowStatus == 'COMPLETED'}">
+                                                <td>
+                                                    <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+                                                        <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
+                                                    </a>
+                                                </td>
+                                            </c:if>
                                             <%-- locked status here --%>
                                         </c:if>
                                         <td>
@@ -370,7 +380,7 @@
                                             </c:forEach>
                                         </c:if>
 
-                                        <c:if test="${ (userRole.director || userRole.coordinator) && (versionCount>1 || differentFormVersionAvailable) && studyRelatedTostudySub.status.available  && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true  && currRow.bean.studyEvent.locked !=true && currRow.bean.studyEvent.workflowStatus != 'SKIPPED' && currRow.bean.studyEvent.workflowStatus != 'STOPPED' && dec.eventCRF.removed != true && dec.eventCRF.archived != true }">
+                                        <c:if test="${ (userRole.director || userRole.coordinator) && (versionCount>1 || differentFormVersionAvailable) && studyRelatedTostudySub.status.available  && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && currRow.bean.studyEvent.removed !=true && currRow.bean.studyEvent.archived !=true  && currRow.bean.studyEvent.locked !=true && currRow.bean.studyEvent.workflowStatus != 'SKIPPED' && dec.eventCRF.removed != true && dec.eventCRF.archived != true }">
                                             <td>
                                                 <a class="accessCheck"  access_attr='<c:out value="${dec.eventCRF.id}"/>'
                                                 href='pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySub.label}"/>&studySubjectId=<c:out value="${studySub.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>'
