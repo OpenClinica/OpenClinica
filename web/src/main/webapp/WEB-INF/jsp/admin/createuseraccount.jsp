@@ -138,7 +138,7 @@ int selectedValue;
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script> 
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-migrate-3.3.1.js"></script>
 
 <script type="text/javascript">
 jQuery.noConflict();
@@ -154,7 +154,7 @@ function handleUserSource() {
         jQuery(".passwordRow").show();
         jQuery(".webservicesRow").show();
         jQuery(".ldapSelect").hide();
-        jQuery("#userName").removeAttr('readonly');
+        jQuery("#userName").prop('readonly', 'false');
     }
 }
 </script>
@@ -194,7 +194,7 @@ function handleUserSource() {
         jQuery(".passwordRow").show();
         jQuery(".webservicesRow").show();
         jQuery(".ldapSelect").hide();
-        jQuery("#userName").removeAttr('readonly');
+        jQuery("#userName").prop('readonly', 'false');
     }
 }
 </script>

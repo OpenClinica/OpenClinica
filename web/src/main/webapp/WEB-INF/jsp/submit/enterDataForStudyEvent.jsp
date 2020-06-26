@@ -13,7 +13,7 @@
 <jsp:include page="../include/submit-header.jsp"/>
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-3.3.1.js"></script>
 <script type="text/javascript" language="javascript">
     function checkCRFLocked(ecId, url){
         jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
