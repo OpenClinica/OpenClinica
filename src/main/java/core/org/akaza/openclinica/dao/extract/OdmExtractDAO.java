@@ -3401,7 +3401,7 @@ public class OdmExtractDAO extends DatasetDAO {
         permissionTags =(permissionTags.length() != 0 ? permissionTags : "null");
         return " where sed.study_id = " + parentStudyId + " " + showArchived[0] + " and "
                 + this.getEventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite) + " " + showArchived[1] + " and edc.crf_id = crf.crf_id "
-                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3] + " and (pt.permission_tag_id is null or pt.permission_tag_id in (" + permissionTags + ")) "
+                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3] + " and (sed.type != 'common' or pt.permission_tag_id is null or pt.permission_tag_id in (" + permissionTags + ")) "
                 + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 
