@@ -193,6 +193,7 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setEventDefinitionCrfDao(getEventDefinitionCrfDao());
         factory.setItemFormMetadataDao(getItemFormMetadataDao());
         factory.setPermissionTagDao(getPermissionTagDao());
+        factory.setStudySubjectDao(getStudySubjectDao());
         factory.setStudyEventDefinitionHibDao(getStudyEventDefinitionHibDao());
 
         List<Component> components = getViewStudySubjectService().getPageComponents(ListStudySubjectTableFactory.PAGE_NAME);
@@ -322,6 +323,9 @@ public class ListStudySubjectsServlet extends SecureController {
 
     }
 
+    public StudySubjectDao getStudySubjectDao() {
+        return (StudySubjectDao) SpringServletAccess.getApplicationContext(context).getBean("studySubjectDaoDomain");
+    }
     public StudyDao getStudyDao() {
         return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
     }

@@ -91,6 +91,10 @@
         <constructor-arg ref="studyDaoDomain"/>
     </bean>
 
+    <bean id="ocQrtzTriggersDAO" class="core.org.akaza.openclinica.dao.extract.OcQrtzTriggersDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
     <bean id="ruleSetListenerService" class="core.org.akaza.openclinica.service.rule.RuleSetListenerService">
         <property name="ruleSetService" ref="ruleSetService"/>
         <property name="ruleSetDao" ref="ruleSetDao"/>

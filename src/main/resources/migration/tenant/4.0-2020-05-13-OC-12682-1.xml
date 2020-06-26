@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="schan" id="2020-05-13-OC-12682-02">
+        <comment>Adding a column dataset file Uuid to archived dataset file table</comment>
+        <addColumn tableName="archived_dataset_file">
+            <column name="dataset_file_uuid" type="VARCHAR(255)"></column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

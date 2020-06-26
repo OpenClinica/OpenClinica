@@ -69,6 +69,7 @@ public class PFormCache {
 
         FormUrlObject formUrlObject = enketo.getFormURL(contextHash, crfOID, site,
                 Role.RESEARCHASSISTANT, parentStudy, studyEvent, EnketoAPI.PARTICIPATE_MODE, null, false);
+
         return formUrlObject.getFormUrl();
     }
 

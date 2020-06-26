@@ -174,6 +174,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			studyBean.setStudyEnvUuid(study.getStudyEnvUuid());
 			studyBean.setStudyUuid(study.getStudyUuid());
 			studyBean.setStudyEnvSiteUuid(study.getStudyEnvSiteUuid());
+
 			if (study.isSite())
 				studyBean.setStudy(study.getStudy());
 			tagIds = permissionService.getPermissionTagsList(studyBean, getRequest());

@@ -388,27 +388,19 @@
                 <table>
                  <tr>
 
-                 <c:choose>
+                  <c:choose>
 
                     <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
 
                         &nbsp;
                     </c:when>
-                    <c:when test="${ studyEvent.removed != true && studyEvent.archived != true && studyEvent.locked != true && studyEvent.workflowStatus != 'SKIPPED' && studyEvent.workflowStatus != 'STOPPED' && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' }">
-                            <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
-                            onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
-                            onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
-                            ><span name="bt_EnterData<c:out value="${rowCount}"/>" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;
-                    </c:when>
-
-                    <c:otherwise></c:otherwise>
-                    </c:choose>
-                                   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
+                  </c:choose>
+                    <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                       onMouseDown="javascript:setImage('bt_View','images/bt_View_d.gif');"
                       onMouseUp="javascript:setImage('bt_View','images/bt_View.gif');"><span
                       name="bt_View" align="left" class="icon icon-search" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>&nbsp;
                   </tr>
-                    </table>
+                </table>
 
                 </td>
 
@@ -533,13 +525,7 @@
                             <%-- added above 112007, tbh --%>
                         </c:when>
                         <c:otherwise>
-                            <c:if test="${studyEvent.removed !=true && studyEvent.archived !=true && studyEvent.locked !=true && dec.eventCRF.removed != true && dec.eventCRF.archived != true && studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
-                            <a href="<c:out value="${actionQuery}"/>"
-                                onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
-                                onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
-                                ><span name="bt_EnterData<c:out value="${rowCount}"/>" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;
-                            </c:if>
-                                   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
+                          <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                                 onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View_d.gif');"
                                 onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 ><span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></a>&nbsp;

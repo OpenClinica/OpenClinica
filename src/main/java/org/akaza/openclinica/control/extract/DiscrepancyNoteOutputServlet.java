@@ -25,6 +25,7 @@ import core.org.akaza.openclinica.bean.submit.SubjectBean;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -506,7 +507,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setEventStart(se.getDateStarted());
                     dnb.setEventName(se.getName());
                     dnb.setCrfName(cb.getName());
-
                     dnb.setEventCrfWorkflowStatus(ec.getWorkflowStatus());
                     dnb.setEvent(se);
                     dnb.setStudyEventDefinitionBean(sedb);

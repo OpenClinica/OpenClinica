@@ -782,7 +782,7 @@ public class CoreResources implements InitializingBean {
                 epbean.setFormatDescription(getExtractField("extract." + i + ".formatDescription"));
                 if (epbean.getFileName().length != epbean.getExportFileName().length)
                     throw new OpenClinicaSystemException(
-                            "The comma seperated values of file names and export file names should correspond 1 on 1 for the property number" + i);
+                            "The comma separated values of file names and export file names should correspond 1 on 1 for the property number" + i);
 
                 if ("sql".equals(whichFunction)) {
                     // set the bean within, so that we can access the file locations etc

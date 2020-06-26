@@ -75,6 +75,7 @@ public class SQLFactory {
     public final String DAO_SUBJECTTRANSFER = "subjecttransfer";
     // YW, 05-2008, for odm extract
     public final String DAO_ODM_EXTRACT = "odm_extract";
+    public final String DAO_OC_QRTZ_TRIGGERS = "oc_qrtz_triggers";
 
     private SQLFactory() {
         // to thwart any instantiation of this class
@@ -189,6 +190,7 @@ public class SQLFactory {
             fileList.put(this.DAO_RULESET_AUDIT, "oracle_ruleset_audit_dao.xml");
             fileList.put(this.DAO_RULESETRULE_AUDIT, "oracle_rulesetrule_audit_dao.xml");
             fileList.put(this.DAO_ODM_EXTRACT, "oracle_odm_extract_dao.xml");
+            fileList.put(this.DAO_OC_QRTZ_TRIGGERS, "oc_qrtz_triggers_dao.xml");
             // fileList.put(this.DAO_SUBJECTTRANSFER, "oracle_subjecttransfer_dao.xml");
         } else if ("postgres".equals(dbName)) {
             fileList.put(this.DAO_USERACCOUNT, "useraccount_dao.xml");
@@ -231,7 +233,7 @@ public class SQLFactory {
             fileList.put(this.DAO_SUBJECTTRANSFER, "subjecttransfer_dao.xml");
 
             fileList.put(this.DAO_ODM_EXTRACT, "odm_extract_dao.xml");
-
+            fileList.put(this.DAO_OC_QRTZ_TRIGGERS, "oc_qrtz_triggers_dao.xml");
             // add files here as we port over to postgres, tbh
         } // should be either oracle or postgres, but what if the file is
           // gone?

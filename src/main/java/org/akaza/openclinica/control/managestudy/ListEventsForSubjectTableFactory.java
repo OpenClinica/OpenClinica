@@ -775,6 +775,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             String value = "";
             StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
             Study subjectStudy = studyDao.findByPK(studySubjectBean.getStudyId());
+
             Integer studySubjectId = studySubjectBean.getId();
             if (studySubjectId != null) {
                 StringBuilder url = new StringBuilder();
