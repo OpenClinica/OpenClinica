@@ -750,14 +750,13 @@ public class ImportServiceImpl implements ImportService {
     }
 
     private ErrorObj validateForReal(String value) {
-        if (!isNumeric(value)) {
+        try {
+            Double.parseDouble(value);
+        } catch (NumberFormatException nfe) {
+            logger.error("Unable to parse real value", nfe);
             return new ErrorObj(FAILED, ErrorConstants.ERR_VALUE_TYPE_MISMATCH);
         }
         return null;
-    }
-
-    private boolean isNumeric(String str) {
-        return str.matches("^\\d+(\\.\\d+)?");
     }
 
     private ErrorObj validateForDate(String value) {
