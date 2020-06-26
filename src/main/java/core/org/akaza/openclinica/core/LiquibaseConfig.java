@@ -11,6 +11,7 @@ import javax.sql.DataSource;
  * Created by yogi on 3/22/17.
  */
 @Configuration
+@ComponentScan("ScheduledJobConfig.class")
 public class LiquibaseConfig {
     @Autowired CoreResources coreResources;
     @Autowired DataSource dataSource;
@@ -44,7 +45,6 @@ public class LiquibaseConfig {
         liquibase.setChangeLog("classpath:migration/publicSchemaOnly/release.xml");
         return liquibase;
     }
-
 
 
     @Bean

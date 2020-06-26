@@ -163,7 +163,6 @@ public class StudyParticipantController {
 
         } catch (OpenClinicaSystemException e) {
             return new ResponseEntity(validateService.getResponseForException(e, studyOid, siteOid), HttpStatus.BAD_REQUEST);
-
         }
         return new ResponseEntity<Object>(result, HttpStatus.OK);
     }

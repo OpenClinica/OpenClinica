@@ -205,6 +205,7 @@ public class EventCrfLayerBuilder {
 
 
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.COMPLETED) {
+
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -236,7 +237,8 @@ public class EventCrfLayerBuilder {
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
             if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && !getStudyEvent().isLocked()
-                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED) {
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 clearEventCrf(html, eventCrfBean, studySubject);
@@ -252,7 +254,6 @@ public class EventCrfLayerBuilder {
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject, reswords.getString("reassign"));
                 html.tdEnd().trEnd(0);
             }
-
         } else if (eventCrfBean.getWorkflowStatus() == EventCrfWorkflowStatusEnum.NOT_STARTED) {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
@@ -305,7 +306,8 @@ public class EventCrfLayerBuilder {
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
             if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && !getStudyEvent().isLocked()
-                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED) {
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 clearEventCrf(html, eventCrfBean, studySubject);

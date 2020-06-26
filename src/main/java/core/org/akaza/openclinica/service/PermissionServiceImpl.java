@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.domain.datamap.*;
+import core.org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("permissionService")
-@Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
 public class PermissionServiceImpl implements PermissionService {
     @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
@@ -44,6 +45,8 @@ public class PermissionServiceImpl implements PermissionService {
     private StudyEventDefinitionDao studyEventDefinitionDao;
     @Autowired
     private CrfDao crfDao;
+    @Autowired
+    private KeycloakClientImpl keycloakClient;
 
     private static final String CREATE_TOKEN_API_PATH = "/oauth/token";
 
@@ -97,7 +100,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (userContextMap == null)
             return null;
         String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("SBSBaseUrl")+"/user-service/api/users/" + userUuid + "/roles";
+        String uri = CoreResources.getField("SBSBaseUrl") + "/user-service/api/users/" + userUuid + "/roles";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -121,6 +124,37 @@ public class PermissionServiceImpl implements PermissionService {
             }
         }
         return response;
+    }
+
+    public ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(String userUuid, String accessToken) {
+        String uri = CoreResources.getField("SBSBaseUrl") + "/user-service/api/users/" + userUuid + "/roles";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<StudyEnvironmentRoleDTO>>() {
+        });
+        logger.debug("Response: getUserRoles:" + response);
+        if (logger.isDebugEnabled()) {
+            for (StudyEnvironmentRoleDTO userRole : response.getBody()) {
+                logger.debug("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid());
+            }
+        }
+        return response;
+    }
+
+    public ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(String userUuid) {
+        String accessToken = keycloakClient.getSystemToken();
+        return getUserRoles(userUuid, accessToken);
     }
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -189,11 +223,11 @@ public class PermissionServiceImpl implements PermissionService {
         List<String> permissionTagsList = getPermissionTagsList(request);
 
         return this.hasFormAccess(eventDefCrf, permissionTagsList);
-        
+
     }
 
-    public boolean hasFormAccess(EventDefinitionCrf edc,List<String> permissionTagsList) {
-   	 List<String> tagsForEDC = permissionTagDao.findTagsForEDC(edc);
+    public boolean hasFormAccess(EventDefinitionCrf edc, List<String> permissionTagsList) {
+        List<String> tagsForEDC = permissionTagDao.findTagsForEDC(edc);
         if (CollectionUtils.isEmpty(tagsForEDC))
             return true;
         if (CollectionUtils.isNotEmpty(tagsForEDC) && CollectionUtils.isEmpty(permissionTagsList))
@@ -210,16 +244,22 @@ public class PermissionServiceImpl implements PermissionService {
         return getTagList(roles, study);
     }
 
-    public boolean isUserHasPermission(String column,HttpServletRequest request,Study studyBean) {
+    public List<String> getPermissionTagsList(Study study, String userUuid) {
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(userUuid);
+        return getTagList(roles, study);
+    }
+
+
+    public boolean isUserHasPermission(String column, HttpServletRequest request, Study studyBean) {
         String sedOid = column.split("\\.")[0];
         String formOid = column.split("\\.")[1];
         StudyEventDefinition sed = studyEventDefinitionDao.findByOcOID(sedOid);
         CrfBean crf = crfDao.findByOcOID(formOid);
         int studyId;
-        if(studyBean.isSite())
+        if (studyBean.isSite())
             studyId = studyBean.getStudy().getStudyId();
         else
-            studyId=studyBean.getStudyId();
+            studyId = studyBean.getStudyId();
         EventDefinitionCrf eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getStudyEventDefinitionId(), crf.getCrfId(), studyId);
         List<String> tagsInEDC = permissionTagDao.findTagsForEDC(eventDefCrf);
         if (org.apache.commons.collections.CollectionUtils.isNotEmpty(tagsInEDC)) {
@@ -233,11 +273,24 @@ public class PermissionServiceImpl implements PermissionService {
     private List<String> getPermissionTags(HttpServletRequest request) {
         return (List<String>) request.getSession().getAttribute("userPermissionTags");
     }
-    public String getPermissionTagsString(Study study,HttpServletRequest request) {
-        List<String> tagsList = getPermissionTagsList(study ,request);
-        return getTagsString(tagsList);    }
 
-    public String[] getPermissionTagsStringArray(Study study,HttpServletRequest request) {
-        List<String> tagsList = getPermissionTagsList(study,request);
-        return getStringArray(tagsList);    }
+    public String getPermissionTagsString(Study study, HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(study, request);
+        return getTagsString(tagsList);
+    }
+
+    public String getPermissionTagsString(Study study, String userUuid) {
+        List<String> tagsList = getPermissionTagsList(study, userUuid);
+        return getTagsString(tagsList);
+    }
+
+    public String[] getPermissionTagsStringArray(Study study, HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(study, request);
+        return getStringArray(tagsList);
+    }
+
+    public String[] getPermissionTagsStringArray(Study study, String userUuid) {
+        List<String> tagsList = getPermissionTagsList(study, userUuid);
+        return getStringArray(tagsList);
+    }
 }

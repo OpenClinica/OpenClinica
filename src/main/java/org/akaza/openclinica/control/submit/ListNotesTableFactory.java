@@ -19,6 +19,7 @@ import core.org.akaza.openclinica.bean.core.ResolutionStatus;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.dao.hibernate.*;
+import core.org.akaza.openclinica.domain.EventCrfStatusEnum;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.control.AbstractTableFactory;
@@ -285,7 +286,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 CrfBean crf = eventCrf.getCrfVersion().getCrf();
                 discrepancyNoteBean.setCrfName(crf.getName());
                 studyEvent = eventCrf.getStudyEvent();
-
                 discrepancyNoteBean.setEventCrfWorkflowStatus(eventCrf.getWorkflowStatus());
                 studyEventDefinition = studyEvent.getStudyEventDefinition();
                 discrepancyNoteBean.setEventName(studyEventDefinition.getName());

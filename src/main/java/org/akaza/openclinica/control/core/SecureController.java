@@ -7,6 +7,7 @@
  */
 
 package org.akaza.openclinica.control.core;
+
 import core.org.akaza.openclinica.bean.admin.CRFBean;
 import core.org.akaza.openclinica.bean.core.*;
 import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -16,10 +17,6 @@ import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.submit.EventCRFBean;
 import core.org.akaza.openclinica.bean.submit.ItemBean;
 import core.org.akaza.openclinica.bean.submit.ItemDataBean;
-import core.org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.config.StudyParamNames;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.controller.KeycloakController;
 import core.org.akaza.openclinica.core.EmailEngine;
 import core.org.akaza.openclinica.core.EventCRFLocker;
 import core.org.akaza.openclinica.core.SessionManager;
@@ -31,29 +28,36 @@ import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.hibernate.*;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.dao.managestudy.*;
-import core.org.akaza.openclinica.dao.service.StudyConfigService;
-import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.EventCrf;
-import core.org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.exception.OpenClinicaException;
 import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import core.org.akaza.openclinica.web.InconsistentStateException;
+import core.org.akaza.openclinica.web.InsufficientPermissionException;
+import core.org.akaza.openclinica.web.SQLInitServlet;
+import core.org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.controller.KeycloakController;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
+<<<<<<< HEAD
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
+=======
+>>>>>>> master
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -62,7 +66,6 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -94,7 +97,6 @@ import java.util.stream.Collectors;
 
 /**
  * This class enhances the Controller in several ways.
- *
  * <ol>
  * <li>The method mayProceed, for which the class is named, is declared abstract and is called before processRequest.
  * This
@@ -108,33 +110,27 @@ import java.util.stream.Collectors;
  * be redirected in order to be informed that he has insufficient permission, and the process method enforces this
  * redirection
  * by catching an InsufficientPermissionException object.
- *
  * <li>Four new members, session, request, response, and the UserAccountBean object ub have been declared protected, and
  * are
  * set in the process method. This allows developers to avoid passing these objects between methods, and moreover it
  * accurately encodes the fact that these objects represent the state of the servlet.
- *
  * <br/>
  * In particular, please note that it is no longer necessary to generate a bean for the session manager, the current
  * user or
  * the current study.
- *
  * <li>The method processRequest has been declared abstract. This change is unlikely to affect most code, since by
  * custom
  * processRequest is declared in each subclass anyway.
- *
  * <li>The standard try-catch block within most processRequest methods has been included in the process method, which
  * calls
  * the processRequest method. Therefore, subclasses may throw an Exception in the processRequest method without having
  * to
  * handle it.
- *
  * <li>The addPageMessage method has been declared to streamline the process of setting page-level messages. The
  * accompanying
  * showPageMessages.jsp file in jsp/include/ automatically displays all of the page messages; the developer need only
  * include
  * this file in the jsp.
- *
  * <li>The addEntityList method makes it easy to add a Collection of EntityBeans to the request. Note that this method
  * should
  * only be used for Collections from which one EntityBean must be selected by the user. If the Collection is empty, this
@@ -143,7 +139,6 @@ import java.util.stream.Collectors;
  * that the user may not proceed because no entities are present. Note that the error page and the error message must be
  * specified.
  * </ol>
- *
  * @author ssachs
  */
 public abstract class SecureController extends HttpServlet implements SingleThreadModel {
@@ -166,7 +161,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected StudyUserRoleBean currentRole;
     protected HashMap errors = new HashMap();
     protected UserAccountDao userDaoDomain;
-    private static String SCHEDULER = "schedulerFactoryBean";
+    protected static String SCHEDULER = "schedulerFactoryBean";
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
     public static final String QUERY_SUFFIX = "form-queries.xml";
@@ -175,8 +170,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static final String CONTACTDATA = "contactdata";
 
     protected UserService userService;
-
-    private StdScheduler scheduler;
+    protected StdScheduler scheduler;
     /**
      * local_df is set to the client locale in each request.
      */
@@ -279,7 +273,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Process request
-     *
      * @throws Exception
      */
     protected abstract void processRequest() throws Exception;
@@ -370,7 +363,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
             }
         } catch (SchedulerException se) {
-            logger.error("Pinging job server is failing due to ",se);
+            logger.error("Pinging job server is failing due to ", se);
         }
 
     }
@@ -396,7 +389,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
 
-        logger.debug("Metric0 {}"+new Date());
+        logger.debug("Metric0 {}" + new Date());
         this.request = request;
         this.response = response;
         request.setCharacterEncoding("UTF-8");
@@ -442,7 +435,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         currentPublicStudy = (Study) session.getAttribute("publicStudy");
 
 
-
         // Set current language preferences
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundleProvider.updateLocale(locale);
@@ -473,10 +465,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // sm = new SessionManager(ub, userName);
             sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
             WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-            KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
+            KeycloakController controller = (KeycloakController) webApplicationContext.getBean("keycloakController");
 
             String ocUserUuid = null;
-            logger.debug("Metric1 {}",new Date());
+            logger.debug("Metric1 {}", new Date());
 
             try {
                 ocUserUuid = controller.getOcUserUuid(request);
@@ -485,7 +477,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 forwardPage(Page.ERROR);
                 return;
             }
-            logger.debug("Metric2: {}",new Date());
+            logger.debug("Metric2: {}", new Date());
 
             if (ocUserUuid != null) {
                 if (ub == null || StringUtils.isEmpty(ub.getName())) {
@@ -494,7 +486,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
             }
             if (ub == null || StringUtils.isEmpty(ub.getName())) {
-                if(session != null || request.isRequestedSessionIdValid() ) {
+                if (session != null || request.isRequestedSessionIdValid()) {
                     session.invalidate();
                     SecurityContextHolder.clearContext();
                 }
@@ -510,7 +502,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             if (processSpecificStudyEnvUuid()) {
                 /* this handles the scenario when forceRenewAuth is true */
                 session.removeAttribute("userRole");
-                response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID) +  "&firstLoginCheck=true");
+                response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID + "=" + getParameter(request, STUDY_ENV_UUID) + "&firstLoginCheck=true");
                 return;
             }
 
@@ -548,18 +540,22 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     forwardPage(Page.ERROR);
                     return;
                 }
-                if(currentStudy == null || currentStudy.getStudyId() == 0 )
+                if (currentStudy == null || currentStudy.getStudyId() == 0)
                     currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 if (currentStudy != null) {
-                    if(currentPublicStudy != null && currentPublicStudy.getStudy() != null)
-                    {
-                        if(currentStudy.getStudy() == null)
+                    if (currentPublicStudy != null && currentPublicStudy.getStudy() != null) {
+                        if (currentStudy.getStudy() == null)
                             currentStudy.setStudy(getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
+<<<<<<< HEAD
                 setStudy(currentStudy, session);
             }
             else {
+=======
+                session.setAttribute("study", currentStudy);
+            } else {
+>>>>>>> master
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                 currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 setStudy(currentStudy, session);
@@ -569,7 +565,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
             if (currentRole == null || !currentRole.isActive() || currentRole.getId() <= 0) {
-                refreshUserRole(request,ub,currentPublicStudy);
+                refreshUserRole(request, ub, currentPublicStudy);
                 currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
             }
             // YW << For the case that current role is not "invalid" but current
@@ -589,32 +585,32 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                  * issue-2422
                  */
                 List roles = Role.toArrayList();
-                for (Iterator it = roles.iterator(); it.hasNext();) {
+                for (Iterator it = roles.iterator(); it.hasNext(); ) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
-                    case 2:
-                        role.setDescription("site_Study_Coordinator");
-                        break;
-                    case 3:
-                        role.setDescription("site_Study_Director");
-                        break;
-                    case 4:
-                        role.setDescription("site_investigator");
-                        break;
-                    case 5:
-                        role.setDescription("site_Data_Entry_Person");
-                        break;
-                    case 6:
-                        role.setDescription("site_monitor");
-                        break;
-                    case 7:
-                        role.setDescription("site_Data_Entry_Person2");
-                        break;
-                    case 8:
-                        role.setDescription("site_Data_Entry_Participant");
-                        break;
-                    default:
-                        // logger.info("No role matched when setting role description");
+                        case 2:
+                            role.setDescription("site_Study_Coordinator");
+                            break;
+                        case 3:
+                            role.setDescription("site_Study_Director");
+                            break;
+                        case 4:
+                            role.setDescription("site_investigator");
+                            break;
+                        case 5:
+                            role.setDescription("site_Data_Entry_Person");
+                            break;
+                        case 6:
+                            role.setDescription("site_monitor");
+                            break;
+                        case 7:
+                            role.setDescription("site_Data_Entry_Person2");
+                            break;
+                        case 8:
+                            role.setDescription("site_Data_Entry_Participant");
+                            break;
+                        default:
+                            // logger.info("No role matched when setting role description");
                     }
                 }
             } else {
@@ -622,30 +618,29 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                  * If the current study is a site, we will change the role description. issue-2422
                  */
                 List roles = Role.toArrayList();
-                for (Iterator it = roles.iterator(); it.hasNext();) {
+                for (Iterator it = roles.iterator(); it.hasNext(); ) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
-                    case 2:
-                        role.setDescription("Study_Coordinator");
-                        break;
-                    case 3:
-                        role.setDescription("Study_Director");
-                        break;
-                    case 4:
-                        role.setDescription("Investigator");
-                        break;
-                    case 5:
-                        role.setDescription("Data_Entry_Person");
-                        break;
-                    case 6:
-                        role.setDescription("Monitor");
-                        break;
-                    default:
-                        // logger.info("No role matched when setting role description");
+                        case 2:
+                            role.setDescription("Study_Coordinator");
+                            break;
+                        case 3:
+                            role.setDescription("Study_Director");
+                            break;
+                        case 4:
+                            role.setDescription("Investigator");
+                            break;
+                        case 5:
+                            role.setDescription("Data_Entry_Person");
+                            break;
+                        case 6:
+                            role.setDescription("Monitor");
+                            break;
+                        default:
+                            // logger.info("No role matched when setting role description");
                     }
                 }
             }
-
 
 
             // YW 06-19-2007 >>
@@ -700,13 +695,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             forwardPage(Page.ERROR);
         }
-        logger.debug("Metric4 {}",new Date());
+        logger.debug("Metric4 {}", new Date());
     }
 
     private boolean shouldProcessUser() {
         String path = StringUtils.substringAfterLast(request.getRequestURI(), "/");
         boolean flag = false;
-        switch(path) {
+        switch (path) {
             case "VerifyImportedRule":
             case "UpdateRuleSetRule":
             case "ViewRuleAssignment":
@@ -717,23 +712,24 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
         return flag;
     }
+
     public String getRequestSchema(HttpServletRequest request) {
         switch (StringUtils.substringAfterLast(request.getRequestURI(), "/")) {
-        case "ChangeStudy":
-        case "DeleteStudyUserRole":
-        case "DeleteUser":
-        case "ListStudyUser":
-        case "ViewUserAccount":
-        case "ListUserAccounts":
-        case "CreateUserAccount":
-        case "SetUserRole":
-        case "ListStudy":
-        case "AuditUserActivity":
-        case "EditStudyUserRole":
-        case "SignStudySubject":
-            return "public";
-        default:
-            return currentPublicStudy.getSchemaName();
+            case "ChangeStudy":
+            case "DeleteStudyUserRole":
+            case "DeleteUser":
+            case "ListStudyUser":
+            case "ViewUserAccount":
+            case "ListUserAccounts":
+            case "CreateUserAccount":
+            case "SetUserRole":
+            case "ListStudy":
+            case "AuditUserActivity":
+            case "EditStudyUserRole":
+            case "SignStudySubject":
+                return "public";
+            default:
+                return currentPublicStudy.getSchemaName();
         }
     }
 
@@ -748,7 +744,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Handles the HTTP <code>GET</code> method.
-     *
      * @param request
      * @param response
      * @throws ServletException
@@ -766,11 +761,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request
-     *            servlet request
-     * @param response
-     *            servlet response
+     * @param request servlet request
+     * @param response servlet response
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
@@ -783,16 +775,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     /**
-     * <P>
+     * <p>
      * Forwards to a jsp page. Additions to the forwardPage() method involve checking the session for the bread crumb
      * trail
      * and setting it, if necessary. Setting it here allows the developer to only have to update the
      * <code>BreadcrumbTrail</code> class.
-     *
-     * @param jspPage
-     *            The page to go to.
-     * @param checkTrail
-     *            The command to check for, and set a trail in the session.
+     * @param jspPage The page to go to.
+     * @param checkTrail The command to check for, and set a trail in the session.
      */
     protected void forwardPage(Page jspPage, boolean checkTrail) {
         Page page1 = Page.valueOf(jspPage.name());
@@ -868,7 +857,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
              * }
              * }
              * }
-             */ logger.error(se.getMessage(), se);
+             */
+            logger.error(se.getMessage(), se);
         } finally {
             page1 = null;
             jspPage = null;
@@ -889,15 +879,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * e.g.:
      * <code>addEntityList("groups", allGroups, "There are no groups to display, so you cannot add a subject to this Study.",
      * Page.SUBMIT_DATA)</code>
-     *
-     * @param beanName
-     *            The name of the entity list as it should be stored in the request object.
-     * @param list
-     *            The Collection of entities.
-     * @param messageIfEmpty
-     *            The message to display if the collection is empty.
-     * @param destinationIfEmpty
-     *            The Page to go to if the collection is empty.
+     * @param beanName The name of the entity list as it should be stored in the request object.
+     * @param list The Collection of entities.
+     * @param messageIfEmpty The message to display if the collection is empty.
+     * @param destinationIfEmpty The Page to go to if the collection is empty.
      * @throws InconsistentStateException
      */
     protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty) throws InconsistentStateException {
@@ -910,7 +895,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * @return A blank String if this servlet is not an Administer System servlet. SecureController.ADMIN_SERVLET_CODE
-     *         otherwise.
+     * otherwise.
      */
     protected String getAdminServlet() {
         return "";
@@ -929,22 +914,16 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * <p>
      * Check if an entity with passed entity id is included in studies of current user.
      * </p>
-     *
+     * <p>
      * <p>
      * Note: This method called AuditableEntityDAO.findByPKAndStudy which required
      * "The subclass must define findByPKAndStudyName before calling this
      * method. Otherwise an inactive AuditableEntityBean will be returned."
      * </p>
-     * 
-     * @author ywang 10-18-2007
-     * @param entityId
-     *            int
-     * @param userName
-     *            String
-     * @param adao
-     *            AuditableEntityDAO
-     * @param ds
-     *            javax.sql.DataSource
+     * @param entityId int
+     * @param userName String
+     * @param adao AuditableEntityDAO
+     * @param ds javax.sql.DataSource
      */
     protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao, DataSource ds) {
         ArrayList<Study> studies = (ArrayList<Study>) getStudyDao().findAllByUserNotRemoved(userName);
@@ -1004,7 +983,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 response.sendRedirect(url);
             }
         } catch (Exception ex) {
-            logger.error("Error while redirecting to {} ",url, ex);
+            logger.error("Error while redirecting to {} ", url, ex);
         }
     }
 
@@ -1026,7 +1005,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 response.sendRedirect(url);
             }
         } catch (Exception ex) {
-            logger.error("Error while redirecting to {} ",url,ex);
+            logger.error("Error while redirecting to {} ", url, ex);
         }
 
     }
@@ -1098,7 +1077,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail, String successMessage, String failMessage,
-            Boolean sendMessage) throws Exception {
+                             Boolean sendMessage) throws Exception {
         Boolean messageSent = true;
         try {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) SpringServletAccess.getApplicationContext(context).getBean("mailSender");
@@ -1126,7 +1105,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
-            logger.error("Error while sending mail: ",me);
+            logger.error("Error while sending mail: ", me);
             if (failMessage != null && sendMessage) {
                 addPageMessage(failMessage);
             }
@@ -1251,7 +1230,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
         System.out.println("the url :  " + url);
         */
-        request.setAttribute("participantUrl","need_to_fix");
+        request.setAttribute("participantUrl", "need_to_fix");
 
     }
 
@@ -1259,7 +1238,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner
      * class
      * allows the test case to call the outer class' private process() method.
-     *
      * @author Bruce W. Perry 01/2008
      */
     public class SecureControllerTestDelegate {
@@ -1273,23 +1251,23 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
-    public  EventCRFLocker getEventCrfLocker() {
+    public EventCRFLocker getEventCrfLocker() {
         return eventCrfLocker;
     }
 
 
-    private boolean isEnrollmentCapEnforced(){
-        String enrollmentCapStatus=null;
-        if(currentStudy.isSite()){
+    private boolean isEnrollmentCapEnforced() {
+        String enrollmentCapStatus = null;
+        if (currentStudy.isSite()) {
             enrollmentCapStatus = currentStudy.getStudy().getEnforceEnrollmentCap();
-        }else {
+        } else {
             enrollmentCapStatus = currentStudy.getEnforceEnrollmentCap();
         }
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         return capEnforced;
     }
 
-    protected boolean isEnrollmentCapped(){
+    protected boolean isEnrollmentCapped() {
 
         String previousSchema = (String) request.getAttribute("requestSchema");
         request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
@@ -1300,12 +1278,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
 
         Study sb = null;
-        if(currentStudy.isSite()){
+        if (currentStudy.isSite()) {
             sb = (Study) currentStudy.getStudy();
-        }else{
-             sb = (Study) currentStudy;
+        } else {
+            sb = (Study) currentStudy;
         }
-        int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
+        int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
         request.setAttribute("requestSchema", previousSchema);
 
@@ -1314,6 +1292,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         else
             return false;
     }
+
     private boolean
     processForceRenewAuth(String renewAuth) throws IOException {
         logger.info("forceRenewAuth is true");
@@ -1330,7 +1309,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
 
-    private static ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames, HttpServletRequest request){
+    private static ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames, HttpServletRequest request) {
         ArrayList<String> parameters = new ArrayList<>();
         if (parameterNames.hasMoreElements()) {
             parameters = new ArrayList<>(Arrays.asList(request.getParameterNames().nextElement().split("=|&")));
@@ -1345,10 +1324,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * @param parameterName
      * @return parameter value
      */
-    public static String getParameter(HttpServletRequest request, String parameterName){
+    public static String getParameter(HttpServletRequest request, String parameterName) {
         String paramValue = request.getParameter(parameterName);
-        if (paramValue == null){
-            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames(),request);
+        if (paramValue == null) {
+            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames(), request);
             paramValue = parameters.indexOf(parameterName) > -1 ? parameters.get(parameters.indexOf(parameterName) + 1) : null;
         }
         logger.info("Getting parameter name: " + parameterName + " value: " + paramValue);
@@ -1383,7 +1362,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         Study tmpPublicStudy = getStudyDao().findByStudyEnvUuid(studyEnvUuid);
 
         if (tmpPublicStudy == null) {
-            CoreResources.setRequestSchema(request,currentSchema);
+            CoreResources.setRequestSchema(request, currentSchema);
             return isRenewAuth;
         }
 
@@ -1425,18 +1404,20 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         String permissionTags = permissionService.getPermissionTagsString(request);
         return permissionTags;
     }
-    public List<String>  getPermissionTagsList() {
+
+    public List<String> getPermissionTagsList() {
         PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
         List<String> permissionTagsList = permissionService.getPermissionTagsList(request);
         return permissionTagsList;
     }
 
     public boolean hasFormAccess(EventCrf ec) {
-        Integer formLayoutId = request.getParameter("formLayoutId") != null? new Integer(request.getParameter("formLayoutId")) : null;
-        Integer studyEventId = request.getParameter("studyEventId") != null? new Integer(request.getParameter("studyEventId")) : null;
+        Integer formLayoutId = request.getParameter("formLayoutId") != null ? new Integer(request.getParameter("formLayoutId")) : null;
+        Integer studyEventId = request.getParameter("studyEventId") != null ? new Integer(request.getParameter("studyEventId")) : null;
         PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
         return permissionService.hasFormAccess(ec, formLayoutId, studyEventId, request);
     }
+
     protected CustomRole checkMatchingUuid(CustomRole customRole, ChangeStudyDTO changeStudyDTO, StudyEnvironmentRoleDTO s) {
         if (StringUtils.equals(changeStudyDTO.getStudyEnvUuid().toString(), s.getStudyEnvironmentUuid())) {
             customRole.studyRoleMap.put(changeStudyDTO.getStudyId(), s.getDynamicRoleName());
@@ -1464,13 +1445,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         String participateStatus = parentStudy.getParticipantPortal();
         return participateStatus;
     }
+
     protected UserService getUserService() {
-        return userService= (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
+        return userService = (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
     }
 
     protected void changeParticipantAccountStatus(Study study, StudySubjectBean studySub, UserStatus userStatus) {
         // check if particiate module enabled
-        Study  parentStudy = (study.isSite()) ? study.getStudy() : study;
+        Study parentStudy = (study.isSite()) ? study.getStudy() : study;
         String participateStatus = getParticipateStatus(parentStudy);
         if (participateStatus.equals(ENABLED) && studySub.getUserId() != 0) {
             studySub.setUserStatus(userStatus);
@@ -1508,9 +1490,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return subjectCount;
     }
 
-    protected  StudyBuildService getStudyBuildService(){
+    protected StudyBuildService getStudyBuildService() {
         return (StudyBuildService) SpringServletAccess.getApplicationContext(context).getBean("studyBuildService");
     }
+
     protected CryptoConverter getCrytoConverter() {
         return (CryptoConverter) SpringServletAccess.getApplicationContext(context).getBean("cryptoConverter");
     }
@@ -1531,18 +1514,18 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
     }
 
-    private String isContactsModuleEnabled(){
-        String contactsModuleStatus=null;
-        if(currentStudy.isSite())
+    private String isContactsModuleEnabled() {
+        String contactsModuleStatus = null;
+        if (currentStudy.isSite())
             contactsModuleStatus = currentStudy.getStudy().getContactsModule();
         else
             contactsModuleStatus = currentStudy.getContactsModule();
         return contactsModuleStatus.equals(ENABLED) ? ENABLED : DISABLED;
     }
 
-    public void changeStudy(String study_oid){
+    public void changeStudy(String study_oid) {
         currentPublicStudy = getStudyDao().findPublicStudy(study_oid.toUpperCase());
-        String schemaName =currentPublicStudy.getSchemaName();
+        String schemaName = currentPublicStudy.getSchemaName();
         CoreResources.setRequestSchema(schemaName);
         if (currentPublicStudy != null) {
             // study level
@@ -1563,7 +1546,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     protected PermissionService getPermissionService() {
-        return  (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+        return (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
     }
 
     protected void setStudy(Study study, HttpSession session) {

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,14 +69,10 @@ public class ExtractController {
     private DatasetDAO datasetDao;
 
     @Autowired
-    @Qualifier("schedulerFactoryBean")
-    private Scheduler scheduler;
-
-    @Autowired
-    private OpenClinicaSchedulerFactoryBean schedulerFactoryBean;
-
-    @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -94,11 +91,11 @@ public class ExtractController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap processSubmit(@RequestParam("id") String id,
                                   @RequestParam("datasetId") String datasetId, HttpServletRequest request, HttpServletResponse response) {
-        if(!mayProceed(request)){
-            try{
+        if (!mayProceed(request)) {
+            try {
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
-            }catch (Exception e){
-                logger.error("Error in redirecting the response: ",e);
+            } catch (Exception e) {
+                logger.error("Error in redirecting the response: ", e);
             }
             return null;
         }
@@ -114,29 +111,27 @@ public class ExtractController {
         // if id is a number and dataset id is a number ...
         datasetDao = new DatasetDAO(dataSource);
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-        CoreResources cr =  new CoreResources();
+        CoreResources cr = new CoreResources();
 
 
-        ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(new Integer(id).intValue(),datasetId);
+        ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(new Integer(id).intValue(), datasetId);
 
-        DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
+        DatasetBean dsBean = (DatasetBean) datasetDao.findByPK(new Integer(datasetId).intValue());
         // set the job in motion
         String[] files = epBean.getFileName();
         String exportFileName;
-        int fileSize = files.length;
-        int  cnt = 0;
-        SimpleTrigger simpleTrigger = null;
+        int cnt = 0;
+        SimpleTrigger simpleTrigger;
         //TODO: if files and export names size is not same... throw an error
         dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
-        String[] exportFiles= epBean.getExportFileName();
+        String[] exportFiles = epBean.getExportFileName();
         String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
         SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
-        int i =0;
+        int i = 0;
         String[] temp = new String[exportFiles.length];
         //JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
-        while(i<exportFiles.length)
-        {
-            temp[i] = resolveVars(exportFiles[i],dsBean,sdfDir, SQLInitServlet.getField("filePath"), extractUtils);
+        while (i < exportFiles.length) {
+            temp[i] = resolveVars(exportFiles[i], dsBean, SQLInitServlet.getField("filePath"), extractUtils);
             i++;
         }
         epBean.setDoNotDelFiles(temp);
@@ -156,50 +151,25 @@ public class ExtractController {
         logger.debug("found odm xml file path " + generalFileDir);
         // next, can already run jobs, translations, and then add a message to be notified later
         //JN all the properties need to have the variables...
-        String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator +files[cnt];
+        String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + files[cnt];
         String endFilePath = epBean.getFileLocation();
-        endFilePath  = getEndFilePath(endFilePath,dsBean,sdfDir, SQLInitServlet.getField("filePath"), extractUtils);
+        endFilePath = getEndFilePath(endFilePath, dsBean, sdfDir, SQLInitServlet.getField("filePath"), extractUtils);
         //  exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
-        if(epBean.getPostProcExportName()!=null)
-        {
+        if (epBean.getPostProcExportName() != null) {
             //String preProcExportPathName = getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
-            String preProcExportPathName = resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir, SQLInitServlet.getField("filePath"), extractUtils);
+            String preProcExportPathName = resolveVars(epBean.getPostProcExportName(), dsBean, SQLInitServlet.getField("filePath"), extractUtils);
             epBean.setPostProcExportName(preProcExportPathName);
         }
-        if(epBean.getPostProcLocation()!=null)
-        {
-            String prePocLoc = getEndFilePath(epBean.getPostProcLocation(),dsBean,sdfDir, SQLInitServlet.getField("filePath"), extractUtils);
+        if (epBean.getPostProcLocation() != null) {
+            String prePocLoc = getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, SQLInitServlet.getField("filePath"), extractUtils);
             epBean.setPostProcLocation(prePocLoc);
         }
-        setAllProps(epBean,dsBean,sdfDir, extractUtils);
+        setAllProps(epBean, dsBean, extractUtils);
         // also need to add the status fields discussed w/ cc:
         // result code, user message, optional URL, archive message, log file message
         // asdf table: sort most recent at top
         logger.debug("found xslt file name " + xsltPath);
-        ApplicationContext context = null;
-        Scheduler jobScheduler = scheduler;
-        try {
-            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
-        } catch (SchedulerException e) {
-            logger.error("Error in receiving application context: ",e);
-        }
-        jobScheduler = getSchemaScheduler(request, context, jobScheduler);
-        String permissionTagsString =permissionService.getPermissionTagsString((Study)request.getSession().getAttribute("study"),request);
-        String[] permissionTagsStringArray =permissionService.getPermissionTagsStringArray((Study)request.getSession().getAttribute("study"),request);
-        List<String> permissionTagsList =permissionService.getPermissionTagsList((Study)request.getSession().getAttribute("study"),request);
-        ODMFilterDTO odmFilter = new ODMFilterDTO();
-
-
-        try {
-            jobScheduler.getContext().put("permissionTagsString",permissionTagsString);
-            jobScheduler.getContext().put("permissionTagsStringArray",permissionTagsStringArray);
-            jobScheduler.getContext().put("permissionTagsList",permissionTagsList);
-            jobScheduler.getContext().put("odmFilter", odmFilter);
-        } catch (SchedulerException e) {
-            logger.error("Error in setting the permissions: ",e);
-        }
-
-
+        Scheduler jobScheduler = getSchemaScheduler(request);
 
         ArchivedDatasetFileBean archivedDatasetFileBean = new ArchivedDatasetFileBean();
         archivedDatasetFileBean.setStatus(JobStatus.IN_QUEUE.name());
@@ -208,10 +178,13 @@ public class ExtractController {
         archivedDatasetFileBean.setDatasetId(dsBean.getId());
         archivedDatasetFileBean.setDateCreated(new Date());
         archivedDatasetFileBean.setExportFormatId(1);
-        archivedDatasetFileBean.setFileReference("");
+        archivedDatasetFileBean.setFileReference(null);
+        archivedDatasetFileBean.setJobUuid(UUID.randomUUID().toString());
+        archivedDatasetFileBean.setJobExecutionUuid(UUID.randomUUID().toString());
+        archivedDatasetFileBean.setJobType("Manual");
 
         ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(dataSource);
-        archivedDatasetFileBean=(ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
+        archivedDatasetFileBean = (ArchivedDatasetFileBean) archivedDatasetFileDAO.create(archivedDatasetFileBean);
 
 
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
@@ -234,7 +207,7 @@ public class ExtractController {
         cnt++;
 
         //WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
-        JobDetailFactoryBean jobDetailFactoryBean = context.getBean(JobDetailFactoryBean.class, simpleTrigger, this.TRIGGER_GROUP_NAME);
+        JobDetailFactoryBean jobDetailFactoryBean = applicationContext.getBean(JobDetailFactoryBean.class, simpleTrigger, this.TRIGGER_GROUP_NAME);
 
 
         try {
@@ -242,38 +215,39 @@ public class ExtractController {
             logger.debug("== found job date: " + dateStart.toString());
 
         } catch (SchedulerException se) {
-            logger.error("Error while accesssing job date: ",se);
+            logger.error("Error while accesssing job date: ", se);
         }
 
         request.setAttribute("datasetId", datasetId);
         // set the job name here in the user's session, so that we can ping the scheduler to pull it out later
-        if(jobDetailFactoryBean!=null)
+        if (jobDetailFactoryBean != null)
             request.getSession().setAttribute("jobName", jobDetailFactoryBean.getObject().getKey().getName());
-        if(simpleTrigger!= null)
+        if (simpleTrigger != null)
             request.getSession().setAttribute("groupName", this.TRIGGER_GROUP_NAME);
 
         request.getSession().setAttribute("datasetId", new Integer(dsBean.getId()));
         return map;
     }
 
-    private Scheduler getSchemaScheduler(HttpServletRequest request, ApplicationContext context, Scheduler jobScheduler) {
+    private Scheduler getSchemaScheduler(HttpServletRequest request) {
+        Scheduler jobScheduler = null;
         if (request.getAttribute(CURRENT_TENANT_ID) != null) {
             String schema = (String) request.getAttribute(CURRENT_TENANT_ID);
             if (StringUtils.isNotEmpty(schema) &&
                     (schema.equalsIgnoreCase("public") != true)) {
                 try {
-                    jobScheduler = (Scheduler) context.getBean(schema);
+                    jobScheduler = (Scheduler) applicationContext.getBean(schema);
                     logger.debug("Existing schema scheduler found:" + schema);
                 } catch (NoSuchBeanDefinitionException e) {
-                    createSchedulerFactoryBean(context, schema);
+                    createSchedulerFactoryBean(schema);
                     try {
-                        jobScheduler = (Scheduler) context.getBean(schema);
+                        jobScheduler = (Scheduler) applicationContext.getBean(schema);
                     } catch (BeansException e1) {
-                        logger.error("Bean for scheduler is not able to accessed after creating scheduled factory bean: ",e1);
+                        logger.error("Bean for scheduler is not able to accessed after crexating scheduled factory bean: ", e1);
 
                     }
                 } catch (BeansException e) {
-                    logger.error("Bean for scheduler is not able to accessed: ",e);
+                    logger.error("Bean for scheduler is not able to accessed: ", e);
 
                 }
             }
@@ -281,17 +255,17 @@ public class ExtractController {
         return jobScheduler;
     }
 
-    public void createSchedulerFactoryBean(ApplicationContext context, String schema) {
+    public void createSchedulerFactoryBean(String schema) {
         logger.debug("Creating a new schema scheduler:" + schema);
         OpenClinicaSchedulerFactoryBean sFBean = new OpenClinicaSchedulerFactoryBean();
         sFBean.setSchedulerName(schema);
         Properties properties = new Properties();
         AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
-        jobFactory.setApplicationContext(context);
+        jobFactory.setApplicationContext(applicationContext);
         sFBean.setJobFactory(jobFactory);
-        sFBean.setDataSource((DataSource) context.getBean("dataSource"));
-        sFBean.setTransactionManager((PlatformTransactionManager) context.getBean("transactionManager"));
-        sFBean.setApplicationContext(context);
+        sFBean.setDataSource((DataSource) applicationContext.getBean("dataSource"));
+        sFBean.setTransactionManager((PlatformTransactionManager) applicationContext.getBean("transactionManager"));
+        sFBean.setApplicationContext(applicationContext);
         sFBean.setApplicationContextSchedulerContextKey("applicationContext");
         sFBean.setGlobalJobListeners(new JobExecutionExceptionListener());
         sFBean.setGlobalTriggerListeners(new JobTriggerListener());
@@ -305,7 +279,7 @@ public class ExtractController {
                 CoreResources.getField("org.quartz.jobStore.driverDelegateClass"));
         properties.setProperty("org.quartz.jobStore.useProperties",
                 CoreResources.getField("org.quartz.jobStore.useProperties"));
-        properties.setProperty("org.quartz.jobStore.tablePrefix", schema + "."+
+        properties.setProperty("org.quartz.jobStore.tablePrefix", schema + "." +
                 CoreResources.getField("org.quartz.jobStore.tablePrefix"));
         properties.setProperty("org.quartz.threadPool.class",
                 CoreResources.getField("org.quartz.threadPool.class"));
@@ -321,36 +295,23 @@ public class ExtractController {
             return;
         }
         sFBean.start();
-        ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
+        ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
         beanFactory.registerSingleton(schema, sFBean);
     }
-    /**
-     * @deprecated Use {@link #setAllProps(ExtractPropertyBean,DatasetBean,SimpleDateFormat,ExtractUtils)} instead
-     */
-    @Deprecated
-    private ExtractPropertyBean setAllProps(ExtractPropertyBean epBean,DatasetBean dsBean,SimpleDateFormat sdfDir) {
-        return setAllProps(epBean, dsBean, sdfDir,new ExtractUtils());
-    }
 
-    private ExtractPropertyBean setAllProps(ExtractPropertyBean epBean,DatasetBean dsBean,SimpleDateFormat sdfDir, ExtractUtils extractUtils) {
-
-
-
-        return extractUtils.setAllProps(epBean, dsBean, sdfDir,  SQLInitServlet.getField("filePath"));
+    private ExtractPropertyBean setAllProps(ExtractPropertyBean epBean, DatasetBean dsBean, ExtractUtils extractUtils) {
+        return extractUtils.setAllProps(epBean, dsBean, SQLInitServlet.getField("filePath"));
 
 
     }
 
-
-    //TODO: ${linkURL} needs to be added
     /**
-     *
      * for dateTimePattern, the directory structure is created. "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator,
      * to resolve location
-     * @param filePath TODO
-     * @param extractUtils TODO
+     * @param filePath
+     * @param extractUtils
      */
-    private String getEndFilePath(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir, String filePath, ExtractUtils extractUtils){
+    private String getEndFilePath(String endFilePath, DatasetBean dsBean, SimpleDateFormat sdfDir, String filePath, ExtractUtils extractUtils) {
         return extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, filePath);
     }
 
@@ -358,42 +319,15 @@ public class ExtractController {
      * Returns the datetime based on pattern :"yyyy-MM-dd-HHmmssSSS", typically for resolving file name
      * @param endFilePath
      * @param dsBean
-     * @param sdfDir
-     * @return
-     * @deprecated Use {@link #resolveVars(String,DatasetBean,SimpleDateFormat,String, ExtractUtils)} instead
-     */
-    @Deprecated
-    private String resolveVars(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir){
-        return resolveVars(endFilePath, dsBean, sdfDir, SQLInitServlet.getField("filePath"),new ExtractUtils());
-    }
-
-    /**
-     * Returns the datetime based on pattern :"yyyy-MM-dd-HHmmssSSS", typically for resolving file name
-     * @param endFilePath
-     * @param dsBean
-     * @param sdfDir
-     * @param filePath TODO
-     * @return
-     * @deprecated Use {@link #resolveVars(String,DatasetBean,SimpleDateFormat,String,ExtractUtils)} instead
-     */
-    @Deprecated
-    private String resolveVars(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir, String filePath){
-        return resolveVars(endFilePath, dsBean, sdfDir, filePath, new ExtractUtils());
-    }
-
-    /**
-     * Returns the datetime based on pattern :"yyyy-MM-dd-HHmmssSSS", typically for resolving file name
-     * @param endFilePath
-     * @param dsBean
-     * @param sdfDir
-     * @param filePath TODO
-     * @param extractUtils TODO
+     * @param filePath
+     * @param extractUtils
      * @return
      */
-    private String resolveVars(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir, String filePath, ExtractUtils extractUtils){
-        return extractUtils.resolveVars(endFilePath, dsBean, sdfDir, filePath);
+    private String resolveVars(String endFilePath, DatasetBean dsBean, String filePath, ExtractUtils extractUtils) {
+        return extractUtils.resolveVars(endFilePath, dsBean, filePath);
 
     }
+
     private void setUpSidebar(HttpServletRequest request) {
         if (sidebarInit.getAlertsBoxSetup() == SidebarEnumConstants.OPENALERTS) {
             request.setAttribute("alertsBoxSetup", true);
@@ -419,7 +353,7 @@ public class ExtractController {
         this.sidebarInit = sidebarInit;
     }
 
-    private String resolveExportFilePath(String  epBeanFileName) {
+    private String resolveExportFilePath(String epBeanFileName) {
         // String retMe = "";
         //String epBeanFileName = epBean.getExportFileName();
         // important that this goes first, tbh
@@ -448,7 +382,7 @@ public class ExtractController {
         Role r = currentRole.getRole();
 
         if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)
-                || currentRole.getRole().equals(Role.INVESTIGATOR) ) {
+                || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             return true;
         }
         return false;

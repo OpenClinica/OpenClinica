@@ -27,7 +27,7 @@
 		</div>
 
 		</td>
-	
+
 	</tr>
 	<tr id="sidebar_Instructions_closed" style="display: none">
 		<td class="sidebar_tab">
@@ -54,7 +54,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="event_definition_name" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.studyEventDefinition.name}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="location" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.location}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="visit" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.sampleOrdinal}"/></td></tr>
-    
+
   <tr valign="top"><td class="table_header_column"><fmt:message key="date_started" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${displayEvent.studyEvent.dateStarted}" pattern="${dteFormat}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="date_ended" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${displayEvent.studyEvent.dateEnded}" pattern="${dteFormat}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="status" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${displayEvent.studyEvent.workflowStatus.getDisplayValue()}"/>
@@ -89,10 +89,10 @@
 		<td class="table_cell"><fmt:formatDate value="${dec.eventCRF.dateInterviewed}" pattern="${dteFormat}"/></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.interviewerName}"/></td>
 		<td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" /></td>
-		<td class="table_cell"><c:out value="${dec.eventCRF.status.name}" /></td>
+		<td class="table_cell"><c:out value="${dec.eventCRF.workflowStatus.getDisplayValue()}" /></td>
 	 </tr>
- </c:forEach> 
- 
+ </c:forEach>
+
  </table>
 </div>
 </div></div></div></div></div></div></div></div>
@@ -110,16 +110,16 @@
       <input type="submit" name="submit" value="<fmt:message key="remove_event_from_study" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_event_has_CRF_data_shown" bundle="${resword}"/>");'>
          &nbsp;
        <input type="button" onclick="confirmCancel('ViewStudySubject?id=<c:out value="${studySub.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-     </form>    
+     </form>
     </c:when>
-    <c:otherwise>      
+    <c:otherwise>
       <form action='RemoveStudyEvent?action=submit&id=<c:out value="${displayEvent.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
         <input type="submit" name="submit" value="<fmt:message key="remove_event_from_study" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_remove_it" bundle="${resword}"/>");'>
           &nbsp;
         <input type="button" onclick="confirmCancel('ViewStudySubject?id=<c:out value="${studySub.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-      </form> 
+      </form>
     </c:otherwise>
-   </c:choose>  
- 
+   </c:choose>
+
 <br><br>
 <jsp:include page="../include/footer.jsp"/>

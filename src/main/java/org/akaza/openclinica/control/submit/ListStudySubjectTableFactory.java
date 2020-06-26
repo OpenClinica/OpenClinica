@@ -20,6 +20,7 @@ import core.org.akaza.openclinica.i18n.core.LocaleResolver;
 import core.org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import core.org.akaza.openclinica.service.*;
 import core.org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.ViewStudySubjectService;
@@ -93,6 +94,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ItemFormMetadataDao itemFormMetadataDao;
     private ResponseSetDao responseSetDao;
     private EventCrfDao eventCrfDao;
+    private StudySubjectDao studySubjectDao;
     private StudyEventDao studyEventDao;
     private CrfDao crfDao;
     private CrfVersionDao crfVersionDao;
@@ -435,7 +437,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             // key and a list of study events as the value.
             List<StudyEventBean> allStudyEventsForStudySubject = getStudyEventDAO().findAllByStudySubject(studySubjectBean);
             HashMap<Integer, List<StudyEventBean>> allStudyEventsForStudySubjectBySedId = new HashMap<Integer, List<StudyEventBean>>();
-            theItem.put("isSignable", isSignable(allStudyEventsForStudySubject, studySubjectBean));
+            theItem.put("isSignable", isSignable( studySubjectBean.getId()));
 
             for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
                 if (allStudyEventsForStudySubjectBySedId.get(studyEventBean.getStudyEventDefinitionId()) == null) {
@@ -486,45 +488,77 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     }
 
-    private Boolean isSignable(List<StudyEventBean> allStudyEventsForStudySubject, StudySubjectBean studySubjectBean) {
-        boolean isSignable = true;
-        boolean isRequiredUncomplete;
-        if (studySubjectBean.getStatus().isSigned()) {
+    private Boolean isSignable(int studySubjectId) {
+        boolean atLeastOneValidEventToSign = false;
+        StudySubject studySubject = studySubjectDao.findById(studySubjectId);
+        if (studySubject.getStatus().isSigned() || studySubject.getStudyEvents().size() == 0) {
             return false;
         }
-        for (StudyEventBean studyEventBean : allStudyEventsForStudySubject) {
-            if ((studyEventBean.getRemoved()==null || !studyEventBean.getRemoved()) &&(studyEventBean.getArchived()==null || !studyEventBean.getArchived()) && (studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.DATA_ENTRY_STARTED)
-                    || studyEventBean.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED) )) {
-                isSignable = false;
-                break;
-            } else {
-                isRequiredUncomplete = eventHasRequiredUncompleteCRFs(studyEventBean);
-                if (isRequiredUncomplete) {
-                    isSignable = false;
-                    break;
-                }
+
+        for (StudyEvent studyEvent : studySubject.getStudyEvents()) {
+
+            if (!studyEvent.isCurrentlyRemoved()
+                    && !studyEvent.isCurrentlyArchived()
+                    &&
+                    (
+                            (!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED)
+                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
+                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED)
+                                    && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
+                            )
+                                    || !isAllRequiredCrfsInEventCompleted(studyEvent, studySubject)
+                                    || !isAllFormsInEventCompletedOrNotStarted(studyEvent, studySubject)
+                    )
+            ) {
+                return false;
+            }
+            //At least one of the events is in Skipped, Stopped, or Completed status (excluding any events that are Archived = Yes or Removed = Yes)
+            if (!studyEvent.isCurrentlyRemoved()
+                    && !studyEvent.isCurrentlyArchived()
+                    && (studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.COMPLETED)
+                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SKIPPED)
+                    || studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.STOPPED))) {
+                atLeastOneValidEventToSign = true;
             }
         }
-        return isSignable;
+
+        return atLeastOneValidEventToSign ? true : false;
     }
 
-    @SuppressWarnings("unchecked")
-    private boolean eventHasRequiredUncompleteCRFs(StudyEventBean studyEventBean) {
 
-        List<EventCRFBean> eventCrfBeans = new ArrayList<EventCRFBean>();
-        eventCrfBeans.addAll(getEventCRFDAO().findAllByStudyEvent(studyEventBean));
-        // If the EventCRFBean has a completionStatusId of 0 (indicating that it
-        // is not complete),
-        // then find out whether it's required. If so, then return from the
-        // method false.
-        for (EventCRFBean crfBean : eventCrfBeans) {
-            if (crfBean != null && crfBean.getCompletionStatusId() == 0) {
-                if (getEventDefintionCRFDAO().isRequiredInDefinition(crfBean.getCRFVersionId(), studyEventBean, getStudyDAO())) {
-                    return true;
+    @SuppressWarnings( "unchecked" )
+    private boolean isAllRequiredCrfsInEventCompleted(StudyEvent studyEvent, StudySubject studySubject) {
+        EventDefinitionCrf edc = null;
+        for (EventCrf eventCrf : studyEvent.getEventCrfs()) {
+            if (!eventCrf.isCurrentlyRemoved() && !eventCrf.isCurrentlyArchived()) {
+                edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudyId());
+                if (edc == null) {
+                    edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudy().getStudyId());
                 }
+                if (!edc.getStatusId().equals(Status.DELETED.getId()) && !edc.getStatusId().equals(Status.AUTO_DELETED.getId())
+                        && edc.getRequiredCrf() && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED))
+                    return false;
             }
         }
-        return false;
+        return true;
+    }
+
+
+    private boolean isAllFormsInEventCompletedOrNotStarted(StudyEvent studyEvent, StudySubject studySubject) {
+        EventDefinitionCrf edc = null;
+        for (EventCrf eventCrf : studyEvent.getEventCrfs()) {
+            if (!eventCrf.isCurrentlyRemoved() && !eventCrf.isCurrentlyArchived()) {
+                edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudyId());
+                if (edc == null) {
+                    edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getFormLayout().getCrf().getCrfId(), studySubject.getStudy().getStudy().getStudyId());
+                }
+                if (!edc.getStatusId().equals(Status.DELETED.getId()) && !edc.getStatusId().equals(Status.AUTO_DELETED.getId())
+                        && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)
+                        && !eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.NOT_STARTED))
+                    return false;
+            }
+        }
+        return true;
     }
 
     private void getColumnNames() {
@@ -1855,6 +1889,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     public void setPermissionService(PermissionService permissionService) {
         this.permissionService = permissionService;
+    }
+
+    public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
+        this.studySubjectDao = studySubjectDao;
     }
 
     private String validateProperty(String property) {
