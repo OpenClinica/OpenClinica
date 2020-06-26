@@ -2311,6 +2311,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             errors.add(resPageMsg.getString("section_label_length_error"));
                         }
 
+                        if(secLabel.contains("'")){
+                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SECTION_LABEL_column")
+                                    + " value " + secLabel + " " + resPageMsg.getString("has_invalid_character")+ "\" ' \""+". "
+                                    + resPageMsg.getString("remove_invalid_character"));
+                        }
+
                         if (secNames.contains(secLabel)) {
                             // errors.add("The SECTION_LABEL column was a
                             // duplicate of " + secLabel + " at row " + k

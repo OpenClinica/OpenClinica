@@ -1347,6 +1347,12 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                             errors.add(resPageMsg.getString("section_label_length_error"));
                         }
 
+                        if(secLabel.contains("'")){
+                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SECTION_LABEL_column")
+                                    + " value " + secLabel + " " + resPageMsg.getString("has_invalid_character")+ "\" ' \""+". "
+                                    + resPageMsg.getString("remove_invalid_character"));
+                        }
+
                         if (secNames.contains(secLabel)) {
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SECTION_LABEL_column")
                                 + resPageMsg.getString("was_a_duplicate_of") + secLabel + " " + resPageMsg.getString("at_row") + " " + k + ", "
