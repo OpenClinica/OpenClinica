@@ -1576,7 +1576,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     study.setBoardUrl(boardUrl);
                 }
                 catch (Exception e) {
-                    e.printStackTrace();
                     logger.error(e.getMessage(), e);
                 }
             }
