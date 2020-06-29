@@ -13,6 +13,7 @@ import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import org.akaza.openclinica.controller.dto.StudyEnvironmentDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
+import core.org.akaza.openclinica.bean.login.StudyBuildDTO;
 import core.org.akaza.openclinica.dao.core.CoreResources;
 import core.org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -307,7 +308,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
             Study study = studyDao.findByStudyEnvUuid(uuidToFind);
 
-            
+
             if (study == null)
                 continue;
 
@@ -324,12 +325,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                     //request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
                 }
             }
-            // if current active study is still valid, then need to keep,because the active study is not always 
+            // if current active study is still valid, then need to keep,because the active study is not always
             // the first one in the study list come back from SBS call, so need to "refresh"
             if (study.getStudyId() == userActiveStudyId) {
-            	ub.setActiveStudy(study);        	           
+            	ub.setActiveStudy(study);
                 userAccountDao.saveOrUpdate(ub);
-            
+
                 currentActiveStudyValid = true;
             }
 
@@ -342,7 +343,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             	}else {
             		 ub.setActiveStudy(toUpdate);
             	}
-               
+
                 userAccountDao.saveOrUpdate(ub);
                 currentActiveStudyValid = true;
                 //if (!parentExists)
@@ -388,9 +389,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         // remove all the roles that are not there for this user
         removeDeletedUserRoles(modifiedSURArray, existingStudyUserRoles);
-        
-       
-        
+
+
+
         // If role sizes are different update the flag
         if (modifiedSURArray.size() != existingStudyUserRoles.size())
             studyUserRoleUpdated = true;
@@ -624,7 +625,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             request.getSession().setAttribute("baseUserRole", role.getRoleName());
         }
     }
-    
+
     private void removeDeletedUserRoles(ArrayList<StudyUserRole> modifiedStudyUserRoles, Collection<StudyUserRole> existingStudyUserRoles) {
         existingStudyUserRoles.removeIf(existingStudyUserRole -> modifiedStudyUserRoles.stream().anyMatch(
                 modifiedStudyUserRole -> existingStudyUserRole.getId().getStudyId().equals(modifiedStudyUserRole.getId().getStudyId())));
@@ -730,8 +731,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         headers.add("Accept-Charset", "UTF-8");
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, entity, JsonNode.class);
-        return response.getBody().get("currentBoardUrl").asText();
+        ResponseEntity<StudyBuildDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyBuildDTO.class);
+
+        return response.getBody().getCurrentBoardUrl();
     }
 
 }
