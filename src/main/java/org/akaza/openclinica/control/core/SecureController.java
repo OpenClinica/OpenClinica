@@ -50,14 +50,11 @@ import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
-<<<<<<< HEAD
 import core.org.akaza.openclinica.web.InconsistentStateException;
 import core.org.akaza.openclinica.web.InsufficientPermissionException;
 import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
-=======
->>>>>>> master
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -548,14 +545,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                             currentStudy.setStudy(getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getStudy().getUniqueIdentifier()));
                     }
                 }
-<<<<<<< HEAD
                 setStudy(currentStudy, session);
             }
             else {
-=======
-                session.setAttribute("study", currentStudy);
-            } else {
->>>>>>> master
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                 currentStudy = (Study) getStudyDao().findStudyWithSPVByUniqueId(currentPublicStudy.getUniqueIdentifier());
                 setStudy(currentStudy, session);
