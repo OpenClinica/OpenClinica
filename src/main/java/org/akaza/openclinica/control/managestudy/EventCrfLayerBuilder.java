@@ -109,6 +109,9 @@ public class EventCrfLayerBuilder {
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
         String subjectText = reswords.getString("subject");
         String crfText = reswords.getString("CRF");
+        String signText = reswords.getString("signed");
+        String lockText = reswords.getString("locked");
+        String archiveText = reswords.getString("archived");
 
         // Event Div
         html.div().id("Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount)
@@ -127,6 +130,17 @@ public class EventCrfLayerBuilder {
         html.append(crfText).append(": ").append(crf.getName()).br();
 
         html.append("Status").append(": ").append(eventCrfWorkflowStatus.getDisplayValue()).br();
+        if (getStudyEvent() != null) {
+            if (getStudyEvent().isSigned()) {
+                html.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
+            }
+            if (getStudyEvent().isLocked()) {
+                html.append("<span class=\"icon icon-lock-new status\" alt=" + lockText + " title=" + lockText + " style=\"margin-right: 5px;\"></span>");
+            }
+        }
+        if (eventCrfBean.isArchived()) {
+            html.append("<span class=\"icon icon-archived-new status\" alt=" + archiveText + " title=" + archiveText + " style=\"margin-right: 5px;\"></span>");
+        }
         html.tdEnd();
         html.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
         if (eventCrfBean.isRemoved() || eventCrfBean.isArchived()) {
