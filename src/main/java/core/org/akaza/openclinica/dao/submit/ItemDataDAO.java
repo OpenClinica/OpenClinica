@@ -555,4 +555,49 @@ public class ItemDataDAO extends AuditableEntityDAO {
             aeb.setUpdaterId(updateId.intValue());
         }
     }
+
+    public boolean isItemExists(int item_id, int ordinal_for_repeating_group_field, int event_crf_id) {
+
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.INT);
+        this.setTypeExpected(3, TypeNames.INT);
+
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(item_id));
+        variables.put(new Integer(2), new Integer(ordinal_for_repeating_group_field));
+        variables.put(new Integer(3), new Integer(event_crf_id));
+
+        ArrayList alist = this.select(digester.getQuery("isItemExists"), variables);
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public int getMaxOrdinalForGroupByGroupOID(String item_group_oid, int event_crf_id) {
+
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.STRING);
+
+        HashMap variables = new HashMap(1);
+        variables.put(new Integer(1), new Integer(event_crf_id));
+        variables.put(new Integer(2), item_group_oid);
+
+        ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByGroupOID"), variables);
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            try {
+                HashMap hm = (HashMap) it.next();
+                Integer max = (Integer) hm.get("max_ord");
+                return max.intValue();
+            } catch (Exception e) {
+            }
+        }
+
+        return 0;
+    }
 }
