@@ -27,6 +27,7 @@ import core.org.akaza.openclinica.bean.login.ResponseSuccessSiteDTO;
 import core.org.akaza.openclinica.bean.login.ResponseSuccessStudyDTO;
 import core.org.akaza.openclinica.bean.login.SiteDTO;
 import core.org.akaza.openclinica.bean.login.StudyDTO;
+import core.org.akaza.openclinica.bean.login.StudyBuildDTO;
 import core.org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.login.UserRole;
@@ -294,13 +295,13 @@ public class StudyController {
         return  new ResponseEntity(studyEnvStatusDTO, org.springframework.http.HttpStatus.OK);
     }
 
-    private List<StudyParameterValue> processStudyParameterValues(HashMap<String, Object> map, ArrayList<ErrorObj> errorObjects , String templateID) {
+    private List<StudyParameterValue> processStudyParameterValues(StudyBuildDTO dto, ArrayList<ErrorObj> errorObjects , String templateID) {
         List<StudyParameterValue> studyParameterValues = new ArrayList<>();
-        String collectBirthDate = (String) map.get("collectDateOfBirth");
-        Boolean collectSex = (Boolean) map.get("collectSex");
-        String collectPersonId = (String) map.get("collectPersonId");
-        Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
-        String enforceEnrollmentCap =  String.valueOf(map.get("enforceEnrollmentCap"));
+        String collectBirthDate = dto.getCollectDateOfBirth();
+        Boolean collectSex = dto.getCollectSex();
+        String collectPersonId = dto.getCollectPersonId();
+        Boolean showSecondaryId = dto.isShowSecondaryId();
+        Boolean enforceEnrollmentCap =  dto.isEnforceEnrollmentCap();
         if (templateID != null && !StringUtils.isEmpty(templateID)) {
             studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.SUBJECT_ID_GENERATION, "auto non-editable"));
             studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.PARTICIPANT_ID_TEMPLATE, templateID));
@@ -373,7 +374,7 @@ public class StudyController {
             studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, "false"));
         }
         else
-            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, enforceEnrollmentCap));
+            studyParameterValues.add(createStudyParameterValueWithHandleAndValue(StudyParamNames.ENFORCE_ENROLLMENT_CAP, Boolean.toString(enforceEnrollmentCap)));
 
         return studyParameterValues;
     }
@@ -387,13 +388,12 @@ public class StudyController {
 
     @RequestMapping(value = "/", method = RequestMethod.PUT)
     public ResponseEntity<Object> UpdateStudy(HttpServletRequest request,
-                                              @RequestBody HashMap<String, Object> map) throws Exception {
+                                              @RequestBody StudyBuildDTO dto) throws Exception {
         ArrayList<ErrorObj> errorObjects = new ArrayList();
         logger.info("In Update Study Settings");
         ResponseEntity<Object> response = null;
 
-        StudyParameters parameters = new StudyParameters(map);
-        parameters.setParameters();
+        StudyParameters parameters = new StudyParameters(dto);
         errorObjects = parameters.validateParameters(request);
 
         // get the study to update
@@ -428,7 +428,7 @@ public class StudyController {
 
 
     private class StudyParameters {
-        HashMap<String, Object> map;
+        StudyBuildDTO dto;
         String uniqueStudyID;
         String name;
         String studyOid;
@@ -448,25 +448,22 @@ public class StudyController {
         String studyUuid;
 
 
-        public StudyParameters(HashMap<String, Object> map) {
-            this.map = map;
-        }
-
-        void setParameters() {
-            uniqueStudyID = (String) map.get("uniqueStudyID");
-            name = (String) map.get("briefTitle");
-            studyOid = (String) map.get("studyEnvOid");
-            studyEnvUuid = (String) map.get("studyEnvUuid");
-            description = (String) map.get("description");
-            studyType = (String) map.get("type");
-            phase = (String) map.get("phase");
-            startDateStr = (String) map.get("expectedStartDate");
-            endDateStr = (String) map.get("expectedEndDate");
-            expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
-            status = setStatus((String) map.get("status"));
-            templateID = (String) map.get("participantIdTemplate");
-            enrollmentCap = (Boolean) map.get("enforceEnrollmentCap");
-            studyUuid = (String) map.get("uuid");
+        public StudyParameters(StudyBuildDTO dto) {
+            this.dto = dto;
+            uniqueStudyID = dto.getUniqueStudyID();
+            name = dto.getBriefTitle();
+            studyOid = dto.getStudyEnvOid();
+            studyEnvUuid = dto.getStudyEnvUuid();
+            description = dto.getDescription();
+            studyType = dto.getType();
+            phase = dto.getPhase();
+            startDateStr = dto.getExpectedStartDate();
+            endDateStr = dto.getExpectedEndDate();
+            expectedTotalEnrollment = dto.getExpectedTotalEnrollment();
+            status = setStatus(dto.getStatus());
+            templateID = dto.getParticipantIdTemplate();
+            enrollmentCap = dto.isEnforceEnrollmentCap();
+            studyUuid = dto.getUuid();
         }
 
         core.org.akaza.openclinica.domain.Status setStatus(String myStatus) {
@@ -564,7 +561,7 @@ public class StudyController {
                 errorObjects.add(errorObject);
             }
 
-            studyParameterValues = processStudyParameterValues(map, errorObjects, templateID);
+            studyParameterValues = processStudyParameterValues(dto, errorObjects, templateID);
             Locale locale = new Locale("en_US");
             request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
             ResourceBundleProvider.updateLocale(locale);
@@ -611,13 +608,12 @@ public class StudyController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
-                                                 @RequestBody HashMap<String, Object> map) throws Exception {
+                                                 @RequestBody StudyBuildDTO dto) throws Exception {
         StudyDTO studyDTO = new StudyDTO();
         logger.info("In Create Study");
         ResponseEntity<Object> response = null;
 
-        StudyParameters parameters = new StudyParameters(map);
-        parameters.setParameters();
+        StudyParameters parameters = new StudyParameters(dto);
         ArrayList<ErrorObj> errorObjects = parameters.validateParameters(request);
         Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(parameters.studyOid);
         String envType = "";
