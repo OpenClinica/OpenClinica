@@ -446,7 +446,7 @@ public class StudyController {
         String templateID;
         Boolean enrollmentCap;
         String studyUuid;
-
+        String currentBoardUrl;
 
         public StudyParameters(StudyBuildDTO dto) {
             this.dto = dto;
@@ -464,6 +464,7 @@ public class StudyController {
             templateID = dto.getParticipantIdTemplate();
             enrollmentCap = dto.isEnforceEnrollmentCap();
             studyUuid = dto.getUuid();
+            currentBoardUrl = dto.getCurrentBoardUrl();
         }
 
         core.org.akaza.openclinica.domain.Status setStatus(String myStatus) {
@@ -548,6 +549,13 @@ public class StudyController {
                 errorObjects.add(errorObject);
             } else {
                 studyUuid = studyUuid.trim();
+            }
+
+            if (StringUtils.isEmpty(currentBoardUrl)) {
+                ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "currentBoardUrl");
+                errorObjects.add(errorObject);
+            } else {
+                currentBoardUrl = currentBoardUrl.trim();
             }
 
             if (status == null ) {
@@ -702,6 +710,7 @@ public class StudyController {
         }
         study.setStatus(parameters.status);
         study.setStudyUuid(parameters.studyUuid);
+        study.setBoardUrl(parameters.currentBoardUrl);
     }
 
     private Study createSchemaStudy(HttpServletRequest request, Study study, UserAccountBean ownerUserAccount) throws Exception {
