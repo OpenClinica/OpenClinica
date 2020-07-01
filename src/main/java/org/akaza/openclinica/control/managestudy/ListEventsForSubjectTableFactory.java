@@ -900,13 +900,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         String schedule = resword.getString("schedule");
         String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
-        ;
         String remove = resword.getString("remove");
-        ;
         String subjectText = resword.getString("subject");
-        ;
         String eventText = resword.getString("event");
-        ;
+        String signText = resword.getString("signed");
+        String lockText = resword.getString("locked");
+        String archiveText = resword.getString("archived");
 
         StudyEventWorkflowStatusEnum eventStatus = studyEvents.size() == 0 ? StudyEventWorkflowStatusEnum.NOT_SCHEDULED : studyEvents.get(0).getWorkflowStatus();
         // String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
@@ -919,6 +918,17 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
         eventDiv.append(resword.getString("status")).append(": ").append(eventStatus.getDisplayValue()).br();
+        if (studyEvents.size() > 0) {
+            if (studyEvents.get(0).isSigned()) {
+                eventDiv.append("<span class=\"icon icon-stamp-new status\" alt=" + signText + " title=" + signText + " style=\"margin-right: 5px;\"></span>");
+            }
+            if (studyEvents.get(0).isLocked()) {
+                eventDiv.append("<span class=\"icon icon-lock-new status\" alt=" + lockText + " title=" + lockText + " style=\"margin-right: 5px;\"></span>");
+            }
+            if (studyEvents.get(0).isArchived()) {
+                eventDiv.append("<span class=\"icon icon-archived-new status\" alt=" + archiveText + " title=" + archiveText + " style=\"margin-right: 5px;\"></span>");
+            }
+        }
         eventDiv.tdEnd();
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
         linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
