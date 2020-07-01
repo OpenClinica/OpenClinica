@@ -119,12 +119,6 @@ public class ViewDatasetsServlet extends SecureController {
                 EntityBeanTable table = fp.getEntityBeanTable();
 
                 ArrayList datasets = (ArrayList) dsdao.findByOwnerId(ownerId, currentStudy.getStudyId());
-
-                /*
-                 * if (datasets.isEmpty()) {
-                 * forwardPage(Page.VIEW_EMPTY_DATASETS); } else {
-                 */
-
                 ArrayList datasetRows = DatasetRow.generateRowsFromBeans(datasets);
                 String[] columns =
                     { resword.getString("dataset_name"), resword.getString("description"), resword.getString("created_by"), resword.getString("created_date"),

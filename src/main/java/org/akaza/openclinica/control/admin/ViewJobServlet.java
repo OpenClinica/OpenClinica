@@ -62,8 +62,6 @@ public class ViewJobServlet extends ScheduleJobServlet {
                 DatasetBean dataset = (DatasetBean) datasetDAO.findByPK(dsId);
                 triggerBean.setDataset(dataset);
                 triggerBean.setDatasetName(dataset.getName());
-                Study study = getStudyDao().findByPK(dataset.getStudyId());
-                triggerBean.setStudyName(study.getName());
                 triggerBean.setJobUuid(trigger.getKey().getName());
             }
             logger.debug("Trigger Priority: " + trigger.getKey().getName() + " " + trigger.getPriority());
@@ -83,16 +81,10 @@ public class ViewJobServlet extends ScheduleJobServlet {
         table.setSortingIfNotExplicitlySet(0, true); // sort by name
         String[] columns =
                 {resword.getString("name"), resword.getString("previous_fire_time"), resword.getString("next_fire_time"), resword.getString("description"),
-                        resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"), resword.getString("actions")};
+                        resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("actions")};
         table.setColumns(new ArrayList(Arrays.asList(columns)));
-        table.hideColumnLink(0);
-        table.hideColumnLink(1);
-        table.hideColumnLink(2);
         table.hideColumnLink(3);
-        table.hideColumnLink(4);
-        table.hideColumnLink(5);
         table.hideColumnLink(6);
-        table.hideColumnLink(7);
         table.setQuery("ViewJob", new HashMap());
         table.setRows(allRows);
         table.computeDisplay();
