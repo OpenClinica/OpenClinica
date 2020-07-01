@@ -148,7 +148,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(getFilters(request), getDateFormat(), discrepancyNoteTypesDecoder,
                 resolutionStatusDecoder);
-        List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(currentStudy, filter, ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)), getPermissionTagsList());
 
 
         ListNotesTableFactory factory = new ListNotesTableFactory(true, getPermissionTagsList());
@@ -163,7 +162,9 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         factory.setEventDefinitionCrfDao(getEventDefinitionCrfDao());
         factory.setPermissionTagDao(getPermissionTagDao());
         factory.setStudyEventDefinitionHibDao(getStudyEventDefinitionDao());
+        factory.setViewNotesService(viewNotesService);
 
+        List<DiscrepancyNoteBean> notes = factory.listNotes(currentStudy, filter, ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)), getPermissionTagsList());
         int columnCount = factory.getNetCountCustomColumns(currentStudy, request);
         for (DiscrepancyNoteBean note : notes) {
             if (note.getEntityType().equals(ListNotesTableFactory.ITEM_DATA)) {
