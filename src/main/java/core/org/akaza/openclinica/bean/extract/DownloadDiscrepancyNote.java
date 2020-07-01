@@ -50,6 +50,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         RESOLUTION_STATUS_MAP.put(3,"Resolution Proposed");
         RESOLUTION_STATUS_MAP.put(4,"Closed");
         RESOLUTION_STATUS_MAP.put(5,"Not Applicable");
+        RESOLUTION_STATUS_MAP.put(6,"Closed-Modified");
     }
 
     //Does the user want the first line of the CSV to be column headers
@@ -325,7 +326,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName()));
             writer.append(",");
         }
-
         writer.append(escapeQuotesInCSV(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId())+""));
         writer.append(",");
 
