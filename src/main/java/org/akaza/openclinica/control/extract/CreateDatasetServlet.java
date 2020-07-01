@@ -545,7 +545,6 @@ public class CreateDatasetServlet extends SecureController {
 
                     if (!db.getItemMap().containsKey(selectedItem.getDatasetItemMapKey())) {
                         // logger.info("one item selected");
-                        logger.info("one item selected");
                         db.getItemIds().add(new Integer(selectedItem.getId()));
                         if (selectedItem.getDefId() == 0) {
                             db.getItemMap().put(defId + "_" + selectedItem.getId(), selectedItem);
@@ -554,8 +553,8 @@ public class CreateDatasetServlet extends SecureController {
                         }
                         db.getItemDefCrf().add(selectedItem);
                     }
-
                 } else {
+
                 	if(crfId == -1) {
                 		if(db.getItemMap().containsKey(selectedItem.getDatasetItemMapKey())) {
                             for (int j = 0; j < db.getItemDefCrf().size(); ++j) {

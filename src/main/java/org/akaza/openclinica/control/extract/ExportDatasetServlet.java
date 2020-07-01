@@ -549,18 +549,13 @@ public class ExportDatasetServlet extends SecureController {
 
         ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
         EntityBeanTable table = fp.getEntityBeanTable();
-        table.setSortingIfNotExplicitlySet(3, false);// sort by date
+        table.setSortingIfNotExplicitlySet(4, false);// sort by date
         String[] columns =
                 {resword.getString("dataset_format"), resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
                         resword.getString("created_by"), resword.getString("status"), resword.getString("job_type"), resword.getString("action")};
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(0);
-        table.hideColumnLink(1);
         table.hideColumnLink(2);
-        table.hideColumnLink(3);
-        table.hideColumnLink(4);
-        table.hideColumnLink(5);
-        table.hideColumnLink(6);
         table.hideColumnLink(7);
         table.hideColumnLink(8);
 

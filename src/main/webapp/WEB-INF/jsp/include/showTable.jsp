@@ -9,8 +9,7 @@
 <c:set var="rowURL" value="${param.rowURL}" />
 <c:set var="outerFormName" value="${param.outerFormName}" />
 <c:set var="searchFormOnClickJS" value="${param.searchFormOnClickJS}" />
-<c:set var="viewSingleJob" value="${param.viewSingleJob}" />
-<c:set var="exportDataset" value="${param.exportDataset}" />
+
 <c:choose>
 	<c:when test='${(outerFormName != null) && (outerFormName != "")}'><c:set var="searchFormDisplayed" value="${0}"/></c:when>
 	<c:otherwise><c:set var="searchFormDisplayed" value="${1}"/></c:otherwise>
@@ -40,7 +39,6 @@
 <c:set var="removeFilterQuery" value="${table.baseGetQuery}&module=${module}&ebl_page=${table.currPageNumber}&ebl_sortColumnInd=${table.sortingColumnInd}&ebl_sortAscending=${ascending}&ebl_filtered=0&ebl_filterKeyword=&ebl_paginated=${paginated}" />
 
 
-
 <!-- These DIVs define shaded box borders -->
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 	<tr>
@@ -55,18 +53,18 @@
 		<td width="33%" class="table_actions">
             <table border="0" cellpadding="0" cellspacing="0">
 
-                <td valign="top" style="white-space:nowrap;" class="table_tools">
+                <td valign="top" class="table_tools">
                     <c:if test="${table.paginated && (table.currPageNumber > 1)}">
                         <a href="<c:out value="${firstPageQuery}"/>"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>
                         <a href="<c:out value="${prevPageQuery}"/>"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>
                     </c:if>
                 </td>
-                <td valign="top" style="white-space:nowrap;" class="table_tools">
+                <td valign="top" class="table_tools">
                     <c:choose>
                         <c:when test="${empty table.rows}"> <fmt:message key="no_pages" bundle="${resword}"/></c:when>
                         <c:otherwise> <fmt:message key="page" bundle="${resword}"/> <c:out value="${table.currPageNumber}" /> <fmt:message key="of" bundle="${resword}"/> <c:out value="${table.totalPageNumbers}" /> </td></c:otherwise>
                     </c:choose>
-                <td valign="top" style="white-space:nowrap;" class="table_tools">
+                <td valign="top" class="table_tools">
                     <c:if test="${table.paginated && (table.currPageNumber < table.totalPageNumbers)}">
                         <a href="<c:out value="${nextPageQuery}"/>"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>
                         <a href="<c:out value="${lastPageQuery}"/>"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>
@@ -88,29 +86,27 @@
                 <input type="hidden" name="ebl_sortAscending" value="<c:out value="${ascending}"/>"/>
                 <input type="hidden" name="ebl_filtered" value="1" />
                 <input type="hidden" name="ebl_paginated" value="<c:out value="${paginated}"/>" />
-                <c:if test="${viewSingleJob!='true' && exportDataset!='true'}">
-                    <table border="0" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td valign="top">
-                                <div class="formfieldM_BG">
-                                    <input name="ebl_filterKeyword" type="text" class="formfieldM" value="" />
-                                </div>
-                            </td>
-                            <td valign="top">
-                                <input type="submit" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>"
-                                    <c:choose>
-                                        <c:when test="${searchFormDisplayed == 0}">
-                                            onClick="if (document.<c:out value="${outerFormName}"/>.ebl_filterKeyword.value == '') return false; document.<c:out value="${outerFormName}"/>.elements['submitted'].value=0;document.<c:out value="${outerFormName}"/>.elements['action'].value='';<c:out value="${searchFormOnClickJS}" escapeXml="false" />"
-                                        </c:when>
-                                        <c:otherwise>
-                                            onClick="if (document.forms[0].ebl_filterKeyword.value == '') return false;"
-                                        </c:otherwise>
-                                    </c:choose>
-                                />
-                            </td>
-                        </tr>
-                    </table>
-                </c:if>
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td valign="top">
+                            <div class="formfieldM_BG">
+                                <input name="ebl_filterKeyword" type="text" class="formfieldM" value="" />
+                            </div>
+                        </td>
+                        <td valign="top">
+                            <input type="submit" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>"
+                                <c:choose>
+                                    <c:when test="${searchFormDisplayed == 0}">
+                                        onClick="if (document.<c:out value="${outerFormName}"/>.ebl_filterKeyword.value == '') return false; document.<c:out value="${outerFormName}"/>.elements['submitted'].value=0;document.<c:out value="${outerFormName}"/>.elements['action'].value='';<c:out value="${searchFormOnClickJS}" escapeXml="false" />"
+                                    </c:when>
+                                    <c:otherwise>
+                                        onClick="if (document.forms[0].ebl_filterKeyword.value == '') return false;"
+                                    </c:otherwise>
+                                </c:choose>
+                            />
+                        </td>
+                    </tr>
+                </table>
             </table>
 		</td>
 	
