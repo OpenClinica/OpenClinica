@@ -218,7 +218,8 @@ public class EventCrfLayerBuilder {
             // if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() ||
             // currentUser.isSysAdmin())) {
             if (!currentRole.isMonitor() && subjectStudy.getStatus() == Status.AVAILABLE && !getStudyEvent().isLocked()) {
-                if (!hiddenCrf()) {
+                if (!hiddenCrf() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
+                        && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED ) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
@@ -246,7 +247,9 @@ public class EventCrfLayerBuilder {
                 clearEventCrf(html, eventCrfBean, studySubject, reswords.getString("clear_form"));
                 html.tdEnd().trEnd(0);
             }
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable) && !getStudyEvent().isLocked()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)
+                    && !getStudyEvent().isLocked() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
@@ -316,7 +319,9 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
 
-            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable) && !getStudyEvent().isLocked()) {
+            if (subjectStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor() && (numberOfVersions > 1 || otherVersionAvailable)
+                    && !getStudyEvent().isLocked() && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.SKIPPED
+                    && getStudyEvent().getWorkflowStatus() != StudyEventWorkflowStatusEnum.STOPPED) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 reassignEventCrf(html, eventDefinitionCrf, eventCrfBean, crf, studySubject);
