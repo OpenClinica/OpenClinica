@@ -485,10 +485,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 //Just the parent of the thread?  discNoteThread.getLinkedNoteList()
                 for(DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()){
                     //DiscrepancyNoteBean discNoteBean = discNoteThread.getLinkedNoteList().getFirst();
-                    if(discNoteBean.getParentDnId()==0) {
                         pdfDoc.add(this.createTableFromBean(discNoteBean));
                         pdfDoc.add(new Paragraph("\n"));
-                    }
                 }
             }
             //pdfDoc.add(new Paragraph(content));
@@ -567,11 +565,11 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 for(DiscrepancyNoteBean discNoteBean : dnThread.getLinkedNoteList()){
                     //DiscrepancyNoteBean discNoteBean = dnThread.getLinkedNoteList().getFirst();
                     ++counter;
-                    if(discNoteBean.getParentDnId()==0) {
+
 
                         singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter) : serializeToString(discNoteBean, false, threadCounter);
                         allContent.append(singleBeanContent);
-                    }
+
                 }
             }
         }
