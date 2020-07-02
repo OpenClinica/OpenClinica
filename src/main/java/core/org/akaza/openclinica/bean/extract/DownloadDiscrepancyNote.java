@@ -348,7 +348,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(escapeQuotesInCSV(discNoteBean.getCrfName()));
         writer.append(",");
 
-        writer.append(escapeQuotesInCSV(discNoteBean.getCrfStatus()));
+        writer.append(escapeQuotesInCSV(discNoteBean.getEventCrfWorkflowStatus().getDisplayValue()));
         writer.append(",");
 
         String itemGroupName = discNoteBean.getItemGroupName() == null
@@ -693,7 +693,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             tmpStrBuilder.append(dnBean.getCrfName());
             tmpStrBuilder.append("\n");
             tmpStrBuilder.append("Status: ");
-            tmpStrBuilder.append(dnBean.getCrfStatus());
+            tmpStrBuilder.append(dnBean.getEventCrfWorkflowStatus().getDisplayValue());
             content.append(dnBean.getCrfName());
 
             cell = new Cell(new Paragraph(tmpStrBuilder.toString(), new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0))));

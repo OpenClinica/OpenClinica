@@ -329,7 +329,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("eventName", discrepancyNoteBean.getEventName());
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
             h.put("crfName", discrepancyNoteBean.getCrfName());
-            h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
+            h.put("crfStatus", discrepancyNoteBean.getEventCrfWorkflowStatus().getDisplayValue());
             h.put("entityName", discrepancyNoteBean.getEntityName());
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
             DiscrepancyNoteBean parentdNBean;
