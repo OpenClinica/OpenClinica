@@ -849,21 +849,39 @@ public class RuleSetService implements RuleSetServiceInterface {
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByGroupOrdinal(java.util.List)
      */
     public List<RuleSetBean> filterRuleSetsByGroupOrdinal(List<RuleSetBean> ruleSets) {
-
-        for (RuleSetBean ruleSetBean : ruleSets) {
+  	         
+    	for (RuleSetBean ruleSetBean : ruleSets) {
             List<ExpressionBean> expressionsWithCorrectGroupOrdinal = new ArrayList<ExpressionBean>();
+            
+           /**
+	       	 * get the itemDataSize by studyEventId,itemGroupOid,itemOid for the whole study
+	       	 * only run once
+	       	 */  
+	       	String itemOid = getExpressionService().getItemOid(ruleSetBean.getExpressions().get(0).getValue());
+	        String itemGroupOid = getExpressionService().getItemGroupOid(ruleSetBean.getExpressions().get(0).getValue());
+           
+            HashMap itemDataCountHm = getItemDataDao().findCountByStudyEventAndOIDs(ruleSetBean.getStudyId(), itemOid, itemGroupOid);
+           
+            
+            int itemDataSize = 0; 
+            
             for (ExpressionBean expression : ruleSetBean.getExpressions()) {
-                String studyEventId = getExpressionService().getStudyEventDefinitionOrdninalCurated(expression.getValue());
-                String itemOid = getExpressionService().getItemOid(expression.getValue());
-                String itemGroupOid = getExpressionService().getItemGroupOid(expression.getValue());
-                String groupOrdinal = getExpressionService().getGroupOrdninalCurated(expression.getValue());
-                List<ItemDataBean> itemDatas = getItemDataDao().findByStudyEventAndOids(Integer.valueOf(studyEventId), itemOid, itemGroupOid);
-                logger.debug("studyEventId {} , itemOid {} , itemGroupOid {} , groupOrdinal {} , itemDatas {}", new Object[] { studyEventId, itemOid,
-                    itemGroupOid, groupOrdinal, itemDatas.size() });
-
+            	
+            	 String studyEventId = getExpressionService().getStudyEventDefinitionOrdninalCurated(expression.getValue());
+                 itemOid = getExpressionService().getItemOid(expression.getValue());
+                 itemGroupOid = getExpressionService().getItemGroupOid(expression.getValue());
+                 String groupOrdinal = getExpressionService().getGroupOrdninalCurated(expression.getValue());                            
+                 String key = studyEventId + itemGroupOid +itemOid;
+                 
+                 if(itemDataCountHm.containsKey(key)) {
+                 	itemDataSize = ((Integer)itemDataCountHm.get(key)).intValue();
+                 	logger.debug("studyEventId {} , itemOid {} , itemGroupOid {} , groupOrdinal {} , itemDatas {}", new Object[] { studyEventId, itemOid,
+                              itemGroupOid, groupOrdinal, itemDataSize });
+                 }
+            	
                 // case 1 : group ordinal = ""
-                if (groupOrdinal.equals("") && itemDatas.size() > 0) {
-                    for (int k = 0; k < itemDatas.size(); k++) {
+                if (groupOrdinal.equals("") && itemDataSize > 0) {
+                    for (int k = 0; k < itemDataSize; k++) {
                         ExpressionBean expBean = new ExpressionBean();
                         expBean.setValue(getExpressionService().replaceGroupOidOrdinalInExpression(expression.getValue(), k + 1));
                         expBean.setContext(expression.getContext());
@@ -871,12 +889,14 @@ public class RuleSetService implements RuleSetServiceInterface {
                     }
                 }
                 // case 2 : group ordinal = x and itemDatas should be size >= x
-                if (!groupOrdinal.equals("") && itemDatas.size() >= Integer.valueOf(groupOrdinal)) {
+                if (!groupOrdinal.equals("") && itemDataSize >= Integer.valueOf(groupOrdinal)) {
                     ExpressionBean expBean = new ExpressionBean();
                     expBean.setValue(getExpressionService().replaceGroupOidOrdinalInExpression(expression.getValue(), null));
                     expBean.setContext(expression.getContext());
                     expressionsWithCorrectGroupOrdinal.add(expBean);
                 }
+                
+                itemDataSize = 0; 
             }
             ruleSetBean.setExpressions(expressionsWithCorrectGroupOrdinal);
         }
