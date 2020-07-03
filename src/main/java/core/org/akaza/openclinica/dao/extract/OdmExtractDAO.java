@@ -723,7 +723,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<Integer, Integer> cvIdPoses = new HashMap<Integer, Integer>();
 
         this.setStudyEventAndFormMetaTypesExpected();
-        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, true, showArchivedSql(showArchived)));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, true, showArchivedSql(showArchived), permissionTagsString));
         Iterator it = rows.iterator();
         String sedprev = "";
         MetaDataVersionProtocolBean protocol = metadata.getProtocol();
@@ -784,17 +784,17 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    public void getMetadata(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion) {
+    public void getMetadata(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
         if (odmVersion.equalsIgnoreCase("occlinical_data"))
             odmVersion = "oc1.3";
 
         if ("oc1.3".equals(odmVersion)) {
             // this.getOCMetadata(parentStudyId, study, metadata, odmVersion);
-            this.getMetadataOC1_3(parentStudy, study, metadata, odmVersion);
+            this.getMetadataOC1_3(parentStudy, study, metadata, odmVersion, permissionTags);
         } else if ("oc1.2".equals(odmVersion)) {
-            this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion);
+            this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion, permissionTags);
         } else {
-            this.getODMMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion);
+            this.getODMMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion, permissionTags);
         }
     }
 
@@ -973,14 +973,14 @@ public class OdmExtractDAO extends DatasetDAO {
     /**
      * metadata for ODM extraction only
      */
-    public void getODMMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
+    public void getODMMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
         String cvIds = "";
         HashMap<Integer, Integer> cvIdPoses = new HashMap<Integer, Integer>();
         this.setStudyEventAndFormMetaTypesExpected();
 
         logger.debug("Begin to execute GetStudyEventAndFormMetaSql");
-        logger.info("getStudyEventAndFormMetaSQl= " + this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false, showArchivedSql(showArchived)));
-        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false, showArchivedSql(showArchived)));
+        logger.info("getStudyEventAndFormMetaSQl= " + this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false, showArchivedSql(showArchived), permissionTags));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false, showArchivedSql(showArchived), permissionTags));
         Iterator it = rows.iterator();
         String sedprev = "";
         MetaDataVersionProtocolBean protocol = metadata.getProtocol();
@@ -1364,8 +1364,8 @@ public class OdmExtractDAO extends DatasetDAO {
      * @param metadata
      * @param odmVersion
      */
-    public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
-        this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion);
+    public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
+        this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion, permissionTags);
 
         String cvIds = metadata.getCvIds();
         if (odmVersion.startsWith("oc")) {
@@ -1526,7 +1526,7 @@ public class OdmExtractDAO extends DatasetDAO {
         // return nullClSet;
     }
 
-    public void getStudyEventAndFormMetaOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, boolean isIncludedSite) {
+    public void getStudyEventAndFormMetaOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, boolean isIncludedSite, String permissionTags) {
         ArrayList<StudyEventDefBean> seds = (ArrayList<StudyEventDefBean>) metadata.getStudyEventDefs();
         ArrayList<FormDefBean> forms = (ArrayList<FormDefBean>) metadata.getFormDefs();
 
@@ -1550,9 +1550,9 @@ public class OdmExtractDAO extends DatasetDAO {
 
         this.setStudyEventAndFormMetaOC1_3TypesExpected();
         logger.debug("Begin to execute GetStudyEventAndFormMetaOC1_3Sql");
-        logger.debug("getStudyEventAndFormMetaOC1_3SQl= {} ", this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived)));
+        logger.debug("getStudyEventAndFormMetaOC1_3SQl= {} ", this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived), permissionTags));
 
-        ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived)));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudy.getStudyId(), study.getStudyId(), isIncludedSite, showArchivedSql(showArchived), permissionTags));
         Iterator iter = rows.iterator();
         String sedOIDs = "";
         while (iter.hasNext()) {
@@ -1665,8 +1665,8 @@ public class OdmExtractDAO extends DatasetDAO {
         return formDetail;
     }
 
-    public void getMetadataOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion) {
-        this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion);
+    public void getMetadataOC1_3(Study parentStudy, Study study, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
+        this.getOCMetadata(parentStudy.getStudyId(), study.getStudyId(), metadata, odmVersion, permissionTags);
 
         // StudyBean study = metadata.getStudy();
         // if(study.getId()>0) {
@@ -1677,7 +1677,7 @@ public class OdmExtractDAO extends DatasetDAO {
         // StudyConfigService studyConfig = new StudyConfigService(this.ds);
         // study = studyConfig.setParametersForStudy(study);
 
-        this.getStudyEventAndFormMetaOC1_3(parentStudy, study, metadata, odmVersion, false);
+        this.getStudyEventAndFormMetaOC1_3(parentStudy, study, metadata, odmVersion, false, permissionTags);
 
         String cvIds = metadata.getCvIds();
         ArrayList<ItemGroupDefBean> igs = (ArrayList<ItemGroupDefBean>) metadata.getItemGroupDefs();
@@ -3371,22 +3371,23 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getStudyEventAndFormMetaSql(int parentStudyId, int studyId, boolean isIncludedSite, String[]
-            showArchived) {
+            showArchived, String permissionTags) {
         return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, cv.crf_version_id,"
                 + " sed.oc_oid as definition_oid, sed.name as definition_name, sed.repeating as definition_repeating,"
                 + " sed.type as definition_type, cv.oc_oid as cv_oid,"
                 + " cv.name as cv_name, edc.required_crf as cv_required, edc.null_values, crf.name as crf_name,crf.oc_oid as crf_oid ,sed.status_id as sed_status_id,edc.status_id as edc_status_id"
-                + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived);
+                + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived, permissionTags);
     }
 
     protected String getStudyEventAndFormMetaOC1_3Sql(int parentStudyId, int studyId,
-                                                      boolean isIncludedSite, String[] showArchived) {
+                                                      boolean isIncludedSite, String[] showArchived,
+                                                      String permissionTags) {
         return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, cv.crf_version_id,"
                 + " sed.oc_oid as definition_oid, cv.oc_oid as cv_oid,"
                 + " sed.description, sed.category, cv.description as version_description, cv.revision_notes,"
                 + " crf.oc_oid as crf_oid, crf.description as crf_description, edc.null_values, edc.default_version_id, edc.electronic_signature,"
                 + " edc.double_entry, edc.hide_crf, edc.participant_form,edc.allow_anonymous_submission,edc.submission_url,case when edc_tag.active is null then false else edc_tag.active end, edc.source_data_verification_code,sed.status_id as sed_status_id,edc.status_id as edc_status_id"
-                + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived);
+                + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived, permissionTags);
     }
 
     protected String studyEventAndFormMetaTables() {
@@ -3397,10 +3398,17 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String studyEventAndFormMetaCondition(int parentStudyId, int studyId,
-                                                    boolean isIncludedSite, String[] showArchived) {
+                                                    boolean isIncludedSite, String[] showArchived,
+                                                    String permissionTags) {
+        String checkPermissionTag = " and (sed.type != 'common' or pt.permission_tag_id is null ";
+        if (!permissionTags.isEmpty()) {
+            checkPermissionTag += " or pt.permission_tag_id in (" + permissionTags + ")";
+        }
+        checkPermissionTag += ")";
+
         return " where sed.study_id = " + parentStudyId + " " + showArchived[0] + " and "
                 + this.getEventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite) + " " + showArchived[1] + " and edc.crf_id = crf.crf_id "
-                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3] + " and (sed.type != 'common' or pt.permission_tag_id is null or pt.permission_tag_id in (" + permissionTags + ")) "
+                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3] + checkPermissionTag
                 + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 

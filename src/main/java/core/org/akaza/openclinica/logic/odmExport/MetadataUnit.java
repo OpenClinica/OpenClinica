@@ -268,7 +268,7 @@ public class MetadataUnit extends OdmUnit {
             // studyId,
             // metadata, this.getODMBean().getODMVersion());
             // studyBase.setNullClSet(nullCodeSet);
-            oedao.getMetadata(study.isSite() ? study.getStudy() : study , study, metadata, this.odmBean.getODMVersion());
+            oedao.getMetadata(study.isSite() ? study.getStudy() : study , study, metadata, this.odmBean.getODMVersion(), permissionTagsString);
             metadata.setRuleSetRules(getRuleSetRuleDao().findByRuleSetStudyIdAndStatusAvail(parentStudyId));
         }
     }
