@@ -90,9 +90,9 @@
         </c:choose>
     </td>
     <td class="table_cell"><c:out value="${note.eventName}" />&nbsp;</td>
-    <td class="table_cell"><c:out value="${note.eventStart}" />&nbsp;</td>
+    <td class="table_cell"><fmt:formatDate value="${note.eventStart}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><c:out value="${note.crfName}" />&nbsp;</td>
-    <td class="table_cell"><c:out value="${note.crfStatus}" />&nbsp;</td>
+    <td class="table_cell"><c:out value="${note.eventCrfWorkflowStatus.displayValue}" />&nbsp;</td>
     <td class="table_cell">
         <c:out value="${note.entityName}"/>&nbsp;    
     </td>

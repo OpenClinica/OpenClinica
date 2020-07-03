@@ -768,14 +768,23 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             String n = audit.getNewValue();
             String vt = audit.getValueType();
             String details = (audit.getDetails() != null) ? audit.getDetails() : "";
-
+            ResourceBundle resterm = ResourceBundleProvider.getTermsBundle(locale);
             if (vt.equals("Archived") || vt.equals("Removed") || vt.equals("Locked") || vt.equals("Signed")) {
                 if (o.equals("true")) o = "Yes";
                 if (n.equals("true")) n = "Yes";
                 if (o.equals("false")) o = "No";
                 if (n.equals("false")) n = "No";
             }
-
+            if(audit.getAuditLogEventTypeId() ==32 ){
+                if(StringUtils.isEmpty(o))
+                    o = "Null";
+                else if(resterm.getString(o) != null)
+                    o = resterm.getString(o);
+                if(StringUtils.isEmpty(n))
+                    n ="Null";
+                else if(resterm.getString(n) != null)
+                    n = resterm.getString(n);
+            }
             if (getAuditLogEventTypes().contains(audit.getAuditLogEventTypeId()) && o.length() > 0) {
                 o = StringEscapeUtils.escapeXml("Masked");
             }
