@@ -10,7 +10,7 @@
 
 
 	<xsl:output method="text" indent="yes" encoding="utf-8"
-		standalone="yes" />
+		standalone="yes" use-character-maps="quot"/>
 	<xsl:strip-space elements="*" />
 
 	<!-- Parameterized separator/end of line characters for flexibility -->
@@ -26,6 +26,17 @@
 	
 	<xsl:variable name="delimiter" select="$sep" />
 	<xsl:variable name="studyEventDefOID" select="//odm:StudyEventDef[@OID]" />
+	<xsl:variable name="filename">
+		<xsl:value-of select="base-uri()" />
+	</xsl:variable>
+	<xsl:character-map name="quot">
+		<!--PROPOSAL1-->
+<!--		<xsl:output-character character="&#x22;" string="/&#x22;" />-->
+		<!--PROPOSAL3-->
+<!--		<xsl:output-character character="&#x22;" string=" &#x22;" />-->
+		<!--PROPOSAL2-->
+		<xsl:output-character character="&#x22;" string="&amp;quot;" />
+	</xsl:character-map>
 
 	<xsl:key name="eventCRFs"
 		match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"
