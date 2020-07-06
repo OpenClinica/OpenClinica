@@ -539,6 +539,11 @@
         <servlet-name>ViewSiteServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewSiteServlet</servlet-class>
     </servlet>
+    <servlet>
+        <display-name>CreateDiscrepancyNote</display-name>
+        <servlet-name>CreateDiscrepancyNoteServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet</servlet-class>
+    </servlet>
 
     <!-- Export Excel -->
     <servlet>
@@ -1334,6 +1339,10 @@
     <servlet-mapping>
         <servlet-name>ViewDicomServlet</servlet-name>
         <url-pattern>/ViewDicom</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateDiscrepancyNoteServlet</servlet-name>
+        <url-pattern>/CreateDiscrepancyNote</url-pattern>
     </servlet-mapping>
 
     <!--  Export Excel -->

@@ -4,10 +4,7 @@ import core.org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 
 import java.util.ArrayList;
 
-/**
- * @author thickerson
- */
-public class ArchivedDatasetFileRow extends EntityBeanRow {
+public class ArchivedDatasetFileRowScheduledJobs extends EntityBeanRow {
 
     public static final int COL_DATASETFORMAT = 0;
     public static final int COL_FILENAME = 1;
@@ -16,17 +13,16 @@ public class ArchivedDatasetFileRow extends EntityBeanRow {
     public static final int COL_FILECREATEDDATE = 4;
     public static final int COL_FILEOWNER = 5;
     public static final int COL_STATUS = 6;
-    public static final int COL_JOB_TYPE = 7;
-    public static final int COL_ACTION = 8;
+    public static final int COL_ACTION = 7;
 
     @Override
     protected int compareColumn(Object row, int sortingColumn) {
-        if (!row.getClass().equals(ArchivedDatasetFileRow.class)) {
+        if (!row.getClass().equals(ArchivedDatasetFileRowScheduledJobs.class)) {
             return 0;
         }
 
         ArchivedDatasetFileBean thisAccount = (ArchivedDatasetFileBean) bean;
-        ArchivedDatasetFileBean argAccount = (ArchivedDatasetFileBean) ((ArchivedDatasetFileRow) row).bean;
+        ArchivedDatasetFileBean argAccount = (ArchivedDatasetFileBean) ((ArchivedDatasetFileRowScheduledJobs) row).bean;
 
         int answer = 0;
         switch (sortingColumn) {
@@ -57,9 +53,8 @@ public class ArchivedDatasetFileRow extends EntityBeanRow {
     @Override
     public String getSearchString() {
         ArchivedDatasetFileBean thisAccount = (ArchivedDatasetFileBean) bean;
-        return thisAccount.getFormat() + " " + thisAccount.getName() + " " +
-                thisAccount.getDateCreated() + " " + thisAccount.getOwner() + " " +
-                thisAccount.getStatus() + " " + thisAccount.getJobType();
+        return thisAccount.getFormat() + " " + thisAccount.getName() + " " + thisAccount.getDateCreated() + " " +
+                thisAccount.getOwner() + " " + thisAccount.getStatus();
     }
 
     public static ArrayList generateRowsFromBeans(ArrayList beans) {
@@ -67,7 +62,7 @@ public class ArchivedDatasetFileRow extends EntityBeanRow {
 
         for (int i = 0; i < beans.size(); i++) {
             try {
-                ArchivedDatasetFileRow row = new ArchivedDatasetFileRow();
+                ArchivedDatasetFileRowScheduledJobs row = new ArchivedDatasetFileRowScheduledJobs();
                 row.setBean((ArchivedDatasetFileBean) beans.get(i));
                 answer.add(row);
             } catch (Exception e) {

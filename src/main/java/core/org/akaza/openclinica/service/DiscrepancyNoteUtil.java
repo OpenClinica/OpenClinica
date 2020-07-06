@@ -661,6 +661,7 @@ public class DiscrepancyNoteUtil {
                      * getResolutionStatusId()));
                      * }
                      */
+                    childBean.setEventCrfWorkflowStatus(discBean.getEventCrfWorkflowStatus());
                     tempDNThread.getLinkedNoteList().offer(childBean);
                 }
             }

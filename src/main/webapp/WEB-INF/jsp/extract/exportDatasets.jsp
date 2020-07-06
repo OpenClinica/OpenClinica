@@ -100,7 +100,6 @@
 
 <c:import url="../include/showTable.jsp">
     <c:param name="rowURL" value="showArchivedDatasetFileRow.jsp" />
-    <c:param name="exportDataset" value="true"/>
 </c:import>
 
 <jsp:include page="../include/footer.jsp"/>

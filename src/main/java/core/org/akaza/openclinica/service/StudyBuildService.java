@@ -57,4 +57,7 @@ public interface StudyBuildService {
     public void setRequestSchemaByStudy(String ocId);
 
     public void setRequestSchemaByStudyOrParentStudy(String ocId);
+
+    public String getCurrentBoardUrl(String accessToken, Study study);
+
 }

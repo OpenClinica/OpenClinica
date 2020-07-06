@@ -9,7 +9,7 @@ import core.org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import core.org.akaza.openclinica.dao.extract.DatasetDAO;
 import core.org.akaza.openclinica.dao.login.UserAccountDAO;
 import core.org.akaza.openclinica.service.extract.XsltTriggerService;
-import core.org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
+import core.org.akaza.openclinica.web.bean.ArchivedDatasetFileRowScheduledJobs;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 import core.org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -64,7 +64,6 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
         String jobUuid = fp.getString("jobUuid");
         String triggerName = fp.getString("tname");
         String gName = fp.getString("gname");
-        String filterKeyword = fp.getString("ebl_filterKeyword");
         String groupName = "";
         if (gName.equals("") || gName.equals("0")) {
             groupName = TRIGGER_EXPORT_GROUP;
@@ -123,20 +122,15 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
 
                 ArchivedDatasetFileDAO archivedDatasetFileDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
                 ArrayList<ArchivedDatasetFileBean> archivedDatasetFileBeans = archivedDatasetFileDAO.findByJobUuid(jobUuid);
-                ArrayList allRows = ArchivedDatasetFileRow.generateRowsFromBeans(archivedDatasetFileBeans);
+                ArrayList allRows = ArchivedDatasetFileRowScheduledJobs.generateRowsFromBeans(archivedDatasetFileBeans);
                 EntityBeanTable table = fp.getEntityBeanTable();
-                table.setSortingIfNotExplicitlySet(3, false); // sort by date
+                table.setSortingIfNotExplicitlySet(4, false); // sort by date
                 String[] columns =
                         {resword.getString("dataset_format"), resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
                                 resword.getString("created_by"), resword.getString("status"), resword.getString("action")};
                 table.setColumns(new ArrayList(Arrays.asList(columns)));
                 table.hideColumnLink(0);
-                table.hideColumnLink(1);
                 table.hideColumnLink(2);
-                table.hideColumnLink(3);
-                table.hideColumnLink(4);
-                table.hideColumnLink(5);
-                table.hideColumnLink(6);
                 table.hideColumnLink(7);
 
                 HashMap args = new HashMap();
@@ -145,9 +139,7 @@ public class ViewSingleJobServlet extends ScheduleJobServlet {
                 args.put("jobUuid", new String(jobUuid).toString());
                 table.setQuery("ViewSingleJob", args);
                 table.setRows(allRows);
-                if (filterKeyword != null && !"".equalsIgnoreCase(filterKeyword)) {
-                    table.setKeywordFilter(filterKeyword);
-                }
+
                 table.computeDisplay();
 
                 request.setAttribute("table", table);

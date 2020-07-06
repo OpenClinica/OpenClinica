@@ -17,8 +17,7 @@ public class TriggerRow extends EntityBeanRow {
     public static final int COL_DESCRIPTION = 3;
 	public static final int COL_PERIOD = 4;
 	public static final int COL_DATASET_NAME = 5;
-	public static final int COL_STUDY_NAME = 6;
-    public static final int COL_JOB_UUID = 7;
+    public static final int COL_JOB_UUID = 6;
 	
 	@Override
 	protected int compareColumn(Object row, int sortingColumn) {
@@ -49,9 +48,6 @@ public class TriggerRow extends EntityBeanRow {
 		case COL_DATASET_NAME:
             answer = thisTrigger.getDatasetName().compareTo(argTrigger.getDatasetName());
             break;
-		case COL_STUDY_NAME:
-			answer = thisTrigger.getStudyName().compareTo(argTrigger.getStudyName());
-			break;
         case COL_JOB_UUID:
             answer = thisTrigger.getJobUuid().compareTo(argTrigger.getJobUuid());
         }
@@ -73,9 +69,6 @@ public class TriggerRow extends EntityBeanRow {
 	
 	public static ArrayList generateRowsFromBeans(ArrayList beans) {
         ArrayList answer = new ArrayList();
-
-        Class[] parameters = null;
-        Object[] arguments = null;
 
         for (int i = 0; i < beans.size(); i++) {
             try {

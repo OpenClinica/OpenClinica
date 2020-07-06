@@ -98,8 +98,7 @@
 </div>
 
 <c:import url="../include/showTable.jsp">
-    <c:param name="rowURL" value="../extract/showArchivedDatasetFileRow.jsp" />
-    <c:param name="viewSingleJob" value="true"/>
+    <c:param name="rowURL" value="../extract/showArchivedDatasetFileRowScheduledJobs.jsp" />
     <c:param name="jobUuid" value="${triggerBean.jobUuid}"/>
     <c:param name="tname" value="${triggerBean.fullName}"/>
     <c:param name="gname" value=""/>

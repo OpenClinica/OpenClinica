@@ -4,8 +4,10 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-
 <script language="JavaScript">
+window.onload = function(){
+    $(".enableSaveOnload").prop("disabled", false);
+}
 <!--
 
 function selectAll() {
@@ -96,8 +98,8 @@ function notSelectAll() {
 <p><b><fmt:message key="show_items_this_dataset" bundle="${restext}"/></b></p>
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
-   <td><input type="submit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
-   <td><input type="submit" name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="submit" disabled name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
+   <td><input type="submit" disabled name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
    <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
   </tr>
 </table>
@@ -107,8 +109,8 @@ function notSelectAll() {
 
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
-   <td><input type="submit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
-   <td><input type="submit" name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong"/></td>
+   <td><input type="submit" disabled name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
+   <td><input type="submit" disabled name="saveContinue" value="<fmt:message key="save_and_define_scope" bundle="${resword}"/>" class="button_xlong enableSaveOnload"/></td>
    <td><input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></td>
   </tr>
 </table>

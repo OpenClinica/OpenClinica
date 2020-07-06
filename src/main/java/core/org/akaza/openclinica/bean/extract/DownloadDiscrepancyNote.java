@@ -50,6 +50,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         RESOLUTION_STATUS_MAP.put(3,"Resolution Proposed");
         RESOLUTION_STATUS_MAP.put(4,"Closed");
         RESOLUTION_STATUS_MAP.put(5,"Not Applicable");
+        RESOLUTION_STATUS_MAP.put(6,"Closed-Modified");
     }
 
     //Does the user want the first line of the CSV to be column headers
@@ -325,7 +326,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName()));
             writer.append(",");
         }
-
         writer.append(escapeQuotesInCSV(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId())+""));
         writer.append(",");
 
@@ -348,7 +348,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(escapeQuotesInCSV(discNoteBean.getCrfName()));
         writer.append(",");
 
-        writer.append(escapeQuotesInCSV(discNoteBean.getCrfStatus()));
+        writer.append(escapeQuotesInCSV(discNoteBean.getEventCrfWorkflowStatus().getDisplayValue()));
         writer.append(",");
 
         String itemGroupName = discNoteBean.getItemGroupName() == null
@@ -485,10 +485,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 //Just the parent of the thread?  discNoteThread.getLinkedNoteList()
                 for(DiscrepancyNoteBean discNoteBean : discNoteThread.getLinkedNoteList()){
                     //DiscrepancyNoteBean discNoteBean = discNoteThread.getLinkedNoteList().getFirst();
-                    if(discNoteBean.getParentDnId()==0) {
                         pdfDoc.add(this.createTableFromBean(discNoteBean));
                         pdfDoc.add(new Paragraph("\n"));
-                    }
                 }
             }
             //pdfDoc.add(new Paragraph(content));
@@ -567,11 +565,11 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
                 for(DiscrepancyNoteBean discNoteBean : dnThread.getLinkedNoteList()){
                     //DiscrepancyNoteBean discNoteBean = dnThread.getLinkedNoteList().getFirst();
                     ++counter;
-                    if(discNoteBean.getParentDnId()==0) {
+
 
                         singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter) : serializeToString(discNoteBean, false, threadCounter);
                         allContent.append(singleBeanContent);
-                    }
+
                 }
             }
         }
@@ -695,7 +693,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             tmpStrBuilder.append(dnBean.getCrfName());
             tmpStrBuilder.append("\n");
             tmpStrBuilder.append("Status: ");
-            tmpStrBuilder.append(dnBean.getCrfStatus());
+            tmpStrBuilder.append(dnBean.getEventCrfWorkflowStatus().getDisplayValue());
             content.append(dnBean.getCrfName());
 
             cell = new Cell(new Paragraph(tmpStrBuilder.toString(), new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0))));

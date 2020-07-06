@@ -217,11 +217,44 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         limit.setRowSelect(null);
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
                 resolutionStatusDropdown.getDecoder());
-        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
+        List<DiscrepancyNoteBean> items = listNotes(getCurrentStudy(), filter,
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet(), itemDao), userTags);
         return items;
     }
 
+    public List<DiscrepancyNoteBean> listNotes(Study currentStudy, ViewNotesFilterCriteria filter,
+                                        ViewNotesSortCriteria sort, List<String> userTags){
+        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(currentStudy, filter,
+                sort, userTags);
+        for(DiscrepancyNoteBean discrepancyNoteBean : items) {
+            int item_data_id = 0;
+            int study_event_id = 0;
+            ItemData itemData = null;
+            StudyEvent studyEvent = null;
+            StudyEventDefinition studyEventDefinition = null;
+
+            if (discrepancyNoteBean.getEntityType().equals("itemData")) {
+                item_data_id = discrepancyNoteBean.getEntityId();
+                itemData = itemDataDao.findById(item_data_id);
+                discrepancyNoteBean.setEntityName(itemData.getItem().getName());
+                discrepancyNoteBean.setEntityValue(itemData.getValue());
+                EventCrf eventCrf = itemData.getEventCrf();
+                CrfBean crf = eventCrf.getCrfVersion().getCrf();
+                discrepancyNoteBean.setCrfName(crf.getName());
+                studyEvent = eventCrf.getStudyEvent();
+                discrepancyNoteBean.setEventCrfWorkflowStatus(eventCrf.getWorkflowStatus());
+                studyEventDefinition = studyEvent.getStudyEventDefinition();
+                discrepancyNoteBean.setEventName(studyEventDefinition.getName());
+                discrepancyNoteBean.setEventStart(studyEvent.getDateStart());
+
+            } else if (discrepancyNoteBean.getEntityType().equals("studyEvent")) {
+                study_event_id = discrepancyNoteBean.getEntityId();
+                studyEvent = studyEventDao.findById(study_event_id);
+                discrepancyNoteBean.setEventName(studyEvent.getStudyEventDefinition().getName());
+            }
+        }
+        return items;
+    }
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
         // initialize i18n
@@ -261,7 +294,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     resolutionStatusDropdown.getDecoder());
         }
 
-        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
+        List<DiscrepancyNoteBean> items = listNotes(getCurrentStudy(), filter,
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet(), itemDao), userTags);
 
         this.setAllNotes(items);
@@ -271,31 +304,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         DiscrepancyNoteBean dNBean;
 
         for (DiscrepancyNoteBean discrepancyNoteBean : items) {
-            int item_data_id = 0;
-            int study_event_id = 0;
-            ItemData itemData = null;
-            StudyEvent studyEvent = null;
-            StudyEventDefinition studyEventDefinition = null;
-
-            if (discrepancyNoteBean.getEntityType().equals("itemData")) {
-                item_data_id = discrepancyNoteBean.getEntityId();
-                itemData = itemDataDao.findById(item_data_id);
-                discrepancyNoteBean.setEntityName(itemData.getItem().getName());
-                discrepancyNoteBean.setEntityValue(itemData.getValue());
-                EventCrf eventCrf = itemData.getEventCrf();
-                CrfBean crf = eventCrf.getCrfVersion().getCrf();
-                discrepancyNoteBean.setCrfName(crf.getName());
-                studyEvent = eventCrf.getStudyEvent();
-                discrepancyNoteBean.setEventCrfWorkflowStatus(eventCrf.getWorkflowStatus());
-                studyEventDefinition = studyEvent.getStudyEventDefinition();
-                discrepancyNoteBean.setEventName(studyEventDefinition.getName());
-                discrepancyNoteBean.setEventStart(studyEvent.getDateStart());
-
-            } else if (discrepancyNoteBean.getEntityType().equals("studyEvent")) {
-                study_event_id = discrepancyNoteBean.getEntityId();
-                studyEvent = studyEventDao.findById(study_event_id);
-                discrepancyNoteBean.setEventName(studyEvent.getStudyEventDefinition().getName());
-            }
 
 
             HashMap<Object, Object> h = new HashMap<Object, Object>();
@@ -329,7 +337,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("eventName", discrepancyNoteBean.getEventName());
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
             h.put("crfName", discrepancyNoteBean.getCrfName());
-            h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
+            h.put("crfStatus", discrepancyNoteBean.getEventCrfWorkflowStatus().getDisplayValue());
             h.put("entityName", discrepancyNoteBean.getEntityName());
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
             DiscrepancyNoteBean parentdNBean;

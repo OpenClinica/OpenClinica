@@ -69,9 +69,6 @@ import java.util.*;
  * 
  * @author ssachs
  * @see EntityBeanRow
- * @see org.akaza.openclinica.control.admin.ListUserAccountsServlet <p>Method
- *      'computeDisplay()' modified by ywang to remove duplicated items when
- *      search by keywords.
  */
 public class EntityBeanTable {
     /**
