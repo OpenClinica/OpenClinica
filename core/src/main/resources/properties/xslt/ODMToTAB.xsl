@@ -3271,7 +3271,7 @@
 										</xsl:when>
 										<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
 											<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull" />
-											<xsl:value-of select="$delimiter" />												
+											<xsl:value-of select="$delimiter" />
 										</xsl:when>
 										<xsl:otherwise>
 											<xsl:value-of select="$delimiter" />
@@ -3291,7 +3291,7 @@
 										</xsl:when>
 										<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
 											<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull" />
-											<xsl:value-of select="$delimiter" />												
+											<xsl:value-of select="$delimiter" />
 										</xsl:when>
 										<xsl:otherwise>
 											<xsl:value-of select="$delimiter" />
@@ -3311,7 +3311,7 @@
 										</xsl:when>
 										<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
 											<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull" />
-											<xsl:value-of select="$delimiter" />												
+											<xsl:value-of select="$delimiter" />
 										</xsl:when>
 										<xsl:otherwise>
 											<xsl:value-of select="$delimiter" />
@@ -3331,7 +3331,7 @@
 										</xsl:when>
 										<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
 											<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull" />
-											<xsl:value-of select="$delimiter" />												
+											<xsl:value-of select="$delimiter" />
 										</xsl:when>
 										<xsl:otherwise>
 											<xsl:value-of select="$delimiter" />
