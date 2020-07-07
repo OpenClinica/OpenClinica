@@ -19,6 +19,8 @@ import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.SdvStatus;
 import org.apache.commons.lang3.BooleanUtils;
 
+import javax.persistence.Column;
+
 /**
  * <P>
  * EventCRFBean, the object that collects data on a subject while filling out a
@@ -65,6 +67,9 @@ public class EventCRFBean extends AuditableEntityBean {
     private EventCrfWorkflowStatusEnum workflowStatus;
     private Boolean removed;
     private Boolean archived;
+    private Boolean required;
+    private Boolean relevant;
+    private Boolean editable;
 
     public EventCRFBean(EventCrfWorkflowStatusEnum workflowStatus) {
         this.workflowStatus = workflowStatus;
@@ -628,4 +633,37 @@ public class EventCRFBean extends AuditableEntityBean {
     public boolean isArchived() {
         return BooleanUtils.isTrue(this.getArchived());
     }
+
+    public Boolean getRequired() {
+        return required;
+    }
+    public void setRequired(Boolean required) {
+        this.required = required;
+    }
+
+    public Boolean getRelevant() {
+        return relevant;
+    }
+    public void setRelevant(Boolean relevant) {
+        this.relevant = relevant;
+    }
+
+    public Boolean getEditable() {
+        return editable;
+    }
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    public boolean isRequired() {
+        return BooleanUtils.isTrue(this.getRequired());
+    }
+    public boolean isRelevant() {
+        return BooleanUtils.isTrue(this.getRelevant());
+    }
+    public boolean isEditable() {
+        return BooleanUtils.isTrue(this.getEditable());
+    }
+
+
 }

@@ -56,6 +56,9 @@ public class EventCrf extends DataMapDomainObject {
     private EventCrfWorkflowStatusEnum workflowStatus;
     private Boolean removed;
     private Boolean archived;
+    private Boolean required;
+    private Boolean relevant;
+    private Boolean editable;
 
 
     static Comparator<EventCrf> compareByOrdinal;
@@ -445,6 +448,30 @@ public class EventCrf extends DataMapDomainObject {
         this.archived = archived;
     }
 
+    @Column(name = "required")
+    public Boolean getRequired() {
+        return required;
+    }
+    public void setRequired(Boolean required) {
+        this.required = required;
+    }
+
+    @Column(name = "relevant")
+    public Boolean getRelevant() {
+        return relevant;
+    }
+    public void setRelevant(Boolean relevant) {
+        this.relevant = relevant;
+    }
+
+    @Column(name = "editable")
+    public Boolean getEditable() {
+        return editable;
+    }
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
     @Transient
     public boolean isCurrentlyRemoved() {
         return BooleanUtils.isTrue(this.getRemoved());
@@ -452,5 +479,17 @@ public class EventCrf extends DataMapDomainObject {
     @Transient
     public boolean isCurrentlyArchived() {
         return BooleanUtils.isTrue(this.getArchived());
+    }
+    @Transient
+    public boolean isCurrentlyRequired() {
+        return BooleanUtils.isTrue(this.getRequired());
+    }
+    @Transient
+    public boolean isCurrentlyRelevant() {
+        return BooleanUtils.isTrue(this.getRelevant());
+    }
+    @Transient
+    public boolean isCurrentlyEditable() {
+        return BooleanUtils.isTrue(this.getEditable());
     }
   }

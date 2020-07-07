@@ -1218,6 +1218,27 @@
 		</insert>
 	</changeSet>
 
+	<changeSet author="jmcinerney" id="2020-07-07-OC-13098-01">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="63"/>
+			<column name="name" value="event_crf_required"/>
+		</insert>
+	</changeSet>
+
+	<changeSet author="jmcinerney" id="2020-07-07-OC-13098-02">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="64"/>
+			<column name="name" value="event_crf_relevant"/>
+		</insert>
+	</changeSet>
+
+	<changeSet author="jmcinerney" id="2020-07-07-OC-13098-03">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="65"/>
+			<column name="name" value="event_crf_editable"/>
+		</insert>
+	</changeSet>
+
 	<changeSet author="jkeremian" id="2015-12-08-OC-6847">
 		<comment>Insert a new record in the studyParameter table</comment>
 		<insert tableName="study_parameter">
