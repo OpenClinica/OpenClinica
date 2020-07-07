@@ -26,9 +26,6 @@
 	
 	<xsl:variable name="delimiter" select="$sep" />
 	<xsl:variable name="studyEventDefOID" select="//odm:StudyEventDef[@OID]" />
-	<xsl:variable name="filename">
-		<xsl:value-of select="base-uri()" />
-	</xsl:variable>
 	<xsl:character-map name="quot">
 		<xsl:output-character character="&#x22;" string="&amp;quot;" />
 	</xsl:character-map>
