@@ -53,8 +53,6 @@ public class AuditEventCrfAspect {
     public boolean eventCrfIsTheSame(EventCrf eventCrf){
         EventCrf existingEventCrf = getExistingEventCrf(eventCrf);
 
-        //EventCrf existingEventCrf = eventCrfDao.findById(eventCrf.getEventCrfId());
-
         if (existingEventCrf != null){
             if (areEventCrfStatusesTheSame(eventCrf, existingEventCrf)) {
                 log.info("AoP: eventCRF is the same! Skipping kafka message.");

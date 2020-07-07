@@ -17,16 +17,23 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.header.internals.RecordHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class KafkaService {
+
+    protected final Logger log = LoggerFactory.getLogger(getClass().getName());
+
     @Autowired
     UserAccountDao userAccountDao;
     @Autowired
@@ -227,7 +234,8 @@ public class KafkaService {
         eventAttributeChangeDTO.setEventWorkflowStatus(studyEventBean.getWorkflowStatus().getEnglishDisplayValue());
 
         if (studyEventBean.getCreatedDate() != null){
-            eventAttributeChangeDTO.setEventStartDate(studyEventBean.getCreatedDate().toString());
+            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd");
+            eventAttributeChangeDTO.setEventStartDate(dateTimeFormatter.format(studyEventBean.getDateStarted()));
         }
         if (studyEventBean.getRemoved() != null){
             eventAttributeChangeDTO.setEventRemoved(studyEventBean.getRemoved().toString());
@@ -263,9 +271,10 @@ public class KafkaService {
         }
         eventAttributeChangeDTO.setEventRepeatKey(getEventRepeatKey(studyEvent));
         if (studyEvent.getDateCreated() != null){
-            eventAttributeChangeDTO.setEventStartDate(studyEvent.getDateCreated().toString());
+            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd");
+            eventAttributeChangeDTO.setEventStartDate(dateTimeFormatter.format(studyEvent.getDateStart()));
         }
-        eventAttributeChangeDTO.setEventWorkflowStatus(studyEvent.getWorkflowStatus().name());
+        eventAttributeChangeDTO.setEventWorkflowStatus(studyEvent.getWorkflowStatus().getEnglishDisplayValue());
         if (studyEvent.getRemoved() != null){
             eventAttributeChangeDTO.setEventRemoved(studyEvent.getRemoved().toString());
         }
