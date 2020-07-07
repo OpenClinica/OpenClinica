@@ -10,14 +10,12 @@
 
 
 	<xsl:output method="text" indent="yes" encoding="utf-8"
-		standalone="yes"/>
+		standalone="yes" use-character-maps="quot"/>
 	<xsl:strip-space elements="*" />
 
 	<!-- Parameterized separator/end of line characters for flexibility -->
 	<xsl:param name="sep" select="'&#x09;'" />
 	<xsl:param name="eol" select="'&#10;'" />
-<!--	PROPOSAL 5 -->
-	<xsl:param name="space" select="'&#32;'" />
 	<!--E to represent Events -->
 	<xsl:variable name="E" select="'E'" />
 	<xsl:variable name="C" select="'C'" />
@@ -31,14 +29,9 @@
 	<xsl:variable name="filename">
 		<xsl:value-of select="base-uri()" />
 	</xsl:variable>
-	<!--<xsl:character-map name="quot">
-		&lt;!&ndash;PROPOSAL1&ndash;&gt;
-&lt;!&ndash;		<xsl:output-character character="&#x22;" string="/&#x22;" />&ndash;&gt;
-		&lt;!&ndash;PROPOSAL3&ndash;&gt;
-&lt;!&ndash;		<xsl:output-character character="&#x22;" string=" &#x22;" />&ndash;&gt;
-		&lt;!&ndash;PROPOSAL2&ndash;&gt;
+	<xsl:character-map name="quot">
 		<xsl:output-character character="&#x22;" string="&amp;quot;" />
-	</xsl:character-map>-->
+	</xsl:character-map>
 
 	<xsl:key name="eventCRFs"
 		match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"
@@ -1257,10 +1250,8 @@
 				<xsl:when test="$eventRepeatKey">
 					<xsl:choose>
 						<xsl:when test="count($subjectItemRepeating) &gt; 0">
-							<xsl:value-of select="$space"/>
 							<xsl:value-of select="$itemData/@Value" />
 							<xsl:value-of select="$delimiter" />
-							<xsl:value-of select="$space"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="$delimiter" />
@@ -1270,10 +1261,8 @@
 				<xsl:otherwise>
 					<xsl:choose>
 						<xsl:when test="count($subjectItemSingle) &gt; 0">
-							<xsl:value-of select="$space"/>
 							<xsl:value-of select="$itemData/@Value" />
 							<xsl:value-of select="$delimiter" />
-							<xsl:value-of select="$space"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="$delimiter" />
@@ -3272,10 +3261,8 @@
 									 <!--itemData oid:<xsl:value-of select="$itemData/@ItemOID"/>-->
 									<xsl:choose>
 										<xsl:when test="$itemData/@Value">
-											<xsl:value-of select="$space"/>
 											<xsl:value-of select="$itemData/@Value" />
 											<xsl:value-of select="$delimiter" />
-											<xsl:value-of select="$space"/>
 										</xsl:when>
 										<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
 											<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull" />
@@ -3294,10 +3281,8 @@
 									 <!--itemData oid:<xsl:value-of select="$itemData/@ItemOID"/>-->
 									<xsl:choose>
 										<xsl:when test="$itemData/@Value">
-											<xsl:value-of select="$space"/>
 											<xsl:value-of select="$itemData/@Value" />
 											<xsl:value-of select="$delimiter" />
-											<xsl:value-of select="$space"/>
 										</xsl:when>
 										<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
 											<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull" />
@@ -3316,10 +3301,8 @@
 									<!-- itemData oid:<xsl:value-of select="$itemData/@ItemOID"/>-->
 									<xsl:choose>
 										<xsl:when test="$itemData/@Value">
-											<xsl:value-of select="$space"/>
 											<xsl:value-of select="$itemData/@Value" />
 											<xsl:value-of select="$delimiter" />
-											<xsl:value-of select="$space"/>
 										</xsl:when>
 										<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
 											<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull" />
@@ -3338,10 +3321,8 @@
 									<!-- itemData oid:<xsl:value-of select="$itemData/@ItemOID"/>-->
 									<xsl:choose>
 										<xsl:when test="$itemData/@Value">
-											<xsl:value-of select="$space"/>
 											<xsl:value-of select="$itemData/@Value" />
 											<xsl:value-of select="$delimiter" />
-											<xsl:value-of select="$space"/>
 										</xsl:when>
 										<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
 											<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull" />
