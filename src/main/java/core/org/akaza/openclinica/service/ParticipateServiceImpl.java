@@ -207,12 +207,14 @@ public class ParticipateServiceImpl implements ParticipateService {
                             String formUrl = null;
                             FormLayout fl = formLayoutDao.findById(formLayout.getId());
                             List<Bind> binds = xformParserHelper.getBinds(fl,PARTICIPATE_FLAVOR,studyOID);
-                            if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
-                                formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
-                            }else {
-                                formUrl = createEditUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
+                            if (!formLayout.getStatus().getName().equals("Removed")) {
+                                if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
+                                    formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
+                                }else {
+                                    formUrl = createEditUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
+                                }
+                                formDatas.add(getFormDataPerCrf(formLayout, nextEvent, eventCrfs, crfDAO, formUrl, itemDataExists));
                             }
-                            formDatas.add(getFormDataPerCrf(formLayout, nextEvent, eventCrfs, crfDAO, formUrl, itemDataExists));
                         }
                     }
                 }
