@@ -278,6 +278,7 @@ public class ParticipateServiceImpl implements ParticipateService {
         studyEventData.setEventName(studyEventDefBean.getName());
         studyEventData.setStudyEventOID(studyEventDefBean.getOid());
         studyEventData.setStudyEventRepeatKey(String.valueOf(studyEvent.getSampleOrdinal()));
+        studyEventData.setWorkflowStatus(studyEvent.getWorkflowStatus().getDisplayValue());
         return studyEventData;
     }
 
@@ -310,14 +311,14 @@ public class ParticipateServiceImpl implements ParticipateService {
         formData.getFormDataElementExtension().add(odmLinks);
 
         if (eventCRFBean == null) {
-            formData.setStatus(EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue());
+            formData.setWorkflowStatus(EventCrfWorkflowStatusEnum.NOT_STARTED.getDisplayValue());
         } else {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
             if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
-                formData.setStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue());
+                formData.setWorkflowStatus(EventCrfWorkflowStatusEnum.INITIAL_DATA_ENTRY.getDisplayValue());
               //  formData.setStatus("Not Started");
             } else {
-                formData.setStatus(eventCRFBean.getWorkflowStatus().getDisplayValue());
+                formData.setWorkflowStatus(eventCRFBean.getWorkflowStatus().getDisplayValue());
             }
 
             if (eventCrf.getDateUpdated() != null) {
