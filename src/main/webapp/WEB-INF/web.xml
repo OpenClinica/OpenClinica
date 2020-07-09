@@ -770,7 +770,7 @@
     <servlet>
         <display-name>ImportData</display-name>
         <servlet-name>ImportDataServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.submit.ImportDataServlet</servlet-class>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ImportDataServlet</servlet-class>
     </servlet>
 
     <servlet>
