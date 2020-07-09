@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+    <changeSet  author="jkeremian"  id="OC-12650-01">
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_workflow_status_changed"/>
+            <where>audit_log_event_type_id='17'</where>
+        </update>
+    </changeSet>
+    <changeSet  author="jkeremian"  id="OC-12650-02">
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_workflow_status_changed"/>
+            <where>audit_log_event_type_id='18'</where>
+        </update>
+    </changeSet>
+    <changeSet  author="jkeremian"  id="OC-12650-03">
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_workflow_status_changed"/>
+            <where>audit_log_event_type_id='19'</where>
+        </update>
+    </changeSet>
+    <changeSet  author="jkeremian"  id="OC-12650-04">
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_workflow_status_changed"/>
+            <where>audit_log_event_type_id='20'</where>
+        </update>
+    </changeSet>
+    <changeSet  author="jkeremian"  id="OC-12650-05">
+        <update tableName="audit_log_event_type">
+            <column name="name" value="study_event_workflow_status_changed"/>
+            <where>audit_log_event_type_id='21'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>
