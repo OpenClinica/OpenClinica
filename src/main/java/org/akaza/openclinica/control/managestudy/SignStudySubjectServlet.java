@@ -226,7 +226,7 @@ public class SignStudySubjectServlet extends SecureController {
                     studySub.setStatus(Status.SIGNED);
                     studySub.setUpdater(ub);
                     subdao.update(studySub);
-                    addPageMessage(respage.getString("subject_event_signed"));
+                    addPageMessage(respage.getString("subject_event_signed").replace("<Participant ID>", studySub.getLabel()));
                     // forwardPage(Page.SUBMIT_DATA_SERVLET);
                     forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
                     // >> changed tbh, 06/2009
