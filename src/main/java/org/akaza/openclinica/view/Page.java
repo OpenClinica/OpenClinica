@@ -209,6 +209,8 @@ public enum Page {
     /**
      * Page for creating crf data imports
      */
+    IMPORT_DATA ("/WEB-INF/jsp/managestudy/import-data.jsp", "Import Data"),
+    IMPORT_DATA_SERVLET ("/ImportData", "Import Data"),
     IMPORT_CRF_DATA ("/WEB-INF/jsp/submit/import.jsp", "Import CRF Data"),
     VERIFY_IMPORT_SERVLET ("/VerifyImportedCRFData", "Verify Imported CRF Data Servlet"),
     VERIFY_IMPORT_CRF_DATA ("/WEB-INF/jsp/submit/verifyImport.jsp", "Verify Imported CRF Data"),
@@ -463,7 +465,7 @@ public enum Page {
     ADVANCED_SEARCH ("/WEB-INF/jsp/" + "managestudy/advancedSearch.jsp", "advanced search"),
     ADVANCED_SEARCH_SERVLET ("/ParticipantSearch", "advanced search"),
 
-    JOBS ("/WEB-INF/jsp/" + "managestudy/jobs.jsp", "jobs (bulk logfile)"),
+    JOBS ("/WEB-INF/jsp/managestudy/jobs.jsp", "jobs (bulk logfile)"),
     JOBS_SERVLET ("/Jobs", "jobs (bulk logfile)"),
 
     REPORTS ("/WEB-INF/jsp/" + "managestudy/embedded-reports.jsp", "embedded reports"),
