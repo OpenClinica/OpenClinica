@@ -883,17 +883,14 @@ public class ImportServiceImpl implements ImportService {
                         if (formLayoutObject instanceof ErrorObj) return formLayoutObject;
                         FormLayout formLayout = (FormLayout) formLayoutObject;
                         EventCrf eventCrf = null;
-                        List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
-                        if (eventCrfs.size() > 0) eventCrf = eventCrfs.get(0);
-                        // Event Crf has status complete or unavailable
-                        // in complete status will not throw out error any more at this stage
 
-                        /*
-                         * OC-12136
-                         * at this time, eventCRF can still be null  see OC-11814
-                         * if (eventCrf == null) { return new ErrorObj(FAILED,
-                         * ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH); }
-                         */
+                        // If the event is not imported correctly, StudyEvent will be in Scheduled state,
+                        // So checking the errorCode.repeatKeyAndFormMismatch only on other event status
+                        if(!studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.NOT_SCHEDULED) && !studyEvent.getWorkflowStatus().equals(StudyEventWorkflowStatusEnum.SCHEDULED)){
+                            List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getCrf().getCrfId());
+                            if (eventCrfs.size() == 0 || eventCrfs.get(0) == null)
+                                return new ErrorObj(FAILED, ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH);
+                        }
                     }
                     return studyEvent;
 
