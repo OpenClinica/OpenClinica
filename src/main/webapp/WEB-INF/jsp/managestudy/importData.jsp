@@ -49,4 +49,20 @@
 
 <jsp:include page="../include/sideInfo.jsp"/>
 
+<div>
+  <a href="ImportCRFData">Import CRF Data</a>
+  <div>
+    Upload an xml file that contains CRF data.
+  </div>
+</div>
+
+<br>
+
+<div>
+	<a href="UploadCRFData">Upload CRF Data</a>
+  <div>
+    Upload pipe delimited text files which contains CRF data and one data mapping file.
+  </div>
+</div>
+
 <jsp:include page="../include/footer.jsp"/>
