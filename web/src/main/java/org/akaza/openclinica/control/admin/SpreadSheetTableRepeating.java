@@ -1605,6 +1605,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                         }
                         //queries.add(sql2);
+
                         sqlParameters.add(new SqlParameter(responseLabel));
 
                         sqlParameters.add(new SqlParameter(subHeader));
