@@ -26,14 +26,13 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: all">
+<tr id="sidebar_Instructions_open">
 	<td class="sidebar_tab">
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');">
 			<span class="icon icon-caret-down gray"></span>
 		</a>
 		<fmt:message key="instructions" bundle="${restext}"/>
 		<div class="sidebar_tab_content">
-			<fmt:message key="upload_side_bar_instructions" bundle="${restext}"/>
 		</div>
 	</td>
 </tr>
