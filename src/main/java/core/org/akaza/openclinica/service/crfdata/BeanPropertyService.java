@@ -154,7 +154,8 @@ public class BeanPropertyService{
             	studyEvent.setStudyEventDefinition(sed);
             	studyEvent.setStudySubject(ss);
             	studyEvent.setSampleOrdinal(getNewEventOrdinal(eventOID,eow.getStudySubjectBeanId(), sed));
-            	studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.NOT_SCHEDULED);
+            	// OC-12829 Status not updated after Event Action Rule is triggered
+            	studyEvent.setWorkflowStatus(StudyEventWorkflowStatusEnum.SCHEDULED);
 				studyEvent.setStartTimeFlag(false);
             	studyEvent.setEndTimeFlag(false);
                 studyEvent.setDateCreated(new Date());
