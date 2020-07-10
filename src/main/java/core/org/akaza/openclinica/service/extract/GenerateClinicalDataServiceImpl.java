@@ -412,9 +412,23 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					dataBean.setWorkflowStatus(ecrf.getWorkflowStatus());
 					dataBean.setRemoved(ecrf.getRemoved());
 					dataBean.setArchived(ecrf.getArchived());
-					dataBean.setRequired(ecrf.getRequired());
-					dataBean.setRelevant(ecrf.getRelevant());
-					dataBean.setEditable(ecrf.getEditable());
+
+					if (ecrf.getRequired() != null){
+						dataBean.setRequired(ecrf.getRequired());
+					} else {
+						dataBean.setRequired(eventDefinitionCrf.getRequiredCrf());
+					}
+					if (ecrf.getRelevant() != null){
+						dataBean.setRelevant(ecrf.getRelevant());
+					} else {
+						dataBean.setRelevant(eventDefinitionCrf.getRelevant());
+					}
+					if (ecrf.getEditable() != null){
+						dataBean.setEditable(ecrf.getEditable());
+					} else {
+						dataBean.setEditable(eventDefinitionCrf.getEditable());
+					}
+
 					dataBean.setCreatedDate(ecrf.getDateCreated());
 					dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
 					dataBean.setUpdatedDate(ecrf.getDateUpdated());

@@ -520,9 +520,9 @@ public class OdmImportServiceImpl implements OdmImportService {
 			eventDefinitionCrf.setAllowAnonymousSubmission(false);
 		}
 		if (conf.getParticipantForm().equalsIgnoreCase("Yes")) {
-			eventDefinitionCrf.setParicipantForm(true);
+			eventDefinitionCrf.setParticipantForm(true);
 		} else {
-			eventDefinitionCrf.setParicipantForm(false);
+			eventDefinitionCrf.setParticipantForm(false);
 		}
 		if (conf.getHideCRF().equalsIgnoreCase("Yes")) {
 			eventDefinitionCrf.setHideCrf(true);
@@ -542,9 +542,9 @@ public class OdmImportServiceImpl implements OdmImportService {
 
 	private EventDefinitionCrf setParticipateConfPropOnlyForAllSites(OCodmComplexTypeDefinitionConfigurationParameters conf, EventDefinitionCrf eventDefinitionCrf) {
 		if (conf.getParticipantForm().equalsIgnoreCase("Yes")) {
-			eventDefinitionCrf.setParicipantForm(true);
+			eventDefinitionCrf.setParticipantForm(true);
 		} else {
-			eventDefinitionCrf.setParicipantForm(false);
+			eventDefinitionCrf.setParticipantForm(false);
 		}
 		return eventDefinitionCrf;
 	}

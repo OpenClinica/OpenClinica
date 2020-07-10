@@ -1,7 +1,6 @@
 package core.org.akaza.openclinica.service;
 
 import core.org.akaza.openclinica.bean.admin.CRFBean;
-import core.org.akaza.openclinica.bean.core.DataEntryStage;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.*;
 import core.org.akaza.openclinica.bean.service.StudyParameterValueBean;
@@ -16,7 +15,6 @@ import core.org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
-import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.xform.XformParserHelper;
 import core.org.akaza.openclinica.domain.xform.dto.Bind;
@@ -29,7 +27,6 @@ import core.org.akaza.openclinica.web.pform.OpenRosaServices;
 import core.org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
@@ -430,7 +427,7 @@ public class ParticipateServiceImpl implements ParticipateService {
             for (EventCrf eventCrf:eventCrfs) {
                 if (eventDefCrf.getCrf().getCrfId() == eventCrf.getFormLayout().getCrf().getCrfId()) {
                     foundEventCrfMatch = true;
-                    if (eventDefCrf.getParicipantForm()) {
+                    if (eventDefCrf.getParticipantForm()) {
                          eventCrf.setWorkflowStatus(EventCrfWorkflowStatusEnum.COMPLETED);
                         eventCrf.setDateCompleted(new Date());
                         eventCrfDao.saveOrUpdate(eventCrf);
@@ -438,7 +435,7 @@ public class ParticipateServiceImpl implements ParticipateService {
                     } else if (!eventCrf.getWorkflowStatus().equals(EventCrfWorkflowStatusEnum.COMPLETED)) completeStudyEvent = false;
                 }
             }
-            if (!foundEventCrfMatch && !eventDefCrf.getParicipantForm()) completeStudyEvent = false;
+            if (!foundEventCrfMatch && !eventDefCrf.getParticipantForm()) completeStudyEvent = false;
         }
 
         // Complete study event only if there are no uncompleted, non-participant forms.
