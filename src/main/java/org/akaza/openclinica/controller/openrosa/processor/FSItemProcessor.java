@@ -5,6 +5,7 @@ import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.service.StudyBuildService;
+import core.org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
@@ -381,19 +382,15 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         studySubjectBean.setUpdatedDate(new Date());
         studySubjectBean.setUpdater(userAccountBean);
         ssdao.update(studySubjectBean);
-
+        Boolean isDetailsAdded = true;
         if (attrValue.equals(FIRSTNAME)) {
             studySubject.getStudySubjectDetail().setFirstName(itemValue);
-            studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(LASTNAME)) {
             studySubject.getStudySubjectDetail().setLastName(itemValue);
-            studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(SECONDARYID)) {
             studySubject.getStudySubjectDetail().setIdentifier(itemValue);
-            studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(EMAIL)) {
             studySubject.getStudySubjectDetail().setEmail(itemValue);
-            studySubjectDao.saveOrUpdate(studySubject);
         } else if (attrValue.equals(MOBILENUMBER)) {
             Pattern usPhonePattern = Pattern.compile(US_PHONE_PATTERN);
             Matcher usPhoneMatch = usPhonePattern.matcher(itemValue);
@@ -401,6 +398,12 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 itemValue=US_PHONE_PREFIX+itemValue;
             }
             studySubject.getStudySubjectDetail().setPhone(itemValue);
+        }else
+            isDetailsAdded = false;
+
+        if(isDetailsAdded){
+            if(studySubject.getUserStatus() == null || studySubject.getUserStatus().equals(UserStatus.INVALID))
+                studySubject.setUserStatus(UserStatus.CREATED);
             studySubjectDao.saveOrUpdate(studySubject);
         }
     }
