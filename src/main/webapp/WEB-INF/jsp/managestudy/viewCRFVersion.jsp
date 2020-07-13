@@ -64,32 +64,6 @@
   <span class="table_title_manage">
  </c:otherwise>
 </c:choose>
-<fmt:message key="section" bundle="${resword}"/></span>
-<div style="width: 700px">
-<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-<div class="tablebox_center">
-
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-  <tr valign="top">
-  <td class="table_header_row_left"><fmt:message key="section_name" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="title" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="subtitle" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="instructions" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="page_number_label" bundle="${resword}"/></td>
- </tr>
-  <tr valign="top">
-   <td class="table_cell_left"><c:out value="${section.name}"/></td>
-   <td class="table_cell"><c:out value="${section.title}"/></td>
-   <td class="table_cell"><c:out value="${section.subtitle}"/>&nbsp;</td>
-   <td class="table_cell"><c:out value="${section.instructions}"/>&nbsp;</td>
-   <td class="table_cell"><c:out value="${section.pageNumberLabel}"/>&nbsp;</td>
-  </tr>
-  </table>
-  </div>
-</div></div></div></div></div></div></div></div>
-</div>
-<br>
 <c:choose>
  <c:when test="${userBean.sysAdmin && module=='admin'}">
   <span class="table_title_Admin">
@@ -107,40 +81,23 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr valign="top">
   <td class="table_header_row_left"><fmt:message key="group_name" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="OID" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="header" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="repeat_number" bundle="${resword}"/></td>
-  <td class="table_header_row"><fmt:message key="repeat_max" bundle="${resword}"/></td>
-  <td class="table_header_row">Is shown?</td>
-  <td class="table_header_row"><fmt:message key="group_layout" bundle="${resword}"/></td>    
+  <td class="table_header_row"><fmt:message key="group_space_oid" bundle="${resword}"/></td>
+  <td class="table_header_row"><fmt:message key="group_type" bundle="${resword}"/></td>
  </tr>
  <c:forEach var ="group" items="${section.groups}">
   <tr valign="top">
-   <td class="table_cell_left"><c:out value="${group.name}"/></td>
-   <td class="table_cell"><c:out value="${group.oid}"/></td>
-   <td class="table_cell"><c:out value="${group.meta.header}"/>&nbsp;</td>
-   <td class="table_cell"><c:out value="${group.meta.repeatNum}"/>&nbsp;</td>
-   <td class="table_cell"><c:out value="${group.meta.repeatMax}"/>&nbsp;</td>
-   <td class="table_cell">
-      <c:choose>
-      <c:when test="${group.meta.showGroup==true}">
-       <fmt:message key="yes" bundle="${resword}"/>
-      </c:when>
-      <c:otherwise>
-        <fmt:message key="no" bundle="${resword}"/>
-      </c:otherwise>
-      </c:choose>
-   </td>
-      <td class="table_cell">
-         <c:choose>
-         <c:when test="${group.meta.repeatingGroup==true}">
-          <fmt:message key="repeating" bundle="${resword}"/>
-         </c:when>
-         <c:otherwise>
-           <fmt:message key="non_repeating" bundle="${resword}"/>
-         </c:otherwise>
-         </c:choose>
-      </td>
+    <td class="table_cell_left"><c:out value="${group.name}"/></td>
+    <td class="table_cell"><c:out value="${group.oid}"/></td>
+    <td class="table_cell">
+       <c:choose>
+       <c:when test="${group.meta.repeatingGroup==true}">
+        <fmt:message key="repeating" bundle="${resword}"/>
+       </c:when>
+       <c:otherwise>
+         <fmt:message key="non_repeating" bundle="${resword}"/>
+       </c:otherwise>
+       </c:choose>
+    </td>
   </tr>
   </c:forEach>
  </table>
@@ -165,19 +122,15 @@
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
  <tr valign="top">
-    <td class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="item_oid" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="group_oid" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="item_name" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="item_space_oid" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="group_space_oid" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="group_name" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="units" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="PHI_status" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="item_data" bundle="${resword}"/> <fmt:message key="type" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="left_item_text" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="right_item_text" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="default_value" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="response_layout" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="response_label" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="response_options" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="response_values" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
@@ -216,10 +169,6 @@
     <td class="table_cell"><c:out value="${item.phiStatus}"/>&nbsp;</td>
     <td class="table_cell"><c:out value="${item.dataType.description}"/>&nbsp;</td>
     <td class="table_cell"><c:out value="${item.itemMeta.leftItemText}"/></td>
-    <td class="table_cell"><c:out value="${item.itemMeta.rightItemText}"/>&nbsp;</td>
-     <td class="table_cell"><c:out value="${item.itemMeta.defaultValue}"/></td>
-     <td class="table_cell"><c:out value="${item.itemMeta.responseLayout}"/></td>
-    <td class="table_cell"><c:out value="${item.itemMeta.responseSet.label}"/></td>
     <td class="table_cell">
     <c:set var="optionSize" value="0"/>
     <c:forEach var="option" items="${item.itemMeta.responseSet.options}">
