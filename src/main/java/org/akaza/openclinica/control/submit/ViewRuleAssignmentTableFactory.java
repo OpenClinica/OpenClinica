@@ -159,7 +159,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     @Override
     protected ExportType[] getExportTypes() {
-        if (isDesignerRequest) {
+        if (isDesignerRequest || ruleSetRuleIds.size() == 0) {
             return new ExportType[] {};
         }
         return new ExportType[] { ExportType.CSV, ExportType.EXCEL, ExportType.PDF };

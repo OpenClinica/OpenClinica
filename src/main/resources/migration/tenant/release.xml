@@ -53,4 +53,5 @@
        <include file="migration/tenant/4.0-2020-06-01-OC-12719.xml"/>
        <include file="migration/tenant/4.0-2020-06-01-OC-11408.xml"/>
        <include file="migration/tenant/4.0-2020-06-18-OC-12802.xml"/>
+       <include file="migration/tenant/4.0-2020-07-06-OC-12650.xml"/>
 </databaseChangeLog>
