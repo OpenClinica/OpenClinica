@@ -86,6 +86,8 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		this.setTypeExpected(22, TypeNames.BOOL); // participant_crf
 		this.setTypeExpected(23, TypeNames.BOOL); // allow_anonymous_submission
 		this.setTypeExpected(24, TypeNames.STRING); // submission_url
+		this.setTypeExpected(25, TypeNames.BOOL); // relevant
+		this.setTypeExpected(26, TypeNames.BOOL); // editable
 	}
 
 	/**
@@ -124,6 +126,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		eb.setParticipantForm(((Boolean) hm.get("participant_form")).booleanValue());
 		eb.setAllowAnonymousSubmission(((Boolean) hm.get("allow_anonymous_submission")).booleanValue());
 		eb.setSubmissionUrl(((String) hm.get("submission_url")));
+		eb.setRelevant(((Boolean) hm.get("relevant")).booleanValue());
+		eb.setEditable(((Boolean) hm.get("editable")).booleanValue());
+
 		return eb;
 	}
 
@@ -454,7 +459,9 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 			sb.setSubmissionUrl("");
 			variables.put(new Integer(21), sb.getSubmissionUrl());
 		}
-		variables.put(new Integer(22), new Integer(sb.getId()));
+		variables.put(new Integer(22), new Boolean(sb.getRelevant()));
+		variables.put(new Integer(23), new Boolean(sb.getEditable()));
+		variables.put(new Integer(24), new Integer(sb.getId()));
 
 		String sql = digester.getQuery("update");
 		this.execute(sql, variables, nullVars);
