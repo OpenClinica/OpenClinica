@@ -127,15 +127,11 @@
     <td class="table_header_row"><fmt:message key="group_space_oid" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="group_name" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="units" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="PHI_status" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="item_data" bundle="${resword}"/> <fmt:message key="type" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="left_item_text" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="label" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="response_options" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="response_values" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
-    <td class="table_header_row">Is shown?</td>
-
   </tr>
   <c:forEach var ="item" items="${section.items}">
    <tr valign="top">
@@ -165,8 +161,6 @@
       <td class="table_cell"><c:out value=""/></td>
     </c:otherwise>
     </c:choose>
-    <td class="table_cell"><c:out value="${item.units}"/>&nbsp;</td>
-    <td class="table_cell"><c:out value="${item.phiStatus}"/>&nbsp;</td>
     <td class="table_cell"><c:out value="${item.dataType.description}"/>&nbsp;</td>
     <td class="table_cell"><c:out value="${item.itemMeta.leftItemText}"/></td>
     <td class="table_cell">
@@ -206,17 +200,6 @@
      <td class="table_cell">
      <c:choose>
       <c:when test="${item.itemMeta.required==true}">
-       <fmt:message key="yes" bundle="${resword}"/>
-      </c:when>
-      <c:otherwise>
-        <fmt:message key="no" bundle="${resword}"/>
-      </c:otherwise>
-      </c:choose>
-      </td>
-      <%-- adding a column for dynamics, tbh --%>
-      <td class="table_cell">
-     <c:choose>
-      <c:when test="${item.itemMeta.showItem==true}">
        <fmt:message key="yes" bundle="${resword}"/>
       </c:when>
       <c:otherwise>
