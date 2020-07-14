@@ -59,7 +59,7 @@ import java.util.stream.Stream;
 @Service("studyBuildService")
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class StudyBuildServiceImpl implements StudyBuildService {
-    protected final com.sun.istack.internal.logging.Logger logger = LoggerFactory.getLogger(getClass().getName());
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private static final String sbsUrl = CoreResources.getField("SBSBaseUrl");
     PermissionService permissionService;
     @Autowired
