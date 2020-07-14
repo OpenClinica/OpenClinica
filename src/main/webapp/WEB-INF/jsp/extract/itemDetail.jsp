@@ -17,6 +17,18 @@
   background-color: #FFFFFF;
   }
 
+  td.body {
+    padding: 10px 20px;
+  }
+
+  td.background {
+    padding: 10px;
+    background-color: #00344c;
+  }
+
+  td.background img {
+    width: 150px;
+  }
 
 </style>
 
@@ -40,10 +52,10 @@
  <jsp:include page="../include/alertbox.jsp"/>
  <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
  <tr valign="top">
-  <td background="images/popup_BG.gif" ><img src="images/popup_OC.gif"></td>  
+  <td class="background"><img src="images/logo-color-on-dark.svg"></td>  
   </tr>
  <tr valign="top"> 
- <td>
+ <td class="body">
      <h1><span class="title_manage"><fmt:message key="item_meta_global_att" bundle="${resword}"/></span><h1>
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -65,20 +77,6 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="data_type" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${item.dataType.name}"/>&nbsp;
   </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="units" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${item.units}"/>&nbsp;
-  </td></tr> 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="PHI" bundle="${resword}"/>:</td><td class="table_cell">  
-  <c:choose>
-    <c:when test="${item.phiStatus}">
-      <fmt:message key="yes" bundle="${resword}"/>
-    </c:when>
-    <c:otherwise>
-      <fmt:message key="no" bundle="${resword}"/>
-    </c:otherwise>
-  </c:choose>
-  
-  </td></tr> 
 </table>
 </div>
 
@@ -110,29 +108,18 @@
        <table border="0" cellpadding="0" cellspacing="0">
         <tr>
 
-         <td class="table_header_column_top"><fmt:message key="left_item_text" bundle="${resword}"/></td>
-           <td class="table_header_column_top"><fmt:message key="right_item_text" bundle="${resword}"/></td>   
-           <td class="table_header_column_top"><fmt:message key="default_value" bundle="${resword}"/></td>
-         <td class="table_header_column_top"><fmt:message key="response_layout" bundle="${resword}"/></td>
+         <td class="table_header_column_top"><fmt:message key="label" bundle="${resword}"/></td>
          <td class="table_header_column_top"><fmt:message key="response_type" bundle="${resword}"/></td>
-           <td class="table_header_column_top"><fmt:message key="response_label" bundle="${resword}"/></td>
            <td class="table_header_column_top"><fmt:message key="response_options" bundle="${resword}"/>/   
            <fmt:message key="response_values" bundle="${resword}"/></td>
 
-           <td class="table_header_column_top"><fmt:message key="section_label" bundle="${resword}"/></td>
            <td class="table_header_column_top"><fmt:message key="group_name" bundle="${resword}"/></td>
-           <td class="table_header_column_top"><fmt:message key="validation_label" bundle="${resword}"/></td>
-           <td class="table_header_column_top"><fmt:message key="validation_error_mgs" bundle="${resword}"/></td>
 
            <td class="table_header_column_top"><fmt:message key="required" bundle="${resword}"/></td>
           </tr>
           <tr valign="top">            
            <td class="table_cell"><c:out value="${versionItem.leftItemText}"/>&nbsp;</td>
-           <td class="table_cell"><c:out value="${versionItem.rightItemText}"/>&nbsp;</td>           
-           <td class="table_cell"><c:out value="${versionItem.defaultValue}"/>&nbsp;</td>             
-           <td class="table_cell"><c:out value="${versionItem.responseLayout}"/>&nbsp;</td>     
            <td class="table_cell"><c:out value="${versionItem.responseSet.responseType.name}"/>&nbsp;</td>
-           <td class="table_cell"><c:out value="${versionItem.responseSet.label}"/>&nbsp;</td>
            <td class="table_cell">
             <c:forEach var="option" items="${versionItem.responseSet.options}" varStatus="status">
                 <c:out value="${option.text}"/>
@@ -143,7 +130,6 @@
                 </c:if>
 
             </c:forEach>&nbsp;
-           <td class="table_cell"><c:out value="${section.label}"/>&nbsp;</td>   
               <c:choose>
                <c:when test="${versionItem.groupLabel != 'Ungrouped'}">
                    <td class="table_cell"><c:out value="${versionItem.groupLabel}"/></td>
@@ -152,10 +138,6 @@
                    <td class="table_cell"><c:out value=""/>&nbsp;</td>
                </c:otherwise>
                </c:choose>
-
-           <td class="table_cell"><c:out value="${ifmdBean.regexp}"/>&nbsp;</td>   
-           <td class="table_cell"><c:out value="${ifmdBean.regexpErrorMsg}"/>&nbsp;</td>   
-
            <td class="table_cell">
             <c:choose>
              <c:when test="${versionItem.required==true}">
