@@ -9,6 +9,7 @@ import core.org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import core.org.akaza.openclinica.domain.datamap.Study;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.CustomRuntimeException;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.springframework.http.ResponseEntity;
 
@@ -68,6 +69,7 @@ public interface ValidateService {
     boolean hasCRFpermissionTag(EventDefinitionCrf edc, List<String> permissionTags);
 
     ParameterizedErrorVM getResponseForException(OpenClinicaSystemException e, String studyOid, String siteOid);
+    ParameterizedErrorVM getResponseForException(CustomRuntimeException e, String studyOid, String siteOid);
     
     void validateStudyAndRolesForPdfCaseBook(String studyOid, String siteOid, UserAccountBean userAccountBean);
 

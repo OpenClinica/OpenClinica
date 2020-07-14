@@ -357,15 +357,16 @@ public class KafkaService {
         formChangeDTO.setFormUpdatedDate(eventCrf.getDateUpdated().toString());
 
         formChangeDTO.setFormCreatedBy(eventCrf.getUserAccount().getUserName());
-        formChangeDTO.setFormUpdatedBy(updaterAccount.getUserName());
+        if (updaterAccount != null){
+            formChangeDTO.setFormUpdatedBy(updaterAccount.getUserName());}
 
         formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().getEnglishDisplayValue());
         if (eventCrf.getSdvStatus() != null){
-        formChangeDTO.setFormSdvStatus(eventCrf.getSdvStatus().getEnglishDisplayValue());}
+            formChangeDTO.setFormSdvStatus(eventCrf.getSdvStatus().getEnglishDisplayValue());}
         if (eventCrf.getRemoved() != null){
-        formChangeDTO.setFormRemoved(eventCrf.getRemoved().toString());}
+            formChangeDTO.setFormRemoved(eventCrf.getRemoved().toString());}
         if (eventCrf.getArchived() != null){
-        formChangeDTO.setFormArchived(eventCrf.getArchived().toString());}
+            formChangeDTO.setFormArchived(eventCrf.getArchived().toString());}
 
         return formChangeDTO;
     }
@@ -394,7 +395,9 @@ public class KafkaService {
         } else {
             formChangeDTO.setFormUpdatedDate(eventCrf.getDateCreated().toString());
         }
-        formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().getEnglishDisplayValue());
+        //TODO Fix this
+        // was eventCrf.getWorkflowStatus().getEnglishDisplayValue()
+        formChangeDTO.setFormWorkflowStatus(eventCrf.getWorkflowStatus().name());
 
         return formChangeDTO;
     }

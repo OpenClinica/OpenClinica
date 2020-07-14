@@ -11,8 +11,10 @@ import core.org.akaza.openclinica.domain.Status;
 import core.org.akaza.openclinica.domain.datamap.*;
 import core.org.akaza.openclinica.domain.user.UserAccount;
 import core.org.akaza.openclinica.exception.OpenClinicaSystemException;
+import core.org.akaza.openclinica.service.CustomRuntimeException;
 import core.org.akaza.openclinica.service.PermissionService;
 import core.org.akaza.openclinica.service.auth.TokenService;
+import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import core.org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -482,6 +484,16 @@ public class ValidateServiceImpl implements ValidateService {
         map.put("studyOid", studyOid);
         map.put("siteOid", siteOid);
         return new ParameterizedErrorVM(errorMsg, map);
+    }
+
+    @Override
+    public ParameterizedErrorVM getResponseForException(CustomRuntimeException runtimeException, String studyOid, String siteOid) {
+        String errorMsg = runtimeException.getMessage();
+        HashMap<String, String> errorList = new HashMap<>();
+        for (ErrorObj error : runtimeException.getErrList()){
+            errorList.put(error.getCode(), error.getMessage());
+        }
+        return new ParameterizedErrorVM(errorMsg, errorList);
     }
 
     public boolean isStudySubjectPresent(String studySubjectLabel, Study study) {

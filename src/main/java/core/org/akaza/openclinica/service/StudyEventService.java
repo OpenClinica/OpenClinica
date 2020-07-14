@@ -6,11 +6,9 @@ import core.org.akaza.openclinica.bean.login.RestReponseDTO;
 import core.org.akaza.openclinica.bean.login.UserAccountBean;
 import core.org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import core.org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import core.org.akaza.openclinica.domain.datamap.StudyEvent;
+import core.org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
 import org.akaza.openclinica.controller.dto.StudyEventUpdateRequestDTO;
-import core.org.akaza.openclinica.domain.datamap.JobDetail;
-import core.org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,5 +31,7 @@ public interface StudyEventService {
     void convertStudyEventStatus(String value, StudyEvent studyEvent);
 
     void convertStudyEventBeanStatus(String value, StudyEventBean studyEventBean);
+
+    StudyEvent validateStudyEventExists(StudySubject studySubject, String studyEventOID, String studyEventRepeatKey, CustomRuntimeException validationErrors);
 
 }

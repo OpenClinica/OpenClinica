@@ -1,6 +1,6 @@
 package org.akaza.openclinica.controller.dto;
 
-public class FormUpdateRequestDTO {
+public class FormRequestDTO {
 
 	private String subjectKey;
 	private String studyEventOID;

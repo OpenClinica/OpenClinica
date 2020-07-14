@@ -37,6 +37,7 @@ import core.org.akaza.openclinica.bean.submit.FormLayoutBean;
 import core.org.akaza.openclinica.core.SessionManager;
 import core.org.akaza.openclinica.dao.admin.CRFDAO;
 import core.org.akaza.openclinica.dao.hibernate.StudyDao;
+import core.org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import core.org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import core.org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -46,7 +47,11 @@ import core.org.akaza.openclinica.dao.submit.EventCRFDAO;
 import core.org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import core.org.akaza.openclinica.dao.submit.ItemDataDAO;
 import core.org.akaza.openclinica.domain.datamap.Study;
+import core.org.akaza.openclinica.domain.datamap.StudySubject;
+import core.org.akaza.openclinica.service.CustomRuntimeException;
+import core.org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.domain.enumsupport.StudyEventWorkflowStatusEnum;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +64,8 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
     private DataSource dataSource;
 
+    @Autowired
+    StudySubjectDao studySubjectDao;
     @Autowired
     @Qualifier("studyEventJDBCDao")
     private StudyEventDAO studyEventDAO;
@@ -559,6 +566,19 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             dedcrf.getEdc().setVersions(versions);
             uncompletedEventDefinitionCRFs.set(i, dedcrf);
         }
+    }
+
+    public static final String FAILED = "Failed";
+    @Override
+    public StudySubject validateStudySubjectExists(Study study, String subjectKey, CustomRuntimeException validationErrors) {
+
+        StudySubject studySubject = studySubjectDao.findByLabelAndStudy(subjectKey, study);
+        if (studySubject == null){
+            validationErrors.addError(new ErrorObj(FAILED, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND));
+            return null;
+        }
+
+        return studySubject;
     }
 
     public DataSource getDataSource() {
