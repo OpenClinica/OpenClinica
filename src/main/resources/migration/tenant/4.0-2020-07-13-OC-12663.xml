@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="jkeremian" id="2020-07-13-OC-12663-01"
+               dbms="postgresql" >
+        <comment>Migrating Study Event Statuses</comment>
+        <sql>
+            CREATE OR REPLACE FUNCTION migratestudyevents()
+            RETURNS void AS
+            '
+            declare
+            se_rec  record;
+            sed_rec record;
+            ale_rec record;
+
+            begin
+            ALTER TABLE study_event DISABLE TRIGGER ALL;
+
+            -- loggers
+            RAISE NOTICE ''----------------------------------   BEFORE MIGRATION   ----------------------------------'';
+            FOR  se_rec IN SELECT study_event_id, status_id, workflow_status,subject_event_status_id,signed,locked,removed,archived  FROM study_event order by study_event_id
+            LOOP
+            RAISE NOTICE ''eventId: % statusId: % workflowStatus: % subjectEventStatusId: %, signed: % ,locked: %, removed: %, archived: %'' , se_rec.study_event_id  ,se_rec.status_id, se_rec.workflow_status, se_rec.subject_event_status_id  , se_rec.signed , se_rec.locked,se_rec.removed,se_rec.archived ;
+            END LOOP;
+
+
+
+
+            -- iterate study_event table
+            FOR  se_rec IN SELECT study_event_id,study_event_definition_id ,status_id, workflow_status,subject_event_status_id,signed,locked,removed,archived  FROM study_event order by study_event_id
+
+            LOOP
+
+
+
+            ---------------------------------------------------------------------------------------
+            ---  OC-12663 AC2 , AC3 , AC4
+            ---------------------------------------------------------------------------------------
+            select   study_event_definition_id, status_id  INTO sed_rec from study_event_definition sed where sed.study_event_definition_id=se_rec.study_event_definition_id;
+
+            -- if event definition has removed or auto-removed status
+            if(sed_rec.status_id =5 or sed_rec.status_id=7) then
+            update study_event set archived =''true'' where study_event_id = se_rec.study_event_id;
+            else
+            if (se_rec.status_id = 5 ) then
+            update study_event set removed =''true'' where study_event_id = se_rec.study_event_id;
+            end if;
+            end if;
+
+
+            ---------------------------------------------------------------------------------------
+            ---  OC-12663 AC5
+            ---------------------------------------------------------------------------------------
+            --   if study event has scheduled status
+            if(se_rec.subject_event_status_id=1) then
+            UPDATE study_event SET workflow_status=''SCHEDULED'' where study_event_id = se_rec.study_event_id;
+            exit;
+            end if;
+
+            --  if study event has not-scheduled status
+            if(se_rec.subject_event_status_id=2) then
+            UPDATE study_event SET workflow_status=''NOT_SCHEDULED'' where study_event_id = se_rec.study_event_id;
+            exit;
+            end if;
+
+            --  if study event has data_entry_started status
+            if(se_rec.subject_event_status_id=3) then
+            UPDATE study_event SET workflow_status=''DATA_ENTRY_STARTED'' where study_event_id = se_rec.study_event_id;
+            exit;
+            end if;
+
+            -- if study event has completed status
+            if(se_rec.subject_event_status_id=4) then
+            UPDATE study_event SET workflow_status=''COMPLETED'' where study_event_id = se_rec.study_event_id;
+            exit;
+            end if;
+
+            --  if study event has stopped status
+            if(se_rec.subject_event_status_id=5) then
+            UPDATE study_event SET workflow_status=''STOPPED'' where study_event_id = se_rec.study_event_id;
+            exit;
+            end if;
+
+            --  if study event has skipped status
+            if(se_rec.subject_event_status_id=6) then
+            UPDATE study_event SET workflow_status=''SKIPPED'' where study_event_id = se_rec.study_event_id;
+            exit;
+            end if;
+
+
+
+
+            ---------------------------------------------------------------------------------------
+            ---  OC-12663 AC6
+            ---------------------------------------------------------------------------------------
+            -- if study_event has signed status
+            if (se_rec.subject_event_status_id = 8 ) then
+            update study_event set signed=''true'' where study_event_id=se_rec.study_event_id;
+
+            -- iterate audit_log_event table for statuses
+            for  ale_rec IN SELECT audit_log_event_type_id  FROM audit_log_event where audit_table = ''study_event'' and entity_id = se_rec.study_event_id and entity_name=''Status''    order by audit_id desc
+            loop
+
+            -- if audit_log has study_event scheduled
+            if(ale_rec.audit_log_event_type_id = 17) then
+            update study_event set workflow_status=''SCHEDULED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+            -- if audit_log has study_event data_entry_started
+            if(ale_rec.audit_log_event_type_id = 18) then
+            update study_event set workflow_status=''DATA_ENTRY_STARTED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+            -- if audit_log has study_event completed
+            if(ale_rec.audit_log_event_type_id = 19) then
+            update study_event set workflow_status=''COMPLETED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+            -- if audit_log has study_event stopped
+            if(ale_rec.audit_log_event_type_id = 20) then
+            update study_event set workflow_status=''STOPPED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+            -- if audit_log has study_event skipped
+            if(ale_rec.audit_log_event_type_id = 21) then
+            update study_event set workflow_status=''SKIPPED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+
+            end loop;
+            end if;
+
+
+            ---------------------------------------------------------------------------------------
+            ---  OC-12663 AC7
+            ---------------------------------------------------------------------------------------
+            -- if study_event has locked status
+            if ( se_rec.subject_event_status_id = 7 ) then
+            update study_event set locked =''true'' where study_event_id = se_rec.study_event_id;
+
+            -- iterate audit_log_event table for statuses
+            for  ale_rec IN SELECT audit_log_event_type_id  FROM audit_log_event where audit_table = ''study_event'' and entity_id = se_rec.study_event_id and entity_name=''Status''    order by audit_id desc
+            loop
+
+
+            -- if audit_log has study_event signed
+            if(ale_rec.audit_log_event_type_id = 31) then
+            update study_event set signed = ''true'' where study_event_id=se_rec.study_event_id;
+            continue;
+            end if;
+            -- if audit_log has study_event scheduled
+            if(ale_rec.audit_log_event_type_id = 17) then
+            update study_event set workflow_status=''SCHEDULED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+            -- if audit_log has study_event data_entry_started
+            if(ale_rec.audit_log_event_type_id = 18) then
+            update study_event set workflow_status=''DATA_ENTRY_STARTED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+            -- if audit_log has study_event completed
+            if(ale_rec.audit_log_event_type_id = 19) then
+            update study_event set workflow_status=''COMPLETED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+            -- if audit_log has study_event stopped
+            if(ale_rec.audit_log_event_type_id = 20) then
+            update study_event set workflow_status=''STOPPED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+            -- if audit_log has study_event skipped
+            if(ale_rec.audit_log_event_type_id = 21) then
+            update study_event set workflow_status=''SKIPPED'' where study_event_id=se_rec.study_event_id;
+            exit ;
+            end if;
+
+            end loop;
+            end if;
+
+
+
+
+
+
+            ---------------------------------------------------------------------------------------
+
+
+            END LOOP;
+
+
+            -- loggers
+            RAISE NOTICE ''----------------------------------   AFTER MIGRATION   ----------------------------------'';
+            FOR  se_rec IN SELECT study_event_id, status_id, workflow_status,subject_event_status_id,signed,locked,removed,archived  FROM study_event order by study_event_id
+            LOOP
+            RAISE NOTICE ''eventId: % statusId: % workflowStatus: % subjectEventStatusId: %, signed: % ,locked: %, removed: %, archived: %'' , se_rec.study_event_id  ,se_rec.status_id, se_rec.workflow_status, se_rec.subject_event_status_id  , se_rec.signed , se_rec.locked,se_rec.removed,se_rec.archived ;
+            END LOOP;
+
+            ALTER TABLE study_event ENABLE TRIGGER ALL;
+
+            raise notice ''the end'';
+
+            end;
+              '
+            LANGUAGE plpgsql;
+
+            select migratestudyevents();
+        </sql>
+
+    </changeSet>
+
+
+</databaseChangeLog>
