@@ -89,7 +89,7 @@
 	</c:otherwise>
 </c:choose>
 
-<fmt:message key="import_crf_data" bundle="${resworkflow}"/>
+<fmt:message key="import_xml_crf_data" bundle="${restext}"/>
 <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/import-data')">
     <span class=""></span>
 </a></h1>

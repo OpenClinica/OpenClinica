@@ -49,18 +49,18 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <div>
-  <a href="ImportCRFData">Import CRF Data</a>
+  <a href="ImportCRFData"><fmt:message key="import_xml_crf_data" bundle="${restext}"/></a>
   <div>
-    Upload an xml file that contains CRF data.
+    <fmt:message key="import_instructions" bundle="${restext}"/>
   </div>
 </div>
 
 <br>
 
 <div>
-	<a href="UploadCRFData">Upload CRF Data</a>
+	<a href="UploadCRFData"><fmt:message key="upload_crf_data" bundle="${restext}"/></a>
   <div>
-    Upload pipe delimited text files which contains CRF data and one data mapping file.
+  	<fmt:message key="upload_instructions" bundle="${restext}"/>
   </div>
 </div>
 
