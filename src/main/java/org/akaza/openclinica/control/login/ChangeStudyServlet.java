@@ -219,7 +219,7 @@ public class ChangeStudyServlet extends SecureController {
             udao.update(ub);
 
             String accessToken = (String) request.getSession().getAttribute("accessToken");
-            session.setAttribute("study", newStudy);
+            setStudy(newStudy, session);
             getStudyBuildService().processModule(accessToken, newPublicStudy, ModuleProcessor.Modules.PARTICIPATE);
             request.setAttribute("changeStudySchema", newStudySchema);
             currentStudy = newStudy;

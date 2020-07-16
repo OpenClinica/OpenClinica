@@ -298,10 +298,10 @@
                 <a href="${study.manager.replace('.build.','.design.').replace('/#/account-study', '')}${study.boardUrl}"><fmt:message key="design" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
             </c:if>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
-                <a href="${study.manager}/${study.studyUuid}/${study.studyEnvUuid}"><fmt:message key="share" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${study.manager}/${study.uuid}/${study.envUuid}"><fmt:message key="share" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
             </c:if>
             <c:if test="${sessionScope.baseUserRole == 'Data Manager' || userBean.sysAdmin || userBean.techAdmin}">
-                <a href="${study.manager.replace('account-study','study-settings')}/${study.studyUuid}/settings"><fmt:message key="settings" bundle="${resword}"/></a>
+                <a href="${study.manager.replace('account-study','study-settings')}/${study.uuid}/settings"><fmt:message key="settings" bundle="${resword}"/></a>
             </c:if>
         </div>
 

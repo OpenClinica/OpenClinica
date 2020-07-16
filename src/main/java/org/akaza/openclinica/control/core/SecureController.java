@@ -1549,6 +1549,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 try {
                     boardUrl = getStudyBuildService().getCurrentBoardUrl(accessToken, study);
                     study.setBoardUrl(boardUrl);
+                    getStudyDao().update(study);
                 }
                 catch (Exception e) {
                     logger.error(e.getMessage(), e);
