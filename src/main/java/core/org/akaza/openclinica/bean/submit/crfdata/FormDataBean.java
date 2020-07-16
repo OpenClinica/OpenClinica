@@ -5,6 +5,8 @@ import java.util.Date;
 
 import core.org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import core.org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
+import core.org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.domain.enumsupport.EventCrfWorkflowStatusEnum;
 
 public class FormDataBean {
     private ArrayList<ImportItemGroupDataBean> itemGroupData;
@@ -20,6 +22,7 @@ public class FormDataBean {
     private Date updatedDate;
     private String createdBy;
     private String updatedBy;
+    private EventCrfWorkflowStatusEnum workflowStatus;
 
     public FormDataBean() {
         itemGroupData = new ArrayList<>();
@@ -115,4 +118,27 @@ public class FormDataBean {
         this.reasonForChangeForCompleteForms = reasonForChangeForCompleteForms;
     }
 
+    public EventCrfWorkflowStatusEnum getWorkflowStatus() {
+        return workflowStatus;
+    }
+
+    public void setWorkflowStatus(EventCrfWorkflowStatusEnum workflowStatus) {
+        this.workflowStatus = workflowStatus;
+    }
+
+    public void setWorkflowStatusAsString(String workflowStatus){
+        if(workflowStatus == null){
+            return;
+        }
+        EventCrfWorkflowStatusEnum statusEnum = EventCrfWorkflowStatusEnum.getByEnglishDescription  (workflowStatus.toLowerCase());
+        if(statusEnum == null)   //Setting to EventCRFStatus if it is not able to map any EventCrfWorkflowStatusEnum, this is done for throwing errorCode.formStatusNotValid later in the code flow
+            this.EventCRFStatus = workflowStatus;
+        this.workflowStatus = statusEnum;
+    }
+
+    public String getWorkflowStatusAsString(){
+        if(this.workflowStatus == null)
+            return null;
+        return this.workflowStatus.getDisplayValue();
+    }
 }
