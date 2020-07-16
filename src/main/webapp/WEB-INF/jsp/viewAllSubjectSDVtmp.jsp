@@ -377,7 +377,7 @@
         </label>
     </fieldset>
 
-    <a id="clear-filter" href="javascript:clearFilter()">Clear Filter</a>
+    <a id="clear-filter" href="javascript:;">Clear Filter</a>
     <table id='sdv-items' style="width:100%">
         <thead>
         <tr>
@@ -553,6 +553,15 @@
             itemsTable.clear().draw();
             getItems();
         }).change();
+
+        $('#clear-filter').click(function(){
+                jQuery('#sdv-items').dataTable().fnSortNeutral();   
+                if (data.sdvStatus === 'CHANGED_SINCE_VERIFIED') {
+                    $('#sdv-show-type input[value=y]').click();
+                } else {
+                    $('#sdv-show-type input[value=n]').click();
+                }
+        });
 
         var verifyButton = $(this).siblings('[name=sdvVerify]');
         $('#sdvVerify').off('click').click(function () {
