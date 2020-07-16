@@ -56,6 +56,7 @@ import core.org.akaza.openclinica.web.SQLInitServlet;
 import core.org.akaza.openclinica.web.bean.EntityBeanTable;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.StaleStateException;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -1549,7 +1550,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 try {
                     boardUrl = getStudyBuildService().getCurrentBoardUrl(accessToken, study);
                     study.setBoardUrl(boardUrl);
-                    getStudyDao().update(study);
+                    try {
+                        getStudyDao().update(study);
+                    }
+                    catch (StaleStateException e) {
+                    }
                 }
                 catch (Exception e) {
                     logger.error(e.getMessage(), e);
