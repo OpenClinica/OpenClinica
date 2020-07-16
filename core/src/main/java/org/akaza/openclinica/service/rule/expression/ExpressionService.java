@@ -811,11 +811,11 @@ public class ExpressionService {
         return buildExpression + ruleExpression;
     }
 
-    private String getItemOidFromExpression(String expression) throws OpenClinicaSystemException {
+    public String getItemOidFromExpression(String expression) throws OpenClinicaSystemException {
         return getOidFromExpression(expression, 0, 0);
     }
 
-    private String getItemGroupOidFromExpression(String expression) throws OpenClinicaSystemException {
+    public String getItemGroupOidFromExpression(String expression) throws OpenClinicaSystemException {
         return getOidFromExpression(expression, 1, 1).replaceAll(BRACKETS_AND_CONTENTS, "");
     }
 
