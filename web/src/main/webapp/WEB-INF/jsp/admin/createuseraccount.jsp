@@ -225,7 +225,7 @@ function handleUserSource() {
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" id="userName" name="userName" value="<c:out value="${userName}"/>" size="20" class="formfieldM" />
+						<input type="text" autocomplete="off" id="userName" name="userName" value="<c:out value="${userName}"/>" size="20" class="formfieldM" />
 					</div></td>
 					<td><c:if test="${ldapEnabled}"><a class="ldapSelect" href="#"><img alt="<fmt:message key="createUserAccount.user.lookupLdap.tooltip" bundle="${resword}"/>" 
 					   title="<fmt:message key="createUserAccount.user.lookupLdap.tooltip" bundle="${resword}"/>" src="images/create_new.gif" border="0"></a>

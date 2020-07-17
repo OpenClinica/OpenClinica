@@ -69,7 +69,10 @@
                id="pwd.chars.min"
                name="pwd.chars.min"
                type="text"
-               value="${presetValues['pwd.chars.min']}" /></div>  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.chars.min" /></jsp:include></td>
+               value="<c:out value="${presetValues['pwd.chars.min']}"/>" />
+      </div>
+      <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.chars.min" /></jsp:include>
+    </td>
     <td><fmt:message bundle="${resword}" key="pwd_reqs_min_length_note" />
   </td>
   </tr>
@@ -81,7 +84,10 @@
                id="pwd.chars.max"
                name="pwd.chars.max"
                type="text"
-               value="${presetValues['pwd.chars.max']}" /></div><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.chars.max" /></jsp:include></td>
+               value="<c:out value="${presetValues['pwd.chars.max']}"/>" />
+      </div>
+      <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.chars.max" /></jsp:include>
+    </td>
     <td><fmt:message bundle="${resword}" key="pwd_reqs_max_length_note" /></td>
   </tr>
   <tr>
@@ -159,7 +165,7 @@
                id="pwd.expiration.days"
                name="pwd.expiration.days"
                type="text"
-               value="${presetValues['pwd.expiration.days']}" /></div>
+               value="<c:out value="${presetValues['pwd.expiration.days']}"/>" /></div>
     <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.expiration.days" /></jsp:include></td>
     <td><fmt:message bundle="${resword}" key="pwd_reqs_expiration_days_note"/></td>
   </tr>

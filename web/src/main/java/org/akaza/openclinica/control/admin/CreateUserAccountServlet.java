@@ -280,8 +280,8 @@ public class CreateUserAccountServlet extends SecureController {
                                 addPageMessage(respage.getString("there_was_an_error_sending_account_creating_mail"));
                             }
                         } else {
-                            addPageMessage(respage.getString("user_password") + ":<br/>" + password + "<br/> "
-                                + respage.getString("please_write_down_the_password_and_provide"));
+                            addPageMessage(respage.getString("user_password") + ":" + password);
+                            addPageMessage(respage.getString("please_write_down_the_password_and_provide"));
                         }
                     }
                 } else {
