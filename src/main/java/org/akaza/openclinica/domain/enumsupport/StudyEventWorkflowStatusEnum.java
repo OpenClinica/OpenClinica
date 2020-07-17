@@ -31,5 +31,12 @@ public enum StudyEventWorkflowStatusEnum {
         return mapObject.get(description);
     }
 
+    public static StudyEventWorkflowStatusEnum getByEnglishDescription(String description) {
+        HashMap<String, StudyEventWorkflowStatusEnum> mapObject = new HashMap<String, StudyEventWorkflowStatusEnum>();
+        for (StudyEventWorkflowStatusEnum theEnum : StudyEventWorkflowStatusEnum.values()) {
+            mapObject.put(theEnum.getEnglishDisplayValue(), theEnum);
+        }
+        return mapObject.get(description);
+    }
 
 }
